@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.gui.merge
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.customNeko
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
 import cc.mewcraft.wakame.util.*
@@ -25,6 +24,7 @@ import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
+import kotlin.properties.Delegates
 
 internal class MergingMenu(
     val table: MergingTable,
@@ -113,6 +113,14 @@ internal class MergingMenu(
         builder.addCloseHandler(::onWindowClose)
     }
 
+    /**
+     * 玩家是否已经确认取出合并后的物品.
+     * 这只是个标记, 具体的作用取决于实现.
+     */
+    private var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
+        logger.info("Confirmed status updated: $old -> $new")
+    }
+
     private enum class InputSlot {
         INPUT1, INPUT2
     }
@@ -149,6 +157,8 @@ internal class MergingMenu(
                 // 重新渲染放入容器的物品
                 e.newItem = renderInputSlot(added)
 
+                confirmed = false
+
                 executeReforge()
                 updateOutputSlot()
             }
@@ -167,6 +177,8 @@ internal class MergingMenu(
                         session.returnInputItem2(viewer)
                     }
                 }
+
+                confirmed = false
 
                 executeReforge()
                 updateOutputSlot()
@@ -199,6 +211,12 @@ internal class MergingMenu(
                         return
                     }
 
+                    if (!confirmed) {
+                        confirmed = true
+                        updateOutputSlot()
+                        return
+                    }
+
                     // 把合并后的物品递给玩家
                     viewer.inventory.addItem(*session.getFinalOutputs())
 
@@ -209,6 +227,7 @@ internal class MergingMenu(
 
                     // 重置会话状态
                     session.reset()
+                    confirmed = false
                 }
             }
         }
@@ -267,21 +286,22 @@ internal class MergingMenu(
             // 渲染成功的结果
 
             // 渲染输出的物品
-            val outputItemStack = result.output.apply {
-                val renderingContext = MergingTableContext.MergeOutputSlot(session)
-                ItemRenderers.MERGING_TABLE.render(this, renderingContext)
-            }.itemStack
-
-            return outputItemStack.edit {
+            val output = result.output
+            ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
+            return output.directEdit {
                 itemName = "<white>结果: <green>就绪".mini
                 lore = lore.orEmpty() + buildList {
                     add(empty())
                     addAll(result.reforgeType.description)
                     addAll(result.reforgeCost.description)
-                    add(empty())
-                    add(clickToMerge)
+
+                    if (confirmed) {
+                        add(empty())
+                        add(clickToMerge)
+                    }
                 }.removeItalic
             }
+
         } else {
             // 渲染失败的结果
 

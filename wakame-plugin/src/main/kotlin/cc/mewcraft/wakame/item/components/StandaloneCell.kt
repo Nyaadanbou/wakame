@@ -45,15 +45,15 @@ data class StandaloneCell(
     private data class Codec(override val id: String) : ItemComponentType<StandaloneCell> {
         override fun read(holder: ItemComponentHolder): StandaloneCell? {
             val tag = holder.getTag() ?: return null
-            val id = tag.getString("id")
-            val cell = Cell.of(id, tag.getCompound("core"))
+            val id = tag.getString(TAG_ID)
+            val cell = Cell.of(id, tag.getCompound(TAG_CELL))
             return StandaloneCell(cell)
         }
 
         override fun write(holder: ItemComponentHolder, value: StandaloneCell) {
             holder.editTag { tag ->
                 tag.putString(TAG_ID, value.id)
-                tag.put(TAG_CORE, value.core.serializeAsTag())
+                tag.put(TAG_CELL, value.cell.serializeAsTag())
             }
         }
 
@@ -63,7 +63,7 @@ data class StandaloneCell(
 
         companion object {
             private const val TAG_ID = "id"
-            private const val TAG_CORE = "core"
+            private const val TAG_CELL = "cell"
         }
     }
 }

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
-import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
@@ -80,12 +79,13 @@ internal class SimpleRerollingSession(
         return result.toTypedArray()
     }
 
-    override fun getUnusedInputs(): Array<ItemStack> {
-        return emptyArray() // 未来可能会用到?
-    }
-
     override fun getFinalOutputs(): Array<ItemStack> {
-        TODO("Not yet implemented")
+        val reforgeResult = latestResult
+        if (reforgeResult.isSuccess) {
+            return arrayOf(reforgeResult.output.itemStack)
+        } else {
+            return emptyArray()
+        }
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -311,12 +311,12 @@ internal object Selection {
     ) : RerollingSession.Selection {
         override val rule: RerollingTable.CellRule
             get() = RerollingTable.CellRule.empty()
+        override val changeable: Boolean
+            get() = false
         override val template: Group<CoreBlueprint, ItemGenerationContext>
             get() = Group.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
-        override val changeable: Boolean
-            get() = false
         override var selected: Boolean
             set(_) = Unit
             get() = false
@@ -390,7 +390,7 @@ internal object SelectionMap : KoinComponent {
         val itemRule = session.table.itemRuleMap[sourceItem.id] ?: return empty(session)
 
         val selectionMap = Simple(session)
-        for ((id, cell) in cells) {
+        for ((id, _) in cells) {
 
             // 获取核孔的重造规则
             val cellRule = itemRule.cellRuleMap[id]
@@ -409,16 +409,6 @@ internal object SelectionMap : KoinComponent {
                 logger.info("Item cell '$id' does not support rerolling.")
                 selectionMap[id] = Selection.unchangeable(session, id)
                 continue
-            }
-
-            val display = ItemStack(CoreIcons.get(cell.hashCode()))
-            display.editMeta {
-                // TODO reforge2
-                val name = cell.getId().mini
-                val lore = listOf(cell.getCore().id.asString().mini)
-                it.itemName(name)
-                it.lore(lore)
-                it.hideAllFlags()
             }
 
             val selection = Selection.changeable(
@@ -445,13 +435,13 @@ internal object SelectionMap : KoinComponent {
             get() = emptySet()
         override val values: Collection<RerollingSession.Selection>
             get() = emptyList()
-        override val isEmpty: Boolean
-            get() = true
 
-        override fun get(id: String): RerollingSession.Selection? =
-            null
+        override fun get(id: String): RerollingSession.Selection =
+            // 对于任何核孔, 返回 unchangeable
+            Selection.unchangeable(session, id)
 
         override fun contains(id: String): Boolean =
+            // 对于任何核孔, 都返回 false
             false
 
         override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> =
@@ -475,11 +465,9 @@ internal object SelectionMap : KoinComponent {
             get() = data.keys
         override val values: Collection<RerollingSession.Selection>
             get() = data.values
-        override val isEmpty: Boolean
-            get() = data.isEmpty()
 
-        override fun get(id: String): RerollingSession.Selection? {
-            return data[id]
+        override fun get(id: String): RerollingSession.Selection {
+            return data[id] ?: Selection.unchangeable(session, id)
         }
 
         // exposed for implementation

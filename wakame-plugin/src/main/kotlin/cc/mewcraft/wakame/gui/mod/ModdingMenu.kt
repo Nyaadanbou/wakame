@@ -8,7 +8,9 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -111,7 +113,6 @@ internal class ModdingMenu(
 
     /**
      * 玩家是否已经确认取出定制后的物品.
-     *
      * 这只是个标记, 具体的作用取决于实现.
      */
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
@@ -254,15 +255,16 @@ internal class ModdingMenu(
 
                     // 玩家必须先确认才能完成定制
                     if (!confirmed) {
-                        val confirmIcon = renderOutputSlotForConfirm(reforgeResult)
-                        setOutputSlot(confirmIcon)
                         confirmed = true
+                        setOutputSlot(renderOutputSlotForConfirm(reforgeResult))
                         return
                     }
 
                     // 检查玩家是否有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        viewer.sendMessage(GuiMessages.MESSAGE_INSUFFICIENT_RESOURCES)
+                        setOutputSlot(ItemStack.of(Material.BARRIER).edit {
+                            itemName = text { content("资源不足!"); color(NamedTextColor.RED) }
+                        })
                         return
                     }
 
@@ -274,14 +276,12 @@ internal class ModdingMenu(
 
                     // 重置会话状态
                     session.reset()
+                    confirmed = false
 
                     // 清空菜单内容
                     setInputSlot(null)
                     setOutputSlot(null)
                     setReplaceGuis(null)
-
-                    // 重置确认状态
-                    confirmed = false
                 }
 
                 // 如果结果失败的话:

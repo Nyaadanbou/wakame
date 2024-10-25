@@ -48,12 +48,12 @@ private constructor(
         // 获取核孔的选择状态
         // 如果没有可重造的核孔, 返回一个失败结果
         val selectionMap = session.selectionMap
-        if (selectionMap.isEmpty || selectionMap.values.all { !it.changeable }) {
+        if (!selectionMap.values.any { it.changeable }) {
             return ReforgeResult.failure("<gray>物品无法重造.".mini)
         }
 
         // 如果没有选择任何核孔, 返回一个失败结果
-        if (selectionMap.values.all { !it.selected }) {
+        if (!selectionMap.values.any { it.selected }) {
             return ReforgeResult.failure("<gray>没有要重造的核孔.".mini)
         }
 

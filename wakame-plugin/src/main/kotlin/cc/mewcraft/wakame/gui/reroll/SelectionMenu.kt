@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.item.getCell
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
+import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.removeItalic
-import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
@@ -68,18 +69,12 @@ private constructor(
             val cellId = selection.id
             val cell = sourceItem.getCell(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))
             val core = cell.getCore()
-            val icon = CoreIcons.get(core).edit {
-                itemName = core.displayName
-                lore = buildList {
-                    add(text {
-                        content("惩罚: ").color(NamedTextColor.GRAY)
-                        append(text(cell.getReforgeHistory().rerollCount).color(NamedTextColor.RED))
-                    })
-                    addAll(core.description)
-                }.removeItalic
-            }
+            val icon = CoreIcons.getNekoStack(core)
+            icon.directEdit { itemName = core.displayName }
+            icon.setStandaloneCell(StandaloneCell(cell))
+            ItemRenderers.REROLLING_TABLE.render(icon, RerollingTableContext(session))
 
-            return ItemWrapper(icon)
+            return ItemWrapper(icon.unsafe.handle)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -111,22 +106,10 @@ private constructor(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            val selectedId = selection.id
-            if (selection.invert()) {
-                parent.viewer.sendMessage(text {
-                    content("核孔 [")
-                    append(getCoreDisplayNameBy(selectedId))
-                    append(text("] 将被重造."))
-                })
-            } else {
-                parent.viewer.sendMessage(text {
-                    content("核孔 [")
-                    append(getCoreDisplayNameBy(selectedId))
-                    append(text("] 将保持不变."))
-                })
-            }
+            selection.invert()
 
             // 执行一次重造, 并更新主菜单
+            parent.confirmed = false
             parent.executeReforge()
             parent.updateOutput()
 

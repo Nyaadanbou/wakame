@@ -99,11 +99,6 @@ interface RerollingSession : Examinable {
     fun getAllInputs(): Array<ItemStack>
 
     /**
-     * 返回输入进菜单但未使用的物品.
-     */
-    fun getUnusedInputs(): Array<ItemStack>
-
-    /**
      * 返回本会话产生的最终物品输出, 无论是重造成功还是失败.
      * 如果重造成功, 这包括了重造成功后的物品, 以及所有未使用的耗材.
      * 如果重造失败, 则包括了需要被重造的物品, 以及输入的所有耗材.
@@ -176,6 +171,11 @@ interface RerollingSession : Examinable {
         val rule: RerollingTable.CellRule
 
         /**
+         * 核孔是否可以被重造.
+         */
+        val changeable: Boolean
+
+        /**
          * 用于重新随机核孔核心的掉落表.
          */
         val template: Group<CoreBlueprint, ItemGenerationContext>
@@ -184,11 +184,6 @@ interface RerollingSession : Examinable {
          * 核孔花费的计算函数.
          */
         val total: MochaFunction
-
-        /**
-         * 核孔是否可以被重造.
-         */
-        val changeable: Boolean
 
         /**
          * 记录了该核孔是否被选择重造.
@@ -221,13 +216,26 @@ interface RerollingSession : Examinable {
          */
         val session: RerollingSession
 
+        /**
+         * 在配置文件中存在定义的核孔的数量.
+         */
         val size: Int
+
+        /**
+         * 在配置文件中存在定义的核孔的 id.
+         */
         val keys: Set<String>
+
+        /**
+         * 所有核孔的 [Selection].
+         */
         val values: Collection<Selection>
 
-        val isEmpty: Boolean
-
-        operator fun get(id: String): Selection?
+        /**
+         * 获得指定核孔的 [Selection].
+         * 该函数对于任意 id 都会返回一个 [Selection].
+         */
+        operator fun get(id: String): Selection
         operator fun contains(id: String): Boolean
     }
 }

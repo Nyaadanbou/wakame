@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.NekoItemHolder
-import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRenderContext
+import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRendererContext
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.components.cells.*
 import org.bukkit.inventory.ItemStack
@@ -23,7 +23,7 @@ internal object CoreIcons {
             else -> NekoItemHolder.get(DEFAULT_ITEM_ID)
         }
         val nekoStack = holder.createNekoStack()
-        ItemRenderers.SIMPLE.render(nekoStack, SimpleItemRenderContext())
+        ItemRenderers.SIMPLE.render(nekoStack, SimpleItemRendererContext())
         return nekoStack
     }
 

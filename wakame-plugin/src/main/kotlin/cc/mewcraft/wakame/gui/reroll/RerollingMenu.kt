@@ -8,7 +8,9 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -26,6 +28,7 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
+import kotlin.properties.Delegates
 
 /**
  * 重造台的主菜单, 也是玩家打开重造台后的代码入口.
@@ -53,8 +56,7 @@ internal class RerollingMenu(
      * 基于 [session] 的当前状态刷新输出容器.
      */
     fun updateOutput() {
-        val itemStack = renderOutputSlot()
-        setOutputSlot(itemStack)
+        setOutputSlot(renderOutputSlot())
     }
 
     /**
@@ -92,6 +94,14 @@ internal class RerollingMenu(
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
+    }
+
+    /**
+     * 玩家是否已经确认取出重造后的物品.
+     * 这只是个标记, 具体的作用取决于实现.
+     */
+    var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
+        logger.info("Confirmed status updated: $old -> $new")
     }
 
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
@@ -138,6 +148,7 @@ internal class RerollingMenu(
 
                 // 重置会话的状态
                 session.reset()
+                confirmed = false
 
                 // 清空菜单内容
                 setInputSlot(null)
@@ -183,19 +194,28 @@ internal class RerollingMenu(
 
                 // 再次更新输出容器
                 // 因为此时玩家所持有的资源可能发生了变化 (例如突然收到了一笔金币)
-                updateOutput()
+                if (!confirmed) {
+                    confirmed = true
+                    updateOutput()
+                    return
+                } else {
+                    updateOutput()
+                }
 
                 // 判断玩家是否有足够的资源
                 if (!result.reforgeCost.test(viewer)) {
-                    viewer.sendMessage(GuiMessages.MESSAGE_INSUFFICIENT_RESOURCES)
+                    setOutputSlot(ItemStack.of(Material.BARRIER).edit {
+                        itemName = text { content("资源不足!"); color(NamedTextColor.RED) }
+                    })
                     return
                 }
 
                 // 把重造后的源物品给玩家
-                viewer.inventory.addItem(result.output.itemStack) // TODO getFinalOutputs
+                viewer.inventory.addItem(*session.getFinalOutputs())
 
                 // 重置会话状态
                 session.reset()
+                confirmed = false
 
                 // 清空菜单内容
                 setInputSlot(null)
@@ -223,7 +243,9 @@ internal class RerollingMenu(
     }
 
     private fun createSelectionMenus(): List<Gui> {
-        return session.selectionMap.map { (_, sel) -> SelectionMenu(this, sel) }
+        return session.selectionMap.values
+            .filter { selection -> selection.changeable /* 只为可被重造的核孔创建菜单 */ }
+            .map { selection -> SelectionMenu(this, selection) }
     }
 
     private fun setSelectionMenus(guis: List<Gui>?) {
@@ -243,7 +265,7 @@ internal class RerollingMenu(
      * 渲染 [RerollingMenu.inputSlot] 里面的内容.
      */
     private fun renderInputSlot(source: NekoStack): ItemStack {
-        val context = RerollingTableContext(RerollingTableContext.Slot.INPUT, session)
+        val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
         ItemRenderers.REROLLING_TABLE.render(source, context)
         return source.itemStack
     }
@@ -262,14 +284,16 @@ internal class RerollingMenu(
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
             val previewItem = session.inputItem?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
-            ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(RerollingTableContext.Slot.OUTPUT, session))
-
+            ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
             return previewItem.directEdit {
                 lore = lore.orEmpty() + buildList {
                     add(empty())
                     addAll(result.reforgeCost.description)
-                    add(empty())
-                    add("<gray>[<aqua>点击确认重造</aqua>]".mini)
+
+                    if (confirmed) {
+                        add(empty())
+                        add("<gray>[<aqua>点击确认重造</aqua>]".mini)
+                    }
                 }.removeItalic
             }
 

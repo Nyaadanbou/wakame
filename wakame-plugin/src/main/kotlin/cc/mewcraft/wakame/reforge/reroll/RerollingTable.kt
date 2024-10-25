@@ -143,12 +143,12 @@ interface RerollingTable : Examinable {
 /* Internals */
 
 
-private object EmptyCellRule : RerollingTable.CellRule {
+private object EmptyCellRule : CellRule {
     override val maxReroll: Int = 0
-    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { .0 } }
+    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { Double.NaN } }
 }
 
-private object EmptyCellRuleMap : RerollingTable.CellRuleMap {
-    override fun get(key: String): RerollingTable.CellRule? = null
+private object EmptyCellRuleMap : CellRuleMap {
+    override fun get(key: String): CellRule? = null
     override fun contains(key: String): Boolean = false
 }

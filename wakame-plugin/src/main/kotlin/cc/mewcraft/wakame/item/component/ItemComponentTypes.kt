@@ -198,6 +198,12 @@ internal object ItemComponentTypes {
     val SKIN_OWNER: ItemComponentType<ItemSkinOwner> = dummy<ItemSkinOwner>(ItemConstants.SKIN_OWNER).register()
 
     /**
+     * 独立存在的核孔.
+     */
+    @JvmField
+    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CORE).register()
+
+    /**
      * 附魔书内存储的魔咒.
      *
      * 对应原版组件: [`minecraft:stored_enchantments`](https://minecraft.wiki/w/Data_component_format#stored_enchantments)

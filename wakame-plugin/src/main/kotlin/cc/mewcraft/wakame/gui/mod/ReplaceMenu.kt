@@ -205,7 +205,10 @@ private constructor(
                             text { content(" (不可修改)"); color(NamedTextColor.RED) }
                         )
                     }
-                lore = core.description
+                lore = buildList {
+                    addAll(core.description)
+                    // TODO reforge2 渲染惩罚值
+                }
             }
 
             return ItemWrapper(coreIcon)

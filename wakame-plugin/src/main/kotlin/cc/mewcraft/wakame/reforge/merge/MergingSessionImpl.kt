@@ -174,7 +174,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(): MergingSession.ReforgeResult {
-        return Simple(false, "<gray>没有输入.".mini, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
+        return Simple(false, "<gray>没有要合并的核心.".mini, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
     }
 
     /**

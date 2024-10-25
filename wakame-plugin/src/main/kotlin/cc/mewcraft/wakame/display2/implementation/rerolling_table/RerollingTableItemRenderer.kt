@@ -34,11 +34,11 @@ internal class RerollingTableRendererFormats(renderer: RerollingTableItemRendere
 internal class RerollingTableRendererLayout(renderer: RerollingTableItemRenderer) : AbstractRendererLayout(renderer)
 
 internal data class RerollingTableContext(
-    val slot: Slot,
     val session: RerollingSession,
+    val slot: Slot = Slot.UNDEFINED,
 ) {
     enum class Slot {
-        INPUT, OUTPUT, SELECTION
+        INPUT, OUTPUT, UNDEFINED
     }
 }
 
@@ -55,9 +55,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
     }
 
     override fun render(item: NekoStack, context: RerollingTableContext?) {
-        // TODO display2 RerollingTable
-        // Selection#display 渲染核心本身,渲染已重造次数,渲染最大重造次数
-
         requireNotNull(context) { "context" }
 
         item.isClientSide = false
@@ -70,16 +67,16 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
         val components = item.components
         components.process(ItemComponentTypes.CELLS) { data -> for ((id, cell) in data) renderCore(collector, id, cell, context) }
+        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingParts.STANDALONE_CELL.process(collector, data, context) }
         components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> RerollingTableRenderingParts.RARITY.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
         val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
-        item.erase()
+        item.erase() // 这是呈现给玩家的最后一环, 可以 erase
 
         item.directEdit {
-            customName = null
             lore = itemLore
             customModelData = itemCustomModelData
             showNothing()
@@ -106,7 +103,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
                 }
             }
 
-            RerollingTableContext.Slot.SELECTION -> TODO()
+            RerollingTableContext.Slot.UNDEFINED -> {}
         }
     }
 }
@@ -166,6 +163,16 @@ internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItem
 
     @JvmField
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
+
+    @JvmField
+    val STANDALONE_CELL: RenderingPart2<StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { data, context, format ->
+        val selectionMap = context.session.selectionMap
+        val penaltyLimit = selectionMap[data.id]?.rule?.maxReroll ?: 0
+        format.render(data, rerollPenaltyLimit = penaltyLimit)
+    }
+
+    // TODO 让渲染器负责渲染重造的花费
+    // val REFORGE_COST
 }
 
 
@@ -213,7 +220,7 @@ internal data class DifferenceFormats(
      */
     fun render(id: String, source: List<Component>, context: RerollingTableContext): List<Component> {
         val selectionMap = context.session.selectionMap
-        val selection = selectionMap[id] ?: error("Missing rerolling selection for cell '$id'")
+        val selection = selectionMap[id]
 
         var result = source
 
