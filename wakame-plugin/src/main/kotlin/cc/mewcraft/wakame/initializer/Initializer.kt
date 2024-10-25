@@ -27,7 +27,6 @@ import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
-import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.user.PaperUserManager
@@ -141,7 +140,6 @@ object Initializer : KoinComponent, Listener {
         registerListenerAndBind<ItemChangeListener>()
         registerListenerAndBind<ItemBehaviorListener>()
         registerListenerAndBind<ItemMiscellaneousListener>()
-        registerListenerAndBind<FuckOffHandListener>()
         registerListenerAndBind<ComponentListener>()
 
         // attribute

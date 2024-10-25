@@ -75,48 +75,47 @@ object DamageManager : KoinComponent {
 
                 val itemStack = causingEntity.inventory.itemInMainHand
                 val attack = itemStack.tryNekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
-                if (attack != null) {
-                    // 玩家手中的物品是 Attack
-                    when (event.cause) {
-                        DamageCause.ENTITY_ATTACK -> {
-                            // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
-                            // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
+                when (event.cause) {
+                    DamageCause.ENTITY_ATTACK -> {
+                        // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
+                        // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
+                        if (attack != null) {
+                            // 玩家手中的物品是 Attack
                             return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
-                        }
-
-                        DamageCause.ENTITY_SWEEP_ATTACK -> {
-                            // TODO 横扫的临时实现, 等待麻将的组件化
-                            // 需要Attack物品的攻击特效是“sword”才能打出横扫伤害
-                            val attackType = attack.attackType
-                            if (attackType is SwordAttack) {
-                                val attributeMap = causingEntity.toUser().attributeMap
-                                return PlayerDamageMetadata(
-                                    damager = causingEntity,
-                                    damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
-                                    damageBundle = damageBundle(attributeMap) {
-                                        every {
-                                            standard()
-                                            rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
-                                        }
-                                    }
-                                )
-                            } else {
-                                // 取消Bukkit伤害事件
-                                event.isCancelled = true
-                                // 返回null是为了供外部识别以不触发neko伤害事件
-                                return null
-                            }
-                        }
-
-                        else -> {
-                            // 其他Cause的玩家伤害
-                            // 不应该发生
-                            return warnAndDefaultReturn(event)
+                        } else {
+                            // 手中的物品无Attack行为甚至不是NekoStack
+                            return PlayerDamageMetadata.default(causingEntity)
                         }
                     }
-                } else {
-                    // 手中的物品无Attack行为甚至不是NekoStack
-                    return PlayerDamageMetadata.default(causingEntity)
+
+                    DamageCause.ENTITY_SWEEP_ATTACK -> {
+                        // TODO 横扫的临时实现, 等待麻将的组件化
+                        // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
+                        if (attack?.attackType is SwordAttack) {
+                            val attributeMap = causingEntity.toUser().attributeMap
+                            return PlayerDamageMetadata(
+                                damager = causingEntity,
+                                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
+                                damageBundle = damageBundle(attributeMap) {
+                                    every {
+                                        standard()
+                                        rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
+                                    }
+                                }
+                            )
+                        } else {
+                            // 取消Bukkit伤害事件
+                            event.isCancelled = true
+                            // 返回null是为了供外部识别以不触发neko伤害事件
+                            return null
+                        }
+                    }
+
+                    else -> {
+                        // 其他Cause的玩家伤害
+                        // 不应该发生
+                        return warnAndDefaultReturn(event)
+                    }
                 }
             }
             // 来源实体是非玩家生物
@@ -399,7 +398,7 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity?, kno
 
     // 触发一下bukkit的伤害事件
     // 伤害填多少都无所谓, 最后都是要neko伤害事件重新算
-    this.damage(4.0, source)
+    this.damage(4.95, source)
 }
 
 /**

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.LivingEntity
@@ -22,7 +23,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.bukkit.inventory.EquipmentSlot
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -57,17 +57,12 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
     }
 
     @EventHandler
-    fun on(event: PlayerInteractEvent) {
+    fun on(wrappedEvent: WrappedPlayerInteractEvent) {
+        val event = wrappedEvent.event
         val item = event.item ?: return
         val nekoStack = item.tryNekoStack ?: return
-        //TODO 主副手交互冲突问题
-        if (event.hand == EquipmentSlot.OFF_HAND) {
-            if (event.player.inventory.itemInMainHand.tryNekoStack?.behaviors != null) {
-                return
-            }
-        }
         nekoStack.behaviors.forEach { behavior ->
-            behavior.handleInteract(event.player, item, event.action, event)
+            behavior.handleInteract(event.player, item, event.action, wrappedEvent)
         }
     }
 

@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -33,7 +33,7 @@ sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品进行交互事件时执行的逻辑.
      */
-    fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, event: PlayerInteractEvent) = Unit
+    fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 }
 
 /**

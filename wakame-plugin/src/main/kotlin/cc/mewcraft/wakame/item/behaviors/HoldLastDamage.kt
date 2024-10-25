@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.Skill
 import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.entity.Entity
@@ -15,7 +16,6 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
@@ -26,8 +26,8 @@ interface HoldLastDamage : ItemBehavior {
             tryCancelEvent(itemStack, player, event)
         }
 
-        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
-            tryCancelEvent(itemStack, player, wrappedEvent)
+        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+            tryCancelEvent(itemStack, player, wrappedEvent.event)
         }
 
         override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {

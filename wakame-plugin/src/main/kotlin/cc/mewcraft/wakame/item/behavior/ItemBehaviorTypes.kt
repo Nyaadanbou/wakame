@@ -32,7 +32,7 @@ object ItemBehaviorTypes {
     val FOOD: ItemBehaviorType<Food> = Food
 
     /**
-     * 当玩家的冒险等级 < 物品等级时, 禁用物品的逻辑.
+     * 物品剩余最后一点耐久进入“损坏状态”而不是消失的逻辑.
      */
     val HOLD_LAST_DAMAGE: ItemBehaviorType<HoldLastDamage> = HoldLastDamage
 

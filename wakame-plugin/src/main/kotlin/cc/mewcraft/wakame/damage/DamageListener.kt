@@ -116,23 +116,4 @@ object DamageListener : Listener, KoinComponent {
             event.isCancelled = true
         }
     }
-
-    /* @EventHandler
-    fun on(event: PlayerInteractEntityEvent) {
-        val player = event.player
-        val entity = event.rightClicked
-        if (event.hand != EquipmentSlot.HAND) return
-        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
-        if (entity is LivingEntity) {
-            entity.applyCustomDamage(
-                CustomDamageMetadata(
-                    1.0, false, false,
-                    listOf(
-                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
-                    )
-                ),
-                player
-            )
-        }
-    } */
 }

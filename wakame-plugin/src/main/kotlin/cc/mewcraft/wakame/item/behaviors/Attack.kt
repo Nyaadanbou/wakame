@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
  */
 interface Attack : ItemBehavior {
     private object Default : Attack {
-        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: PlayerInteractEvent) {
+        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
             val nekoStack = itemStack.toNekoStack
             val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
             attack.attackType.handleInteract(player, nekoStack, action, wrappedEvent)
