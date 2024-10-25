@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
-import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HasItemCondition
-import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HoldingCondition
+import cc.mewcraft.wakame.compatibility.mythicmobs.condition.*
 import cc.mewcraft.wakame.compatibility.mythicmobs.drop.NekoDrop
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.*
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -21,6 +20,7 @@ class MythicMobsListener : Listener {
         when (e.conditionName.lowercase()) {
             "nekohasitem" -> e.registerCondition(::HasItemCondition)
             "nekoholding" -> e.registerCondition(::HoldingCondition)
+            "nekolevel" -> e.registerCondition(::LevelCondition)
         }
     }
 
