@@ -196,8 +196,7 @@ private constructor(
         override fun getItemProvider(): ItemProvider {
             val core = replace.cell.getCore()
             val changeable = replace.changeable
-            val coreIcon = CoreIcons.get(core)
-            val itemStack = coreIcon.edit {
+            val coreIcon = CoreIcons.getItemStack(core).edit {
                 itemName =
                     if (changeable) {
                         core.displayName
@@ -209,7 +208,7 @@ private constructor(
                 lore = core.description
             }
 
-            return ItemWrapper(itemStack)
+            return ItemWrapper(coreIcon)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
