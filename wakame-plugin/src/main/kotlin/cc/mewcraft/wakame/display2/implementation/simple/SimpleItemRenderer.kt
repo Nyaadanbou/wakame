@@ -15,9 +15,9 @@ import java.nio.file.Path
 internal class SimpleItemRendererFormats : AbstractRendererFormats(SimpleItemRenderer)
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-internal class SimpleItemRenderContext
+internal class SimpleItemRendererContext
 
-internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRenderContext>() {
+internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormats = SimpleItemRendererFormats()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()
@@ -29,7 +29,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: NekoStack, context: SimpleItemRenderContext?) {
+    override fun render(item: NekoStack, context: SimpleItemRendererContext?) {
         requireNotNull(context) { "context" }
 
         item.isClientSide = false
@@ -43,8 +43,6 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
 
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
-
-        item.erase()
 
         item.directEdit {
             lore = itemLore
