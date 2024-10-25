@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.SkillEventHandler
 import cc.mewcraft.wakame.util.takeUnlessEmpty
+import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -19,10 +20,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -63,6 +61,15 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         val nekoStack = item.tryNekoStack ?: return
         nekoStack.behaviors.forEach { behavior ->
             behavior.handleInteract(event.player, item, event.action, wrappedEvent)
+        }
+    }
+
+    @EventHandler
+    fun on(event: PlayerInteractAtEntityEvent) {
+        val item = event.player.inventory.itemInMainHand.takeUnlessEmpty()
+        val nekoStack = item?.tryNekoStack ?: return
+        nekoStack.behaviors.forEach { behavior ->
+            behavior.handleEntityInteract(event.player, item, event.rightClicked, event)
         }
     }
 
@@ -126,6 +133,15 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
     }
 
     @EventHandler
+    fun on(event: PlayerStopUsingItemEvent) {
+        val item = event.item.takeUnlessEmpty() ?: return
+        val nekoStack = item.tryNekoStack ?: return
+        nekoStack.behaviors.forEach { behavior ->
+            behavior.handleRelease(event.player, item, event)
+        }
+    }
+
+    @EventHandler
     fun on(event: PlayerItemConsumeEvent) {
         val item = event.item.takeUnlessEmpty() ?: return
         val nekoStack = item.tryNekoStack ?: return
@@ -151,7 +167,6 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 // FIXME 合并到 [ItemChangeListener] 或 [ItemBehaviorListener] 中去
 internal class ItemMiscellaneousListener : KoinComponent, Listener {
     private val skillEventHandler: SkillEventHandler by inject()
-
 
     //<editor-fold desc="Skills">
     @EventHandler
