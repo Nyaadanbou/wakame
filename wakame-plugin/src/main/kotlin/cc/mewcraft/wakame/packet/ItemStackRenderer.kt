@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.display.PacketItemRenderer
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.StandardContext
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
