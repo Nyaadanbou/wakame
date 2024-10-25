@@ -134,6 +134,10 @@ components:
     enabled: true
     display_name: "皮肤所有者"
 
+  standalone_cell:
+    enabled: true
+    display_name: "独立核孔"
+
   stored_enchantments:
     enabled: true
     display_name: "存储的附魔"

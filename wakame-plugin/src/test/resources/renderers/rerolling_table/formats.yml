@@ -104,6 +104,20 @@ cells/empty/out:
     unselected:
       style: "<!i><dark_gray>"
 
+# id: `standalone_cell`
+standalone_cell:
+  namespace: reforge
+  # 可用标签
+  # <mod_penalty> 定制惩罚
+  # <max_mod_penalty> 最大定制惩罚 (dev: 从 ctx 解析)
+  # <reroll_penalty> 重造惩罚
+  # <max_reroll_penalty> 最大重造惩罚 (dev: 从 ctx 解析)
+  history:
+    - "惩罚: <reroll_penalty> / <max_reroll_penalty>"
+  ordinal:
+    - core
+    - history
+
 # id: `custom_name`
 custom_name:
   namespace: vanilla
