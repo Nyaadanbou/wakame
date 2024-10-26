@@ -167,7 +167,7 @@ internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItem
     @JvmField
     val STANDALONE_CELL: RenderingPart2<StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { data, context, format ->
         val selectionMap = context.session.selectionMap
-        val penaltyLimit = selectionMap[data.id]?.rule?.maxReroll ?: 0
+        val penaltyLimit = selectionMap[data.id].rule.maxReroll
         format.render(data, rerollPenaltyLimit = penaltyLimit)
     }
 
