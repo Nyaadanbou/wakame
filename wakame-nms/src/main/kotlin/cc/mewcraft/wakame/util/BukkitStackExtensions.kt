@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.nbt.CompoundTag
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.ItemAttributeModifiers
@@ -11,6 +12,111 @@ private fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) 
     val oldData = get(type) ?: return
     val newData = block(oldData)
     set(type, newData)
+}
+
+class ItemStackDSL(
+    internal val target: ItemStack,
+) {
+    var itemName
+        get() =
+            target.itemName0
+        set(value) {
+            target.itemName0 = value
+        }
+
+    var customName
+        get() =
+            target.customName0
+        set(value) {
+            target.customName0 = value
+        }
+
+    var lore
+        get() =
+            target.lore0
+        set(value) {
+            target.lore0 = value
+        }
+
+    var customModelData
+        get() =
+            target.customModelData0
+        set(value) {
+            target.customModelData0 = value
+        }
+
+    var hideAdditionalTooltip: Boolean
+        get() = target.hideAdditionalTooltip0
+        set(value) {
+            target.hideAdditionalTooltip0 = value
+        }
+
+    var hideTooltip: Boolean
+        get() = target.hideTooltip0
+        set(value) {
+            target.hideTooltip0 = value
+        }
+
+    var customData: CompoundTag?
+        get() = target.nbt
+        set(value) {
+            target.nbt = value
+        }
+
+    fun showAttributeModifiers(value: Boolean) {
+        target.showAttributeModifiers(value)
+    }
+
+    fun showCanBreak(value: Boolean) {
+        target.showCanBreak(value)
+    }
+
+    fun showCanPlaceOn(value: Boolean) {
+        target.showCanPlaceOn(value)
+    }
+
+    fun showDyedColor(value: Boolean) {
+        target.showDyedColor(value)
+    }
+
+    fun showEnchantments(value: Boolean) {
+        target.showEnchantments(value)
+    }
+
+    fun showJukeboxPlayable(value: Boolean) {
+        target.showJukeboxPlayable(value)
+    }
+
+    fun showStoredEnchantments(value: Boolean) {
+        target.showStoredEnchantments(value)
+    }
+
+    fun showTrim(value: Boolean) {
+        target.showTrim(value)
+    }
+
+    fun showUnbreakable(value: Boolean) {
+        target.showUnbreakable(value)
+    }
+
+    fun showNothing() {
+        showAttributeModifiers(false)
+        showCanBreak(false)
+        showCanPlaceOn(false)
+        showDyedColor(false)
+        showEnchantments(false)
+        showJukeboxPlayable(false)
+        showStoredEnchantments(false)
+        showTrim(false)
+        showUnbreakable(false)
+    }
+}
+
+/**
+ * 直接修改一个 [ItemStack]. 暂时仅支持部分常用数据.
+ */
+fun ItemStack.edit(block: ItemStackDSL.() -> Unit): ItemStack {
+    return ItemStackDSL(this).apply(block).target
 }
 
 private val EMPTY_ATTRIBUTE_MODIFIERS = ItemAttributeModifiers.EMPTY.withTooltip(false)

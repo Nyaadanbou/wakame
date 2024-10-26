@@ -39,21 +39,21 @@ interface ModdingTable : Examinable {
     /**
      * 储存了本定制台支持的所有物品的定制规则.
      */
-    val itemRules: ItemRuleMap
+    val itemRuleMap: ItemRuleMap
 
     /**
-     * 封装了某个物品的定制规则.
+     * 封装了一个物品的定制规则.
      */
     interface ItemRule : Examinable {
         /**
-         * 本规则的目标萌芽物品的类型.
+         * 目标萌芽物品的 id.
          */
-        val target: Key
+        val itemId: Key
 
         /**
-         * 该物品每个词条栏的定制规则.
+         * 该物品每个核孔的定制规则.
          */
-        val cellRules: CellRuleMap
+        val cellRuleMap: CellRuleMap
     }
 
     /**
@@ -79,11 +79,11 @@ interface ModdingTable : Examinable {
     }
 
     /**
-     * 代表一个词条栏的定制规则.
+     * 代表一个核孔的定制规则.
      */
     interface CellRule : Examinable {
         /**
-         * 最多可以定制本词条栏多少次?
+         * 最多可以定制本核孔多少次?
          */
         val modLimit: Int
 
@@ -93,19 +93,19 @@ interface ModdingTable : Examinable {
         val requireElementMatch: Boolean
 
         /**
-         * 定制本词条栏所需要的货币.
+         * 定制本核孔所需要的货币.
          */
         val currencyCost: CurrencyCost<CellTotalFunction>
 
         /**
-         * 定制本词条栏所需要的前置权限.
+         * 定制本核孔所需要的前置权限.
          */
         val permission: String?
 
         /**
-         * 记录了哪些核心种类可以参与定制本词条栏.
+         * 记录了哪些核心种类可以参与定制本核孔.
          */
-        val acceptedCores: CoreMatchRuleContainer
+        val acceptableCores: CoreMatchRuleContainer
 
         companion object {
             fun empty(): CellRule = EmptyCellRule
@@ -113,9 +113,20 @@ interface ModdingTable : Examinable {
     }
 
     /**
-     * 代表一个映射, 储存了各个词条栏的定制规则.
+     * 储存了每个核孔的定制规则.
      */
     interface CellRuleMap : Examinable {
+        /**
+         * 关于核孔 id 的 [Comparator], 基于核孔在配置文件中的顺序.
+         */
+        val comparator: Comparator<String?>
+
+        /**
+         * 获取指定 [key] 的核孔定制规则.
+         *
+         * 如果返回的不是 `null`, 则我们说这个核孔在定制系统中存在定义.
+         * 否则, 我们说这个核孔在定制系统中不存在定义 (无法进行定制).
+         */
         operator fun get(key: String): CellRule?
 
         companion object {
@@ -152,7 +163,7 @@ interface ModdingTable : Examinable {
          */
         fun compile(
             session: ModdingSession,
-            replace: ModdingSession.Replace
+            replace: ModdingSession.Replace,
         ): MochaFunction
     }
 }
@@ -166,7 +177,7 @@ private object EmptyCellRule : ModdingTable.CellRule {
     override val requireElementMatch: Boolean = false
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = CurrencyCost
     override val permission: String? = null
-    override val acceptedCores: CoreMatchRuleContainer = CoreMatchRuleContainer.empty()
+    override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.empty()
 
     private object CurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
         override val total = ModdingTable.CellTotalFunction { _, _ -> MochaFunction { .0 } }
@@ -174,5 +185,6 @@ private object EmptyCellRule : ModdingTable.CellRule {
 }
 
 private object EmptyCellRuleMap : ModdingTable.CellRuleMap {
+    override val comparator: Comparator<String?> = nullsLast(naturalOrder())
     override fun get(key: String): ModdingTable.CellRule? = null
 }

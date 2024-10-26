@@ -35,7 +35,7 @@ import java.util.stream.Stream
 // 2. 如果 namespace 不是 *, 那么 path 是必须的. 这时应该根据 namespace 来返回对应的 CoreMatchRule
 
 /**
- * 词条栏的核心的匹配规则, 用于测试一个核心是否符合某种规则.
+ * 核孔的核心的匹配规则, 用于测试一个核心是否符合某种规则.
  */
 interface CoreMatchRule : Examinable {
     /**

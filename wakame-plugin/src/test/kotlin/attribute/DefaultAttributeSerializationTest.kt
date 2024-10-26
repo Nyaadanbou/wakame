@@ -1,13 +1,9 @@
 package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.DefaultAttributes
-import cc.mewcraft.wakame.attribute.attributeModule
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry.*
 import io.mockk.mockk
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
@@ -17,10 +13,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import testEnv
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class DefaultAttributeSerializationTest : KoinTest {
     companion object {
@@ -48,7 +41,7 @@ class DefaultAttributeSerializationTest : KoinTest {
 
             ElementRegistry.onPreWorld()
             AttributeRegistry.onPreWorld()
-            DefaultAttributes.onPostWorld()
+            DefaultAttributes.onPreWorld()
         }
 
         @JvmStatic

@@ -2,7 +2,7 @@
 
 # id: `custom_name`
 custom_name:
-  namespace: "general"
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "定制名: <value>"
@@ -20,23 +20,50 @@ elements:
 
 # id: `item_name`
 item_name:
-  namespace: "vanilla"
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
   tooltip: "物品名: <value>"
 
 # id: `level`
 level:
-  namespace: "general"
+  namespace: general
   # 可用标签
   # <value> 等级值
   tooltip: "等级: <value>"
 
-# id: `portable_core`
-portable_core:
-  namespace: general
+# id: `merge_input`
+merge_input:
+  namespace: reforge
+  # 可用标签
+  # <penalty> 惩罚
+  tooltip: "惩罚: <penalty>"
+  # 顺序
+  ordinal:
+    - core
+    - penalty
+
+# id: `merge_output`
+merge_output:
+  namespace: reforge
+  # 便携核心的惩罚的渲染格式
+  # 可用标签
+  # <penalty> 惩罚
+  penalty_format: "惩罚: <penalty>"
+  # 内容的整体顺序
+  # - core 是核心的数值描述
+  # - penalty 是其惩罚值的描述
+  overall_ordinal:
+    - core
+    - penalty
+  # 便携核心的数值的混淆格式
+  obfuscation:
+    # 要混淆的模式 (regex)
+    pattern: "[+-]?\\d+(\\.\\d+)?"
+    # 混淆后的内容
+    replacement: "???"
 
 # id: `rarity`
 rarity:
-  namespace: "general"
+  namespace: general
   tooltip: "稀有度: <value>"

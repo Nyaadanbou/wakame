@@ -6,13 +6,13 @@ import cc.mewcraft.wakame.item.ReforgeBinaryKeys
 import cc.mewcraft.wakame.util.CompoundTag
 
 // 开发日记 2024/7/5
-// 经过讨论, 一个特定的词条栏的重铸配置应该是在配置文件里指定的 (通过词条栏的 id),
+// 经过讨论, 一个特定的核孔的重铸配置应该是在配置文件里指定的 (通过核孔的 id),
 // 而不应该把重铸配置记录在物品的 NBT 里; NBT 只储存重铸的历史数据.
-// 我们一致认为这样的架构是最好的 - 它既能随时修改词条栏的重铸选项,
-// 也可以让词条栏的重铸变成一个支持持久状态的流程.
+// 我们一致认为这样的架构是最好的 - 它既能随时修改核孔的重铸选项,
+// 也可以让核孔的重铸变成一个支持持久状态的流程.
 
 /**
- * 词条栏的重铸历史数据.
+ * 核孔的重铸历史数据.
  *
  * 该对象不可变, 所有的修改操作都会返回一个新的 [ReforgeHistory] 实例.
  */
@@ -23,32 +23,32 @@ interface ReforgeHistory : BinarySerializable<CompoundTag> {
     val isEmpty: Boolean
 
     /**
-     * 该词条栏有史以来被*定制*的次数.
+     * 该核孔有史以来被*定制*的次数.
      */
     val modCount: Int
 
     /**
-     * 设置该词条栏有史以来被*定制*的次数.
+     * 设置该核孔有史以来被*定制*的次数.
      */
     fun setModCount(value: Int): ReforgeHistory
 
     /**
-     * 增加该词条栏有史以来被*定制*的次数.
+     * 增加该核孔有史以来被*定制*的次数.
      */
     fun addModCount(value: Int): ReforgeHistory
 
     /**
-     * 该词条栏有史以来被*重造*的次数.
+     * 该核孔有史以来被*重造*的次数.
      */
     val rerollCount: Int
 
     /**
-     * 设置该词条栏有史以来被*重造*的次数.
+     * 设置该核孔有史以来被*重造*的次数.
      */
     fun setRerollCount(value: Int): ReforgeHistory
 
     /**
-     * 增加该词条栏有史以来被*重造*的次数.
+     * 增加该核孔有史以来被*重造*的次数.
      */
     fun addRerollCount(value: Int): ReforgeHistory
 

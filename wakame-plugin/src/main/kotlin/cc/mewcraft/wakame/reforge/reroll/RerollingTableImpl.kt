@@ -16,6 +16,8 @@ import java.util.stream.Stream
  * 一个无限制的 [RerollingTable] 实现.
  */
 internal object WtfRerollingTable : RerollingTable {
+    private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
+
     override val identifier: String = "wtf"
 
     override val enabled: Boolean = true
@@ -23,8 +25,6 @@ internal object WtfRerollingTable : RerollingTable {
     override val title: Component = Component.text("Rerolling Table (Cheat ON)")
 
     override val rarityNumberMapping: RarityNumberMapping = RarityNumberMapping.constant(1.0)
-
-    private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
 
     override val currencyCost: RerollingTable.TableCurrencyCost = RerollingTable.TableCurrencyCost { ZERO_MOCHA_FUNCTION }
 
@@ -41,6 +41,7 @@ internal object WtfRerollingTable : RerollingTable {
     }
 
     private data object AnyCellRuleMap : RerollingTable.CellRuleMap {
+        override val comparator: Comparator<String?> = nullsLast(naturalOrder())
         override fun get(key: String): RerollingTable.CellRule = AnyCellRule
         override fun contains(key: String): Boolean = true
     }
@@ -86,18 +87,22 @@ internal class SimpleRerollingTable(
     }
 
     data class CellRuleMap(
-        private val map: Map<String, RerollingTable.CellRule>,
+        private val data: LinkedHashMap<String, RerollingTable.CellRule>,
     ) : RerollingTable.CellRuleMap {
+
+        private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
+        override val comparator: Comparator<String?> = nullsLast(compareBy(keyOrder::get))
+
         override fun get(key: String): RerollingTable.CellRule? {
-            return map[key]
+            return data[key]
         }
 
         override fun contains(key: String): Boolean {
-            return map.containsKey(key)
+            return data.containsKey(key)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", map),
+            ExaminableProperty.of("map", data),
         )
 
         override fun toString(): String = toSimpleString()
@@ -114,25 +119,25 @@ internal class SimpleRerollingTable(
     }
 
     data class ItemRuleMap(
-        private val map: Map<Key, RerollingTable.ItemRule>,
+        private val data: Map<Key, RerollingTable.ItemRule>,
     ) : RerollingTable.ItemRuleMap {
         override fun get(key: Key): RerollingTable.ItemRule? {
-            return map[key]
+            return data[key]
         }
 
         override fun contains(key: Key): Boolean {
-            return map.containsKey(key)
+            return data.containsKey(key)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", map),
+            ExaminableProperty.of("map", data),
         )
 
         override fun toString(): String = toSimpleString()
     }
 
     data class TableCurrencyCost(
-        val code: String
+        val code: String,
     ) : RerollingTable.TableCurrencyCost {
         override fun compile(session: RerollingSession): MochaFunction {
             val mocha = MochaEngine.createStandard()
@@ -159,19 +164,19 @@ internal class TableCostBinding(
     val session: RerollingSession,
 ) {
     @Binding("source_rarity")
-    fun sourceRarity(): Double {
+    fun getSourceRarity(): Double {
         val mapping = session.table.rarityNumberMapping
-        val rarity = session.sourceItem?.components?.get(ItemComponentTypes.RARITY)?.rarity?.key ?: return .0
+        val rarity = session.usableInput?.components?.get(ItemComponentTypes.RARITY)?.rarity?.key ?: return .0
         return mapping.get(rarity)
     }
 
     @Binding("source_level")
-    fun sourceLevel(): Int {
-        return session.sourceItem?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+    fun getSourceLevel(): Int {
+        return session.usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
     }
 
     @Binding("cell_count")
-    fun countCell(type: String): Int {
+    fun getCellCount(type: String): Int {
         val selectionMap = session.selectionMap
         return when (type) {
             "all" -> selectionMap.size
@@ -182,7 +187,7 @@ internal class TableCostBinding(
     }
 
     @Binding("sum_of_cost")
-    fun sumOfCost(type: String): Double {
+    fun getCostSum(type: String): Double {
         val selections = session.selectionMap
         return when (type) {
             "all" -> selections.values.sumOf { it.total.evaluate() }
@@ -199,13 +204,13 @@ internal class CellCostBinding(
     val selection: RerollingSession.Selection,
 ) {
     @Binding("max_reroll")
-    fun maxReroll(): Int {
+    fun getMaxReroll(): Int {
         return selection.rule.maxReroll
     }
 
     @Binding("reroll_count")
-    fun rerollCount(): Int {
-        val sourceItem = session.sourceItem
+    fun getRerollCount(): Int {
+        val sourceItem = session.usableInput
         val sourceCells = sourceItem?.components?.get(ItemComponentTypes.CELLS) ?: return 0
         val rerollCount = sourceCells.get(selection.id)?.getReforgeHistory()?.rerollCount ?: 0
         return rerollCount

@@ -1,8 +1,8 @@
 # 在这里设置定制台物品的 *渲染布局*.
 
-# FIXME 补充说明
-
 primary:
+  - reforge:standalone_cell
+
   - (fixed:general)
   - general:level
   - general:rarity
@@ -10,12 +10,15 @@ primary:
 
   - (fixed:attribute)
   - attribute:attack_damage
-  - attribute:block_interaction_range
-  - attribute:critical_strike_chance
   - attribute:defense
-  - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
   - stash:cells/empty
 
+  - (fixed:vanilla)
   - vanilla:item_name
+  - vanilla:custom_name
+
+  # 从重铸的上下文获取的数据
+  - reforge:reforge_cost
+  - reforge:replace_input

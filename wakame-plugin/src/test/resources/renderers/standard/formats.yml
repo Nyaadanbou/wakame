@@ -58,7 +58,7 @@ cells/skills:
 cells/empty:
   namespace: stash
   tooltip:
-    - "[ 空词条栏 ]"
+    - "[ 空核孔 ]"
 
 # TODO 盲盒系统完成后重新考虑
 # id: `crate`

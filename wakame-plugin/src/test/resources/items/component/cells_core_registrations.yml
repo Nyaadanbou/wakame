@@ -10,11 +10,11 @@ cells:
     core_groups:
       all_possible_cores:
         noop:
-          # 无操作核心 (没有核心, 也没有词条栏)
+          # 无操作核心 (没有核心, 也没有核孔)
           - type: generic:noop
             weight: 1
         empty:
-          # 空核心 (没有核心, 但有词条栏)
+          # 空核心 (没有核心, 但有核孔)
           - type: generic:empty
             weight: 1
         all_attributes:

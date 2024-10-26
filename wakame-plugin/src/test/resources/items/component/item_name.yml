@@ -12,4 +12,6 @@ base: bedrock
 # 额外标签:
 # <rarity:name> 稀有度名字
 # <rarity:style> 稀有度样式
-item_name: "<rarity:style><rarity:name>Foo"
+item_name:
+  plain: Foo
+  fancy: <rarity:style><rarity:name>

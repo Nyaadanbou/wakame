@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.components.tracks.TrackReforgeHistory.Companion.T
 import cc.mewcraft.wakame.util.CompoundTag
 
 /**
- * 跟踪物品的重铸数据 (不同于词条栏里的重铸历史, 该重铸历史针对的是整个物品).
+ * 跟踪物品的重铸数据 (不同于核孔里的重铸历史, 该重铸历史针对的是整个物品).
  */
 interface TrackReforgeHistory : Track {
 

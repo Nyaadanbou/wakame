@@ -1,8 +1,46 @@
 # 在这里设置重造台的物品 *渲染内容*.
 
 # id: <有效的属性 id>
-cells/attributes:
+cells/attributes/in:
   namespace: attribute
+  # 用于区分核孔是否 要将重造,可被重造,... 的一些渲染格式
+  diff_formats:
+    # 可被重造的核孔
+    changeable: { }
+    # 不可被重造的核孔
+    unchangeable:
+      style: "<!i><dark_gray>"
+    # 选择要重造的核孔
+    selected: { }
+    # 未选择要重造的核孔
+    unselected: { }
+  ordinal:
+    # 元素的顺序
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    # 运算模式的顺序
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: <有效的属性 id>
+cells/attributes/out:
+  namespace: attribute
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    selected:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    unselected:
+      style: "<!i><dark_gray>"
   ordinal:
     element:
       - neutral
@@ -17,17 +55,70 @@ cells/attributes:
       - multiply_total
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/skills:
+cells/skills/in:
   namespace: skill
+  diff_formats:
+    # 可被重造的核孔
+    changeable: { }
+    # 不可被重造的核孔
+    unchangeable:
+      style: "<!i><dark_gray>"
+    # 选择要重造的核孔
+    selected: { }
+    # 未选择要重造的核孔
+    unselected: { }
+
+cells/skills/out:
+  namespace: skill
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    selected:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    unselected:
+      style: "<!i><dark_gray>"
 
 # id: `cells/empty`
-cells/empty:
+cells/empty/in:
   namespace: stash
-  tooltip: "[ 空词条栏 ]"
+  tooltip: "[ 空核孔 ]"
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    selected: { }
+    unselected: { }
+
+cells/empty/out:
+  namespace: stash
+  tooltip: "[ 空核孔 ]"
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    selected:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    unselected:
+      style: "<!i><dark_gray>"
+
+# id: `standalone_cell`
+standalone_cell:
+  namespace: reforge
+  # 可用标签
+  # <reroll_penalty> 重造惩罚
+  # <reroll_penalty_limit> 重造惩罚上限 (dev: 从 ctx 解析)
+  history_format:
+    - "惩罚: <reroll_penalty> / <reroll_penalty_limit>"
+  overall_ordinal:
+    - core
+    - history
 
 # id: `custom_name`
 custom_name:
-  namespace: "general"
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "定制名: <value>"
@@ -45,14 +136,14 @@ elements:
 
 # id: `item_name`
 item_name:
-  namespace: "vanilla"
+  namespace: vanilla
   # 可用标签
   # <value> 物品的 `minecraft:item_name`
   tooltip: "物品名: <value>"
 
 # id: `level`
 level:
-  namespace: "general"
+  namespace: general
   # 可用标签
   # <value> 等级值
   tooltip: "等级: <value>"

@@ -1,12 +1,24 @@
 package cc.mewcraft.wakame.display2
 
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationItemRenderer
+import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationItemRenderer
+import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableItemRenderer
+import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRenderer
+import cc.mewcraft.wakame.display2.implementation.standard.StandardItemRenderer
 import java.nio.file.Path
 
 /**
  * 所有的 [ItemRenderers] 实例.
  */
 internal object ItemRenderers {
+
+    // 不要忘记在 KoinModule 中注册这些实例 !!!
+
+    @JvmField
+    val SIMPLE = SimpleItemRenderer
+
     @JvmField // 省去无用的函数调用
     val STANDARD = StandardItemRenderer
 

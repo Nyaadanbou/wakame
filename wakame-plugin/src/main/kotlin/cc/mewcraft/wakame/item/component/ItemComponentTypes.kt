@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.*
+import net.kyori.adventure.text.Component
 
 /**
  * 本单例提供了物品组件的所有类型.
@@ -49,7 +50,7 @@ internal object ItemComponentTypes {
     val CAN_PLACE_ON: ItemComponentType<ItemAdventurePredicate> = ItemAdventurePredicate.codec(ItemConstants.CAN_PLACE_ON).register()
 
     /**
-     * 物品的(所有)词条栏.
+     * 物品的(所有)核孔.
      */
     @JvmField
     val CELLS: ItemComponentType<ItemCells> = ItemCells.codec(ItemConstants.CELLS).register()
@@ -74,7 +75,7 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)
      */
     @JvmField
-    val CUSTOM_NAME: ItemComponentType<CustomName> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
+    val CUSTOM_NAME: ItemComponentType<Component> = CustomName.codec(ItemConstants.CUSTOM_NAME).register()
 
     /**
      * 物品已经损失的耐久.
@@ -150,7 +151,7 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:item_name`](https://minecraft.wiki/w/Data_component_format#item_name)
      */
     @JvmField
-    val ITEM_NAME: ItemComponentType<ItemName> = ItemName.codec(ItemConstants.ITEM_NAME).register()
+    val ITEM_NAME: ItemComponentType<Component> = ItemName.codec(ItemConstants.ITEM_NAME).register()
 
     /**
      * 物品的铭刻.
@@ -163,12 +164,6 @@ internal object ItemComponentTypes {
      */
     @JvmField
     val LEVEL: ItemComponentType<ItemLevel> = ItemLevel.codec(ItemConstants.LEVEL).register()
-
-    /**
-     * 物品的描述 (不同于原版物品组件 `minecraft:lore`).
-     */
-    @JvmField
-    val LORE: ItemComponentType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()
 
     /**
      * 物品最大可损失的耐久.
@@ -201,6 +196,12 @@ internal object ItemComponentTypes {
      */
     @JvmField
     val SKIN_OWNER: ItemComponentType<ItemSkinOwner> = dummy<ItemSkinOwner>(ItemConstants.SKIN_OWNER).register()
+
+    /**
+     * 独立存在的核孔.
+     */
+    @JvmField
+    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CORE).register()
 
     /**
      * 附魔书内存储的魔咒.

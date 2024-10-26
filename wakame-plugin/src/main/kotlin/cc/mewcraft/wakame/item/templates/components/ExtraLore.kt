@@ -5,9 +5,12 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
-import cc.mewcraft.wakame.item.components.ExtraLore as ExtraLoreData
 
 
 // 开发日记 2024/6/27
@@ -18,13 +21,16 @@ import cc.mewcraft.wakame.item.components.ExtraLore as ExtraLoreData
 // 还是得使用 MiniMessage. 因为目前的系统在设计上
 // 支持在模板 lore 的基础之上添加额外的内容. 这一
 // 机制依赖于 MiniMessage 的解析.
+
 data class ExtraLore(
     val lore: List<String>,
-) : ItemTemplate<ExtraLoreData> {
-    override val componentType: ItemComponentType<ExtraLoreData> = ItemComponentTypes.LORE
+) : ItemTemplate<Nothing>, KoinComponent {
+    val processedLore: List<Component> = lore.map { get<MiniMessage>().deserialize(it) }
 
-    override fun generate(context: ItemGenerationContext): ItemGenerationResult<ExtraLoreData> {
-        return ItemGenerationResult.of(ExtraLoreData(lore))
+    override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
+
+    override fun generate(context: ItemGenerationContext): ItemGenerationResult<Nothing> {
+        return ItemGenerationResult.empty()
     }
 
     companion object : ItemTemplateBridge<ExtraLore> {

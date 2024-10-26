@@ -1,22 +1,22 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.common.TemporaryIcons
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
@@ -26,71 +26,68 @@ import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class SimpleRerollingSession(
+internal class SimpleRerollingSession(
     override val table: RerollingTable,
     override val viewer: Player,
-    sourceItem: NekoStack? = null,
 ) : RerollingSession, KoinComponent {
-
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    }
-
-    private val logger: Logger by inject()
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
-    override var sourceItem: NekoStack? by SourceItemDelegate(sourceItem)
+    override var originalInput: ItemStack? by OriginalInputDelegate(null)
+
+    override var usableInput: NekoStack? by UsableInputDelegate(null)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
-        logger.info("$PREFIX Selection map updated: $old -> $new")
+        logger.info("Selection map updated: $old -> $new")
     }
 
-    override var latestResult: RerollingSession.Result by Delegates.observable(Result.empty()) { _, old, new ->
-        logger.info("$PREFIX Result status updated: $old -> $new")
+    override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
+        logger.info("Result status updated: $old -> $new")
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
         if (!new && old) {
-            logger.error("$PREFIX Trying to unfreeze a frozen session. This is a bug!")
+            logger.error("Trying to unfreeze a frozen session. This is a bug!")
             return@vetoable false
         }
 
-        logger.info("$PREFIX Frozen status updated: $old -> $new")
+        logger.info("Frozen status updated: $old -> $new")
         return@vetoable true
     }
 
-    private fun executeReforge0(): RerollingSession.Result {
-        val result = try {
-            ReforgeOperation(this).execute()
+    private fun executeReforge0(): RerollingSession.ReforgeResult {
+        return try {
+            ReforgeOperation(this)
         } catch (e: Exception) {
-            logger.error("$PREFIX An unknown error occurred while rerolling an item", e)
-            Result.error()
+            logger.error("An unknown error occurred while rerolling an item", e)
+            ReforgeResult.error()
         }
-        return result
     }
 
-    override fun executeReforge(): RerollingSession.Result {
-        val result = executeReforge0()
-        latestResult = result
-        return result
+    override fun executeReforge(): RerollingSession.ReforgeResult {
+        return executeReforge0().also { latestResult = it }
     }
 
     override fun reset() {
-        sourceItem = null
+        originalInput = null
         selectionMap = SelectionMap.empty(this)
-        latestResult = Result.empty()
+        latestResult = ReforgeResult.empty()
     }
 
-    override fun getAllPlayerInputs(): Collection<ItemStack> {
-        val items = buildList<ItemStack> {
-            sourceItem?.let { add(it.itemStack) }
+    override fun getAllInputs(): Array<ItemStack> {
+        val result = mutableListOf<ItemStack>()
+        originalInput?.let(result::add)
+        return result.toTypedArray()
+    }
+
+    override fun getFinalOutputs(): Array<ItemStack> {
+        val reforgeResult = latestResult
+        if (reforgeResult.isSuccess) {
+            return arrayOf(reforgeResult.output.itemStack)
+        } else {
+            return emptyArray()
         }
-        return items
-    }
-
-    override fun getUnusedPlayerInputs(): Collection<ItemStack> {
-        return emptyList() // 未来可能会用到?
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -100,33 +97,42 @@ class SimpleRerollingSession(
 
     override fun toString(): String = toSimpleString()
 
-    private inner class SourceItemDelegate(
-        private var backing: NekoStack?,
-    ) : ReadWriteProperty<RerollingSession, NekoStack?> {
+    private inner class OriginalInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
+            return backing?.clone()
+        }
+
+        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
+            backing = value?.clone()
+            usableInput = value?.customNeko
+            selectionMap = SelectionMap.simple(thisRef)
+            latestResult = executeReforge0()
+        }
+    }
+
+    private inner class UsableInputDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
         override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
             return backing?.clone()
         }
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: NekoStack?) {
             backing = value?.clone()
-            selectionMap = SelectionMap.simple(thisRef)
-            latestResult = executeReforge0()
         }
     }
 }
 
-internal object Result {
+internal object ReforgeResult {
     /**
      * 空结果; 用于表示没有要重造的物品.
      */
-    fun empty(): RerollingSession.Result {
+    fun empty(): RerollingSession.ReforgeResult {
         return Empty()
     }
 
     /**
      * 错误结果; 用于表示重造过程中出现了内部错误.
      */
-    fun error(): RerollingSession.Result {
+    fun error(): RerollingSession.ReforgeResult {
         return Error()
     }
 
@@ -135,16 +141,16 @@ internal object Result {
      */
     fun failure(
         description: List<Component>,
-    ): RerollingSession.Result {
-        return Simple(false, description, NekoStack.empty(), Cost.empty())
+    ): RerollingSession.ReforgeResult {
+        return Simple(false, description, NekoStack.empty(), ReforgeCost.empty())
     }
 
     /**
-     * 参考 [Result.failure].
+     * 参考 [ReforgeResult.failure].
      */
     fun failure(
         description: Component,
-    ): RerollingSession.Result {
+    ): RerollingSession.ReforgeResult {
         return failure(listOf(description))
     }
 
@@ -153,78 +159,78 @@ internal object Result {
      */
     fun success(
         item: NekoStack,
-        cost: RerollingSession.Cost,
-    ): RerollingSession.Result {
+        cost: RerollingSession.ReforgeCost,
+    ): RerollingSession.ReforgeResult {
         return Simple(true, "<gray>准备就绪!".mini, item, cost)
     }
 
-    private abstract class Base : RerollingSession.Result {
+    private abstract class Base : RerollingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("item", item),
-            ExaminableProperty.of("cost", cost),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()
     }
 
     private class Empty : Base() {
-        override val successful: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<gray>没有要重造的物品"))
-        override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.Cost = Cost.empty()
+        override val isSuccess: Boolean = false
+        override val description: List<Component> = listOf(text("没有要重造的物品.").color(NamedTextColor.GRAY))
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
+        override val output: NekoStack = NekoStack.empty()
     }
 
     private class Error : Base() {
-        override val successful: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<red>内部错误"))
-        override val item: NekoStack = NekoStack.empty()
-        override val cost: RerollingSession.Cost = Cost.error()
+        override val isSuccess: Boolean = false
+        override val description: List<Component> = listOf(text("内部错误.").color(NamedTextColor.GRAY))
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
+        override val output: NekoStack = NekoStack.empty()
     }
 
     private class Simple(
         successful: Boolean,
         description: List<Component>,
         item: NekoStack,
-        cost: RerollingSession.Cost,
+        cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
             description: Component,
             item: NekoStack,
-            cost: RerollingSession.Cost,
+            cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
-        override val successful: Boolean = successful
+        override val isSuccess: Boolean = successful
         override val description: List<Component> = description
-        override val item: NekoStack by NekoStackDelegates.copyOnRead(item)
-        override val cost: RerollingSession.Cost = cost
+        override val reforgeCost: RerollingSession.ReforgeCost = cost
+        override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", successful),
+            ExaminableProperty.of("successful", isSuccess),
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("cost", cost),
-            ExaminableProperty.of("item", item),
+            ExaminableProperty.of("reforgeCost", reforgeCost),
+            ExaminableProperty.of("output", output),
         )
 
         override fun toString(): String = toSimpleString()
     }
 }
 
-internal object Cost {
+internal object ReforgeCost {
     /**
      * 空的花费; 当没有需要重造的物品时, 使用这个.
      */
-    fun empty(): RerollingSession.Cost {
+    fun empty(): RerollingSession.ReforgeCost {
         return Empty()
     }
 
     /**
      * 错误的花费; 当重造过程中出现了内部错误, 使用这个.
      */
-    fun error(): RerollingSession.Cost {
+    fun error(): RerollingSession.ReforgeCost {
         return Error()
     }
 
@@ -232,12 +238,12 @@ internal object Cost {
      * 正常的花费; 当重造已经准备就绪时, 使用这个.
      */
     fun simple(
-        currencyAmount: Double
-    ): RerollingSession.Cost {
+        currencyAmount: Double,
+    ): RerollingSession.ReforgeCost {
         return Simple(currencyAmount)
     }
 
-    private abstract class Base : RerollingSession.Cost {
+    private abstract class Base : RerollingSession.ReforgeCost {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
         )
@@ -248,18 +254,18 @@ internal object Cost {
     private class Empty : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf("<gray>资源消耗: <white>无".mini)
+        override val description: List<Component> = listOf("<gray>花费: <yellow>无".mini)
     }
 
     private class Error : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf("<gray>资源消耗: <red>内部错误".mini)
+        override val description: List<Component> = listOf("<gray>花费: <yellow>内部错误".mini)
     }
 
     private class Simple(
         val currencyAmount: Double,
-    ) : RerollingSession.Cost {
+    ) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
             // TODO 实现 take, test, description
         }
@@ -269,7 +275,7 @@ internal object Cost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>金币消耗: <yellow>${currencyAmount}".mini
+            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -285,8 +291,8 @@ internal object Selection {
     /**
      * 创建一个不可修改的 [Selection].
      */
-    fun unchangeable(session: RerollingSession): RerollingSession.Selection {
-        return Empty(session)
+    fun unchangeable(session: RerollingSession, id: String): RerollingSession.Selection {
+        return Empty(session, id)
     }
 
     /**
@@ -297,28 +303,22 @@ internal object Selection {
         id: String,
         rule: RerollingTable.CellRule,
         template: Group<CoreBlueprint, ItemGenerationContext>,
-        display: ItemStack,
     ): RerollingSession.Selection {
-        return Simple(session, id, rule, template, display)
+        return Simple(session, id, rule, template)
     }
-
-    private const val PREFIX = ReforgeLoggerPrefix.REROLL
 
     private class Empty(
         override val session: RerollingSession,
+        override val id: String,
     ) : RerollingSession.Selection {
-        override val id: String
-            get() = "" // ???
         override val rule: RerollingTable.CellRule
             get() = RerollingTable.CellRule.empty()
-        override val template: Group<CoreBlueprint, ItemGenerationContext>
-            get() = Group.empty()
-        override val display: ItemStack
-            get() = ItemStack.empty()
-        override val total: MochaFunction
-            get() = MochaFunction { .0 }
         override val changeable: Boolean
             get() = false
+        override val template: Group<CoreBlueprint, ItemGenerationContext>
+            get() = Group.empty()
+        override val total: MochaFunction
+            get() = MochaFunction { .0 }
         override var selected: Boolean
             set(_) = Unit
             get() = false
@@ -332,14 +332,13 @@ internal object Selection {
         override val id: String,
         override val rule: RerollingTable.CellRule,
         override val template: Group<CoreBlueprint, ItemGenerationContext>,
-        override val display: ItemStack,
     ) : RerollingSession.Selection, KoinComponent {
-        private val logger: Logger by inject()
+        private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
         override val changeable: Boolean
             get() = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            logger.info("$PREFIX Selection status updated (cell: '$id'): $old -> $new")
+            logger.info("Selection status updated (cell: '$id'): $old -> $new")
         }
 
         override fun invert(): Boolean {
@@ -370,69 +369,59 @@ internal object SelectionMap : KoinComponent {
     /**
      * 创建一个普通的 [SelectionMap].
      *
-     * 该函数会根据 [session] 的具体状态, 选择性的调用 [empty] 并返回.
+     * 该函数会根据 [session] 的具体状态, 选择性返回空的 [SelectionMap].
      */
     fun simple(session: RerollingSession): RerollingSession.SelectionMap {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
-        val sourceItem = session.sourceItem ?: return empty(session)
-        val sourceItemId = sourceItem.id
+        val usableInput = session.usableInput ?: return empty(session)
 
-        // 获取源物品的词条栏模板
-        // 如果源物品没有词条栏*模板*, 则判定整个物品不支持重造
-        val templates = sourceItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            LOGGER.info("$PREFIX Source item has no `cells` templates.")
+        // 获取源物品的核孔模板
+        // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
+        val templates = usableInput.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
+            logger.info("Usable input has no `cells` template.")
             return empty(session)
         }
 
-        // 获取源物品的词条栏
-        // 如果这个物品没有词条栏组件, 则判定整个物品不支持重造
-        val cells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
+        // 获取源物品的核孔
+        // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
+        val cells = usableInput.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[sourceItemId] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[usableInput.id] ?: return empty(session)
 
-        val selectionMap = Simple(session)
-        for ((id, cell) in cells) {
+        val cellRuleMap = itemRule.cellRuleMap
+        val selectionData = sortedMapOf<String, RerollingSession.Selection>(cellRuleMap.comparator)
+        for ((id, _) in cells) {
 
-            // 获取词条栏的重造规则
-            // 如果这个词条栏没有对应的重造规则, 则判定该词条栏不支持重造
-            val cellRule = itemRule.cellRuleMap[id] ?: continue
+            // 获取核孔的重造规则
+            val cellRule = cellRuleMap[id]
 
-            // 获取词条栏的重造模板
-            // 这个词条栏没有对应的模板, 则判定该词条栏不支持重造
-            val template = templates[id]?.core ?: continue
+            // 获取核孔的重造模板
+            val template = templates[id]?.core
 
-            val display = ItemStack(TemporaryIcons.get(cell.hashCode()))
-            display.editMeta {
-                // TODO 使用新的渲染器生成文本
-                val name = cell.getId().mini
-                val lore = listOf(cell.getCore().id.asString().mini)
-                it.itemName(name)
-                it.lore(lore)
-                it.hideAllFlags()
+            // 如果:
+            //   这个核孔没有对应的重造规则, 或者
+            //   这个核孔没有对应的物品模板,
+            // 则判定该核孔不支持重造.
+            // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
+            // 这样可以让其他系统比较优雅的处理一些特殊情况 (例如无定义情况).
+            if (cellRule != null && template != null) {
+                selectionData[id] = Selection.changeable(session, id, cellRule, template)
+            } else {
+                logger.info("Item cell '$id' does not support rerolling.")
+                selectionData[id] = Selection.unchangeable(session, id)
             }
-
-            val selection = Selection.changeable(
-                session = session,
-                id = id,
-                rule = cellRule,
-                template = template,
-                display = display,
-            )
-
-            selectionMap[id] = selection
         }
 
-        return selectionMap
+        return Simple(session, LinkedHashMap(selectionData))
     }
 
-    private const val PREFIX = ReforgeLoggerPrefix.REROLL
-    private val LOGGER: Logger by inject()
+    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     private class Empty(
-        override val session: RerollingSession
+        override val session: RerollingSession,
     ) : RerollingSession.SelectionMap {
         override val size: Int
             get() = 0
@@ -440,12 +429,18 @@ internal object SelectionMap : KoinComponent {
             get() = emptySet()
         override val values: Collection<RerollingSession.Selection>
             get() = emptyList()
-        override val isEmpty: Boolean
-            get() = true
 
-        override fun get(id: String): RerollingSession.Selection? = null
-        override fun contains(id: String): Boolean = false
-        override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> = emptyMap<String, RerollingSession.Selection>().iterator()
+        override fun get(id: String): RerollingSession.Selection =
+            // 对于任何核孔, 返回 unchangeable
+            Selection.unchangeable(session, id)
+
+        override fun contains(id: String): Boolean =
+            // 对于任何核孔, 都返回 false
+            false
+
+        override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> =
+            emptyMap<String, RerollingSession.Selection>().iterator()
+
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("session", session),
         )
@@ -455,37 +450,36 @@ internal object SelectionMap : KoinComponent {
 
     private class Simple(
         override val session: RerollingSession,
+        private val data: LinkedHashMap<String, RerollingSession.Selection>,
     ) : RerollingSession.SelectionMap, KoinComponent {
-        private val map: MutableMap<String, RerollingSession.Selection> = HashMap()
 
         override val size: Int
-            get() = map.size
+            get() = data.size
         override val keys: Set<String>
-            get() = map.keys
+            get() = data.keys
         override val values: Collection<RerollingSession.Selection>
-            get() = map.values
-        override val isEmpty: Boolean
-            get() = map.isEmpty()
+            get() = data.values
 
-        override fun get(id: String): RerollingSession.Selection? {
-            return map[id]
+        override fun get(id: String): RerollingSession.Selection {
+            return data[id] ?: Selection.unchangeable(session, id)
         }
 
+        // exposed for implementation
         operator fun set(id: String, selection: RerollingSession.Selection) {
-            map[id] = selection
+            data[id] = selection
         }
 
         override fun contains(id: String): Boolean {
-            return map.containsKey(id)
+            return data.containsKey(id)
         }
 
         override fun iterator(): Iterator<Map.Entry<String, RerollingSession.Selection>> {
-            return map.iterator()
+            return data.iterator()
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("session", session),
-            ExaminableProperty.of("map", map),
+            ExaminableProperty.of("data", data),
         )
 
         override fun toString(): String = toSimpleString()

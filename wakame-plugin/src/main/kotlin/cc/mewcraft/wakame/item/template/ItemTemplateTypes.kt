@@ -138,7 +138,7 @@ object ItemTemplateTypes {
     val LEVEL: ItemTemplateType<ItemLevel> = ItemLevel.codec(ItemConstants.LEVEL).register()
 
     /**
-     * 组件: [cc.mewcraft.wakame.item.components.ExtraLore]
+     * 组件: n/a
      */
     @JvmField
     val LORE: ItemTemplateType<ExtraLore> = ExtraLore.codec(ItemConstants.LORE).register()

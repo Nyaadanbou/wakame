@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.*
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
@@ -203,13 +204,13 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            // 词条栏: attack
+            // 核孔: attack
             run {
                 val cell = it.get("attack")
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+                val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
@@ -230,13 +231,13 @@ class CustomNekoStackTest : KoinTest {
                 }
             }
 
-            // 词条栏: bonus
+            // 核孔: bonus
             run {
                 val cell = it.get("bonus")
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+                val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
                 val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
@@ -266,7 +267,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<ConstantCompositeAttributeS>(cell1.getCoreAs(CoreType.ATTRIBUTE)?.attribute)
+            val core1 = assertIs<ConstantCompositeAttributeS>((cell1.getCore() as? AttributeCore)?.attribute)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
             val core2 = assertIs<EmptyCore>(cell2.getCore())
@@ -341,7 +342,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+            val core = cell.getCore() as? AttributeCore
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.id)
         }
@@ -366,7 +367,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo_b")
             assertNotNull(cell)
-            val core = cell.getCoreAs(CoreType.ATTRIBUTE)
+            val core = cell.getCore() as? AttributeCore
             assertNotNull(core)
             assertAny(
                 { assertEquals(Key.key("attribute:critical_strike_chance"), core.id) },
@@ -411,12 +412,13 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(it.raw, "<!i><rarity:style>Foo")
+            assertIs<TextComponent>(it)
+            assertEquals("Foo", it.content())
 
             val expectedStyle = Style.style(*common.styles)
-            val actualStyle = it.rich.style().edit {
+            val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
-                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+                builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
             }
             assertEquals(expectedStyle, actualStyle)
         }
@@ -651,12 +653,13 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals("<rarity:style><rarity:name>Foo", it.raw)
+            assertIs<TextComponent>(it)
+            assertEquals("普通", it.content())
 
             val expectedStyle = Style.style(*common.styles)
-            val actualStyle = it.rich.style().edit {
+            val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
-                it.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
+                builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
             }
             assertEquals(expectedStyle, actualStyle)
         }
@@ -750,7 +753,7 @@ class CustomNekoStackTest : KoinTest {
 
     @Test
     fun `component - lore`() = componentLifecycleTest(
-        "lore", ItemTemplateTypes.LORE, ItemComponentTypes.LORE,
+        "lore", ItemTemplateTypes.LORE, ItemComponentTypes.EMPTY,
     ) {
         serialization {
             assertNotNull(it)

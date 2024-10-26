@@ -1,17 +1,15 @@
 package cc.mewcraft.wakame.skill.trigger
 
-import cc.mewcraft.commons.collections.contentEquals
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
+import xyz.xenondevs.commons.collections.contentEquals
 import java.lang.reflect.Type
 import java.util.function.Predicate
 import java.util.stream.Stream

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.commons.collections.mapToByteArray
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.*
@@ -10,6 +9,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import xyz.xenondevs.commons.collections.mapToByteArray
 import java.util.stream.Stream
 
 

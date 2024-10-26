@@ -1,0 +1,13 @@
+primary:
+  - (fixed:reforge)
+  - reforge:merge_input
+  - reforge:merge_output
+
+  - (fixed:general)
+  - general:level
+  - general:rarity
+  - general:elements
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:custom_name

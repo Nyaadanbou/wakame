@@ -33,7 +33,7 @@ interface MergingTable : Examinable {
     /**
      * 用于检查玩家输入的核心, 是否允许参与合并.
      */
-    val acceptedCoreMatcher: CoreMatchRuleContainer
+    val acceptableCoreMatcher: CoreMatchRuleContainer
 
     /**
      * 稀有度到固定数值的映射表.

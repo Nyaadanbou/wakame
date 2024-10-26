@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.github.GithubRepoManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -46,7 +44,7 @@ object ResourcePackPublisherProvider {
      * 警告: 非线程安全!
      */
     fun loadAndSet(): ResourcePackPublisher {
-        val config = RESOURCE_PACK_CONFIG.derive("publisher")
+        val config = RESOURCE_PACK_CONFIG.node("publisher")
         val inst = when (
             val type = config.entry<String>("type").get()
         ) {

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.commons.collections.takeUnlessEmpty
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -16,10 +16,27 @@ import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.*
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import kotlin.collections.component1
 import kotlin.collections.component2
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
+
+/**
+ * 硬编码的渲染格式.
+ *
+ * 不包含任何现成的格式, 只提供最基本的格式信息.
+ */
+@ConfigSerializable
+internal data class HardcodedRendererFormat(
+    @Setting @Required
+    override val namespace: String,
+    @Setting @NodeKey
+    override val id: String, // id 是配置文件指定的
+) : RendererFormat.Simple {
+    override val index = createIndex()
+    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+}
 
 /**
  * 一种最简单的渲染格式.
@@ -185,11 +202,11 @@ internal data class ExtraLoreRendererFormat(
     /**
      * @param data 额外的物品描述
      */
-    fun render(data: List<String>): IndexedText {
+    fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
-        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, parsed("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: emptyList()
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: emptyList()
+        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
+        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)

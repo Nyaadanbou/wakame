@@ -6,5 +6,5 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 internal fun rerollingModule(): Module = module {
-    single { RerollingTables } bind Initializable::class
+    single { RerollingTableRegistry } bind Initializable::class
 }

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.wakame.config.derive
-import cc.mewcraft.wakame.config.entry
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.ConcurrentHashMap
@@ -35,7 +33,7 @@ private constructor(
     /**
      * 根配置文件.
      */
-    val root by lazy { ItemComponentRegistry.CONFIG.derive(id) }
+    val root by lazy { ItemComponentRegistry.CONFIG.node(id) }
 
     /**
      * 该组件是否启用? (具体的作用之后再逐渐完善)

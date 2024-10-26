@@ -1,14 +1,9 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.BiIdentifiable
-import cc.mewcraft.wakame.FriendlyNamed
-import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.*
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.toStableByte
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -17,6 +12,7 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import java.lang.reflect.Type
 import java.util.stream.Stream
 
@@ -25,7 +21,8 @@ import java.util.stream.Stream
  *
  * 使用 [RarityRegistry] 来获得该实例.
  */
-interface Rarity : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte> {
+interface Rarity : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte>, Comparable<Rarity> {
+    val weight: Int
     val glowColor: GlowColor
 }
 
@@ -37,6 +34,7 @@ private data class RarityType(
     override val binaryId: Byte,
     override val displayName: Component,
     override val styles: Array<StyleBuilderApplicable>,
+    override val weight: Int,
     override val glowColor: GlowColor,
 ) : KoinComponent, Rarity {
     override val key: Key = Key.key(Namespaces.RARITY, uniqueId)
@@ -46,8 +44,13 @@ private data class RarityType(
         ExaminableProperty.of("binaryId", binaryId),
         ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
         ExaminableProperty.of("styles", styles),
+        ExaminableProperty.of("weight", weight),
         ExaminableProperty.of("glowColor", glowColor)
     )
+
+    override fun compareTo(other: Rarity): Int {
+        return weight.compareTo(other.weight)
+    }
 
     override fun hashCode(): Int = uniqueId.hashCode()
     override fun equals(other: Any?): Boolean {
@@ -88,7 +91,8 @@ internal object RaritySerializer : SchemaSerializer<Rarity> {
         val binary = node.node("binary_index").krequire<Int>().toStableByte()
         val displayName = node.node("display_name").krequire<Component>()
         val styles = node.node("styles").krequire<Array<StyleBuilderApplicable>>()
+        val weight = node.node("weight").get<Int>(0)
         val glowColor = node.node("glow_color").krequire<GlowColor>()
-        return RarityType(key, binary, displayName, styles, glowColor)
+        return RarityType(key, binary, displayName, styles, weight, glowColor)
     }
 }

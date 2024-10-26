@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.enchantment
 
-import cc.mewcraft.commons.collections.mapKeysNotNull
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.mapKeysNotNull
 
 /**
  * @see CustomEnchantmentRegistry

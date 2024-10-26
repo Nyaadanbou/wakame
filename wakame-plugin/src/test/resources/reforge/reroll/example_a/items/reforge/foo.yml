@@ -1,30 +1,28 @@
-# 词条栏的重造设置
+# 核孔的重造设置
 cells:
-  # 这里每个节点的 key 对应一个词条栏的 id.
-  # 如果定义了一个节点, 则允许重造该词条栏.
-  # 反之, 未定义的词条栏不允许被重造.
+  # 这里每个节点的 key 对应一个核孔的 id.
+  # 如果定义了一个节点, 则允许重造该核孔.
+  # 反之, 未定义的核孔不允许被重造.
 
-  # 对应 id 为 a 的词条栏
+  # 对应 id 为 "a" 的核孔
   a:
-    # 本词条栏的货币花费.
+    # 本核孔的货币花费.
     #
     # 可用上下文:
-    #
     # query.max_reroll()
-    #   词条栏的重造次数上限
+    #   核孔的重造次数上限
     # query.reroll_count()
-    #   词条栏有史以来被重造过的次数 // dev: 从物品 NBT 读取
-    #
+    #   核孔有史以来被重造过的次数 // dev: 从物品 NBT 读取
     currency_cost: "100.0 * query.reroll_count()"
     # 重造次数上限
     max_reroll: 3
 
-  # 对应 id 为 b 的词条栏
+  # 对应 id 为 "b" 的核孔
   b:
     currency_cost: "150.0 * query.reroll_count()"
     max_reroll: 4
 
-  # 对应 id 为 c 的词条栏
+  # 对应 id 为 "c" 的核孔
   c:
     currency_cost: "200.0 * query.reroll_count()"
     max_reroll: 5

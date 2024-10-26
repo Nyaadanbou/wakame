@@ -20,7 +20,13 @@ components:
 
   cells:
     enabled: true
-    display_name: "<!i><white>词条栏"
+    display_name: "<!i><white>核孔"
+    virtual_core:
+      display_name: "<!i><white>虚核心"
+      description: [ ]
+    empty_core:
+      display_name: "<!i><white>空核心"
+      description: [ ]
 
   crate:
     enabled: true
@@ -105,6 +111,10 @@ components:
   skin_owner:
     enabled: true
     display_name: "<!i><white>皮肤所有者"
+
+  standalone_cell:
+    enabled: true
+    display_name: "独立核孔"
 
   stored_enchantments:
     enabled: true

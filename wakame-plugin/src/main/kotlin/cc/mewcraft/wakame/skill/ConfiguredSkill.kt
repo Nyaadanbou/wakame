@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.*
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.trigger.*
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
@@ -25,7 +27,7 @@ import java.util.function.Predicate
  * @return 构建的 [ConfiguredSkill]
  */
 fun ConfiguredSkill(
-    id: Key, trigger: Trigger, variant: TriggerVariant
+    id: Key, trigger: Trigger, variant: TriggerVariant,
 ): ConfiguredSkill {
     return SimpleConfiguredSkill(id, trigger, variant)
 }
@@ -46,7 +48,7 @@ fun ConfiguredSkill(
  * @return 从 NBT 构建的 [ConfiguredSkill]
  */
 fun ConfiguredSkill(
-    id: Key, tag: CompoundTag
+    id: Key, tag: CompoundTag,
 ): ConfiguredSkill {
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
@@ -70,7 +72,7 @@ fun ConfiguredSkill(
  * @return 从配置文件构建的 [ConfiguredSkill]
  */
 fun ConfiguredSkill(
-    id: Key, node: ConfigurationNode
+    id: Key, node: ConfigurationNode,
 ): ConfiguredSkill {
     val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
     val variant = node.node("variant").krequire<TriggerVariant>()
@@ -110,6 +112,16 @@ interface ConfiguredSkill : BinarySerializable<CompoundTag> {
     val instance: Skill
 
     /**
+     * 技能的显示名称.
+     */
+    val displayName: Component
+
+    /**
+     * 技能的完整描述.
+     */
+    val description: List<Component>
+
+    /**
      * 将此对象序列化为 NBT, 拥有以下结构:
      *
      * ```NBT
@@ -132,10 +144,18 @@ internal data class SimpleConfiguredSkill(
 ) : ConfiguredSkill {
     override val instance: Skill
         get() = SkillRegistry.INSTANCES[id]
+    override val displayName: Component
+        get() = instance.displays.name.let(MM::deserialize)
+    override val description: List<Component>
+        get() = instance.displays.tooltips.map(MM::deserialize)
 
     override fun serializeAsTag(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
+    }
+
+    companion object Shared {
+        private val MM = Injector.get<MiniMessage>()
     }
 }
 

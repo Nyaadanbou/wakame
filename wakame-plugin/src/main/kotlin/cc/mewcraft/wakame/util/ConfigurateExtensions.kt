@@ -107,6 +107,7 @@ internal fun YamlConfigurationLoader.Builder.withDefaults(): YamlConfigurationLo
                     it.kregister(NumericValueSerializer)
                     it.register(ComponentSerializer)
                     it.register(StyleBuilderApplicableSerializer)
+                    it.register(StyleSerializer)
                 }
         }
 }

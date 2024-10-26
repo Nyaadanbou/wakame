@@ -1,25 +1,17 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.commons.collections.associateNotNull
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
-import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.reforge.common.*
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.collections.associateNotNull
 import java.io.File
 import java.lang.reflect.Type
 
@@ -27,10 +19,10 @@ import java.lang.reflect.Type
  * [ModdingTable] 的序列化器.
  */
 internal object ModdingTableSerializer : KoinComponent {
-    const val REFORGE_DIR_NAME = "reforge"
-    const val MODDING_DIR_NAME = "mod"
+    private const val REFORGE_DIR_NAME = "reforge"
+    private const val MODDING_DIR_NAME = "mod"
 
-    private val LOGGER: Logger by inject()
+    private val LOGGER: Logger = get()
     private val MODDING_DIR by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MODDING_DIR_NAME) }
 
     /**
@@ -101,8 +93,8 @@ internal object ModdingTableSerializer : KoinComponent {
             .collect("yml")
             .associateNotNull {
                 try {
-                    val key = Key.key(it.namespace, it.path)
-                    val text = it.file.readText()
+                    val itemId = Key.key(it.namespace, it.path)
+                    val fileText = it.file.readText()
                     val itemNode = yamlConfig {
                         withDefaults()
                         serializers {
@@ -111,11 +103,14 @@ internal object ModdingTableSerializer : KoinComponent {
                             kregister(CoreMatchRuleSerializer)
                             kregister(CoreMatchRuleContainerSerializer)
                         }
-                    }.buildAndLoadString(text)
+                    }.buildAndLoadString(fileText)
 
-                    val cellRuleMap = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
-                    val itemRule = SimpleModdingTable.ItemRule(key, SimpleModdingTable.CellRuleMap(cellRuleMap))
-                    key to itemRule
+                    // configurate 返回的是 LinkedHashMap, 保留了顺序
+                    val cellRuleMapData = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
+                    val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
+                    val itemRule = SimpleModdingTable.ItemRule(itemId, cellRuleMap)
+
+                    itemId to itemRule
                 } catch (e: Exception) {
                     LOGGER.error("Can't load item rule: '${it.file.relativeTo(MODDING_DIR)}'", e)
                     null
@@ -130,7 +125,7 @@ internal object ModdingTableSerializer : KoinComponent {
             title = title,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,
-            itemRules = itemRuleMap,
+            itemRuleMap = itemRuleMap,
         )
     }
 
@@ -162,7 +157,7 @@ internal object ModdingTableSerializer : KoinComponent {
                 currencyCost = currencyCost,
                 requireElementMatch = requireElementMatch,
                 permission = permission,
-                acceptedCores = acceptedCores,
+                acceptableCores = acceptedCores,
             )
         }
     }

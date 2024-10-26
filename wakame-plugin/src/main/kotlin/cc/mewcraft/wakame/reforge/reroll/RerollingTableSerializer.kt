@@ -4,15 +4,11 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -20,10 +16,10 @@ import java.io.File
 import java.lang.reflect.Type
 
 internal object RerollingTableSerializer : KoinComponent {
-    const val REFORGE_DIR_NAME = "reforge"
-    const val REROLLING_DIR_NAME = "reroll"
+    private const val REFORGE_DIR_NAME = "reforge"
+    private const val REROLLING_DIR_NAME = "reroll"
 
-    private val logger: Logger by inject()
+    private val logger: Logger = get()
     private val rerollDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(REROLLING_DIR_NAME) }
 
     /**
@@ -92,7 +88,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val itemRules = NamespacedPathCollector(tableItemsDirectory, true)
             .collect("yml")
             .associate {
-                val key = Key.key(it.namespace, it.path)
+                val itemId = Key.key(it.namespace, it.path)
                 val itemRule = run {
                     val text = it.file.readText()
                     val itemRuleNode = yamlConfig {
@@ -103,16 +99,16 @@ internal object RerollingTableSerializer : KoinComponent {
                         }
                     }.buildAndLoadString(text)
 
-                    val cellRules = itemRuleNode.node("cells").krequire<Map<String, RerollingTable.CellRule>>()
+                    val cellRuleMapData = itemRuleNode.node("cells").krequire<Map<String, RerollingTable.CellRule>>()
+                    val cellRuleMap = LinkedHashMap(cellRuleMapData)
+
                     // 未来可能会包含更多规则
                     // ...
 
-                    SimpleRerollingTable.ItemRule(
-                        cellRuleMap = SimpleRerollingTable.CellRuleMap(cellRules)
-                    )
+                    SimpleRerollingTable.ItemRule(SimpleRerollingTable.CellRuleMap(cellRuleMap))
                 }
 
-                key to itemRule
+                itemId to itemRule
             }
             .toMap(HashMap())
             .let(SimpleRerollingTable::ItemRuleMap)
@@ -130,16 +126,14 @@ internal object RerollingTableSerializer : KoinComponent {
     private object TableCurrencyCostSerializer : TypeSerializer<RerollingTable.TableCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.TableCurrencyCost {
             val code = node.krequire<String>()
-            val ret = SimpleRerollingTable.TableCurrencyCost(code)
-            return ret
+            return SimpleRerollingTable.TableCurrencyCost(code)
         }
     }
 
     private object CellCurrencyCostSerializer : TypeSerializer<RerollingTable.CellCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellCurrencyCost {
             val code = node.krequire<String>()
-            val ret = SimpleRerollingTable.CellCurrencyCost(code)
-            return ret
+            return SimpleRerollingTable.CellCurrencyCost(code)
         }
     }
 
@@ -147,11 +141,7 @@ internal object RerollingTableSerializer : KoinComponent {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellRule {
             val maxReroll = node.node("max_reroll").int
             val currencyCost = node.node("currency_cost").krequire<RerollingTable.CellCurrencyCost>()
-
-            return SimpleRerollingTable.CellRule(
-                maxReroll = maxReroll,
-                currencyCost = currencyCost
-            )
+            return SimpleRerollingTable.CellRule(maxReroll, currencyCost)
         }
     }
 }

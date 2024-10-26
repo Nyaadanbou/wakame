@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.commons.provider.Provider
-import cc.mewcraft.commons.provider.immutable.provider
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.krequire
@@ -13,6 +11,9 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.objectmapping.ObjectMapper
 import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.util.NamingSchemes
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.provider
 import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -66,6 +67,7 @@ internal abstract class AbstractRendererFormats(
             serializers {
                 registerAnnotatedObjects(
                     ObjectMapper.factoryBuilder()
+                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
                         .addNodeResolver(NodeResolver.nodeKey())
                         .addNodeResolver(NodeResolver.onlyWithSetting())
                         .addConstraint(Required::class.java, Constraint.required())

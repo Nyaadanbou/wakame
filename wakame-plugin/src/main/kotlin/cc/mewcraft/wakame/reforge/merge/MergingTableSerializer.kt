@@ -7,7 +7,8 @@ import cc.mewcraft.wakame.skill.TriggerVariantSerializer
 import cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.text.Component
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -19,7 +20,7 @@ internal object MergingTableSerializer : KoinComponent {
     const val REFORGE_DIR_NAME = "reforge"
     const val MERGING_DIR_NAME = "merge"
 
-    private val logger: Logger by inject()
+    private val logger: Logger = get()
     private val mergeDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MERGING_DIR_NAME) }
 
     /**
@@ -79,7 +80,7 @@ internal object MergingTableSerializer : KoinComponent {
             val title = tableMainConfigNode.node("title").krequire<Component>()
             val maxInputItemLevel = tableMainConfigNode.node("max_input_item_level").getInt(0)
             val maxOutputItemPenalty = tableMainConfigNode.node("max_output_item_penalty").getInt(0)
-            val acceptedCoreMatcher = tableMainConfigNode.node("accepted_cores").krequire<CoreMatchRuleContainer>()
+            val acceptableCoreMatcher = tableMainConfigNode.node("accepted_cores").krequire<CoreMatchRuleContainer>()
             val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
             val currencyCost = tableMainConfigNode.node("currency_cost").krequire<MergingTable.CurrencyCost>()
             val numberMergeFunction = tableMainConfigNode.node("number_merge_function").krequire<MergingTable.NumberMergeFunction>()
@@ -93,7 +94,7 @@ internal object MergingTableSerializer : KoinComponent {
             title = tableMainConfigData.title,
             maxInputItemLevel = tableMainConfigData.maxInputItemLevel,
             maxOutputItemPenalty = tableMainConfigData.maxOutputItemPenalty,
-            acceptedCoreMatcher = tableMainConfigData.acceptedCoreMatcher,
+            acceptableCoreMatcher = tableMainConfigData.acceptableCoreMatcher,
             rarityNumberMapping = tableMainConfigData.rarityNumberMapping,
             currencyCost = tableMainConfigData.currencyCost,
             numberMergeFunction = tableMainConfigData.numberMergeFunction,

@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.station.recipe
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ItemRegistry

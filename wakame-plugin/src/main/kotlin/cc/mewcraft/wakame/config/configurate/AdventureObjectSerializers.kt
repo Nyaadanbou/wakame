@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.config.configurate
 
-import cc.mewcraft.wakame.WakameInjections
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.StyleBuilderApplicable
-import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.format.*
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.get
-import org.koin.core.context.GlobalContext
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
@@ -22,11 +20,24 @@ internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
 internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
         val message = obj.toString().replace("§", "")
-        return WakameInjections.get<MiniMessage>().deserialize(message)
+        return Injector.get<MiniMessage>().deserialize(message)
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
-        return WakameInjections.get<MiniMessage>().serialize(item)
+        return Injector.get<MiniMessage>().serialize(item)
+    }
+}
+
+internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): Style {
+        val component = ComponentSerializer.deserialize(type, obj)
+        val style = component.style()
+        return style
+    }
+
+    override fun serialize(item: Style, typeSupported: Predicate<Class<*>>?): Any {
+        val component = Component.text().style(item).build()
+        return Injector.get<MiniMessage>().serialize(component)
     }
 }
 
@@ -36,14 +47,14 @@ internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleB
         val styleList = ArrayList<StyleBuilderApplicable>()
 
         with(component) {
-            // font()?.let { font -> styleList += StyleBuilderApplicable { it.font(font) } }
+            font()?.let { font -> styleList += StyleBuilderApplicable { it.font(font) } }
             color()?.let { styleList += it }
             TextDecoration.entries
                 .filter { decoration(it) == TextDecoration.State.TRUE }
                 .map { it.withState(decoration(it)) }
                 .forEach { styleList += it }
-            // clickEvent()?.let { styleList += it }
-            // hoverEvent()?.let { styleList += it }
+            clickEvent()?.let { styleList += it }
+            hoverEvent()?.let { styleList += it }
         }
 
         return styleList.toTypedArray()
@@ -51,6 +62,6 @@ internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleB
 
     override fun serialize(item: Array<StyleBuilderApplicable>, typeSupported: Predicate<Class<*>>?): Any {
         val component = Component.text().style { builder -> item.forEach(builder::apply) }.build()
-        return GlobalContext.get().get<MiniMessage>().serialize(component)
+        return Injector.get<MiniMessage>().serialize(component)
     }
 }

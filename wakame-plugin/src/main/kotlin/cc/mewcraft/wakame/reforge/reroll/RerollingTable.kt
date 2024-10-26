@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -46,7 +46,7 @@ interface RerollingTable : Examinable {
      */
     interface ItemRule : Examinable {
         /**
-         * 该物品每个词条栏的重造规则.
+         * 该物品每个核孔的重造规则.
          */
         val cellRuleMap: CellRuleMap
     }
@@ -68,40 +68,56 @@ interface RerollingTable : Examinable {
     }
 
     /**
-     * 代表一个词条栏的重造规则.
+     * 代表一个核孔的重造规则.
      */
     interface CellRule : Examinable {
         /**
-         * 词条栏最多能重造几次.
+         * 核孔最多能重造几次.
          */
         val maxReroll: Int
 
         /**
-         * 该词条栏的货币花费.
+         * 该核孔的货币花费.
          */
         val currencyCost: CellCurrencyCost
 
-        companion object {
+        companion object Shared {
             fun empty(): CellRule = EmptyCellRule
         }
     }
 
     /**
-     * 该对象本质是一个映射, 包含了所有词条栏的重造规则.
+     * 该对象本质是一个映射, 包含了所有核孔的重造规则.
      */
     interface CellRuleMap : Examinable {
+
         /**
-         * 获取词条栏的重造规则.
+         * 关于核孔 id 的 [Comparator], 基于核孔在配置文件中的顺序.
+         */
+        val comparator: Comparator<String?>
+
+        /**
+         * 获取核孔的重造规则.
          *
-         * 如果返回 `null` 则说明该词条栏不支持重造.
+         * 如果返回 `null` 则说明该核孔不支持重造.
          *
-         * @param key 词条栏的唯一标识
+         * @param key 核孔的唯一标识
+         * @return 核孔的重造规则
          */
         operator fun get(key: String): CellRule?
 
+        /**
+         * 检查是否包含指定核孔的重造规则.
+         *
+         * 返回 `true` 则说明该核孔支持重造.
+         * 返回 `false` 则说明该核孔不支持重造.
+         *
+         * @param key 核孔的唯一标识
+         * @return 是否支持重造
+         */
         operator fun contains(key: String): Boolean
 
-        companion object {
+        companion object Shared {
             fun empty(): CellRuleMap = EmptyCellRuleMap
         }
     }
@@ -143,12 +159,13 @@ interface RerollingTable : Examinable {
 /* Internals */
 
 
-private object EmptyCellRule : RerollingTable.CellRule {
+private object EmptyCellRule : CellRule {
     override val maxReroll: Int = 0
-    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { .0 } }
+    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { Double.NaN } }
 }
 
-private object EmptyCellRuleMap : RerollingTable.CellRuleMap {
-    override fun get(key: String): RerollingTable.CellRule? = null
+private object EmptyCellRuleMap : CellRuleMap {
+    override val comparator: Comparator<String?> = nullsLast(naturalOrder())
+    override fun get(key: String): CellRule? = null
     override fun contains(key: String): Boolean = false
 }

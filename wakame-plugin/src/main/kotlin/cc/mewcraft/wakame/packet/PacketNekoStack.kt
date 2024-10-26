@@ -214,7 +214,7 @@ private class PacketCustomNekoStack(
         get() = false
 
     override var isClientSide: Boolean
-        get() = abortWrites() // 实际不会调用这里, 而是外部直接读取
+        get() = abortReads() // 实际不会调用这里, 而是外部直接读取
         set(_) = abortWrites()
 
     override val itemType: Material

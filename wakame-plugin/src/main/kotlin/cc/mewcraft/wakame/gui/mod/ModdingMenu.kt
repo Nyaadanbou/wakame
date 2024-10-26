@@ -1,33 +1,30 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
+import cc.mewcraft.wakame.gui.common.GuiMessages
+import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.reforge.mod.ModdingTable
-import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
-import cc.mewcraft.wakame.util.hideTooltip
-import cc.mewcraft.wakame.util.translateBy
-import net.kyori.adventure.text.Component.text
+import cc.mewcraft.wakame.reforge.mod.*
+import cc.mewcraft.wakame.util.*
+import me.lucko.helper.text3.mini
+import net.kyori.adventure.text.Component.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.Item
-import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
+import xyz.xenondevs.invui.item.*
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.properties.Delegates
 
 /**
@@ -36,11 +33,11 @@ import kotlin.properties.Delegates
  * ## 用户流程
  * 按照整体设计 (假设每一步都没有意外发生):
  * - 玩家首先要将需要定制的物品放入 [inputSlot]
- * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个词条栏
+ * - 然后主菜单中便会出现若干个*子菜单*, 每个*子菜单*对应物品上的一个核孔
  * - 在每一个子菜单中:
- *    - 玩家可以看到子菜单所关联的词条栏信息
+ *    - 玩家可以看到子菜单所关联的核孔信息
  *    - 玩家可以将一个便携式核心放入子菜单的*输入容器*中
- *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个词条栏
+ *    - 这相当于告诉定制台: 我要消耗这个物品来定制这个核孔
  * - 主菜单的 [outputSlot] 会实时显示定制之后的物品
  * - 玩家可以随时将定制后的物品从 [outputSlot] 中取出
  * - 如果玩家取出了 [outputSlot] 中的物品, 则相当于完成定制, 同时会消耗掉所有的输入容器中的物品
@@ -53,9 +50,6 @@ internal class ModdingMenu(
     val table: ModdingTable,
     val viewer: Player,
 ) : KoinComponent {
-    companion object {
-        private const val PREFIX = ReforgeLoggerPrefix.MOD
-    }
 
     /**
      * 向玩家展示定制台菜单.
@@ -65,52 +59,32 @@ internal class ModdingMenu(
     }
 
     /**
-     * 基于当前的所有状态执行一次定制.
-     */
-    fun executeReforge() {
-        session.executeReforge()
-    }
-
-    /**
-     * 基于 [session] 的当前状态更新 [outputSlot], 也就是定制后的物品.
-     */
-    fun updateOutput() {
-        val result = session.latestResult
-        val output = ResultRender.normal(result)
-        setOutputSlot(output)
-    }
-
-    /**
-     * 基于 [session] 的当前状态更新子菜单, 也就是每个词条栏的定制菜单.
-     */
-    fun updateReplace() {
-        val replaceParams = session.replaceParams
-        val replaceGuis = replaceParams
-            .map { (_, replace) -> ReplaceMenu(this, replace) }
-            .map { it.primaryGui }
-
-        setReplaceGuis(replaceGuis)
-    }
-
-    /**
      * 本菜单的 [ModdingSession].
      */
     val session: ModdingSession = SimpleModdingSession(table, viewer)
 
     /**
      * 玩家是否已经确认取出定制后的物品.
-     *
      * 这只是个标记, 具体的作用取决于实现.
      */
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
-        logger.info("$PREFIX Confirmed status updated: $old -> $new")
+        logger.info("Confirmed status updated: $old -> $new")
     }
 
-    private val logger: Logger by inject()
+    /**
+     * 本菜单的日志记录器, 自带前缀.
+     */
+    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
 
-    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 10
+        setPreUpdateHandler(::onInputInventoryPreUpdate)
+    }
 
-    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1))
+    private val outputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
+        guiPriority = 10
+        setPreUpdateHandler(::onOutputInventoryPreUpdate)
+    }
 
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(
@@ -130,6 +104,8 @@ internal class ModdingMenu(
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     }
 
+    private val selectionMenus: MutableList<ReplaceMenu> = mutableListOf()
+
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
         builder.setTitle(table.title.translateBy(viewer))
@@ -144,59 +120,49 @@ internal class ModdingMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Input item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
-            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
-            event.isCancelled = true; return
+            event.isCancelled = true
+            logger.error("Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
+            return
         }
 
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                event.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             // 玩家尝试把物品放入 inputSlot:
+            // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
+            // 这里需要做的就是刷新 session 的状态, 然后更新菜单的内容.
             event.isAdd -> {
-                // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
-                // 这里需要做的就是刷新 ModdingSession 的状态, 然后更新菜单.
+                session.originalInput = newItem
 
-                val stack = newItem?.tryNekoStack ?: run {
-                    viewer.sendPlainMessage("请放入一个萌芽物品!")
-                    event.isCancelled = true; return
-                }
+                // 重新渲染放入的物品
+                event.newItem = renderInputItem()
 
-                session.sourceItem = stack
-                updateReplace()
-                updateOutput()
-
-                // 重置确认状态
                 confirmed = false
+                recreateReplaceGuis()
+                updateOutputSlot()
             }
 
             // 玩家尝试把物品从 inputSlot 取出:
+            // 玩家将物品从 inputSlot 取出, 意味着定制过程被 *中途* 终止了.
+            // 我们需要把玩家放入定制台的所有物品 *原封不动* 的归还给玩家.
             event.isRemove -> {
-                // 玩家将物品从*inputSlot*取出, 意味着定制过程被*中途*终止了.
-                // 我们需要把玩家放入定制台的所有物品*原封不动*的归还给玩家.
-
                 event.isCancelled = true
 
                 // 归还玩家放入定制台的所有物品
-                val itemsToReturn = session.getAllPlayerInputs()
-                viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+                viewer.inventory.addItem(*session.getAllInputs())
 
-                // 重置会话状态
                 session.reset()
-
-                // 清空菜单内容
-                setInputSlot(null)
-                setOutputSlot(null)
-                setReplaceGuis(null)
-
-                // 重置确认状态
                 confirmed = false
+                updateInputSlot()
+                recreateReplaceGuis()
+                updateOutputSlot()
             }
         }
     }
@@ -207,18 +173,19 @@ internal class ModdingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("$PREFIX Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
-            logger.error("$PREFIX Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
-            event.isCancelled = true; return
+            logger.error("Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")
+            event.isCancelled = true
+            return
         }
 
         when {
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
-                viewer.sendPlainMessage("猫咪不可以!")
-                event.isCancelled = true; return
+                event.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             // 玩家从 outputSlot 中取出物品:
@@ -227,68 +194,59 @@ internal class ModdingMenu(
 
                 // 如果玩家尝试取出定制后的物品, 意味着玩家想要完成这次定制.
                 // 下面要做的就是检查玩家是否满足完成定制的所有要求.
-                // 如果满足就消耗资源, 给予定制后的物品.
-                // 如果不满足则终止操作, 给玩家合适的提示.
+                // - 如果满足则消耗资源, 给予定制后的物品.
+                // - 如果不满足则终止操作, 展示玩家相应的提示.
 
                 // 获取当前定制的结果
-                val result = session.latestResult
+                val reforgeResult = session.latestResult
 
                 // 如果结果成功的话:
-                if (result.successful) {
+                if (reforgeResult.isSuccess) {
 
                     // 玩家必须先确认才能完成定制
                     if (!confirmed) {
-                        val rendered = ResultRender.confirm(result)
-                        setOutputSlot(rendered)
                         confirmed = true
+                        updateOutputSlot()
                         return
                     }
 
-                    // 储存所有需要给予玩家的物品
-                    val itemsToGive = buildList {
-                        // 定制后的物品
-                        add(result.outputItem?.itemStack ?: run {
-                            logger.error("$PREFIX Output item is null, but the player is trying to take it. This is a bug!")
-                            return
+                    // 检查玩家是否有足够的资源完成定制
+                    if (!reforgeResult.reforgeCost.test(viewer)) {
+                        setOutputSlot(ItemStack.of(Material.BARRIER).edit {
+                            itemName = "<white>结果: <red>资源不足".mini
                         })
-
-                        // 未使用的物品, 一般是无效的耗材
-                        addAll(session.getInapplicablePlayerInputs())
+                        return
                     }
-                    // 把所有输出的物品给予玩家
-                    viewer.inventory.addItem(*itemsToGive.toTypedArray())
 
-                    // 从玩家身上拿走需要的资源
-                    result.cost.take(viewer)
+                    // 从玩家身上拿走本次定制需要的资源
+                    reforgeResult.reforgeCost.take(viewer)
 
-                    // 重置会话状态
+                    // 把会话中所有的物品输出给予玩家
+                    viewer.inventory.addItem(*session.getFinalOutputs())
+
                     session.reset()
-
-                    // 清空菜单内容
-                    setInputSlot(null)
-                    setOutputSlot(null)
-                    setReplaceGuis(null)
-
-                    // 重置确认状态
                     confirmed = false
-
-                    return
+                    updateInputSlot()
+                    recreateReplaceGuis()
+                    updateOutputSlot()
                 }
 
                 // 如果结果失败的话:
                 else {
-                    viewer.sendPlainMessage("猫咪不可以!")
+                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 }
             }
         }
     }
 
     private fun onWindowClose() {
+        logger.info("Modding window closed for ${viewer.name}")
+
         // 将定制过程中玩家输入的所有物品归还给玩家
-        val itemsToReturn = session.getAllPlayerInputs()
-        viewer.inventory.addItem(*itemsToReturn.toTypedArray())
+        viewer.inventory.addItem(*session.getAllInputs())
 
         // 冻结会话
+        session.reset()
         session.frozen = true
     }
 
@@ -296,15 +254,92 @@ internal class ModdingMenu(
         // NOP
     }
 
-    init {
-        inputSlot.setPreUpdateHandler(::onInputInventoryPreUpdate)
-        outputSlot.setPreUpdateHandler(::onOutputInventoryPreUpdate)
-        inputSlot.guiPriority = 10
-        outputSlot.guiPriority = 0
+    /**
+     * 基于当前的所有状态执行一次定制.
+     */
+    fun executeReforge() {
+        session.executeReforge()
     }
 
-    private fun setReplaceGuis(guis: List<Gui>?) {
-        primaryGui.setContent(guis)
+    /**
+     * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
+     */
+    fun updateInputSlot() {
+        setInputSlot(renderInputItem())
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新 [outputSlot], 也就是定制后的物品.
+     */
+    fun updateOutputSlot() {
+        val reforgeResult = session.latestResult
+        val newItemStack = if (reforgeResult.isSuccess) {
+            // 定制成功了:
+
+            val output = reforgeResult.output ?: error("Output item is null, but the result is successful. This is a bug!")
+            val context = ModdingTableContext.Output(session)
+            ItemRenderers.MODDING_TABLE.render(output, context)
+            output.directEdit {
+                if (confirmed) {
+                    lore = lore.orEmpty() + listOf(
+                        empty(),
+                        "<gray>[<aqua>点击确认取出</aqua>]".mini
+                    ).removeItalic
+                }
+            }
+
+        } else {
+            // 定制失败了:
+
+            ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>失败".mini
+                lore = reforgeResult.description.removeItalic
+            }
+        }
+
+        setOutputSlot(newItemStack)
+    }
+
+    /**
+     * 刷新当前所有的 [selectionMenus].
+     */
+    fun refreshReplaceGuis(excluded: ReplaceMenu) {
+        selectionMenus.filter { it !== excluded }.forEach { menu ->
+            // 让这个 replace 单独重新执行一次重铸, 更新状态.
+            // 这样之后在主菜单执行重铸时, 才能读取最新的状态.
+            menu.replace.bake()
+            menu.updateInputSlot()
+        }
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新子菜单, 为每个核孔创建好一个新的 [ReplaceMenu].
+     */
+    private fun recreateReplaceGuis() {
+        val menus = session.replaceParams.values
+            // 只为可被定制的核孔创建菜单
+            .filter { replace -> replace.changeable }
+            // 给每个 Replace 创建菜单
+            .map { replace -> ReplaceMenu(this, replace) }
+
+        selectionMenus.clear()
+        selectionMenus += menus
+
+        setReplaceGuis(menus.map(ReplaceMenu::primaryGui))
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
+     */
+    private fun renderInputItem(): ItemStack? {
+        val sourceItem = session.usableInput
+            ?: return session.originalInput // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
+
+        val context = ModdingTableContext.Input(session)
+        ItemRenderers.MODDING_TABLE.render(sourceItem, context)
+        val newItemStack = sourceItem.itemStack
+
+        return newItemStack
     }
 
     private fun setInputSlot(stack: ItemStack?) {
@@ -313,6 +348,10 @@ internal class ModdingMenu(
 
     private fun setOutputSlot(stack: ItemStack?) {
         outputSlot.setItemSilently(0, stack)
+    }
+
+    private fun setReplaceGuis(guis: List<Gui>?) {
+        primaryGui.setContent(guis)
     }
 
     /**

@@ -38,15 +38,15 @@ Compound('wakame')
         // 可以释放技能?
         Compound('castable')
 
-        // 词条栏
+        // 核孔
         Compound('cells')
-            // 词条栏的 id
+            // 核孔的 id
             Compound('a')
-                 // 词条栏的内容（词条）
+                 // 核孔的内容（核心）
                 Compound('core')
-                    // 词条的 id
+                    // 核心的 id
                     String('id'): 'attribute:attack_damage'
-                    // 词条的具体设置
+                    // 核心的具体设置
                     Short('min'): 10s
                     Short('max'): 15s
                     Byte('elem'): 0b
@@ -55,7 +55,7 @@ Compound('wakame')
                 Compound('reforge')
                     Byte('success'): 5b
                     Byte('failure'): 1b
-                // 词条栏的解锁条件
+                // 核孔的解锁条件
                 Compound('curse')
                     // 诅咒的 id
                     String('id'): 'entity_kills'

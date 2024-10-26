@@ -27,7 +27,7 @@ sealed interface ItemGenerationResult<out T> {
          * @param T 物品组件的快照类型
          */
         fun <T> empty(): ItemGenerationResult<T> {
-            return Empty as ItemGenerationResult<T>
+            return Empty
         }
 
         /**

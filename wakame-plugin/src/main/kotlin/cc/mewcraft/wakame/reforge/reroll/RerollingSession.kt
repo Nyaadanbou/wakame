@@ -32,21 +32,36 @@ interface RerollingSession : Examinable {
     val total: MochaFunction
 
     /**
-     * 要被重造的物品; 访问该物品会返回一个克隆.
+     * 需要被重造的物品.
      *
-     * ## 副作用
+     * ### 契约
+     * - 当为 `null` 时, 说明此时玩家还没有放入需要重造的物品.
+     * - 当不为 `null` 时, 说明此时玩家已经放入了需要重造的物品.
+     * - 该物品不一定是合法的可重造物品! 玩家输入什么就是什么.
+     * - 该物品不应该被任何形式修改, 应该完整保存输入时的状态.
+     * - 访问该物品始终会返回一个克隆.
      *
-     * 对该属性赋值时:
-     * - 会生成一个新的 [Result] 并赋值给 [RerollingSession.latestResult]
-     * - 会生成一个新的 [SelectionMap] 并赋值给 [RerollingSession.selectionMap]
+     * ### 副作用
+     * 为该物品赋值将自动执行一次完整的重铸流程, 具体如下:
+     * - 如果物品是合法的, [usableInput] 将不再返回 `null`
+     * - 生成新的 [SelectionMap] 并赋值给 [selectionMap]
+     * - 生成新的 [ReforgeResult] 并赋值给 [latestResult]
      */
     @VariableByPlayer
-    @get:Contract(" -> new")
-    @set:Contract("_ -> param")
-    var sourceItem: NekoStack?
+    var originalInput: ItemStack?
 
     /**
-     * 每个词条栏的选择状态.
+     * 需要被重造的物品; 访问该物品会返回一个克隆.
+     *
+     * ### 契约
+     * 如果 [originalInput] 无法用于定制, 则该属性会返回 `null`.
+     * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
+     */
+    @VariableByPlayer
+    val usableInput: NekoStack?
+
+    /**
+     * 每个核孔的选择状态.
      */
     @VariableByPlayer
     val selectionMap: SelectionMap
@@ -55,7 +70,7 @@ interface RerollingSession : Examinable {
      * 封装了重造后的结果.
      */
     @VariableByPlayer
-    val latestResult: Result
+    val latestResult: ReforgeResult
 
     /**
      * 标记该会话是否已冻结.
@@ -67,9 +82,9 @@ interface RerollingSession : Examinable {
      * 根据会话的当前状态, 执行一次重造.
      *
      * ## 副作用
-     * 该函数会将新的结果 [Result] 赋值到属性 [latestResult].
+     * 该函数会将新的结果 [ReforgeResult] 赋值到属性 [latestResult].
      */
-    fun executeReforge(): Result
+    fun executeReforge(): ReforgeResult
 
     /**
      * 重置会话的状态.
@@ -77,23 +92,25 @@ interface RerollingSession : Examinable {
     fun reset()
 
     /**
-     * 返回玩家输入的所有物品.
+     * 返回输入进菜单的所有物品.
      */
-    fun getAllPlayerInputs(): Collection<ItemStack>
+    fun getAllInputs(): Array<ItemStack>
 
     /**
-     * 返回玩家输入的未使用的物品.
+     * 返回本会话产生的最终物品输出, 无论是重造成功还是失败.
+     * 如果重造成功, 这包括了重造成功后的物品, 以及所有未使用的耗材.
+     * 如果重造失败, 则包括了需要被重造的物品, 以及输入的所有耗材.
      */
-    fun getUnusedPlayerInputs(): Collection<ItemStack>
+    fun getFinalOutputs(): Array<ItemStack>
 
     /**
      * 封装了一次重造的结果.
      */
-    interface Result : Examinable {
+    interface ReforgeResult : Examinable {
         /**
          * `true` 表示重造已准备就绪.
          */
-        val successful: Boolean
+        val isSuccess: Boolean
 
         /**
          * 本次重造的结果的描述.
@@ -101,21 +118,21 @@ interface RerollingSession : Examinable {
         val description: List<Component>
 
         /**
+         * 本次重造的总花费.
+         */
+        val reforgeCost: ReforgeCost
+
+        /**
          * 重造后的物品.
          */
         @get:Contract(" -> new")
-        val item: NekoStack
-
-        /**
-         * 本次重造的总花费.
-         */
-        val cost: Cost
+        val output: NekoStack
     }
 
     /**
      * 封装了一次重造所需要消耗的资源.
      */
-    interface Cost : Examinable {
+    interface ReforgeCost : Examinable {
         /**
          * 扣除玩家身上相应的货币.
          */
@@ -133,7 +150,7 @@ interface RerollingSession : Examinable {
     }
 
     /**
-     * 封装了单个词条栏的选择状态.
+     * 封装了单个核孔的选择状态.
      */
     interface Selection : Examinable {
         /**
@@ -142,39 +159,34 @@ interface RerollingSession : Examinable {
         val session: RerollingSession
 
         /**
-         * 词条栏的唯一标识.
+         * 核孔的唯一标识.
          */
         val id: String
 
         /**
-         * 词条栏的重造规则.
+         * 核孔的重造规则.
          */
         val rule: RerollingTable.CellRule
 
         /**
-         * 用于重新随机词条栏核心的掉落表.
-         */
-        val template: Group<CoreBlueprint, ItemGenerationContext>
-
-        /**
-         * 词条栏在菜单中的图标, 用于告诉玩家这个词条栏是什么.
-         */
-        val display: ItemStack
-
-        /**
-         * 词条栏花费的计算函数.
-         */
-        val total: MochaFunction
-
-        /**
-         * 词条栏是否可以被重造.
+         * 核孔是否可以被重造.
          */
         val changeable: Boolean
 
         /**
-         * 记录了该词条栏是否被选择重造.
+         * 用于重新随机核孔核心的掉落表.
+         */
+        val template: Group<CoreBlueprint, ItemGenerationContext>
+
+        /**
+         * 核孔花费的计算函数.
+         */
+        val total: MochaFunction
+
+        /**
+         * 记录了该核孔是否被选择重造.
          *
-         * `true` 表示该词条栏应该被重造.
+         * `true` 表示该核孔应该被重造.
          */
         @VariableByPlayer
         var selected: Boolean
@@ -188,13 +200,17 @@ interface RerollingSession : Examinable {
     }
 
     /**
-     * 封装了所有词条栏的选择状态 ([Selection]).
+     * 封装了所有核孔的选择状态 ([Selection]).
      *
      * ## 设计哲学
-     * 本对象覆盖了物品上所有的词条栏, 无论这个词条栏能否被重造.
-     * 对于能被重造的词条栏, 会有一个普通的 [Selection] 对象来表示.
-     * 对于不能被重造的词条栏, 会有一个特殊的 [Selection] 对象来表示.
-     * 这可以让我们优雅的分别处理这两种情况.
+     * 本对象覆盖了物品上所有的核孔, 无论这个核孔能否被重造, 或是否在重造系统中“存在定义”.
+     * 所谓“存在定义”, 具体指的是, 在设计上是否已经为一个核孔定义了重造规则.
+     *
+     * 对于可以被重造的核孔, 会有一个普通的 [Selection] 对象来表示.
+     * 对于不可以被重造的核孔, 会有一个特殊的 [Selection] 对象来表示.
+     *
+     * 无论 [Selection] 的实现如何, 其行为和结果应该都是合理的.
+     * 这可以让其他系统在访问本接口时能够优雅的处理所有的特殊情况.
      */
     interface SelectionMap : Examinable, Iterable<Map.Entry<String, Selection>> {
         /**
@@ -202,12 +218,30 @@ interface RerollingSession : Examinable {
          */
         val session: RerollingSession
 
+        /**
+         * 在配置文件中存在定义的核孔的数量.
+         */
         val size: Int
-        val keys: Set<String>
-        val values: Collection<Selection>
-        val isEmpty: Boolean
 
-        operator fun get(id: String): Selection?
+        /**
+         * 在配置文件中存在定义的核孔的 id.
+         */
+        val keys: Set<String>
+
+        /**
+         * 所有核孔的 [Selection].
+         */
+        val values: Collection<Selection>
+
+        /**
+         * 获得指定核孔的 [Selection].
+         * 该函数对于任意 id 都会返回一个 [Selection].
+         */
+        operator fun get(id: String): Selection
+
+        /**
+         * 检查指定核孔是否在系统中存在定义.
+         */
         operator fun contains(id: String): Boolean
     }
 }

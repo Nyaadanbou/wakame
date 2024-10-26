@@ -1,12 +1,12 @@
 base: bedrock
 
 # 假设物品等级为 10
-# 一个简单的词条栏设置
+# 一个简单的核孔设置
 cells:
   buckets:
     attack:
       core: "base_attack"
-      # 这个词条栏没有诅咒
+      # 这个核孔没有诅咒
     bonus:
       core: "base_bonus"
   selectors:

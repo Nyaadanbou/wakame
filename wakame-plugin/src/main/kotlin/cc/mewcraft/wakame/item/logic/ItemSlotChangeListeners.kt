@@ -81,7 +81,7 @@ internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
 /**
  * 属性.
  *
- * 物品发生变化时, 根据物品词条栏, 修改玩家的 [cc.mewcraft.wakame.attribute.AttributeMap].
+ * 物品发生变化时, 根据物品核孔, 修改玩家的 [cc.mewcraft.wakame.attribute.AttributeMap].
  */
 internal object AttributeItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {

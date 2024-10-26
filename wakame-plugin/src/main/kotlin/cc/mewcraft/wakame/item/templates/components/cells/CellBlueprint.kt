@@ -12,7 +12,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * 代表一个 [词条栏][cc.mewcraft.wakame.item.components.cells.Cell] 的模板.
+ * 代表一个 [核孔][cc.mewcraft.wakame.item.components.cells.Cell] 的模板.
  */
 interface CellBlueprint {
     /**
@@ -29,13 +29,13 @@ internal class SimpleCellBlueprint(
 ) : CellBlueprint
 
 /**
- * 词条栏模板的序列化器。
+ * 核孔模板的序列化器。
  *
  * 该序列化实现要求给定的节点中已经存在“选择器”的根节点.
  *
- * 请注意，配置中的词条栏的“核心”是 *分散* 的, 也就是它们不在同一个节点中!
+ * 请注意，配置中的核孔的“核心”是 *分散* 的, 也就是它们不在同一个节点中!
  *
- * 例如, 给定这样一个词条栏节点:
+ * 例如, 给定这样一个核孔节点:
  * ```yaml
  * <node>:
  *   core: group_b # 这只是一个到指定节点的 *路径*

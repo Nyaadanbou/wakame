@@ -71,8 +71,8 @@ internal abstract class AbstractRendererLayout(
 
         // loop through each unprocessed primary line and
         // create corresponding TextMeta for each of them
-        for ((sourceIndex, unprocessedLine) in unprocessedPrimary.withIndex()) {
-            val textMeta = createTextMeta(unprocessedLine, sourceIndex) ?: continue
+        for ((sourceOrdinal, unprocessedLine) in unprocessedPrimary.withIndex()) {
+            val textMeta = createTextMeta(unprocessedLine, sourceOrdinal) ?: continue
 
             val derivedOrdinals = textMeta.deriveOrdinals(accIndexOffset).onEach { (derivedIndex, derivedOrdinal) ->
                 // populate the ordinal lookup
