@@ -41,9 +41,15 @@ private constructor(
             return ReforgeResult.error()
         }
 
-        // 获取源物品
-        // 如果源物品不存在, 返回一个空结果
-        val sourceItem = session.usableInput ?: return ReforgeResult.empty()
+        // 获取 originalInput
+        // 如果 originalInput 不存在, 则代表没有输入
+        val originalInput = session.originalInput
+            ?: return ReforgeResult.empty()
+
+        // 获取 usableInput
+        // 如果 usableInput 不存在, 则代表物品无法重造
+        val usableInput = session.usableInput
+            ?: return ReforgeResult.failure("<gray>物品无法重造.".mini)
 
         // 获取核孔的选择状态
         // 如果没有可重造的核孔, 返回一个失败结果
@@ -58,10 +64,10 @@ private constructor(
         }
 
         // 获取必要的物品组件
-        val itemId = sourceItem.id
-        val itemLevel = sourceItem.components.get(ItemComponentTypes.LEVEL)?.level
+        val itemId = usableInput.id
+        val itemLevel = usableInput.components.get(ItemComponentTypes.LEVEL)?.level
             ?: return ReforgeResult.failure("<gray>物品不可重造.".mini)
-        val itemCells = sourceItem.components.get(ItemComponentTypes.CELLS)
+        val itemCells = usableInput.components.get(ItemComponentTypes.CELLS)
             ?: return ReforgeResult.failure("<gray>物品不可重造.".mini)
 
         // 检查在已选择的核孔当中, 是否有超过了重造次数上限的核孔
@@ -74,9 +80,9 @@ private constructor(
         }
 
         // 获取可有可无的物品组件
-        val itemRarity = sourceItem.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
-        val itemElements = sourceItem.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-        val itemKizamiz = sourceItem.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
+        val itemRarity = usableInput.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+        val itemElements = usableInput.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+        val itemKizamiz = usableInput.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
 
         // 准备生成核心用的上下文
         val context = try {
@@ -118,7 +124,7 @@ private constructor(
         }.build()
 
         // 准备作为输出的物品
-        val output = sourceItem.clone()
+        val output = usableInput.clone()
 
         // 将新的核孔组件写入物品
         output.components.set(ItemComponentTypes.CELLS, updatedItemCells)
