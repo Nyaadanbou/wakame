@@ -121,8 +121,8 @@ internal class RerollingMenu(
                 // 重新渲染放入的物品
                 event.newItem = renderInputItem(added)
 
-                updateOutputSlot()
                 updateSelectionGuis()
+                updateOutputSlot()
             }
 
             // 玩家尝试从 inputSlot 拿出物品:
@@ -138,8 +138,8 @@ internal class RerollingMenu(
                 confirmed = false
 
                 updateInputSlot()
-                updateOutputSlot()
                 updateSelectionGuis()
+                updateOutputSlot()
             }
         }
     }
@@ -205,8 +205,8 @@ internal class RerollingMenu(
                 confirmed = false
 
                 updateInputSlot()
-                updateOutputSlot()
                 updateSelectionGuis()
+                updateOutputSlot()
             }
         }
     }
