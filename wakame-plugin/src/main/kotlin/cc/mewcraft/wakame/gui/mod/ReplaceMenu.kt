@@ -83,7 +83,7 @@ internal class ReplaceMenu(
                 event.newItem = renderInputItem()
 
                 parent.refreshReplaceGuis(this)
-                parent.executeReforge() // FIXME 可以优化掉这个吗?
+                parent.executeReforge()
                 parent.updateInputSlot()
                 parent.updateOutputSlot()
                 parent.confirmed = false
@@ -108,7 +108,7 @@ internal class ReplaceMenu(
                 updateInputSlot()
 
                 parent.refreshReplaceGuis(this)
-                parent.executeReforge() // FIXME 可以优化掉这个吗?
+                parent.executeReforge()
                 parent.updateInputSlot()
                 parent.updateOutputSlot()
                 parent.confirmed = false

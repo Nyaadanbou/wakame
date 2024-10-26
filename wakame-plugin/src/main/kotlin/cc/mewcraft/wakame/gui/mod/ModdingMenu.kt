@@ -305,7 +305,9 @@ internal class ModdingMenu(
      */
     fun refreshReplaceGuis(excluded: ReplaceMenu) {
         selectionMenus.filter { it !== excluded }.forEach { menu ->
-            menu.replace.bake() // 重新执行一次流程, 更新状态
+            // 让这个 replace 单独重新执行一次重铸, 更新状态.
+            // 这样之后在主菜单执行重铸时, 才能读取最新的状态.
+            menu.replace.bake()
             menu.updateInputSlot()
         }
     }

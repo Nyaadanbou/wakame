@@ -34,9 +34,9 @@ internal class SimpleRerollingSession(
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
-    override var originalInput: ItemStack? by InputItemDelegate(null)
+    override var originalInput: ItemStack? by OriginalInputDelegate(null)
 
-    override var usableInput: NekoStack? by SourceItemDelegate(null)
+    override var usableInput: NekoStack? by UsableInputDelegate(null)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
         logger.info("Selection map updated: $old -> $new")
@@ -97,7 +97,7 @@ internal class SimpleRerollingSession(
 
     override fun toString(): String = toSimpleString()
 
-    private inner class InputItemDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+    private inner class OriginalInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
         override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
             return backing?.clone()
         }
@@ -110,7 +110,7 @@ internal class SimpleRerollingSession(
         }
     }
 
-    private inner class SourceItemDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
+    private inner class UsableInputDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
         override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
             return backing?.clone()
         }
@@ -374,22 +374,22 @@ internal object SelectionMap : KoinComponent {
     fun simple(session: RerollingSession): RerollingSession.SelectionMap {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
-        val sourceItem = session.usableInput ?: return empty(session)
+        val usableInput = session.usableInput ?: return empty(session)
 
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
-        val templates = sourceItem.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            logger.info("Source item has no `cells` template.")
+        val templates = usableInput.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
+            logger.info("Usable input has no `cells` template.")
             return empty(session)
         }
 
         // 获取源物品的核孔
         // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
-        val cells = sourceItem.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
+        val cells = usableInput.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[sourceItem.id] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[usableInput.id] ?: return empty(session)
 
         val selectionMap = Simple(session)
         for ((id, _) in cells) {

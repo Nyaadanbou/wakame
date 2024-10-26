@@ -39,34 +39,6 @@ internal class MergingMenu(
     }
 
     /**
-     * 基于当前 [session] 的状态, 执行一次合并操作.
-     */
-    private fun executeReforge() {
-        session.executeReforge()
-    }
-
-    /**
-     * 基于当前 [session] 的状态, 渲染物品 [source].
-     */
-    private fun renderInputSlot(source: NekoStack): ItemStack {
-        val context = MergingTableContext.MergeInputSlot(session)
-        ItemRenderers.MERGING_TABLE.render(source, context)
-        return source.itemStack
-    }
-
-    /**
-     * 根据当前 [session] 的状态, 刷新输出容器里的物品.
-     */
-    private fun updateOutputSlot() {
-        // 获取最新的合并结果
-        val result = session.latestResult
-        // 根据合并的结果, 渲染输出容器里的物品
-        val output = renderOutputSlot(result)
-        // 设置输出容器里的物品
-        setOutputSlot(output)
-    }
-
-    /**
      * 本次合并的会话.
      *
      * ## 开发日记 2024/8/9
@@ -133,14 +105,14 @@ internal class MergingMenu(
 
         when {
             e.isSwap -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 e.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             e.isAdd -> {
                 val added = newItem?.customNeko ?: run {
-                    viewer.sendMessage(text { content("请放入一个核心!"); color(NamedTextColor.RED) })
                     e.isCancelled = true
+                    viewer.sendMessage(text { content("不是便携核心."); color(NamedTextColor.RED) })
                     return
                 }
 
@@ -158,7 +130,6 @@ internal class MergingMenu(
                 e.newItem = renderInputSlot(added)
 
                 confirmed = false
-
                 executeReforge()
                 updateOutputSlot()
             }
@@ -179,7 +150,6 @@ internal class MergingMenu(
                 }
 
                 confirmed = false
-
                 executeReforge()
                 updateOutputSlot()
             }
@@ -193,20 +163,22 @@ internal class MergingMenu(
 
         when {
             e.isSwap || e.isAdd -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 e.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             e.isRemove -> {
                 e.isCancelled = true
-
-                val result = session.latestResult
-                if (result.isSuccess) {
+                val reforgeResult = session.latestResult
+                if (reforgeResult.isSuccess) {
 
                     // 玩家必须有足够的资源
-                    if (!result.reforgeCost.test(viewer)) {
+                    if (!reforgeResult.reforgeCost.test(viewer)) {
                         setOutputSlot(ItemStack.of(Material.BARRIER).edit {
-                            itemName = text { content("资源不足!"); color(NamedTextColor.RED) }
+                            itemName = text {
+                                content("结果: ").color(NamedTextColor.WHITE)
+                                append(text("资源不足").color(NamedTextColor.RED))
+                            }
                         })
                         return
                     }
@@ -234,46 +206,33 @@ internal class MergingMenu(
     }
     //</editor-fold>
 
-    private fun onWindowClose() {
-        logger.info("Menu closed for ${viewer.name}")
 
-        setInputSlot1(null)
-        setInputSlot2(null)
-        setOutputSlot(null)
-
-        session.returnInputItem1(viewer)
-        session.returnInputItem2(viewer)
-        session.frozen = true
+    /**
+     * 基于当前 [session] 的状态, 执行一次合并操作.
+     */
+    private fun executeReforge() {
+        session.executeReforge()
     }
 
-    private fun onWindowOpen() {
-        logger.info("Menu opened for ${viewer.name}")
+    /**
+     * 基于当前 [session] 的状态, 渲染物品 [source].
+     */
+    private fun renderInputSlot(source: NekoStack): ItemStack {
+        val context = MergingTableContext.MergeInputSlot(session)
+        ItemRenderers.MERGING_TABLE.render(source, context)
+        return source.itemStack
     }
 
-    private fun getInputSlot1(): ItemStack? {
-        return inputSlot1.getItem(0)
-    }
-
-    @Suppress("SameParameterValue")
-    private fun setInputSlot1(item: ItemStack?) {
-        inputSlot1.setItemSilently(0, item)
-    }
-
-    private fun getInputSlot2(): ItemStack? {
-        return inputSlot2.getItem(0)
-    }
-
-    @Suppress("SameParameterValue")
-    private fun setInputSlot2(item: ItemStack?) {
-        inputSlot2.setItemSilently(0, item)
-    }
-
-    private fun getOutputSlot(): ItemStack? {
-        return outputSlot.getItem(0)
-    }
-
-    private fun setOutputSlot(item: ItemStack?) {
-        outputSlot.setItemSilently(0, item)
+    /**
+     * 根据当前 [session] 的状态, 刷新输出容器里的物品.
+     */
+    private fun updateOutputSlot() {
+        // 获取最新的合并结果
+        val result = session.latestResult
+        // 根据合并的结果, 渲染输出容器里的物品
+        val output = renderOutputSlot(result)
+        // 设置输出容器里的物品
+        setOutputSlot(output)
     }
 
     /**
@@ -310,5 +269,35 @@ internal class MergingMenu(
                 lore = listOf(result.description).removeItalic
             }
         }
+    }
+
+    private fun onWindowClose() {
+        logger.info("Menu closed for ${viewer.name}")
+
+        setInputSlot1(null)
+        setInputSlot2(null)
+        setOutputSlot(null)
+
+        session.returnInputItem1(viewer)
+        session.returnInputItem2(viewer)
+        session.frozen = true
+    }
+
+    private fun onWindowOpen() {
+        logger.info("Menu opened for ${viewer.name}")
+    }
+
+    @Suppress("SameParameterValue")
+    private fun setInputSlot1(item: ItemStack?) {
+        inputSlot1.setItemSilently(0, item)
+    }
+
+    @Suppress("SameParameterValue")
+    private fun setInputSlot2(item: ItemStack?) {
+        inputSlot2.setItemSilently(0, item)
+    }
+
+    private fun setOutputSlot(item: ItemStack?) {
+        outputSlot.setItemSilently(0, item)
     }
 }
