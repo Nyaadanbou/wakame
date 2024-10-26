@@ -272,7 +272,7 @@ internal class MergingMenu(
     }
 
     private fun onWindowClose() {
-        logger.info("Menu closed for ${viewer.name}")
+        logger.info("Merging window closed for ${viewer.name}")
 
         setInputSlot1(null)
         setInputSlot2(null)
@@ -284,7 +284,7 @@ internal class MergingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("Menu opened for ${viewer.name}")
+        logger.info("Merging window opened for ${viewer.name}")
     }
 
     @Suppress("SameParameterValue")

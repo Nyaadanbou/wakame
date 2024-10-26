@@ -102,18 +102,18 @@ internal class SimpleModdingTable(
     }
 
     class ItemRuleMap(
-        private val map: Map<Key, ModdingTable.ItemRule>,
+        private val data: Map<Key, ModdingTable.ItemRule>,
     ) : ModdingTable.ItemRuleMap {
         override fun get(key: Key): ModdingTable.ItemRule? {
-            return map[key]
+            return data[key]
         }
 
         override fun contains(key: Key): Boolean {
-            return map.containsKey(key)
+            return data.containsKey(key)
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", map),
+            ExaminableProperty.of("map", data),
         )
 
         override fun toString(): String = toSimpleString()
@@ -150,7 +150,7 @@ internal class SimpleModdingTable(
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", data)
+            ExaminableProperty.of("data", data)
         )
 
         override fun toString(): String = toSimpleString()

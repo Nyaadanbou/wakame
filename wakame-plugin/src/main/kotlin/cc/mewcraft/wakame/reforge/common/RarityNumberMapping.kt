@@ -64,7 +64,7 @@ private object EmptyRarityNumberMapping : RarityNumberMapping {
 }
 
 private class ConstantRarityNumberMapping(
-    val constant: Double
+    val constant: Double,
 ) : RarityNumberMapping {
     override fun get(key: Key): Double {
         return constant
@@ -78,14 +78,14 @@ private class ConstantRarityNumberMapping(
 }
 
 private class SimpleRarityNumberMapping(
-    private val map: Map<Key, Double>,
+    private val data: Map<Key, Double>,
 ) : RarityNumberMapping {
     override fun get(key: Key): Double {
-        return map[key] ?: 0.0
+        return data[key] ?: 0.0
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("map", map)
+        ExaminableProperty.of("data", data)
     )
 
     override fun toString(): String = toSimpleString()

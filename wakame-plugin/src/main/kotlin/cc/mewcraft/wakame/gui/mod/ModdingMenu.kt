@@ -251,7 +251,7 @@ internal class ModdingMenu(
     }
 
     private fun onWindowOpen() {
-        // NOP
+        logger.info("Modding window opened for ${viewer.name}")
     }
 
     /**

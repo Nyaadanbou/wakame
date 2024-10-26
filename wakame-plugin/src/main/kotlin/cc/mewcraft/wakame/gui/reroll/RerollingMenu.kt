@@ -307,7 +307,7 @@ internal class RerollingMenu(
     }
 
     private fun onWindowOpen() {
-        logger.info("RerollingMenu opened for ${viewer.name}")
+        logger.info("Rerolling window opened for ${viewer.name}")
     }
 
     private fun setInputSlot(stack: ItemStack?) {

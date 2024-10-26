@@ -206,7 +206,7 @@ internal object ReforgeResult {
         override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", isSuccess),
+            ExaminableProperty.of("isSuccess", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("reforgeType", reforgeType),
             ExaminableProperty.of("reforgeCost", reforgeCost),

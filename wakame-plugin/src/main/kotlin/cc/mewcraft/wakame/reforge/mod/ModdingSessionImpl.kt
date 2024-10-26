@@ -42,7 +42,7 @@ internal class SimpleModdingSession(
 
     // 初始为 ReplaceMap.empty() 表示还没有输入
     override var replaceParams: ModdingSession.ReplaceMap by Delegates.observable(ReforgeReplaceMap.empty(this)) { _, old, new ->
-        logger.info("Session's replace parameters updated: $old -> $new")
+        // logger.info("Session's replace parameters updated: $old -> $new")
     }
 
     // 从配置文件编译 MochaFunction
@@ -161,7 +161,7 @@ internal class SimpleModdingSession(
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("table", table),
         ExaminableProperty.of("viewer", viewer.name),
-        ExaminableProperty.of("sourceItem", usableInput),
+        ExaminableProperty.of("usableInput", usableInput),
     )
 
     override fun toString(): String = toSimpleString()
@@ -281,7 +281,7 @@ internal object ReforgeResult {
 
     private abstract class Base : ModdingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("successful", isSuccess),
+            ExaminableProperty.of("isSuccess", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("reforgeCost", reforgeCost),
             ExaminableProperty.of("output", output),
@@ -715,7 +715,7 @@ private object ReforgeReplaceMap {
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("size", size),
-            ExaminableProperty.of("data", data),
+            ExaminableProperty.of("keys", keys),
         )
 
         override fun toString(): String {

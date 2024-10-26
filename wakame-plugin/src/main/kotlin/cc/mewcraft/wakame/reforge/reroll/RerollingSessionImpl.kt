@@ -39,7 +39,7 @@ internal class SimpleRerollingSession(
     override var usableInput: NekoStack? by UsableInputDelegate(null)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
-        logger.info("Selection map updated: $old -> $new")
+        // logger.info("Selection map updated: $old -> $new")
     }
 
     override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
@@ -166,7 +166,7 @@ internal object ReforgeResult {
 
     private abstract class Base : RerollingSession.ReforgeResult {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", isSuccess),
+            ExaminableProperty.of("isSuccess", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("reforgeCost", reforgeCost),
             ExaminableProperty.of("output", output),
@@ -209,7 +209,7 @@ internal object ReforgeResult {
         override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("successful", isSuccess),
+            ExaminableProperty.of("isSuccess", isSuccess),
             ExaminableProperty.of("description", description.plain),
             ExaminableProperty.of("reforgeCost", reforgeCost),
             ExaminableProperty.of("output", output),
@@ -349,8 +349,6 @@ internal object Selection {
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("id", id),
-            ExaminableProperty.of("rule", rule),
-            ExaminableProperty.of("group", template),
             ExaminableProperty.of("selected", selected),
         )
 

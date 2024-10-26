@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -64,9 +63,9 @@ internal class SimpleRerollingTable(
 ) : RerollingTable {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
+        ExaminableProperty.of("id", identifier),
         ExaminableProperty.of("enabled", enabled),
-        ExaminableProperty.of("title", title),
+        ExaminableProperty.of("title", title.plain),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("currencyCost", currencyCost),
         ExaminableProperty.of("itemRuleMap", itemRuleMap),
@@ -102,7 +101,7 @@ internal class SimpleRerollingTable(
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", data),
+            ExaminableProperty.of("data", data),
         )
 
         override fun toString(): String = toSimpleString()
@@ -130,7 +129,7 @@ internal class SimpleRerollingTable(
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", data),
+            ExaminableProperty.of("data", data),
         )
 
         override fun toString(): String = toSimpleString()
