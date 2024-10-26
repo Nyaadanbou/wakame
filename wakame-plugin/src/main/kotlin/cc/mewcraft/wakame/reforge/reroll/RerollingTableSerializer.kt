@@ -88,7 +88,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val itemRules = NamespacedPathCollector(tableItemsDirectory, true)
             .collect("yml")
             .associate {
-                val key = Key.key(it.namespace, it.path)
+                val itemId = Key.key(it.namespace, it.path)
                 val itemRule = run {
                     val text = it.file.readText()
                     val itemRuleNode = yamlConfig {
@@ -99,16 +99,16 @@ internal object RerollingTableSerializer : KoinComponent {
                         }
                     }.buildAndLoadString(text)
 
-                    val cellRules = itemRuleNode.node("cells").krequire<Map<String, RerollingTable.CellRule>>()
+                    val cellRuleMapData = itemRuleNode.node("cells").krequire<Map<String, RerollingTable.CellRule>>()
+                    val cellRuleMap = LinkedHashMap(cellRuleMapData)
+
                     // 未来可能会包含更多规则
                     // ...
 
-                    SimpleRerollingTable.ItemRule(
-                        cellRuleMap = SimpleRerollingTable.CellRuleMap(cellRules)
-                    )
+                    SimpleRerollingTable.ItemRule(SimpleRerollingTable.CellRuleMap(cellRuleMap))
                 }
 
-                key to itemRule
+                itemId to itemRule
             }
             .toMap(HashMap())
             .let(SimpleRerollingTable::ItemRuleMap)

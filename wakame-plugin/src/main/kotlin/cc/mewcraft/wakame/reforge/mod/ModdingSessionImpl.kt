@@ -213,20 +213,21 @@ internal class SimpleModdingSession(
 
         private fun createReplaceParameters(
             thisRef: SimpleModdingSession,
-            inputCells: ItemCells,
-            inputItemRule: ItemRule,
+            itemCells: ItemCells,
+            itemRule: ItemRule,
         ): ModdingSession.ReplaceMap {
-            val data = mutableMapOf<String, ModdingSession.Replace>()
-            for ((id, cell) in inputCells) {
-                val rule = inputItemRule.cellRules[id]
+            val cellRuleMap = itemRule.cellRuleMap
+            val replaceData = sortedMapOf<String, ModdingSession.Replace>(cellRuleMap.comparator)
+            for ((id, cell) in itemCells) {
+                val rule = cellRuleMap[id]
                 if (rule != null) {
-                    data[id] = ReforgeReplace.changeable(thisRef, cell, rule)
+                    replaceData[id] = ReforgeReplace.changeable(thisRef, cell, rule)
                 } else {
-                    data[id] = ReforgeReplace.unchangeable(thisRef, cell)
+                    replaceData[id] = ReforgeReplace.unchangeable(thisRef, cell)
                 }
             }
 
-            return ReforgeReplaceMap.simple(thisRef, data)
+            return ReforgeReplaceMap.simple(thisRef, LinkedHashMap(replaceData))
         }
     }
 
@@ -641,7 +642,7 @@ private object ReforgeReplaceMap {
      *
      * 当存在可以定制的核孔时, 使用这个.
      */
-    fun simple(session: SimpleModdingSession, data: Map<String, ModdingSession.Replace> = HashMap()): ModdingSession.ReplaceMap {
+    fun simple(session: SimpleModdingSession, data: LinkedHashMap<String, ModdingSession.Replace>): ModdingSession.ReplaceMap {
         return Simple(session, data)
     }
 
@@ -671,11 +672,9 @@ private object ReforgeReplaceMap {
     }
 
     private class Simple(
-        session: SimpleModdingSession,
-        data: Map<String, ModdingSession.Replace>,
+        private val session: SimpleModdingSession,
+        private val data: LinkedHashMap<String, ModdingSession.Replace>,
     ) : ModdingSession.ReplaceMap {
-        val session = session
-        val data = HashMap(data) // TODO 对 Gui 排序
 
         override val size: Int
             get() = data.size

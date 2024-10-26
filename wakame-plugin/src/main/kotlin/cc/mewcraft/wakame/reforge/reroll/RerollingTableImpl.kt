@@ -41,6 +41,7 @@ internal object WtfRerollingTable : RerollingTable {
     }
 
     private data object AnyCellRuleMap : RerollingTable.CellRuleMap {
+        override val comparator: Comparator<String?> = nullsLast(naturalOrder())
         override fun get(key: String): RerollingTable.CellRule = AnyCellRule
         override fun contains(key: String): Boolean = true
     }
@@ -86,8 +87,12 @@ internal class SimpleRerollingTable(
     }
 
     data class CellRuleMap(
-        private val data: Map<String, RerollingTable.CellRule>,
+        private val data: LinkedHashMap<String, RerollingTable.CellRule>,
     ) : RerollingTable.CellRuleMap {
+
+        private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
+        override val comparator: Comparator<String?> = nullsLast(compareBy(keyOrder::get))
+
         override fun get(key: String): RerollingTable.CellRule? {
             return data[key]
         }

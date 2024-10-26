@@ -158,7 +158,7 @@ private constructor(
             // 如果不跳过, 那么新的核孔将无法被正确生成.
             // 这是因为截止至 2024/8/20, 我们的设计不允许
             // 相似的核心出现在同一个物品上.
-            .filter2 { cell -> selectionMap[cell.getId()]?.selected == false }
+            .filter2 { cell -> !selectionMap[cell.getId()].selected }
             .forEach { (_, cell) ->
                 when (
                     val core = cell.getCore()

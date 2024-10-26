@@ -93,8 +93,8 @@ internal object ModdingTableSerializer : KoinComponent {
             .collect("yml")
             .associateNotNull {
                 try {
-                    val key = Key.key(it.namespace, it.path)
-                    val text = it.file.readText()
+                    val itemId = Key.key(it.namespace, it.path)
+                    val fileText = it.file.readText()
                     val itemNode = yamlConfig {
                         withDefaults()
                         serializers {
@@ -103,11 +103,14 @@ internal object ModdingTableSerializer : KoinComponent {
                             kregister(CoreMatchRuleSerializer)
                             kregister(CoreMatchRuleContainerSerializer)
                         }
-                    }.buildAndLoadString(text)
+                    }.buildAndLoadString(fileText)
 
-                    val cellRuleMap = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
-                    val itemRule = SimpleModdingTable.ItemRule(key, SimpleModdingTable.CellRuleMap(cellRuleMap))
-                    key to itemRule
+                    // configurate 返回的是 LinkedHashMap, 保留了顺序
+                    val cellRuleMapData = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
+                    val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
+                    val itemRule = SimpleModdingTable.ItemRule(itemId, cellRuleMap)
+
+                    itemId to itemRule
                 } catch (e: Exception) {
                     LOGGER.error("Can't load item rule: '${it.file.relativeTo(MODDING_DIR)}'", e)
                     null

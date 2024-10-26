@@ -81,7 +81,7 @@ interface RerollingTable : Examinable {
          */
         val currencyCost: CellCurrencyCost
 
-        companion object {
+        companion object Shared {
             fun empty(): CellRule = EmptyCellRule
         }
     }
@@ -90,18 +90,34 @@ interface RerollingTable : Examinable {
      * 该对象本质是一个映射, 包含了所有核孔的重造规则.
      */
     interface CellRuleMap : Examinable {
+
+        /**
+         * 关于核孔 id 的 [Comparator], 基于核孔在配置文件中的顺序.
+         */
+        val comparator: Comparator<String?>
+
         /**
          * 获取核孔的重造规则.
          *
          * 如果返回 `null` 则说明该核孔不支持重造.
          *
          * @param key 核孔的唯一标识
+         * @return 核孔的重造规则
          */
         operator fun get(key: String): CellRule?
 
+        /**
+         * 检查是否包含指定核孔的重造规则.
+         *
+         * 返回 `true` 则说明该核孔支持重造.
+         * 返回 `false` 则说明该核孔不支持重造.
+         *
+         * @param key 核孔的唯一标识
+         * @return 是否支持重造
+         */
         operator fun contains(key: String): Boolean
 
-        companion object {
+        companion object Shared {
             fun empty(): CellRuleMap = EmptyCellRuleMap
         }
     }
@@ -149,6 +165,7 @@ private object EmptyCellRule : CellRule {
 }
 
 private object EmptyCellRuleMap : CellRuleMap {
+    override val comparator: Comparator<String?> = nullsLast(naturalOrder())
     override fun get(key: String): CellRule? = null
     override fun contains(key: String): Boolean = false
 }

@@ -33,9 +33,9 @@ internal object WtfModdingTable : ModdingTable {
     private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
 
     private class AnyItemRule(
-        override val target: Key,
+        override val itemId: Key,
     ) : ModdingTable.ItemRule {
-        override val cellRules: ModdingTable.CellRuleMap = AnyCellRuleMap
+        override val cellRuleMap: ModdingTable.CellRuleMap = AnyCellRuleMap
     }
 
     private object AnyCellRule : ModdingTable.CellRule {
@@ -47,6 +47,7 @@ internal object WtfModdingTable : ModdingTable {
     }
 
     private object AnyCellRuleMap : ModdingTable.CellRuleMap {
+        override val comparator: Comparator<String?> = nullsLast(naturalOrder())
         override fun get(key: String): ModdingTable.CellRule = AnyCellRule
     }
 
@@ -89,12 +90,12 @@ internal class SimpleModdingTable(
         toSimpleString()
 
     class ItemRule(
-        override val target: Key,
-        override val cellRules: ModdingTable.CellRuleMap,
+        override val itemId: Key,
+        override val cellRuleMap: ModdingTable.CellRuleMap,
     ) : ModdingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("target", target),
-            ExaminableProperty.of("cellRules", cellRules),
+            ExaminableProperty.of("itemId", itemId),
+            ExaminableProperty.of("cellRuleMap", cellRuleMap),
         )
 
         override fun toString(): String = toSimpleString()
@@ -137,14 +138,19 @@ internal class SimpleModdingTable(
     }
 
     class CellRuleMap(
-        private val map: Map<String, ModdingTable.CellRule>,
+        private val data: LinkedHashMap<String, ModdingTable.CellRule>,
     ) : ModdingTable.CellRuleMap {
+
+        // 让 string 的顺序采用 key 在 data 里的顺序
+        private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
+        override val comparator: Comparator<String?> = nullsLast(compareBy(keyOrder::get))
+
         override fun get(key: String): ModdingTable.CellRule? {
-            return map[key]
+            return data[key]
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("map", map)
+            ExaminableProperty.of("map", data)
         )
 
         override fun toString(): String = toSimpleString()

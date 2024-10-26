@@ -391,11 +391,12 @@ internal object SelectionMap : KoinComponent {
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
         val itemRule = session.table.itemRuleMap[usableInput.id] ?: return empty(session)
 
-        val selectionMap = Simple(session)
+        val cellRuleMap = itemRule.cellRuleMap
+        val selectionData = sortedMapOf<String, RerollingSession.Selection>(cellRuleMap.comparator)
         for ((id, _) in cells) {
 
             // 获取核孔的重造规则
-            val cellRule = itemRule.cellRuleMap[id]
+            val cellRule = cellRuleMap[id]
 
             // 获取核孔的重造模板
             val template = templates[id]?.core
@@ -405,25 +406,16 @@ internal object SelectionMap : KoinComponent {
             //   这个核孔没有对应的物品模板,
             // 则判定该核孔不支持重造.
             // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
-            // 这样这个核孔会显示在菜单里. 如果连 Selection 对象都不存在,
-            // 那么这个核孔就不会显示在菜单里.
-            if (cellRule == null || template == null) {
+            // 这样可以让其他系统比较优雅的处理一些特殊情况 (例如无定义情况).
+            if (cellRule != null && template != null) {
+                selectionData[id] = Selection.changeable(session, id, cellRule, template)
+            } else {
                 logger.info("Item cell '$id' does not support rerolling.")
-                selectionMap[id] = Selection.unchangeable(session, id)
-                continue
+                selectionData[id] = Selection.unchangeable(session, id)
             }
-
-            val selection = Selection.changeable(
-                session = session,
-                id = id,
-                rule = cellRule,
-                template = template,
-            )
-
-            selectionMap[id] = selection
         }
 
-        return selectionMap
+        return Simple(session, LinkedHashMap(selectionData))
     }
 
     private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
@@ -458,9 +450,8 @@ internal object SelectionMap : KoinComponent {
 
     private class Simple(
         override val session: RerollingSession,
+        private val data: LinkedHashMap<String, RerollingSession.Selection>,
     ) : RerollingSession.SelectionMap, KoinComponent {
-        // TODO 对 Gui 排序
-        private val data: HashMap<String, RerollingSession.Selection> = HashMap()
 
         override val size: Int
             get() = data.size
