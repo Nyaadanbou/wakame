@@ -104,6 +104,8 @@ internal class ModdingMenu(
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     }
 
+    private val selectionMenus: MutableList<ReplaceMenu> = mutableListOf()
+
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
         builder.setTitle(table.title.translateBy(viewer))
@@ -121,29 +123,29 @@ internal class ModdingMenu(
         logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
-            logger.error("Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
             event.isCancelled = true
+            logger.error("Modding session is frozen, but the player is trying to interact with the primary input slot. This is a bug!")
             return
         }
 
         when {
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             // 玩家尝试把物品放入 inputSlot:
             // 玩家将物品放入*inputSlot*, 意味着一个新的定制过程开始了.
             // 这里需要做的就是刷新 session 的状态, 然后更新菜单的内容.
             event.isAdd -> {
-                session.inputItem = newItem
+                session.originalInput = newItem
 
                 // 重新渲染放入的物品
                 event.newItem = renderInputItem()
 
                 confirmed = false
-                updateReplaceGuis()
+                recreateReplaceGuis()
                 updateOutputSlot()
             }
 
@@ -159,7 +161,7 @@ internal class ModdingMenu(
                 session.reset()
                 confirmed = false
                 updateInputSlot()
-                updateReplaceGuis()
+                recreateReplaceGuis()
                 updateOutputSlot()
             }
         }
@@ -182,8 +184,8 @@ internal class ModdingMenu(
         when {
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
                 event.isCancelled = true
+                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
             }
 
             // 玩家从 outputSlot 中取出物品:
@@ -225,7 +227,7 @@ internal class ModdingMenu(
                     session.reset()
                     confirmed = false
                     updateInputSlot()
-                    updateReplaceGuis()
+                    recreateReplaceGuis()
                     updateOutputSlot()
                 }
 
@@ -275,7 +277,7 @@ internal class ModdingMenu(
             // 定制成功了:
 
             val output = reforgeResult.output ?: error("Output item is null, but the result is successful. This is a bug!")
-            val context = ModdingTableContext.MainOutputSlot(session)
+            val context = ModdingTableContext.Output(session)
             ItemRenderers.MODDING_TABLE.render(output, context)
             output.directEdit {
                 if (confirmed) {
@@ -299,26 +301,39 @@ internal class ModdingMenu(
     }
 
     /**
-     * 基于 [session] 的当前状态更新子菜单, 也就是每个核孔的定制菜单.
+     * 刷新当前所有的 [selectionMenus].
      */
-    fun updateReplaceGuis() {
-        val guis = session.replaceParams.values
+    fun refreshReplaceGuis(excluded: ReplaceMenu) {
+        selectionMenus.filter { it !== excluded }.forEach { menu ->
+            menu.replace.bake() // 重新执行一次流程, 更新状态
+            menu.updateInputSlot()
+        }
+    }
+
+    /**
+     * 基于 [session] 的当前状态更新子菜单, 为每个核孔创建好一个新的 [ReplaceMenu].
+     */
+    private fun recreateReplaceGuis() {
+        val menus = session.replaceParams.values
             // 只为可被定制的核孔创建菜单
             .filter { replace -> replace.changeable }
             // 给每个 Replace 创建菜单
             .map { replace -> ReplaceMenu(this, replace) }
 
-        setReplaceGuis(guis)
+        selectionMenus.clear()
+        selectionMenus += menus
+
+        setReplaceGuis(menus.map(ReplaceMenu::primaryGui))
     }
 
     /**
      * 基于 [session] 的当前状态更新 [inputSlot], 也就是玩家放入的物品.
      */
     private fun renderInputItem(): ItemStack? {
-        val sourceItem = session.sourceItem
-            ?: return session.inputItem // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
+        val sourceItem = session.usableInput
+            ?: return session.originalInput // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
 
-        val context = ModdingTableContext.MainInputSlot(session)
+        val context = ModdingTableContext.Input(session)
         ItemRenderers.MODDING_TABLE.render(sourceItem, context)
         val newItemStack = sourceItem.itemStack
 

@@ -3,12 +3,14 @@ package cc.mewcraft.wakame.gui.mod
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.setStandaloneCell
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -30,23 +32,18 @@ import xyz.xenondevs.invui.item.impl.SimpleItem
  *
  * 物品上的*每个*核孔都有一个对应的 [ReplaceMenu] 实例来处理定制.
  */
-internal class ReplaceMenu
-private constructor(
-    private val parent: ModdingMenu,
-    private val replace: ModdingSession.Replace,
+internal class ReplaceMenu(
+    val parent: ModdingMenu,
+    val replace: ModdingSession.Replace,
 ) : KoinComponent {
-    companion object {
-        operator fun invoke(parent: ModdingMenu, replace: ModdingSession.Replace): Gui {
-            return ReplaceMenu(parent, replace).primaryGui
-        }
-    }
 
     private val viewer: Player = parent.viewer
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         setPreUpdateHandler(::onInputInventoryPreUpdate)
         guiPriority = 10
     }
-    private val primaryGui: Gui = Gui.normal { builder ->
+
+    val primaryGui: Gui = Gui.normal { builder ->
         // a: 被定制对象的预览物品
         // b: 接收玩家输入的虚拟容器
         // *: 起视觉引导作用的物品
@@ -79,89 +76,99 @@ private constructor(
 
             // 玩家尝试向 inputSlot 中添加物品:
             event.isAdd -> {
-                val addedNekoStack = newItem?.customNeko ?: run {
-                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
-                    event.isCancelled = true
-                    return
-                }
-
                 // 执行一次替换流程
-                replace.executeReplace(addedNekoStack)
+                replace.originalInput = newItem
 
                 // 重新渲染放入的物品
-                event.newItem = renderInputItem(replace)
+                event.newItem = renderInputItem()
 
-                // 执行一次定制流程
-                parent.executeReforge()
-
-                // 更新主菜单的状态
+                parent.refreshReplaceGuis(this)
+                parent.executeReforge() // FIXME 可以优化掉这个吗?
                 parent.updateInputSlot()
                 parent.updateOutputSlot()
-
-                // 重置确认状态
                 parent.confirmed = false
             }
 
-            // 玩家尝试从 inputSlot 中移除物品
+            // 玩家尝试从 inputSlot 中移除物品:
             event.isRemove -> {
                 event.isCancelled = true
 
-                val ingredient = replace.latestResult.ingredient ?: run {
+                val inputItem = replace.originalInput ?: run {
                     parent.logger.error("Ingredient is null, but an item is being removed from the replace menu. This is a bug!")
                     return
                 }
 
-                // 将用于定制的物品退给玩家
-                viewer.inventory.addItem(ingredient.itemStack)
+                // 将定制的耗材还给玩家
+                viewer.inventory.addItem(inputItem)
 
-                // 更新本定制的结果
-                replace.executeReplace(null)
+                // 更新本定制的状态
+                replace.originalInput = null
 
                 // 更新本菜单的内容
-                setInputSlot(null)
+                updateInputSlot()
 
-                // 执行一次定制流程
-                parent.executeReforge()
-
-                // 更新主菜单
+                parent.refreshReplaceGuis(this)
+                parent.executeReforge() // FIXME 可以优化掉这个吗?
                 parent.updateInputSlot()
                 parent.updateOutputSlot()
-
-                // 重置确认状态
                 parent.confirmed = false
             }
         }
     }
 
-    @Suppress("SameParameterValue")
-    private fun setInputSlot(item: ItemStack?) {
-        inputSlot.setItemSilently(0, item)
+    /**
+     * 更新 [inputSlot] 中的物品.
+     * 这将从 [replace] 读取最新的数据.
+     */
+    fun updateInputSlot() {
+        setInputSlot(renderInputItem())
     }
 
-    private fun renderInputItem(replace: ModdingSession.Replace): ItemStack {
-        val clickToWithdraw = "<gray>[<aqua>点击取回核心</aqua>]".mini
-
-        val replaceResult = replace.latestResult
-        val ingredient = replaceResult.ingredient
-        if (ingredient == null) {
-            // 内部错误:
-
-            return ItemStack.of(Material.BARRIER).edit {
-                itemName = "<white>结果: <red>内部错误".mini
-                lore = listOf(
-                    empty(),
-                    clickToWithdraw
-                ).removeItalic
-            }
+    private fun renderInputItem(): ItemStack {
+        val originalInput = replace.originalInput
+        if (originalInput == null) {
+            // 没有任何耗材输入:
+            return ItemStack.empty()
         }
 
-        // 重新渲染耗材
-        ItemRenderers.MODDING_TABLE.render(ingredient, ModdingTableContext.ReplaceInputSlot(replace))
+        val clickToWithdraw = text {
+            color(NamedTextColor.GRAY)
+            content("[")
+            append(text { content("点击以取回").color(NamedTextColor.AQUA) })
+            append(text("]"))
+        }
 
-        if (replaceResult.applicable) {
+        val replaceResult = replace.latestResult
+        val usableInput = replace.usableInput
+        if (usableInput == null) {
+            // 耗材不可用于定制:
+
+            originalInput.edit {
+                // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
+                // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉.
+                customData = null
+
+                itemName = "<white>结果: <red>无效".mini
+                lore = buildList {
+                    add(empty())
+                    addAll(replaceResult.description)
+                    add(empty())
+                    add(clickToWithdraw)
+                }.removeItalic
+            }
+
+            return originalInput
+
+        } else {
             // 耗材可用于定制:
 
-            ingredient.directEdit {
+            // 重新渲染耗材
+            val session = parent.session
+            val context = ModdingTableContext.Replace(session, replace)
+            ItemRenderers.MODDING_TABLE.render(usableInput, context)
+
+            // 加上交互提示
+            usableInput.directEdit {
                 customName = null // 玩家可能改了名, 所以清除一下
                 itemName = "<white>结果: <green>就绪".mini
                 lore = lore.orEmpty().map {
@@ -172,22 +179,12 @@ private constructor(
                 }.removeItalic
             }
 
-            return ingredient.itemStack
-
-        } else {
-            // 耗材不可用于定制:
-
-            ingredient.directEdit {
-                itemName = "<white>结果: <red>无效".mini
-                lore = buildList {
-                    addAll(replaceResult.description)
-                    add(empty())
-                    add(clickToWithdraw)
-                }.removeItalic
-            }
-
-            return ingredient.itemStack
+            return usableInput.itemStack
         }
+    }
+
+    private fun setInputSlot(item: ItemStack?) {
+        inputSlot.setItemSilently(0, item)
     }
 
     private inner class ViewItem(
@@ -202,7 +199,7 @@ private constructor(
 
             icon.setStandaloneCell(StandaloneCell(cell))
             icon.directEdit { itemName = core.displayName }
-            ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.ReplacePreview(session))
+            ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.Preview(session))
 
             return ItemWrapper(icon.unsafe.handle)
         }

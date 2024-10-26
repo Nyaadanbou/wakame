@@ -27,12 +27,19 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         /**
          * 构建一个 [ItemCells] 的实例.
          */
+        fun of(): ItemCells {
+            return Value(emptyMap())
+        }
+
+        /**
+         * 构建一个 [ItemCells] 的实例, 初始值为给定的参数
+         */
         fun of(cells: Map<String, Cell>): ItemCells {
             return Value(cells)
         }
 
         /**
-         * 返回一个 [ItemCells] 的构建器.
+         * 返回一个 [ItemCells] 的建造者.
          */
         fun builder(): Builder {
             return BuilderImpl()

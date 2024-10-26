@@ -111,7 +111,7 @@ internal class RerollingMenu(
             event.isAdd -> {
                 // 设置本会话的源物品
                 // 赋值完毕之后, session 内部的其他状态应该也要更新
-                session.inputItem = newItem
+                session.originalInput = newItem
 
                 // 重新渲染放入的物品
                 event.newItem = renderInputItem()
@@ -162,7 +162,7 @@ internal class RerollingMenu(
             event.isRemove -> {
                 event.isCancelled = true
 
-                if (session.sourceItem == null) {
+                if (session.usableInput == null) {
                     logger.error("An item is being removed from the output slot, but the source item is null. This is a bug!")
                     return
                 }
@@ -241,7 +241,7 @@ internal class RerollingMenu(
             // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
-            val previewItem = session.inputItem?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
+            val previewItem = session.originalInput?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
             previewItem.directEdit {
                 lore = lore.orEmpty() + buildList {
@@ -287,8 +287,8 @@ internal class RerollingMenu(
      * 用于重新渲染玩家输入的源物品.
      */
     private fun renderInputItem(): ItemStack? {
-        val sourceItem = session.sourceItem
-            ?: return session.inputItem // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
+        val sourceItem = session.usableInput
+            ?: return session.originalInput // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
 
         val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
         ItemRenderers.REROLLING_TABLE.render(sourceItem, context)

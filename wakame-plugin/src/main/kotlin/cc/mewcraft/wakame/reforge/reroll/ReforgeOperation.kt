@@ -43,7 +43,7 @@ private constructor(
 
         // 获取源物品
         // 如果源物品不存在, 返回一个空结果
-        val sourceItem = session.sourceItem ?: return ReforgeResult.empty()
+        val sourceItem = session.usableInput ?: return ReforgeResult.empty()
 
         // 获取核孔的选择状态
         // 如果没有可重造的核孔, 返回一个失败结果

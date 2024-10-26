@@ -17,11 +17,11 @@ import team.unnamed.mocha.runtime.MochaFunction
  * 代表了一个定制核孔的全过程, 封装了一次定制所需要的所有状态.
  *
  * ## 流程概述
- * 当玩家把要定制的物品 X 放进输入容器的时候, X 应该赋值到 [sourceItem] 属性上.
+ * 当玩家把要定制的物品 X 放进输入容器的时候, X 应该赋值到 [usableInput] 属性上.
  * 这时候如果玩家要对某个核孔进行定制, 则需要更新 [replaceParams] 的相应状态.
  *
  * 待一切准备就绪, 调用 [executeReforge] 函数即可进行一次完整的定制;
- * 该函数会基于 [sourceItem] 和 [replaceParams] 的状态进行计算,
+ * 该函数会基于 [usableInput] 和 [replaceParams] 的状态进行计算,
  * 并且会在最后返回一个 [ReforgeResult] 对象, 用来表示当前定制的结果.
  *
  * 如果 [executeReforge] 函数返回成功, 那么 [latestResult] 属性也会被重新赋值.
@@ -52,16 +52,16 @@ interface ModdingSession : Examinable {
      *
      * ### 副作用
      * 为该物品赋值将自动执行一次完整的重铸流程, 具体如下:
-     * - 如果物品是合法的, [sourceItem] 将不再返回 `null`
+     * - 如果物品是合法的, [usableInput] 将不再返回 `null`
      * - 生成新的 [ReplaceMap] 并赋值给 [replaceParams]
      * - 生成新的 [ReforgeResult] 并赋值给 [latestResult]
      */
     @VariableByPlayer
-    var inputItem: ItemStack?
+    var originalInput: ItemStack?
 
     /**
-     * 当 [inputItem] 允许被定制时, 该属性将不会返回 `null`.
-     * 否则, 当 [inputItem] 为 `null` 或不允许被定制时, 该属性将返回 `null`.
+     * 当 [originalInput] 允许被定制时, 该属性将不会返回 `null`.
+     * 否则, 当 [originalInput] 为 `null` 或不允许被定制时, 该属性将返回 `null`.
      *
      * ### 契约
      * - 当为 `null` 时, 说明此时没有需要定制的物品, 或者是需要定制的物品不合法.
@@ -69,7 +69,7 @@ interface ModdingSession : Examinable {
      * - 访问该物品始终会返回一个克隆.
      */
     @VariableByPlayer
-    val sourceItem: NekoStack?
+    val usableInput: NekoStack?
 
     /**
      * 储存了每个核孔的定制参数.
@@ -98,7 +98,7 @@ interface ModdingSession : Examinable {
     var frozen: Boolean
 
     /**
-     * 以当前参数定制一次 [sourceItem] 并返回一个 [ReforgeResult].
+     * 以当前参数定制一次 [usableInput] 并返回一个 [ReforgeResult].
      *
      * 该函数的返回值会重新赋值到 [ModdingSession.latestResult].
      */
@@ -123,19 +123,19 @@ interface ModdingSession : Examinable {
     fun reset()
 
     /**
-     * 获取 [sourceItem] 的物品等级.
+     * 获取 [usableInput] 的物品等级.
      * 若不存在则返回 `0`.
      */
     fun getSourceItemLevel(): Int
 
     /**
-     * 获取 [sourceItem] 的物品稀有度所映射的数值.
+     * 获取 [usableInput] 的物品稀有度所映射的数值.
      * 若不存在则返回 `0`.
      */
     fun getSourceItemRarityNumber(): Double
 
     /**
-     * 获取 [sourceItem] 的总核孔数量.
+     * 获取 [usableInput] 的总核孔数量.
      * 若不存在则返回 `0`.
      */
     fun getSourceItemTotalCellCount(): Int
@@ -163,11 +163,6 @@ interface ModdingSession : Examinable {
      */
     interface ReforgeResult : Examinable {
         /**
-         * 是否为空结果.
-         */
-        val isEmpty: Boolean
-
-        /**
          * 本结果是成功还是失败.
          *
          * - 成功(true)  = 玩家可以取出定制后的物品.
@@ -190,7 +185,7 @@ interface ModdingSession : Examinable {
          *
          * 该属性在以下情况下为 `null`:
          * - 本次定制失败, i.e., [ReforgeResult.isSuccess] = `false`
-         * - 源物品不存在, i.e., [ModdingSession.sourceItem] = `null`
+         * - 源物品不存在, i.e., [ModdingSession.usableInput] = `null`
          */
         @get:Contract(" -> new")
         val output: NekoStack?
@@ -210,18 +205,20 @@ interface ModdingSession : Examinable {
      *
      * 对于一个物品一次完整的定制过程, 可以看成是对该物品上的每个核孔分别进行修改.
      * 玩家可以选择定制他想定制的核孔; 选择方式就是往定制台上的特定槽位*放入*特定的物品.
-     * *放入*这个操作在代码里的抽象就是: 将玩家放入的物品传入函数 [Replace.executeReplace].
+     * *放入*这个操作在代码里的抽象就是: 将玩家放入菜单的物品赋值给 [originalInput].
      */
     interface Replace : Examinable {
         /**
-         * 本定制所绑定的会话.
+         * 绑定的会话.
          */
         val session: ModdingSession
 
         /**
-         * 被定制的核孔的唯一标识.
+         * 是否允许定制?
+         *
+         * 如果返回 `false`, 那么本 [Replace] 将实际为不可变的
          */
-        val id: String
+        val changeable: Boolean
 
         /**
          * 被定制的核孔.
@@ -229,12 +226,7 @@ interface ModdingSession : Examinable {
         val cell: Cell
 
         /**
-         * 被定制的核孔是否可以修改.
-         */
-        val changeable: Boolean
-
-        /**
-         * 被定制的核孔所对应的定制规则.
+         * 被定制的核孔所对应的规则.
          */
         val rule: ModdingTable.CellRule
 
@@ -248,37 +240,66 @@ interface ModdingSession : Examinable {
         val total: MochaFunction
 
         /**
-         * 储存了当前最新的定制结果.
+         * 玩家的原始输入.
          *
-         * 当函数 [executeReplace] 被调用后, 该属性将被重新赋值.
+         * 该物品不一定是合法的耗材! 玩家输入的什么, 就是什么.
+         * 如需判断耗材是否合法, 调用 [Result.applicable].
+         *
+         * ### 副作用
+         * 该函数会根据输入的物品, 重新赋值 [latestResult].
+         *
+         * ### 契约
+         * - 当为 `null` 时, 说明此时玩家还没有放入用于定制的耗材
+         * - 当不为 `null` 时, 说明此时玩家已经放入了用于定制的耗材
+         * - 该物品不应该被任何形式修改, 应该完整保存输入时的状态.
+         * - 访问该物品始终会返回一个克隆.
+         */
+        @VariableByPlayer
+        var originalInput: ItemStack?
+
+        /**
+         * 以 [originalInput] 为输入对本 [Replace] 执行一次定制流程.
+         *
+         * ### 副作用
+         * 该函数会改变本对象其他属性 (比如 [latestResult]) 的返回值.
+         */
+        fun bake(): Result
+
+        /**
+         * 经过检查的 [originalInput].
+         *
+         * 如果 [originalInput] 无法用于定制, 则该属性会返回 `null`.
+         * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
+         */
+        @VariableByPlayer
+        val usableInput: NekoStack?
+
+        /**
+         * 方便函数.
+         * 获取 [usableInput] 中包含的 [PortableCore].
+         */
+        @VariableByPlayer
+        val augment: PortableCore?
+
+        /**
+         * 储存了当前的重铸结果.
+         * 当 [originalInput] 被重新赋值时, 该属性也会被重新赋值.
          */
         @VariableByPlayer
         val latestResult: Result
 
         /**
-         * 检查是否有耗材放入, 包括非法的耗材.
+         * 获取当前 [originalInput] 的物品等级.
+         * 若不存在则返回 `0`.
          */
         @VariableByPlayer
-        val hasInput: Boolean
-
-        /**
-         * 尝试将耗材 [ingredient] 应用到这个核孔上.
-         *
-         * ### 副作用
-         * 该函数还会将其返回值赋值到属性 [latestResult].
-         *
-         * @return 一个新的结果
-         */
-        fun executeReplace(ingredient: NekoStack?): Result
-
-        /**
-         * 获取当前 [Result.ingredient] 的物品等级. 若不存在则返回 `0`.
-         */
         fun getIngredientLevel(): Int
 
         /**
-         * 获取当前 [Result.ingredient] 的物品稀有度所映射的数值. 若不存在则返回 `0`.
+         * 获取当前 [originalInput] 的物品稀有度所映射的数值.
+         * 若不存在则返回 `0`.
          */
+        @VariableByPlayer
         fun getIngredientRarityNumber(): Double
 
         /**
@@ -286,27 +307,7 @@ interface ModdingSession : Examinable {
          */
         interface Result : Examinable {
             /**
-             * 储存了当前用于定制核孔的耗材.
-             *
-             * 该物品不一定是合法的耗材! 玩家输入的什么, 就是什么.
-             * 如需判断耗材是否合法, 调用 [Result.applicable].
-             *
-             * ### 契约
-             * - 当该属性为 `null` 时, 说明此时玩家还没有放入用于定制的耗材
-             * - 当该属性不为 `null` 时, 说明此时玩家已经放入了用于定制的耗材
-             */
-            // TODO 这个 property 应该移到 Replace 中
-            @get:Contract(" -> new")
-            val ingredient: NekoStack?
-
-            /**
-             * 方便函数.
-             * 获取 [ingredient] 中包含的便携核心.
-             */
-            val augment: PortableCore?
-
-            /**
-             * [ingredient] 是否可以应用在核孔上.
+             * 当前的输入是否可以应用在核孔上.
              */
             val applicable: Boolean
 
@@ -325,7 +326,18 @@ interface ModdingSession : Examinable {
         val keys: Set<String>
         val values: Collection<Replace>
 
-        operator fun get(id: String): Replace?
+        /**
+         * 获取指定 id 的 [Replace].
+         * 该函数永远不会返回 `null`.
+         * 对于不存在定义的 id, 该函数会返回一个特殊的 [Replace].
+         * 这个特殊的 [Replace] 会优雅的处理所有情况.
+         */
+        operator fun get(id: String): Replace
+
+        /**
+         * 指定 id 的 [Replace] 是否“存在定义”.
+         * “存在定义”指: 系统中存在对应的重铸规则.
+         */
         operator fun contains(id: String): Boolean
 
         /**

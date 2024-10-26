@@ -17,13 +17,10 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.colorRecursively
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextDecoration
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -34,17 +31,27 @@ internal class ModdingTableRendererFormats(renderer: ModdingTableItemRenderer) :
 internal class ModdingTableRendererLayout(renderer: ModdingTableItemRenderer) : AbstractRendererLayout(renderer)
 
 internal sealed interface ModdingTableContext {
-    // 输入的物品 (需要被定制的物品)
-    data class MainInputSlot(val session: ModdingSession) : ModdingTableContext
+    val session: ModdingSession
 
-    // 输出的物品 (经过定制后的物品)
-    data class MainOutputSlot(val session: ModdingSession) : ModdingTableContext
+    /**
+     * 用于输入的主要物品, 也就是需要被定制的物品.
+     */
+    data class Input(override val session: ModdingSession) : ModdingTableContext
 
-    // 核孔的预览
-    data class ReplacePreview(val session: ModdingSession) : ModdingTableContext
+    /**
+     * 用于输出的主要物品, 也就是经过定制后的物品.
+     */
+    data class Output(override val session: ModdingSession) : ModdingTableContext
 
-    // 玩家放入的核心
-    data class ReplaceInputSlot(val replace: ModdingSession.Replace) : ModdingTableContext
+    /**
+     * 用于核孔的预览, 例如渲染核孔的名字, 重铸的历史数据等.
+     */
+    data class Preview(override val session: ModdingSession) : ModdingTableContext
+
+    /**
+     * 用于便携式核心.
+     */
+    data class Replace(override val session: ModdingSession, val replace: ModdingSession.Replace) : ModdingTableContext
 }
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
@@ -75,11 +82,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRendererParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> ModdingTableRendererParts.RARITY.process(collector, data) }
 
-        if (context is ModdingTableContext.ReplacePreview) {
-            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, data, context) }
-        }
-
-        if (context is ModdingTableContext.MainInputSlot) {
+        if (context is ModdingTableContext.Input) {
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
@@ -89,7 +92,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             }
         }
 
-        if (context is ModdingTableContext.MainOutputSlot) {
+        if (context is ModdingTableContext.Output) {
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
@@ -102,9 +105,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             ModdingTableRendererParts.REFORGE_COST.process(collector, context)
         }
 
-        if (context is ModdingTableContext.ReplaceInputSlot) {
-            val replace = context.replace
-            val augment = replace.latestResult.augment
+        if (context is ModdingTableContext.Preview) {
+            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, data, context) }
+        }
+
+        if (context is ModdingTableContext.Replace) {
+            val augment = context.replace.augment
             if (augment != null) {
                 ModdingTableRendererParts.REPLACE_IN.process(collector, augment, context)
             }
@@ -128,53 +134,57 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
 
 internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRenderer) {
+
+    //<editor-fold desc="重铸部分">
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingPart3<String, AttributeCore, ModdingTableContext.MainInputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, inputSlot, format ->
-        format.render(id, attribute, inputSlot)
+    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingPart3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, context, format ->
+        format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingPart3<String, AttributeCore, ModdingTableContext.MainOutputSlot, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, outputSlot, format ->
-        format.render(id, attribute, outputSlot)
+    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingPart3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
+        format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_SKILL_IN: RenderingPart3<String, SkillCore, ModdingTableContext.MainInputSlot, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, inputSlot, format ->
-        format.render(id, skill, inputSlot)
+    val CELLULAR_SKILL_IN: RenderingPart3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, context, format ->
+        format.render(id, skill, context)
     }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingPart3<String, SkillCore, ModdingTableContext.MainOutputSlot, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, outputSlot, format ->
-        format.render(id, skill, outputSlot)
+    val CELLULAR_SKILL_OUT: RenderingPart3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, context, format ->
+        format.render(id, skill, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_IN: RenderingPart2<String, ModdingTableContext.MainInputSlot, CellularEmptyRendererFormat> = configure2("cells/empty/in") { id, inputSlot, format ->
-        format.render(id, inputSlot)
+    val CELLULAR_EMPTY_IN: RenderingPart2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/in") { id, context, format ->
+        format.render(id, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_OUT: RenderingPart2<String, ModdingTableContext.MainOutputSlot, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, outputSlot, format ->
-        format.render(id, outputSlot)
+    val CELLULAR_EMPTY_OUT: RenderingPart2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, context, format ->
+        format.render(id, context)
     }
 
     @JvmField
-    val REFORGE_COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
-        SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
-    }
-
-    @JvmField
-    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
+    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
         SimpleIndexedText(format.index, core.description)
     }
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart2<StandaloneCell, ModdingTableContext.ReplacePreview, StandaloneCellRendererFormat> = configure2("standalone_cell") { cell, context, format ->
+    val STANDALONE_CELL: RenderingPart2<StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { cell, context, format ->
         val replaceParams = context.session.replaceParams
-        val penaltyLimit = replaceParams[cell.id]?.rule?.modLimit ?: 0
+        val penaltyLimit = replaceParams[cell.id].rule.modLimit
         format.render(cell, modPenaltyLimit = penaltyLimit)
     }
 
+    @JvmField
+    val REFORGE_COST: RenderingPart<ModdingTableContext, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
+        SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="通用部分">
     @JvmField
     val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 
@@ -189,37 +199,50 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
 
     @JvmField
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
+    //</editor-fold>
 }
 
 
 //////
 
 
-private fun renderMainInputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
-    var result = text
+@ConfigSerializable
+internal data class ModdingDifferenceFormats(
+    @Setting
+    val changeable: DifferenceFormat = DifferenceFormat(),
+    @Setting
+    val unchangeable: DifferenceFormat = DifferenceFormat(),
+    @Setting
+    val hasInput: DifferenceFormat = DifferenceFormat(),
+    @Setting
+    val hasNoInput: DifferenceFormat = DifferenceFormat(),
+) {
+    /**
+     * @param id 核孔的 id
+     * @param source 原核心的描述
+     * @param context 重造台的上下文
+     * @return 基于 [id], [core], [context] 生成的 [IndexedText]
+     */
+    fun render(id: String, source: List<Component>, context: ModdingTableContext): List<Component> {
+        val replaceMap = context.session.replaceParams
+        val replace = replaceMap[id]
 
-    // 核孔不可修改, 渲染成深灰色
-    if (!replace.changeable) {
-        result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
+        var result = source
+
+        if (replace.changeable) {
+            result = changeable.process(result)
+        } else {
+            result = unchangeable.process(result)
+        }
+
+        if (replace.originalInput != null) {
+            result = hasInput.process(result)
+        } else {
+            result = hasNoInput.process(result)
+        }
+
+        return result
     }
-
-    // 核孔存在修改, 渲染成深灰色+删除线
-    if (replace.hasInput) {
-        result = result.map { it.decorate(TextDecoration.STRIKETHROUGH) }
-    }
-
-    return result
-}
-
-private fun renderMainOutputSlot(text: List<Component>, replace: ModdingSession.Replace): List<Component> {
-    var result = text
-
-    // 不可修改 或 没有输入, 则将属性的颜色变为深灰色
-    if (!replace.changeable || !replace.hasInput) {
-        result = result.map { it.colorRecursively(NamedTextColor.DARK_GRAY) }
-    }
-
-    return result
 }
 
 @ConfigSerializable
@@ -228,30 +251,17 @@ internal data class CellularAttributeRendererFormat(
     override val namespace: String,
     @Setting @Required
     private val ordinal: Ordinal,
+    @Setting @Required
+    private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
     /**
      * @param id 核孔的 id
      */
-    fun render(id: String, core: AttributeCore, context: ModdingTableContext.MainInputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
+    fun render(id: String, core: AttributeCore, context: ModdingTableContext): IndexedText {
         val original = core.description
-        val processed = renderMainInputSlot(original, replace)
-
-        return SimpleIndexedText(computeIndex(core), processed)
-    }
-
-    /**
-     * @param id 核孔的 id
-     */
-    fun render(id: String, core: AttributeCore, context: ModdingTableContext.MainOutputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
-        val original = core.description
-        val processed = renderMainOutputSlot(original, replace)
-
+        val processed = diffFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }
 
@@ -275,24 +285,14 @@ internal data class CellularAttributeRendererFormat(
 internal data class CellularSkillRendererFormat(
     @Setting @Required
     override val namespace: String,
+    @Setting @Required
+    private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
 
-    fun render(id: String, core: SkillCore, context: ModdingTableContext.MainInputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
+    fun render(id: String, core: SkillCore, context: ModdingTableContext): IndexedText {
         val original = core.description
-        val processed = renderMainInputSlot(original, replace)
-
-        return SimpleIndexedText(computeIndex(core), processed)
-    }
-
-    fun render(id: String, core: SkillCore, context: ModdingTableContext.MainOutputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
-        val original = core.description
-        val processed = renderMainOutputSlot(original, replace)
-
+        val processed = diffFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }
 
@@ -310,6 +310,8 @@ internal data class CellularEmptyRendererFormat(
     override val namespace: String,
     @Setting
     private val tooltip: List<Component> = listOf(Component.text("Empty Slot")),
+    @Setting @Required
+    private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Simple {
     override val id = "cells/empty"
     override val index = createIndex()
@@ -321,21 +323,10 @@ internal data class CellularEmptyRendererFormat(
         SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
     }
 
-    fun render(id: String, context: ModdingTableContext.MainInputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
-        val original = tooltipCycle.next()
-        val processed = renderMainInputSlot(original.text, replace)
-
-        return original.copy(text = processed)
-    }
-
-    fun render(id: String, context: ModdingTableContext.MainOutputSlot): IndexedText {
-        val replace = context.session.replaceParams[id] ?: error("Missing replace params for cell $id")
-
-        val original = tooltipCycle.next()
-        val processed = renderMainOutputSlot(original.text, replace)
-
-        return original.copy(text = processed)
+    fun render(id: String, context: ModdingTableContext): IndexedText {
+        val next = tooltipCycle.next()
+        val original = next.text
+        val processed = diffFormats.render(id, original, context)
+        return next.copy(text = processed)
     }
 }

@@ -161,13 +161,13 @@ internal class TableCostBinding(
     @Binding("source_rarity")
     fun getSourceRarity(): Double {
         val mapping = session.table.rarityNumberMapping
-        val rarity = session.sourceItem?.components?.get(ItemComponentTypes.RARITY)?.rarity?.key ?: return .0
+        val rarity = session.usableInput?.components?.get(ItemComponentTypes.RARITY)?.rarity?.key ?: return .0
         return mapping.get(rarity)
     }
 
     @Binding("source_level")
     fun getSourceLevel(): Int {
-        return session.sourceItem?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+        return session.usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
     }
 
     @Binding("cell_count")
@@ -205,7 +205,7 @@ internal class CellCostBinding(
 
     @Binding("reroll_count")
     fun getRerollCount(): Int {
-        val sourceItem = session.sourceItem
+        val sourceItem = session.usableInput
         val sourceCells = sourceItem?.components?.get(ItemComponentTypes.CELLS) ?: return 0
         val rerollCount = sourceCells.get(selection.id)?.getReforgeHistory()?.rerollCount ?: 0
         return rerollCount

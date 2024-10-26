@@ -56,7 +56,7 @@ private constructor(
     private inner class IndicatorItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             val session = parent.session
-            val sourceItem = session.sourceItem ?: return makeErrorItem(text("内部错误 (source item is null)"))
+            val sourceItem = session.usableInput ?: return makeErrorItem(text("内部错误 (source item is null)"))
 
             val cellId = selection.id
             val cell = sourceItem.getCell(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))

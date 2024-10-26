@@ -3,6 +3,17 @@
 # id: <有效的属性 id>
 cells/attributes/in:
   namespace: attribute
+  # 用于区分核孔是否 要将定制,可被定制,... 的一些渲染格式
+  diff_formats:
+    # 可被定制的核孔
+    changeable: { }
+    # 不可被定制的核孔
+    unchangeable:
+      style: "<!i><dark_gray>"
+    # 选择要定制的核孔
+    has_input: { }
+    # 未选择要定制的核孔
+    has_no_input: { }
   ordinal:
     element:
       - neutral
@@ -19,6 +30,15 @@ cells/attributes/in:
 # id: <有效的属性 id>
 cells/attributes/out:
   namespace: attribute
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    has_input:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    has_no_input:
+      style: "<!i><dark_gray>"
   ordinal:
     element:
       - neutral
@@ -35,20 +55,50 @@ cells/attributes/out:
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills/in:
   namespace: skill
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    has_input: { }
+    has_no_input: { }
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/skills/out:
   namespace: skill
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    has_input:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    has_no_input:
+      style: "<!i><dark_gray>"
 
 # id: `cells/empty`
 cells/empty/in:
   namespace: stash
   tooltip: "[ 空核孔 ]"
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    has_input: { }
+    has_no_input: { }
 
 # id: `cells/empty`
 cells/empty/out:
   namespace: stash
   tooltip: "[ 空核孔 ]"
+  diff_formats:
+    changeable: { }
+    unchangeable:
+      style: "<!i><dark_gray>"
+    has_input:
+      style: "<st><gray>"
+      suffix: " <gray>???"
+    has_no_input:
+      style: "<!i><dark_gray>"
 
 # id: `standalone_cell`
 standalone_cell:
@@ -56,8 +106,6 @@ standalone_cell:
   # 可用标签
   # <mod_penalty> 定制惩罚
   # <mod_penalty_limit> 定制惩罚上限 (dev: 从 ctx 解析)
-  # <reroll_penalty> 重造惩罚
-  # <reroll_penalty_limit> 重造惩罚上限 (dev: 从 ctx 解析)
   history_format:
     - "惩罚: <mod_penalty> / <mod_penalty_limit>"
   overall_ordinal:

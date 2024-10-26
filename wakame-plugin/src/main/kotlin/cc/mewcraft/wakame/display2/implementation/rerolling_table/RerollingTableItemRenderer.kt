@@ -17,13 +17,10 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
-import cc.mewcraft.wakame.util.styleRecursively
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.extra.kotlin.plus
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.Style
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -184,25 +181,8 @@ internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItem
 // 但把要重造的核孔划上删除线并加上类似“???”的前缀/后缀,
 // 这样应该就足矣表示这个核孔将要经历重造了.
 
-/**
- * 本类负责渲染将要被重铸的核孔.
- */
 @ConfigSerializable
-internal data class DifferenceFormat(
-    @Setting
-    val style: Style? = null,
-    @Setting
-    val prefix: Component = empty(),
-    @Setting
-    val suffix: Component = empty(),
-) {
-    fun process(source: List<Component>): List<Component> {
-        return source.map { text -> (prefix + (style?.let { text.styleRecursively(it) } ?: text) + suffix).compact() }
-    }
-}
-
-@ConfigSerializable
-internal data class DifferenceFormats(
+internal data class RerollingDifferenceFormats(
     @Setting
     val changeable: DifferenceFormat = DifferenceFormat(),
     @Setting
@@ -248,7 +228,7 @@ internal data class CellularAttributeRendererFormat(
     private val ordinal: Ordinal,
     @Setting("diff_formats")
     @Required
-    private val differenceFormats: DifferenceFormats,
+    private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
@@ -285,7 +265,7 @@ internal data class CellularSkillRendererFormat(
     override val namespace: String,
     @Setting("diff_formats")
     @Required
-    private val differenceFormats: DifferenceFormats,
+    private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
 
@@ -316,7 +296,7 @@ internal data class CellularEmptyRendererFormat(
     private val tooltip: List<Component> = listOf(text("Empty Slot")),
     @Setting("diff_formats")
     @Required
-    private val differenceFormats: DifferenceFormats,
+    private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Simple {
     override val id = "cells/empty"
     override val index = createIndex()

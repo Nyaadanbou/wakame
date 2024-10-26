@@ -34,9 +34,9 @@ internal class SimpleRerollingSession(
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
-    override var inputItem: ItemStack? by InputItemDelegate(null)
+    override var originalInput: ItemStack? by InputItemDelegate(null)
 
-    override var sourceItem: NekoStack? by SourceItemDelegate(null)
+    override var usableInput: NekoStack? by SourceItemDelegate(null)
 
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
         logger.info("Selection map updated: $old -> $new")
@@ -70,14 +70,14 @@ internal class SimpleRerollingSession(
     }
 
     override fun reset() {
-        inputItem = null
+        originalInput = null
         selectionMap = SelectionMap.empty(this)
         latestResult = ReforgeResult.empty()
     }
 
     override fun getAllInputs(): Array<ItemStack> {
         val result = mutableListOf<ItemStack>()
-        sourceItem?.itemStack?.let(result::add)
+        originalInput?.let(result::add)
         return result.toTypedArray()
     }
 
@@ -104,7 +104,7 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            sourceItem = value?.customNeko
+            usableInput = value?.customNeko
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }
@@ -374,7 +374,7 @@ internal object SelectionMap : KoinComponent {
     fun simple(session: RerollingSession): RerollingSession.SelectionMap {
         // 获取源物品
         // 如果源物品不存在, 则直接返回空容器
-        val sourceItem = session.sourceItem ?: return empty(session)
+        val sourceItem = session.usableInput ?: return empty(session)
 
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.nbt.CompoundTag
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.ItemAttributeModifiers
@@ -54,6 +55,12 @@ class ItemStackDSL(
         get() = target.hideTooltip0
         set(value) {
             target.hideTooltip0 = value
+        }
+
+    var customData: CompoundTag?
+        get() = target.nbt
+        set(value) {
+            target.nbt = value
         }
 
     fun showAttributeModifiers(value: Boolean) {

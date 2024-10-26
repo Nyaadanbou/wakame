@@ -12,6 +12,9 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
+/**
+ * 包含了大部分渲染系统共有的 [RenderingPart] 实现.
+ */
 internal object CommonRenderingParts {
     @JvmField
     val CUSTOM_NAME: RenderingParts.() -> RenderingPart<CustomName, SingleValueRendererFormat> = xconfigure<CustomName, SingleValueRendererFormat>("custom_name") { data, format ->

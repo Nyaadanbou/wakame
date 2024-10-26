@@ -43,24 +43,22 @@ interface RerollingSession : Examinable {
      *
      * ### 副作用
      * 为该物品赋值将自动执行一次完整的重铸流程, 具体如下:
-     * - 如果物品是合法的, [sourceItem] 将不再返回 `null`
+     * - 如果物品是合法的, [usableInput] 将不再返回 `null`
      * - 生成新的 [SelectionMap] 并赋值给 [selectionMap]
      * - 生成新的 [ReforgeResult] 并赋值给 [latestResult]
      */
     @VariableByPlayer
-    var inputItem: ItemStack?
+    var originalInput: ItemStack?
 
     /**
-     * 要被重造的物品; 访问该物品会返回一个克隆.
+     * 需要被重造的物品; 访问该物品会返回一个克隆.
      *
-     * ## 副作用
-     *
-     * 对该属性赋值时:
-     * - 会生成一个新的 [ReforgeResult] 并赋值给 [RerollingSession.latestResult]
-     * - 会生成一个新的 [SelectionMap] 并赋值给 [RerollingSession.selectionMap]
+     * ### 契约
+     * 如果 [originalInput] 无法用于定制, 则该属性会返回 `null`.
+     * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
      */
     @VariableByPlayer
-    val sourceItem: NekoStack?
+    val usableInput: NekoStack?
 
     /**
      * 每个核孔的选择状态.
