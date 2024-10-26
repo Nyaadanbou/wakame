@@ -46,24 +46,13 @@ internal class RerollingMenu(
     }
 
     /**
-     * 基于 [session] 的当前状态执行一次重造.
-     */
-    fun executeReforge() {
-        session.executeReforge()
-    }
-
-    /**
-     * 基于 [session] 的当前状态刷新输出容器.
-     */
-    fun updateOutput() {
-        setOutputSlot(renderOutputSlot())
-    }
-
-    /**
      * 本菜单的 [RerollingSession].
      */
     val session: RerollingSession = SimpleRerollingSession(table, viewer)
 
+    /**
+     * 本菜单的日志记录器, 自带前缀.
+     */
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
@@ -126,16 +115,14 @@ internal class RerollingMenu(
                 }
 
                 // 设置本会话的源物品
+                // 赋值完毕之后, session 内部的其他状态应该也要更新
                 session.inputItem = newItem
 
                 // 重新渲染放入的物品
-                event.newItem = renderInputSlot(added)
+                event.newItem = renderInputItem(added)
 
-                // 创建并设置子菜单
-                setSelectionMenus(createSelectionMenus())
-
-                // 更新输出容器
-                updateOutput()
+                updateOutputSlot()
+                updateSelectionGuis()
             }
 
             // 玩家尝试从 inputSlot 拿出物品:
@@ -150,10 +137,9 @@ internal class RerollingMenu(
                 session.reset()
                 confirmed = false
 
-                // 清空菜单内容
-                setInputSlot(null)
-                setOutputSlot(null)
-                setSelectionMenus(null)
+                updateInputSlot()
+                updateOutputSlot()
+                updateSelectionGuis()
             }
         }
     }
@@ -196,16 +182,17 @@ internal class RerollingMenu(
                 // 因为此时玩家所持有的资源可能发生了变化 (例如突然收到了一笔金币)
                 if (!confirmed) {
                     confirmed = true
-                    updateOutput()
+                    updateOutputSlot()
                     return
-                } else {
-                    updateOutput()
                 }
 
                 // 判断玩家是否有足够的资源
                 if (!result.reforgeCost.test(viewer)) {
                     setOutputSlot(ItemStack.of(Material.BARRIER).edit {
-                        itemName = text { content("资源不足!"); color(NamedTextColor.RED) }
+                        itemName = text {
+                            content("结果: ").color(NamedTextColor.GRAY)
+                            append(text { content("资源不足").color(NamedTextColor.RED) })
+                        }
                     })
                     return
                 }
@@ -217,20 +204,113 @@ internal class RerollingMenu(
                 session.reset()
                 confirmed = false
 
-                // 清空菜单内容
-                setInputSlot(null)
-                setOutputSlot(null)
-                setSelectionMenus(null)
+                updateInputSlot()
+                updateOutputSlot()
+                updateSelectionGuis()
             }
         }
     }
 
+    /**
+     * 基于 [session] 的当前状态执行一次重造.
+     */
+    fun executeReforge() {
+        session.executeReforge()
+    }
+
+    /**
+     * 基于 [session] 的当前状态刷新输入容器.
+     *
+     * 该函数不应该用于在事件 [ItemPreUpdateEvent] 中修改玩家放入的物品.
+     * 要修改玩家放入的物品, 应该在事件处理函数中使用 [renderInputItem].
+     */
+    fun updateInputSlot() {
+        val inputItem = session.inputItem
+        if (inputItem == null) {
+            // 没有任何输入, 则应该清空输入容器
+            setInputSlot(null)
+            return
+        }
+
+        val sourceItem = session.sourceItem
+        if (sourceItem == null) {
+            // 源物品无法重造, 则什么也做 (输入容器保持原样)
+            return
+        }
+
+        val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
+        ItemRenderers.REROLLING_TABLE.render(sourceItem, context)
+        val newItemStack = sourceItem.itemStack
+
+        setInputSlot(newItemStack)
+    }
+
+    /**
+     * 基于 [session] 的当前状态刷新输出容器.
+     */
+    fun updateOutputSlot() {
+        val reforgeResult = session.latestResult
+
+        val newItemStack = if (reforgeResult.isSuccess) {
+            // 如果可以重造:
+
+            // 这里修改输入的原始物品, 作为输出物品的预览.
+            // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
+            // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
+
+            val previewItem = session.inputItem?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
+            ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
+            previewItem.directEdit {
+                lore = lore.orEmpty() + buildList {
+                    add(empty())
+                    addAll(reforgeResult.reforgeCost.description)
+
+                    if (confirmed) {
+                        // 如果玩家已经确认, 则加上确认提示
+                        add(empty())
+                        add("<gray>[<aqua>点击确认重造</aqua>]".mini)
+                    }
+                }.removeItalic
+            }
+
+        } else {
+            // 如果不可重造:
+
+            // 由于根本无法重造, 所以也不存在重造后的物品.
+            // 这里直接创建一个新的物品堆叠 (暂时用屏障).
+            ItemStack.of(Material.BARRIER).edit {
+                itemName = "<white>结果: <red>失败".mini
+                lore = reforgeResult.description.removeItalic
+            }
+        }
+
+        setOutputSlot(newItemStack)
+    }
+
+    /**
+     * 基于 [session] 的当前状态刷新所有的 [SelectionMenu].
+     */
+    fun updateSelectionGuis() {
+        val guis = session.selectionMap.values
+            // 只为可被重造的核孔创建菜单
+            .filter { selection -> selection.changeable }
+            // 给每个 Selection 创建菜单
+            .map { selection -> SelectionMenu(this, selection) }
+
+        setSelectionGuis(guis)
+    }
+
+    /**
+     * 用于重新渲染玩家输入的源物品.
+     */
+    private fun renderInputItem(source: NekoStack): ItemStack {
+        val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
+        ItemRenderers.REROLLING_TABLE.render(source, context)
+        return source.itemStack
+    }
+
     private fun onWindowClose() {
         logger.info("Rerolling window closed for ${viewer.name}")
-
-        setInputSlot(null)
-        setOutputSlot(null)
-        setSelectionMenus(null)
 
         viewer.inventory.addItem(*session.getAllInputs())
 
@@ -242,17 +322,6 @@ internal class RerollingMenu(
         logger.info("RerollingMenu opened for ${viewer.name}")
     }
 
-    private fun createSelectionMenus(): List<Gui> {
-        return session.selectionMap.values
-            .filter { selection -> selection.changeable /* 只为可被重造的核孔创建菜单 */ }
-            .map { selection -> SelectionMenu(this, selection) }
-    }
-
-    private fun setSelectionMenus(guis: List<Gui>?) {
-        primaryGui.setContent(guis)
-    }
-
-    @Suppress("SameParameterValue")
     private fun setInputSlot(stack: ItemStack?) {
         inputSlot.setItemSilently(0, stack)
     }
@@ -261,52 +330,8 @@ internal class RerollingMenu(
         outputSlot.setItemSilently(0, stack)
     }
 
-    /**
-     * 渲染 [RerollingMenu.inputSlot] 里面的内容.
-     */
-    private fun renderInputSlot(source: NekoStack): ItemStack {
-        val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
-        ItemRenderers.REROLLING_TABLE.render(source, context)
-        return source.itemStack
-    }
-
-    /**
-     * 渲染 [RerollingMenu.outputSlot] 里面的内容.
-     */
-    private fun renderOutputSlot(): ItemStack {
-        val result = session.latestResult
-
-        if (result.isSuccess) {
-            // 如果可以重造:
-
-            // 这里修改输入的原始物品, 作为输出物品的预览.
-            // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
-            // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
-
-            val previewItem = session.inputItem?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
-            ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
-            return previewItem.directEdit {
-                lore = lore.orEmpty() + buildList {
-                    add(empty())
-                    addAll(result.reforgeCost.description)
-
-                    if (confirmed) {
-                        add(empty())
-                        add("<gray>[<aqua>点击确认重造</aqua>]".mini)
-                    }
-                }.removeItalic
-            }
-
-        } else {
-            // 如果不可重造:
-
-            // 由于根本无法重造, 所以也不存在重造后的物品.
-            // 这里直接创建一个新的物品堆叠 (屏障).
-            return ItemStack.of(Material.BARRIER).edit {
-                itemName = "<white>结果: <red>失败".mini
-                lore = result.description.removeItalic
-            }
-        }
+    private fun setSelectionGuis(guis: List<Gui>?) {
+        primaryGui.setContent(guis)
     }
 
     private class PrevItem : ScrollItem(-1) {

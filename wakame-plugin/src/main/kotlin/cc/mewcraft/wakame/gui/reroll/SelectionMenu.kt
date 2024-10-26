@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.edit
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -45,14 +44,6 @@ private constructor(
     }
 
     /**
-     * @param id 核孔的 id
-     */
-    private fun getCoreDisplayNameBy(id: String): Component {
-        return parent.session.sourceItem?.getCell(id)?.getCore()?.displayName
-            ?: return text("内部错误 (no such cell)").color(NamedTextColor.AQUA)
-    }
-
-    /**
      * @param message 错误信息
      */
     private fun makeErrorItem(message: Component): ItemProvider {
@@ -66,8 +57,10 @@ private constructor(
         override fun getItemProvider(): ItemProvider {
             val session = parent.session
             val sourceItem = session.sourceItem ?: return makeErrorItem(text("内部错误 (source item is null)"))
+
             val cellId = selection.id
             val cell = sourceItem.getCell(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))
+
             val core = cell.getCore()
             val icon = CoreIcons.getNekoStack(core)
             icon.directEdit { itemName = core.displayName }
@@ -92,10 +85,10 @@ private constructor(
 
             if (selection.selected) {
                 type = Material.PINK_DYE
-                name = text("将被重造")
+                name = text("该核孔将被重造")
             } else {
                 type = Material.GRAY_DYE
-                name = text("保持不变")
+                name = text("该核孔保持不变")
             }
 
             val stack = ItemStack.of(type).edit {
@@ -111,7 +104,7 @@ private constructor(
             // 执行一次重造, 并更新主菜单
             parent.confirmed = false
             parent.executeReforge()
-            parent.updateOutput()
+            parent.updateOutputSlot()
 
             notifyWindows()
         }
