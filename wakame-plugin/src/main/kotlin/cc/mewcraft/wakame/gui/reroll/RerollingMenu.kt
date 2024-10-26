@@ -190,7 +190,7 @@ internal class RerollingMenu(
                 if (!result.reforgeCost.test(viewer)) {
                     setOutputSlot(ItemStack.of(Material.BARRIER).edit {
                         itemName = text {
-                            content("结果: ").color(NamedTextColor.GRAY)
+                            content("结果: ").color(NamedTextColor.WHITE)
                             append(text { content("资源不足").color(NamedTextColor.RED) })
                         }
                     })
