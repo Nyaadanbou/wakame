@@ -295,6 +295,7 @@ interface ModdingSession : Examinable {
              * - 当该属性为 `null` 时, 说明此时玩家还没有放入用于定制的耗材
              * - 当该属性不为 `null` 时, 说明此时玩家已经放入了用于定制的耗材
              */
+            // TODO 这个 property 应该移到 Replace 中
             @get:Contract(" -> new")
             val ingredient: NekoStack?
 

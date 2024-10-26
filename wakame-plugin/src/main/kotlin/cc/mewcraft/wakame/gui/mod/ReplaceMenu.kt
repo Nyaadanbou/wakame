@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.gui.mod
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.customNeko
-import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
@@ -20,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.inventory.event.UpdateReason
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
@@ -90,7 +89,7 @@ private constructor(
                 replace.executeReplace(addedNekoStack)
 
                 // 重新渲染放入的物品
-                event.newItem = renderInputSlot(replace)
+                event.newItem = renderInputItem(replace)
 
                 // 执行一次定制流程
                 parent.executeReforge()
@@ -136,15 +135,17 @@ private constructor(
 
     @Suppress("SameParameterValue")
     private fun setInputSlot(item: ItemStack?) {
-        inputSlot.setItem(UpdateReason.SUPPRESSED, 0, item)
+        inputSlot.setItemSilently(0, item)
     }
 
-    private fun renderInputSlot(replace: ModdingSession.Replace): ItemStack {
+    private fun renderInputItem(replace: ModdingSession.Replace): ItemStack {
         val clickToWithdraw = "<gray>[<aqua>点击取回核心</aqua>]".mini
 
         val replaceResult = replace.latestResult
         val ingredient = replaceResult.ingredient
         if (ingredient == null) {
+            // 内部错误:
+
             return ItemStack.of(Material.BARRIER).edit {
                 itemName = "<white>结果: <red>内部错误".mini
                 lore = listOf(
@@ -158,7 +159,7 @@ private constructor(
         ItemRenderers.MODDING_TABLE.render(ingredient, ModdingTableContext.ReplaceInputSlot(replace))
 
         if (replaceResult.applicable) {
-            // 耗材可用于定制
+            // 耗材可用于定制:
 
             ingredient.directEdit {
                 customName = null // 玩家可能改了名, 所以清除一下
@@ -174,7 +175,7 @@ private constructor(
             return ingredient.itemStack
 
         } else {
-            // 耗材不可用于定制
+            // 耗材不可用于定制:
 
             ingredient.directEdit {
                 itemName = "<white>结果: <red>无效".mini
@@ -189,20 +190,21 @@ private constructor(
         }
     }
 
-    private class ViewItem(
+    private inner class ViewItem(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val core = replace.cell.getCore()
-            val coreIcon = CoreIcons.getItemStack(core).edit {
-                itemName = core.displayName
-                lore = buildList {
-                    addAll(core.description)
-                    // TODO reforge2 渲染惩罚值
-                }
-            }
+            val session = parent.session
 
-            return ItemWrapper(coreIcon)
+            val cell = replace.cell
+            val core = cell.getCore()
+            val icon = CoreIcons.getNekoStack(core)
+
+            icon.setStandaloneCell(StandaloneCell(cell))
+            icon.directEdit { itemName = core.displayName }
+            ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.ReplacePreview(session))
+
+            return ItemWrapper(icon.unsafe.handle)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

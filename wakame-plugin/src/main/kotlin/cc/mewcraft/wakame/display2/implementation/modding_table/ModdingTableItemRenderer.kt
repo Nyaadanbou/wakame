@@ -40,6 +40,9 @@ internal sealed interface ModdingTableContext {
     // 输出的物品 (经过定制后的物品)
     data class MainOutputSlot(val session: ModdingSession) : ModdingTableContext
 
+    // 核孔的预览
+    data class ReplacePreview(val session: ModdingSession) : ModdingTableContext
+
     // 玩家放入的核心
     data class ReplaceInputSlot(val replace: ModdingSession.Replace) : ModdingTableContext
 }
@@ -72,10 +75,39 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRendererParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> ModdingTableRendererParts.RARITY.process(collector, data) }
 
-        when (context) {
-            is ModdingTableContext.MainInputSlot -> process(item, context, collector)
-            is ModdingTableContext.MainOutputSlot -> process(item, context, collector)
-            is ModdingTableContext.ReplaceInputSlot -> process(item, context, collector)
+        if (context is ModdingTableContext.ReplacePreview) {
+            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, data, context) }
+        }
+
+        if (context is ModdingTableContext.MainInputSlot) {
+            components.process(ItemComponentTypes.CELLS) { data ->
+                for ((_, cell) in data) when (val core = cell.getCore()) {
+                    is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
+                    is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
+                    is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
+                }
+            }
+        }
+
+        if (context is ModdingTableContext.MainOutputSlot) {
+            components.process(ItemComponentTypes.CELLS) { data ->
+                for ((_, cell) in data) when (val core = cell.getCore()) {
+                    is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
+                    is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
+                    is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
+                }
+            }
+
+            // 输出物品需要渲染定制花费
+            ModdingTableRendererParts.REFORGE_COST.process(collector, context)
+        }
+
+        if (context is ModdingTableContext.ReplaceInputSlot) {
+            val replace = context.replace
+            val augment = replace.latestResult.augment
+            if (augment != null) {
+                ModdingTableRendererParts.REPLACE_IN.process(collector, augment, context)
+            }
         }
 
         val itemLore = textAssembler.assemble(collector)
@@ -88,35 +120,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             customModelData = itemCustomModelData
             showNothing()
         }
-    }
-
-    private fun process(item: NekoStack, context: ModdingTableContext.MainInputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
-        item.components.process(ItemComponentTypes.CELLS) { data ->
-            for ((_, cell) in data) when (val core = cell.getCore()) {
-                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
-                is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
-            }
-        }
-    }
-
-    private fun process(item: NekoStack, context: ModdingTableContext.MainOutputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
-        item.components.process(ItemComponentTypes.CELLS) { data ->
-            for ((_, cell) in data) when (val core = cell.getCore()) {
-                is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
-                is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
-            }
-        }
-
-        // 输出物品需要渲染定制花费
-        ModdingTableRendererParts.REFORGE_COST.process(collector, context)
-    }
-
-    private fun process(item: NekoStack, context: ModdingTableContext.ReplaceInputSlot, collector: ReferenceOpenHashSet<IndexedText>) {
-        val replace = context.replace
-        val augment = replace.latestResult.augment ?: return
-        ModdingTableRendererParts.REPLACE_IN.process(collector, augment, context)
     }
 }
 
@@ -156,6 +159,23 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     }
 
     @JvmField
+    val REFORGE_COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
+        SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
+    }
+
+    @JvmField
+    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
+        SimpleIndexedText(format.index, core.description)
+    }
+
+    @JvmField
+    val STANDALONE_CELL: RenderingPart2<StandaloneCell, ModdingTableContext.ReplacePreview, StandaloneCellRendererFormat> = configure2("standalone_cell") { cell, context, format ->
+        val replaceParams = context.session.replaceParams
+        val penaltyLimit = replaceParams[cell.id]?.rule?.modLimit ?: 0
+        format.render(cell, modPenaltyLimit = penaltyLimit)
+    }
+
+    @JvmField
     val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 
     @JvmField
@@ -169,16 +189,6 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
 
     @JvmField
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
-
-    @JvmField
-    val REFORGE_COST: RenderingPart<ModdingTableContext.MainOutputSlot, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
-        SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
-    }
-
-    @JvmField
-    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext.ReplaceInputSlot, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
-        SimpleIndexedText(format.index, core.description)
-    }
 }
 
 
