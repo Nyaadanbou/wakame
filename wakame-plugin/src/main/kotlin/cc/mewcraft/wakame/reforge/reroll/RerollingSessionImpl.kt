@@ -457,6 +457,7 @@ internal object SelectionMap : KoinComponent {
     private class Simple(
         override val session: RerollingSession,
     ) : RerollingSession.SelectionMap, KoinComponent {
+        // TODO 对 Gui 排序
         private val data: HashMap<String, RerollingSession.Selection> = HashMap()
 
         override val size: Int

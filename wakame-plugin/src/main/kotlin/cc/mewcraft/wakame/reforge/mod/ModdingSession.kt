@@ -229,6 +229,11 @@ interface ModdingSession : Examinable {
         val cell: Cell
 
         /**
+         * 被定制的核孔是否可以修改.
+         */
+        val changeable: Boolean
+
+        /**
          * 被定制的核孔所对应的定制规则.
          */
         val rule: ModdingTable.CellRule
@@ -241,11 +246,6 @@ interface ModdingSession : Examinable {
          * 自定义函数, 计算定制这个核孔所需要的货币数量.
          */
         val total: MochaFunction
-
-        /**
-         * 被定制的核孔是否可以修改.
-         */
-        val changeable: Boolean
 
         /**
          * 储存了当前最新的定制结果.

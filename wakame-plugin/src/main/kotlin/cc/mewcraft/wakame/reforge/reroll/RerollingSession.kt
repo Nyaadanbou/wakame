@@ -205,10 +205,14 @@ interface RerollingSession : Examinable {
      * 封装了所有核孔的选择状态 ([Selection]).
      *
      * ## 设计哲学
-     * 本对象覆盖了物品上所有的核孔, 无论这个核孔能否被重造.
-     * 对于能被重造的核孔, 会有一个普通的 [Selection] 对象来表示.
-     * 对于不能被重造的核孔, 会有一个特殊的 [Selection] 对象来表示.
-     * 这可以让我们优雅的分别处理这两种情况.
+     * 本对象覆盖了物品上所有的核孔, 无论这个核孔能否被重造, 或是否在重造系统中“存在定义”.
+     * 所谓“存在定义”, 具体指的是, 在设计上是否已经为一个核孔定义了重造规则.
+     *
+     * 对于可以被重造的核孔, 会有一个普通的 [Selection] 对象来表示.
+     * 对于不可以被重造的核孔, 会有一个特殊的 [Selection] 对象来表示.
+     *
+     * 无论 [Selection] 的实现如何, 其行为和结果应该都是合理的.
+     * 这可以让其他系统在访问本接口时能够优雅的处理所有的特殊情况.
      */
     interface SelectionMap : Examinable, Iterable<Map.Entry<String, Selection>> {
         /**
@@ -236,6 +240,10 @@ interface RerollingSession : Examinable {
          * 该函数对于任意 id 都会返回一个 [Selection].
          */
         operator fun get(id: String): Selection
+
+        /**
+         * 检查指定核孔是否在系统中存在定义.
+         */
         operator fun contains(id: String): Boolean
     }
 }

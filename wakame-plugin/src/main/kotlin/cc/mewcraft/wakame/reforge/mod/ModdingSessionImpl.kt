@@ -620,6 +620,7 @@ private object ReforgeReplaceMap {
     private class Simple(
         data: Map<String, ModdingSession.Replace>,
     ) : ModdingSession.ReplaceMap {
+        // TODO 对 Gui 排序
         val data: HashMap<String, ModdingSession.Replace> = HashMap(data) // explicit copy
 
         override val size: Int
