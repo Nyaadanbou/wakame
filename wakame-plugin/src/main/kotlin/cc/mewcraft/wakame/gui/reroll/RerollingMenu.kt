@@ -3,7 +3,8 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.customNeko
+import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.*
@@ -108,18 +109,12 @@ internal class RerollingMenu(
             // 玩家尝试把物品放进 inputSlot:
             // ... 说明玩家想要开始一次重造流程
             event.isAdd -> {
-                val added = newItem?.customNeko ?: run {
-                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
-                    event.isCancelled = true
-                    return
-                }
-
                 // 设置本会话的源物品
                 // 赋值完毕之后, session 内部的其他状态应该也要更新
                 session.inputItem = newItem
 
                 // 重新渲染放入的物品
-                event.newItem = renderInputItem(added)
+                event.newItem = renderInputItem()
 
                 updateSelectionGuis()
                 updateOutputSlot()
@@ -221,28 +216,16 @@ internal class RerollingMenu(
     /**
      * 基于 [session] 的当前状态刷新输入容器.
      *
-     * 该函数不应该用于在事件 [ItemPreUpdateEvent] 中修改玩家放入的物品.
-     * 要修改玩家放入的物品, 应该在事件处理函数中使用 [renderInputItem].
+     * 该函数不应该用于在事件 [ItemPreUpdateEvent] 中重新渲染玩家放入的物品.
+     * 要重新渲染玩家放入的物品, 应该在事件中使用 [renderInputItem] 的返回值.
+     *
+     * 具体代码如下:
+     * ```kotlin
+     * event.newItem = renderInputItem()
+     * ```
      */
     fun updateInputSlot() {
-        val inputItem = session.inputItem
-        if (inputItem == null) {
-            // 没有任何输入, 则应该清空输入容器
-            setInputSlot(null)
-            return
-        }
-
-        val sourceItem = session.sourceItem
-        if (sourceItem == null) {
-            // 源物品无法重造, 则什么也做 (输入容器保持原样)
-            return
-        }
-
-        val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
-        ItemRenderers.REROLLING_TABLE.render(sourceItem, context)
-        val newItemStack = sourceItem.itemStack
-
-        setInputSlot(newItemStack)
+        setInputSlot(renderInputItem())
     }
 
     /**
@@ -303,10 +286,15 @@ internal class RerollingMenu(
     /**
      * 用于重新渲染玩家输入的源物品.
      */
-    private fun renderInputItem(source: NekoStack): ItemStack {
+    private fun renderInputItem(): ItemStack? {
+        val sourceItem = session.sourceItem
+            ?: return session.inputItem // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
+
         val context = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
-        ItemRenderers.REROLLING_TABLE.render(source, context)
-        return source.itemStack
+        ItemRenderers.REROLLING_TABLE.render(sourceItem, context)
+        val newItemStack = sourceItem.itemStack
+
+        return newItemStack
     }
 
     private fun onWindowClose() {

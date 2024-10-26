@@ -10,6 +10,8 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -175,14 +177,14 @@ internal object ReforgeResult {
 
     private class Empty : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<gray>没有输入."))
+        override val description: List<Component> = listOf(text("没有要重造的物品.").color(NamedTextColor.GRAY))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
         override val output: NekoStack = NekoStack.empty()
     }
 
     private class Error : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(Component.text("<red>内部错误."))
+        override val description: List<Component> = listOf(text("内部错误.").color(NamedTextColor.GRAY))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
         override val output: NekoStack = NekoStack.empty()
     }
@@ -252,13 +254,13 @@ internal object ReforgeCost {
     private class Empty : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf("<gray>花费: <white>无".mini)
+        override val description: List<Component> = listOf("<gray>花费: <yellow>无".mini)
     }
 
     private class Error : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf("<gray>花费: <red>内部错误".mini)
+        override val description: List<Component> = listOf("<gray>花费: <yellow>内部错误".mini)
     }
 
     private class Simple(

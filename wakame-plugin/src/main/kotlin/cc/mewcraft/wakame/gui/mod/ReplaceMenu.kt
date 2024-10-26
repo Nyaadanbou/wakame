@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -195,16 +194,8 @@ private constructor(
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             val core = replace.cell.getCore()
-            val changeable = replace.changeable
             val coreIcon = CoreIcons.getItemStack(core).edit {
-                itemName =
-                    if (changeable) {
-                        core.displayName
-                    } else {
-                        core.displayName.append(
-                            text { content(" (不可修改)"); color(NamedTextColor.RED) }
-                        )
-                    }
+                itemName = core.displayName
                 lore = buildList {
                     addAll(core.description)
                     // TODO reforge2 渲染惩罚值

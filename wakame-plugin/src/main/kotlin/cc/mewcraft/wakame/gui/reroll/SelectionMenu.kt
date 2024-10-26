@@ -104,6 +104,7 @@ private constructor(
             // 执行一次重造, 并更新主菜单
             parent.confirmed = false
             parent.executeReforge()
+            parent.updateInputSlot()
             parent.updateOutputSlot()
 
             notifyWindows()

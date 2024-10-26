@@ -167,19 +167,20 @@ internal class SimpleModdingSession(
 
     private inner class InputItemDelegate(
         private var _value: ItemStack?,
-    ) : ReadWriteProperty<Any?, ItemStack?> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack? {
+    ) : ReadWriteProperty<SimpleModdingSession, ItemStack?> {
+        override fun getValue(thisRef: SimpleModdingSession, property: KProperty<*>): ItemStack? {
             return _value?.clone()
         }
 
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: ItemStack?) {
+        override fun setValue(thisRef: SimpleModdingSession, property: KProperty<*>, value: ItemStack?) {
             val old = _value
             _value = value?.clone()
 
             if (_value == null) {
                 // 传入的是 null, 重置所有状态
+                sourceItem = null
                 replaceParams = ReforgeReplaceMap.empty()
-                latestResult = ReforgeResult.empty()
+                executeReforge()
                 return
             }
 
@@ -205,11 +206,12 @@ internal class SimpleModdingSession(
             }
 
             sourceItem = sourceItem0
-            replaceParams = createReplaceParameters(sourceItemCells, sourceItemRule)
+            replaceParams = createReplaceParameters(thisRef, sourceItemCells, sourceItemRule)
             executeReforge()
         }
 
         private fun createReplaceParameters(
+            thisRef: SimpleModdingSession,
             sourceCells: ItemCells,
             sourceItemRule: ModdingTable.ItemRule,
         ): ModdingSession.ReplaceMap {
@@ -217,9 +219,9 @@ internal class SimpleModdingSession(
             for ((id, cell) in sourceCells) {
                 val cellRule = sourceItemRule.cellRules[id]
                 if (cellRule != null) {
-                    map[id] = ReforgeReplace.changeable(this@SimpleModdingSession, cell, cellRule)
+                    map[id] = ReforgeReplace.changeable(thisRef, cell, cellRule)
                 } else {
-                    map[id] = ReforgeReplace.unchangeable(this@SimpleModdingSession, cell)
+                    map[id] = ReforgeReplace.unchangeable(thisRef, cell)
                 }
             }
 
@@ -229,12 +231,12 @@ internal class SimpleModdingSession(
 
     private inner class SourceItemDelegate(
         private var _value: NekoStack?,
-    ) : ReadWriteProperty<Any?, NekoStack?> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): NekoStack? {
+    ) : ReadWriteProperty<SimpleModdingSession, NekoStack?> {
+        override fun getValue(thisRef: SimpleModdingSession, property: KProperty<*>): NekoStack? {
             return _value?.clone()
         }
 
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: NekoStack?) {
+        override fun setValue(thisRef: SimpleModdingSession, property: KProperty<*>, value: NekoStack?) {
             val old = _value
             _value = value?.clone()
 

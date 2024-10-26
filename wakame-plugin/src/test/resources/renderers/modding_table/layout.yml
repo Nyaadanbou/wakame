@@ -1,7 +1,5 @@
 # 在这里设置定制台物品的 *渲染布局*.
 
-# FIXME 补充说明
-
 primary:
   - (fixed:general)
   - general:level
@@ -10,14 +8,12 @@ primary:
 
   - (fixed:attribute)
   - attribute:attack_damage
-  - attribute:block_interaction_range
-  - attribute:critical_strike_chance
   - attribute:defense
-  - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
   - stash:cells/empty
 
+  - (fixed:vanilla)
   - vanilla:item_name
   - vanilla:custom_name
 
