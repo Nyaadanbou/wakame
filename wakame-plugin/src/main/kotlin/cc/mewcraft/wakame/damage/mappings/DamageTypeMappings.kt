@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR

@@ -15,7 +15,7 @@ data class CriticalStrikeMetadata(
     /**
      * 这次伤害的暴击状态.
      */
-    val state: CriticalStrikeState
+    val state: CriticalStrikeState,
 ) {
     companion object {
         /**

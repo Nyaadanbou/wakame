@@ -45,7 +45,7 @@ sealed interface DamageMetadata {
  * 或用于无来源的弹射物的伤害.
  */
 class VanillaDamageMetadata(
-    override val damageBundle: DamageBundle
+    override val damageBundle: DamageBundle,
 ) : DamageMetadata {
     constructor(element: Element, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double) : this(
         damageBundle = damageBundle {
@@ -119,7 +119,7 @@ class PlayerDamageMetadata(
 class EntityDamageMetadata(
     damager: LivingEntity,
     override val damageBundle: DamageBundle,
-    override val criticalStrikeMetadata: CriticalStrikeMetadata
+    override val criticalStrikeMetadata: CriticalStrikeMetadata,
 ) : DamageMetadata, KoinComponent {
     private val logger: Logger by inject()
     private val weakEntity: WeakReference<LivingEntity> = WeakReference(damager)
@@ -146,7 +146,7 @@ class EntityDamageMetadata(
 class CustomDamageMetadata(
     override val damageBundle: DamageBundle,
     override val damageTags: DamageTags,
-    override val criticalStrikeMetadata: CriticalStrikeMetadata
+    override val criticalStrikeMetadata: CriticalStrikeMetadata,
 ) : DamageMetadata {
     override val damageValue: Double = damageBundle.damageSum
 }

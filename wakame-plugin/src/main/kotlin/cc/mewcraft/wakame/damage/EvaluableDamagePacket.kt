@@ -62,12 +62,12 @@ private data object DefaultEvaluableDamagePacket : EvaluableDamagePacket {
 }
 
 private data class EvaluableDamagePacketImpl(
-    val element: Element,
-    val min: Evaluable<*>,
-    val max: Evaluable<*>,
-    val rate: Evaluable<*>,
-    val defensePenetration: Evaluable<*>,
-    val defensePenetrationRate: Evaluable<*>,
+    private val element: Element,
+    private val min: Evaluable<*>,
+    private val max: Evaluable<*>,
+    private val rate: Evaluable<*>,
+    private val defensePenetration: Evaluable<*>,
+    private val defensePenetrationRate: Evaluable<*>,
 ) : EvaluableDamagePacket {
     override fun evaluate(engine: MochaEngine<*>): DamagePacket {
         return damagePacket(element) {
@@ -97,7 +97,9 @@ internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDama
 
 internal object EvaluableDamagePacketSerializer : SchemaSerializer<EvaluableDamagePacket> {
     override fun deserialize(type: Type, node: ConfigurationNode): EvaluableDamagePacket {
-        val element = node.key()?.toString()?.let { ElementRegistry.INSTANCES.find(it) } ?: throw SerializationException(node, type, "Element ${node.key()} not found")
+        val element = node.key()?.toString()?.let { ElementRegistry.INSTANCES.find(it) }
+            ?: throw SerializationException(node, type, "Element ${node.key()} not found")
+
         return EvaluableDamagePacketImpl(
             element = element,
             min = node.node("min").krequire(),

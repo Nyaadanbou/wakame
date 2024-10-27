@@ -6,7 +6,7 @@ package cc.mewcraft.wakame.damage
  * 目前仅玩家造成的伤害会有标签.
  */
 class DamageTags(
-    vararg tags: DamageTag
+    vararg tags: DamageTag,
 ) {
     private val tagSet: MutableSet<DamageTag> = mutableSetOf()
 

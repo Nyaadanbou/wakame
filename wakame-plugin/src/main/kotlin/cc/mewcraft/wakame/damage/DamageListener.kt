@@ -40,12 +40,14 @@ object DamageListener : Listener, KoinComponent {
             event.isCancelled = true
             return
         }
-        val defenseMetadata = DamageManager.generateDefenseMetadata(event)
 
+        val defenseMetadata = DamageManager.generateDefenseMetadata(event)
         val nekoEntityDamageEvent = NekoEntityDamageEvent(damageMetadata, defenseMetadata, event)
-        // neko伤害事件被取消, 则直接返回
-        // neko伤害事件被取消时，其内部的Bukkit伤害事件必然是取消的状态
-        if (!nekoEntityDamageEvent.callEvent()) return
+
+        // 萌芽伤害事件被取消, 则直接返回
+        // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
+        if (!nekoEntityDamageEvent.callEvent())
+            return
 
         // 修改最终伤害
         event.damage = nekoEntityDamageEvent.getFinalDamage()

@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
@@ -20,7 +22,6 @@ import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -34,6 +35,7 @@ import java.lang.reflect.Type
     runBefore = [ElementRegistry::class]
 )
 object EntityAttackMappings : Initializable, KoinComponent {
+    private val LOGGER: Logger = get()
     private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, List<EntityAttackMapping>> = Reference2ObjectOpenHashMap()
 
     /**
@@ -74,13 +76,13 @@ object EntityAttackMappings : Initializable, KoinComponent {
             }
             .forEach { (key, node) ->
                 val entityType = entityTypeRegistry.get(key) ?: run {
-                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
+                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
                 val mappings = node.childrenMap()
                     .map { (_, node) ->
                         node.get<EntityAttackMapping>() ?: run {
-                            logger.warn("Malformed entity attack mapping at: ${node.path()}. Please correct your config.")
+                            LOGGER.warn("Malformed entity attack mapping at: ${node.path()}. Please correct your config.")
                             return@forEach
                         }
                     }
@@ -88,8 +90,6 @@ object EntityAttackMappings : Initializable, KoinComponent {
                 MAPPINGS[entityType] = mappings
             }
     }
-
-    private val logger: Logger by inject()
 }
 
 /**
@@ -143,7 +143,7 @@ internal object DamageInfoSerializer : TypeSerializer<DamageInfo> {
 
 /**
  * 原版生物特定攻击类型的映射.
- * 如: 近战攻击, 弹射物攻击, 近战攻击(按尺寸)等
+ * 例如: 近战攻击, 弹射物攻击, 近战攻击(按尺寸)等.
  */
 sealed interface EntityAttackMapping {
     val damageInfo: DamageInfo
@@ -163,7 +163,7 @@ sealed interface EntityAttackMapping {
  * ```
  */
 data class MeleeAttackMapping(
-    override val damageInfo: DamageInfo
+    override val damageInfo: DamageInfo,
 ) : EntityAttackMapping {
     companion object {
         const val TYPE_NAME = "melee"
@@ -189,7 +189,7 @@ data class MeleeAttackMapping(
  */
 data class AgeMeleeAttackMapping(
     override val damageInfo: DamageInfo,
-    val isBaby: Boolean
+    val isBaby: Boolean,
 ) : EntityAttackMapping {
     companion object {
         const val TYPE_NAME = "melee_age"
@@ -219,7 +219,7 @@ data class AgeMeleeAttackMapping(
  */
 data class SizeMeleeAttackMapping(
     override val damageInfo: DamageInfo,
-    val size: Int
+    val size: Int,
 ) : EntityAttackMapping {
     companion object {
         const val TYPE_NAME = "melee_size"
@@ -231,7 +231,7 @@ data class SizeMeleeAttackMapping(
         val directEntity = damageSource.directEntity ?: return false
         val causingEntity = damageSource.causingEntity ?: return false
         if (directEntity != causingEntity) return false
-        // MagmaCube在bukkit api下是实现了Slime的
+        // MagmaCube 在 Bukkit API 下是实现了 Slime 的
         if (causingEntity is Slime) {
             if (causingEntity.size == size) return true
         }
@@ -240,7 +240,7 @@ data class SizeMeleeAttackMapping(
 }
 
 /**
- * 非玩家生物弹射物攻击
+ * 非玩家生物的弹射物攻击.
  *
  * ## Node structure
  * ```yaml
@@ -252,7 +252,7 @@ data class SizeMeleeAttackMapping(
  */
 data class ProjectileAttackMapping(
     override val damageInfo: DamageInfo,
-    val projectileType: EntityType
+    val projectileType: EntityType,
 ) : EntityAttackMapping {
     companion object {
         const val TYPE_NAME = "projectile"
@@ -267,7 +267,6 @@ data class ProjectileAttackMapping(
         return false
     }
 }
-
 
 internal object EntityAttackMappingSerializer : TypeSerializer<EntityAttackMapping> {
     override fun deserialize(type: Type, node: ConfigurationNode): EntityAttackMapping {

@@ -25,7 +25,7 @@ import org.bukkit.event.entity.EntityDamageEvent
  * ```
  */
 data class SpearAttack(
-    val size: Double
+    val size: Double,
 ) : AttackType {
     companion object {
         const val NAME = "spear"

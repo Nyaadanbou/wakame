@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
@@ -83,7 +85,7 @@ object DamageManager : KoinComponent {
                             // 玩家手中的物品是 Attack
                             return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
                         } else {
-                            // 手中的物品无Attack行为甚至不是NekoStack
+                            // 手中的物品无 Attack 行为甚至不是 NekoStack
                             return PlayerDamageMetadata.default(causingEntity)
                         }
                     }
@@ -104,15 +106,15 @@ object DamageManager : KoinComponent {
                                 }
                             )
                         } else {
-                            // 取消Bukkit伤害事件
+                            // 取消 Bukkit 伤害事件
                             event.isCancelled = true
-                            // 返回null是为了供外部识别以不触发neko伤害事件
+                            // 返回 null 是为了供外部识别以不触发萌芽伤害事件
                             return null
                         }
                     }
 
                     else -> {
-                        // 其他Cause的玩家伤害
+                        // 其他 Cause 的玩家伤害
                         // 不应该发生
                         return warnAndDefaultReturn(event)
                     }
@@ -396,8 +398,8 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity?, kno
         DamageManager.markCancelKnockback(this.uniqueId)
     }
 
-    // 触发一下bukkit的伤害事件
-    // 伤害填多少都无所谓, 最后都是要neko伤害事件重新算
+    // 触发一下 Bukkit 的伤害事件
+    // 伤害填多少都无所谓, 最后都是要萌芽伤害事件重新算
     this.damage(4.95, source)
 }
 
