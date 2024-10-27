@@ -2,7 +2,8 @@ base: golden_sword[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> 红温武器"
 rarity: mapping:demo_1
-level: 2
+level:
+  base: 2
 castable: { }
 glowable: { }
 lore:

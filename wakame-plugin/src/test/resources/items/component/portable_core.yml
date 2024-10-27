@@ -1,7 +1,8 @@
 base: bedrock
 
 # 如果核心依赖等级, 则必须加上物品等级的组件
-level: 10
+level:
+  base: 10
 
 # 使该物品成为便携式核心
 portable_core:
