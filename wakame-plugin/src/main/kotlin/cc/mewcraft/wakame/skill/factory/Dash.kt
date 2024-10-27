@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.Damageable
+import cc.mewcraft.wakame.item.damage
+import cc.mewcraft.wakame.item.decreaseDurability
+import cc.mewcraft.wakame.item.isDamageable
+import cc.mewcraft.wakame.item.maxDamage
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey
@@ -67,7 +69,7 @@ interface Dash : Skill {
         override val duration: Long,
         override val canContinueAfterHit: Boolean,
         override val hitEffects: List<SkillProvider>,
-        override val hitInterval: Long
+        override val hitInterval: Long,
     ) : Dash, SkillBase(key, config) {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
@@ -82,7 +84,7 @@ private class DashTick(
     context: SkillContext,
     skill: Dash,
     override val interruptTriggers: TriggerConditions,
-    override val forbiddenTriggers: TriggerConditions
+    override val forbiddenTriggers: TriggerConditions,
 ) : AbstractPlayerSkillTick<Dash>(skill, context) {
     companion object {
         private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")
@@ -144,14 +146,16 @@ private class DashTick(
     }
 
     override fun tickBackswing(tickCount: Long): TickResult {
-        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer
-        player?.isSprinting = false
+        val player = context[SkillContextKey.CASTER]
+            ?.value<Caster.Single.Player>()
+            ?.bukkitPlayer
+            ?: return TickResult.ALL_DONE
+        player.isSprinting = false
         val damageCount = context[DASH_DAMAGE_KEY] ?: return TickResult.ALL_DONE
-        context[SkillContextKey.NEKO_STACK]?.let {
-            val components = it.components
-            val damage = components.get(ItemComponentTypes.DAMAGEABLE) ?: return@let
-            if (damage.damage < damage.maxDamage) {
-                components.set(ItemComponentTypes.DAMAGEABLE, Damageable(damage.damage + damageCount, damage.maxDamage))
+        val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return TickResult.ALL_DONE
+        if (nekoStack.isDamageable) {
+            if (nekoStack.damage < nekoStack.maxDamage) {
+                nekoStack.decreaseDurability(player, damageCount)
             } else {
                 return TickResult.ALL_DONE
             }

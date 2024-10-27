@@ -45,7 +45,7 @@ internal class NekooApiProvider : Nekoo, KoinComponent {
             nekoStack = realizer.realize(nekoItem, user)
         }
 
-        return nekoStack.unsafe.handle
+        return nekoStack.wrapped
     }
 
     companion object {

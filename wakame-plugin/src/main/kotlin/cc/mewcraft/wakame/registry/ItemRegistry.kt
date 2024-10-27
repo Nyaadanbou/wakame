@@ -43,16 +43,16 @@ import xyz.xenondevs.commons.provider.immutable.*
 )
 object ItemRegistry : KoinComponent, Initializable {
     /**
-     * 用于原版物品代理的 [NekoItem]. 这些 NekoItem 不应该用来生成物品.
-     */
-    @JvmField
-    val VANILLA: Registry<Key, NekoItem> = SimpleRegistry()
-
-    /**
-     * 用于一般用途的 [NekoItem]. 这些 [NekoItem] 可以用来生成物品.
+     * 用于一般用途的 [NekoItem]. 这些模板可以用来生成 [ItemStack].
      */
     @JvmField
     val CUSTOM: Registry<Key, NekoItem> = SimpleRegistry()
+
+    /**
+     * 包含了虚拟的 [NekoItem]. 这些模板不应该用来生成 [ItemStack].
+     */
+    @JvmField
+    val IMAGINARY: Registry<Key, NekoItem> = SimpleRegistry()
 
     /**
      * All namespaces of loaded items.
@@ -126,7 +126,7 @@ object ItemRegistry : KoinComponent, Initializable {
         loadConfiguration()
     }
 
-    private val logger: Logger = get()
+    private val LOGGER: Logger = get()
 
     /**
      * 默认的 [Error NekoItem][NekoItem] 的唯一标识.
@@ -159,35 +159,37 @@ object ItemRegistry : KoinComponent, Initializable {
 
     private fun loadConfiguration() {
         // 清空注册表
-        VANILLA.clear()
-        logger.info("Unregistered all vanilla items.")
+        IMAGINARY.clear()
+        LOGGER.info("Unregistered all vanilla items.")
         CUSTOM.clear()
-        logger.info("Unregistered all custom items.")
+        LOGGER.info("Unregistered all custom items.")
 
         // 加载所有配置文件
         for ((key, path, node) in NekoItemNodeIterator) {
             val namespace = key.namespace()
             if (namespace == Key.MINECRAFT_NAMESPACE) {
                 // Process as vanilla item
+                LOGGER.info("Loading vanilla item: '$key'")
                 runCatching { NekoItemFactory.createVanilla(key, path, node) }
-                    .onSuccess { VANILLA.register(key, it) }
-                    .onFailure { logError(key, it) }
+                    .onSuccess { IMAGINARY.register(key, it) }
+                    .onFailure { reportError(key, it) }
             } else {
                 // Process as custom item
+                LOGGER.info("Loading custom item: '$key'")
                 runCatching { NekoItemFactory.createCustom(key, path, node) }
                     .onSuccess { CUSTOM.register(key, it) }
-                    .onFailure { logError(key, it) }
+                    .onFailure { reportError(key, it) }
             }
         }
-        logger.info("Registered all items.")
+        LOGGER.info("Registered all items.")
 
         // 注册默认的 error item
         if (CUSTOM.has(ERROR_NEKO_ITEM_ID)) {
-            logger.info("Found a custom error neko item.")
+            LOGGER.info("Found a custom error neko item!")
         } else {
-            logger.warn("Custom error neko item not found. Registering default one.")
+            LOGGER.warn("Custom error neko item not found, using default one.")
             CUSTOM.register(ERROR_NEKO_ITEM_ID, ItemRegistryInternals.DEFAULT_ERROR_NEKO_ITEM)
-            logger.info("Registered default error neko item.")
+            LOGGER.info("Registered default error neko item.")
         }
 
         // 重新加载 Error NekoItem
@@ -197,11 +199,11 @@ object ItemRegistry : KoinComponent, Initializable {
         NekoItemHolder.reload()
     }
 
-    private fun logError(key: Key, throwable: Throwable) {
+    private fun reportError(key: Key, throwable: Throwable) {
         if (Initializer.isDebug) {
-            logger.error("Can't load item '$key'", throwable)
+            LOGGER.error("Can't load item '$key'", throwable)
         } else {
-            logger.error("Can't load item '$key': ${throwable.message}")
+            LOGGER.error("Can't load item '$key': ${throwable.message}")
         }
     }
 }

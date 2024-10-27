@@ -72,6 +72,13 @@ internal object ItemComponentMaps {
     /**
      * 构建一个只允许读操作的 [ItemComponentMap].
      */
+    fun unmodifiable(stack: BukkitStack): ItemComponentMap {
+        return unmodifiable(wrapStack(stack))
+    }
+
+    /**
+     * 构建一个只允许读操作的 [ItemComponentMap].
+     */
     fun unmodifiable(delegate: ItemComponentMap): ItemComponentMap {
         return ImmutableItemComponentMap(delegate)
     }

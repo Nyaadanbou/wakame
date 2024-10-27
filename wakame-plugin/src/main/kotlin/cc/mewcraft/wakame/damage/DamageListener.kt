@@ -8,7 +8,6 @@ import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Server
-import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -29,25 +28,26 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
-        if (event.isCancelled) {
-            return
-        }
-
         val entity = event.entity
         if (entity !is LivingEntity) {
             return
         }
 
         val damageMetadata = DamageManager.generateDamageMetadata(event)
-        val defenseMetadata = DamageManager.generateDefenseMetadata(event)
-
-        val nekoEntityDamageEvent = NekoEntityDamageEvent(event.damageSource, damageMetadata, defenseMetadata, event)
-        if (!nekoEntityDamageEvent.callEvent()) {
-            event.isCancelled = true // 同时取消 EntityDamageEvent
+        if (damageMetadata == null) {
+            event.isCancelled = true
             return
         }
+
+        val defenseMetadata = DamageManager.generateDefenseMetadata(event)
+        val nekoEntityDamageEvent = NekoEntityDamageEvent(damageMetadata, defenseMetadata, event)
+
+        // 萌芽伤害事件被取消, 则直接返回
+        // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
+        if (!nekoEntityDamageEvent.callEvent())
+            return
 
         // 修改最终伤害
         event.damage = nekoEntityDamageEvent.getFinalDamage()
@@ -75,7 +75,7 @@ object DamageListener : Listener, KoinComponent {
                             .appendNewline()
                             .append(text("伤害未计算防御阶段"))
                             .appendNewline()
-                            .append(text("点击复制实体的 UUID"))
+                            .append(text("点击复制实体 UUID"))
                     )
                 }
         ).clickEvent(
@@ -85,19 +85,13 @@ object DamageListener : Listener, KoinComponent {
         server.filterAudience { it is Player }.sendMessage(message)
     }
 
-    /**
-     * 在弹射物射出时记录其 [DamageMetadata].
-     */
+
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
         DamageManager.recordProjectileDamageMetadata(event)
     }
 
-    /**
-     * 在弹射物射出时记录其 [DamageMetadata].
-     *
-     * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整.
-     */
+
     @EventHandler
     fun on(event: EntityShootBowEvent) {
         DamageManager.recordProjectileDamageMetadata(event)
@@ -111,12 +105,7 @@ object DamageListener : Listener, KoinComponent {
         if (event.hitBlock == null) {
             return
         }
-        when (val projectile = event.entity) {
-            // 弹射物是箭矢 (普通箭/光灵箭/药水箭) 和三叉戟
-            is AbstractArrow -> {
-                DamageManager.removeProjectileDamageMetadata(projectile.uniqueId)
-            }
-        }
+        DamageManager.removeProjectileDamageMetadata(event.entity.uniqueId)
     }
 
     /**
@@ -129,23 +118,4 @@ object DamageListener : Listener, KoinComponent {
             event.isCancelled = true
         }
     }
-
-    /* @EventHandler
-    fun on(event: PlayerInteractEntityEvent) {
-        val player = event.player
-        val entity = event.rightClicked
-        if (event.hand != EquipmentSlot.HAND) return
-        player.sendMessage(Component.text("你右键了" + entity.type + "(" + entity.uniqueId + ")"))
-        if (entity is LivingEntity) {
-            entity.applyCustomDamage(
-                CustomDamageMetadata(
-                    1.0, false, false,
-                    listOf(
-                        ElementDamagePacket(ElementRegistry.DEFAULT, 5.0, 10.0, 0.0, 0.0, 0.0)
-                    )
-                ),
-                player
-            )
-        }
-    } */
 }

@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsListener
-import cc.mewcraft.wakame.config.*
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.damage.DamageListener
-import cc.mewcraft.wakame.damage.VanillaDamageMappings.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
@@ -24,7 +24,6 @@ import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.component.ComponentListener
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
-import cc.mewcraft.wakame.player.interact.FuckOffHandListener
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.user.PaperUserManager
@@ -131,7 +130,6 @@ object Initializer : KoinComponent, Listener {
         registerListenerAndBind<ItemChangeListener>()
         registerListenerAndBind<ItemBehaviorListener>()
         registerListenerAndBind<ItemMiscellaneousListener>()
-        registerListenerAndBind<FuckOffHandListener>()
         registerListenerAndBind<ComponentListener>()
 
         // attribute

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.packet
 
+import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.Hologram
@@ -11,12 +12,21 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.*
-import org.bukkit.entity.*
-import org.bukkit.event.*
+import org.bukkit.Color
+import org.bukkit.Location
+import org.bukkit.Sound
+import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.joml.Vector3f
-import java.util.WeakHashMap
-import kotlin.math.*
+import java.util.*
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
 
 /**
  * 以悬浮文字显示玩家造成的伤害.
@@ -37,10 +47,9 @@ internal class DamageDisplay : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
-        val damageSource = event.damageSource
-        val damager = damageSource.causingEntity as? Player ?: return
-        val damageValueMap = event.getFinalDamageMap(excludeZeroDamage = true)
-        val isCritical = event.damageMetadata.isCritical
+        val damager = event.damageSource.causingEntity as? Player ?: return
+        val damageValueMap = event.getFinalDamageMap()
+        val criticalState = event.getCriticalState()
 
         val hologramLoc = calculateHologramLocation(damager = damager, distance = 3f)
         val hologramText = damageValueMap
@@ -50,22 +59,33 @@ internal class DamageDisplay : Listener {
                     content(damageValue)
                     element.styles.forEach { applicableApply(it) }
                 }
-                if (isCritical) {
-                    damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
-                    text {
-                        content("\ud83d\udca5 ")
-                        color(TextColor.color(0xff9900))
-                        style { decorate(TextDecoration.BOLD) }
-                        append(damageText)
+                when (criticalState) {
+                    CriticalStrikeState.POSITIVE -> {
+                        damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
+                        text {
+                            content("\ud83d\udca5 ")
+                            color(TextColor.color(0xff9900))
+                            style { decorate(TextDecoration.BOLD) }
+                            append(damageText)
+                        }
                     }
-                } else {
-                    damageText
+
+                    CriticalStrikeState.NEGATIVE -> {
+                        text {
+                            content("\ud83d\udca5 ")
+                            color(TextColor.color(0x02afff))
+                            style { decorate(TextDecoration.BOLD) }
+                            append(damageText)
+                        }
+                    }
+
+                    CriticalStrikeState.NONE -> damageText
                 }
             }.let { components ->
                 Component.join(JoinConfiguration.spaces(), components)
             }
 
-        sendDamageHologram(damager, hologramLoc, hologramText, isCritical)
+        sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
     }
 
     /**
@@ -111,7 +131,7 @@ internal class DamageDisplay : Listener {
         hologramViewer: Player,
         hologramLocation: Location,
         damageText: Component,
-        isCritical: Boolean,
+        criticalStrikeState: CriticalStrikeState,
     ) {
         val hologramData = TextHologramData(
             location = hologramLocation,
@@ -134,10 +154,10 @@ internal class DamageDisplay : Listener {
                 this.startInterpolation = 0
                 this.interpolationDuration = 5
                 this.translation.add(0f, .5f, 0f)
-                if (isCritical) {
-                    this.scale.add(3f, 3f, 3f)
-                } else {
+                if (criticalStrikeState == CriticalStrikeState.NONE) {
                     this.scale.add(1f, 1f, 1f)
+                } else {
+                    this.scale.add(3f, 3f, 3f)
                 }
             }
             hologram.setEntityData(hologramData)

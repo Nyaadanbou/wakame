@@ -1,6 +1,7 @@
 package item
 
 import assertAny
+import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
@@ -124,19 +125,6 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             assertFalse(it.showInTooltip)
-        }
-    }
-
-    @Test
-    fun `component - bow`() = componentLifecycleTest(
-        "bow", ItemTemplateTypes.BOW, ItemComponentTypes.EMPTY
-    ) {
-        serialization {
-            assertNotNull(it)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
         }
     }
 
@@ -430,37 +418,22 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - damage`() {
+    fun `component - damage`() = componentLifecycleTest("damage", ItemTemplateTypes.DAMAGE, ItemComponentTypes.DAMAGE) {
+        serialization {
+            assertNotNull(it)
+        }
 
-    }
-
-    @Test
-    fun `component - dyed color`() {
-        componentLifecycleTest(
-            "dyed_color", ItemTemplateTypes.DYED_COLOR, ItemComponentTypes.DYED_COLOR,
-        ) {
-            serialization {
-                assertNotNull(it)
-            }
-
-            result {
-                assertFalse(it.isEmpty())
-            }
-
-            unboxed {
-                assertFalse(it.showInTooltip)
-                assertEquals(0xffffff, it.rgb)
-            }
+        result {
+            assertFalse(it.isEmpty())
         }
     }
 
     @Test
-    fun `component - damageable`() = componentLifecycleTest(
-        "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
+    fun `component - dyed color`() = componentLifecycleTest(
+        "dyed_color", ItemTemplateTypes.DYED_COLOR, ItemComponentTypes.DYED_COLOR,
     ) {
         serialization {
             assertNotNull(it)
-            assertTrue(it.disappearWhenBroken)
         }
 
         result {
@@ -468,14 +441,34 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(1, it.damage)
-            assertEquals(512, it.maxDamage)
+            assertFalse(it.showInTooltip)
+            assertEquals(0xffffff, it.rgb)
         }
     }
 
     @Test
-    fun `component - max_damage`() {
+    fun `component - attack`() = componentLifecycleTest(
+        "attack", ItemTemplateTypes.ATTACK, ItemComponentTypes.EMPTY,
+    ) {
+        serialization {
+            assertNotNull(it)
+            assertIs<SwordAttack>(it.attackType)
+        }
 
+        result {
+            assertTrue(it.isEmpty())
+        }
+    }
+
+    @Test
+    fun `component - max_damage`() = componentLifecycleTest("max_damage", ItemTemplateTypes.MAX_DAMAGE, ItemComponentTypes.MAX_DAMAGE) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertFalse(it.isEmpty())
+        }
     }
 
     @Test

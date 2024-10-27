@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.damage
+package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ReloadableProperty
@@ -6,17 +6,16 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.registry.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toNamespacedKey
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import net.kyori.adventure.key.InvalidKeyException
-import net.kyori.adventure.key.Key
-import org.bukkit.damage.DamageType
+import org.bukkit.NamespacedKey
+import org.bukkit.entity.EntityType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -29,20 +28,26 @@ import java.io.File
 import java.lang.reflect.Type
 
 /**
- * 记录了原版伤害如何映射到萌芽系统.
+ * 记录弹射物类型映射到萌芽伤害的逻辑.
  */
 @ReloadDependency(
     runBefore = [ElementRegistry::class]
 )
-object VanillaDamageMappings : Initializable, KoinComponent {
-    const val DAMAGE_GLOBAL_CONFIG_FILE = "damage.yml"
+object ProjectileTypeMappings : Initializable, KoinComponent {
 
-    private val DEFAULT_MAPPING: VanillaDamageMapping by ReloadableProperty { VanillaDamageMapping(ElementRegistry.DEFAULT, .0, .0) }
+    private val DEFAULT_MAPPING: ProjectileTypeMapping by ReloadableProperty {
+        ProjectileTypeMapping(
+            element = ElementRegistry.DEFAULT,
+            value = 1.0,
+            defensePenetration = 0.0,
+            defensePenetrationRate = 0.0,
+        )
+    }
 
-    private val MAPPINGS: Reference2ObjectOpenHashMap<DamageType, VanillaDamageMapping> = Reference2ObjectOpenHashMap()
+    private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, ProjectileTypeMapping> = Reference2ObjectOpenHashMap()
 
-    fun get(damageType: DamageType): VanillaDamageMapping {
-        return MAPPINGS[damageType] ?: DEFAULT_MAPPING
+    fun get(entityType: EntityType): ProjectileTypeMapping {
+        return MAPPINGS[entityType] ?: DEFAULT_MAPPING
     }
 
     override fun onPostWorld(): Unit = loadConfig()
@@ -56,53 +61,49 @@ object VanillaDamageMappings : Initializable, KoinComponent {
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
             serializers {
                 kregister(ElementSerializer)
-                kregister(VanillaDamageMappingSerializer)
+                kregister(ProjectileTypeMappingSerializer)
             }
         }.build().load()
 
-        val damageTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
-        root.node("vanilla_mappings")
+        val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
+        root.node("projectile_type_mappings")
             .childrenMap()
             .mapKeys { (key, _) ->
-                val stringKey = key.toString()
-                val adventKey = try {
-                    Key.key(stringKey)
-                } catch (e: InvalidKeyException) {
-                    throw IllegalArgumentException("Invalid key format for damage type", e)
-                }
-                adventKey.toNamespacedKey()
+                NamespacedKey.minecraft(key.toString())
             }
             .forEach { (key, node) ->
-                val damageType = damageTypeRegistry.get(key) ?: run {
-                    logger.warn("Unknown damage type: ${key.asString()}. Skipped.")
+                val entityType = entityTypeRegistry.get(key) ?: run {
+                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
-                val mapping = node.get<VanillaDamageMapping>() ?: run {
-                    logger.warn("Malformed vanilla damage mapping at: ${node.path()}. Please correct your config.")
+                val mapping = node.get<ProjectileTypeMapping>() ?: run {
+                    logger.warn("Malformed projectile type mapping at: ${node.path()}. Please correct your config.")
                     return@forEach
                 }
-                MAPPINGS[damageType] = mapping
+                MAPPINGS[entityType] = mapping
             }
     }
 
     private val logger: Logger by inject()
 }
 
-data class VanillaDamageMapping(
+data class ProjectileTypeMapping(
     val element: Element,
+    val value: Double,
     val defensePenetration: Double,
     val defensePenetrationRate: Double,
 )
 
-internal object VanillaDamageMappingSerializer : TypeSerializer<VanillaDamageMapping> {
-    override fun deserialize(type: Type, node: ConfigurationNode): VanillaDamageMapping {
+internal object ProjectileTypeMappingSerializer : TypeSerializer<ProjectileTypeMapping> {
+    override fun deserialize(type: Type, node: ConfigurationNode): ProjectileTypeMapping {
         val element = node.node("element").krequire<Element>()
+        val value = node.node("value").krequire<Double>()
         val defensePenetration = node.node("defense_penetration").getDouble(0.0)
         val defensePenetrationRate = node.node("defense_penetration_rate").getDouble(0.0)
-        return VanillaDamageMapping(element, defensePenetration, defensePenetrationRate)
+        return ProjectileTypeMapping(element, value, defensePenetration, defensePenetrationRate)
     }
 
-    override fun serialize(type: Type, obj: VanillaDamageMapping?, node: ConfigurationNode) {
+    override fun serialize(type: Type, obj: ProjectileTypeMapping?, node: ConfigurationNode) {
         throw UnsupportedOperationException()
     }
 }

@@ -104,7 +104,7 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            usableInput = value?.customNeko
+            usableInput = value?.shadowNeko(true)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }

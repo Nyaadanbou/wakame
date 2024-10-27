@@ -201,7 +201,7 @@ internal class ReplaceMenu(
             icon.directEdit { itemName = core.displayName }
             ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.Preview(session))
 
-            return ItemWrapper(icon.unsafe.handle)
+            return ItemWrapper(icon.wrapped)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

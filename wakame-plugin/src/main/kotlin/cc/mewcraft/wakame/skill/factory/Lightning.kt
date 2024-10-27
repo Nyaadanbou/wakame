@@ -95,7 +95,7 @@ private class LightningTick(
         val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
-                entity.hurt(skill.damageMetadata.evaluate(engine), caster)
+                entity.hurt(skill.damageMetadata.evaluate(engine), caster, false)
             }
         }
         return TickResult.ALL_DONE

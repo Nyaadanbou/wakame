@@ -86,12 +86,6 @@ internal object ItemComponentTypes {
     val DAMAGE: ItemComponentType<Int> = ItemDamage.codec(ItemConstants.DAMAGE).register()
 
     /**
-     * 物品组件 [DAMAGE], [MAX_DAMAGE], [UNBREAKABLE] 的整合.
-     */
-    @JvmField
-    val DAMAGEABLE: ItemComponentType<Damageable> = Damageable.codec(ItemConstants.DAMAGEABLE).register()
-
-    /**
      * 皮革的颜色.
      *
      * 对应原版组件: [`minecraft:dyed_color`](https://minecraft.wiki/w/Data_component_format#dyed_color)
@@ -201,7 +195,7 @@ internal object ItemComponentTypes {
      * 独立存在的核孔.
      */
     @JvmField
-    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CORE).register()
+    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CELL).register()
 
     /**
      * 附魔书内存储的魔咒.

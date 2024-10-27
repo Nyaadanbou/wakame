@@ -3,9 +3,12 @@ package cc.mewcraft.wakame.config.configurate
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
+import org.bukkit.entity.EntityType
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
@@ -33,6 +36,17 @@ internal object PotionEffectTypeSerializer : ScalarSerializer<PotionEffectType>(
     }
 
     override fun serialize(item: PotionEffectType, typeSupported: Predicate<Class<*>>?): Any {
+        return item.key.value()
+    }
+}
+
+internal object EntityTypeSerializer : ScalarSerializer<EntityType>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): EntityType {
+        val key = NamespacedKey.minecraft(obj.toString())
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE).get(key) ?: throw SerializationException(type, "Can't find entity type with key '$key'")
+    }
+
+    override fun serialize(item: EntityType, typeSupported: Predicate<Class<*>>?): Any {
         return item.key.value()
     }
 }

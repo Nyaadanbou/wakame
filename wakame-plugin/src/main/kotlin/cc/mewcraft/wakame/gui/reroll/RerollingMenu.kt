@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
-import cc.mewcraft.wakame.item.customNeko
 import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.reroll.*
 import cc.mewcraft.wakame.util.*
@@ -241,7 +241,7 @@ internal class RerollingMenu(
             // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
-            val previewItem = session.originalInput?.customNeko ?: error("Result is successful but the input item is null. This is a bug!")
+            val previewItem = session.originalInput?.shadowNeko(true) ?: error("Result is successful but the input item is null. This is a bug!")
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
             previewItem.directEdit {
                 lore = lore.orEmpty() + buildList {

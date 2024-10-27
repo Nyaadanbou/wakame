@@ -67,7 +67,7 @@ private constructor(
             icon.setStandaloneCell(StandaloneCell(cell))
             ItemRenderers.REROLLING_TABLE.render(icon, RerollingTableContext(session))
 
-            return ItemWrapper(icon.unsafe.handle)
+            return ItemWrapper(icon.wrapped)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

@@ -47,8 +47,8 @@ interface NekoItemRealizer {
 
 }
 
-internal object VanillaNekoItemRealizer : NekoItemRealizer {
-    override fun realize(prototype: NekoItem): VanillaNekoStack {
+internal object ImaginaryNekoItemRealizer : NekoItemRealizer {
+    override fun realize(prototype: NekoItem): ImaginaryNekoStack {
         // 没 trigger 的 ctx
         val context = ItemGenerationContexts.create(ItemGenerationTriggers.empty(), prototype.id, 0)
         // 获取 物品组件 的构建器
@@ -67,7 +67,8 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.GLOWABLE)
 
         generate(ItemTemplateTypes.ARROW)
-        generate(ItemTemplateTypes.BOW)
+        generate(ItemTemplateTypes.ATTACK)
+        generate(ItemTemplateTypes.ATTACK_SPEED)
 
         generate(ItemTemplateTypes.LEVEL)
         generate(ItemTemplateTypes.RARITY)
@@ -77,8 +78,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CELLS)
 
         val components = builder.build()
-        val nekoStack = VanillaNekoStack(
-            id = prototype.id,
+        val nekoStack = ImaginaryNekoStack(
             prototype = prototype,
             components = ItemComponentMaps.unmodifiable(components)
         )
@@ -86,15 +86,15 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         return nekoStack
     }
 
-    override fun realize(prototype: NekoItem, user: User<*>): VanillaNekoStack {
+    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryNekoStack {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem, crate: Crate): VanillaNekoStack {
+    override fun realize(prototype: NekoItem, crate: Crate): ImaginaryNekoStack {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem, context: ItemGenerationContext): VanillaNekoStack {
+    override fun realize(prototype: NekoItem, context: ItemGenerationContext): ImaginaryNekoStack {
         return realize(prototype)
     }
 }
@@ -134,11 +134,11 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 创建空的萌芽物品
         val nekoStack = prototype.base.createNekoStack()
         // 获取萌芽物品的底层 ItemStack
-        val itemStack = nekoStack.unsafe.handle
+        val itemStack = nekoStack.wrapped
 
         // 设置物品的 id 和 variant
-        NekoStackSupport.setId(itemStack, prototype.id)
-        NekoStackSupport.setVariant(itemStack, 0)
+        NekoStackImplementations.setId(itemStack, prototype.id)
+        NekoStackImplementations.setVariant(itemStack, 0)
 
         // 获取 物品组件 的容器
         val components = nekoStack.components
@@ -170,6 +170,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ITEM_NAME)
         generate(ItemTemplateTypes.LORE)
 
+        generate(ItemTemplateTypes.ATTACK)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
         generate(ItemTemplateTypes.FIRE_RESISTANT)
@@ -182,7 +183,8 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.DYED_COLOR)
         generate(ItemTemplateTypes.ENCHANTMENTS)
         generate(ItemTemplateTypes.STORED_ENCHANTMENTS)
-        generate(ItemTemplateTypes.DAMAGEABLE)
+        generate(ItemTemplateTypes.MAX_DAMAGE)
+        generate(ItemTemplateTypes.DAMAGE)
         generate(ItemTemplateTypes.TOOL)
         generate(ItemTemplateTypes.FOOD)
 

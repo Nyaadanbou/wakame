@@ -41,6 +41,7 @@ class ItemRendererInitTest : KoinTest {
 
     @Test
     fun `initialize item renderers`() {
+        ItemRenderers.SIMPLE.initialize0()
         ItemRenderers.STANDARD.initialize0()
         ItemRenderers.CRAFTING_STATION.initialize0()
         ItemRenderers.MERGING_TABLE.initialize0()

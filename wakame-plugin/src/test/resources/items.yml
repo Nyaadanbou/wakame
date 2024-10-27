@@ -62,10 +62,6 @@ components:
     enabled: true
     display_name: "耐久损耗"
 
-  damageable:
-    enabled: true
-    display_name: "耐久度"
-
   dyed_color:
     enabled: true
     display_name: "染色"

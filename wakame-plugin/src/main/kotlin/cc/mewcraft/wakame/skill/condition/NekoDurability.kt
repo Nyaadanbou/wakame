@@ -37,10 +37,11 @@ internal interface NekoDurability : SkillCondition {
 
         override fun newSession(context: SkillContext): SkillConditionSession {
             val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return SkillConditionSession.alwaysFailure()
-            val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return SkillConditionSession.alwaysFailure()
+            val maxDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return SkillConditionSession.alwaysFailure()
+            val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return SkillConditionSession.alwaysFailure()
             val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
             val evaluatedDurability = this.durability.evaluate(engine).toStableInt()
-            val isSuccess = (damageable.maxDamage - damageable.damage) <= evaluatedDurability
+            val isSuccess = (maxDamage - damage) <= evaluatedDurability
             return SessionImpl(isSuccess)
         }
 
@@ -51,11 +52,11 @@ internal interface NekoDurability : SkillCondition {
 
             override fun onSuccess(context: SkillContext) {
                 val nekoStack = context[SkillContextKey.ITEM_STACK]?.tryNekoStack ?: return
-                val damageable = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
+                nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return
+                val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return
                 val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
                 val evaluatedDurability = durability.evaluate(engine).toStableInt()
-                val newDamage = damageable.copy(damage = damageable.damage + evaluatedDurability)
-                nekoStack.components.set(ItemComponentTypes.DAMAGEABLE, newDamage)
+                nekoStack.components.set(ItemComponentTypes.DAMAGE, damage + evaluatedDurability)
                 notification.notifySuccess(context)
             }
 

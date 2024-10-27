@@ -58,7 +58,7 @@ internal val ItemStack.nekooTag: NBTCompound?
 
 internal val ItemStack.isNeko: Boolean
     get() {
-        return nekooTag != null || VanillaNekoStackRegistry.has(id)
+        return nekooTag != null || ImaginaryNekoStackRegistry.has(id)
     }
 
 internal val ItemStack.isCustomNeko: Boolean
@@ -68,7 +68,7 @@ internal val ItemStack.isCustomNeko: Boolean
 
 internal val ItemStack.isVanillaNeko: Boolean
     get() {
-        return !isCustomNeko && VanillaNekoStackRegistry.has(id)
+        return !isCustomNeko && ImaginaryNekoStackRegistry.has(id)
     }
 
 internal val ItemStack.isClientSide: Boolean
@@ -86,11 +86,9 @@ internal val ItemStack.tryNekoStack: PacketNekoStack?
         if (isCustomNeko) {
             return PacketCustomNekoStack(this)
         }
-        val nekoStack = VanillaNekoStackRegistry.get(id)
-        if (nekoStack != null) {
-            return PacketVanillaNekoStack(this, nekoStack)
-        }
-        return null
+        val imaginary = ImaginaryNekoStackRegistry.get(id)
+            ?: return null
+        return PacketVanillaNekoStack(this, imaginary)
     }
 
 // 开发日记 2024/7/11
@@ -222,28 +220,30 @@ private class PacketCustomNekoStack(
 
     override val itemStack: BukkitStack
         get() = abortReads()
+    override val wrapped: BukkitStack
+        get() = abortReads()
 
     override val id: Key
-        get() = NekoStackSupport.getIdOrThrow(nyaTag)
+        get() = NekoStackImplementations.getIdOrThrow(nyaTag)
 
     override var variant: Int
-        get() = NekoStackSupport.getVariant(nyaTag)
+        get() = NekoStackImplementations.getVariant(nyaTag)
         set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
-        get() = NekoStackSupport.getSlotGroup(nyaTag)
+        get() = NekoStackImplementations.getSlotGroup(nyaTag)
 
     override val prototype: NekoItem
-        get() = NekoStackSupport.getPrototypeOrThrow(nyaTag)
+        get() = NekoStackImplementations.getPrototypeOrThrow(nyaTag)
 
     override val components: ItemComponentMap
-        get() = NekoStackSupport.getImmutableComponents(handle) // 使用 ImmutableMap 以禁止写入新的组件信息
+        get() = NekoStackImplementations.getImmutableComponents(handle) // 使用 ImmutableMap 以禁止写入新的组件信息
 
     override val templates: ItemTemplateMap
-        get() = NekoStackSupport.getTemplates(nyaTag)
+        get() = NekoStackImplementations.getTemplates(nyaTag)
 
     override val behaviors: ItemBehaviorMap
-        get() = NekoStackSupport.getBehaviors(nyaTag)
+        get() = NekoStackImplementations.getBehaviors(nyaTag)
 
     override val unsafe: NekoStack.Unsafe
         get() = Unsafe(this)
@@ -270,14 +270,12 @@ private class PacketCustomNekoStack(
     class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
         override val nyaTag: CompoundTag
             get() = nekoStack.nyaTag
-        override val handle: BukkitStack
-            get() = nekoStack.handle
     }
 }
 
 private class PacketVanillaNekoStack(
     override val packetItem: ItemStack,
-    private val nekoStack: VanillaNekoStack, // 已注册的原版实例
+    private val shadowNeko: ImaginaryNekoStack, // 已注册的原版实例
 ) : PacketNekoStack {
     private val handle: BukkitStack = SpigotConversionUtil.toBukkitItemStack(packetItem)
 
@@ -295,34 +293,36 @@ private class PacketVanillaNekoStack(
 
     override val itemStack: BukkitStack
         get() = abortReads()
+    override val wrapped: BukkitStack
+        get() = abortReads()
 
     override val id: Key
-        get() = nekoStack.id
+        get() = shadowNeko.id
 
     override var variant: Int
         get() = 0
         set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
-        get() = nekoStack.slotGroup
+        get() = shadowNeko.slotGroup
 
     override val prototype: NekoItem
-        get() = nekoStack.prototype
+        get() = shadowNeko.prototype
 
     // 虽然这是一个NBT (custom_data) 未经修改的原版物品,
     // 但其仍然会包含一些原版的物品组件, 例如魔咒, 耐久度.
     override val components: ItemComponentMap
         get() {
-            val base = nekoStack.components
+            val base = shadowNeko.components
             val patch = ItemComponentMaps.wrapStack(handle)
             return ItemComponentMaps.composite(base, patch)
         }
 
     override val templates: ItemTemplateMap
-        get() = nekoStack.templates
+        get() = shadowNeko.templates
 
     override val behaviors: ItemBehaviorMap
-        get() = nekoStack.behaviors
+        get() = shadowNeko.behaviors
 
     override val unsafe: NekoStack.Unsafe
         get() = abortReads()

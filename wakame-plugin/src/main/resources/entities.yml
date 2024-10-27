@@ -33,6 +33,8 @@ entity_attributes:
       defense_penetration: default
       defense_penetration_rate: default
       entity_interaction_range: default
+      hammer_damage_range: default
+      hammer_damage_ratio: default
       health_regeneration: default
       incoming_damage_rate: default
       lifesteal: default
@@ -43,6 +45,8 @@ entity_attributes:
       max_health: default
       max_mana: 200.0
       movement_speed: default
+      negative_critical_strike_power: default
+      sweeping_damage_ratio: default
       universal_attack_damage: default
       universal_defense: default
       universal_defense_penetration: default
@@ -413,15 +417,6 @@ entity_attributes:
   minecraft:arrow:
     parent: minecraft:all_zero
     values: { }
-
-  minecraft:trident:
-    parent: minecraft:all_zero
-    values: { }
-
-  minecraft:dispenser:
-    parent: minecraft:all_zero
-    values: { }
-
 
 
 # 实体索引表（目前仅用于条件判断）

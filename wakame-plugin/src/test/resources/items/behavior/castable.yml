@@ -9,7 +9,7 @@ base: stick
 #
 # 例如, 这里指定的 castable 它是一个纯粹的 behavior, 有这个 behavior 物品就可以释放技能 (前提是核孔里有技能).
 # 再来看另一个, attributable 是一个纯粹的 component, 有这个 component 物品就可以提供属性加成 (前提是核孔里有属性).
-# 比较特殊的 damageable 是一个 component + behavior 的复合体, 其 component 负责储存耐久度信息,
+# 比较特殊的 max_damage 是一个 component + behavior 的复合体, 其 component 负责储存耐久度信息,
 # 而 behavior 负责实现修复的交互逻辑 (例如想做一个拿着修复材料跟物品交换位置就可以修复的功能).
 #
 # 可以用该物品释放技能?

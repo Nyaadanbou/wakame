@@ -2,7 +2,6 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.api.NekooApiProvider
-import cc.mewcraft.wakame.attack.attackModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.compatibility.compatibilityModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
@@ -65,7 +64,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
 
                 // sub modules (by alphabet order)
                 adventureModule(),
-                attackModule(),
                 attributeModule(),
                 compatibilityModule(),
                 crateModule(),

@@ -93,11 +93,12 @@ object AttributeRegistry : Initializable {
         +buildComposite("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
         +buildComposite("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
         +buildComposite("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
-        +buildComposite("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
         +buildComposite("defense").single().element().bind { DEFENSE }
         +buildComposite("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
         +buildComposite("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
         +buildComposite("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
+        +buildComposite("hammer_damage_range").single().bind { HAMMER_DAMAGE_RANGE }
+        +buildComposite("hammer_damage_ratio").single().bind { HAMMER_DAMAGE_RATIO }
         +buildComposite("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
         +buildComposite("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
         +buildComposite("lifesteal").single().bind { LIFESTEAL }
@@ -109,9 +110,11 @@ object AttributeRegistry : Initializable {
         +buildComposite("max_mana").single().bind { MAX_MANA }
         +buildComposite("mining_efficiency").single().bind { MINING_EFFICIENCY }
         +buildComposite("movement_speed").single().bind { MOVEMENT_SPEED }
+        +buildComposite("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
         +buildComposite("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
         +buildComposite("scale").single().bind { SCALE }
         +buildComposite("step_height").single().bind { STEP_HEIGHT }
+        +buildComposite("sweeping_damage_ratio").single().bind { SWEEPING_DAMAGE_RATIO }
         +buildComposite("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
         +buildComposite("universal_defense").single().bind { UNIVERSAL_DEFENSE }
         +buildComposite("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }

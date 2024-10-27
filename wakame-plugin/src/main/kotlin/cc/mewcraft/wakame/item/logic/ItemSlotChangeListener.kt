@@ -117,12 +117,13 @@ internal abstract class ItemSlotChangeListener {
             return true // 如果不是萌芽物品, 那么该物品应该按照游戏原版的逻辑处理
         }
 
-        val damageableComponent = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE)
-        if (damageableComponent == null) {
-            return true // 如果物品没有 damageable 组件, 那么物品则没有耐久度, 应该返回 true
+        val maxDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE)
+        val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE)
+        if (maxDamage == null || nekoStack.components.has(ItemComponentTypes.UNBREAKABLE) || damage == null) {
+            return true // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
         }
 
-        if (damageableComponent.damage + 1 >= damageableComponent.maxDamage) {
+        if (damage + 1 >= maxDamage) {
             return false // 如果物品已经损坏, 那么应该返回 false
         }
 

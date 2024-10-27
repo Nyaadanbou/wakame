@@ -10,8 +10,6 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.KizamiMap
-import cc.mewcraft.wakame.packet.addFakePotionEffect
-import cc.mewcraft.wakame.packet.removeFakePotionEffect
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
@@ -23,15 +21,13 @@ import cc.mewcraft.wakame.user.toUser
 import com.google.common.collect.Multimap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 import kotlin.collections.component1
 import kotlin.collections.component2
 
 /**
  * 攻击速度.
  *
- * 物品发生变化时, 根据物品攻击速度, 为玩家添加一个纯视觉的挖掘疲劳效果.
+ * 物品发生变化时, 根据物品攻击速度, 更新所有必要的状态.
  */
 internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
@@ -41,40 +37,15 @@ internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeListener() {
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        nekoStack?.getAttackSpeedLevel()?.let { level ->
-            removeFakeEffect(player, level)
-        }
+        nekoStack?.handleAttackSpeed { /* TODO 完善攻击速度 */ }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        nekoStack?.getAttackSpeedLevel()?.let { level ->
-            addFakeEffect(player, level)
-        }
+        nekoStack?.handleAttackSpeed { /* TODO 完善攻击速度 */ }
     }
 
-    private fun NekoStack.getAttackSpeedLevel(): AttackSpeedLevel? {
-        return components.get(ItemComponentTypes.ATTACK_SPEED)?.level
-    }
-
-    private fun NekoStack.getAttackSpeedLevelOrThrow(): AttackSpeedLevel {
-        return getAttackSpeedLevel() ?: throw IllegalStateException("AttackSpeedLevel is null")
-    }
-
-    private fun addFakeEffect(player: Player, level: AttackSpeedLevel) {
-        val fatigueLevel = level.fatigueLevel ?: return
-        val miningFatigueEffect = PotionEffect(
-            /* type = */ PotionEffectType.MINING_FATIGUE,
-            /* duration = */ -1,
-            /* amplifier = */ fatigueLevel,
-            /* ambient = */ false,
-            /* particles = */ false,
-            /* icon = */ false
-        )
-        player.addFakePotionEffect(miningFatigueEffect)
-    }
-
-    private fun removeFakeEffect(player: Player, level: AttackSpeedLevel) {
-        player.removeFakePotionEffect(PotionEffectType.MINING_FATIGUE)
+    private fun NekoStack.handleAttackSpeed(block: (AttackSpeedLevel) -> Unit) {
+        components.get(ItemComponentTypes.ATTACK_SPEED)?.level?.apply(block)
     }
 }
 

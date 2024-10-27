@@ -26,27 +26,25 @@ import java.util.stream.Stream
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
-        val tag = this.unsafeNyaTag
-        if (tag != null) {
-            if (NekoStackSupport.getPrototype(tag) != null) {
-                return true
-            }
+        val nbt = this.unsafeNyaTag
+        if (nbt != null && NekoStackImplementations.getPrototype(nbt) != null) {
+            return true
         }
-        return VanillaNekoStackRegistry.has(this.type)
+        return ImaginaryNekoStackRegistry.has(this.type)
     }
 
 /**
- * 检查一个物品是否算作 [CustomNekoStack].
+ * 检查一个物品堆叠是否算作 [CustomNekoStack].
  */
 @get:Contract(pure = true)
 val ItemStack.isCustomNeko: Boolean
     get() {
-        val tag = this.unsafeNyaTag ?: return false
-        return NekoStackSupport.getPrototype(tag) != null
+        val nbt = this.unsafeNyaTag ?: return false
+        return NekoStackImplementations.getPrototype(nbt) != null
     }
 
 /**
- * 检查一个物品是否算作 [VanillaNekoStack]
+ * 检查一个物品堆叠是否算作 [VanillaNekoStack].
  */
 @get:Contract(pure = true)
 val ItemStack.isVanillaNeko: Boolean
@@ -54,71 +52,81 @@ val ItemStack.isVanillaNeko: Boolean
         if (this.unsafeNyaTag != null) {
             return false
         }
-        return VanillaNekoStackRegistry.has(this.type)
+        return ImaginaryNekoStackRegistry.has(this.type)
     }
 
 /**
- * 尝试将 [ItemStack] 转换为一个 [NekoStack].
- * 如果无法完成转换, 则返回 `null`.
+ * 尝试获取 [ItemStack] 在萌芽物品系统下的投影 [NekoStack].
+ * 如果该 [ItemStack] 不存在投影, 则返回 `null`.
  */
-@get:Contract(pure = false)
-val ItemStack.tryNekoStack: NekoStack?
-    get() {
-        val tag = this.unsafeNyaTag
-        if (tag != null) {
-            if (NekoStackSupport.getPrototype(tag) != null) {
-                return CustomNekoStack(this)
-            }
-        }
-        return VanillaNekoStackRegistry.get(this.type)
-    }
-
-/**
- * 尝试获取 [ItemStack] 对应的 [NekoStack].
- * 如果无法完成转换, 则返回 `null`.
- */
-val ItemStack.neko: NekoStack?
-    get() {
-        val tag = this.unsafeNyaTag
-        if (tag != null) {
-            if (NekoStackSupport.getPrototype(tag) != null) {
-                return CustomNekoStack(this)
-            }
-        }
-        return VanillaNekoStackRegistry.get(this.type)
-    }
-
-/**
- * 尝试获取 [ItemStack] 对应的 [CustomNekoStack].
- * 如果无法完成转换, 则返回 `null`.
- */
-val ItemStack.customNeko: NekoStack?
-    get() {
-        val tag = this.unsafeNyaTag
-        if (tag != null) {
+@Contract(pure = true)
+fun ItemStack.shadowNeko(excludeVanilla: Boolean = false): NekoStack? {
+    val nbt = this.unsafeNyaTag
+    if (nbt != null) {
+        if (NekoStackImplementations.getPrototype(nbt) != null) {
+            // 存在萌芽 NBT, 并且存在对应的物品模板,
+            // 那么这是一个合法的 CustomNekoStack.
             return CustomNekoStack(this)
+        } else {
+            // 存在萌芽 NBT, 但是没有对应的物品模板,
+            // 这意味着该物品定义已经从物品库中移除.
+            this.nbt = null
         }
-        return null
+    } else {
+        if (excludeVanilla) {
+            // 函数的参数选择不对原版物品进行投影,
+            // 返回 null
+            return null
+        }
+
+        // 如果没有萌芽 NBT, 并且没有对应的物品模板,
+        // 则看该物品是否存在一个原版物品的萌芽投影.
+        val imaginary = ImaginaryNekoStackRegistry.get(this.type)
+            ?: return null // 没有原版物品的萌芽投影, 返回 null
+
+        return VanillaNekoStack(imaginary, this)
     }
 
+    return null
+}
+
 /**
- * 将 [ItemStack] 转换为一个 [NekoStack].
+ * 获取 [ItemStack] 在萌芽物品系统下的投影 [NekoStack].
+ * 如果该 [ItemStack] 不存在投影, 则抛出异常.
+ *
+ * @throws IllegalArgumentException
+ */
+@Contract(pure = true)
+fun ItemStack.projectNeko(excludeVanilla: Boolean = false): NekoStack {
+    return requireNotNull(this.shadowNeko(excludeVanilla)) { "The ItemStack cannot be projected to NekoStack" }
+}
+
+/**
+ * 尝试获取 [ItemStack] 在萌芽物品系统下的投影.
+ * 如果无法完成转换, 则返回 `null`.
+ */
+@Deprecated("Use 'shadowNeko' instead", ReplaceWith("shadowNeko(false)"))
+@get:Contract(pure = true)
+val ItemStack.tryNekoStack: NekoStack?
+    get() = shadowNeko(false)
+
+/**
+ * 获取 [ItemStack] 在萌芽物品系统下的投影.
  * 如果无法完成转换, 则抛出异常.
  *
  * @throws IllegalArgumentException
  */
-@get:Contract(pure = false)
+@Deprecated("Use 'projectNeko' instead", ReplaceWith("projectNeko(false)"))
+@get:Contract(pure = true)
 val ItemStack.toNekoStack: NekoStack
-    get() {
-        return requireNotNull(this.tryNekoStack) { "The ItemStack is not a NekoStack" }
-    }
+    get() = projectNeko(false)
 
 /**
- * 如果 [ItemStack] 是一个萌芽物品, 则返回对象本身. 否则返回 `null`.
+ * 如果 [ItemStack] 在萌芽系统中存在投影, 则返回对象本身. 否则返回 `null`.
  */
 @Contract(pure = true)
 fun ItemStack.takeIfNeko(): ItemStack? {
-    return this.takeUnlessEmpty()?.takeIf { it.isNeko }
+    return takeIf(ItemStack::isNeko)
 }
 
 /**
@@ -128,7 +136,7 @@ fun ItemStack.takeIfNeko(): ItemStack? {
  */
 fun NekoStack.directEdit(block: ItemStackDSL.() -> Unit): ItemStack {
     if (this is CustomNekoStack) {
-        return handle.edit(block)
+        return wrapped.edit(block)
     } else {
         Injector.get<Logger>().warn("Attempted to edit a non-custom NekoStack. Returning empty one.")
         return ItemStack.empty()
@@ -152,17 +160,16 @@ internal fun ItemBase.createNekoStack(): NekoStack {
 }
 
 /**
- * 一个标准的 [NekoStack] 实现.
+ * 一个标准的 [NekoStack] 实现, 封装了一个 [ItemStack][handle].
  *
- * 底层物品必须拥有 `minecraft:custom_data` 组件, 并且其中存在 `wakame` 的复合标签.
- *
- * 该实现是 *可变的*.
+ * 如果该实例存在, 则说明 [handle] 肯定拥有 `custom_data` 组件,
+ * 并且其中存在萌芽的 NBT 标签.
  */
 private class CustomNekoStack(
-    val handle: ItemStack,
+    private val handle: ItemStack,
 ) : NekoStack {
 
-    // 所有访问该对象的代码应该只能读取其状态, 禁止写入
+    // 所有访问该对象的代码应该只能读取, 禁止写入!
     private val unsafeNyaTag: CompoundTag
         get() = handle.unsafeNyaTagOrThrow
 
@@ -170,9 +177,8 @@ private class CustomNekoStack(
         get() = false
 
     override var isClientSide: Boolean
-        // 只要*没有*这个标签就返回 true; 标签的类型可以用 ByteTag
-        get() = NekoStackSupport.isClientSide(handle)
-        set(value) = NekoStackSupport.setClientSide(handle, value)
+        get() = NekoStackImplementations.isClientSide(handle)
+        set(value) = NekoStackImplementations.setClientSide(handle, value)
 
     override val itemType: Material
         get() = handle.type
@@ -180,27 +186,30 @@ private class CustomNekoStack(
     override val itemStack: ItemStack
         get() = handle.clone()
 
+    override val wrapped: ItemStack
+        get() = handle
+
     override val prototype: NekoItem
-        get() = NekoStackSupport.getPrototypeOrThrow(unsafeNyaTag)
+        get() = NekoStackImplementations.getPrototypeOrThrow(unsafeNyaTag)
 
     override val id: Key
-        get() = NekoStackSupport.getIdOrThrow(unsafeNyaTag)
+        get() = NekoStackImplementations.getIdOrThrow(unsafeNyaTag)
 
     override var variant: Int
-        get() = NekoStackSupport.getVariant(unsafeNyaTag)
-        set(value) = NekoStackSupport.setVariant(handle, value)
+        get() = NekoStackImplementations.getVariant(unsafeNyaTag)
+        set(value) = NekoStackImplementations.setVariant(handle, value)
 
     override val slotGroup: ItemSlotGroup
-        get() = NekoStackSupport.getSlotGroup(unsafeNyaTag)
+        get() = NekoStackImplementations.getSlotGroup(unsafeNyaTag)
 
     override val components: ItemComponentMap
-        get() = NekoStackSupport.getComponents(handle)
+        get() = NekoStackImplementations.getComponents(handle)
 
     override val templates: ItemTemplateMap
-        get() = NekoStackSupport.getTemplates(unsafeNyaTag)
+        get() = NekoStackImplementations.getTemplates(unsafeNyaTag)
 
     override val behaviors: ItemBehaviorMap
-        get() = NekoStackSupport.getBehaviors(unsafeNyaTag)
+        get() = NekoStackImplementations.getBehaviors(unsafeNyaTag)
 
     override val unsafe: NekoStack.Unsafe
         get() = Unsafe(this)
@@ -227,52 +236,148 @@ private class CustomNekoStack(
     ) : NekoStack.Unsafe {
         override val nyaTag: CompoundTag
             get() = owner.unsafeNyaTag
-        override val handle: ItemStack
-            get() = owner.handle
     }
 }
 
 /**
- * 一个特殊的 [NekoStack] 实现, 代表一个 Minecraft 原版物品的萌芽版本.
+ * 一个特殊的 [NekoStack] 实现, 代表一个 *原版物品* 在萌芽物品系统下的投影.
+ * 仅用于封装原版的物品堆叠, 以便让原版物品拥有一些 (固定的) 萌芽物品的特性.
  *
- * 仅用于封装原版物品的*类型*, 以便让原版物品拥有默认的萌芽特性.
- *
- * 该实现是 *不可变的*.
+ * 本实现禁止一切写操作! 任何写操作都会导致异常.
  */
-internal class VanillaNekoStack(
-    override val id: Key,
-    override val prototype: NekoItem,
-    override val components: ItemComponentMap,
+private class VanillaNekoStack(
+    private val shadow: NekoStack, // 在萌芽物品系统下的投影
+    private val handle: ItemStack, // 所封装的原版物品堆叠
 ) : NekoStack {
     override val isEmpty: Boolean = false
+
     override var isClientSide: Boolean
         get() = true
         set(_) = unsupported()
 
     override val itemType: Material
-        get() = unsupported()
+        get() = handle.type
+
     override val itemStack: ItemStack
+        get() = handle.clone()
+
+    override val wrapped: ItemStack
         get() = unsupported()
 
-    override var variant: Int = 0 // 变体永远都是 0
-    override val slotGroup: ItemSlotGroup = prototype.slotGroup
-    override val templates: ItemTemplateMap = prototype.templates
-    override val behaviors: ItemBehaviorMap = prototype.behaviors
+    override val id: Key
+        get() = prototype.id
+
+    override var variant: Int
+        get() = 0 // 变体永远都是 0
+        set(_) = unsupported()
+
+    override val slotGroup: ItemSlotGroup
+        get() = prototype.slotGroup
+
+    override val prototype: NekoItem
+        get() = shadow.prototype
+
+    override val components: ItemComponentMap
+        get() {
+            val base = shadow.components
+            val patch = ItemComponentMaps.unmodifiable(handle)
+            return ItemComponentMaps.composite(base, patch)
+        }
+
+    override val templates: ItemTemplateMap
+        get() = prototype.templates
+
+    override val behaviors: ItemBehaviorMap
+        get() = prototype.behaviors
+
     override val unsafe: NekoStack.Unsafe
         get() = unsupported()
 
-    override fun clone(): NekoStack =
-        unsupported()
+    override fun clone(): NekoStack {
+        return VanillaNekoStack(shadow, handle)
+    }
 
-    override fun erase(): Unit =
+    override fun erase() {
         unsupported()
+    }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id.asString()),
         ExaminableProperty.of("variant", variant),
     )
 
-    override fun toString(): String = toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
+
+    private fun unsupported(): Nothing {
+        throw UnsupportedOperationException("This operation is not supported on ${this::class.simpleName}")
+    }
+}
+
+/**
+ * 一个虚拟的 [NekoStack] 实现.
+ * 虚拟”指这个 [NekoStack] 不负责封装 [ItemStack],
+ * 而是负责独立储存一些固定的信息 (例如: 攻速与核孔).
+ *
+ * ### 开发日记 2024/10/27 小米
+ * 目前该实现仅仅用于储存 *原版物品* 的萌芽投影.
+ *
+ * @see VanillaNekoStack
+ */
+internal class ImaginaryNekoStack(
+    // 物品模板
+    override val prototype: NekoItem,
+    // 物品组件 (禁止修改)
+    override val components: ItemComponentMap,
+) : NekoStack {
+    override val isEmpty: Boolean
+        get() = false
+
+    override var isClientSide: Boolean
+        get() = unsupported()
+        set(_) = unsupported()
+
+    override val itemType: Material
+        get() = unsupported()
+
+    override val itemStack: ItemStack
+        get() = unsupported()
+
+    override val wrapped: ItemStack
+        get() = unsupported()
+
+    override val id: Key = prototype.id
+
+    override var variant: Int
+        get() = unsupported()
+        set(_) = unsupported()
+
+    override val slotGroup: ItemSlotGroup = prototype.slotGroup
+
+    override val templates: ItemTemplateMap = prototype.templates
+
+    override val behaviors: ItemBehaviorMap = prototype.behaviors
+
+    override val unsafe: NekoStack.Unsafe
+        get() = unsupported()
+
+    override fun clone(): NekoStack {
+        unsupported()
+    }
+
+    override fun erase() {
+        unsupported()
+    }
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("id", id.asString()),
+        ExaminableProperty.of("variant", variant),
+    )
+
+    override fun toString(): String {
+        return toSimpleString()
+    }
 
     private fun unsupported(): Nothing {
         throw UnsupportedOperationException("This operation is not supported on ${this::class.simpleName}")
@@ -282,9 +387,9 @@ internal class VanillaNekoStack(
 @ReloadDependency(
     runBefore = [ItemRegistry::class],
 )
-internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
-    private val realizer: VanillaNekoItemRealizer by inject()
-    private val registry: Object2ObjectOpenHashMap<Key, VanillaNekoStack> = Object2ObjectOpenHashMap()
+internal object ImaginaryNekoStackRegistry : Initializable, KoinComponent {
+    private val realizer: ImaginaryNekoItemRealizer by inject()
+    private val registry: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)
 
     fun has(material: Material): Boolean {
         return has(material.key())
@@ -294,15 +399,15 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
         return registry.containsKey(id)
     }
 
-    fun get(material: Material): VanillaNekoStack? {
+    fun get(material: Material): ImaginaryNekoStack? {
         return get(material.key())
     }
 
-    fun get(id: Key): VanillaNekoStack? {
+    fun get(id: Key): ImaginaryNekoStack? {
         return registry[id]
     }
 
-    fun register(id: Key, stack: VanillaNekoStack) {
+    fun register(id: Key, stack: ImaginaryNekoStack) {
         registry[id] = stack
     }
 
@@ -316,7 +421,7 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
 
     private fun realizeAndRegister() {
         registry.clear()
-        for ((id, prototype) in ItemRegistry.VANILLA) {
+        for ((id, prototype) in ItemRegistry.IMAGINARY) {
             val stack = realizer.realize(prototype)
             register(id, stack)
         }
@@ -326,9 +431,11 @@ internal object VanillaNekoStackRegistry : Initializable, KoinComponent {
 /**
  * Common implementations related to [NekoStack].
  */
-internal object NekoStackSupport {
+internal object NekoStackImplementations {
     fun isClientSide(handle: ItemStack): Boolean {
         val nbt = handle.unsafeNbt ?: return true
+        // 只要*没有*这个标签就返回 true;
+        // 标签类型可以用最小的 ByteTag.
         return !nbt.contains(NekoStack.CLIENT_SIDE_KEY)
     }
 
