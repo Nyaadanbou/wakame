@@ -30,6 +30,7 @@ koin-test = { group = "io.insert-koin", name = "koin-test" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
 
 helper = { group = "me.lucko", name = "helper", version = "6.0.0" }
+carbon = { group = "de.hexaoxi", name = "carbonchat-api", version = "3.0.0-beta.26" }
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }

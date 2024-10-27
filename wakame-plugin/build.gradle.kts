@@ -54,6 +54,7 @@ dependencies {
 
     // other plugins (without ide pollution)
     compileOnly(local.adventurelevel)
+    compileOnly(local.carbon)
 
     // test
     testImplementation(project(":wakame-common"))
@@ -118,6 +119,10 @@ paper {
         register("helper") {
             required = true
             load = RelativeLoadOrder.BEFORE
+        }
+        register("CarbonChat") {
+            required = true
+            load = RelativeLoadOrder.OMIT // 懒加载 class
         }
         register("AdventureLevel") {
             required = false
