@@ -1,16 +1,17 @@
 package cc.mewcraft.wakame.attack
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
+import org.koin.core.component.get
+import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 
@@ -40,9 +41,12 @@ sealed interface AttackType {
  * [AttackType] 的序列化器.
  */
 internal object AttackTypeSerializer : TypeSerializer<AttackType> {
+    private val LOGGER: Logger = Injector.get()
+
     override fun deserialize(type: Type, node: ConfigurationNode): AttackType {
-        val attackType = node.node("type").krequire<String>()
-        return when (attackType) {
+        return when (
+            val attackType = node.node("type").getString("")
+        ) {
             AxeAttack.NAME -> {
                 AxeAttack()
             }
@@ -77,7 +81,8 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
             }
 
             else -> {
-                throw SerializationException("Unknown attack type")
+                LOGGER.warn("Unknown attack type: '$attackType', using default attack type.")
+                SwordAttack()
             }
         }
     }
