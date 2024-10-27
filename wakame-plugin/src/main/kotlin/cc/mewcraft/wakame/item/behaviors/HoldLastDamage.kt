@@ -39,7 +39,7 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
-            // FIXME
+            // TODO 应该由那些需要操作 damage/max_damage 的代码来操作物品的耐久度
             // if (event.isCancelled) {
             //     return
             // }
