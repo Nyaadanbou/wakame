@@ -1,6 +1,7 @@
 package item
 
 import assertAny
+import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
@@ -441,25 +442,19 @@ class CustomNekoStackTest : KoinTest {
         }
     }
 
-    // TODO Attack
-//    @Test
-//    fun `component - damageable`() = componentLifecycleTest(
-//        "damageable", ItemTemplateTypes.DAMAGEABLE, ItemComponentTypes.DAMAGEABLE,
-//    ) {
-//        serialization {
-//            assertNotNull(it)
-//            assertTrue(it.disappearWhenBroken)
-//        }
-//
-//        result {
-//            assertFalse(it.isEmpty())
-//        }
-//
-//        unboxed {
-//            assertEquals(1, it.damage)
-//            assertEquals(512, it.maxDamage)
-//        }
-//    }
+    @Test
+    fun `component - attack`() = componentLifecycleTest(
+        "attack", ItemTemplateTypes.ATTACK, ItemComponentTypes.EMPTY,
+    ) {
+        serialization {
+            assertNotNull(it)
+            assertIs<SwordAttack>(it.attackType)
+        }
+
+        result {
+            assertTrue(it.isEmpty())
+        }
+    }
 
     @Test
     fun `component - max_damage`() {
