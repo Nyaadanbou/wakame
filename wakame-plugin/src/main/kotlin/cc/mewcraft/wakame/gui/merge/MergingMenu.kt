@@ -110,7 +110,7 @@ internal class MergingMenu(
             }
 
             e.isAdd -> {
-                val added = newItem?.customNeko ?: run {
+                val added = newItem?.shadowNeko(true) ?: run {
                     e.isCancelled = true
                     viewer.sendMessage(text { content("不是便携核心."); color(NamedTextColor.RED) })
                     return

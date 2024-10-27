@@ -43,16 +43,16 @@ import xyz.xenondevs.commons.provider.immutable.*
 )
 object ItemRegistry : KoinComponent, Initializable {
     /**
-     * 用于原版物品代理的 [NekoItem]. 这些 NekoItem 不应该用来生成物品.
-     */
-    @JvmField
-    val VANILLA: Registry<Key, NekoItem> = SimpleRegistry()
-
-    /**
-     * 用于一般用途的 [NekoItem]. 这些 [NekoItem] 可以用来生成物品.
+     * 用于一般用途的 [NekoItem]. 这些模板可以用来生成 [ItemStack].
      */
     @JvmField
     val CUSTOM: Registry<Key, NekoItem> = SimpleRegistry()
+
+    /**
+     * 包含了虚拟的 [NekoItem]. 这些模板不应该用来生成 [ItemStack].
+     */
+    @JvmField
+    val IMAGINARY: Registry<Key, NekoItem> = SimpleRegistry()
 
     /**
      * All namespaces of loaded items.
@@ -159,7 +159,7 @@ object ItemRegistry : KoinComponent, Initializable {
 
     private fun loadConfiguration() {
         // 清空注册表
-        VANILLA.clear()
+        IMAGINARY.clear()
         LOGGER.info("Unregistered all vanilla items.")
         CUSTOM.clear()
         LOGGER.info("Unregistered all custom items.")
@@ -171,14 +171,14 @@ object ItemRegistry : KoinComponent, Initializable {
                 // Process as vanilla item
                 LOGGER.info("Loading vanilla item: '$key'")
                 runCatching { NekoItemFactory.createVanilla(key, path, node) }
-                    .onSuccess { VANILLA.register(key, it) }
-                    .onFailure { logError(key, it) }
+                    .onSuccess { IMAGINARY.register(key, it) }
+                    .onFailure { reportError(key, it) }
             } else {
                 // Process as custom item
                 LOGGER.info("Loading custom item: '$key'")
                 runCatching { NekoItemFactory.createCustom(key, path, node) }
                     .onSuccess { CUSTOM.register(key, it) }
-                    .onFailure { logError(key, it) }
+                    .onFailure { reportError(key, it) }
             }
         }
         LOGGER.info("Registered all items.")
@@ -199,7 +199,7 @@ object ItemRegistry : KoinComponent, Initializable {
         NekoItemHolder.reload()
     }
 
-    private fun logError(key: Key, throwable: Throwable) {
+    private fun reportError(key: Key, throwable: Throwable) {
         if (Initializer.isDebug) {
             LOGGER.error("Can't load item '$key'", throwable)
         } else {

@@ -187,7 +187,7 @@ internal class SimpleModdingSession(
 
             logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
-            val usableInput0 = _value?.customNeko ?: run {
+            val usableInput0 = _value?.shadowNeko(true) ?: run {
                 usableInput = null
                 replaceParams = ReforgeReplaceMap.empty(thisRef)
                 executeReforge()
@@ -486,7 +486,7 @@ private object ReforgeReplace {
             }
 
             if (replaceResult.applicable) {
-                usableInput = originalInput!!.customNeko!!
+                usableInput = originalInput!!.shadowNeko(true)!!
             } else {
                 usableInput = null
             }
@@ -521,7 +521,7 @@ private object ReforgeReplace {
             // TODO 检查权限
 
             // 获取耗材中的便携核心
-            val customNekoStack = originalInput?.customNeko
+            val customNekoStack = originalInput?.shadowNeko(true)
             val portableCore = customNekoStack?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
                 return ReforgeReplaceResult.failure("<gray>非便携核心.".mini)
             }
