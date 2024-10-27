@@ -199,6 +199,7 @@ damage_type_mappings:
     defense_penetration: 0.0
     defense_penetration_rate: 0.0
 
+# 对原版生物攻击的映射
 entity_attack_mappings:
   # 生物
   axolotl:
@@ -945,7 +946,7 @@ entity_attack_mappings:
         critical_strike_power: 1.0
 
 # 默认弹射物伤害映射
-# 当弹射物没有来源实体或伤害只和类型有关时使用
+# 当弹射物没有来源实体, 或伤害只与类型有关时使用
 projectile_type_mappings:
   arrow:
     element: neutral
