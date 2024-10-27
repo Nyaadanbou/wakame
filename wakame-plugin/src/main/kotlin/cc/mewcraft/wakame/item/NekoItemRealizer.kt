@@ -134,7 +134,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 创建空的萌芽物品
         val nekoStack = prototype.base.createNekoStack()
         // 获取萌芽物品的底层 ItemStack
-        val itemStack = nekoStack.unsafe.handle
+        val itemStack = nekoStack.wrapped
 
         // 设置物品的 id 和 variant
         NekoStackSupport.setId(itemStack, prototype.id)

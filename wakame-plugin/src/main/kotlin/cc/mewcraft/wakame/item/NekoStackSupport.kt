@@ -179,6 +179,8 @@ private class CustomNekoStack(
 
     override val itemStack: ItemStack
         get() = handle.clone()
+    override val wrapped: ItemStack
+        get() = handle
 
     override val prototype: NekoItem
         get() = NekoStackSupport.getPrototypeOrThrow(unsafeNyaTag)
@@ -227,8 +229,6 @@ private class CustomNekoStack(
     ) : NekoStack.Unsafe {
         override val nyaTag: CompoundTag
             get() = owner.unsafeNyaTag
-        override val handle: ItemStack
-            get() = owner.handle
     }
 }
 
@@ -252,6 +252,8 @@ internal class VanillaNekoStack(
     override val itemType: Material
         get() = unsupported()
     override val itemStack: ItemStack
+        get() = unsupported()
+    override val wrapped: ItemStack
         get() = unsupported()
 
     override var variant: Int = 0 // 变体永远都是 0

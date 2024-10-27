@@ -222,6 +222,8 @@ private class PacketCustomNekoStack(
 
     override val itemStack: BukkitStack
         get() = abortReads()
+    override val wrapped: BukkitStack
+        get() = abortReads()
 
     override val id: Key
         get() = NekoStackSupport.getIdOrThrow(nyaTag)
@@ -270,8 +272,6 @@ private class PacketCustomNekoStack(
     class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
         override val nyaTag: CompoundTag
             get() = nekoStack.nyaTag
-        override val handle: BukkitStack
-            get() = nekoStack.handle
     }
 }
 
@@ -294,6 +294,8 @@ private class PacketVanillaNekoStack(
         get() = SpigotConversionUtil.toBukkitItemMaterial(packetItem.type)
 
     override val itemStack: BukkitStack
+        get() = abortReads()
+    override val wrapped: BukkitStack
         get() = abortReads()
 
     override val id: Key

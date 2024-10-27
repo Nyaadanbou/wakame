@@ -50,7 +50,7 @@ object ItemCommands : CommandFactory<CommandSender> {
                     recipients.forEach { player ->
                         val itemStackFlow = sequence {
                             repeat(amount) {
-                                yield(item.realize(player.toUser()).unsafe.handle)
+                                yield(item.realize(player.toUser()).wrapped)
                             }
                         }
                         val itemStacks = itemStackFlow.toList().toTypedArray()

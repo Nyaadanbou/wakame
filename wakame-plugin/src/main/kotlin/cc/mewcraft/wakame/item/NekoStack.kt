@@ -69,6 +69,14 @@ interface NekoStack : Examinable {
     val itemStack: ItemStack
 
     /**
+     * 获取底层 [ItemStack] 的直接引用.
+     * 任何对该对象的修改都会直接影响到物品本身的状态.
+     * 除非你很清楚这么做的所有后果, 否则不要使用这个.
+     */
+    @get:Contract(" -> this")
+    val wrapped: ItemStack
+
+    /**
      * The namespaced identifier of this item.
      *
      * The `namespace` is the name of the directory in which the item is defined in the config.
@@ -133,13 +141,6 @@ interface NekoStack : Examinable {
          * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品本身的 NBT 数据.
          */
         val nyaTag: CompoundTag
-
-        /**
-         * 获取该 [NekoStack] 封装的 [ItemStack].
-         *
-         * 这是 [ItemStack] 对象的直接引用, 任何对该对象的修改都会直接影响到物品本身的状态.
-         */
-        val handle: ItemStack
     }
 }
 
@@ -245,6 +246,9 @@ private object EmptyNekoStack : NekoStack {
     override val itemStack: ItemStack
         get() = ItemStack.empty()
 
+    override val wrapped: ItemStack
+        get() = ItemStack.empty()
+
     override val id: Key = GenericKeys.EMPTY
 
     override var variant: Int
@@ -274,7 +278,5 @@ private object EmptyNekoStack : NekoStack {
     object Unsafe : NekoStack.Unsafe {
         override val nyaTag: CompoundTag
             get() = CompoundTag.create()
-        override val handle: ItemStack
-            get() = ItemStack.empty()
     }
 }

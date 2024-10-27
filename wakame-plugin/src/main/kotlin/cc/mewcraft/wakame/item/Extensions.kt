@@ -2,10 +2,14 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.maxDamage
 import org.bukkit.EntityEffect
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import kotlin.math.min
 
 fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
@@ -17,6 +21,19 @@ fun NekoStack.applyAttackCooldown(player: Player) {
     player.setCooldown(this.itemType, attackSpeedLevel.cooldown)
 }
 
+//<editor-fold desc="耐久度">
+var NekoStack.damage: Int
+    get() = wrapped.damage
+    set(value) {
+        wrapped.damage = value
+    }
+
+val NekoStack.maxDamage: Int
+    get() = wrapped.maxDamage
+
+val NekoStack.isDamageable: Boolean
+    get() = wrapped.isDamageable
+
 fun NekoStack.decreaseDurability(player: Player, amount: Int) {
     require(amount >= 0) { "The reduce durability can't less than 0." }
 
@@ -27,11 +44,12 @@ fun NekoStack.decreaseDurability(player: Player, amount: Int) {
     // 耐久组件不全的物品不做处理
     val maxDamage = this.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return
     val damage = this.components.get(ItemComponentTypes.DAMAGE) ?: return
+    val clampedToMaxDamage = min(amount, maxDamage) // clamped to maxDamage
 
     // TODO 考虑耐久附魔
-    val amountAfterEnchantment = amount
+    val amountAfterEnchantment = clampedToMaxDamage
 
-    val playerItemDamageEvent = PlayerItemDamageEvent(player, this.itemStack, amountAfterEnchantment, amount)
+    val playerItemDamageEvent = PlayerItemDamageEvent(player, this.itemStack, amountAfterEnchantment, clampedToMaxDamage)
     // 如果掉耐久事件被取消则不处理
     if (!playerItemDamageEvent.callEvent()) return
 
@@ -45,3 +63,4 @@ fun NekoStack.decreaseDurability(player: Player, amount: Int) {
         this.components.set(ItemComponentTypes.DAMAGE, damage + playerItemDamageEvent.damage)
     }
 }
+//</editor-fold>

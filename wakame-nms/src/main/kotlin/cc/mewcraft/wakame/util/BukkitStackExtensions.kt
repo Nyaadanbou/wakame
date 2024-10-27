@@ -8,39 +8,36 @@ import net.minecraft.world.item.enchantment.ItemEnchantments
 import org.bukkit.inventory.ItemStack
 import net.minecraft.world.item.ItemStack as MojangStack
 
-private fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) {
-    val oldData = get(type) ?: return
-    val newData = block(oldData)
-    set(type, newData)
+/**
+ * 直接修改一个 [ItemStack]. 暂时仅支持部分常用数据.
+ */
+fun ItemStack.edit(block: ItemStackDSL.() -> Unit): ItemStack {
+    return ItemStackDSL(this).apply(block).target
 }
 
 class ItemStackDSL(
     internal val target: ItemStack,
 ) {
     var itemName
-        get() =
-            target.itemName0
+        get() = target.itemName0
         set(value) {
             target.itemName0 = value
         }
 
     var customName
-        get() =
-            target.customName0
+        get() = target.customName0
         set(value) {
             target.customName0 = value
         }
 
     var lore
-        get() =
-            target.lore0
+        get() = target.lore0
         set(value) {
             target.lore0 = value
         }
 
     var customModelData
-        get() =
-            target.customModelData0
+        get() = target.customModelData0
         set(value) {
             target.customModelData0 = value
         }
@@ -63,6 +60,7 @@ class ItemStackDSL(
             target.nbt = value
         }
 
+    //<editor-fold desc="`show_in_tooltip`">
     fun showAttributeModifiers(value: Boolean) {
         target.showAttributeModifiers(value)
     }
@@ -100,25 +98,39 @@ class ItemStackDSL(
     }
 
     fun showNothing() {
-        showAttributeModifiers(false)
-        showCanBreak(false)
-        showCanPlaceOn(false)
-        showDyedColor(false)
-        showEnchantments(false)
-        showJukeboxPlayable(false)
-        showStoredEnchantments(false)
-        showTrim(false)
-        showUnbreakable(false)
+        target.showNothing()
     }
+    //</editor-fold>
 }
 
 /**
- * 直接修改一个 [ItemStack]. 暂时仅支持部分常用数据.
+ * 检查物品是否允许被损耗.
  */
-fun ItemStack.edit(block: ItemStackDSL.() -> Unit): ItemStack {
-    return ItemStackDSL(this).apply(block).target
-}
+val ItemStack.isDamageable: Boolean
+    get() = handle?.isDamageableItem == true
 
+/**
+ * 检查物品是否损耗.
+ */
+val ItemStack.isDamaged: Boolean
+    get() = handle?.isDamaged == true
+
+/**
+ * 获取物品当前的损耗.
+ * 必须先检查 [isDamageable] 是否为 `true`.
+ */
+var ItemStack.damage: Int
+    get() = handle?.damageValue ?: 0
+    set(value) = (this.handle?.damageValue = value)
+
+/**
+ * 获取物品的最大损耗.
+ * 必须先检查 [isDamageable] 是否为 `true`.
+ */
+val ItemStack.maxDamage: Int
+    get() = handle?.maxDamage ?: 0
+
+//<editor-fold desc="`show_in_tooltip`">
 private val EMPTY_ATTRIBUTE_MODIFIERS = ItemAttributeModifiers.EMPTY.withTooltip(false)
 
 // FIXME 等 Mojang 修复: https://bugs.mojang.com/browse/MC-271826.
@@ -176,4 +188,23 @@ fun ItemStack.showTrim(value: Boolean) {
 
 fun ItemStack.showUnbreakable(value: Boolean) {
     handle?.modify(DataComponents.UNBREAKABLE) { data -> data.withTooltip(value) }
+}
+
+fun ItemStack.showNothing() {
+    showAttributeModifiers(false)
+    showCanBreak(false)
+    showCanPlaceOn(false)
+    showDyedColor(false)
+    showEnchantments(false)
+    showJukeboxPlayable(false)
+    showStoredEnchantments(false)
+    showTrim(false)
+    showUnbreakable(false)
+}
+//</editor-fold>
+
+private fun <T> MojangStack.modify(type: DataComponentType<T>, block: (T) -> T) {
+    val oldData = get(type) ?: return
+    val newData = block(oldData)
+    set(type, newData)
 }
