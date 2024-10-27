@@ -35,12 +35,13 @@ data class SpearAttack(
         val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {
             return null
+        } else {
+            // 应用攻击冷却
+            nekoStack.applyAttackCooldown(player)
         }
 
         applyAttack(player)
 
-        // 攻击冷却
-        nekoStack.applyAttackCooldown(player)
         // TODO 扣除耐久
 
         return null
@@ -49,13 +50,16 @@ data class SpearAttack(
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
         val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) return
+        if (user.attackSpeed.isActive(nekoStack.id)) {
+            return
+        } else {
+            // 应用攻击冷却
+            nekoStack.applyAttackCooldown(player)
+        }
 
         applyAttack(player)
         wrappedEvent.actionPerformed = true
 
-        // 攻击冷却
-        nekoStack.applyAttackCooldown(player)
         // TODO 扣除耐久
     }
 

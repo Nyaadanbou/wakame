@@ -70,15 +70,15 @@ class HammerAttack : AttackType {
         val hitLocation = damagee.location
         val radius = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceAtLeast(0.0)
         // 范围伤害目标的判定为:
-        // 以直接受击实体的脚部坐标向y轴正方向(上方)偏移0.5格为中心
-        // 高为1格, 半径为radius的圆柱体
+        // 以直接受击实体的脚部坐标向 y 轴正方向(上方)偏移 0.5 格为中心
+        // 高为 1 格, 半径为 radius 的圆柱体
         hitLocation.clone().add(.0, .5, .0).getNearbyLivingEntities(radius, 0.5) {
             it.uniqueId != player.uniqueId && it.uniqueId != damagee.uniqueId && distanceXZ(it.location, hitLocation) < radius
         }.forEach {
             it.hurt(extraDamageMetadata, player, true)
         }
 
-        // 攻击冷却
+        // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // TODO 扣除耐久
 
@@ -97,7 +97,7 @@ class HammerAttack : AttackType {
                 .count(10)
                 .offset(0.3, 0.1, 0.3)
                 .extra(0.15)
-                .allPlayers()
+                .receivers(16)
                 .spawn()
         }
         ParticleBuilder(Particle.BLOCK)
@@ -106,7 +106,7 @@ class HammerAttack : AttackType {
             .count(50)
             .offset(0.3, 0.3, 0.3)
             .extra(0.15)
-            .allPlayers()
+            .receivers(16)
             .spawn()
         world.playSound(player.location, Sound.ITEM_MACE_SMASH_GROUND, SoundCategory.PLAYERS, 1F, 1F)
 
