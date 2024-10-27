@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.editMeta
+import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.isDamageable
 import net.kyori.examination.Examinable
-import org.bukkit.inventory.meta.Damageable as CraftDamageable
 
 
 interface ItemDamage : Examinable {
@@ -27,18 +27,26 @@ interface ItemDamage : Examinable {
         override val id: String,
     ) : ItemComponentType<Int> {
         override fun read(holder: ItemComponentHolder): Int? {
-            return (holder.item.itemMeta as? CraftDamageable)?.damage
+            val item = holder.item
+            if (item.isDamageable) {
+                return item.damage
+            } else {
+                return null
+            }
         }
 
         override fun write(holder: ItemComponentHolder, value: Int) {
-            holder.item.editMeta<CraftDamageable> { itemMeta ->
-                itemMeta.damage = value
+            val item = holder.item
+            if (item.isDamageable) {
+                item.damage = value
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta<CraftDamageable> { itemMeta ->
-                itemMeta.setMaxDamage(null)
+            // 移除 `damage` 物品组件, 相当于将物品损耗降低至 0.
+            val item = holder.item
+            if (item.isDamageable) {
+                item.damage = 0
             }
         }
     }

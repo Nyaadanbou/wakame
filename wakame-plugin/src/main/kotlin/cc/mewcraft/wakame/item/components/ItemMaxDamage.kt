@@ -5,9 +5,10 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.editMeta
+import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.maxDamage
+import cc.mewcraft.wakame.util.unsetDamageable
 import net.kyori.examination.Examinable
-import org.bukkit.inventory.meta.Damageable as CraftDamageable
 
 
 interface ItemMaxDamage : Examinable {
@@ -26,19 +27,25 @@ interface ItemMaxDamage : Examinable {
         override val id: String,
     ) : ItemComponentType<Int> {
         override fun read(holder: ItemComponentHolder): Int? {
-            return (holder.item.itemMeta as? CraftDamageable)?.takeIf { it.hasMaxDamage() }?.maxDamage
+            val item = holder.item
+            if (item.isDamageable) {
+                return item.maxDamage
+            } else {
+                return null
+            }
         }
 
         override fun write(holder: ItemComponentHolder, value: Int) {
-            holder.item.editMeta<CraftDamageable> { itemMeta ->
-                itemMeta.setMaxDamage(value)
+            val item = holder.item
+            if (item.isDamageable) {
+                item.maxDamage = value
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta<CraftDamageable> { itemMeta ->
-                itemMeta.setMaxDamage(null)
-            }
+            // 移除 `max_damage` 物品组件, 相当于让物品变得不可损耗.
+            val item = holder.item
+            item.unsetDamageable()
         }
     }
 }

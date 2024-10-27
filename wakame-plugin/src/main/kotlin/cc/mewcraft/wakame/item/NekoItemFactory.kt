@@ -156,6 +156,7 @@ object NekoItemFactory : KoinComponent {
             tryAdd("max_damage", ItemBehaviorTypes.MAX_DAMAGE)
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
