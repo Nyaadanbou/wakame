@@ -51,7 +51,6 @@ object NekoItemFactory : KoinComponent {
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             // tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
-            // tryAdd("damageable", ItemBehaviorTypes.DAMAGEABLE)
             // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             // tryAdd("food", ItemBehaviorTypes.FOOD)
             tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
@@ -124,11 +123,7 @@ object NekoItemFactory : KoinComponent {
         }
 
         return SimpleNekoItem(
-            id = key,
-            base = itemBase,
-            slotGroup = slotGroup,
-            templates = templateMap,
-            behaviors = behaviorMap
+            id = key, base = itemBase, slotGroup = slotGroup, templates = templateMap, behaviors = behaviorMap
         )
     }
 
@@ -211,11 +206,7 @@ object NekoItemFactory : KoinComponent {
         }
 
         return SimpleNekoItem(
-            id = key,
-            base = itemBase,
-            slotGroup = slotGroup,
-            templates = templateMap,
-            behaviors = behaviorMap
+            id = key, base = itemBase, slotGroup = slotGroup, templates = templateMap, behaviors = behaviorMap
         )
     }
 

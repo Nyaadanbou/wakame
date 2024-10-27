@@ -185,8 +185,6 @@ object ItemTemplateTypes {
     @JvmField
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
 
-
-
     /**
      * 获取所有模板的序列化器.
      */

@@ -418,27 +418,31 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - damage`() {
+    fun `component - damage`() = componentLifecycleTest("damage", ItemTemplateTypes.DAMAGE, ItemComponentTypes.DAMAGE) {
+        serialization {
+            assertNotNull(it)
+        }
 
+        result {
+            assertFalse(it.isEmpty())
+        }
     }
 
     @Test
-    fun `component - dyed color`() {
-        componentLifecycleTest(
-            "dyed_color", ItemTemplateTypes.DYED_COLOR, ItemComponentTypes.DYED_COLOR,
-        ) {
-            serialization {
-                assertNotNull(it)
-            }
+    fun `component - dyed color`() = componentLifecycleTest(
+        "dyed_color", ItemTemplateTypes.DYED_COLOR, ItemComponentTypes.DYED_COLOR,
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
 
-            result {
-                assertFalse(it.isEmpty())
-            }
+        result {
+            assertFalse(it.isEmpty())
+        }
 
-            unboxed {
-                assertFalse(it.showInTooltip)
-                assertEquals(0xffffff, it.rgb)
-            }
+        unboxed {
+            assertFalse(it.showInTooltip)
+            assertEquals(0xffffff, it.rgb)
         }
     }
 
@@ -457,8 +461,14 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - max_damage`() {
+    fun `component - max_damage`() = componentLifecycleTest("max_damage", ItemTemplateTypes.MAX_DAMAGE, ItemComponentTypes.MAX_DAMAGE) {
+        serialization {
+            assertNotNull(it)
+        }
 
+        result {
+            assertFalse(it.isEmpty())
+        }
     }
 
     @Test

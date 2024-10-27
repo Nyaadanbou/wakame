@@ -21,7 +21,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 interface HoldLastDamage : ItemBehavior {
-    private object Default : HoldLastDamage{
+    private object Default : HoldLastDamage {
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
             tryCancelEvent(itemStack, player, event)
         }
@@ -39,25 +39,25 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
-            // TODO
-//            if (event.isCancelled) {
-//                return
-//            }
-//
-//            val nekoStack = itemStack.toNekoStack
-//            val damageableComponent = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
-//            val damageableTemplate = nekoStack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return
-//
-//            // 如果有损耗, 设置损耗为固定值 1
-//            event.damage = 1
-//
-//            val currentDamage = damageableComponent.damage
-//            val maximumDamage = damageableComponent.maxDamage
-//            val disappearWhenBroken = damageableTemplate.disappearWhenBroken
-//            if (currentDamage >= maximumDamage && !disappearWhenBroken) {
-//                // 物品将会在下一 tick 消失, 但是萌芽设置了不消失, 于是取消事件
-//                event.isCancelled = true
-//            }
+            // FIXME
+            // if (event.isCancelled) {
+            //     return
+            // }
+            //
+            // val nekoStack = itemStack.toNekoStack
+            // val damageableComponent = nekoStack.components.get(ItemComponentTypes.DAMAGEABLE) ?: return
+            // val damageableTemplate = nekoStack.templates.get(ItemTemplateTypes.DAMAGEABLE) ?: return
+            //
+            // // 如果有损耗, 设置损耗为固定值 1
+            // event.damage = 1
+            //
+            // val currentDamage = damageableComponent.damage
+            // val maximumDamage = damageableComponent.maxDamage
+            // val disappearWhenBroken = damageableTemplate.disappearWhenBroken
+            // if (currentDamage >= maximumDamage && !disappearWhenBroken) {
+            //     // 物品将会在下一 tick 消失, 但是萌芽设置了不消失, 于是取消事件
+            //     event.isCancelled = true
+            // }
         }
 
         override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
