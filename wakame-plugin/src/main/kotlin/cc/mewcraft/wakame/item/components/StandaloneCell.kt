@@ -17,7 +17,7 @@ data class StandaloneCell(
         /**
          * 该组件的配置文件.
          */
-        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.STANDALONE_CORE)
+        private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.STANDALONE_CELL)
 
         override fun codec(id: String): ItemComponentType<StandaloneCell> {
             return Codec(id)

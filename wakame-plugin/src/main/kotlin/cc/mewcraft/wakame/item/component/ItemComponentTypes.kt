@@ -195,7 +195,7 @@ internal object ItemComponentTypes {
      * 独立存在的核孔.
      */
     @JvmField
-    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CORE).register()
+    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CELL).register()
 
     /**
      * 附魔书内存储的魔咒.
