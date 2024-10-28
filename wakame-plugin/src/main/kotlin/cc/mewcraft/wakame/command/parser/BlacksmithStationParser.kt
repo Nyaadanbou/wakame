@@ -31,13 +31,14 @@ class RecyclingStationParser<C : Any> : ArgumentParser<C, RecyclingStation>, Blo
         // val readStr = commandInput.readString()
         // return ArgumentParseResult.success(RecyclingStationRegistry[readStr]!!)
         // TODO recycling
+        val readStr = commandInput.readString()
         return ArgumentParseResult.success(WtfRecyclingStation)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
         // return RecyclingStationRegistry.NAMES
         // TODO recycling
-        return listOf()
+        return listOf("wtf")
     }
 }
 
