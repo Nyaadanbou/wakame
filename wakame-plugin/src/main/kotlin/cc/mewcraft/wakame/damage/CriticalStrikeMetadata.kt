@@ -27,22 +27,24 @@ data class CriticalStrikeMetadata(
         /**
          * 通过属性计算和随机得到暴击元数据.
          */
-        fun byCalculate(chance: Double, positivePower: Double, negativePower: Double): CriticalStrikeMetadata {
+        fun byCalculate(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
             val power: Double
             val state: CriticalStrikeState
             if (chance < 0) {
-                power = negativePower
-                state = if (Random.nextDouble() < chance.absoluteValue) {
-                    CriticalStrikeState.NEGATIVE
+                if (Random.nextDouble() < chance.absoluteValue) {
+                    state = CriticalStrikeState.NEGATIVE
+                    power = negativePower
                 } else {
-                    CriticalStrikeState.NONE
+                    state = CriticalStrikeState.NONE
+                    power = nonePower
                 }
             } else {
-                power = positivePower
-                state = if (Random.nextDouble() < chance) {
-                    CriticalStrikeState.POSITIVE
+                if (Random.nextDouble() < chance) {
+                    state = CriticalStrikeState.POSITIVE
+                    power = positivePower
                 } else {
-                    CriticalStrikeState.NONE
+                    state = CriticalStrikeState.NONE
+                    power = nonePower
                 }
             }
             return CriticalStrikeMetadata(power, state)

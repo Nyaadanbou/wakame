@@ -13,7 +13,7 @@ class DamageTags(
     companion object {
         private val EMPTY = DamageTags()
 
-        fun empty(): DamageTags = EMPTY
+        fun empty(): DamageTags = EMPTY // FIXME 应该不可变, 但实际可变
     }
 
     init {

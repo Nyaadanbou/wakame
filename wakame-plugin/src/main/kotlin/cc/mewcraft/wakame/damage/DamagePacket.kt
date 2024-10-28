@@ -79,12 +79,21 @@ data class DamagePacket(
 /**
  * 伤害捆绑包, 封装了一个或多个 [DamagePacket].
  */
-class DamageBundle : Examinable, KoinComponent {
-    private val packets = Reference2ObjectArrayMap<Element, DamagePacket>()
+class DamageBundle(
+    packets: Map<Element, DamagePacket>
+) : Examinable, KoinComponent {
+    constructor() : this(emptyMap())
+
+    private val packets = Reference2ObjectArrayMap(packets)
+
+    fun total(): Double {
+        return packets.values.sumOf { it.packetDamage }
+    }
 
     /**
      * 该捆绑包的总伤害值.
      */
+    @Deprecated("Use 'total' instead", ReplaceWith("total()"))
     val damageSum: Double = packets.values.sumOf { it.packetDamage }
 
     /**

@@ -34,7 +34,7 @@ class TridentAttack : AttackType {
         }
 
         return PlayerDamageMetadata(
-            damager = player,
+            user = user,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.TRIDENT),
             damageBundle = damageBundle(player.toUser().attributeMap) { every { standard() } }
         )

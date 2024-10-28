@@ -63,22 +63,23 @@ data class SpearAttack(
         // TODO 扣除耐久
     }
 
-    private fun applyAttack(damager: Player) {
-        val world = damager.world
+    private fun applyAttack(player: Player) {
+        val world = player.world
         val maxHitAmount = 100
         val hitEntities: MutableList<LivingEntity> = mutableListOf()
-        val attributeMap = damager.toUser().attributeMap
+        val user = player.toUser()
+        val attributeMap = user.attributeMap
         val maxDistance = attributeMap.getValue(Attributes.ENTITY_INTERACTION_RANGE)
         for (i in 0 until maxHitAmount) {
             val rayTraceResult = world.rayTrace(
-                damager.eyeLocation,
-                damager.eyeLocation.direction,
+                player.eyeLocation,
+                player.eyeLocation.direction,
                 maxDistance,
                 FluidCollisionMode.NEVER,
                 true,
                 size
             ) {
-                it is LivingEntity && it.uniqueId != damager.uniqueId && !hitEntities.contains(it)
+                it is LivingEntity && it.uniqueId != player.uniqueId && !hitEntities.contains(it)
             }
             if (rayTraceResult == null) {
                 break
@@ -97,11 +98,11 @@ data class SpearAttack(
         val damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
         hitEntities.forEach {
             val playerDamageMetadata = PlayerDamageMetadata(
-                damager = damager,
+                user = user,
                 damageBundle = damageBundle(attributeMap) { every { standard() } },
                 damageTags = damageTags
             )
-            it.hurt(playerDamageMetadata, damager, true)
+            it.hurt(playerDamageMetadata, player, true)
         }
     }
 }

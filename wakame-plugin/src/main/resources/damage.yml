@@ -205,92 +205,98 @@ entity_attack_mappings:
   axolotl:
     melee:
       type: melee
-      damage:
-        element: water
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 3.0
+            max: 3.0
+            rate: 1.0
+            defense_penetration: 0.0
+            defense_penetration_rate: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+          positive_power: 1.0
+          negative_power: 1.0
+          none_power: 1.0
+        damage_tags: []
   bee:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   blaze:
     melee:
       type: melee
-      damage:
-        element: fire
-        min: 9.0
-        max: 9.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     small_fireball:
       type: projectile
       projectile: small_fireball
-      damage:
-        element: fire
-        min: 5.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 5.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   bogged:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 6.0
-        max: 6.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   breeze:
     wind_charge:
       type: projectile
       projectile: breeze_wind_charge
-      damage:
-        element: wind
-        min: 1.0
-        max: 1.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          wind:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   cave_spider:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #  creeper:
   #    explode:
   #      type: explode
@@ -300,41 +306,41 @@ entity_attack_mappings:
   #        max: 3.0
   #        defense_penetration: 0.0
   #        defense_penetration_rate: 0.0
-  #        critical_strike_chance: 0.0
-  #        critical_strike_power: 1.0
+  #        critical_strike_metadata_chance: 0.0
+  #        critical_strike_metadata_power: 1.0
   dolphin:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   drowned:
     melee:
       type: melee
-      damage:
-        element: water
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     trident:
       type: projectile
       projectile: trident
-      damage:
-        element: water
-        min: 13.5
-        max: 13.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 13.5
+            max: 13.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #  elder_guardian:
   #    laser:
   #      element: neutral
@@ -342,39 +348,39 @@ entity_attack_mappings:
   #      max: 12.0
   #      defense_penetration: 0.0
   #      defense_penetration_rate: 0.0
-  #      critical_strike_chance: 0.0
-  #      critical_strike_power: 1.0
+  #      critical_strike_metadata_chance: 0.0
+  #      critical_strike_metadata_power: 1.0
   #    spikes:
   #      element: neutral
   #      min: 2.0
   #      max: 3.0
   #      defense_penetration: 0.0
   #      defense_penetration_rate: 0.0
-  #      critical_strike_chance: 0.0
-  #      critical_strike_power: 1.0
+  #      critical_strike_metadata_chance: 0.0
+  #      critical_strike_metadata_power: 1.0
   #  ender_dragon:
   enderman:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 10.5
-        max: 10.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 10.5
+            max: 10.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   endermite:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #  evoker:
   #    fang:
   #      element: neutral
@@ -382,76 +388,76 @@ entity_attack_mappings:
   #      max: 13.5
   #      defense_penetration: 0.0
   #      defense_penetration_rate: 0.0
-  #      critical_strike_chance: 0.0
-  #      critical_strike_power: 1.0
+  #      critical_strike_metadata_chance: 0.0
+  #      critical_strike_metadata_power: 1.0
   fox:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   frog:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 15.0
-        max: 15.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 15.0
+            max: 15.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   ghast:
     fireball:
       type: projectile
       projectile: fireball
-      damage:
-        element: fire
-        min: 9.0
-        max: 9.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   giant:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 75.0
-        max: 75.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 75.0
+            max: 75.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   goat:
     melee:
       type: melee_age
       baby: false
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_baby:
       type: melee_age
       baby: true
-      damage:
-        element: neutral
-        min: 1.5
-        max: 1.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 1.5
+            max: 1.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #  guardian:
   #    laser:
   #      element: neutral
@@ -459,389 +465,389 @@ entity_attack_mappings:
   #      max: 9.0
   #      defense_penetration: 0.0
   #      defense_penetration_rate: 0.0
-  #      critical_strike_chance: 0.0
-  #      critical_strike_power: 1.0
+  #      critical_strike_metadata_chance: 0.0
+  #      critical_strike_metadata_power: 1.0
   #    spikes:
   #      element: neutral
   #      min: 2.0
   #      max: 3.0
   #      defense_penetration: 0.0
   #      defense_penetration_rate: 0.0
-  #      critical_strike_chance: 0.0
-  #      critical_strike_power: 1.0
+  #      critical_strike_metadata_chance: 0.0
+  #      critical_strike_metadata_power: 1.0
   hoglin:
     melee:
       type: melee_age
       baby: false
-      damage:
-        element: neutral
-        min: 4.5
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_baby:
       type: melee_age
       baby: true
-      damage:
-        element: neutral
-        min: 0.75
-        max: 0.75
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 0.75
+            max: 0.75
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   husk:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   illusioner:
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 3.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   iron_golem:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 11.25
-        max: 32.25
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 11.25
+            max: 32.25
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   llama:
     spit:
       type: projectile
       projectile: llama_spit
-      damage:
-        element: neutral
-        min: 1.0
-        max: 1.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   magma_cube:
     melee_size_0:
       type: melee_size
       size: 0
-      damage:
-        element: fire
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_size_1:
       type: melee_size
       size: 1
-      damage:
-        element: fire
-        min: 6
-        max: 6
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_size_3:
       type: melee_size
       size: 3
-      damage:
-        element: fire
-        min: 9
-        max: 9
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          fire:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   panda:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 9.0
-        max: 9.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   phantom:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   piglin:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 7.5
-        max: 7.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 7.5
+            max: 7.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 3.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   piglin_brute:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 19.5
-        max: 19.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 19.5
+            max: 19.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   pillager:
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 4.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   polar_bear:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 9.0
-        max: 9.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   pufferfish:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   rabbit:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 12.0
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 12.0
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   ravager:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 18.0
-        max: 18.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 18.0
+            max: 18.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #    roar:
   shulker:
     shulker_bullet:
       type: projectile
       projectile: shulker_bullet
-      damage:
-        element: neutral
-        min: 6.0
-        max: 6.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   silverfish:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 1.5
-        max: 1.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          earth:
+            min: 1.5
+            max: 1.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   skeleton:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 4.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   slime:
     melee_size_1:
       type: melee_size
       size: 1
-      damage:
-        element: fire
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_size_3:
       type: melee_size
       size: 3
-      damage:
-        element: fire
-        min: 6.0
-        max: 6.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   snow_golem:
     snowball:
       type: projectile
       projectile: snowball
-      damage:
-        element: neutral
-        min: 0.0
-        max: 0.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          water:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   spider:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   stray:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 3.0
-        max: 3.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     arrow:
       type: projectile
       projectile: arrow
-      damage:
-        element: neutral
-        min: 4.0
-        max: 5.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   trader_llama:
     spit:
       type: projectile
       projectile: llama_spit
-      damage:
-        element: neutral
-        min: 1.0
-        max: 1.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   vex:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 13.5
-        max: 13.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 13.5
+            max: 13.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   vindicator:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 19.5
-        max: 19.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 19.5
+            max: 19.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   warden:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 45.0
-        max: 45.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 45.0
+            max: 45.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   #    sonic_boom:
   #      type: sonic_boom
   #      damage:
@@ -850,100 +856,100 @@ entity_attack_mappings:
   #        max: 15.0
   #        defense_penetration: 0.0
   #        defense_penetration_rate: 1.0
-  #        critical_strike_chance: 0.0
-  #        critical_strike_power: 1.0
+  #        critical_strike_metadata_chance: 0.0
+  #        critical_strike_metadata_power: 1.0
   # witch
   wither:
     wither_skull:
       type: projectile
       projectile: wither_skull
-      damage:
-        element: neutral
-        min: 12.0
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 12.0
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     # explode
   wither_skeleton:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 12.0
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 12.0
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   wolf:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 6.0
-        max: 6.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   zoglin:
     melee:
       type: melee_age
       baby: false
-      damage:
-        element: neutral
-        min: 4.5
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
     melee_baby:
       type: melee_age
       baby: true
-      damage:
-        element: neutral
-        min: 0.5
-        max: 0.75
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 0.5
+            max: 0.75
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   zombie:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   zombie_villager:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 4.5
-        max: 4.5
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 4.5
+            max: 4.5
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
   zombified_piglin:
     melee:
       type: melee
-      damage:
-        element: neutral
-        min: 12.0
-        max: 12.0
-        defense_penetration: 0.0
-        defense_penetration_rate: 0.0
-        critical_strike_chance: 0.0
-        critical_strike_power: 1.0
+      damage_metadata:
+        damage_bundle:
+          neutral:
+            min: 12.0
+            max: 12.0
+        critical_strike_metadata:
+          chance: 0.0
+        damage_tags: []
 
 # 默认弹射物伤害映射
 # 当弹射物没有来源实体, 或伤害只与类型有关时使用

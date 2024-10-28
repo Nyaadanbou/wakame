@@ -80,7 +80,7 @@ private data class EvaluableDamagePacketImpl(
     }
 }
 
-internal object EvaluableDamageBundleSerializer : SchemaSerializer<EvaluableDamageMetadata> {
+internal object EvaluableDamageMetadataSerializer : SchemaSerializer<EvaluableDamageMetadata> {
     override fun deserialize(type: Type, node: ConfigurationNode): EvaluableDamageMetadata {
         val damageTagList = node.node("damage_tags").getList<DamageTag>(emptyList())
         val damageTags = DamageTags(damageTagList)

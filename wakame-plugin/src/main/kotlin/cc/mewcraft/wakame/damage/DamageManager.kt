@@ -86,7 +86,7 @@ object DamageManager : KoinComponent {
                             return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
                         } else {
                             // 手中的物品无 Attack 行为甚至不是 NekoStack
-                            return PlayerDamageMetadata.default(causingEntity)
+                            return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
                         }
                     }
 
@@ -96,7 +96,7 @@ object DamageManager : KoinComponent {
                         if (attack?.attackType is SwordAttack) {
                             val attributeMap = causingEntity.toUser().attributeMap
                             return PlayerDamageMetadata(
-                                damager = causingEntity,
+                                user = causingEntity.toUser(),
                                 damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
                                 damageBundle = damageBundle(attributeMap) {
                                     every {
@@ -128,7 +128,6 @@ object DamageManager : KoinComponent {
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
                     logger.warn("The vanilla entity damage from ${damageSource.causingEntity?.type} to ${event.entity.type} by ${damageSource.directEntity?.type} is not config!")
                     return EntityDamageMetadata(
-                        damager = causingEntity,
                         damageBundle = damageBundle {
                             default {
                                 min(event.damage)
@@ -143,7 +142,6 @@ object DamageManager : KoinComponent {
                 } else {
                     // 配置文件指定了该情景下生物的伤害映射
                     return EntityDamageMetadata(
-                        damager = causingEntity,
                         damageBundle = damageBundle {
                             single(damageInfo.element) {
                                 min(damageInfo.min)
@@ -156,7 +154,8 @@ object DamageManager : KoinComponent {
                         criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
                             chance = damageInfo.criticalStrikeChance,
                             positivePower = damageInfo.criticalStrikePower,
-                            negativePower = 1.0
+                            negativePower = 1.0,
+                            nonePower = 1.0
                         )
                     )
                 }
@@ -188,7 +187,7 @@ object DamageManager : KoinComponent {
      * 使用弹射物类型映射, 根据弹射物类型获取伤害元数据
      * 箭矢特殊处理, 计算词条栏伤害
      */
-    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): VanillaDamageMetadata {
+    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): DamageMetadata {
         if (projectile is Arrow) {
             val damageBundle = buildArrowDamageBundleByCells(projectile)
             if (damageBundle != null) {
@@ -204,7 +203,7 @@ object DamageManager : KoinComponent {
         return VanillaDamageMetadata(mapping.element, mapping.value, mapping.defensePenetration, mapping.defensePenetrationRate)
     }
 
-    private fun warnAndDefaultReturn(event: EntityDamageEvent): VanillaDamageMetadata {
+    private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {
         val damageSource = event.damageSource
         logger.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
         return VanillaDamageMetadata(event.damage)
@@ -253,7 +252,7 @@ object DamageManager : KoinComponent {
                 putProjectileDamageMetadata(
                     projectile.uniqueId,
                     PlayerDamageMetadata(
-                        damager = shooter,
+                        user = shooter.toUser(),
                         damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT),
                         damageBundle = damageBundle(shooter.toUser().attributeMap) { every { standard() } }
                     )
@@ -337,7 +336,7 @@ object DamageManager : KoinComponent {
         putProjectileDamageMetadata(
             projectile.uniqueId,
             PlayerDamageMetadata(
-                damager = entity,
+                user = entity.toUser(),
                 damageTags = damageTags,
                 damageBundle = damageBundle
             )
