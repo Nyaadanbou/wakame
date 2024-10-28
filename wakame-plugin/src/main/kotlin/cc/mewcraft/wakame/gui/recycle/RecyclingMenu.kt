@@ -158,6 +158,7 @@ internal class RecyclingMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            confirmed = false
             val currentTab = TabType.entries[gui.currentTab]
             gui.setTab(if (currentTab == TabType.RECYCLING) 1 else 0)
         }
