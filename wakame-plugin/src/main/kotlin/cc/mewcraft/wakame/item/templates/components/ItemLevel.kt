@@ -23,6 +23,11 @@ import cc.mewcraft.wakame.item.components.ItemLevel as ItemLevelData
  *
  * # 动态等级
  * 由生成的上下文决定要生成的等级.
+ *
+ * @param base 等级的基础值
+ * @param floatChance 等级浮动的概率
+ * @param floatAmount 等级浮动的范围
+ * @param max 等级最终的最大值
  */
 data class ItemLevel(
     private val base: Any,
@@ -31,7 +36,7 @@ data class ItemLevel(
     private val max: Int,
 ) : ItemTemplate<ItemLevelData> {
 
-    companion object: ItemTemplateBridge<ItemLevel> {
+    companion object : ItemTemplateBridge<ItemLevel> {
         override fun codec(id: String): ItemTemplateType<ItemLevel> {
             return Codec(id)
         }
@@ -86,22 +91,18 @@ data class ItemLevel(
          * ## Node structure 1
          * ```yaml
          * <node>:
-         *   value: <int>
-         *   add_chance: <double>
-         *   add_amount: <int_range>
-         *   sub_chance: <double>
-         *   sub_amount: <int_range>
+         *   base: <int>
+         *   float_chance: <double>
+         *   float_amount: <string>
          *   max: <int>
          * ```
          *
          * ## Node structure 2
          * ```yaml
          * <node>:
-         *   value: <enum>
-         *   add_chance: <double>
-         *   add_amount: <int_range>
-         *   sub_chance: <double>
-         *   sub_amount: <int_range>
+         *   base: <enum>
+         *   float_chance: <double>
+         *   float_amount: <string>
          *   max: <int>
          * ```
          */
@@ -111,8 +112,8 @@ data class ItemLevel(
                 is String -> EnumLookup.lookup<Option>(scalar).getOrThrow()
                 else -> throw SerializationException(node, type.type, "Invalid value type")
             }
-            val floatChance = node.node("float_chance").get<Double> { .0 }.takeIf { it in 0.0..1.0 } ?: throw SerializationException(node, type.type, "Invalid float_chance range")
-            val floatAmount = node.node("float_amount").get<Range<Int>> { Range.closed(0, 0) }.toKotlinRange() ?: throw SerializationException(node, type.type, "Invalid float_amount range")
+            val floatChance = node.node("float_chance").get<Double>(.0).takeIf { it in 0.0..1.0 } ?: throw SerializationException(node, type.type, "Invalid float_chance range")
+            val floatAmount = node.node("float_amount").get<Range<Int>>(Range.closed(0, 0)).toKotlinRange() ?: throw SerializationException(node, type.type, "Invalid float_amount range")
             val max = node.node("max").get<Int>() ?: Int.MAX_VALUE
             return ItemLevel(base, floatChance, floatAmount, max)
         }
