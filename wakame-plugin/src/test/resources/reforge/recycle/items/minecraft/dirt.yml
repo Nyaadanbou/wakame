@@ -1,23 +1,5 @@
 base: 10.0
+
 level:
-  type: "add_value"
-  value: "1.0 * query.value"
-rarity:
-  type: "add_value"
-  value: "1.0 * query.value"
-  mapping:
-    common: 0.0
-    uncommon: 1.0
-    rare: 2.0
-    epic: 3.0
-    legendary: 4.0
-    ancient: 5.0
-merge_penalty:
-  type: "add_value"
-  value: "1.0 * query.value"
-mod_penalty:
-  type: "add_value"
-  value: "1.0 * query.value"
-reroll_penalty:
   type: "add_value"
   value: "1.0 * query.value"
