@@ -29,7 +29,7 @@ class MythicMobsListener : Listener {
         when (e.mechanicName.lowercase()) {
             "nekoattribute" -> e.registerMechanic(::AttributeMechanic)
             "nekoattributemodifier" -> e.registerMechanic(::AttributeModifierMechanic)
-            // "nekodamage" -> e.registerMechanic(::NekoDamageMechanic)
+            "nekodamage" -> e.registerMechanic(::NekoDamageMechanic)
             "nekoremoveattributemodifier" -> e.registerMechanic(::RemoveAttributeModifierMechanic)
         }
     }
