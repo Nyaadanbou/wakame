@@ -11,6 +11,7 @@ object CommandPermissions {
     val LOOT = Permission.of("wakame.command.loot")
     val PLUGIN = Permission.of("wakame.command.plugin")
     val REFORGE = Permission.of("wakame.command.reforge")
+    val REFORGE_BLACKSMITH = Permission.of("wakame.command.reforge.blacksmith")
     val REFORGE_MERGING = Permission.of("wakame.command.reforge.merging")
     val REFORGE_MODDING = Permission.of("wakame.command.reforge.modding")
     val REFORGE_REROLLING = Permission.of("wakame.command.reforge.rerolling")
