@@ -2,4 +2,5 @@
 #
 # 该原型*不应该*加载成功
 
-level: CONTEXT # 仅支持静态等级
+level:
+  base: CONTEXT # 仅支持静态等级

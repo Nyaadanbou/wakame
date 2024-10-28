@@ -2,7 +2,8 @@ base: stone_sword[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> Shoot!"
 rarity: mapping:demo_1
-level: 2
+level:
+  base: 2
 lore:
   - "<rainbow>评价为g22"
 food:

@@ -2,7 +2,8 @@ base: stick[!attribute_modifiers,!tool]
 slot: vanilla:mainhand
 item_name: "<rarity:style><rarity:name> 射雷"
 rarity: mapping:demo_1
-level: 23
+level:
+  base: 23
 castable: { }
 lore:
   - "<blue>雷了"
