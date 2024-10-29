@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.wakame.damage.EvaluableDamageMetadata
+import cc.mewcraft.wakame.damage.MolangDamageMetadataSerializable
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.skill.*
 import cc.mewcraft.wakame.skill.context.SkillContext
@@ -23,7 +23,7 @@ interface Lightning : Skill {
 
     val targetType: TargetType
 
-    val damageMetadata: EvaluableDamageMetadata
+    val damageMetadata: MolangDamageMetadataSerializable
 
     /**
      * 雷击允许的目标类型.
@@ -48,7 +48,7 @@ interface Lightning : Skill {
     companion object Factory : SkillFactory<Lightning> {
         override fun create(key: Key, config: ConfigurationNode): Lightning {
             val targetType = config.node("target_type").get<TargetType>() ?: TargetType.ALL
-            val damageMetadata = config.node("damage_metadata").krequire<EvaluableDamageMetadata>()
+            val damageMetadata = config.node("damage_metadata").krequire<MolangDamageMetadataSerializable>()
             return Impl(key, config, targetType, damageMetadata)
         }
     }
@@ -57,7 +57,7 @@ interface Lightning : Skill {
         override val key: Key,
         config: ConfigurationNode,
         override val targetType: TargetType,
-        override val damageMetadata: EvaluableDamageMetadata,
+        override val damageMetadata: MolangDamageMetadataSerializable,
     ) : Lightning, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
@@ -95,7 +95,7 @@ private class LightningTick(
         val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity as? LivingEntity
         for (entity in entitiesBeStruck) {
             if (entity is LivingEntity) {
-                entity.hurt(skill.damageMetadata.evaluate(engine), caster, false)
+                entity.hurt(skill.damageMetadata.decode(engine), caster, false)
             }
         }
         return TickResult.ALL_DONE

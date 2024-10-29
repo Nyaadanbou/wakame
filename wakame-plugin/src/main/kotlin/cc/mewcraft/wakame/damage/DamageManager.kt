@@ -122,8 +122,8 @@ object DamageManager : KoinComponent {
             }
             // 来源实体是非玩家生物
             is LivingEntity -> {
-                val damageInfo = EntityAttackMappings.find(event.damageSource)?.damageInfo
-                if (damageInfo == null) {
+                val mapping = EntityAttackMappings.find(event.damageSource)
+                if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
                     logger.warn("The vanilla entity damage from ${damageSource.causingEntity?.type} to ${event.entity.type} by ${damageSource.directEntity?.type} is not config!")
@@ -141,23 +141,7 @@ object DamageManager : KoinComponent {
                     )
                 } else {
                     // 配置文件指定了该情景下生物的伤害映射
-                    return EntityDamageMetadata(
-                        damageBundle = damageBundle {
-                            single(damageInfo.element) {
-                                min(damageInfo.min)
-                                max(damageInfo.max)
-                                rate(1.0)
-                                defensePenetration(damageInfo.defensePenetration)
-                                defensePenetrationRate(damageInfo.defensePenetrationRate)
-                            }
-                        },
-                        criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
-                            chance = damageInfo.criticalStrikeChance,
-                            positivePower = damageInfo.criticalStrikePower,
-                            negativePower = 1.0,
-                            nonePower = 1.0
-                        )
-                    )
+                    return mapping.generateDamageMetadata(event)
                 }
             }
             // 不可能发生

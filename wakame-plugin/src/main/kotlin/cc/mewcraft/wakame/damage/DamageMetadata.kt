@@ -95,12 +95,16 @@ object PlayerDamageMetadata {
 }
 
 object EntityDamageMetadata {
-    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata): DamageMetadata {
+    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata, damageTags: DamageTags): DamageMetadata {
         return DamageMetadata(
-            damageTags = DamageTags(),
+            damageTags = damageTags,
             damageBundle = damageBundle,
             criticalStrikeMetadata = criticalStrikeMetadata
         )
+    }
+
+    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata): DamageMetadata {
+        return invoke(damageBundle, criticalStrikeMetadata, DamageTags())
     }
 }
 //</editor-fold>

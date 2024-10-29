@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
-import cc.mewcraft.wakame.damage.DAMAGE_EXTERNAL
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
 import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.initializer.Initializable
@@ -25,7 +24,13 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
+import org.spongepowered.configurate.objectmapping.ObjectMapper
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import org.spongepowered.configurate.util.NamingSchemes
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 const val CRATE_PROTO_CONFIG_DIR = "crates"
@@ -114,13 +119,20 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
+            registerAnnotatedObjects(
+                ObjectMapper.factoryBuilder()
+                    .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
+                    .addNodeResolver(NodeResolver.nodeKey())
+                    .addConstraint(Required::class.java, Constraint.required())
+                    .addDiscoverer(dataClassFieldDiscoverer())
+                    .build()
+            )
             register(MaterialSerializer)
             register(PotionEffectTypeSerializer)
             register(SkillSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
             registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
-            registerAll(get(named(DAMAGE_EXTERNAL)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
             registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
