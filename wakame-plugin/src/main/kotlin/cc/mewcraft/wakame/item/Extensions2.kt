@@ -1,8 +1,25 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.registry.RarityRegistry
+
+var NekoStack.level: Int
+    get() = components.get(ItemComponentTypes.LEVEL)?.level ?: 1
+    set(value) {
+        require(value > 0) { "Level must be positive" }
+        val boxedValue = ItemLevel(value)
+        components.set(ItemComponentTypes.LEVEL, boxedValue)
+    }
+
+var NekoStack.rarity: Rarity
+    get() = components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
+    set(value) {
+        val boxedValue = ItemRarity(value)
+        components.set(ItemComponentTypes.RARITY, boxedValue)
+    }
 
 fun NekoStack.getCell(id: String): Cell? {
     return components.get(ItemComponentTypes.CELLS)?.get(id)
