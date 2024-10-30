@@ -1,0 +1,19 @@
+# 基础花费
+base: 100.0
+
+# 物品损耗
+damage:
+  type: add_value
+  value: "1.0 * value"
+
+# 物品稀有度
+rarity:
+  type: add_value
+  value: "1.0 * value"
+  mapping:
+    common: 0.0
+    uncommon: 1.0
+    rare: 2.0
+    epic: 3.0
+    legendary: 4.0
+    ancient: 5.0

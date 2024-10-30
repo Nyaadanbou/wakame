@@ -1,5 +1,5 @@
 base: 10.0
 
-level:
+damage:
   type: add_value
   value: "1.0 * value"

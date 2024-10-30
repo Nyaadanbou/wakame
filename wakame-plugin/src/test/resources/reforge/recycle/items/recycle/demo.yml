@@ -9,13 +9,13 @@ level:
   # - add_value
   # - add_multiplied_base
   # - add_multiplied_total
-  type: "add_value"
+  type: add_value
   # Molang 表达式
   value: "1.0 * value"
 
 # 物品稀有度
 rarity:
-  type: "add_value"
+  type: add_value
   value: "1.0 * value"
   mapping:
     common: 0.0
@@ -27,15 +27,15 @@ rarity:
 
 # 合并惩罚
 merge_penalty:
-  type: "add_value"
+  type: add_value
   value: "1.0 * value"
 
 # 定制惩罚
 mod_penalty:
-  type: "add_value"
+  type: add_value
   value: "1.0 * value"
 
 # 重造惩罚
 reroll_penalty:
-  type: "add_value"
+  type: add_value
   value: "1.0 * value"

@@ -1,0 +1,5 @@
+enabled: true
+title: "回收台: example_b"
+items:
+  - minecraft:golden_sword
+  - minecraft:wooden_sword

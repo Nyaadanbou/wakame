@@ -1,4 +1,4 @@
 enabled: true
 title: "回收台: example_a"
 items:
-  - recycle:demo
+  - repair:demo
