@@ -47,7 +47,12 @@ object DamageManager : KoinComponent {
         // 不存在直接实体
         // 自然伤害(溺水、岩浆)
         // 使用伤害类型映射, 根据伤害类型调整伤害
-        if (directEntity == null) {
+        //
+        // 2024.10.30
+        // 加入非Living的TNT和末影水晶(爆炸伤害)
+        // 旨在这俩的伤害无论来源实体存在与否, 都作为自然伤害处理
+        // 毕竟通常来说爆炸的伤害和是谁引发的爆炸没有关系
+        if (directEntity == null || directEntity is TNTPrimed || directEntity is EnderCrystal) {
             val mapping = DamageTypeMappings.get(damageSource.damageType)
             return VanillaDamageMetadata(mapping.element, event.damage, mapping.defensePenetration, mapping.defensePenetrationRate)
         }
@@ -126,7 +131,7 @@ object DamageManager : KoinComponent {
                 if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
-                    logger.warn("The vanilla entity damage from ${damageSource.causingEntity?.type} to ${event.entity.type} by ${damageSource.directEntity?.type} is not config!")
+                    logger.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config!")
                     return EntityDamageMetadata(
                         damageBundle = damageBundle {
                             default {
