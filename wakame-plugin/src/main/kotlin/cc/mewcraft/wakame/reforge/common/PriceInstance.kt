@@ -8,26 +8,52 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMap
 import java.util.EnumMap
 import java.util.stream.Stream
+import kotlin.random.Random
 
 /**
  * 一个价格计算器, 设计上类似“属性实例”.
  */
 class PriceInstance(
-    baseValue: Double,
-    modifiers: Map<String, PriceModifier>,
+    minimumBaseValue: Double,
+    maximumBaseValue: Double,
+    priceModifiers: Map<String, PriceModifier>,
 ) : Examinable {
-    private val baseValue = baseValue.coerceAtLeast(.0)
+
+    constructor(
+        baseValue: Double,
+        priceModifiers: Map<String, PriceModifier>,
+    ) : this(baseValue, baseValue, priceModifiers)
+
+    companion object Shared {
+        private val ZERO_RANDOM = Random(0)
+    }
+
+    private val minimumBaseValue = minimumBaseValue.coerceAtLeast(.0)
+    private val maximumBaseValue = maximumBaseValue.coerceAtLeast(.0)
     private val priceModifiersById: Object2ObjectOpenHashMap<String, PriceModifier> = Object2ObjectOpenHashMap()
     private val priceModifiersByOp: EnumMap<PriceModifier.Operation, Object2ObjectOpenHashMap<String, PriceModifier>> = enumMap()
 
     init {
-        modifiers.forEach { (name, modifier) ->
+        priceModifiers.forEach { (name, modifier) ->
             priceModifiersById[name] = modifier
             priceModifiersByOp.computeIfAbsent(modifier.operation) { Object2ObjectOpenHashMap() }[name] = modifier
         }
     }
 
-    fun getValue(item: ItemStack): Double {
+    fun getMinimumValue(item: ItemStack, random: Random = ZERO_RANDOM): Double {
+        return getValue(item, minimumBaseValue)
+    }
+
+    fun getMaximumValue(item: ItemStack, random: Random): Double {
+        return getValue(item, maximumBaseValue)
+    }
+
+    // 当 minimumBaseValue 和 maximumBaseValue 相同时, 可以直接用这个函数
+    fun getValue(item: ItemStack, random: Random): Double {
+        return getValue(item, minimumBaseValue + random.nextDouble() * (maximumBaseValue - minimumBaseValue))
+    }
+
+    private fun getValue(item: ItemStack, baseValue: Double): Double {
         var x: Double = baseValue
         getModifiersOrEmpty(PriceModifier.Operation.ADD_VALUE).forEach { x += it.value.evaluate(item) }
         var y: Double = x
@@ -42,7 +68,7 @@ class PriceInstance(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("baseValue", baseValue),
+            ExaminableProperty.of("baseValue", minimumBaseValue),
         )
     }
 
