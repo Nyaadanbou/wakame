@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMap
 import java.util.EnumMap
 import java.util.stream.Stream
-import kotlin.random.Random
 
 /**
  * 一个价格计算器, 设计上类似“属性实例”.
@@ -24,10 +23,6 @@ class PriceInstance(
         priceModifiers: Map<String, PriceModifier>,
     ) : this(baseValue, baseValue, priceModifiers)
 
-    companion object Shared {
-        private val ZERO_RANDOM = Random(0)
-    }
-
     private val minimumBaseValue = minimumBaseValue.coerceAtLeast(.0)
     private val maximumBaseValue = maximumBaseValue.coerceAtLeast(.0)
     private val priceModifiersById: Object2ObjectOpenHashMap<String, PriceModifier> = Object2ObjectOpenHashMap()
@@ -40,17 +35,12 @@ class PriceInstance(
         }
     }
 
-    fun getMinimumValue(item: ItemStack, random: Random = ZERO_RANDOM): Double {
+    fun getMinimumValue(item: ItemStack): Double {
         return getValue(item, minimumBaseValue)
     }
 
-    fun getMaximumValue(item: ItemStack, random: Random): Double {
+    fun getMaximumValue(item: ItemStack): Double {
         return getValue(item, maximumBaseValue)
-    }
-
-    // 当 minimumBaseValue 和 maximumBaseValue 相同时, 可以直接用这个函数
-    fun getValue(item: ItemStack, random: Random): Double {
-        return getValue(item, minimumBaseValue + random.nextDouble() * (maximumBaseValue - minimumBaseValue))
     }
 
     private fun getValue(item: ItemStack, baseValue: Double): Double {
