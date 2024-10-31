@@ -58,7 +58,8 @@ class PriceInstance(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("baseValue", minimumBaseValue),
+            ExaminableProperty.of("minimumBaseValue", minimumBaseValue),
+            ExaminableProperty.of("maximumBaseValue", maximumBaseValue),
         )
     }
 

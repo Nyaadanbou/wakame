@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.adventure.translator.MessageContacts
 import cc.mewcraft.wakame.command.*
 import cc.mewcraft.wakame.command.parser.*
+import cc.mewcraft.wakame.gui.blacksmith.BlacksmithMenu
 import cc.mewcraft.wakame.gui.merge.MergingMenu
 import cc.mewcraft.wakame.gui.mod.ModdingMenu
-import cc.mewcraft.wakame.gui.recycle.RecyclingMenu
 import cc.mewcraft.wakame.gui.reroll.RerollingMenu
+import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
-import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.util.coroutine.BukkitMain
 import kotlinx.coroutines.Dispatchers
@@ -46,18 +46,18 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                 permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_BLACKSMITH))
                 literal(REFORGE_LITERAL)
                 literal("blacksmith")
-                required("station", RecyclingStationParser.recyclingStationParser())
+                required("station", BlacksmithStationParser.blacksmithStationParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 suspendingHandler(context = Dispatchers.BukkitMain) { ctx ->
                     val sender = ctx.sender()
-                    val table = ctx.get<RecyclingStation>("station")
+                    val table = ctx.get<BlacksmithStation>("station")
                     val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
                     val viewer = player?.single() ?: (sender as? Player) ?: run {
                         sender.sendPlainMessage("Player not found!")
                         return@suspendingHandler
                     }
 
-                    val blacksmithMenu = RecyclingMenu(table, viewer)
+                    val blacksmithMenu = BlacksmithMenu(table, viewer)
                     sender.sendPlainMessage("Opening blacksmith menu ...")
                     blacksmithMenu.open()
                 }

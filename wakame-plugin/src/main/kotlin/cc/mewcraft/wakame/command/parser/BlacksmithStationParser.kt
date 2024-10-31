@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
-import cc.mewcraft.wakame.reforge.recycle.WtfRecyclingStation
+import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
+import cc.mewcraft.wakame.reforge.blacksmith.WtfBlacksmithStation
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -11,38 +11,38 @@ import org.incendo.cloud.exception.parsing.ParserException
 import org.incendo.cloud.parser.*
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
-class RecyclingStationParser<C : Any> : ArgumentParser<C, RecyclingStation>, BlockingSuggestionProvider.Strings<C> {
+class BlacksmithStationParser<C : Any> : ArgumentParser<C, BlacksmithStation>, BlockingSuggestionProvider.Strings<C> {
     companion object Factory {
-        fun <C : Any> recyclingStationParser(): ParserDescriptor<C, RecyclingStation> {
-            return ParserDescriptor.of(RecyclingStationParser(), typeTokenOf<RecyclingStation>())
+        fun <C : Any> blacksmithStationParser(): ParserDescriptor<C, BlacksmithStation> {
+            return ParserDescriptor.of(BlacksmithStationParser(), typeTokenOf<BlacksmithStation>())
         }
 
-        fun <C : Any> recyclingStationComponent(): CommandComponent.Builder<C, RecyclingStation> {
-            return CommandComponent.builder<C, RecyclingStation?>().parser(RecyclingStationParser())
+        fun <C : Any> blacksmithStationComponent(): CommandComponent.Builder<C, BlacksmithStation> {
+            return CommandComponent.builder<C, BlacksmithStation?>().parser(BlacksmithStationParser())
         }
     }
 
-    override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<RecyclingStation> {
+    override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<BlacksmithStation> {
         // val peekStr = commandInput.peekString()
-        // if (peekStr !in RecyclingStationRegistry.NAMES) {
-        //     return ArgumentParseResult.failure(RecyclingStationParseException(commandContext))
+        // if (peekStr !in BlacksmithStationRegistry.NAMES) {
+        //     return ArgumentParseResult.failure(BlacksmithStationParseException(commandContext))
         // }
         //
         // val readStr = commandInput.readString()
-        // return ArgumentParseResult.success(RecyclingStationRegistry[readStr]!!)
-        // TODO recycling
+        // return ArgumentParseResult.success(BlacksmithStationRegistry[readStr]!!)
+        // TODO #227 从 BlacksmithStationRegistry 读取 BlacksmithStation 实例
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(WtfRecyclingStation)
+        return ArgumentParseResult.success(WtfBlacksmithStation)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        // return RecyclingStationRegistry.NAMES
-        // TODO recycling
+        // return BlacksmithStationRegistry.NAMES
+        // TODO #227 从 BlacksmithStationRegistry 读取所有的 BlacksmithStation id
         return listOf("wtf")
     }
 }
 
-class RecyclingStationParseException(
+class BlacksmithStationParseException(
     context: CommandContext<*>,
 ) : ParserException(
     ModdingTableParser::class.java,
