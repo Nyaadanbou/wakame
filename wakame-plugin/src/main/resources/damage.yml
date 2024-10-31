@@ -961,65 +961,101 @@ entity_attack_mappings:
 # 当弹射物没有来源实体, 或伤害只与类型有关时使用
 projectile_type_mappings:
   arrow:
-    element: neutral
-    value: 1.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 1.0
+        max: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   trident:
-    element: neutral
-    value: 8.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 8.0
+        max: 8.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   egg:
-    element: neutral
-    value: 0.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 0.0
+        max: 0.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   ender_pearl:
-    element: neutral
-    value: 0.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 0.0
+        max: 0.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   fireball:
-    element: fire
-    value: 6.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      fire:
+        min: 6.0
+        max: 6.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   llama_spit:
-    element: neutral
-    value: 1.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 1.0
+        max: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   shulker_bullet:
-    element: neutral
-    value: 4.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 4.0
+        max: 4.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   small_fireball:
-    element: fire
-    value: 5.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      fire:
+        min: 5.0
+        max: 5.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   snowball:
-    element: neutral
-    value: 0.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 0.0
+        max: 0.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   wind_charge:
-    element: wind
-    value: 1.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      wind:
+        min: 1.0
+        max: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   breeze_wind_charge:
-    element: wind
-    value: 1.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      wind:
+        min: 1.0
+        max: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
   wither_skull:
-    element: neutral
-    value: 8.0
-    defense_penetration: 0.0
-    defense_penetration_rate: 0.0
+    damage_bundle:
+      neutral:
+        min: 8.0
+        max: 8.0
+    critical_strike_metadata:
+      chance: 0.0
+    damage_tags: []
 
 # TODO 潮涌核心
 
@@ -1027,8 +1063,8 @@ projectile_type_mappings:
 
 # TODO 烟花火箭(玩家、村民、发射器)
 
-# 玩家可造成间接魔法伤害, 爆炸伤害
+# TODO 玩家可造成间接魔法伤害, 爆炸伤害
 
-# 玩家喂鹦鹉曲奇, 只会造成1伤害
+# TODO 玩家喂鹦鹉曲奇, 只会造成1伤害
 
-# 玩家反弹恶魂火球
+# TODO 玩家反弹恶魂火球

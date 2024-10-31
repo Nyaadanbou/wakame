@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.damage.DirectDamageMetadataSerializable
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -21,11 +19,14 @@ import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.serialize.TypeSerializer
+import org.spongepowered.configurate.objectmapping.ObjectMapper
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
-import java.lang.reflect.Type
 
 /**
  * 记录弹射物类型映射到萌芽伤害的逻辑.
@@ -35,19 +36,10 @@ import java.lang.reflect.Type
 )
 object ProjectileTypeMappings : Initializable, KoinComponent {
 
-    private val DEFAULT_MAPPING: ProjectileTypeMapping by ReloadableProperty {
-        ProjectileTypeMapping(
-            element = ElementRegistry.DEFAULT,
-            value = 1.0,
-            defensePenetration = 0.0,
-            defensePenetrationRate = 0.0,
-        )
-    }
+    private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, DirectDamageMetadataSerializable> = Reference2ObjectOpenHashMap()
 
-    private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, ProjectileTypeMapping> = Reference2ObjectOpenHashMap()
-
-    fun get(entityType: EntityType): ProjectileTypeMapping {
-        return MAPPINGS[entityType] ?: DEFAULT_MAPPING
+    fun find(entityType: EntityType): DirectDamageMetadataSerializable? {
+        return MAPPINGS[entityType]
     }
 
     override fun onPostWorld(): Unit = loadConfig()
@@ -60,8 +52,15 @@ object ProjectileTypeMappings : Initializable, KoinComponent {
             withDefaults()
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
             serializers {
+                registerAnnotatedObjects(
+                    ObjectMapper.factoryBuilder()
+                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
+                        .addNodeResolver(NodeResolver.nodeKey())
+                        .addConstraint(Required::class.java, Constraint.required())
+                        .addDiscoverer(dataClassFieldDiscoverer())
+                        .build()
+                )
                 kregister(ElementSerializer)
-                kregister(ProjectileTypeMappingSerializer)
             }
         }.build().load()
 
@@ -76,8 +75,8 @@ object ProjectileTypeMappings : Initializable, KoinComponent {
                     logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
-                val mapping = node.get<ProjectileTypeMapping>() ?: run {
-                    logger.warn("Malformed projectile type mapping at: ${node.path()}. Please correct your config.")
+                val mapping = node.get<DirectDamageMetadataSerializable>() ?: run {
+                    logger.warn("Malformed damage metadata at: ${node.path()}. Please correct your config.")
                     return@forEach
                 }
                 MAPPINGS[entityType] = mapping
@@ -85,25 +84,4 @@ object ProjectileTypeMappings : Initializable, KoinComponent {
     }
 
     private val logger: Logger by inject()
-}
-
-data class ProjectileTypeMapping(
-    val element: Element,
-    val value: Double,
-    val defensePenetration: Double,
-    val defensePenetrationRate: Double,
-)
-
-internal object ProjectileTypeMappingSerializer : TypeSerializer<ProjectileTypeMapping> {
-    override fun deserialize(type: Type, node: ConfigurationNode): ProjectileTypeMapping {
-        val element = node.node("element").krequire<Element>()
-        val value = node.node("value").krequire<Double>()
-        val defensePenetration = node.node("defense_penetration").getDouble(0.0)
-        val defensePenetrationRate = node.node("defense_penetration_rate").getDouble(0.0)
-        return ProjectileTypeMapping(element, value, defensePenetration, defensePenetrationRate)
-    }
-
-    override fun serialize(type: Type, obj: ProjectileTypeMapping?, node: ConfigurationNode) {
-        throw UnsupportedOperationException()
-    }
 }

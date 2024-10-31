@@ -188,8 +188,7 @@ object DamageManager : KoinComponent {
                 return VanillaDamageMetadata(damageBundle)
             }
         }
-        val mapping = ProjectileTypeMappings.get(projectile.type)
-        return VanillaDamageMetadata(mapping.element, mapping.value, mapping.defensePenetration, mapping.defensePenetrationRate)
+        return ProjectileTypeMappings.find(projectile.type)?.decode() ?: VanillaDamageMetadata(1.0)
     }
 
     private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {
