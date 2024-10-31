@@ -11,15 +11,16 @@ import team.unnamed.mocha.runtime.compiled.Named
 
 @ConfigSerializable
 data class DamagePriceModifier(
+    @Transient
+    override val name: String = NAME,
+    @Required
     override val expression: String,
+    @Required
     override val operation: PriceModifier.Operation,
 ) : PriceModifier {
     companion object Shared {
         const val NAME = "damage"
     }
-
-    override val name: String
-        get() = NAME
 
     private val mocha = MochaEngine.createStandard()
     private val function = mocha.compileFunc<DamageFunction>(expression)
@@ -37,15 +38,16 @@ data class DamagePriceModifier(
 
 @ConfigSerializable
 data class LevelPriceModifier(
+    @Transient
+    override val name: String = NAME,
+    @Required
     override val expression: String,
+    @Required
     override val operation: PriceModifier.Operation,
 ) : PriceModifier {
     companion object Shared {
         const val NAME = "value"
     }
-
-    override val name: String
-        get() = NAME
 
     private val mocha = MochaEngine.createStandard()
     private val function = mocha.compileFunc<LevelFunction>(expression)
@@ -63,6 +65,8 @@ data class LevelPriceModifier(
 
 @ConfigSerializable
 data class RarityPriceModifier(
+    @Transient
+    override val name: String = NAME,
     @Required
     override val expression: String,
     @Required
@@ -73,9 +77,6 @@ data class RarityPriceModifier(
     companion object Shared {
         const val NAME = "rarity"
     }
-
-    override val name: String
-        get() = NAME
 
     private val mocha = MochaEngine.createStandard()
     private val function = mocha.compileFunc<RarityFunction>(expression)
@@ -94,10 +95,11 @@ data class RarityPriceModifier(
 
 @ConfigSerializable
 data class MergingPenaltyPriceModifier(
+    @Required
     override val expression: String,
+    @Required
     override val operation: PriceModifier.Operation,
-
-    ) : PriceModifier {
+) : PriceModifier {
     companion object Shared {
         const val NAME = "merge_penalty"
     }
@@ -117,7 +119,9 @@ data class MergingPenaltyPriceModifier(
 
 @ConfigSerializable
 data class ModdingPenaltyPriceModifier(
+    @Required
     override val expression: String,
+    @Required
     override val operation: PriceModifier.Operation,
 ) : PriceModifier {
     companion object Shared {
@@ -139,7 +143,9 @@ data class ModdingPenaltyPriceModifier(
 
 @ConfigSerializable
 data class RerollingPenaltyPriceModifier(
+    @Required
     override val expression: String,
+    @Required
     override val operation: PriceModifier.Operation,
 ) : PriceModifier {
     companion object Shared {
