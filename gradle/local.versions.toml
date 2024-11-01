@@ -5,10 +5,12 @@ koin = "4.0.0"
 ignite = "1.1.0"
 mixin = "0.8.6"
 mixin-extras = "0.3.6"
-paper = "1.21.1-R0.1-SNAPSHOT"
 commons = "1.17"
 shadow-nbt = "1.21.1-SNAPSHOT"
+paper = "1.21.1-R0.1-SNAPSHOT"
+helper = "6.0.0"
 adventurelevel = "1.4.0"
+mythicmobs = "5.8.0-SNAPSHOT"
 
 [libraries]
 
@@ -31,17 +33,16 @@ koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines"
 koin-test = { group = "io.insert-koin", name = "koin-test" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
 
-# Standalone Paper/Velocity plugins
-
-helper = { group = "me.lucko", name = "helper", version = "6.0.0" }
-mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version = "5.8.0-SNAPSHOT" }
-
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "commons" }
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
+
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
+mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
