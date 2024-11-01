@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
 import cc.mewcraft.wakame.compatibility.mythicmobs.condition.*
-import cc.mewcraft.wakame.compatibility.mythicmobs.drop.NekoDrop
+import cc.mewcraft.wakame.compatibility.mythicmobs.drop.NekoItemDrop
 import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.*
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.IDrop
@@ -37,7 +37,7 @@ class MythicMobsListener : Listener {
     @EventHandler
     private fun on(e: MythicDropLoadEvent) {
         when (e.dropName.lowercase()) {
-            "nekodrop" -> e.registerDrop(::NekoDrop)
+            "nekodrop" -> e.registerDrop(::NekoItemDrop)
         }
     }
 
