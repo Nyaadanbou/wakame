@@ -8,11 +8,20 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.components.HideTooltip
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.components.cells.VirtualCore
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
@@ -86,6 +95,20 @@ class CustomNekoStackTest : KoinTest {
         serialization { arrowTemplate ->
             assertNotNull(arrowTemplate)
             assertEquals(3, arrowTemplate.pierceLevel)
+        }
+
+        result {
+            assertTrue(it.isEmpty())
+        }
+    }
+
+    @Test
+    fun `component - attack`() = componentLifecycleTest(
+        "attack", ItemTemplateTypes.ATTACK, ItemComponentTypes.EMPTY,
+    ) {
+        serialization {
+            assertNotNull(it)
+            assertIs<SwordAttack>(it.attackType)
         }
 
         result {
@@ -443,20 +466,6 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertFalse(it.showInTooltip)
             assertEquals(0xffffff, it.rgb)
-        }
-    }
-
-    @Test
-    fun `component - attack`() = componentLifecycleTest(
-        "attack", ItemTemplateTypes.ATTACK, ItemComponentTypes.EMPTY,
-    ) {
-        serialization {
-            assertNotNull(it)
-            assertIs<SwordAttack>(it.attackType)
-        }
-
-        result {
-            assertTrue(it.isEmpty())
         }
     }
 

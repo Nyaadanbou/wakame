@@ -8,6 +8,7 @@ import io.papermc.paper.registry.RegistryKey
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.EntityType
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -47,6 +48,17 @@ internal object EntityTypeSerializer : ScalarSerializer<EntityType>(typeTokenOf(
     }
 
     override fun serialize(item: EntityType, typeSupported: Predicate<Class<*>>?): Any {
+        return item.key.value()
+    }
+}
+
+internal object DamageTypeSerializer : ScalarSerializer<DamageType>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): DamageType {
+        val key = NamespacedKey.minecraft(obj.toString())
+        return RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE).get(key) ?: throw SerializationException(type, "Can't find damage type with key '$key'")
+    }
+
+    override fun serialize(item: DamageType, typeSupported: Predicate<Class<*>>?): Any {
         return item.key.value()
     }
 }

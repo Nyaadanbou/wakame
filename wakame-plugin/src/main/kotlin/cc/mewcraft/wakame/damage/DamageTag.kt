@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.damage
 /**
  * 伤害标签集.
  * 可能包含0个或多个伤害标签.
- * 目前仅玩家造成的伤害会有标签.
  */
 class DamageTags(
     vararg tags: DamageTag,
@@ -13,7 +12,7 @@ class DamageTags(
     companion object {
         private val EMPTY = DamageTags()
 
-        fun empty(): DamageTags = EMPTY
+        fun empty(): DamageTags = EMPTY // FIXME 应该不可变, 但实际可变
     }
 
     init {

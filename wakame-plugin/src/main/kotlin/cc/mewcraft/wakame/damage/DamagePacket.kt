@@ -45,7 +45,7 @@ data class DamagePacket(
      * 伤害的护甲穿透率.
      */
     val defensePenetrationRate: Double,
-) : Examinable {
+) {
 
     /**
      * 伤害值在最大值与最小值之间的随机结果.
@@ -59,33 +59,33 @@ data class DamagePacket(
      *
      * [packetDamage] 的伤害值是捆绑包中所有包伤害的总和.
      */
-    val packetDamage: Double = value
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("element", element.uniqueId),
-        ExaminableProperty.of("min", min),
-        ExaminableProperty.of("max", max),
-        ExaminableProperty.of("rate", rate),
-        ExaminableProperty.of("defense_penetration", defensePenetration),
-        ExaminableProperty.of("defense_penetration_rate", defensePenetrationRate),
-        ExaminableProperty.of("value", value),
-    )
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    val packetDamage: Double
+        get() = value
 }
 
 /**
  * 伤害捆绑包, 封装了一个或多个 [DamagePacket].
  */
-class DamageBundle : Examinable, KoinComponent {
-    private val packets = Reference2ObjectArrayMap<Element, DamagePacket>()
+class DamageBundle(
+    packets: Map<Element, DamagePacket>,
+) : Examinable, KoinComponent {
+    constructor() : this(emptyMap())
+
+    private val packets = Reference2ObjectArrayMap(packets)
 
     /**
      * 该捆绑包的总伤害值.
      */
-    val damageSum: Double = packets.values.sumOf { it.packetDamage }
+    fun total(): Double {
+        return packets.values.sumOf { it.packetDamage }
+    }
+
+    /**
+     * 该捆绑包的总伤害值.
+     */
+    @Deprecated("Use 'total' instead", ReplaceWith("total()"))
+    val damageSum: Double
+        get() = total()
 
     /**
      * 向伤害捆绑包中添加元素伤害包, 将覆盖已有的元素伤害包.

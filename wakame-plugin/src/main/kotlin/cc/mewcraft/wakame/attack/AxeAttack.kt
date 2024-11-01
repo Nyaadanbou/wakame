@@ -30,7 +30,7 @@ class AxeAttack : AttackType {
         }
 
         return PlayerDamageMetadata(
-            damager = player,
+            user = user,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.AXE),
             damageBundle = damageBundle(player.toUser().attributeMap) { every { standard() } }
         )

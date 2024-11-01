@@ -47,7 +47,12 @@ object DamageManager : KoinComponent {
         // 不存在直接实体
         // 自然伤害(溺水、岩浆)
         // 使用伤害类型映射, 根据伤害类型调整伤害
-        if (directEntity == null) {
+        //
+        // 2024.10.30
+        // 加入非Living的TNT和末影水晶(爆炸伤害)
+        // 旨在这俩的伤害无论来源实体存在与否, 都作为自然伤害处理
+        // 毕竟通常来说爆炸的伤害和是谁引发的爆炸没有关系
+        if (directEntity == null || directEntity is TNTPrimed || directEntity is EnderCrystal) {
             val mapping = DamageTypeMappings.get(damageSource.damageType)
             return VanillaDamageMetadata(mapping.element, event.damage, mapping.defensePenetration, mapping.defensePenetrationRate)
         }
@@ -86,7 +91,7 @@ object DamageManager : KoinComponent {
                             return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
                         } else {
                             // 手中的物品无 Attack 行为甚至不是 NekoStack
-                            return PlayerDamageMetadata.default(causingEntity)
+                            return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
                         }
                     }
 
@@ -96,7 +101,7 @@ object DamageManager : KoinComponent {
                         if (attack?.attackType is SwordAttack) {
                             val attributeMap = causingEntity.toUser().attributeMap
                             return PlayerDamageMetadata(
-                                damager = causingEntity,
+                                user = causingEntity.toUser(),
                                 damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
                                 damageBundle = damageBundle(attributeMap) {
                                     every {
@@ -122,13 +127,12 @@ object DamageManager : KoinComponent {
             }
             // 来源实体是非玩家生物
             is LivingEntity -> {
-                val damageInfo = EntityAttackMappings.find(event.damageSource)?.damageInfo
-                if (damageInfo == null) {
+                val mapping = EntityAttackMappings.find(event.damageSource)
+                if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
-                    logger.warn("The vanilla entity damage from ${damageSource.causingEntity?.type} to ${event.entity.type} by ${damageSource.directEntity?.type} is not config!")
+                    logger.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config!")
                     return EntityDamageMetadata(
-                        damager = causingEntity,
                         damageBundle = damageBundle {
                             default {
                                 min(event.damage)
@@ -142,23 +146,7 @@ object DamageManager : KoinComponent {
                     )
                 } else {
                     // 配置文件指定了该情景下生物的伤害映射
-                    return EntityDamageMetadata(
-                        damager = causingEntity,
-                        damageBundle = damageBundle {
-                            single(damageInfo.element) {
-                                min(damageInfo.min)
-                                max(damageInfo.max)
-                                rate(1.0)
-                                defensePenetration(damageInfo.defensePenetration)
-                                defensePenetrationRate(damageInfo.defensePenetrationRate)
-                            }
-                        },
-                        criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
-                            chance = damageInfo.criticalStrikeChance,
-                            positivePower = damageInfo.criticalStrikePower,
-                            negativePower = 1.0
-                        )
-                    )
+                    return mapping.generateDamageMetadata(event)
                 }
             }
             // 不可能发生
@@ -188,7 +176,7 @@ object DamageManager : KoinComponent {
      * 使用弹射物类型映射, 根据弹射物类型获取伤害元数据
      * 箭矢特殊处理, 计算词条栏伤害
      */
-    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): VanillaDamageMetadata {
+    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): DamageMetadata {
         if (projectile is Arrow) {
             val damageBundle = buildArrowDamageBundleByCells(projectile)
             if (damageBundle != null) {
@@ -200,11 +188,10 @@ object DamageManager : KoinComponent {
                 return VanillaDamageMetadata(damageBundle)
             }
         }
-        val mapping = ProjectileTypeMappings.get(projectile.type)
-        return VanillaDamageMetadata(mapping.element, mapping.value, mapping.defensePenetration, mapping.defensePenetrationRate)
+        return ProjectileTypeMappings.find(projectile.type)?.decode() ?: VanillaDamageMetadata(1.0)
     }
 
-    private fun warnAndDefaultReturn(event: EntityDamageEvent): VanillaDamageMetadata {
+    private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {
         val damageSource = event.damageSource
         logger.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
         return VanillaDamageMetadata(event.damage)
@@ -253,7 +240,7 @@ object DamageManager : KoinComponent {
                 putProjectileDamageMetadata(
                     projectile.uniqueId,
                     PlayerDamageMetadata(
-                        damager = shooter,
+                        user = shooter.toUser(),
                         damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT),
                         damageBundle = damageBundle(shooter.toUser().attributeMap) { every { standard() } }
                     )
@@ -337,7 +324,7 @@ object DamageManager : KoinComponent {
         putProjectileDamageMetadata(
             projectile.uniqueId,
             PlayerDamageMetadata(
-                damager = entity,
+                user = entity.toUser(),
                 damageTags = damageTags,
                 damageBundle = damageBundle
             )

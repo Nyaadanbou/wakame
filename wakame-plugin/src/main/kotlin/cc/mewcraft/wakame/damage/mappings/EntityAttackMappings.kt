@@ -3,7 +3,9 @@
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
 import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
+import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
@@ -20,16 +22,28 @@ import org.bukkit.NamespacedKey
 import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
+import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.ObjectMapper
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
+import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @ReloadDependency(
     runBefore = [ElementRegistry::class]
@@ -46,7 +60,7 @@ object EntityAttackMappings : Initializable, KoinComponent {
         val causingEntity = damageSource.causingEntity ?: return null
         val entityAttackMappings = MAPPINGS[causingEntity.type] ?: return null
         for (entityAttackMapping in entityAttackMappings) {
-            if (entityAttackMapping.check(damageSource)) return entityAttackMapping
+            if (entityAttackMapping.match(damageSource)) return entityAttackMapping
         }
         return null
     }
@@ -61,9 +75,17 @@ object EntityAttackMappings : Initializable, KoinComponent {
             withDefaults()
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
             serializers {
+                registerAnnotatedObjects(
+                    ObjectMapper.factoryBuilder()
+                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
+                        .addNodeResolver(NodeResolver.nodeKey())
+                        .addConstraint(Required::class.java, Constraint.required())
+                        .addDiscoverer(dataClassFieldDiscoverer())
+                        .build()
+                )
                 kregister(ElementSerializer)
-                kregister(DamageInfoSerializer)
                 kregister(EntityTypeSerializer)
+                kregister(DamageTypeSerializer)
                 kregister(EntityAttackMappingSerializer)
             }
         }.build().load()
@@ -93,149 +115,181 @@ object EntityAttackMappings : Initializable, KoinComponent {
 }
 
 /**
- * ## Node structure
- * ```yaml
- * damage:
- *   element: <string>
- *   min: <double>
- *   max: <double>
- *   defense_penetration: <double>
- *   defense_penetration_rate: <double>
- *   critical_strike_chance: <double>
- *   critical_strike_power: <double>
- * ```
- */
-data class DamageInfo(
-    val element: Element,
-    val min: Double,
-    val max: Double,
-    val defensePenetration: Double,
-    val defensePenetrationRate: Double,
-    val criticalStrikeChance: Double,
-    val criticalStrikePower: Double,
-)
-
-internal object DamageInfoSerializer : TypeSerializer<DamageInfo> {
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageInfo {
-        val element = node.node("element").krequire<Element>()
-        val min = node.node("min").krequire<Double>()
-        val max = node.node("max").krequire<Double>()
-        val defensePenetration = node.node("defense_penetration").getDouble(0.0)
-        val defensePenetrationRate = node.node("defense_penetration_rate").getDouble(0.0)
-        val criticalStrikeChance = node.node("critical_strike_chance").getDouble(0.0)
-        val criticalStrikePower = node.node("critical_strike_power").getDouble(1.0)
-        return DamageInfo(
-            element = element,
-            min = min,
-            max = max,
-            defensePenetration = defensePenetration,
-            defensePenetrationRate = defensePenetrationRate,
-            criticalStrikeChance = criticalStrikeChance,
-            criticalStrikePower = criticalStrikePower
-        )
-    }
-
-    override fun serialize(type: Type, obj: DamageInfo?, node: ConfigurationNode) {
-        throw UnsupportedOperationException()
-    }
-
-}
-
-/**
  * 原版生物特定攻击类型的映射.
+ *
  * 例如: 近战攻击, 弹射物攻击, 近战攻击(按尺寸)等.
  */
 sealed interface EntityAttackMapping {
-    val damageInfo: DamageInfo
+    /**
+     * 检查传入的 [damageSource] 是否与此映射相匹配.
+     */
+    fun match(damageSource: DamageSource): Boolean
 
     /**
-     * 检查某次原版伤害是否符合此映射
+     * 从传入的 [event] 生成一个反映了此映射的 [DamageMetadata] 实例.
      */
-    fun check(damageSource: DamageSource): Boolean
+    fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata
 }
 
 /**
+ * 非玩家生物的近战攻击.
+ *
  * ## Node structure
  * ```yaml
- * <node>:
- *   type: melee
- *   damage: <DamageInfo>
+ * melee: <DirectDamageMetadataSerializable>
  * ```
  */
+@ConfigSerializable
 data class MeleeAttackMapping(
-    override val damageInfo: DamageInfo,
+    @Setting(nodeFromParent = true)
+    @Required
+    val damageMetadata: DirectDamageMetadataSerializable,
 ) : EntityAttackMapping {
-    companion object {
-        const val TYPE_NAME = "melee"
-    }
-
-    override fun check(damageSource: DamageSource): Boolean {
+    override fun match(damageSource: DamageSource): Boolean {
         val damageType = damageSource.damageType
         if (damageType != DamageType.MOB_ATTACK && damageType != DamageType.MOB_ATTACK_NO_AGGRO) return false
         val directEntity = damageSource.directEntity ?: return false
         val causingEntity = damageSource.causingEntity ?: return false
         return directEntity == causingEntity
     }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        return damageMetadata.decode()
+    }
 }
 
 /**
+ * 非玩家生物的近战攻击(区分幼年形态)
+ *
  * ## Node structure
  * ```yaml
- * <node>:
- *   type: melee_age
- *   baby: <boolean>
- *   damage: <DamageInfo>
+ * melee_age:
+ *   adult: <DirectDamageMetadataSerializable>
+ *   baby: <DirectDamageMetadataSerializable>
  * ```
  */
+@ConfigSerializable
 data class AgeMeleeAttackMapping(
-    override val damageInfo: DamageInfo,
-    val isBaby: Boolean,
+    @Setting("adult")
+    @Required
+    val adultDamageMetadata: DirectDamageMetadataSerializable,
+    @Setting("baby")
+    @Required
+    val babyDamageMetadata: DirectDamageMetadataSerializable,
 ) : EntityAttackMapping {
-    companion object {
-        const val TYPE_NAME = "melee_age"
-    }
-
-    override fun check(damageSource: DamageSource): Boolean {
+    override fun match(damageSource: DamageSource): Boolean {
         val damageType = damageSource.damageType
         if (damageType != DamageType.MOB_ATTACK && damageType != DamageType.MOB_ATTACK_NO_AGGRO) return false
         val directEntity = damageSource.directEntity ?: return false
         val causingEntity = damageSource.causingEntity ?: return false
         if (directEntity != causingEntity) return false
-        if (causingEntity is Ageable) {
-            if (causingEntity.isAdult == !isBaby) return true
+        return causingEntity is Ageable
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        val causingEntity = event.damageSource.causingEntity
+        val ageable = causingEntity as? Ageable ?: throw IllegalArgumentException("'${causingEntity?.type}' is not an ageable entity.")
+        return if (ageable.isAdult) {
+            adultDamageMetadata.decode()
+        } else {
+            babyDamageMetadata.decode()
         }
-        return false
     }
 }
 
 /**
+ * 非玩家生物的近战攻击(区分史莱姆尺寸)
+ *
  * ## Node structure
  * ```yaml
- * <node>:
- *   type: melee_size
- *   size: <int>
- *   damage: <DamageInfo>
+ * melee_size: <Map<Int, DirectDamageMetadataSerializable>>
  * ```
  */
+@ConfigSerializable
 data class SizeMeleeAttackMapping(
-    override val damageInfo: DamageInfo,
-    val size: Int,
-) : EntityAttackMapping {
-    companion object {
-        const val TYPE_NAME = "melee_size"
-    }
+    @Setting(nodeFromParent = true)
+    @Required
+    val damageMetadata: Map<Int, DirectDamageMetadataSerializable>,
+) : EntityAttackMapping, KoinComponent {
+    private val logger: Logger by inject()
 
-    override fun check(damageSource: DamageSource): Boolean {
+    override fun match(damageSource: DamageSource): Boolean {
         val damageType = damageSource.damageType
         if (damageType != DamageType.MOB_ATTACK && damageType != DamageType.MOB_ATTACK_NO_AGGRO) return false
         val directEntity = damageSource.directEntity ?: return false
         val causingEntity = damageSource.causingEntity ?: return false
         if (directEntity != causingEntity) return false
         // MagmaCube 在 Bukkit API 下是实现了 Slime 的
-        if (causingEntity is Slime) {
-            if (causingEntity.size == size) return true
+        return causingEntity is Slime
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        val causingEntity = event.damageSource.causingEntity
+        val slime = causingEntity as? Slime ?: throw IllegalArgumentException("'${causingEntity?.type}' is not a slime.")
+        return damageMetadata[slime.size]?.decode() ?: warnAndDefault(slime.size, event.damage, causingEntity)
+    }
+
+    private fun warnAndDefault(size: Int, damage: Double, causeEntity: Entity): DamageMetadata {
+        logger.warn("The '$size' size '${causeEntity.type}' entity is not config!")
+        return EntityDamageMetadata(
+            damageBundle = damageBundle {
+                default {
+                    min(damage)
+                    max(damage)
+                    rate(1.0)
+                    defensePenetration(0.0)
+                    defensePenetrationRate(0.0)
+                }
+            },
+            criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+        )
+    }
+}
+
+/**
+ * 非玩家生物的近战攻击(区分河豚状态)
+ *
+ * ## Node structure
+ * ```yaml
+ * melee_puff:
+ *   fully_puffed: <DirectDamageMetadataSerializable>
+ *   semi_puffed: <DirectDamageMetadataSerializable>
+ * ```
+ */
+@ConfigSerializable
+data class PuffStateMeleeAttackMapping(
+    @Setting("fully_puffed")
+    @Required
+    val fullDamageMetadata: DirectDamageMetadataSerializable,
+    @Setting("semi_puffed")
+    @Required
+    val semiDamageMetadata: DirectDamageMetadataSerializable,
+) : EntityAttackMapping {
+    override fun match(damageSource: DamageSource): Boolean {
+        val damageType = damageSource.damageType
+        if (damageType != DamageType.MOB_ATTACK && damageType != DamageType.MOB_ATTACK_NO_AGGRO) return false
+        val directEntity = damageSource.directEntity ?: return false
+        val causingEntity = damageSource.causingEntity ?: return false
+        if (directEntity != causingEntity) return false
+        return causingEntity is PufferFish
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        val causingEntity = event.damageSource.causingEntity
+        val pufferFish = causingEntity as? PufferFish ?: throw IllegalArgumentException("'${causingEntity?.type}' is not a puffer fish.")
+        return when (pufferFish.puffState) {
+            1 -> {
+                semiDamageMetadata.decode()
+            }
+
+            2 -> {
+                fullDamageMetadata.decode()
+            }
+
+            else -> {
+                throw IllegalArgumentException("Why can a puffer fish cause damage in state '${pufferFish.puffState}'?")
+            }
         }
-        return false
     }
 }
 
@@ -244,61 +298,195 @@ data class SizeMeleeAttackMapping(
  *
  * ## Node structure
  * ```yaml
- * <node>:
- *   type: projectile
- *   projectile: <EntityType>
- *   damage: <DamageInfo>
+ * projectile:
+ *   projectile_type: <EntityType>
+ *   (node from parent): <DirectDamageMetadataSerializable>
  * ```
  */
+@ConfigSerializable
 data class ProjectileAttackMapping(
-    override val damageInfo: DamageInfo,
+    @Required
     val projectileType: EntityType,
+    @Setting(nodeFromParent = true)
+    @Required
+    val damageMetadata: DirectDamageMetadataSerializable,
 ) : EntityAttackMapping {
-    companion object {
-        const val TYPE_NAME = "projectile"
-    }
-
-    override fun check(damageSource: DamageSource): Boolean {
+    override fun match(damageSource: DamageSource): Boolean {
         if (damageSource.causingEntity !is LivingEntity) return false
         val directEntity = damageSource.directEntity
-        if (directEntity is Projectile) {
-            if (directEntity.type == projectileType) return true
-        }
-        return false
+        if (directEntity !is Projectile) return false
+        return directEntity.type == projectileType
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        return damageMetadata.decode()
     }
 }
 
+/**
+ * 非玩家生物的弹射物爆炸攻击.
+ *
+ * ## Node structure
+ * ```yaml
+ * projectile_explode:
+ *   projectile_type: <EntityType>
+ *   element: <String>
+ *   defense_penetration: <Double>
+ *   defense_penetration_rate: <Double>
+ *   critical_strike_metadata: <DirectCriticalStrikeMetadataSerializable>
+ *   (node from parent): <DirectDamageTagsSerializable>
+ * ```
+ */
+@ConfigSerializable
+data class ProjectileExplodeAttackMapping(
+    @Required
+    val projectileType: EntityType,
+    @Required
+    val element: Element,
+    val defensePenetration: Double = 0.0,
+    val defensePenetrationRate: Double = 0.0,
+    @Required
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
+    @Required
+    @Setting(nodeFromParent = true)
+    val damageTags: DirectDamageTagsSerializable,
+) : EntityAttackMapping {
+    override fun match(damageSource: DamageSource): Boolean {
+        val damageType = damageSource.damageType
+        if (damageType != DamageType.EXPLOSION && damageType != DamageType.PLAYER_EXPLOSION) return false
+        if (damageSource.causingEntity !is LivingEntity) return false
+        val directEntity = damageSource.directEntity
+        if (directEntity !is Projectile) return false
+        return directEntity.type == projectileType
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        return EntityDamageMetadata(
+            damageBundle = damageBundle {
+                single(element) {
+                    min(event.damage)
+                    max(event.damage)
+                    rate(1.0)
+                    defensePenetration(defensePenetration)
+                    defensePenetrationRate(defensePenetrationRate)
+                }
+            },
+            criticalStrikeMetadata = criticalStrikeMetadata.decode(),
+            damageTags = damageTags.decode()
+        )
+    }
+}
+
+/**
+ * 自身爆炸攻击.
+ *
+ * ## Node structure
+ * ```yaml
+ * self_explode:
+ *   element: <String>
+ *   defense_penetration: <Double>
+ *   defense_penetration_rate: <Double>
+ *   critical_strike_metadata: <DirectCriticalStrikeMetadataSerializable>
+ *   (node from parent): <DirectDamageTagsSerializable>
+ * ```
+ */
+@ConfigSerializable
+data class SelfExplodeAttackMapping(
+    @Required
+    val element: Element,
+    val defensePenetration: Double = 1.0,
+    val defensePenetrationRate: Double = 1.0,
+    @Required
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
+    @Required
+    @Setting(nodeFromParent = true)
+    val damageTags: DirectDamageTagsSerializable,
+) : EntityAttackMapping {
+    override fun match(damageSource: DamageSource): Boolean {
+        val damageType = damageSource.damageType
+        if (damageType != DamageType.EXPLOSION && damageType != DamageType.PLAYER_EXPLOSION) return false
+        val directEntity = damageSource.directEntity ?: return false
+        val causingEntity = damageSource.causingEntity ?: return false
+        return directEntity == causingEntity
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        return EntityDamageMetadata(
+            damageBundle = damageBundle {
+                single(element) {
+                    min(event.damage)
+                    max(event.damage)
+                    rate(1.0)
+                    defensePenetration(defensePenetration)
+                    defensePenetrationRate(defensePenetrationRate)
+                }
+            },
+            criticalStrikeMetadata = criticalStrikeMetadata.decode(),
+            damageTags = damageTags.decode()
+        )
+    }
+}
+
+/**
+ * 根据伤害类型的攻击.
+ * 可用于守卫者尖刺和激光, 唤魔者尖牙, 监守者音爆等.
+ *
+ * ## Node structure
+ * ```yaml
+ * special_type: <Map<DamageType, DirectDamageMetadataSerializable>>
+ * ```
+ */
+@ConfigSerializable
+data class SpecialDamageTypeAttackMapping(
+    @Setting(nodeFromParent = true) @Required
+    val damageMetadata: Map<DamageType, DirectDamageMetadataSerializable>,
+) : EntityAttackMapping, KoinComponent {
+    private val logger: Logger by inject()
+
+    override fun match(damageSource: DamageSource): Boolean {
+        return damageMetadata.keys.contains(damageSource.damageType)
+    }
+
+    override fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata {
+        val causingEntity = event.damageSource.causingEntity ?: throw IllegalArgumentException("Entity shouldn't be null")
+        val damageType = event.damageSource.damageType
+        return damageMetadata[damageType]?.decode() ?: warnAndDefault(damageType, event.damage, causingEntity)
+    }
+
+    private fun warnAndDefault(damageType: DamageType, damage: Double, causeEntity: Entity): DamageMetadata {
+        logger.warn("The damage with '$damageType' type by '${causeEntity.type}' entity is not config!")
+        return EntityDamageMetadata(
+            damageBundle = damageBundle {
+                default {
+                    min(damage)
+                    max(damage)
+                    rate(1.0)
+                    defensePenetration(0.0)
+                    defensePenetrationRate(0.0)
+                }
+            },
+            criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+        )
+    }
+
+}
+
 internal object EntityAttackMappingSerializer : TypeSerializer<EntityAttackMapping> {
+    private val TYPE_MAPPING: Map<String, KType> = mapOf(
+        "melee" to typeOf<MeleeAttackMapping>(),
+        "melee_age" to typeOf<AgeMeleeAttackMapping>(),
+        "melee_size" to typeOf<SizeMeleeAttackMapping>(),
+        "melee_puff" to typeOf<PuffStateMeleeAttackMapping>(),
+        "projectile" to typeOf<ProjectileAttackMapping>(),
+        "projectile_explode" to typeOf<ProjectileExplodeAttackMapping>(),
+        "self_explode" to typeOf<SelfExplodeAttackMapping>(),
+        "special_type" to typeOf<SpecialDamageTypeAttackMapping>(),
+    )
+
     override fun deserialize(type: Type, node: ConfigurationNode): EntityAttackMapping {
-        val typeName = node.node("type").krequire<String>()
-        when (typeName) {
-            MeleeAttackMapping.TYPE_NAME -> {
-                val damageInfo = node.node("damage").krequire<DamageInfo>()
-                return MeleeAttackMapping(damageInfo)
-            }
-
-            AgeMeleeAttackMapping.TYPE_NAME -> {
-                val damageInfo = node.node("damage").krequire<DamageInfo>()
-                val isBaby = node.node("baby").krequire<Boolean>()
-                return AgeMeleeAttackMapping(damageInfo, isBaby)
-            }
-
-            SizeMeleeAttackMapping.TYPE_NAME -> {
-                val damageInfo = node.node("damage").krequire<DamageInfo>()
-                val size = node.node("size").krequire<Int>()
-                return SizeMeleeAttackMapping(damageInfo, size)
-            }
-
-            ProjectileAttackMapping.TYPE_NAME -> {
-                val damageInfo = node.node("damage").krequire<DamageInfo>()
-                val projectileType = node.node("projectile").krequire<EntityType>()
-                return ProjectileAttackMapping(damageInfo, projectileType)
-            }
-
-            else -> {
-                throw SerializationException("Unknown EntityAttackMapping type")
-            }
-        }
+        val key = node.key().toString()
+        val kType = TYPE_MAPPING[key] ?: throw SerializationException("Unknown type: '$key'")
+        return node.krequire(kType)
     }
 
     override fun serialize(type: Type, obj: EntityAttackMapping?, node: ConfigurationNode) {

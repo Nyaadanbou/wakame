@@ -17,38 +17,40 @@ data class CriticalStrikeMetadata(
      */
     val state: CriticalStrikeState,
 ) {
-    companion object {
+    companion object Constants {
         /**
          * 默认的暴击元数据.
          * 用于不会暴击的攻击.
          */
+        @JvmField
         val DEFAULT: CriticalStrikeMetadata = CriticalStrikeMetadata(1.0, CriticalStrikeState.NONE)
-
-        /**
-         * 通过属性计算和随机得到暴击元数据.
-         */
-        fun byCalculate(chance: Double, positivePower: Double, negativePower: Double): CriticalStrikeMetadata {
-            val power: Double
-            val state: CriticalStrikeState
-            if (chance < 0) {
-                power = negativePower
-                state = if (Random.nextDouble() < chance.absoluteValue) {
-                    CriticalStrikeState.NEGATIVE
-                } else {
-                    CriticalStrikeState.NONE
-                }
-            } else {
-                power = positivePower
-                state = if (Random.nextDouble() < chance) {
-                    CriticalStrikeState.POSITIVE
-                } else {
-                    CriticalStrikeState.NONE
-                }
-            }
-            return CriticalStrikeMetadata(power, state)
-        }
-
     }
+}
+
+/**
+ * 通过属性计算和随机得到暴击元数据.
+ */
+fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
+    val power: Double
+    val state: CriticalStrikeState
+    if (chance < 0) {
+        if (Random.nextDouble() < chance.absoluteValue) {
+            state = CriticalStrikeState.NEGATIVE
+            power = negativePower
+        } else {
+            state = CriticalStrikeState.NONE
+            power = nonePower
+        }
+    } else {
+        if (Random.nextDouble() < chance) {
+            state = CriticalStrikeState.POSITIVE
+            power = positivePower
+        } else {
+            state = CriticalStrikeState.NONE
+            power = nonePower
+        }
+    }
+    return CriticalStrikeMetadata(power, state)
 }
 
 /**

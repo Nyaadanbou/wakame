@@ -47,7 +47,7 @@ class HammerAttack : AttackType {
         val attributeMap = user.attributeMap
         // 锤子直接命中的生物的伤害元数据
         val directDamageMetadata = PlayerDamageMetadata(
-            damager = player,
+            user = user,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER),
             damageBundle = damageBundle(attributeMap) {
                 every { standard() }
@@ -56,7 +56,7 @@ class HammerAttack : AttackType {
         val ratio = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RATIO)
         // 锤子范围命中的生物的伤害元数据
         val extraDamageMetadata = PlayerDamageMetadata(
-            damager = player,
+            user = user,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER, DamageTag.EXTRA),
             damageBundle = damageBundle(attributeMap) {
                 every {

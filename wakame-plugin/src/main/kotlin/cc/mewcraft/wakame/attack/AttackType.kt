@@ -28,7 +28,7 @@ sealed interface AttackType {
      * 默认返回造成 1 点默认元素伤害的伤害元数据.
      */
     fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
-        return PlayerDamageMetadata.default(player)
+        return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
     }
 
     /**
@@ -61,10 +61,6 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
 
             HammerAttack.NAME -> {
                 HammerAttack()
-            }
-
-            MaceAttack.NAME -> {
-                MaceAttack()
             }
 
             SpearAttack.NAME -> {
