@@ -203,101 +203,92 @@ damage_type_mappings:
 entity_attack_mappings:
   axolotl:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          water:
-            min: 3.0
-            max: 3.0
-            rate: 1.0
-            defense_penetration: 0.0
-            defense_penetration_rate: 0.0
-        critical_strike_metadata:
-          chance: 0.0
-          positive_power: 1.0
-          negative_power: 1.0
-          none_power: 1.0
+      damage_tags: [ ]
+      damage_bundle:
+        water:
+          min: 3.0
+          max: 3.0
+          rate: 1.0
+          defense_penetration: 0.0
+          defense_penetration_rate: 0.0
+      critical_strike_metadata:
+        chance: 0.0
+        positive_power: 1.0
+        negative_power: 1.0
+        none_power: 1.0
   bee:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   blaze:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          fire:
-            min: 9.0
-            max: 9.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        fire:
+          min: 9.0
+          max: 9.0
+      critical_strike_metadata:
+        chance: 0.0
     projectile:
       projectile_type: small_fireball
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          fire:
-            min: 5.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        fire:
+          min: 5.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   bogged:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
     projectile:
       projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   breeze:
     projectile:
       projectile_type: breeze_wind_charge
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          wind:
-            min: 1.5
-            max: 1.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        wind:
+          min: 1.5
+          max: 1.5
+      critical_strike_metadata:
+        chance: 0.0
   cat:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   cave_spider:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   creeper:
     self_explode:
       damage_tags: [ ]
@@ -308,124 +299,114 @@ entity_attack_mappings:
         chance: 0.0
   dolphin:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 4.5
-            max: 4.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 4.5
+          max: 4.5
+      critical_strike_metadata:
+        chance: 0.0
   drowned:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          water:
-            min: 4.5
-            max: 4.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        water:
+          min: 4.5
+          max: 4.5
+      critical_strike_metadata:
+        chance: 0.0
     projectile:
       projectile_type: trident
-      damage_metadata:
+      damage_tags: [ ]
+      damage_bundle:
+        water:
+          min: 12
+          max: 12
+      critical_strike_metadata:
+        chance: 0.0
+  elder_guardian:
+    special_type:
+      indirect_magic:
         damage_tags: [ ]
         damage_bundle:
           water:
-            min: 12
-            max: 12
+            min: 12.0
+            max: 12.0
         critical_strike_metadata:
           chance: 0.0
-  elder_guardian:
-    special_type:
-      damage_metadata:
-        indirect_magic:
-          damage_tags: [ ]
-          damage_bundle:
-            water:
-              min: 12.0
-              max: 12.0
-          critical_strike_metadata:
-            chance: 0.0
-        thorns:
-          damage_tags: [ ]
-          damage_bundle:
-            water:
-              min: 3.0
-              max: 3.0
-          critical_strike_metadata:
-            chance: 0.0
+      thorns:
+        damage_tags: [ ]
+        damage_bundle:
+          water:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
   # 末影龙数据与原版有些不一致
   ender_dragon:
     special_type:
-      damage_metadata:
-        mob_attack:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 7.0
-              max: 15.0
-          critical_strike_metadata:
-            chance: 0.0
-        indirect_magic:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 3.0
-              max: 6.0
-          critical_strike_metadata:
-            chance: 0.0
+      mob_attack:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 7.0
+            max: 15.0
+        critical_strike_metadata:
+          chance: 0.0
+      indirect_magic:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
   enderman:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 10.5
-            max: 10.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 10.5
+          max: 10.5
+      critical_strike_metadata:
+        chance: 0.0
   endermite:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   evoker:
     special_type:
-      damage_metadata:
-        indirect_magic:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 9
-              max: 9
-          critical_strike_metadata:
-            chance: 0.0
+      indirect_magic:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 9
+            max: 9
+        critical_strike_metadata:
+          chance: 0.0
   fox:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   frog:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 10.0
-            max: 10.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 10.0
+          max: 10.0
+      critical_strike_metadata:
+        chance: 0.0
   ghast:
     projectile_explode:
       projectile_type: fireball
@@ -437,27 +418,25 @@ entity_attack_mappings:
         chance: 0.0
     projectile:
       projectile_type: fireball
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          fire:
-            min: 9.0
-            max: 9.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        fire:
+          min: 9.0
+          max: 9.0
+      critical_strike_metadata:
+        chance: 0.0
   giant:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 75.0
-            max: 75.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 75.0
+          max: 75.0
+      critical_strike_metadata:
+        chance: 0.0
   goat:
     melee_age:
-      damage_metadata:
+      adult:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -465,7 +444,7 @@ entity_attack_mappings:
             max: 3.0
         critical_strike_metadata:
           chance: 0.0
-      baby_damage_metadata:
+      baby:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -475,26 +454,25 @@ entity_attack_mappings:
           chance: 0.0
   guardian:
     special_type:
-      damage_metadata:
-        indirect_magic:
-          damage_tags: [ ]
-          damage_bundle:
-            water:
-              min: 9.0
-              max: 9.0
-          critical_strike_metadata:
-            chance: 0.0
-        thorns:
-          damage_tags: [ ]
-          damage_bundle:
-            water:
-              min: 3.0
-              max: 3.0
-          critical_strike_metadata:
-            chance: 0.0
+      indirect_magic:
+        damage_tags: [ ]
+        damage_bundle:
+          water:
+            min: 9.0
+            max: 9.0
+        critical_strike_metadata:
+          chance: 0.0
+      thorns:
+        damage_tags: [ ]
+        damage_bundle:
+          water:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
   hoglin:
     melee_age:
-      damage_metadata:
+      adult:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -502,7 +480,7 @@ entity_attack_mappings:
             max: 12.0
         critical_strike_metadata:
           chance: 0.0
-      baby_damage_metadata:
+      baby:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -512,157 +490,144 @@ entity_attack_mappings:
           chance: 0.0
   husk:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 4.5
-            max: 4.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 4.5
+          max: 4.5
+      critical_strike_metadata:
+        chance: 0.0
   illusioner:
     projectile:
       projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   iron_golem:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 11.25
-            max: 32.25
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 11.25
+          max: 32.25
+      critical_strike_metadata:
+        chance: 0.0
   llama:
     projectile:
       projectile_type: llama_spit
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 1.5
-            max: 1.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 1.5
+          max: 1.5
+      critical_strike_metadata:
+        chance: 0.0
   magma_cube:
     melee_size:
-      damage_metadata:
-        1:
-          damage_tags: [ ]
-          damage_bundle:
-            fire:
-              min: 4.5
-              max: 3.0
-          critical_strike_metadata:
-            chance: 0.0
-        2:
-          damage_tags: [ ]
-          damage_bundle:
-            fire:
-              min: 6.0
-              max: 6.0
-          critical_strike_metadata:
-            chance: 0.0
-        4:
-          damage_tags: [ ]
-          damage_bundle:
-            fire:
-              min: 9.0
-              max: 9.0
-          critical_strike_metadata:
-            chance: 0.0
-  ocelot:
-    melee:
-      damage_metadata:
+      1:
         damage_tags: [ ]
         damage_bundle:
-          neutral:
-            min: 3.0
+          fire:
+            min: 4.5
             max: 3.0
         critical_strike_metadata:
           chance: 0.0
-  panda:
-    melee:
-      damage_metadata:
+      2:
         damage_tags: [ ]
         damage_bundle:
-          neutral:
+          fire:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+      4:
+        damage_tags: [ ]
+        damage_bundle:
+          fire:
             min: 9.0
             max: 9.0
         critical_strike_metadata:
           chance: 0.0
+  ocelot:
+    melee:
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
+  panda:
+    melee:
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 9.0
+          max: 9.0
+      critical_strike_metadata:
+        chance: 0.0
   phantom:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   piglin:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 7.5
-            max: 7.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 7.5
+          max: 7.5
+      critical_strike_metadata:
+        chance: 0.0
     projectile:
       projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   piglin_brute:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 19.5
-            max: 19.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 19.5
+          max: 19.5
+      critical_strike_metadata:
+        chance: 0.0
   pillager:
     projectile:
       projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 5.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 5.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   polar_bear:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 9.0
-            max: 9.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 9.0
+          max: 9.0
+      critical_strike_metadata:
+        chance: 0.0
   pufferfish:
     melee_puff:
-      full_damage_metadata:
+      fully_puffed:
         damage_tags: [ ]
         damage_bundle:
           water:
@@ -670,7 +635,7 @@ entity_attack_mappings:
             max: 4.5
         critical_strike_metadata:
           chance: 0.0
-      middle_damage_metadata:
+      semi_puffed:
         damage_tags: [ ]
         damage_bundle:
           water:
@@ -680,29 +645,71 @@ entity_attack_mappings:
           chance: 0.0
   rabbit:
     melee:
-      damage_metadata:
-        damage_bundle:
-          neutral:
-            min: 12.0
-            max: 12.0
-        critical_strike_metadata:
-          chance: 0.0
-        damage_tags: [ ]
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 12.0
+          max: 12.0
+      critical_strike_metadata:
+        chance: 0.0
   # 劫掠兽无法区分普通近战和吼叫
   ravager:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 18.0
-            max: 18.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 18.0
+          max: 18.0
+      critical_strike_metadata:
+        chance: 0.0
   shulker:
     projectile:
       projectile_type: shulker_bullet
-      damage_metadata:
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 6.0
+          max: 6.0
+      critical_strike_metadata:
+        chance: 0.0
+  silverfish:
+    melee:
+      damage_tags: [ ]
+      damage_bundle:
+        earth:
+          min: 1.5
+          max: 1.5
+      critical_strike_metadata:
+        chance: 0.0
+  skeleton:
+    melee:
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
+    projectile:
+      projectile_type: arrow
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 4.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
+  slime:
+    melee_size:
+      2:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+      4:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -710,157 +717,99 @@ entity_attack_mappings:
             max: 6.0
         critical_strike_metadata:
           chance: 0.0
-  silverfish:
-    melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          earth:
-            min: 1.5
-            max: 1.5
-        critical_strike_metadata:
-          chance: 0.0
-  skeleton:
-    melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
-    projectile:
-      projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 4.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
-  slime:
-    melee_size:
-      damage_metadata:
-        2:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 3.0
-              max: 3.0
-          critical_strike_metadata:
-            chance: 0.0
-        4:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 6.0
-              max: 6.0
-          critical_strike_metadata:
-            chance: 0.0
   snow_golem:
     # TODO 3 to blaze
     projectile:
       projectile_type: snowball
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          water:
-            min: 0.0
-            max: 0.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        water:
+          min: 0.0
+          max: 0.0
+      critical_strike_metadata:
+        chance: 0.0
   spider:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
   stray:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 3.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
     projectile:
       projectile_type: arrow
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 3.0
-            max: 5.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 3.0
+          max: 5.0
+      critical_strike_metadata:
+        chance: 0.0
   trader_llama:
     projectile:
       projectile_type: llama_spit
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 1.5
-            max: 1.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 1.5
+          max: 1.5
+      critical_strike_metadata:
+        chance: 0.0
   vex:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 13.5
-            max: 13.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 13.5
+          max: 13.5
+      critical_strike_metadata:
+        chance: 0.0
   vindicator:
     melee:
-      damage_metadata:
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 19.5
+          max: 19.5
+      critical_strike_metadata:
+        chance: 0.0
+  warden:
+    special_type:
+      mob_attack:
         damage_tags: [ ]
         damage_bundle:
           neutral:
-            min: 19.5
-            max: 19.5
+            min: 45.0
+            max: 45.0
         critical_strike_metadata:
           chance: 0.0
-  warden:
-    special_type:
-      damage_metadata:
-        mob_attack:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 45.0
-              max: 45.0
-          critical_strike_metadata:
-            chance: 0.0
-        sonic_boom:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 15.0
-              max: 15.0
-          critical_strike_metadata:
-            chance: 0.0
+      sonic_boom:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 15.0
+            max: 15.0
+        critical_strike_metadata:
+          chance: 0.0
   witch:
     special_type:
-      damage_metadata:
-        indirect_magic:
-          damage_tags: [ ]
-          damage_bundle:
-            neutral:
-              min: 6.0
-              max: 6.0
-          critical_strike_metadata:
+      indirect_magic:
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
             chance: 0.0
   wither:
     projectile_explode:
@@ -873,14 +822,13 @@ entity_attack_mappings:
         chance: 0.0
     projectile:
       projectile_type: wither_skull
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 12.0
-            max: 12.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 12.0
+          max: 12.0
+      critical_strike_metadata:
+        chance: 0.0
     self_explode:
       damage_tags: [ ]
       element: fire
@@ -890,27 +838,25 @@ entity_attack_mappings:
         chance: 0.0
   wither_skeleton:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 12.0
-            max: 12.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 12.0
+          max: 12.0
+      critical_strike_metadata:
+        chance: 0.0
   wolf:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 6.0
-            max: 6.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 6.0
+          max: 6.0
+      critical_strike_metadata:
+        chance: 0.0
   zoglin:
     melee_age:
-      damage_metadata:
+      adult:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -918,7 +864,7 @@ entity_attack_mappings:
             max: 12.0
         critical_strike_metadata:
           chance: 0.0
-      baby_damage_metadata:
+      baby:
         damage_tags: [ ]
         damage_bundle:
           neutral:
@@ -928,34 +874,31 @@ entity_attack_mappings:
           chance: 0.0
   zombie:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 4.5
-            max: 4.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 4.5
+          max: 4.5
+      critical_strike_metadata:
+        chance: 0.0
   zombified_piglin:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 12.0
-            max: 12.0
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 12.0
+          max: 12.0
+      critical_strike_metadata:
+        chance: 0.0
   zombie_villager:
     melee:
-      damage_metadata:
-        damage_tags: [ ]
-        damage_bundle:
-          neutral:
-            min: 4.5
-            max: 4.5
-        critical_strike_metadata:
-          chance: 0.0
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 4.5
+          max: 4.5
+      critical_strike_metadata:
+        chance: 0.0
 
 # 默认弹射物伤害映射
 # 当弹射物没有来源实体, 或伤害只与类型有关时使用
