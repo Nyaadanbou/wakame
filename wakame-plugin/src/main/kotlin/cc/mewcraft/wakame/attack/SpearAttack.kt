@@ -29,6 +29,7 @@ data class SpearAttack(
 ) : AttackType {
     companion object {
         const val NAME = "spear"
+        const val MAX_HIT_AMOUNT = 100
     }
 
     override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
@@ -65,12 +66,12 @@ data class SpearAttack(
 
     private fun applyAttack(player: Player) {
         val world = player.world
-        val maxHitAmount = 100
-        val hitEntities: MutableList<LivingEntity> = mutableListOf()
+        val hitEntities = mutableListOf<LivingEntity>()
         val user = player.toUser()
         val attributeMap = user.attributeMap
         val maxDistance = attributeMap.getValue(Attributes.ENTITY_INTERACTION_RANGE)
-        for (i in 0 until maxHitAmount) {
+
+        for (i in 0 until MAX_HIT_AMOUNT) {
             val rayTraceResult = world.rayTrace(
                 player.eyeLocation,
                 player.eyeLocation.direction,
@@ -95,14 +96,13 @@ data class SpearAttack(
             }
         }
 
-        val damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
-        hitEntities.forEach {
+        hitEntities.forEach { livingEntity ->
             val playerDamageMetadata = PlayerDamageMetadata(
                 user = user,
                 damageBundle = damageBundle(attributeMap) { every { standard() } },
-                damageTags = damageTags
+                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
             )
-            it.hurt(playerDamageMetadata, player, true)
+            livingEntity.hurt(playerDamageMetadata, player, true)
         }
     }
 }
