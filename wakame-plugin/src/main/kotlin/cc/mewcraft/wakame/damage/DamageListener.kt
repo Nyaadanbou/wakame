@@ -23,8 +23,12 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun on(event: EntityDamageEvent) {
+        if (event.isCancelled) {
+            return
+        }
+
         val entity = event.entity
         if (entity !is LivingEntity) {
             return
@@ -41,8 +45,9 @@ object DamageListener : Listener, KoinComponent {
 
         // 萌芽伤害事件被取消, 则直接返回
         // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
-        if (!nekoEntityDamageEvent.callEvent())
+        if (!nekoEntityDamageEvent.callEvent()) {
             return
+        }
 
         // 修改最终伤害
         event.damage = nekoEntityDamageEvent.getFinalDamage()
