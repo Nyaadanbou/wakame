@@ -27,7 +27,7 @@ class NekoDamageMechanic(
     private val damageBundle: DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
     private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
     private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
-    private val knockback: Boolean = mlc.getBoolean("knockback", false)
+    private val knockback: Boolean = mlc.getBoolean(arrayOf("knockback", "kb"), true)
 
     private fun parseDamageBundle(origin: List<String>): DamageBundle {
         return DamageBundleFactory.instance().createUnsafe(
