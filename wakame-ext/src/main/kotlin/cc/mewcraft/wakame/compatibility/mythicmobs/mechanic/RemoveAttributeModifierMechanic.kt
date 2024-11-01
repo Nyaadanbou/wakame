@@ -1,11 +1,15 @@
-package cc.mewcraft.wakame.compatibility.mythicmobs
+package cc.mewcraft.wakame.compatibility.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.*
-import io.lumine.mythic.api.skills.placeholders.*
-import io.lumine.mythic.bukkit.utils.Schedulers
+import io.lumine.mythic.api.skills.INoTargetSkill
+import io.lumine.mythic.api.skills.ITargetedEntitySkill
+import io.lumine.mythic.api.skills.SkillMetadata
+import io.lumine.mythic.api.skills.SkillResult
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import net.kyori.adventure.key.Key
@@ -15,7 +19,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import java.io.File
 
-class AttributeModifierMechanic(
+class RemoveAttributeModifierMechanic(
     manager: SkillExecutor,
     file: File,
     line: String,
@@ -29,16 +33,12 @@ class AttributeModifierMechanic(
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")
-    private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), .0, *emptyArray())
-    private val operation: AttributeModifier.Operation = mlc.getEnum(arrayOf("operation", "op"), AttributeModifier.Operation::class.java, AttributeModifier.Operation.ADD)
-    private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *emptyArray())
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
         val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
-        val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
-        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data])
+        attributeInstance.removeModifier(Key.key(name[data]))
 
         return SkillResult.SUCCESS
     }
@@ -46,19 +46,9 @@ class AttributeModifierMechanic(
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
         val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
-        val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
-        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data])
+        attributeInstance.removeModifier(Key.key(name[data]))
 
         return SkillResult.SUCCESS
-    }
-
-    private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int) {
-        attributeInstance.addModifier(modifier)
-        if (duration > 0) {
-            Schedulers.sync().runLater({
-                attributeInstance.removeModifier(modifier)
-            }, duration.toLong())
-        }
     }
 }

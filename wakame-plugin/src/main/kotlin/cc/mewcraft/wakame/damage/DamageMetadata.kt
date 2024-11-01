@@ -7,22 +7,38 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.NodeKey
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.objectmapping.meta.*
 import team.unnamed.mocha.MochaEngine
+import kotlin.math.absoluteValue
+import kotlin.random.Random
 
-/* Implementations */
-
+//<editor-fold desc="CriticalStrikeMetadata">
 /**
- * 伤害元数据, 包含了一次伤害中"攻击阶段"的有关信息.
- * 一旦实例化后, 攻击伤害的数值以及各种信息就已经确定了.
+ * 通过属性计算和随机过程创建一个 [CriticalStrikeMetadata].
  */
-data class DamageMetadata(
-    val damageTags: DamageTags,
-    val damageBundle: DamageBundle,
-    val criticalStrikeMetadata: CriticalStrikeMetadata,
-)
+fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
+    val power: Double
+    val state: CriticalStrikeState
+    if (chance < 0) {
+        if (Random.nextDouble() < chance.absoluteValue) {
+            state = CriticalStrikeState.NEGATIVE
+            power = negativePower
+        } else {
+            state = CriticalStrikeState.NONE
+            power = nonePower
+        }
+    } else {
+        if (Random.nextDouble() < chance) {
+            state = CriticalStrikeState.POSITIVE
+            power = positivePower
+        } else {
+            state = CriticalStrikeState.NONE
+            power = nonePower
+        }
+    }
+    return CriticalStrikeMetadata(power, state)
+}
+//</editor-fold>
 
 //<editor-fold desc="DamageMetadata Constructors">
 /**
@@ -36,7 +52,7 @@ object VanillaDamageMetadata {
         return DamageMetadata(
             damageTags = DamageTags(),
             damageBundle = damageBundle,
-            criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+            criticalStrikeMetadata = CriticalStrikeMetadata.NONE
         )
     }
 
@@ -77,7 +93,7 @@ object PlayerDamageMetadata {
                 defensePenetrationRate(.0)
             }
         },
-        criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+        criticalStrikeMetadata = CriticalStrikeMetadata.NONE
     )
 
     operator fun invoke(user: User<Player>, damageBundle: DamageBundle, damageTags: DamageTags): DamageMetadata {

@@ -2,22 +2,11 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.kizami.KizamiEffect
-import cc.mewcraft.wakame.kizami.KizamiEffectSerializer
-import cc.mewcraft.wakame.kizami.KizamiInstance
-import cc.mewcraft.wakame.kizami.KizamiInstanceSerializer
-import cc.mewcraft.wakame.kizami.KizamiSerializer
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.kizami.*
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -62,10 +51,20 @@ object KizamiRegistry : KoinComponent, Initializable {
         return INSTANCES[BI_LOOKUP.getUniqueIdBy(binary)]
     }
 
-    override fun onPreWorld() = loadRegistries()
-    override fun onReload() = loadRegistries()
+    override fun onPreWorld() {
+        // 注册 KizamiProvider
+        KizamiProvider.register(DefaultKizamiProvider)
+
+        // 从配置文件加载铭刻
+        loadRegistries()
+    }
+
+    override fun onReload() {
+        loadRegistries()
+    }
 
     private val logger: Logger by inject()
+
     private fun loadRegistries() {
         INSTANCES.clear()
         BI_LOOKUP.clear()
@@ -110,5 +109,11 @@ object KizamiRegistry : KoinComponent, Initializable {
                 logger.warn("Failed to load kizami from file: '${file.relativeTo(directory)}'", e)
             }
         }
+    }
+}
+
+private object DefaultKizamiProvider : KizamiProvider {
+    override fun get(id: String): Kizami? {
+        return KizamiRegistry.INSTANCES.find(id)
     }
 }

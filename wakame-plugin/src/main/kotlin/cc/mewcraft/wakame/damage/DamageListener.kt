@@ -10,13 +10,8 @@ import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Server
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.entity.ProjectileHitEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.*
+import org.bukkit.event.entity.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -28,7 +23,9 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    // 由于 MythicMobs 的各种问题,
+    // priority 必须设置为 MONITOR.
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
         val entity = event.entity
         if (entity !is LivingEntity) {
@@ -46,8 +43,9 @@ object DamageListener : Listener, KoinComponent {
 
         // 萌芽伤害事件被取消, 则直接返回
         // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
-        if (!nekoEntityDamageEvent.callEvent())
+        if (!nekoEntityDamageEvent.callEvent()) {
             return
+        }
 
         // 修改最终伤害
         event.damage = nekoEntityDamageEvent.getFinalDamage()
@@ -66,7 +64,7 @@ object DamageListener : Listener, KoinComponent {
             text("点伤害")
         ).hoverEvent(
             damageMetadata.damageBundle.packets()
-                .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.packetDamage)) }
+                .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.damageValue())) }
                 .let { components -> join(JoinConfiguration.newlines(), components) }
                 .let { component ->
                     HoverEvent.showText(

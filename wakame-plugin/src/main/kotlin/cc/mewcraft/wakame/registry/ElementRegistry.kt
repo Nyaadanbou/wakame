@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementProvider
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
@@ -33,6 +34,10 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
     }
 
     override fun onPreWorld() {
+        // 注册 ElementProvider
+        ElementProvider.register(DefaultElementProvider)
+
+        // 从配置文件加载元素
         loadConfiguration()
     }
 
@@ -59,5 +64,11 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
             // register element bi lookup
             BI_LOOKUP.register(element.uniqueId, element.binaryId)
         }
+    }
+}
+
+private object DefaultElementProvider : ElementProvider {
+    override fun get(id: String): Element? {
+        return ElementRegistry.INSTANCES.find(id)
     }
 }

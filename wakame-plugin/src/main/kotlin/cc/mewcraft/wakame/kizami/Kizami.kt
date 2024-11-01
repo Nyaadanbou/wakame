@@ -1,33 +1,20 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.BiIdentifiable
-import cc.mewcraft.wakame.FriendlyNamed
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.toStableByte
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
-import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import java.lang.reflect.Type
 import java.util.stream.Stream
-
-/**
- * 代表一个铭刻类型.
- *
- * 使用 [KizamiRegistry] 来获得该实例.
- */
-interface Kizami : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte>
 
 /**
  * [Kizami] 的实现.
