@@ -80,7 +80,12 @@ class NekoDamageMechanic(
             damageTags, damageBundle, CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
         )
 
-        val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
+        // FIXME StackOverflow:
+        //  对 hurt 函数传入非空 source, 并且 MM 怪物存在
+        //  ~onAttack 触发的 NekoDamage 技能时,
+        //  会发生 StackOverflow.
+        // val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
+        val casterEntity = null
 
         // 对目标生物造成自定义的萌芽伤害
         DamageManagerApi.instance().hurt(entity, damageMetadata, casterEntity, knockback)
