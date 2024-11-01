@@ -25,8 +25,9 @@ class NekoDamageMechanic(
 
     private val damageTags: DamageTags = parseDamageTags(mlc.getStringList(arrayOf("tags", "t"), ""))
     private val damageBundle: DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
-    private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), .0)
+    private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
     private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
+    private val knockback: Boolean = mlc.getBoolean("knockback", false)
 
     private fun parseDamageBundle(origin: List<String>): DamageBundle {
         return DamageBundleFactory.instance().createUnsafe(
@@ -79,8 +80,10 @@ class NekoDamageMechanic(
             damageTags, damageBundle, CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
         )
 
+        val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
+
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.instance().hurt(entity, damageMetadata)
+        DamageManagerApi.instance().hurt(entity, damageMetadata, casterEntity, knockback)
 
         return SkillResult.SUCCESS
     }
