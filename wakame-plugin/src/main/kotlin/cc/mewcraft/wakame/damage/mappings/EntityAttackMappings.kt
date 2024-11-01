@@ -393,7 +393,7 @@ data class SelfExplodeAttackMapping(
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
     @Required
     @Setting(nodeFromParent = true)
-    val damageTags: DirectDamageTagsSerializable
+    val damageTags: DirectDamageTagsSerializable,
 ) : EntityAttackMapping {
     override fun check(damageSource: DamageSource): Boolean {
         val damageType = damageSource.damageType
@@ -435,7 +435,7 @@ data class SelfExplodeAttackMapping(
 @ConfigSerializable
 data class SpecialDamageTypeAttackMapping(
     @Required
-    val damageMetadata: Map<DamageType, DirectDamageMetadataSerializable>
+    val damageMetadata: Map<DamageType, DirectDamageMetadataSerializable>,
 ) : EntityAttackMapping, KoinComponent {
     private val logger: Logger by inject()
 
@@ -467,21 +467,21 @@ data class SpecialDamageTypeAttackMapping(
 
 }
 
-private val TYPE_MAPPING: Map<String, KType> = mapOf(
-    "melee" to typeOf<MeleeAttackMapping>(),
-    "melee_age" to typeOf<AgeMeleeAttackMapping>(),
-    "melee_size" to typeOf<SizeMeleeAttackMapping>(),
-    "melee_puff" to typeOf<PuffStateMeleeAttackMapping>(),
-    "projectile" to typeOf<ProjectileAttackMapping>(),
-    "projectile_explode" to typeOf<ProjectileExplodeAttackMapping>(),
-    "self_explode" to typeOf<SelfExplodeAttackMapping>(),
-    "special_type" to typeOf<SpecialDamageTypeAttackMapping>(),
-)
-
 internal object EntityAttackMappingSerializer : TypeSerializer<EntityAttackMapping> {
+    private val TYPE_MAPPING: Map<String, KType> = mapOf(
+        "melee" to typeOf<MeleeAttackMapping>(),
+        "melee_age" to typeOf<AgeMeleeAttackMapping>(),
+        "melee_size" to typeOf<SizeMeleeAttackMapping>(),
+        "melee_puff" to typeOf<PuffStateMeleeAttackMapping>(),
+        "projectile" to typeOf<ProjectileAttackMapping>(),
+        "projectile_explode" to typeOf<ProjectileExplodeAttackMapping>(),
+        "self_explode" to typeOf<SelfExplodeAttackMapping>(),
+        "special_type" to typeOf<SpecialDamageTypeAttackMapping>(),
+    )
+
     override fun deserialize(type: Type, node: ConfigurationNode): EntityAttackMapping {
         val key = node.key().toString()
-        val kType = TYPE_MAPPING[key] ?: throw SerializationException("Unknown EntityAttackMapping type: '$key'")
+        val kType = TYPE_MAPPING[key] ?: throw SerializationException("Unknown type: '$key'")
         return node.krequire(kType)
     }
 
