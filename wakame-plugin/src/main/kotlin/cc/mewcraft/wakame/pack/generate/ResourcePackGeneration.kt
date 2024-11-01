@@ -103,27 +103,30 @@ internal class ResourcePackCustomModelGeneration(
 
     override fun process() {
         val assets = context.assets
+        val resourcePack = context.resourcePack
+
         for (asset in assets) {
             val modelFiles = asset.files.takeIf { it.isNotEmpty() } ?: continue
             for ((index, modelFile) in modelFiles.withIndex()) {
                 logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
                 val customModelData = config.saveCustomModelData(asset.key, asset.variant)
-                val resourcePack = context.resourcePack
 
                 //<editor-fold desc="Custom Model generation">
                 // Original asset from config
                 val order = index + asset.variant // Order of the model
-                val modelKey = asset.modelKey(order) // Key of the model
+                val modelKey = asset.modelKey(order) // Key of the model that will be generated
                 val configModelTemplate = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), modelKey)
 
                 // Get all textures from the model
+                val parent = configModelTemplate.parent()
                 val textureLayers = configModelTemplate.textures().layers()
                 val particle = configModelTemplate.textures().particle()
                 val variables = configModelTemplate.textures().variables()
 
-                textureLayers.forEach { layer -> setResource(layer.key(), layer) }
-                particle?.let { setResource(it.key(), particle) }
-                variables.forEach { (_, value) -> setResource(value.key(), value) }
+                parent?.let { setModel(it) }
+                textureLayers.forEach { layer -> setTexture(layer.key()) }
+                particle?.let { setTexture(it.key()) }
+                variables.forEach { (_, value) -> setTexture(value.key()) }
 
                 // Get the item type key for generating the CustomModelData vanilla model
                 val itemTypeKey = asset.itemTypeKey()
@@ -175,14 +178,43 @@ internal class ResourcePackCustomModelGeneration(
         return Key("item/${itemType.name.lowercase()}")
     }
 
-    private fun setResource(originKey: Key?, model: ModelTexture?) {
-        model ?: return
-        requireNotNull(originKey) { "Origin key must not be null" }
-        val textureFile = validateAssetsPathStringOrThrow("textures/${originKey.value()}.png")
+    /**
+     * 生成一个模型并添加到资源包中.
+     *
+     * @param originModelKey 原始配置文件中模型的 Key.
+     */
+    private fun setModel(originModelKey: Key) {
+        val modelFile = validateAssetsPathString("models/${originModelKey.value()}.json")
+        if (modelFile == null) {
+            // Skip vanilla models, they are already in the vanilla resource pack
+            return
+        }
+        val model = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), originModelKey)
+        val parent = model.parent()
+        if (parent != null) {
+            setModel(parent)
+        }
+
+        val newModel = model.toBuilder()
+            .key(originModelKey.namespace { RESOURCE_NAMESPACE })
+            .build()
+
+        logger.info("Model for $originModelKey generated.")
+        context.resourcePack.model(newModel)
+    }
+
+    /**
+     * 生成一个纹理并添加到资源包中.
+     *
+     * @param originTextureKey 原始配置文件中纹理的 Key. 如果为 null, 则不会生成纹理.
+     */
+    private fun setTexture(originTextureKey: Key?) {
+        requireNotNull(originTextureKey) { "Origin key must not be null" }
+        val textureFile = validateAssetsPathStringOrThrow("textures/${originTextureKey.value()}.png")
         val textureWritable = Writable.file(textureFile)
 
         val texture = Texture.texture()
-            .key(originKey.namespace { RESOURCE_NAMESPACE }.value { "$it.png" })
+            .key(originTextureKey.namespace { RESOURCE_NAMESPACE }.value { "$it.png" })
             .data(textureWritable)
 
         val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
@@ -191,7 +223,7 @@ internal class ResourcePackCustomModelGeneration(
             texture.meta(meta)
         }
 
-        logger.info("Texture for $originKey generated.")
+        logger.info("Texture for $originTextureKey generated.")
 
         context.resourcePack.texture(texture.build())
     }
@@ -202,6 +234,11 @@ internal class ResourcePackCustomModelGeneration(
      * 如 `(minecraft:)item/iron_sword_0` 转换为 `wakame:item/iron_sword_0`
      */
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {
+        val newParent = parent()?.let {
+            val oldKey = it.key()
+            oldKey.namespace { RESOURCE_NAMESPACE }
+        }
+
         val newLayers = textures().layers().map {
             val oldKey = it.key()
             val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
@@ -221,6 +258,7 @@ internal class ResourcePackCustomModelGeneration(
         }.toMap()
 
         return toBuilder()
+            .parent(newParent)
             .textures(
                 ModelTextures.builder()
                     .layers(newLayers)
