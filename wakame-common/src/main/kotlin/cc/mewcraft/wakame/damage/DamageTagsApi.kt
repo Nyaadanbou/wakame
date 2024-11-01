@@ -1,61 +1,74 @@
 package cc.mewcraft.wakame.damage
 
+import org.jetbrains.annotations.ApiStatus
+
 /**
  * 伤害标签集.
  * 可能包含0个或多个伤害标签.
  */
-class DamageTags(
-    vararg tags: DamageTag,
-) {
-    private val tagSet: MutableSet<DamageTag> = mutableSetOf()
-
-    companion object {
-        private val EMPTY = DamageTags()
-
-        fun empty(): DamageTags = EMPTY // FIXME 应该不可变, 但实际可变
-    }
-
-    init {
-        tagSet.addAll(tags)
-    }
-
-    constructor(tags: List<DamageTag>) : this(*tags.toTypedArray())
-
+interface DamageTags {
     /**
      * 伤害标签集是否为空
      */
-    fun isEmpty(): Boolean {
-        return tagSet.isEmpty()
-    }
+    fun isEmpty(): Boolean
 
     /**
      * 向伤害标签集添加伤害标签.
      * 若伤害标签集中已存在该标签则返回 `false`
      */
-    fun add(tag: DamageTag): Boolean {
-        return tagSet.add(tag)
-    }
+    fun add(tag: DamageTag): Boolean
 
     /**
      * 从伤害标签集移除伤害标签.
      * 若伤害标签集中不存在该伤害标签则返回 `false`
      */
-    fun remove(tag: DamageTag): Boolean {
-        return tagSet.remove(tag)
-    }
+    fun remove(tag: DamageTag): Boolean
 
     /**
      * 伤害标签集是否包含特定标签.
      */
-    fun contains(tag: DamageTag): Boolean {
-        return tagSet.contains(tag)
-    }
+    fun contains(tag: DamageTag): Boolean
 
     /**
      * 列出伤害标签集中的所有标签.
      */
-    fun tags(): Set<DamageTag> {
-        return tagSet.toSet()
+    fun tags(): Set<DamageTag>
+}
+
+/**
+ * 用于创建 [DamageTags] 的实例.
+ */
+interface DamageTagsFactory {
+    /**
+     * 创建一个 [DamageTags].
+     */
+    fun create(vararg tags: DamageTag): DamageTags
+
+    /**
+     * 创建一个 [DamageTags].
+     */
+    fun create(tags: List<DamageTag>): DamageTags
+
+    /**
+     * 半生对象, 用于获取 [DamageTagsFactory] 的实例.
+     */
+    companion object Provider {
+        private var instance: DamageTagsFactory? = null
+
+        @JvmStatic
+        fun instance(): DamageTagsFactory {
+            return instance ?: throw IllegalStateException("DamageTagsFactory has not been initialized.")
+        }
+
+        @ApiStatus.Internal
+        fun register(factory: DamageTagsFactory) {
+            instance = factory
+        }
+
+        @ApiStatus.Internal
+        fun unregister() {
+            instance = null
+        }
     }
 }
 
@@ -63,6 +76,9 @@ class DamageTags(
  * 伤害标签.
  */
 enum class DamageTag {
+
+    // TODO DamageTag 改为接口, 获取实例采用 static final, 以支持数据驱动
+
     /**
      * 标记近战类型的伤害.
      */

@@ -12,9 +12,7 @@ import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -23,9 +21,7 @@ import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -33,15 +29,21 @@ import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.Constraint
-import org.spongepowered.configurate.objectmapping.meta.NodeResolver
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.objectmapping.meta.*
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 import java.lang.reflect.Type
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.forEach
+import kotlin.collections.map
+import kotlin.collections.mapKeys
+import kotlin.collections.mapOf
+import kotlin.collections.set
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -241,7 +243,7 @@ data class SizeMeleeAttackMapping(
                     defensePenetrationRate(0.0)
                 }
             },
-            criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+            criticalStrikeMetadata = CriticalStrikeMetadata.NONE
         )
     }
 }
@@ -465,7 +467,7 @@ data class SpecialDamageTypeAttackMapping(
                     defensePenetrationRate(0.0)
                 }
             },
-            criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+            criticalStrikeMetadata = CriticalStrikeMetadata.NONE
         )
     }
 

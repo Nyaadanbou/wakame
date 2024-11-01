@@ -3,33 +3,53 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
-import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
-import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
-import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.damage.mappings.*
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.toNekoStack
-import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.entity.*
+import org.bukkit.event.entity.EntityDamageEvent.*
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
-object DamageManager : KoinComponent {
-    val logger: Logger by inject()
+/**
+ * @see DamageManagerApi.hurt
+ */
+fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = null, knockback: Boolean = false) {
+    DamageManager.hurt(this, damageMetadata, source, knockback)
+}
+
+/**
+ * 包含伤害系统的主要逻辑和状态, 属于伤害系统的代码入口.
+ */
+object DamageManager : DamageManagerApi, KoinComponent {
+    private val logger: Logger = get()
+
+    /**
+     * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
+     * 当 [source] 为 `null` 时, 伤害属于无源, 即不会产生击退.
+     */
+    override fun hurt(victim: LivingEntity, damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
+        putCustomDamageMetadata(victim.uniqueId, damageMetadata)
+
+        // 如果自定义伤害有源且需要取消击退.
+        // 这里修复了: 无源伤害(即没有造成伤害的 LivingEntity)不会触发击退事件.
+        if (!knockback && source != null) {
+            markCancelKnockback(victim.uniqueId)
+        }
+
+        // 触发一下 Bukkit 的伤害事件.
+        // 伤害填多少都无所谓, 最后都是要萌芽伤害事件重新算.
+        victim.damage(4.95, source)
+    }
 
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {
         // 先检查是不是自定义伤害; 若是, 则直接返回自定义伤害信息
@@ -81,14 +101,14 @@ object DamageManager : KoinComponent {
                 }
 
                 val itemStack = causingEntity.inventory.itemInMainHand
-                val attack = itemStack.tryNekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
+                val attack = itemStack.shadowNeko(false)?.templates?.get(ItemTemplateTypes.ATTACK)
                 when (event.cause) {
                     DamageCause.ENTITY_ATTACK -> {
                         // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
                         // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
                         if (attack != null) {
                             // 玩家手中的物品是 Attack
-                            return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.toNekoStack, event)
+                            return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.projectNeko(false), event)
                         } else {
                             // 手中的物品无 Attack 行为甚至不是 NekoStack
                             return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
@@ -142,7 +162,7 @@ object DamageManager : KoinComponent {
                                 defensePenetrationRate(0.0)
                             }
                         },
-                        criticalStrikeMetadata = CriticalStrikeMetadata.DEFAULT
+                        criticalStrikeMetadata = CriticalStrikeMetadata.NONE
                     )
                 } else {
                     // 配置文件指定了该情景下生物的伤害映射
@@ -158,7 +178,7 @@ object DamageManager : KoinComponent {
 
     private fun buildArrowDamageBundleByCells(arrow: AbstractArrow): DamageBundle? {
         val itemStack = arrow.itemStack
-        val nekoStack = itemStack.tryNekoStack ?: return null
+        val nekoStack = itemStack.shadowNeko(false) ?: return null
         if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
             return null
         }
@@ -254,7 +274,6 @@ object DamageManager : KoinComponent {
         }
     }
 
-
     /**
      * 在弹射物射出时记录其 [DamageMetadata].
      * 目前只记录玩家的箭矢和三叉戟.
@@ -295,7 +314,7 @@ object DamageManager : KoinComponent {
 
 
         val itemStack = projectile.itemStack
-        val nekoStack = itemStack.tryNekoStack
+        val nekoStack = itemStack.shadowNeko(false)
         val cells = nekoStack?.components?.get(ItemComponentTypes.CELLS)
         if (nekoStack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
             val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
@@ -369,25 +388,8 @@ object DamageManager : KoinComponent {
     fun unmarkCancelKnockback(uuid: UUID): Boolean {
         return cancelKnockbackSet.remove(uuid)
     }
+
     // TODO 更通用的临时标记工具类
-}
-
-/**
- * 对该实体造成萌芽伤害.
- * [source] 为空伤害无源, 不会产生击退
- */
-fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
-    DamageManager.putCustomDamageMetadata(this.uniqueId, damageMetadata)
-
-    // 如果自定义伤害有源且需要取消击退
-    // FIXED BUG: 无源伤害(即没有造成伤害的LivingEntity)不会触发击退事件
-    if (!knockback && source != null) {
-        DamageManager.markCancelKnockback(this.uniqueId)
-    }
-
-    // 触发一下 Bukkit 的伤害事件
-    // 伤害填多少都无所谓, 最后都是要萌芽伤害事件重新算
-    this.damage(4.95, source)
 }
 
 /**
