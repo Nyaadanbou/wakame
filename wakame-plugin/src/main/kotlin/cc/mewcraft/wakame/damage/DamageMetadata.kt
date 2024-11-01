@@ -84,11 +84,11 @@ object PlayerDamageMetadata {
         return DamageMetadata(
             damageTags = damageTags,
             damageBundle = damageBundle,
-            criticalStrikeMetadata = CriticalStrikeMetadata.byCalculate(
+            criticalStrikeMetadata = CriticalStrikeMetadata(
                 chance = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
                 positivePower = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
                 negativePower = user.attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER),
-                nonePower = 1.0 //TODO 新属性 NONE_POWER
+                nonePower = 1.0 // TODO 新属性 NONE_POWER
             )
         )
     }
@@ -180,7 +180,7 @@ data class DirectDamagePacketSerializable(
     override val max: Double,
     override val rate: Double = 1.0,
     override val defensePenetration: Double = 0.0,
-    override val defensePenetrationRate: Double = 0.0
+    override val defensePenetrationRate: Double = 0.0,
 ) : DamagePacketSerializable<Double> {
     fun decode(): DamagePacket {
         val element = ElementRegistry.INSTANCES[element]
@@ -196,7 +196,7 @@ data class DirectCriticalStrikeMetadataSerializable(
     override val nonePower: Double = 1.0,
 ) : CriticalStrikeMetadataSerializable<Double> {
     fun decode(): CriticalStrikeMetadata {
-        return CriticalStrikeMetadata.byCalculate(chance, positivePower, negativePower, nonePower)
+        return CriticalStrikeMetadata(chance, positivePower, negativePower, nonePower)
     }
 }
 
@@ -262,7 +262,7 @@ data class MolangCriticalStrikeMetadataSerializable(
     override val nonePower: Evaluable<*>,
 ) : CriticalStrikeMetadataSerializable<Evaluable<*>> {
     fun decode(engine: MochaEngine<*>): CriticalStrikeMetadata {
-        return CriticalStrikeMetadata.byCalculate(
+        return CriticalStrikeMetadata(
             chance.evaluate(engine),
             positivePower.evaluate(engine),
             negativePower.evaluate(engine),
