@@ -21,12 +21,13 @@ interface Nekoo {
     fun createItemStack(namespace: String, path: String, source: Player? = null): ItemStack
 
     /**
-     * 判断一个 [ItemStack] 是否是一个萌芽物品.
+     * 判断 [itemStack] 是否为萌芽物品.
      */
     fun isNekoStack(itemStack: ItemStack): Boolean
 
     /**
-     * 获取一个 [ItemStack] 的萌芽物品 ID. 如果不是萌芽物品, 返回 null.
+     * 如果 [itemStack] 是萌芽物品, 则返回对应萌芽物品的唯一标识.
+     * 如果 [itemStack] 不是萌芽物品, 则返回 null.
      */
-    fun getNekoId(itemStack: ItemStack): Key?
+    fun getNekoItemId(itemStack: ItemStack): Key?
 }

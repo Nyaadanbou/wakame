@@ -63,7 +63,7 @@ class HasItemCondition(
         val contents = inventory.contents
 
         for (item in contents) {
-            if (item != null && nekoo.isNekoStack(item) && nekoo.getNekoId(item) == itemKey) {
+            if (item != null && nekoo.isNekoStack(item) && nekoo.getNekoItemId(item) == itemKey) {
                 count += item.amount
             }
         }

@@ -41,7 +41,7 @@ class HoldingCondition(
             if (entityEquipment != null) {
                 val holding = entityEquipment.itemInMainHand
                 for (itemKey in this.comparisons) {
-                    if (nekoo.getNekoId(holding) == itemKey) {
+                    if (nekoo.getNekoItemId(holding) == itemKey) {
                         return true
                     }
                 }

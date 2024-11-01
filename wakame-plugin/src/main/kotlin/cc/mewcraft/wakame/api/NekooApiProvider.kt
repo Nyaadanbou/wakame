@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.Nekoo
 import cc.mewcraft.wakame.item.CustomNekoItemRealizer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.isNeko
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
@@ -54,8 +54,8 @@ internal class NekooApiProvider : Nekoo, KoinComponent {
         return itemStack.isNeko
     }
 
-    override fun getNekoId(itemStack: ItemStack): Key? {
-        return itemStack.tryNekoStack?.id
+    override fun getNekoItemId(itemStack: ItemStack): Key? {
+        return itemStack.shadowNeko()?.id
     }
 
     companion object {
