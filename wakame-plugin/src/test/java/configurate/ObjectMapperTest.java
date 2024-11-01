@@ -9,6 +9,8 @@ import org.spongepowered.configurate.objectmapping.meta.NodeKey;
 import org.spongepowered.configurate.objectmapping.meta.PostProcess;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ObjectMapperTest {
@@ -94,5 +96,24 @@ class ObjectMapperTest {
         assertNotNull(globalConfig);
         assertEquals("jdbc:mysql://global:3306/default", globalConfig.database.url);
         assertEquals("https://global.api.com", globalConfig.api.endpoint);
+    }
+
+    @ConfigSerializable
+    static class MapNodeFromParent {
+        @Setting(nodeFromParent = true)
+        Map<String, Integer> data;
+    }
+
+    @Test
+    void testMapNodeFromParent() throws Exception {
+        final ConfigurationNode root = BasicConfigurationNode.root(ConfigurationOptions.defaults());
+        root.node("a").set(1);
+        root.node("b").set(2);
+
+        final MapNodeFromParent config = root.get(MapNodeFromParent.class);
+        assertNotNull(config);
+        assertEquals(2, config.data.size());
+        assertEquals(1, config.data.get("a"));
+        assertEquals(2, config.data.get("b"));
     }
 }
