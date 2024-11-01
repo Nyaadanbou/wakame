@@ -30,7 +30,7 @@ class EntityDefenseMetadata(
 
         // 计算防御后伤害
         val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
-            packet.packetDamage,
+            packet.damageValue(),
             (damageeAttributeMap.getValue(Attributes.element(element).DEFENSE) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
             packet.defensePenetration,
             packet.defensePenetrationRate
@@ -40,6 +40,6 @@ class EntityDefenseMetadata(
         val criticalPower = if (damageMetadata.criticalStrikeMetadata.state == CriticalStrikeState.NONE) 1.0 else damageMetadata.criticalStrikeMetadata.power
         val incomingDamageRate = damageeAttributeMap.getValue(Attributes.element(element).INCOMING_DAMAGE_RATE)
 
-        return (damageAfterDefense * packet.rate * incomingDamageRate * criticalPower).coerceAtLeast(if (packet.packetDamage > 0) 1.0 else 0.0)
+        return (damageAfterDefense * packet.rate * incomingDamageRate * criticalPower).coerceAtLeast(if (packet.damageValue() > 0) 1.0 else 0.0)
     }
 }

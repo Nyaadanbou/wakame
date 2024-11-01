@@ -152,9 +152,17 @@ data class DamagePacket(
 ) {
     /**
      * 该伤害包的总伤害值, 称为“包伤害”.
+     *
+     * 伤害值在最大值与最小值之间的随机.
+     * 每次调用都会返回一个新的随机结果.
      */
-    val packetDamage: Double
-        get() = collapsed
+    fun damageValue(): Double {
+        return if (min >= max) {
+            max
+        } else {
+            Random.nextDouble(min, max)
+        }
+    }
 
     // 检查数据的合法性
     init {
@@ -164,15 +172,4 @@ data class DamagePacket(
         require(defensePenetration >= 0.0) { "defense penetration must be greater than or equal to 0.0" }
         require(defensePenetrationRate >= 0.0) { "defense penetration rate must be greater than or equal to 0.0" }
     }
-
-    /**
-     * 伤害值在最大值与最小值之间的随机结果.
-     */
-    private val collapsed: Double =
-        // 伤害值在伤害包实例化时就已经确定
-        if (min >= max) {
-            max
-        } else {
-            Random.nextDouble(min, max)
-        }
 }

@@ -23,12 +23,10 @@ object DamageListener : Listener, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    // 由于 MythicMobs 的各种问题,
+    // priority 必须设置为 MONITOR.
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
-        if (event.isCancelled) {
-            return
-        }
-
         val entity = event.entity
         if (entity !is LivingEntity) {
             return
@@ -66,7 +64,7 @@ object DamageListener : Listener, KoinComponent {
             text("点伤害")
         ).hoverEvent(
             damageMetadata.damageBundle.packets()
-                .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.packetDamage)) }
+                .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.damageValue())) }
                 .let { components -> join(JoinConfiguration.newlines(), components) }
                 .let { component ->
                     HoverEvent.showText(
