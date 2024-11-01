@@ -104,6 +104,7 @@ class ObjectMapperTest {
         Map<String, Integer> data;
     }
 
+
     @Test
     void testMapNodeFromParent() throws Exception {
         final ConfigurationNode root = BasicConfigurationNode.root(ConfigurationOptions.defaults());
@@ -115,5 +116,29 @@ class ObjectMapperTest {
         assertEquals(2, config.data.size());
         assertEquals(1, config.data.get("a"));
         assertEquals(2, config.data.get("b"));
+    }
+
+    @ConfigSerializable
+    static class MergeNodeFromParent {
+        @Setting
+        String type;
+
+        @Setting(nodeFromParent = true)
+        ApiConfig apiConfig;
+    }
+
+    @Test
+    void testMergeNodeFromParent() throws Exception {
+        final ConfigurationNode root = BasicConfigurationNode.root(ConfigurationOptions.defaults());
+        root.node("type").set("merge");
+        root.node("endpoint").set("https://api.example.com");
+        root.node("api-key").set("abcdef123456");
+
+        final MergeNodeFromParent config = root.get(MergeNodeFromParent.class);
+        assertNotNull(config);
+        assertEquals("merge", config.type);
+        assertNotNull(config.apiConfig);
+        assertEquals("https://api.example.com", config.apiConfig.endpoint);
+        assertEquals("abcdef123456", config.apiConfig.apiKey);
     }
 }
