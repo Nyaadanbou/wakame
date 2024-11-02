@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
     private val server: Server by inject()
@@ -19,7 +18,6 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
     // holds the live data of users
     private val userRepository: Cache<Player, User<Player>> = Caffeine.newBuilder()
         .weakKeys()
-        .expireAfterAccess(5, TimeUnit.MINUTES)
         .removalListener<Player, User<Player>> { _, value, _ ->
             value?.cleanup()
         }
