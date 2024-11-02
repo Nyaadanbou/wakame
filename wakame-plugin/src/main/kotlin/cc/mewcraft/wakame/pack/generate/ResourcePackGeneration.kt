@@ -4,9 +4,7 @@ package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.lookup.Assets
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.lookup.itemType
+import cc.mewcraft.wakame.lookup.*
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
@@ -21,9 +19,7 @@ import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
-import team.unnamed.creative.model.ItemOverride
-import team.unnamed.creative.model.ModelTexture
-import team.unnamed.creative.model.ModelTextures
+import team.unnamed.creative.model.*
 import team.unnamed.creative.resources.MergeStrategy
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
@@ -183,7 +179,7 @@ internal class ResourcePackCustomModelGeneration(
      */
     private fun setTexture(originTextureKey: Key?) {
         requireNotNull(originTextureKey) { "Origin key must not be null" }
-        val textureFile = validateAssetsPathStringOrThrow("textures/${originTextureKey.value()}.png")
+        val textureFile = AssetUtils.getFileOrThrow("textures/${originTextureKey.value()}", "png")
         val textureWritable = Writable.file(textureFile)
 
         val texture = Texture.texture()
@@ -191,7 +187,7 @@ internal class ResourcePackCustomModelGeneration(
             .data(textureWritable)
 
         val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
-        val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(it.readTextAndToJson()) }
+        val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(AssetUtils.toJsonElement(it)) }
         if (meta != null) {
             texture.meta(meta)
         }
@@ -254,7 +250,7 @@ internal class ResourcePackCustomModelGeneration(
      * @return 是否成功生成模型.
      */
     private fun setModel(originModelKey: Key): Boolean {
-        val modelFile = validateAssetsPathString("models/${originModelKey.value()}.json", "json")
+        val modelFile = AssetUtils.getFile("models/${originModelKey.value()}", "json")
         if (modelFile == null) {
             // Skip vanilla models, they are already in the vanilla resource pack
             return false

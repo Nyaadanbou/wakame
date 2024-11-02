@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.validateAssetsPathStringOrThrow
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import java.io.File
@@ -24,7 +23,7 @@ data class ItemAssets(
     override val variant: Int,
     private val fileStrings: List<String>,
 ) : Assets {
-    override val files: Collection<File> = fileStrings.map { validateAssetsPathStringOrThrow(it, "json") }
+    override val files: Collection<File> = fileStrings.map { AssetUtils.getFileOrThrow(it, "json") }
 }
 
 internal val Assets.itemType: Material
