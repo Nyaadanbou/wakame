@@ -72,8 +72,7 @@ data class ItemLevel(
         }
 
         return raw
-            .coerceAtLeast(0) // by design, level never goes down below 0
-            .coerceAtMost(max) // by design, level never goes above max
+            .coerceIn(ItemLevelData.minimumLevel, max)
             .also { context.level = it } // populate the context with generated level
             .let { ItemGenerationResult.of(ItemLevelData(level = it)) }
     }

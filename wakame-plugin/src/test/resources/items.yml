@@ -105,6 +105,8 @@ components:
   level:
     enabled: true
     display_name: "等级"
+    # 读取或生成的最小物品等级
+    minimum_level: 1
 
   lore:
     enabled: true

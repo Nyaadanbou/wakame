@@ -83,6 +83,7 @@ components:
   level:
     enabled: true
     display_name: "<!i><white>等级"
+    minimum_level: 1
 
   lore:
     enabled: true
