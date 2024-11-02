@@ -4,9 +4,7 @@ package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.lookup.Assets
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.lookup.itemType
+import cc.mewcraft.wakame.lookup.*
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
@@ -21,9 +19,7 @@ import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
-import team.unnamed.creative.model.ItemOverride
-import team.unnamed.creative.model.ModelTexture
-import team.unnamed.creative.model.ModelTextures
+import team.unnamed.creative.model.*
 import team.unnamed.creative.resources.MergeStrategy
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
@@ -118,12 +114,10 @@ internal class ResourcePackCustomModelGeneration(
                 val configModelTemplate = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), modelKey)
 
                 // Get all textures from the model
-                val parent = configModelTemplate.parent()
                 val textureLayers = configModelTemplate.textures().layers()
                 val particle = configModelTemplate.textures().particle()
                 val variables = configModelTemplate.textures().variables()
 
-                parent?.let { setModel(it) }
                 textureLayers.forEach { layer -> setTexture(layer.key()) }
                 particle?.let { setTexture(it.key()) }
                 variables.forEach { (_, value) -> setTexture(value.key()) }
@@ -179,38 +173,13 @@ internal class ResourcePackCustomModelGeneration(
     }
 
     /**
-     * 生成一个模型并添加到资源包中.
-     *
-     * @param originModelKey 原始配置文件中模型的 Key.
-     */
-    private fun setModel(originModelKey: Key) {
-        val modelFile = validateAssetsPathString("models/${originModelKey.value()}.json")
-        if (modelFile == null) {
-            // Skip vanilla models, they are already in the vanilla resource pack
-            return
-        }
-        val model = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), originModelKey)
-        val parent = model.parent()
-        if (parent != null) {
-            setModel(parent)
-        }
-
-        val newModel = model.toBuilder()
-            .key(originModelKey.namespace { RESOURCE_NAMESPACE })
-            .build()
-
-        logger.info("Model for $originModelKey generated.")
-        context.resourcePack.model(newModel)
-    }
-
-    /**
      * 生成一个纹理并添加到资源包中.
      *
      * @param originTextureKey 原始配置文件中纹理的 Key. 如果为 null, 则不会生成纹理.
      */
     private fun setTexture(originTextureKey: Key?) {
         requireNotNull(originTextureKey) { "Origin key must not be null" }
-        val textureFile = validateAssetsPathStringOrThrow("textures/${originTextureKey.value()}.png")
+        val textureFile = AssetUtils.getFileOrThrow("textures/${originTextureKey.value()}", "png")
         val textureWritable = Writable.file(textureFile)
 
         val texture = Texture.texture()
@@ -218,7 +187,7 @@ internal class ResourcePackCustomModelGeneration(
             .data(textureWritable)
 
         val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
-        val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(it.readTextAndToJson()) }
+        val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(AssetUtils.toJsonElement(it)) }
         if (meta != null) {
             texture.meta(meta)
         }
@@ -229,14 +198,19 @@ internal class ResourcePackCustomModelGeneration(
     }
 
     /**
-     * 将 Wakame 的 Key 转换为 Minecraft 的 Key
+     * 将 Wakame 内部的资源包格式 Key 转换为实际 Minecraft 资源包的 Key
      *
      * 如 `(minecraft:)item/iron_sword_0` 转换为 `wakame:item/iron_sword_0`
      */
     private fun CreativeModel.toMinecraftFormat(): CreativeModel {
-        val newParent = parent()?.let {
-            val oldKey = it.key()
-            oldKey.namespace { RESOURCE_NAMESPACE }
+        val parent = parent()
+
+        val newParent = if (parent != null && setModel(parent)) {
+            // 如果父模型在 Wakame 内部资源包中生成成功, 则将其 Key 转换为 Minecraft 格式
+            parent.namespace { RESOURCE_NAMESPACE }
+        } else {
+            // 如果父模型不在 Wakame 内部资源包中生成, 则保持不变
+            parent()
         }
 
         val newLayers = textures().layers().map {
@@ -267,6 +241,33 @@ internal class ResourcePackCustomModelGeneration(
                     .build()
             )
             .build()
+    }
+
+    /**
+     * 生成一个模型并添加到资源包中.
+     *
+     * @param originModelKey 原始配置文件中模型的 Key.
+     * @return 是否成功生成模型.
+     */
+    private fun setModel(originModelKey: Key): Boolean {
+        val modelFile = AssetUtils.getFile("models/${originModelKey.value()}", "json")
+        if (modelFile == null) {
+            // Skip vanilla models, they are already in the vanilla resource pack
+            return false
+        }
+        val model = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), originModelKey)
+        val parent = model.parent()
+        if (parent != null) {
+            setModel(parent)
+        }
+
+        val newModel = model.toBuilder()
+            .key(originModelKey.namespace { RESOURCE_NAMESPACE })
+            .build()
+
+        logger.info("Model for $originModelKey generated.")
+        context.resourcePack.model(newModel)
+        return true
     }
 }
 
