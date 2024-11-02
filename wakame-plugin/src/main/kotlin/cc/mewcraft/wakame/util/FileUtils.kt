@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.WakameInjections
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import org.koin.core.component.get
@@ -15,17 +15,17 @@ internal fun validateAssetsPathString(path: String, extension: String = ""): Fil
 }
 
 internal fun validateAssetsPathStringOrThrow(path: String, extension: String = ""): File {
-    val assetsDir: File = WakameInjections.get(named(PLUGIN_ASSETS_DIR))
+    val assetsDir: File = Injector.get(named(PLUGIN_ASSETS_DIR))
     val file = assetsDir.resolve(path)
     if (!file.exists())
         throw IllegalArgumentException("No such file: $file")
     if (extension.isNotEmpty() && file.extension != extension)
-        throw IllegalArgumentException("Invalid file extension: $file")
+        throw IllegalArgumentException("Invalid file extension: $file, expected: $extension")
     return file
 }
 
 internal fun File.readTextAndToJson(): JsonElement {
-    return WakameInjections.get<Gson>().fromJson(this.readText(), JsonElement::class.java)
+    return Injector.get<Gson>().fromJson(this.readText(), JsonElement::class.java)
 }
 
 internal fun File.formatSize(): String {
