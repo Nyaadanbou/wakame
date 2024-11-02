@@ -61,4 +61,9 @@ interface User<P> {
      * Attack Speed of the player.
      */
     val attackSpeed: AttackSpeed
+
+    /**
+     * 关闭跟本实例相关的资源, 例如停止运行中的技能.
+     */
+    fun cleanup()
 }

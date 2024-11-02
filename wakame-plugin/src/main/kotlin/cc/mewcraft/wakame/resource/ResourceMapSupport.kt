@@ -42,6 +42,10 @@ private class PlayerResourceMap(
         return getResource(type).take(value)
     }
 
+    override fun set(type: ResourceType, value: Int): Boolean {
+        return getResource(type).set(value)
+    }
+
     private fun getResource(type: ResourceType): Resource {
         return requireNotNull(data[type]) { "The resource type $type" }
     }
@@ -66,6 +70,11 @@ private class Resource(
 
     fun maximum(): Int {
         return resourceType.maximumAmount(attributeMap)
+    }
+
+    fun set(value: Int): Boolean {
+        current = value.coerceIn(0, maximum())
+        return true
     }
 
     fun add(value: Int): Boolean {

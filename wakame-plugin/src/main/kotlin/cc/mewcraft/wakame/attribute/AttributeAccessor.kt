@@ -14,7 +14,7 @@ data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player>
 
     override fun get(subject: Player): Result<AttributeMap> {
         // 该实现仅仅把对函数的调用转发到对应的 User 实例之下
-        return runCatching { userManager.getPlayer(subject).attributeMap }
+        return runCatching { userManager.getUser(subject).attributeMap }
     }
 }
 

@@ -68,9 +68,9 @@ interface SkillMap {
     /**
      * Clears all skills in the skill map.
      *
-     * 他会停止所有技能的持续效果.
+     * 将停止所有技能的持续效果.
      */
-    fun clear()
+    fun cleanup()
 
     /**
      * Returns a collection of [Skill] instances that are triggered by the given [Trigger].
@@ -93,7 +93,7 @@ fun SkillMap(user: User<Player>): SkillMap {
  * then check whether the input has triggered a skill or not.
  */
 private class PlayerSkillMap(
-    private val uniqueId: UUID
+    private val uniqueId: UUID,
 ) : SkillMap {
     private val skills: Multimap<Trigger, Key> = MultimapBuilder
         .hashKeys(8)
@@ -152,7 +152,7 @@ private class PlayerSkillMap(
         return skills.keys().any { clazz.isInstance(it) }
     }
 
-    override fun clear() {
+    override fun cleanup() {
         skills.clear()
         skill2Ticks.values.forEach { Ticker.INSTANCE.stopTick(it) }
         skill2Ticks.clear()
