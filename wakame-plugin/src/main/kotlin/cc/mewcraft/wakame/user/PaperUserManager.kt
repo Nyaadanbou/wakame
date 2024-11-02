@@ -35,7 +35,7 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
     private fun onJoin(e: PlayerJoinEvent) {
         val player = e.player
 
-        // load user data
+        // load or create user data
         getUser(player)
     }
 

@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.resource
 
+import cc.mewcraft.wakame.Injector
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
+import org.koin.core.component.get
+import org.slf4j.Logger
 
 /**
  * 负责在玩家进出服务器 (包括跨服) 时同步玩家资源.
@@ -38,11 +41,14 @@ internal object DefaultResourceSynchronizer : ResourceSynchronizer {
      */
     private val MANA_KEY = NamespacedKey("wakame", "player_mana")
 
+    private val logger: Logger = Injector.get()
+
     override fun save(player: Player) {
         val pdc = player.persistentDataContainer
 
         val health = player.health
         pdc.set(HEALTH_KEY, PersistentDataType.DOUBLE, health)
+        logger.info("[${player.name}] Saved player health: $health")
 
         // 考虑到 Wynn 没有保存魔法值, 我们也暂时不保存魔法值.
         // 如此设计并非无脑照搬. 魔法值上限本就不高, 并且恢复很快.
@@ -57,6 +63,7 @@ internal object DefaultResourceSynchronizer : ResourceSynchronizer {
         val health = pdc.get(HEALTH_KEY, PersistentDataType.DOUBLE)
         if (health != null) {
             player.health = health
+            logger.info("[${player.name}] Loaded player health: $health")
         }
 
         // 考虑到 Wynn 没有保存魔法值, 我们也暂时不保存魔法值
