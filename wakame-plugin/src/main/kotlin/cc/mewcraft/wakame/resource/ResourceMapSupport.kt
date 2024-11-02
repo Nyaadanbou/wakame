@@ -72,6 +72,11 @@ private class Resource(
         return resourceType.maximumAmount(attributeMap)
     }
 
+    fun set(value: Int): Boolean {
+        current = value.coerceIn(0, maximum())
+        return true
+    }
+
     fun add(value: Int): Boolean {
         current += value
         current = current.coerceAtMost(maximum())
@@ -82,13 +87,6 @@ private class Resource(
         if (value > current) return false // insufficient resource - return false
         current -= value
         current = current.coerceAtLeast(0) // minimum should be ZERO for all resource types
-        return true
-    }
-
-    fun set(value: Int): Boolean {
-        current = value
-        current = current.coerceAtMost(maximum())
-        current = current.coerceAtLeast(0)
         return true
     }
 }

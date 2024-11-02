@@ -6,7 +6,7 @@ package cc.mewcraft.wakame.resource
 sealed interface ResourceMap {
     fun current(type: ResourceType): Int
     fun maximum(type: ResourceType): Int
+    fun set(type: ResourceType, value: Int): Boolean
     fun add(type: ResourceType, value: Int): Boolean
     fun take(type: ResourceType, value: Int): Boolean
-    fun set(type: ResourceType, value: Int): Boolean
 }
