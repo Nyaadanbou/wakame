@@ -406,22 +406,18 @@ private class VanillaAttributeInstance(
     // 这样, 生物的原版属性将由原版来应用和持久化.
 
     override fun addModifier(modifier: AttributeModifier) {
-        println("addModifier: $modifier")
         handle.addModifier(modifier.toBukkit())
     }
 
     override fun addTransientModifier(modifier: AttributeModifier) {
-        println("addTransientModifier: $modifier")
         handle.addTransientModifier(modifier.toBukkit())
     }
 
     override fun removeModifier(modifier: AttributeModifier) {
-        println("removeModifier: $modifier")
         handle.removeModifier(modifier.toBukkit())
     }
 
     override fun removeModifier(id: Key) {
-        println("removeModifier2: $id")
         handle.removeModifier(id)
     }
 
