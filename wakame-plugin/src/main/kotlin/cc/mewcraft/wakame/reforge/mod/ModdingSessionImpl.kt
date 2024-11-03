@@ -686,8 +686,7 @@ private object ReforgeReplaceMap {
         override fun get(id: String): ModdingSession.Replace {
             return data.getOrPut(id) {
                 val dummyCell = Cell.of(id) // it should never be accessed
-                val dummyRule = CellRule.empty()
-                ReforgeReplace.changeable(session, dummyCell, dummyRule)
+                ReforgeReplace.unchangeable(session, dummyCell)
             }
         }
 
