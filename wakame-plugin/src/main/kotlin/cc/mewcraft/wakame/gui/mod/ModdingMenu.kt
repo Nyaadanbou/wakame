@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.mod
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
+import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
@@ -113,6 +114,8 @@ internal class ModdingMenu(
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
     }
+
+    private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
     /**
      * 当 [inputSlot] 中的物品发生*变化前*调用.
@@ -239,7 +242,15 @@ internal class ModdingMenu(
         }
     }
 
+    private fun onWindowOpen() {
+        playerInventorySuppressor.startListening()
+
+        logger.info("Modding window opened for ${viewer.name}")
+    }
+
     private fun onWindowClose() {
+        playerInventorySuppressor.stopListening()
+
         logger.info("Modding window closed for ${viewer.name}")
 
         // 将定制过程中玩家输入的所有物品归还给玩家
@@ -248,10 +259,6 @@ internal class ModdingMenu(
         // 冻结会话
         session.reset()
         session.frozen = true
-    }
-
-    private fun onWindowOpen() {
-        logger.info("Modding window opened for ${viewer.name}")
     }
 
     /**

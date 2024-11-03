@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
 import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.gui.toItemProvider
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.station.Station
@@ -70,7 +71,11 @@ internal class StationMenu(
      */
     private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
+        addOpenHandler(::onWindowOpen)
+        addCloseHandler(::onWindowClose)
     }
+
+    private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
     /**
      * 刷新 Gui.
@@ -78,11 +83,15 @@ internal class StationMenu(
      */
     fun update() {
         // 排序已在 StationSession 的迭代器中实现
-        val recipeItems = stationSession.map(::RecipeItem)
-        primaryGui.setContent(recipeItems)
-        val title = layout.title
-        // TODO slot 背景颜色红绿显示
-        primaryWindow.setTitle(title)
+        primaryGui.setContent(stationSession.map(::RecipeItem))
+        primaryWindow.setTitle(layout.title) // TODO slot 背景颜色红绿显示
+    }
+
+    /**
+     * 初始化时刷新一次.
+     */
+    init {
+        update()
     }
 
     /**
@@ -92,11 +101,12 @@ internal class StationMenu(
         primaryWindow.open(viewer)
     }
 
-    /**
-     * 初始化时刷新一次.
-     */
-    init {
-        update()
+    private fun onWindowOpen() {
+        playerInventorySuppressor.startListening()
+    }
+
+    private fun onWindowClose() {
+        playerInventorySuppressor.stopListening()
     }
 
     /**
