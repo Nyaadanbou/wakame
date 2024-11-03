@@ -283,6 +283,15 @@ private object PoolSupport {
             return emptyList()
         }
 
+        // 开发日记 24/11/3
+        // 如果这里总抽取的样本数量小于 pool.amount, 那么 picked.size 会一直小于 pool.amount.
+        // 这样会导致无限循环. 解决方案是在循环开始前, 先判断总抽取的样本数量是否大于等于 pool.amount.
+
+        // 如果满足条件的样本数量小于 pool.amount, 返回空流
+        if (correctSamples.size < pool.amount) {
+            return emptyList()
+        }
+
         // 最终要返回的 Sample
         val finalSamples: MutableList<Sample<S, C>> = arrayListOf()
 
@@ -302,12 +311,19 @@ private object PoolSupport {
             val picked = hashSetOf<Sample<S, C>>()
 
             val selector = RandomSelector.weighted(correctSamples, WEIGHER)
+
+            var count = 0
             while (picked.size < pool.amount) {
-                // FIXME 确保不会无限循环
+                if (count > 1000) {
+                    // 防止因为似循环而导致的严重问题, 进行抛出异常来中断.
+                    throw IllegalStateException("Stuck in an endless loop while selecting samples. This is a bug!")
+                }
+
                 val sample = selector.pick(context.random.asJavaRandom())
                 if (sample !in picked) {
                     picked += sample
                 }
+                count++
             }
 
             finalSamples += picked
