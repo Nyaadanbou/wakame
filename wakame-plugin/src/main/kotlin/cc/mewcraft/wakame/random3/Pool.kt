@@ -295,7 +295,7 @@ private object PoolSupport : KoinComponent {
 
         // 如果满足条件的样本数量小于要抽取的数量, 返回空流
         if (correctSamples.size < pool.amount) {
-            logger.warn("The number of correct samples is less than the amount to be selected.")
+            logger.warn("The number of correct samples is less than that to be selected.")
             return emptyList()
         }
 
