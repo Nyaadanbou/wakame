@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStati
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableItemRenderer
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableItemRenderer
 import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationItemRenderer
+import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRenderer
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableItemRenderer
 import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRenderer
 import cc.mewcraft.wakame.display2.implementation.standard.StandardItemRenderer
@@ -36,6 +37,9 @@ internal object ItemRenderers {
 
     @JvmField
     val RECYCLING_STATION = RecyclingStationItemRenderer
+
+    @JvmField
+    val REPAIRING_TABLE = RepairingTableItemRenderer
 }
 
 /**
