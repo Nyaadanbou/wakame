@@ -231,14 +231,15 @@ internal data class ModdingDifferenceFormats(
 
         if (replace.changeable) {
             result = changeable.process(result)
+
+            if (replace.originalInput != null) {
+                result = hasInput.process(result)
+            } else {
+                result = hasNoInput.process(result)
+            }
+
         } else {
             result = unchangeable.process(result)
-        }
-
-        if (replace.originalInput != null) {
-            result = hasInput.process(result)
-        } else {
-            result = hasNoInput.process(result)
         }
 
         return result

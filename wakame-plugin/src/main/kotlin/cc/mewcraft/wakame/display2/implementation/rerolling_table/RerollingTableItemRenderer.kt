@@ -206,14 +206,15 @@ internal data class RerollingDifferenceFormats(
 
         if (selection.changeable) {
             result = changeable.process(result)
+
+            if (selection.selected) {
+                result = selected.process(result)
+            } else {
+                result = unselected.process(result)
+            }
+
         } else {
             result = unchangeable.process(result)
-        }
-
-        if (selection.selected) {
-            result = selected.process(result)
-        } else {
-            result = unselected.process(result)
         }
 
         return result

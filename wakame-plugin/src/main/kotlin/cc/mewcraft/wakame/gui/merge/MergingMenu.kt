@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.merge
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
+import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.*
@@ -84,6 +85,8 @@ internal class MergingMenu(
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
     }
+
+    private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
     /**
      * 玩家是否已经确认取出合并后的物品.
@@ -271,7 +274,15 @@ internal class MergingMenu(
         }
     }
 
+    private fun onWindowOpen() {
+        playerInventorySuppressor.startListening()
+
+        logger.info("Merging window opened for ${viewer.name}")
+    }
+
     private fun onWindowClose() {
+        playerInventorySuppressor.stopListening()
+
         logger.info("Merging window closed for ${viewer.name}")
 
         setInputSlot1(null)
@@ -281,10 +292,6 @@ internal class MergingMenu(
         session.returnInputItem1(viewer)
         session.returnInputItem2(viewer)
         session.frozen = true
-    }
-
-    private fun onWindowOpen() {
-        logger.info("Merging window opened for ${viewer.name}")
     }
 
     @Suppress("SameParameterValue")

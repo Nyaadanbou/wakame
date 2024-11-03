@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.reroll
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.GuiMessages
+import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -14,6 +15,7 @@ import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -37,7 +39,7 @@ import kotlin.properties.Delegates
 internal class RerollingMenu(
     val table: RerollingTable,
     val viewer: Player,
-) : KoinComponent {
+) : Listener, KoinComponent {
 
     /**
      * 给玩家显示 GUI.
@@ -93,6 +95,8 @@ internal class RerollingMenu(
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
         logger.info("Confirmed status updated: $old -> $new")
     }
+
+    private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
@@ -297,17 +301,21 @@ internal class RerollingMenu(
         return newItemStack
     }
 
+    private fun onWindowOpen() {
+        playerInventorySuppressor.startListening()
+
+        logger.info("Rerolling window opened for ${viewer.name}")
+    }
+
     private fun onWindowClose() {
+        playerInventorySuppressor.stopListening()
+
         logger.info("Rerolling window closed for ${viewer.name}")
 
         viewer.inventory.addItem(*session.getAllInputs())
 
         session.reset()
         session.frozen = true
-    }
-
-    private fun onWindowOpen() {
-        logger.info("Rerolling window opened for ${viewer.name}")
     }
 
     private fun setInputSlot(stack: ItemStack?) {
