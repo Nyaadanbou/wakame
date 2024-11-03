@@ -4,6 +4,9 @@ package cc.mewcraft.wakame.random3
 
 import me.lucko.helper.random.RandomSelector
 import me.lucko.helper.random.Weigher
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
@@ -263,7 +266,9 @@ private object PoolEmpty : Pool<Nothing, RandomSelectorContext>() {
     override fun select(context: RandomSelectorContext): List<Nothing> = emptyList()
 }
 
-private object PoolSupport {
+private object PoolSupport : KoinComponent {
+    private val logger: Logger by inject()
+
     fun <S, C : RandomSelectorContext> select(pool: Pool<S, C>, context: C): List<S> {
         // 检查进入该池的条件是否全部满足;
         // 如果没有全部满足, 直接返回空流.
@@ -280,6 +285,17 @@ private object PoolSupport {
 
         // 如果没有满足条件的样本, 返回空流
         if (correctSamples.isEmpty()) {
+            return emptyList()
+        }
+
+        // 开发日记 24/11/3
+        // 如果这里符合条件的样本数量小于要抽取的数量, 那么会导致程序无法跳出抽取样本的 while 循环.
+        // 解决方案是在循环开始前, 确保 [要抽取的样本数量] 大于等于 [符合条件的样本数量].
+        // 如果 [要抽取的样本数量] 小于 [符合条件的样本数量], 这说明这个池子的配置有问题.
+
+        // 如果满足条件的样本数量小于要抽取的数量, 返回空流
+        if (correctSamples.size < pool.amount) {
+            logger.warn("The number of correct samples is less than that to be selected.")
             return emptyList()
         }
 
@@ -302,8 +318,16 @@ private object PoolSupport {
             val picked = hashSetOf<Sample<S, C>>()
 
             val selector = RandomSelector.weighted(correctSamples, WEIGHER)
+
+            var count = 0
             while (picked.size < pool.amount) {
-                // FIXME 确保不会无限循环
+                count++
+                if (count > 500) {
+                    // 防止因为似循环而导致的严重问题, 记录日志并中断.
+                    logger.warn("Stuck in an endless loop while selecting samples. This is a bug!")
+                    break
+                }
+
                 val sample = selector.pick(context.random.asJavaRandom())
                 if (sample !in picked) {
                     picked += sample
