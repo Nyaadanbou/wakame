@@ -69,7 +69,7 @@ internal abstract class AbstractRendererFormats(
                     ObjectMapper.factoryBuilder()
                         .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
                         .addNodeResolver(NodeResolver.nodeKey())
-                        .addNodeResolver(NodeResolver.onlyWithSetting())
+                        // .addNodeResolver(NodeResolver.onlyWithSetting())
                         .addConstraint(Required::class.java, Constraint.required())
                         .addDiscoverer(dataClassFieldDiscoverer())
                         .build()
