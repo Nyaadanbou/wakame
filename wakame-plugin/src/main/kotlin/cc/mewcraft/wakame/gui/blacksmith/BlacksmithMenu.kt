@@ -60,18 +60,15 @@ internal class BlacksmithMenu(
         get() = viewer.inventory
 
     // 监听玩家与自己背包发生的交互
-    @EventHandler
+    @EventHandler(
+        // 被取消基本意味着 InvUI 已经处理过了.
+        ignoreCancelled = true
+    )
     private fun on(event: InventoryClickEvent) {
         // 当玩家点击自己背包里的物品时,
         // 先看当前“激活”的菜单是不是回收菜单;
         // 如果是, 则尝试将物品加入回收列表.
         // 如果不是, 则直接取消事件.
-
-        if (event.result == Event.Result.DENY) {
-            // 被取消基本意味着 InvUI 已经处理过了,
-            // 我们这里直接返回不再做额外的处理.
-            return
-        }
 
         if (
             getCurrentTab() == TabType.RECYCLING &&
