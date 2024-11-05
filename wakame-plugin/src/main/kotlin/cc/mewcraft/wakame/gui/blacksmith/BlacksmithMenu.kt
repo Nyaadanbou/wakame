@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.gui.blacksmith
 
+import cc.mewcraft.wakame.display2.ItemRenderers
+import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationContext
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.recycle.*
@@ -83,7 +85,10 @@ internal class BlacksmithMenu(
             if (claimResult is RecyclingSession.ClaimResult.Failure) {
                 // 如果未能成功加入回收列表, 则向玩家发送失败信息.
                 // 本次交互后, 整个菜单里的物品也不需要发生变化.
-                claimResult.description.forEach { viewer.sendMessage(it.color(NamedTextColor.RED)) }
+                when (claimResult.reason) {
+                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(text("回收列表已满.").color(NamedTextColor.RED))
+                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(text("铁匠不接受此物品.").color(NamedTextColor.RED))
+                }
                 event.result = Event.Result.DENY
                 return
             }
@@ -153,6 +158,9 @@ internal class BlacksmithMenu(
                 val unclaimed = recyclingSession.removeClaim(slot) ?: error("Claim not found for display slot $slot. This is a bug!")
 
                 syncRecyclingInventory()
+
+                // 重新渲染出售按钮
+                sellButton.notifyWindows()
 
                 // 物品从待回收列表移除, 玩家背包需要更新
                 playerInventory.setItem(unclaimed.playerSlot, unclaimed.originalItem)
@@ -324,36 +332,28 @@ internal class BlacksmithMenu(
 
     private inner class SellButton : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            // TODO #227 渲染图标:
-            //  你正在出售
-            //  <empty>
-            //  - item 1
-            //  - item 2
-            //  <empty>
-            //  价值: x-y
-            //  <empty>
-            //  点击确认
-            //  ------
-            //  确认出售
-            //  <dark_gray>接下来要出售
-            //  <empty>
-            //  - item 1
-            //  - item 2
-            //  <empty>
-            //  价值: x-y
-            //  <empty>
-            //  再次点击确认
-
-            val itemStack = ItemStack.of(Material.WRITABLE_BOOK)
-            itemStack.edit {
-                itemName = text(
-                    if (confirmed)
-                        "确认出售"
-                    else
-                        "你正在出售"
-                )
+            if (!recyclingSession.hasAnyClaims()) {
+                val icon = ItemStack.of(Material.WRITABLE_BOOK)
+                val context = RecyclingStationContext.Empty
+                ItemRenderers.RECYCLING_STATION.render(icon, context)
+                return ItemWrapper(icon)
             }
-            return ItemWrapper(itemStack)
+
+            if (confirmed) {
+                val icon = ItemStack.of(Material.WRITABLE_BOOK)
+                val result = recyclingSession.purchase(true)
+                val items = recyclingSession.getAllClaims().map { it.originalItem }
+                val context = RecyclingStationContext.Confirmed(items, result)
+                ItemRenderers.RECYCLING_STATION.render(icon, context)
+                return ItemWrapper(icon)
+            } else {
+                val icon = ItemStack.of(Material.WRITABLE_BOOK)
+                val result = recyclingSession.purchase(true)
+                val items = recyclingSession.getAllClaims().map { it.originalItem }
+                val context = RecyclingStationContext.Unconfirmed(items, result)
+                ItemRenderers.RECYCLING_STATION.render(icon, context)
+                return ItemWrapper(icon)
+            }
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -369,14 +369,18 @@ internal class BlacksmithMenu(
             when (
                 val purchaseResult = recyclingSession.purchase(false)
             ) {
+                is RecyclingSession.PurchaseResult.Empty -> {
+                    // 如果没有物品, 则什么也不做.
+                }
+
                 is RecyclingSession.PurchaseResult.Failure -> {
                     // 如果购买失败, 则向玩家发送失败信息.
-                    purchaseResult.description.forEach { viewer.sendMessage(it.color(NamedTextColor.RED)) }
+                    viewer.sendMessage(text("Internal error!").color(NamedTextColor.RED))
                 }
 
                 is RecyclingSession.PurchaseResult.Success -> {
                     // 如果购买成功, 则向玩家发送成功信息.
-                    purchaseResult.description.forEach { viewer.sendMessage(it) }
+                    viewer.sendMessage(text("Sold for ${purchaseResult.fixPrice}!").color(NamedTextColor.LIGHT_PURPLE))
 
                     // 同步菜单里的回收列表
                     syncRecyclingInventory()

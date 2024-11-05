@@ -23,15 +23,15 @@ sell_button_title:
   # 没有输入时的渲染格式
   empty_input:
     name: "没有要出售的物品"
-    lore: []
+    lore: [ ]
   # 未确认出售时的渲染格式
   unconfirmed:
     name: "你正在出售"
-    lore: []
+    lore: [ ]
   # 已确认出售时的渲染格式
   confirmed:
     name: "即将要出售"
-    lore: []
+    lore: [ ]
 
 # 用于设置出售按钮的交互提示
 #
@@ -58,7 +58,10 @@ sell_button_item_list:
   # 可用标签
   # <item_name> 物品名字
   # <item_level> 物品等级
-  single_item: "- <item_name> [<item_level>]"
+  with_level: "- <item_name> [<item_level>]"
+  # 可用标签
+  # <item_name> 物品名字
+  without_level: "- <item_name>"
 
 # 用于设置出售按钮的总价值格式
 # (当待出售列表为空时, 该内容不会渲染)

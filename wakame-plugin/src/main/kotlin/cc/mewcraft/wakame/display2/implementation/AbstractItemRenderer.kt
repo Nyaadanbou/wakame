@@ -3,6 +3,7 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.initializer.Initializable
@@ -11,6 +12,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -141,6 +143,11 @@ internal abstract class RenderingParts(
         val show: Provider<Boolean>,
         val format: Provider<F>,
     )
+
+    protected companion object {
+        @JvmField
+        val MM: MiniMessage = Injector.get()
+    }
 }
 
 /* RenderingPart: 渲染的一部分 */

@@ -23,4 +23,11 @@ internal class SimpleRepairingTable(
     override val priceMap: RepairingTable.PriceMap,
 ) : RepairingTable {
 
+    class PriceMap : RepairingTable.PriceMap {
+        private val data: HashMap<Key, PriceInstance> = hashMapOf()
+
+        override fun get(key: Key): PriceInstance? {
+            return data[key]
+        }
+    }
 }

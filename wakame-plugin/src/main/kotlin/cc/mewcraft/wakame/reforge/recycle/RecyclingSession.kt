@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.reforge.common.PriceInstance
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -35,6 +34,8 @@ interface RecyclingSession {
      * 重置回收列表.
      */
     fun reset()
+
+    fun hasAnyClaims(): Boolean
 
     fun getAllClaims(): Collection<Claim>
 
@@ -70,13 +71,21 @@ interface RecyclingSession {
      * 玩家添加待回收物品的结果.
      */
     sealed interface ClaimResult {
-        // 这些内容要在[确认回收]的按钮上显示
-        val description: List<Component>
+        /**
+         * 该结果代表物品无法出售.
+         */
+        interface Failure : ClaimResult {
+            val reason: Reason
 
-        // 该结果代表物品无法回收
-        interface Failure : ClaimResult
+            enum class Reason {
+                TOO_MANY_CLAIMS,
+                UNSUPPORTED_ITEM,
+            }
+        }
 
-        // 该结果代表物品已加入待回收列表
+        /**
+         * 该结果代表物品已加入待回收列表.
+         */
         interface Success : ClaimResult {
             val displaySlot: Int
         }
@@ -86,12 +95,26 @@ interface RecyclingSession {
      * 系统购买待回收物品的结果.
      */
     sealed interface PurchaseResult {
-        val description: List<Component>
+        /**
+         * 本结果代表待出售列表为空.
+         * 剩下的几种情况都是非 [Empty].
+         */
+        interface Empty : PurchaseResult
 
-        // 结果通常是 Success, 有异常抛出或无法给玩家增加余额才会是 Failure
+        /**
+         * 本结果表示出售操作有异常抛出.
+         */
+        interface Failure : PurchaseResult {
+            val reason: Reason
 
-        interface Failure : PurchaseResult
+            enum class Reason {
+                UNKNOWN,
+            }
+        }
 
+        /**
+         * 本结果标识出售成功(没有异常).
+         */
         interface Success : PurchaseResult {
             val minPrice: Double // 最低价格
             val maxPrice: Double // 最高价格

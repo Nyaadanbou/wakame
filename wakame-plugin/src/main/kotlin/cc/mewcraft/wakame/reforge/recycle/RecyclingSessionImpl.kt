@@ -3,9 +3,6 @@ package cc.mewcraft.wakame.reforge.recycle
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -28,7 +25,7 @@ internal class SimpleRecyclingSession(
     override fun claimItem(item: ItemStack, playerSlot: Int): RecyclingSession.ClaimResult {
         if (claims.size >= maxClaims) {
             return ClaimResult.failure(
-                text("Too many claims!").color(NamedTextColor.RED)
+                RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS
             )
         }
 
@@ -38,12 +35,14 @@ internal class SimpleRecyclingSession(
 
         logger.info("${viewer.name} claimed a recycling!")
 
-        return ClaimResult.success(
-            text("Claimed!"), displaySlot
-        )
+        return ClaimResult.success(displaySlot)
     }
 
     override fun purchase(dryRun: Boolean): RecyclingSession.PurchaseResult {
+        if (claims.isEmpty()) {
+            return PurchaseResult.empty()
+        }
+
         var totalMin = .0
         var totalMax = .0
         claims.forEach { claim ->
@@ -73,9 +72,7 @@ internal class SimpleRecyclingSession(
 
         logger.info("Sold for $totalPoint")
 
-        return PurchaseResult.success(
-            text("Sold for ${totalPoint}!"), totalMin, totalMax, totalPoint
-        )
+        return PurchaseResult.success(totalMin, totalMax, totalPoint)
     }
 
     override fun getClaim(displaySlot: Int): RecyclingSession.Claim? {
@@ -95,6 +92,10 @@ internal class SimpleRecyclingSession(
 
     override fun reset() {
         claims.clear()
+    }
+
+    override fun hasAnyClaims(): Boolean {
+        return claims.isNotEmpty()
     }
 
     override fun getAllClaims(): Collection<RecyclingSession.Claim> {
@@ -132,65 +133,53 @@ internal class SimpleRecyclingSession(
     }
 
     private object ClaimResult {
-        fun failure(description: List<Component>): Failure {
-            return Failure(description)
+        fun failure(
+            reason: RecyclingSession.ClaimResult.Failure.Reason,
+        ): Failure {
+            return Failure(reason)
         }
 
-        fun failure(description: Component): Failure {
-            return Failure(listOf(description))
-        }
-
-        fun success(description: List<Component>, displaySlot: Int): Success {
-            return Success(description, displaySlot)
-        }
-
-        fun success(description: Component, displaySlot: Int): Success {
-            return Success(listOf(description), displaySlot)
+        fun success(
+            displaySlot: Int,
+        ): Success {
+            return Success(displaySlot)
         }
 
         data class Failure(
-            override val description: List<Component>,
+            override val reason: RecyclingSession.ClaimResult.Failure.Reason,
         ) : RecyclingSession.ClaimResult.Failure
 
         data class Success(
-            override val description: List<Component>,
             override val displaySlot: Int,
         ) : RecyclingSession.ClaimResult.Success
     }
 
     private object PurchaseResult {
-        fun failure(description: List<Component>): Failure {
-            return Failure(description)
+        fun empty(): Empty {
+            return Empty
         }
 
-        fun failure(description: Component): Failure {
-            return Failure(listOf(description))
+        fun failure(
+            reason: RecyclingSession.PurchaseResult.Failure.Reason,
+        ): Failure {
+            return Failure(reason)
         }
 
         fun success(
-            description: List<Component>,
             minPrice: Double,
             maxPrice: Double,
             fixPrice: Double,
         ): Success {
-            return Success(description, minPrice, maxPrice, fixPrice)
+            return Success(minPrice, maxPrice, fixPrice)
         }
 
-        fun success(
-            description: Component,
-            minPrice: Double,
-            maxPrice: Double,
-            fixPrice: Double,
-        ): Success {
-            return Success(listOf(description), minPrice, maxPrice, fixPrice)
-        }
+        data object Empty : RecyclingSession.PurchaseResult.Empty
 
         data class Failure(
-            override val description: List<Component>,
+            override val reason: RecyclingSession.PurchaseResult.Failure.Reason,
         ) : RecyclingSession.PurchaseResult.Failure
 
         data class Success(
-            override val description: List<Component>,
             override val minPrice: Double,
             override val maxPrice: Double,
             override val fixPrice: Double,
