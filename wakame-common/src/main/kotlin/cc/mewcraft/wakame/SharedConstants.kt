@@ -5,4 +5,5 @@ package cc.mewcraft.wakame
  */
 object SharedConstants {
     const val PLUGIN_NAME = "wakame"
+    const val ROOT_NBT_NAME = "wakame"
 }

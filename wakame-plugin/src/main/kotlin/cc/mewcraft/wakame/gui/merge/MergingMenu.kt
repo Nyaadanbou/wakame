@@ -72,10 +72,10 @@ internal class MergingMenu(
             ". . . . . . . . .",
             ". . . . . . . . .",
         )
-        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).hideTooltip(true)))
+        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).edit { hideTooltip = true }))
         builder.addIngredient('a', inputSlot1)
         builder.addIngredient('b', inputSlot2)
-        builder.addIngredient('c', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).hideTooltip(true)))
+        builder.addIngredient('c', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).edit { hideTooltip = true }))
     }
 
     private val primaryWindow: Window = Window.single { builder ->

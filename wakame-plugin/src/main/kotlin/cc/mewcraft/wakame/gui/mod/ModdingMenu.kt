@@ -96,10 +96,10 @@ internal class ModdingMenu(
             ". . . x x x . . .",
             "# # # < # > # # #"
         )
-        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).hideTooltip(true)))
-        builder.addIngredient('#', SimpleItem(ItemStack(Material.GREEN_STAINED_GLASS_PANE).hideTooltip(true)))
+        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).edit { hideTooltip = true }))
+        builder.addIngredient('#', SimpleItem(ItemStack(Material.GREEN_STAINED_GLASS_PANE).edit { hideTooltip = true }))
         builder.addIngredient('i', inputSlot)
-        builder.addIngredient('o', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).hideTooltip(true)))
+        builder.addIngredient('o', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).edit { hideTooltip = true }))
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)

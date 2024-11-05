@@ -50,7 +50,7 @@ internal class ReplaceMenu(
         builder.setStructure("a * b")
         builder.addIngredient('a', ViewItem(replace))
         builder.addIngredient('b', inputSlot)
-        builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).hideTooltip(true)))
+        builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).edit { hideTooltip = true }))
     }
 
     /**
