@@ -2,9 +2,9 @@
 
 primary:
   - title:sell_button_title
-  - (fixed)
-  - items:sell_button_list_item
-  - (fixed)
+  - (fixed:items)
+  - items:sell_button_item_list
+  - (fixed:worth)
   - worth:sell_button_total_worth
-  - (fixed)
+  - (fixed:usage)
   - usage:sell_button_usage
