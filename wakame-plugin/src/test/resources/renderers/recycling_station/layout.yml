@@ -1,7 +1,10 @@
-# 在这里设置收购站物品的 *渲染布局*.
-
-# FIXME 补充说明
+# 在这里设置回收站物品的 *渲染布局*.
 
 primary:
-  - general:lore
-  - general:worth
+  - title:sell_button_title
+  - (fixed)
+  - items:sell_button_list_item
+  - (fixed)
+  - worth:sell_button_total_worth
+  - (fixed)
+  - usage:sell_button_usage

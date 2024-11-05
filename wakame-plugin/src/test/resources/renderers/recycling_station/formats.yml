@@ -1,32 +1,73 @@
-# 在这里设置收购站的物品 *渲染内容*.
+# 在这里设置回收站的物品 *渲染内容*.
 
-# id: `custom_name`
-custom_name:
-  namespace: vanilla
-  # 可用标签
-  # <value> 物品的 `minecraft:custom_name`
-  tooltip: "定制名: <value>"
+# GUI 的整体布局上, 回收站有:
+# - 玩家背包
+# - 输入容器
+# - 出售按钮
+#
+# 对于玩家背包中的物品, 我们不做任何渲染.
+# 对于输入容器里的物品, 我们也不做任何渲染.
+#   (这是因为设计上不显示单个物品的价值, 这点跟 Wynn 一样)
+# 对于出售按钮, 我们要渲染下面这些内容:
+# - 物品名字 (确认/未确认 两种状态)
+# - 将要出售的物品列表
+# - 物品列表的总价值
+# - 交互提示 (确认/未确认 两种状态)
 
-# id: `item_name`
-item_name:
-  namespace: vanilla
-  # 可用标签
-  # <value> 物品的 `minecraft:item_name`
-  tooltip: "物品名: <value>"
+# 用于设置出售按钮的物品标题
+# 本格式同时用于渲染 `minecraft:item_name` 和 *部分* `minecraft:lore`
+#
+# id: `sell_button_title`
+sell_button_title:
+  namespace: title
+  # 没有输入时的渲染格式
+  empty_input:
+    name: "没有要出售的物品"
+    lore: []
+  # 未确认出售时的渲染格式
+  unconfirmed:
+    name: "你正在出售"
+    lore: []
+  # 已确认出售时的渲染格式
+  confirmed:
+    name: "即将要出售"
+    lore: []
 
-# id: `lore`
-lore:
-  namespace: general
-  # 可用标签
-  # <line> 描述内容
-  tooltip:
-    line: "<line>"
-    header: [ ]
-    bottom: [ ]
+# 用于设置出售按钮的交互提示
+#
+# id: `sell_button_usage`
+sell_button_usage:
+  namespace: usage
+  # 没有输入时的交互提示
+  empty_input:
+    - "点击自己背包中的物品"
+    - "以选择出售给铁匠"
+  # 未确认出售时的交互提示
+  unconfirmed:
+    - "点击确认"
+  # 已确认出售时的交互提示
+  confirmed:
+    - "再次点击确认"
 
-# id: `worth`
-worth:
-  namespace: general
+# 用于设置出售按钮的物品列表
+# (当待出售列表为空时, 该内容不会渲染)
+#
+# id: `sell_button_list_item`
+sell_button_list_item:
+  namespace: items
   # 可用标签
-  # <value> 物品的价值
-  tooltip: "价值: <value>"
+  # <item_name> 物品名字
+  # <item_level> 物品等级
+  single_item: "- <item_name> [<item_level>]"
+
+# 用于设置出售按钮的总价值格式
+# (当待出售列表为空时, 该内容不会渲染)
+#
+# id: `sell_button_total_worth`
+sell_button_total_worth:
+  namespace: worth
+  # 可用标签
+  # <min_value> 所有物品的最小价值
+  # <max_value> 所有物品的最大价值
+  total_worth:
+    - "总价值: <min_value> - <max_value>"

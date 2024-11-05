@@ -1,0 +1,33 @@
+# 在这里设置修复台的物品 *渲染内容*.
+
+# id: `durability`
+durability:
+  namespace: durability
+  # 可用标签
+  # <damage> 当前损耗
+  # <max_damage> 最大损耗
+  # <durability> 剩余耐久 (等价于 <max_damage> 与 <damage> 的差)
+  tooltip:
+    - "[<durability>/<max_damage> 耐久度]"
+
+# id: `repair_cost`
+repair_cost:
+  namespace: repair_cost
+  # 可用标签
+  # <value> 修理的花费
+  tooltip:
+    - "修理花费"
+    - "- 金币: <value>"
+
+# id: `repair_usage`
+repair_usage:
+  namespace: repair_usage
+  tooltip:
+    - "点击以修理"
+
+# id: `item_name`
+item_name:
+  namespace: item_name
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
