@@ -102,7 +102,7 @@ fun DamagePacket(
     elementId: String,
     min: Double,
     max: Double,
-    rate: Double = .0,
+    rate: Double = 1.0,
     defensePenetration: Double = .0,
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
