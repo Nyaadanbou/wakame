@@ -325,13 +325,13 @@ internal class BlacksmithMenu(
             val currentTab = getCurrentTab()
             gui.setTab(if (currentTab == TabType.RECYCLING) 1 else 0)
 
-            // 刷新修理会话
-            repairingSession.registerClaims(playerInventory)
-
             // 将回收列表中的所有物品放回玩家背包
             recyclingSession.getAllClaims().forEach { claim -> playerInventory.setItem(claim.playerSlot, claim.originalItem) }
             // 然后将回收列表中的所有 claim 清除
             recyclingSession.reset()
+
+            // 刷新修理会话
+            repairingSession.registerClaims(playerInventory)
 
             // 将数据同步到菜单
             syncRepairingInventory()
