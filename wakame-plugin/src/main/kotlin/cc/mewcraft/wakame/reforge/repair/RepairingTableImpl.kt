@@ -9,7 +9,7 @@ import net.kyori.examination.ExaminableProperty
 import net.kyori.examination.string.StringExaminer
 import java.util.stream.Stream
 
-internal object WtfRepairingTable : RepairingTable {
+internal data object WtfRepairingTable : RepairingTable {
     private val ZERO_PRICE_INSTANCE = PriceInstance(.0, emptyMap())
 
     override val id: String = "wtf"

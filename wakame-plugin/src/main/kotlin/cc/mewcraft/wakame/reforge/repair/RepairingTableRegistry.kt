@@ -11,6 +11,9 @@ object RepairingTableRegistry : Initializable {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val tables: MutableMap<String, RepairingTable> = mutableMapOf()
 
+    val names: Set<String>
+        get() = tables.keys
+
     fun getItem(id: Key): PriceInstance? {
         return items[id]
     }
@@ -20,11 +23,6 @@ object RepairingTableRegistry : Initializable {
     }
 
     private fun load() {
-        // 物品价格实例必须先加载,
-        // 然后再加载修复台实例.
-        //
-        // 因为创建修复台依赖
-
         items.clear()
         items.putAll(RepairingTableSerializer.loadAllItems())
 

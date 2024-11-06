@@ -6,11 +6,9 @@ import net.kyori.adventure.text.Component
 import kotlin.random.Random
 
 interface RecyclingStation {
+    val id: String
     val title: Component
     val random: Random
-    val priceMap: PriceMap
 
-    interface PriceMap {
-        fun get(key: Key): PriceInstance?
-    }
+    fun getPrice(key: Key): PriceInstance?
 }

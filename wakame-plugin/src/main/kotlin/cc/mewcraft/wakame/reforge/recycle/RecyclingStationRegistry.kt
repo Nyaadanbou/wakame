@@ -8,6 +8,9 @@ object RecyclingStationRegistry : Initializable {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val stations: MutableMap<String, RecyclingStation> = mutableMapOf()
 
+    val names: Set<String>
+        get() = stations.keys
+
     fun getItem(id: Key): PriceInstance? {
         return items[id]
     }
@@ -22,6 +25,7 @@ object RecyclingStationRegistry : Initializable {
 
         stations.clear()
         stations.putAll(RecyclingStationSerializer.loadAllStations())
+        stations.put("wtf", WtfRecyclingStation)
     }
 
     override fun onPostWorld() {

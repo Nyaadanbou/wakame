@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.util.bindInstance
+import cc.mewcraft.wakame.util.damage
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -49,8 +50,7 @@ data class DamagePriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
-        val damage = nekoStack.damage
+        val damage = item.damage
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(DamageBinding(damage), "query")
         return mocha.eval(expression)

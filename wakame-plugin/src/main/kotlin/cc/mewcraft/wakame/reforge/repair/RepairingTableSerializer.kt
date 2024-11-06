@@ -8,6 +8,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
+import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.kotlin.objectMapperFactory
@@ -17,6 +18,8 @@ internal object RepairingTableSerializer {
     private const val ROOT_DIR_NAME = "repair"
     private const val ITEMS_DIR_NAME = "items"
     private const val TABLES_DIR_NAME = "tables"
+
+    private val logger: Logger = Injector.get()
 
     /**
      * 从文件中加载所有物品的 [PriceInstance].
@@ -92,6 +95,8 @@ internal object RepairingTableSerializer {
                     title = title,
                     items = items
                 )
+
+                logger.info("Loaded repairing table: $tableId")
 
                 tableId to table
             }
