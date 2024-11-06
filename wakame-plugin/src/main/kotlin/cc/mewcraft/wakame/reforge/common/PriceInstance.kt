@@ -21,7 +21,13 @@ class PriceInstance(
     constructor(
         baseValue: Double,
         priceModifiers: Map<String, PriceModifier>,
-    ) : this(baseValue, baseValue, priceModifiers)
+    ) : this(
+        // min = max
+        baseValue,
+        baseValue,
+        //
+        priceModifiers
+    )
 
     private val minimumBaseValue = minimumBaseValue.coerceAtLeast(.0)
     private val maximumBaseValue = maximumBaseValue.coerceAtLeast(.0)
@@ -33,6 +39,16 @@ class PriceInstance(
             priceModifiersById[name] = modifier
             priceModifiersByOp.computeIfAbsent(modifier.operation) { Object2ObjectOpenHashMap() }[name] = modifier
         }
+    }
+
+    /**
+     * 方便函数.
+     *
+     * 当客户端代码已经知晓 [minimumBaseValue] 与 [maximumBaseValue]
+     * 是相等的时候, 可以直接使用这个函数. 该函数相当于 [getMinimumValue].
+     */
+    fun getValue(item: ItemStack): Double {
+        return getValue(item, minimumBaseValue)
     }
 
     fun getMinimumValue(item: ItemStack): Double {

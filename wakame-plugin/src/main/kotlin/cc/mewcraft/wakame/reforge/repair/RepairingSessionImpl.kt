@@ -1,7 +1,11 @@
 package cc.mewcraft.wakame.reforge.repair
 
+import cc.mewcraft.wakame.core.EconomyApi
+import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.*
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
@@ -15,12 +19,29 @@ internal class SimpleRepairingSession(
 ) : RepairingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
 
+    private val economyApi: EconomyApi = get()
+
     // 储存了当前所有的 claim.
     // 这里的 index 就是它显示在修理菜单里的位置 (display slot).
     private val claims: ArrayList<Claim> = ArrayList()
 
-    private fun isRepairable(item: ItemStack?): Boolean {
-        return item?.isDamaged == true
+    private fun getItemKey(item: ItemStack): Key {
+        // 先尝试获取萌芽系统里的物品 id,
+        // 如果没有的话就返回原版物品 id
+        return item.shadowNeko()?.id ?: item.type.key
+    }
+
+    private fun getItemPrice(item: ItemStack?): PriceInstance? {
+        if (item?.isDamaged == true) {
+            // 首先物品堆叠必须是受损的,
+            // 未受损的物品无需修复,
+            // 因此也没有价格.
+            val id = getItemKey(item)
+            return table.getPrice(id)
+        } else {
+            // 否则直接返回 null
+            return null
+        }
     }
 
     private fun checkIndex(index: Int): Boolean {
@@ -58,17 +79,20 @@ internal class SimpleRepairingSession(
         claims.clear()
 
         // 遍历背包, 找出所有需要修复的物品
-        inventory.storageContents.forEach { itemStack /* mirror */ ->
-            if (itemStack != null && isRepairable(itemStack)) {
-                // TODO #227 计算实际花费
-                val costValue = 33.0
-                val repairCost = RepairCost(costValue)
-
-                claims += Claim(
-                    repairCost = repairCost,
-                    originalItem = itemStack
-                )
+        for (itemStack /* mirror */ in inventory.storageContents) {
+            if (itemStack == null) {
+                continue
             }
+
+            val price = getItemPrice(itemStack) ?: continue
+
+            val costValue = price.getValue(itemStack)
+            val repairCost = RepairCost(costValue)
+
+            claims += Claim(
+                repairCost = repairCost,
+                originalItem = itemStack
+            )
         }
     }
 
@@ -112,12 +136,11 @@ internal class SimpleRepairingSession(
         override val value: Double,
     ) : RepairingSession.RepairCost {
         override fun test(player: Player): Boolean {
-            // TODO #227 检查玩家是否有足够的金币
-            return true
+            return economyApi.has(player.uniqueId, value).getOrDefault(false)
         }
 
         override fun take(player: Player) {
-            // TODO #227 扣除玩家金币
+            economyApi.take(player.uniqueId, value).getOrDefault(false)
         }
     }
 }
