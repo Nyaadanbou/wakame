@@ -4,4 +4,4 @@ max_base: 15.0
 modifiers:
   level:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"

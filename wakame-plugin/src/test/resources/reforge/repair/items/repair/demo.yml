@@ -7,12 +7,12 @@ modifiers:
   # 物品损耗
   damage:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
 
   # 物品稀有度
   rarity:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
     mapping:
       common: 0.0
       uncommon: 1.0

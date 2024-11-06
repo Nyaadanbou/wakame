@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.item.*
-import cc.mewcraft.wakame.util.compileFunc
+import cc.mewcraft.wakame.util.bindInstance
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import team.unnamed.mocha.MochaEngine
-import team.unnamed.mocha.runtime.compiled.MochaCompiledFunction
-import team.unnamed.mocha.runtime.compiled.Named
+import team.unnamed.mocha.runtime.binding.Binding
 
 interface PriceModifier {
     val name: String
@@ -33,7 +32,8 @@ interface PriceModifier {
     }
 }
 
-private val MOCHA: MochaEngine<*> = MochaEngine.createStandard()
+// TODO 优化这个文件里的 Mocha 的用法
+//  降低创建 MochaEngine 实例的开销
 
 @ConfigSerializable
 data class DamagePriceModifier(
@@ -48,17 +48,19 @@ data class DamagePriceModifier(
         const val NAME = "damage"
     }
 
-    private val function: DamageFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val damage = nekoStack.damage
-        return function.evaluate(damage)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(DamageBinding(damage), "query")
+        return mocha.eval(expression)
     }
 
-    interface DamageFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Int): Double
-    }
+    @Binding("query")
+    class DamageBinding(
+        @JvmField @Binding("value")
+        val value: Int,
+    )
 }
 
 @ConfigSerializable
@@ -74,17 +76,19 @@ data class LevelPriceModifier(
         const val NAME = "value"
     }
 
-    private val function: LevelFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val level = nekoStack.level
-        return function.evaluate(level)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(LevelBinding(level), "query")
+        return mocha.eval(expression)
     }
 
-    interface LevelFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Int): Double
-    }
+    @Binding("query")
+    class LevelBinding(
+        @JvmField @Binding("value")
+        val value: Int,
+    )
 }
 
 @ConfigSerializable
@@ -102,18 +106,20 @@ data class RarityPriceModifier(
         const val NAME = "rarity"
     }
 
-    private val function: RarityFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val rarity = nekoStack.rarity
         val mapped = mapping[rarity.uniqueId] ?: return .0
-        return function.evaluate(mapped)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(RarityBinding(mapped), "query")
+        return mocha.eval(expression)
     }
 
-    interface RarityFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Double): Double
-    }
+    @Binding("query")
+    class RarityBinding(
+        @JvmField @Binding("value")
+        val value: Double,
+    )
 }
 
 @ConfigSerializable
@@ -129,18 +135,20 @@ data class MergingPenaltyPriceModifier(
         const val NAME = "merge_penalty"
     }
 
-    private val function: MergingPenaltyFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val portableCore = nekoStack.portableCore ?: return .0
         val value = portableCore.penalty
-        return function.evaluate(value)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(MergingBinding(value), "query")
+        return mocha.eval(expression)
     }
 
-    interface MergingPenaltyFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Int): Double
-    }
+    @Binding("query")
+    class MergingBinding(
+        @JvmField @Binding("value")
+        val value: Int,
+    )
 }
 
 @ConfigSerializable
@@ -156,18 +164,20 @@ data class ModdingPenaltyPriceModifier(
         const val NAME = "mod_penalty"
     }
 
-    private val function: ModdingPenaltyFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val cells = nekoStack.cells ?: return .0
         val value = cells.map { it.value }.sumOf { it.getReforgeHistory().modCount }
-        return function.evaluate(value)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(ModdingBinding(value), "query")
+        return mocha.eval(expression)
     }
 
-    interface ModdingPenaltyFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Int): Double
-    }
+    @Binding("query")
+    class ModdingBinding(
+        @JvmField @Binding("value")
+        val value: Int,
+    )
 }
 
 @ConfigSerializable
@@ -183,16 +193,18 @@ data class RerollingPenaltyPriceModifier(
         const val NAME = "reroll_penalty"
     }
 
-    private val function: RerollingPenaltyFunction = MOCHA.compileFunc(expression)
-
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val cells = nekoStack.cells ?: return .0
         val value = cells.map { it.value }.sumOf { it.getReforgeHistory().rerollCount }
-        return function.evaluate(value)
+        val mocha = MochaEngine.createStandard()
+        mocha.bindInstance(RerollingBinding(value), "query")
+        return mocha.eval(expression)
     }
 
-    interface RerollingPenaltyFunction : MochaCompiledFunction {
-        fun evaluate(@Named("value") value: Int): Double
-    }
+    @Binding("query")
+    class RerollingBinding(
+        @JvmField @Binding("value")
+        val value: Int,
+    )
 }

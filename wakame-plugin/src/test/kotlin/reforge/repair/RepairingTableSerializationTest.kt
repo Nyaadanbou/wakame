@@ -36,5 +36,7 @@ class RepairingTableSerializationTest : KoinTest {
     fun `test serialization`() {
         val items = RepairingTableSerializer.loadAllItems()
         val tables = RepairingTableSerializer.loadAllTables()
+        items.forEach(::println)
+        tables.forEach(::println)
     }
 }

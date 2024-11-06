@@ -13,12 +13,12 @@ modifiers:
     # - add_multiplied_total
     operation: add_value
     # Molang 表达式
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
 
   # 物品稀有度
   rarity:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
     mapping:
       common: 0.0
       uncommon: 1.0
@@ -30,14 +30,14 @@ modifiers:
   # 合并惩罚
   merge_penalty:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
 
   # 定制惩罚
   mod_penalty:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"
 
   # 重造惩罚
   reroll_penalty:
     operation: add_value
-    expression: "1.0 * value"
+    expression: "1.0 * query.value"

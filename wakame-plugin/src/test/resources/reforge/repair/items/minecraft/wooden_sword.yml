@@ -3,4 +3,4 @@ base: 10.0
 modifiers:
   damage:
     operation: add_value
-    expression: "0.5 * value"
+    expression: "0.5 * query.value"
