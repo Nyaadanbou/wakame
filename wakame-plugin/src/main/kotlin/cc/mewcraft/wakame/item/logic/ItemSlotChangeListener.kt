@@ -1,11 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.ItemSlotRegistry
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import org.bukkit.entity.Player
@@ -117,13 +114,11 @@ internal abstract class ItemSlotChangeListener {
             return true // 如果不是萌芽物品, 那么该物品应该按照游戏原版的逻辑处理
         }
 
-        val maxDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE)
-        val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE)
-        if (maxDamage == null || nekoStack.components.has(ItemComponentTypes.UNBREAKABLE) || damage == null) {
+        if (!nekoStack.isDamageable) {
             return true // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
         }
 
-        if (damage + 1 >= maxDamage) {
+        if (nekoStack.damage >= nekoStack.maxDamage) {
             return false // 如果物品已经损坏, 那么应该返回 false
         }
 

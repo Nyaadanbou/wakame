@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.damage
+import cc.mewcraft.wakame.item.isDamageable
+import cc.mewcraft.wakame.item.maxDamage
+import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.Skill
@@ -39,7 +41,14 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
-            tryCancelEvent(itemStack, player, event)
+            val nekoStack = itemStack.projectNeko()
+            if (!nekoStack.isDamageable) return
+            // 物品要损坏了
+            // 取消掉耐久事件, 设为 0 耐久
+            if (nekoStack.damage + event.damage >= nekoStack.maxDamage) {
+                event.isCancelled = true
+                nekoStack.damage = nekoStack.maxDamage
+            }
         }
 
         override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
@@ -55,10 +64,8 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
-            val nekoStack = itemStack.tryNekoStack ?: return
-            val maximumDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return
-            val currentDamage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return
-            if (currentDamage + 1 >= maximumDamage) {
+            val nekoStack = itemStack.projectNeko()
+            if (nekoStack.damage >= nekoStack.maxDamage) {
                 player.sendActionBar(text("无法使用完全损坏的物品"))
                 e.isCancelled = true
             }

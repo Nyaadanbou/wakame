@@ -2,19 +2,23 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.FluidCollisionMode
+import com.destroystokyo.paper.ParticleBuilder
+import org.bukkit.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.inventory.EquipmentSlot
+import org.joml.Vector3f
 
 /**
  * 自定义矛攻击.
- * 左键后对玩家视线所指方向的所有实体进行攻击.
+ * 左键后对玩家视线所指方向的所有生物进行攻击.
  * 攻击的距离上限由属性 [cc.mewcraft.wakame.attribute.Attributes.ENTITY_INTERACTION_RANGE] 决定.
  *
  * ## Node structure
@@ -32,45 +36,59 @@ data class SpearAttack(
         const val MAX_HIT_AMOUNT = 100
     }
 
-    override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
+    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
         val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {
             return null
-        } else {
-            // 应用攻击冷却
-            nekoStack.applyAttackCooldown(player)
         }
 
-        applyAttack(player)
+        val attributeMap = user.attributeMap
+        val directDamageMetadata = PlayerDamageMetadata(
+            user = user,
+            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.SPEAR),
+            damageBundle = damageBundle(attributeMap) {
+                every { standard() }
+            }
+        )
 
-        // TODO 扣除耐久
-
-        return null
+        return directDamageMetadata
     }
 
-    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        if (!action.isLeftClick) return
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) return
+
         val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {
             return
-        } else {
-            // 应用攻击冷却
-            nekoStack.applyAttackCooldown(player)
         }
 
-        applyAttack(player)
-        wrappedEvent.actionPerformed = true
+        applySpearAttack(player, damagee)
 
-        // TODO 扣除耐久
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
+        player.damageItemStack(EquipmentSlot.HAND, 1)
     }
 
-    private fun applyAttack(player: Player) {
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        super.handleInteract(player, nekoStack, action, wrappedEvent)
+
+        applySpearAttack(player)
+
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
+        player.damageItemStack(EquipmentSlot.HAND, 1)
+    }
+
+    private fun applySpearAttack(player: Player, vararg excludeEntities: LivingEntity) {
         val world = player.world
         val hitEntities = mutableListOf<LivingEntity>()
         val user = player.toUser()
         val attributeMap = user.attributeMap
         val maxDistance = attributeMap.getValue(Attributes.ENTITY_INTERACTION_RANGE)
 
+        var end: Vector3f? = null
         for (i in 0 until MAX_HIT_AMOUNT) {
             val rayTraceResult = world.rayTrace(
                 player.eyeLocation,
@@ -80,12 +98,13 @@ data class SpearAttack(
                 true,
                 size
             ) {
-                it is LivingEntity && it.uniqueId != player.uniqueId && !hitEntities.contains(it)
+                it is LivingEntity && it != player && !hitEntities.contains(it) && !excludeEntities.contains(it)
             }
             if (rayTraceResult == null) {
                 break
             }
             if (rayTraceResult.hitBlock != null) {
+                end = rayTraceResult.hitPosition.toVector3f()
                 break
             }
             val hitEntity = rayTraceResult.hitEntity
@@ -103,6 +122,33 @@ data class SpearAttack(
                 damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
             )
             livingEntity.hurt(playerDamageMetadata, player, true)
+        }
+
+        // 特效
+        if (end == null) {
+            end = player.eyeLocation.toVector3f() + (player.eyeLocation.direction.toVector3f().normalize(maxDistance.toFloat()))
+        }
+        particleLine(
+            world,
+            player.eyeLocation.toVector3f(),
+            end,
+            ParticleBuilder(Particle.CRIT).extra(0.0)
+        )
+        ParticleBuilder(Particle.SWEEP_ATTACK)
+            .location(end.toLocation(world))
+            .receivers(64)
+            .spawn()
+        world.playSound(player.location, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1F, 1F)
+    }
+
+    private fun particleLine(world: World, start: Vector3f, end: Vector3f, particleBuilder: ParticleBuilder) {
+        val distance = end.distance(start)
+        val num = (distance / 0.2).toInt()
+        for (i in 0..num) {
+            val t = i.toFloat() / num
+            particleBuilder.location(
+                (start + ((end - start) mul t)).toLocation(world)
+            ).receivers(64).spawn()
         }
     }
 }

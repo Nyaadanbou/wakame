@@ -48,13 +48,13 @@ object NekoItemFactory : KoinComponent {
                 if (root.contains(path)) this.put(type, type.create())
             }
 
+            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             // tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
             // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             // tryAdd("food", ItemBehaviorTypes.FOOD)
-            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
-            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             // tryAdd("tool", ItemBehaviorTypes.TOOL)
             // tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             // tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
@@ -151,14 +151,13 @@ object NekoItemFactory : KoinComponent {
                 if (root.contains(path)) this.put(type, type.create())
             }
 
+            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
-            tryAdd("max_damage", ItemBehaviorTypes.MAX_DAMAGE)
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
-            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
-            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             tryAdd("wearable", ItemBehaviorTypes.WEARABLE)

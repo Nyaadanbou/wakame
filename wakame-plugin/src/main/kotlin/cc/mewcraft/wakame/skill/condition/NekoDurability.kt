@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.damage
+import cc.mewcraft.wakame.item.isDamageable
+import cc.mewcraft.wakame.item.maxDamage
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillContext
@@ -37,8 +39,9 @@ internal interface NekoDurability : SkillCondition {
 
         override fun newSession(context: SkillContext): SkillConditionSession {
             val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return SkillConditionSession.alwaysFailure()
-            val maxDamage = nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return SkillConditionSession.alwaysFailure()
-            val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return SkillConditionSession.alwaysFailure()
+            if (!nekoStack.isDamageable) return SkillConditionSession.alwaysFailure()
+            val maxDamage = nekoStack.maxDamage
+            val damage = nekoStack.damage
             val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
             val evaluatedDurability = this.durability.evaluate(engine).toStableInt()
             val isSuccess = (maxDamage - damage) <= evaluatedDurability
@@ -52,11 +55,11 @@ internal interface NekoDurability : SkillCondition {
 
             override fun onSuccess(context: SkillContext) {
                 val nekoStack = context[SkillContextKey.ITEM_STACK]?.tryNekoStack ?: return
-                nekoStack.components.get(ItemComponentTypes.MAX_DAMAGE) ?: return
-                val damage = nekoStack.components.get(ItemComponentTypes.DAMAGE) ?: return
+                if (!nekoStack.isDamageable) return
+                val damage = nekoStack.damage
                 val engine = context.getOrThrow(SkillContextKey.MOCHA_ENGINE)
                 val evaluatedDurability = durability.evaluate(engine).toStableInt()
-                nekoStack.components.set(ItemComponentTypes.DAMAGE, damage + evaluatedDurability)
+                nekoStack.damage = damage + evaluatedDurability
                 notification.notifySuccess(context)
             }
 

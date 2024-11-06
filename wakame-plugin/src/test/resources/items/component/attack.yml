@@ -1,6 +1,41 @@
 # 使物品具有攻击效果
+# 目前可用的攻击效果类型：
+
+# 原版斧头, 锄头, 镐子等的单体攻击
+# 伤害基于AttributeMap
+# type: axe
+
+# 原版弓的攻击, 副手无法使用
+# 伤害基于AttributeMap
+# type: bow
+
+# 原版弩的攻击, 副手无法使用
+# 伤害基于AttributeMap
+# type: crossbow
+
+# 棍的攻击, 攻击范围为以玩家自身为中心的长方体, 范围大小由攻击距离属性决定
+# 伤害基于AttributeMap
+# type: cudgel
+
+# 锤的攻击, 攻击范围为以直接攻击到的生物为中心的长方体, 范围大小由锤击范围属性决定
+# 伤害基于AttributeMap, 范围伤害根据直接伤害按比率属性折算
+# type: hammer
+
+# 矛的攻击, 攻击范围为玩家视线前方, 最大距离由攻击距离属性决定
+# 伤害基于AttributeMap
+# type: spear
+# size: 0.2
+
+# 原版剑的横扫攻击
+# 伤害基于AttributeMap, 横扫伤害按比率属性折算
+# type: sword
+
+# 原版三叉戟的攻击, 副手无法使用
+# 伤害基于AttributeMap
+# type: trident
 attack:
   # 设置攻击效果的类型
-  type: sword
+  type: spear
   # 设置攻击效果的其他参数
   # ...
+  size: 0.2

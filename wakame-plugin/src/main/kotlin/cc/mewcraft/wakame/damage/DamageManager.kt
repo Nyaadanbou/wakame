@@ -3,22 +3,29 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.damage.mappings.*
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
+import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
+import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
+import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.*
-import org.bukkit.event.entity.EntityDamageEvent.*
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 /**
  * @see DamageManagerApi.hurt
@@ -101,14 +108,14 @@ object DamageManager : DamageManagerApi, KoinComponent {
                 }
 
                 val itemStack = causingEntity.inventory.itemInMainHand
-                val attack = itemStack.shadowNeko(false)?.templates?.get(ItemTemplateTypes.ATTACK)
+                val nekoStack = itemStack.shadowNeko(false)
+                val attack = nekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
                 when (event.cause) {
                     DamageCause.ENTITY_ATTACK -> {
-                        // handleDirectMeleeAttackEntity的返回值会用于直接受伤的生物的伤害计算
-                        // 该方法中的其他附带效果也会执行, 例如“hammer”攻击特效的伤害周围实体
                         if (attack != null) {
                             // 玩家手中的物品是 Attack
-                            return attack.attackType.handleDirectMeleeAttackEntity(causingEntity, itemStack.projectNeko(false), event)
+                            // 可能返回null, 意为取消伤害事件
+                            return attack.attackType.generateDamageMetadata(causingEntity, nekoStack)
                         } else {
                             // 手中的物品无 Attack 行为甚至不是 NekoStack
                             return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
@@ -122,7 +129,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
                             val attributeMap = causingEntity.toUser().attributeMap
                             return PlayerDamageMetadata(
                                 user = causingEntity.toUser(),
-                                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD, DamageTag.EXTRA),
+                                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD),
                                 damageBundle = damageBundle(attributeMap) {
                                     every {
                                         standard()
@@ -131,8 +138,6 @@ object DamageManager : DamageManagerApi, KoinComponent {
                                 }
                             )
                         } else {
-                            // 取消 Bukkit 伤害事件
-                            event.isCancelled = true
                             // 返回 null 是为了供外部识别以不触发萌芽伤害事件
                             return null
                         }
