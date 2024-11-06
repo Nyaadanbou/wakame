@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame
 
 import com.google.gson.Gson
@@ -10,9 +12,7 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.PluginManager
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.binds
-import org.koin.core.module.dsl.createdAtStart
-import org.koin.core.module.dsl.withOptions
+import org.koin.core.module.dsl.*
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
