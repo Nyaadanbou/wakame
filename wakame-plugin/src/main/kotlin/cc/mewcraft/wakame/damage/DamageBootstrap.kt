@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsDamageManager
 import cc.mewcraft.wakame.initializer.Initializable
+import org.koin.core.component.get
 
 /**
  * 负责初始化伤害系统 API 的一些实例.
@@ -14,6 +18,10 @@ internal object DamageBootstrap : Initializable {
         DamageTagsFactory.register(DefaultDamageTagsFactory)
 
         // 注册 DamageManagerApi
-        DamageManagerApi.register(DamageManager)
+        if (Injector.get<WakamePlugin>().isPluginPresent("MythicMobs")) {
+            DamageManagerApi.register(MythicMobsDamageManager)
+        } else {
+            DamageManagerApi.register(DamageManager)
+        }
     }
 }

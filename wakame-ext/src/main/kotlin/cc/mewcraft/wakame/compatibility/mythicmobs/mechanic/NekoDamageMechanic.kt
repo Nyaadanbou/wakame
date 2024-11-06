@@ -3,14 +3,16 @@ package cc.mewcraft.wakame.compatibility.mythicmobs.mechanic
 import cc.mewcraft.wakame.damage.*
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.*
+import io.lumine.mythic.api.skills.ITargetedEntitySkill
+import io.lumine.mythic.api.skills.SkillMetadata
+import io.lumine.mythic.api.skills.SkillResult
+import io.lumine.mythic.api.skills.ThreadSafetyLevel
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
 import java.io.File
-
 
 class NekoDamageMechanic(
     manager: SkillExecutor,
@@ -21,6 +23,10 @@ class NekoDamageMechanic(
 
     companion object {
         private val DAMAGE_BUNDLE_PATTERN: Regex = Regex("\\([^)]+\\)")
+    }
+
+    init {
+        threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
     private val damageTags: DamageTags = parseDamageTags(mlc.getStringList(arrayOf("tags", "t"), ""))
@@ -80,12 +86,7 @@ class NekoDamageMechanic(
             damageTags, damageBundle, CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
         )
 
-        // FIXME StackOverflow:
-        //  对 hurt 函数传入非空 source, 并且 MM 怪物存在
-        //  ~onAttack 触发的 NekoDamage 技能时,
-        //  会发生 StackOverflow.
-        // val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
-        val casterEntity = null
+        val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
 
         // 对目标生物造成自定义的萌芽伤害
         DamageManagerApi.instance().hurt(entity, damageMetadata, casterEntity, knockback)

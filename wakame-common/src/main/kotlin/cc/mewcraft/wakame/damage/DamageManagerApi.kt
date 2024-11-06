@@ -7,6 +7,11 @@ interface DamageManagerApi {
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
      * 当 [source] 为 `null` 时, 伤害属于无源, 即不会产生击退.
+     *
+     * @param victim 被伤害的实体.
+     * @param damageMetadata 伤害元数据.
+     * @param source 伤害源.
+     * @param knockback 是否产生击退.
      */
     fun hurt(
         victim: LivingEntity, damageMetadata: DamageMetadata,
