@@ -64,7 +64,7 @@ private constructor(
             val core = cell.getCore()
             val icon = CoreIcons.getNekoStack(core)
             icon.directEdit { itemName = core.displayName }
-            icon.setStandaloneCell(StandaloneCell(cell))
+            icon.standaloneCell = StandaloneCell(cell)
             ItemRenderers.REROLLING_TABLE.render(icon, RerollingTableContext(session))
 
             return ItemWrapper(icon.wrapped)

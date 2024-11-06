@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
+import kotlin.reflect.KProperty
 
 var NekoStack.level: Int
     get() = components.get(ItemComponentTypes.LEVEL)?.level ?: 1
@@ -20,6 +22,8 @@ var NekoStack.rarity: Rarity
         val boxedValue = ItemRarity(value)
         components.set(ItemComponentTypes.RARITY, boxedValue)
     }
+
+var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)
 
 fun NekoStack.getCell(id: String): Cell? {
     return components.get(ItemComponentTypes.CELLS)?.get(id)
@@ -46,10 +50,29 @@ fun NekoStack.removeCell(id: String) {
     }
 }
 
-fun NekoStack.getStandaloneCell(): StandaloneCell? {
-    return components.get(ItemComponentTypes.STANDALONE_CELL)
+var NekoStack.standaloneCell: StandaloneCell? by direct(ItemComponentTypes.STANDALONE_CELL)
+
+var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_CORE)
+
+
+/* private */
+
+private fun <T> direct(type: ItemComponentType<T>): DirectComponentDelegate<T> {
+    return DirectComponentDelegate(type)
 }
 
-fun NekoStack.setStandaloneCell(cell: StandaloneCell) {
-    components.set(ItemComponentTypes.STANDALONE_CELL, cell)
+private class DirectComponentDelegate<T>(
+    private val type: ItemComponentType<T>,
+) {
+    operator fun getValue(thisRef: NekoStack, property: KProperty<*>): T? {
+        return thisRef.components.get(type)
+    }
+
+    operator fun setValue(thisRef: NekoStack, property: KProperty<*>, value: T?) {
+        if (value == null) {
+            thisRef.components.unset(type)
+        } else {
+            thisRef.components.set(type, value)
+        }
+    }
 }

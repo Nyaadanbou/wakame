@@ -33,6 +33,8 @@ interface PriceModifier {
     }
 }
 
+private val MOCHA: MochaEngine<*> = MochaEngine.createStandard()
+
 @ConfigSerializable
 data class DamagePriceModifier(
     @Transient
@@ -46,8 +48,7 @@ data class DamagePriceModifier(
         const val NAME = "damage"
     }
 
-    private val mocha = MochaEngine.createStandard()
-    private val function = mocha.compileFunc<DamageFunction>(expression)
+    private val function: DamageFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
@@ -55,7 +56,7 @@ data class DamagePriceModifier(
         return function.evaluate(damage)
     }
 
-    private interface DamageFunction : MochaCompiledFunction {
+    interface DamageFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Int): Double
     }
 }
@@ -73,8 +74,7 @@ data class LevelPriceModifier(
         const val NAME = "value"
     }
 
-    private val mocha = MochaEngine.createStandard()
-    private val function = mocha.compileFunc<LevelFunction>(expression)
+    private val function: LevelFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
@@ -82,7 +82,7 @@ data class LevelPriceModifier(
         return function.evaluate(level)
     }
 
-    private interface LevelFunction : MochaCompiledFunction {
+    interface LevelFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Int): Double
     }
 }
@@ -102,8 +102,7 @@ data class RarityPriceModifier(
         const val NAME = "rarity"
     }
 
-    private val mocha = MochaEngine.createStandard()
-    private val function = mocha.compileFunc<RarityFunction>(expression)
+    private val function: RarityFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
@@ -112,13 +111,15 @@ data class RarityPriceModifier(
         return function.evaluate(mapped)
     }
 
-    private interface RarityFunction : MochaCompiledFunction {
+    interface RarityFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Double): Double
     }
 }
 
 @ConfigSerializable
 data class MergingPenaltyPriceModifier(
+    @Transient
+    override val name: String = NAME,
     @Required
     override val expression: String,
     @Required
@@ -128,21 +129,24 @@ data class MergingPenaltyPriceModifier(
         const val NAME = "merge_penalty"
     }
 
-    override val name: String
-        get() = NAME
+    private val function: MergingPenaltyFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
-        // TODO #227
-        return .0
+        val nekoStack = item.shadowNeko() ?: return .0
+        val portableCore = nekoStack.portableCore ?: return .0
+        val value = portableCore.penalty
+        return function.evaluate(value)
     }
 
-    private interface MergingPenaltyFunction : MochaCompiledFunction {
+    interface MergingPenaltyFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Int): Double
     }
 }
 
 @ConfigSerializable
 data class ModdingPenaltyPriceModifier(
+    @Transient
+    override val name: String = NAME,
     @Required
     override val expression: String,
     @Required
@@ -152,21 +156,24 @@ data class ModdingPenaltyPriceModifier(
         const val NAME = "mod_penalty"
     }
 
-    override val name: String
-        get() = NAME
+    private val function: ModdingPenaltyFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
-        // TODO #227
-        return .0
+        val nekoStack = item.shadowNeko() ?: return .0
+        val cells = nekoStack.cells ?: return .0
+        val value = cells.map { it.value }.sumOf { it.getReforgeHistory().modCount }
+        return function.evaluate(value)
     }
 
-    private interface ModdingPenaltyFunction : MochaCompiledFunction {
+    interface ModdingPenaltyFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Int): Double
     }
 }
 
 @ConfigSerializable
 data class RerollingPenaltyPriceModifier(
+    @Transient
+    override val name: String = NAME,
     @Required
     override val expression: String,
     @Required
@@ -176,15 +183,16 @@ data class RerollingPenaltyPriceModifier(
         const val NAME = "reroll_penalty"
     }
 
-    override val name: String
-        get() = NAME
+    private val function: RerollingPenaltyFunction = MOCHA.compileFunc(expression)
 
     override fun evaluate(item: ItemStack): Double {
-        // TODO #227
-        return .0
+        val nekoStack = item.shadowNeko() ?: return .0
+        val cells = nekoStack.cells ?: return .0
+        val value = cells.map { it.value }.sumOf { it.getReforgeHistory().rerollCount }
+        return function.evaluate(value)
     }
 
-    private interface RerollingPenaltyFunction : MochaCompiledFunction {
+    interface RerollingPenaltyFunction : MochaCompiledFunction {
         fun evaluate(@Named("value") value: Int): Double
     }
 }
