@@ -1,5 +1,5 @@
 enabled: true
-title: "回收台: example_b"
+title: "回收站: example_b"
 items:
   - minecraft:dirt
   - minecraft:sand
