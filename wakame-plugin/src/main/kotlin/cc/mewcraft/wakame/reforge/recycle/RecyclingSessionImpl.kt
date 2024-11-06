@@ -33,13 +33,14 @@ internal class SimpleRecyclingSession(
         val claim = Claim(playerSlot, item)
         claims += claim
 
-        logger.info("${viewer.name} claimed a recycling!")
+        logger.info("${viewer.name} added a claim!")
 
         return ClaimResult.success(displaySlot)
     }
 
     override fun purchase(dryRun: Boolean): RecyclingSession.PurchaseResult {
         if (claims.isEmpty()) {
+            logger.info("Purchase result: (empty).")
             return PurchaseResult.empty()
         }
 
@@ -67,11 +68,11 @@ internal class SimpleRecyclingSession(
                 claim.originalItem.amount = 0
             }
 
+            logger.info("Sold for $totalPoint in total.")
             // TODO #227 真的给玩家转账
         }
 
-        logger.info("Sold for $totalPoint")
-
+        logger.info("Purchase result: (totalMin=$totalMin, totalMax=$totalMax, totalPoint=$totalPoint)")
         return PurchaseResult.success(totalMin, totalMax, totalPoint)
     }
 

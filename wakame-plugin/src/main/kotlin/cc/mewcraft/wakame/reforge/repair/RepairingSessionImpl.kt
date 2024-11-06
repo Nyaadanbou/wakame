@@ -96,8 +96,11 @@ internal class SimpleRepairingSession(
                 // 修复物品
                 originalItem.damage = 0
 
-                // 发送消息
-                player.sendMessage("修复成功!")
+                logger.info("Repaired item: ${originalItem.itemName?.plain ?: originalItem.type}")
+            } else {
+                logger.error("Repairing a non-damageable item. This is a bug!")
+                logger.error("The non-damageable item is logged below:")
+                logger.error(originalItem.toString())
             }
         }
     }

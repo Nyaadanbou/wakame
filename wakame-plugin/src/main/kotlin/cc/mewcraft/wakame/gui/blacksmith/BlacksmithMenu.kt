@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.recycle.*
 import cc.mewcraft.wakame.reforge.repair.*
 import cc.mewcraft.wakame.util.*
+import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
@@ -87,8 +88,15 @@ internal class BlacksmithMenu(
                 // 如果未能成功加入回收列表, 则向玩家发送失败信息.
                 // 本次交互后, 整个菜单里的物品也不需要发生变化.
                 when (claimResult.reason) {
-                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(text("回收列表已满.").color(NamedTextColor.RED))
-                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(text("铁匠不接受此物品.").color(NamedTextColor.RED))
+                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(text {
+                        content("回收列表已满.")
+                        color(NamedTextColor.RED)
+                    })
+
+                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(text {
+                        content("铁匠不接受此物品.")
+                        color(NamedTextColor.RED)
+                    })
                 }
                 event.result = Event.Result.DENY
                 return
@@ -237,6 +245,12 @@ internal class BlacksmithMenu(
                     claim.repairCost.take(viewer)
                     claim.repair(viewer)
 
+                    // 发送消息
+                    viewer.sendMessage(text {
+                        content("花费 ${claim.repairCost.value} 硬币修复了 ")
+                        append(claim.originalItem.itemName ?: translatable(claim.originalItem))
+                    })
+
                     // 修复物品后从 claims 列表中移除
                     repairingSession.removeClaim(slot)
 
@@ -244,7 +258,10 @@ internal class BlacksmithMenu(
                     syncRepairingInventory()
 
                 } else {
-                    viewer.sendMessage(text("无法承担修理费用!").color(NamedTextColor.RED))
+                    viewer.sendMessage(text {
+                        content("你没有足够的硬币修复此物品.")
+                        color(NamedTextColor.RED)
+                    })
                 }
             }
         }
@@ -384,12 +401,18 @@ internal class BlacksmithMenu(
 
                 is RecyclingSession.PurchaseResult.Failure -> {
                     // 如果购买失败, 则向玩家发送失败信息.
-                    viewer.sendMessage(text("Internal error!").color(NamedTextColor.RED))
+                    viewer.sendMessage(text {
+                        content("内部错误.")
+                        color(NamedTextColor.RED)
+                    })
                 }
 
                 is RecyclingSession.PurchaseResult.Success -> {
                     // 如果购买成功, 则向玩家发送成功信息.
-                    viewer.sendMessage(text("Sold for ${purchaseResult.fixPrice}!").color(NamedTextColor.LIGHT_PURPLE))
+                    viewer.sendMessage(text {
+                        content("出售获得 ${purchaseResult.fixPrice} 硬币.")
+                        color(NamedTextColor.LIGHT_PURPLE)
+                    })
 
                     // 同步菜单里的回收列表
                     syncRecyclingInventory()
