@@ -19,11 +19,10 @@ import java.lang.reflect.Type
  * [ModdingTable] 的序列化器.
  */
 internal object ModdingTableSerializer : KoinComponent {
-    private const val REFORGE_DIR_NAME = "reforge"
-    private const val MODDING_DIR_NAME = "mod"
+    private const val ROOT_DIR_NAME = "mod"
 
     private val LOGGER: Logger = get()
-    private val MODDING_DIR by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MODDING_DIR_NAME) }
+    private val MODDING_DIR by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
 
     /**
      * 从配置文件夹中加载所有的定制台.
