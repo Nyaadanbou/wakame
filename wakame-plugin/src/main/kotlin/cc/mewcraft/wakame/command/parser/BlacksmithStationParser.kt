@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
-import cc.mewcraft.wakame.reforge.blacksmith.WtfBlacksmithStation
+import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStationRegistry
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -23,22 +23,17 @@ class BlacksmithStationParser<C : Any> : ArgumentParser<C, BlacksmithStation>, B
     }
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<BlacksmithStation> {
-        // val peekStr = commandInput.peekString()
-        // if (peekStr !in BlacksmithStationRegistry.NAMES) {
-        //     return ArgumentParseResult.failure(BlacksmithStationParseException(commandContext))
-        // }
-        //
-        // val readStr = commandInput.readString()
-        // return ArgumentParseResult.success(BlacksmithStationRegistry[readStr]!!)
-        // TODO #227 从 BlacksmithStationRegistry 读取 BlacksmithStation 实例
+        val peekStr = commandInput.peekString()
+        if (peekStr !in BlacksmithStationRegistry.names) {
+            return ArgumentParseResult.failure(BlacksmithStationParseException(commandContext))
+        }
+
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(WtfBlacksmithStation)
+        return ArgumentParseResult.success(BlacksmithStationRegistry.getStation(readStr)!!)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        // return BlacksmithStationRegistry.NAMES
-        // TODO #227 从 BlacksmithStationRegistry 读取所有的 BlacksmithStation id
-        return listOf("wtf")
+        return BlacksmithStationRegistry.names
     }
 }
 
