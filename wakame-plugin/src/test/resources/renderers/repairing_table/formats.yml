@@ -24,10 +24,3 @@ repair_usage:
   namespace: repair_usage
   tooltip:
     - "点击以修理"
-
-# id: `item_name`
-item_name:
-  namespace: item_name
-  # 可用标签
-  # <value> 物品的 `minecraft:item_name`
-  tooltip: "<value>"

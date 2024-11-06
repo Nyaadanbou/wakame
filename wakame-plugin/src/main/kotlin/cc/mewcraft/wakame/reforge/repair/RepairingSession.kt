@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.reforge.repair
 
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
@@ -21,10 +20,12 @@ interface RepairingSession {
 
     interface Claim {
         /**
-         * 该 claim 的物品堆叠,
+         * 该 [Claim] 的物品堆叠,
          * 也是要被修复的物品堆叠.
          *
-         * 注意: 该物品堆叠是玩家背包里物品的直接引用.
+         * 该物品堆叠是玩家背包里物品的 *直接引用*.
+         * 这样当我们修改这个物品堆叠的耐久度时,
+         * 玩家背包里的那个也会被同时修改.
          */
         val originalItem: ItemStack
 
@@ -41,8 +42,19 @@ interface RepairingSession {
     }
 
     interface RepairCost {
-        val description: List<Component>
+        /**
+         * 修复该物品的花费(货币).
+         */
+        val value: Double
+
+        /**
+         * 测试玩家是否有足够的 [value] 货币来修复该物品.
+         */
         fun test(player: Player): Boolean
+
+        /**
+         * 从玩家身上扣除 [value] 货币.
+         */
         fun take(player: Player)
     }
 }

@@ -226,9 +226,9 @@ var MojangStack.isClientSide: Boolean
     get() = this.unsafeNbt?.contains(CLIENT_SIDE_KEY) == true
     set(value) {
         if (value) {
-            this.editNbt { it.putByte(CLIENT_SIDE_KEY, 0) }
-        } else {
             this.editNbt { it.remove(CLIENT_SIDE_KEY) }
+        } else {
+            this.editNbt { it.putByte(CLIENT_SIDE_KEY, 0) }
         }
     }
 

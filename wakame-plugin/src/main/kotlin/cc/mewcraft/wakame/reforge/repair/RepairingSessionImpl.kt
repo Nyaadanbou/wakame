@@ -2,9 +2,6 @@ package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.*
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
@@ -64,16 +61,8 @@ internal class SimpleRepairingSession(
         inventory.storageContents.forEach { itemStack /* mirror */ ->
             if (itemStack != null && isRepairable(itemStack)) {
                 // TODO #227 计算实际花费
-                val costValue = 0.0
-                val repairCost = RepairCost(
-                    costValue,
-                    text {
-                        content("修理花费: ").color(NamedTextColor.GRAY)
-                        append(text {
-                            content("$costValue 金币").color(NamedTextColor.YELLOW)
-                        })
-                    }
-                )
+                val costValue = 33.0
+                val repairCost = RepairCost(costValue)
 
                 claims += Claim(
                     repairCost = repairCost,
@@ -115,18 +104,10 @@ internal class SimpleRepairingSession(
 
     /**
      * @param value 修复需要花费的金币
-     * @param description 金币花费的文本描述, 将展示给玩家
      */
     inner class RepairCost(
-        private val value: Double,
-        override val description: List<Component>,
+        override val value: Double,
     ) : RepairingSession.RepairCost {
-        constructor(
-            value: Double, description: Component,
-        ) : this(
-            value, listOf(description)
-        )
-
         override fun test(player: Player): Boolean {
             // TODO #227 检查玩家是否有足够的金币
             return true

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.blacksmith
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationContext
+import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.recycle.*
@@ -195,12 +196,20 @@ internal class BlacksmithMenu(
         // 重新向菜单里添加物品
         for (claim in repairingSession.getAllClaims()) {
             val displaySlot = claim.displaySlot
-            val renderedItem = claim.originalItem // TODO #227 渲染物品: 耐久度, 修理费用, 交互提示(点击维修)
+            val displayItem = claim.originalItem.clone().apply {
+                val context = RepairingTableItemRendererContext(
+                    damage = this.damage,
+                    maxDamage = this.maxDamage,
+                    repairCost = claim.repairCost.value,
+                )
+                ItemRenderers.REPAIRING_TABLE.render(this, context)
+            }
+
             if (displaySlot >= unsafeItems.size) {
                 break
             }
 
-            unsafeItems[displaySlot] = renderedItem
+            unsafeItems[displaySlot] = displayItem
         }
 
         // 更新菜单物品
