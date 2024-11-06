@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.recycle
 
+import cc.mewcraft.wakame.core.EconomyApi
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
@@ -20,6 +21,7 @@ internal class SimpleRecyclingSession(
 ) : RecyclingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
 
+    private val economyApi: EconomyApi = get()
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 
     override fun claimItem(item: ItemStack, playerSlot: Int): RecyclingSession.ClaimResult {
@@ -69,7 +71,14 @@ internal class SimpleRecyclingSession(
             }
 
             logger.info("Sold for $totalPoint in total.")
-            // TODO #227 真的给玩家转账
+
+            val result = economyApi.give(viewer.uniqueId, totalPoint)
+            if (result.isFailure) {
+                logger.error("Failed to give money to ${viewer.name}.")
+                return PurchaseResult.failure(
+                    RecyclingSession.PurchaseResult.Failure.Reason.UNKNOWN
+                )
+            }
         }
 
         logger.info("Purchase result: (totalMin=$totalMin, totalMax=$totalMax, totalPoint=$totalPoint)")
