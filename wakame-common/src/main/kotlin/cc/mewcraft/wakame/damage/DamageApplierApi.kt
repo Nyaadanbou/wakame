@@ -6,29 +6,31 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * API for applying damage to entities.
  */
-interface DamageApplierApi {
+// 本接口用来给 [单纯造成伤害] 的逻辑提供抽象,
+// 以保证伤害系统的核心代码的简洁和可维护性.
+interface DamageApplier {
     /**
-     * Applies damage to a victim.
+     * Applies damage to [victim].
      *
      * @param victim The entity to apply damage to.
      * @param source The entity that caused the damage.
      * @param amount The amount of damage to apply.
      */
-    fun doDamage(victim: LivingEntity, source: LivingEntity?, amount: Double)
+    fun damage(victim: LivingEntity, source: LivingEntity?, amount: Double)
 
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
     companion object Provider {
-        private var instance: DamageApplierApi? = null
+        private var instance: DamageApplier? = null
 
         @JvmStatic
-        fun instance(): DamageApplierApi {
-            return instance ?: throw IllegalStateException("DamageManager has not been initialized")
+        fun instance(): DamageApplier {
+            return instance ?: throw IllegalStateException("DamageApplier has not been initialized")
         }
 
         @ApiStatus.Internal
-        fun register(instance: DamageApplierApi) {
+        fun register(instance: DamageApplier) {
             this.instance = instance
         }
 

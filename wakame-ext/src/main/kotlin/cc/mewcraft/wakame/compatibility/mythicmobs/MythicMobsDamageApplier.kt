@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
-import cc.mewcraft.wakame.damage.DamageApplierApi
+import cc.mewcraft.wakame.damage.DamageApplier
 import com.google.common.collect.Maps
 import io.lumine.mythic.api.adapters.SkillAdapter
 import io.lumine.mythic.api.mobs.GenericCaster
@@ -11,8 +11,12 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.ItemStack
 
-object MythicMobsDamageApplier : DamageApplierApi {
-    override fun doDamage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
+/**
+ * 一个用 MythicMobs 实现的 [DamageApplier].
+ */
+// 本实现是为了解决MM技能造成的伤害会无限递归问题.
+object MythicMobsDamageApplier : DamageApplier {
+    override fun damage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
         val mythicSource = BukkitAdapter.adapt(source)
         val mythicVictim = BukkitAdapter.adapt(victim)
         val genericDamager = GenericCaster(mythicSource)

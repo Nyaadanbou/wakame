@@ -20,9 +20,9 @@ internal object DamageBootstrap : Initializable {
 
         // 注册 DamageApplier
         if (Injector.get<WakamePlugin>().isPluginPresent("MythicMobs")) {
-            DamageApplierApi.register(MythicMobsDamageApplier)
+            DamageApplier.register(MythicMobsDamageApplier)
         } else {
-            DamageApplierApi.register(DamageApplier)
+            DamageApplier.register(BukkitDamageApplier)
         }
 
         // 注册 DamageManagerApi
