@@ -102,7 +102,7 @@ fun DamagePacket(
     elementId: String,
     min: Double,
     max: Double,
-    rate: Double = .0,
+    rate: Double = 1.0,
     defensePenetration: Double = .0,
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
@@ -138,7 +138,7 @@ data class DamagePacket(
     /**
      * 伤害的加成比率. 例如: 火元素伤害+50%.
      */
-    val rate: Double = .0,
+    val rate: Double = 1.0,
 
     /**
      * 伤害的护甲穿透值.

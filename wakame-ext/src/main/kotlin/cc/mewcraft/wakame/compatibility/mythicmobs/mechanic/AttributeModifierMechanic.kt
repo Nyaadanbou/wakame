@@ -21,6 +21,10 @@ class AttributeModifierMechanic(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill, KoinComponent {
+    init {
+        threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
+    }
+
     private val attributeProvider: AttributeProvider by inject()
     private val attributeMapAccess: AttributeMapAccess<LivingEntity> by inject(named(AttributeMapAccess.FOR_ENTITY))
 

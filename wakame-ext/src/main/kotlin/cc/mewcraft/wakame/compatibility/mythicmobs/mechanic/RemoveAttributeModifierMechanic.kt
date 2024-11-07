@@ -5,10 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.INoTargetSkill
-import io.lumine.mythic.api.skills.ITargetedEntitySkill
-import io.lumine.mythic.api.skills.SkillMetadata
-import io.lumine.mythic.api.skills.SkillResult
+import io.lumine.mythic.api.skills.*
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
@@ -25,6 +22,11 @@ class RemoveAttributeModifierMechanic(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill, KoinComponent {
+
+    init {
+        threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
+    }
+
     private val attributeProvider: AttributeProvider by inject()
     private val attributeMapAccess: AttributeMapAccess<LivingEntity> by inject(named(AttributeMapAccess.FOR_ENTITY))
 

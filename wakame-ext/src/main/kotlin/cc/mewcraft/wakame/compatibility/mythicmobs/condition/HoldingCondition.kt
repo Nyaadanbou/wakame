@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.Nekoo
 import cc.mewcraft.wakame.NekooProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
+import io.lumine.mythic.api.skills.ThreadSafetyLevel
 import io.lumine.mythic.api.skills.conditions.IEntityCondition
 import io.lumine.mythic.core.logging.MythicLogger
 import io.lumine.mythic.core.skills.SkillCondition
@@ -14,6 +15,10 @@ class HoldingCondition(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillCondition(line), IEntityCondition {
+    init {
+        threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
+    }
+
     private val nekoo: Nekoo = NekooProvider.get()
     private val comparisons: Collection<Key>
 

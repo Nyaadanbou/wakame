@@ -33,6 +33,7 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
  */
 object DamageManager : DamageManagerApi, KoinComponent {
     private val logger: Logger = get()
+    private val damageApplier: DamageApplier = DamageApplier.instance()
 
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
@@ -47,9 +48,8 @@ object DamageManager : DamageManagerApi, KoinComponent {
             markCancelKnockback(victim.uniqueId)
         }
 
-        // 触发一下 Bukkit 的伤害事件.
-        // 伤害填多少都无所谓, 最后都是要萌芽伤害事件重新算.
-        victim.damage(4.95, source)
+        // 造成伤害
+        damageApplier.damage(victim, source, 4.95)
     }
 
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {

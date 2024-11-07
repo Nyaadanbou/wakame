@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.NekooProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.adapters.AbstractLocation
 import io.lumine.mythic.api.config.MythicLineConfig
+import io.lumine.mythic.api.skills.ThreadSafetyLevel
 import io.lumine.mythic.api.skills.conditions.IEntityCondition
 import io.lumine.mythic.api.skills.conditions.ILocationCondition
 import io.lumine.mythic.bukkit.BukkitAdapter
@@ -20,6 +21,10 @@ class HasItemCondition(
     line: String,
     private val mlc: MythicLineConfig,
 ) : SkillCondition(line), IEntityCondition, ILocationCondition {
+    init {
+        threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
+    }
+
     private val nekoo: Nekoo = NekooProvider.get()
 
     private val itemKey: Key
