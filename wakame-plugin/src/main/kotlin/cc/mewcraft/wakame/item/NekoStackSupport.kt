@@ -16,9 +16,7 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 import org.slf4j.Logger
 import java.util.stream.Stream
 

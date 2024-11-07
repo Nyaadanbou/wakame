@@ -2,24 +2,19 @@ package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.damage
-import cc.mewcraft.wakame.item.isDamageable
-import cc.mewcraft.wakame.item.maxDamage
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.Skill
-import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.*
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 
 interface HoldLastDamage : ItemBehavior {

@@ -6,9 +6,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
+import org.bukkit.entity.*
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 

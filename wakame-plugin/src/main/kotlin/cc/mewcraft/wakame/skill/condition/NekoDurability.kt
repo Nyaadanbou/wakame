@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.skill.condition
 
-import cc.mewcraft.wakame.item.damage
-import cc.mewcraft.wakame.item.isDamageable
-import cc.mewcraft.wakame.item.maxDamage
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.context.SkillContextKey

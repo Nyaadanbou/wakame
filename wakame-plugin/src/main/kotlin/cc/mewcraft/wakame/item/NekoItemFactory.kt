@@ -2,14 +2,8 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
