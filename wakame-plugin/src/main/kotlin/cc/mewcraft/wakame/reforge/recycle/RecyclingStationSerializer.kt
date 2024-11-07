@@ -40,18 +40,19 @@ internal object RecyclingStationSerializer {
             }
         }
 
-        val result = itemFiles.associate { (f, ns, ps) ->
+        val result = itemFiles.mapNotNull { (f, ns, ps) ->
             val itemKey = Key.key(ns, ps)
             val rootNode = yamlLoader.buildAndLoadString(f.readText())
 
             // 反序列化配置文件
-            val minBase = rootNode.node("min_base").getDouble(.0)
-            val maxBase = rootNode.node("max_base").getDouble(.0)
-            val modifiers = rootNode.node("modifiers").get<Map<String, PriceModifier>>() ?: emptyMap()
+            val priceInstance = rootNode.get<PriceInstance>() ?: run {
+                logger.warn("Failed to load price instance for item: $itemKey")
+                return@mapNotNull null
+            }
 
             // 构建映射
-            itemKey to PriceInstance(minBase, maxBase, modifiers)
-        }
+            itemKey to priceInstance
+        }.toMap()
 
         return result
     }

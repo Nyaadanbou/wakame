@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.reforge.common.*
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
@@ -40,22 +41,25 @@ internal object RepairingTableSerializer {
         val yamlLoader = yamlConfig {
             withDefaults()
             serializers {
-                registerAnnotatedObjects(objectMapperFactory())
+                registerAnnotatedObjects(ObjectMappers.DEFAULT)
+                kregister(PriceInstanceSerializer)
                 kregister(PriceModifierSerializer)
             }
         }
 
-        val result = itemFiles.associate { (f, ns, ps) ->
+        val result = itemFiles.mapNotNull { (f, ns, ps) ->
             val itemKey = Key.key(ns, ps)
             val rootNode = yamlLoader.buildAndLoadString(f.readText())
 
             // 反序列化配置文件
-            val base = rootNode.node("base").getDouble(.0)
-            val modifiers = rootNode.node("modifiers").get<Map<String, PriceModifier>>() ?: emptyMap()
+            val priceInstance = rootNode.get<PriceInstance>() ?: run {
+                logger.warn("Failed to load price instance for item: $itemKey")
+                return@mapNotNull null
+            }
 
             // 构建映射
-            itemKey to PriceInstance(base, modifiers)
-        }
+            itemKey to priceInstance
+        }.toMap()
 
         return result
     }
@@ -83,7 +87,7 @@ internal object RepairingTableSerializer {
             .drop(1)
             .filter { it.isFile && it.extension == "yml" }
             .associate { f ->
-                val tableId  = f.nameWithoutExtension.lowercase()
+                val tableId = f.nameWithoutExtension.lowercase()
                 val rootNode = yamlLoader.buildAndLoadString(f.readText())
                 val enabled = rootNode.node("enabled").getBoolean(true)
                 val title = rootNode.node("title").get<Component>(Component.empty())
