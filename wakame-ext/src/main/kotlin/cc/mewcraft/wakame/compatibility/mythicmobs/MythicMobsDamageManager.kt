@@ -14,9 +14,12 @@ import io.lumine.mythic.api.skills.damage.DamageMetadata as MythicDamageMetadata
 
 object MythicMobsDamageManager : DamageManagerApi {
     override fun hurt(victim: LivingEntity, damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
-        val sourceEntity = GenericCaster(BukkitAdapter.adapt(source))
-        val damageData = MythicDamageMetadata(
-            /* damager = */ sourceEntity,
+        val mythicSource = BukkitAdapter.adapt(source)
+        val mythicVictim = BukkitAdapter.adapt(victim)
+        val genericDamager = GenericCaster(mythicSource)
+
+        val mythicDamageMetadata = MythicDamageMetadata(
+            /* damager = */ genericDamager,
             /* damagerItem = */ ItemComponentBukkitItemStack(ItemStack.empty()),
             /* amount = */ 4.95,
             /* bonusDamage = */ Maps.newTreeMap<String, Double>(),
@@ -28,8 +31,10 @@ object MythicMobsDamageManager : DamageManagerApi {
             /* preventsKnockback = */ knockback,
             /* ignoreEnchantments = */ false,
             /* damageCause = */ EntityDamageEvent.DamageCause.CUSTOM
-        )
-        damageData.putBoolean("trigger_skills", true)
-        SkillAdapter.get().doDamage(damageData, BukkitAdapter.adapt(victim))
+        ).apply {
+            putBoolean("trigger_skills", true)
+        }
+
+        SkillAdapter.get().doDamage(mythicDamageMetadata, mythicVictim)
     }
 }
