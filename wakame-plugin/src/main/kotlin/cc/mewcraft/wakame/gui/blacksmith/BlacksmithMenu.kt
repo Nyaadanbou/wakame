@@ -74,6 +74,10 @@ internal class BlacksmithMenu(
         // 如果是, 则尝试将物品加入回收列表.
         // 如果不是, 则直接取消事件.
 
+        if (event.whoClicked != viewer) {
+            return
+        }
+
         if (
             getCurrentTab() == TabType.RECYCLING &&
             event.action == InventoryAction.PICKUP_ALL &&
@@ -123,8 +127,12 @@ internal class BlacksmithMenu(
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     private fun on(event: PlayerAttemptPickupItemEvent) {
+        if (event.player != viewer) {
+            return
+        }
+
         event.isCancelled = true
     }
 
