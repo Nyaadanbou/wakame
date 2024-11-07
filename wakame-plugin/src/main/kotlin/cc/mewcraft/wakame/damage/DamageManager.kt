@@ -3,12 +3,8 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.EntityAttributeMapAccess
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
-import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
-import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
+import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.damage.mappings.*
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
@@ -17,15 +13,13 @@ import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.entity.*
+import org.bukkit.event.entity.EntityDamageEvent.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * @see DamageManagerApi.hurt

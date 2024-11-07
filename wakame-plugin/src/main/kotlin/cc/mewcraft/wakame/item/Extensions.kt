@@ -2,9 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.damage
-import cc.mewcraft.wakame.util.isDamageable
-import cc.mewcraft.wakame.util.maxDamage
+import cc.mewcraft.wakame.util.*
 import org.bukkit.entity.Player
 
 fun NekoStack.applyAttackCooldown(player: Player) {
@@ -17,7 +15,6 @@ fun NekoStack.applyAttackCooldown(player: Player) {
     player.setCooldown(this.itemType, attackSpeedLevel.cooldown)
 }
 
-//<editor-fold desc="耐久度">
 var NekoStack.damage: Int
     get() = wrapped.damage
     set(value) {
@@ -31,9 +28,8 @@ val NekoStack.isDamageable: Boolean
     get() = wrapped.isDamageable
 
 /**
- * 使用该方法使物品失去最后一点耐久时, 不会有损坏动画效果
+ * 使用该方法使物品失去最后一点耐久时, 不会有损坏动画效果.
  */
 fun NekoStack.hurtAndBreak(player: Player, amount: Int) {
     wrapped.damage(amount, player)
 }
-//</editor-fold>
