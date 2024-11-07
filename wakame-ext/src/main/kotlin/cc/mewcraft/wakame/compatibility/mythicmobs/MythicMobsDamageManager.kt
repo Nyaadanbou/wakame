@@ -28,7 +28,7 @@ object MythicMobsDamageManager : DamageManagerApi {
             /* multiplier = */ 1.0,
             /* ignoresArmor = */ false,
             /* preventsImmunity = */ false,
-            /* preventsKnockback = */ knockback,
+            /* preventsKnockback = */ !knockback,
             /* ignoreEnchantments = */ false,
             /* damageCause = */ EntityDamageEvent.DamageCause.CUSTOM
         ).apply {
