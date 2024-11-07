@@ -1,24 +1,23 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
-import cc.mewcraft.wakame.damage.DamageManagerApi
-import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamageApplierApi
 import com.google.common.collect.Maps
 import io.lumine.mythic.api.adapters.SkillAdapter
 import io.lumine.mythic.api.mobs.GenericCaster
+import io.lumine.mythic.api.skills.damage.DamageMetadata
 import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.bukkit.adapters.item.ItemComponentBukkitItemStack
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.ItemStack
-import io.lumine.mythic.api.skills.damage.DamageMetadata as MythicDamageMetadata
 
-object MythicMobsDamageManager : DamageManagerApi {
-    override fun hurt(victim: LivingEntity, damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
+object MythicMobsDamageApplier : DamageApplierApi {
+    override fun doDamage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
         val mythicSource = BukkitAdapter.adapt(source)
         val mythicVictim = BukkitAdapter.adapt(victim)
         val genericDamager = GenericCaster(mythicSource)
 
-        val mythicDamageMetadata = MythicDamageMetadata(
+        val mythicDamageMetadata = DamageMetadata(
             /* damager = */ genericDamager,
             /* damagerItem = */ ItemComponentBukkitItemStack(ItemStack.empty()),
             /* amount = */ 4.95,
@@ -28,11 +27,11 @@ object MythicMobsDamageManager : DamageManagerApi {
             /* multiplier = */ 1.0,
             /* ignoresArmor = */ false,
             /* preventsImmunity = */ false,
-            /* preventsKnockback = */ !knockback,
+            /* preventsKnockback = */ false,
             /* ignoreEnchantments = */ false,
             /* damageCause = */ EntityDamageEvent.DamageCause.CUSTOM
         ).apply {
-            putBoolean("trigger_skills", true)
+            putBoolean("trigger_skills", false)
         }
 
         SkillAdapter.get().doDamage(mythicDamageMetadata, mythicVictim)
