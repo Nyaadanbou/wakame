@@ -65,6 +65,12 @@ class PriceInstance(
         var y: Double = x
         getModifiersOrEmpty(PriceModifier.Operation.ADD_MULTIPLIED_BASE).forEach { y += x * it.value.evaluate(item) }
         getModifiersOrEmpty(PriceModifier.Operation.ADD_MULTIPLIED_TOTAL).forEach { y *= 1.0 + it.value.evaluate(item) }
+
+        // 这里的价格为单价, 所以乘以物品堆叠的数量
+        y *= item.amount
+        // 无论如何价格都不应该为负数
+        y = y.coerceAtLeast(.0)
+
         return y
     }
 
