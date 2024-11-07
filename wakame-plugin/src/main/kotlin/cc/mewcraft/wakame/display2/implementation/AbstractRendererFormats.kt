@@ -18,7 +18,8 @@ import java.nio.file.Path
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
-import kotlin.io.path.*
+import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -89,8 +90,6 @@ internal abstract class AbstractRendererFormats(
             registeredRendererFormats[id] = format
             // create & register the text meta factory
             textMetaFactoryRegistry.registerFactory(format.textMetaFactory)
-
-            logger.info("Loaded renderer format (${formatPath.parent.name}): $id")
         }
 
         // reload all renderer formats of this renderer
