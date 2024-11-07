@@ -5,6 +5,11 @@ max_base: 150.0
 # 下面全都是对基础价值 (base) 的修饰符
 modifiers:
 
+  # 物品损耗
+  damage:
+    operation: add_value
+    expression: "-1.0 * query.value"
+
   # 物品等级
   level:
     # 可用类型:
