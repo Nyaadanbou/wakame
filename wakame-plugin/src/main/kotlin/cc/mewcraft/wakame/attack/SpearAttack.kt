@@ -73,7 +73,8 @@ data class SpearAttack(
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        super.handleInteract(player, nekoStack, action, wrappedEvent)
+        if (!action.isLeftClick) return
+        if (player.toUser().attackSpeed.isActive(nekoStack.id)) return
 
         applySpearAttack(player)
 
@@ -81,6 +82,8 @@ data class SpearAttack(
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
         player.damageItemStack(EquipmentSlot.HAND, 1)
+
+        wrappedEvent.actionPerformed = true
     }
 
     private fun applySpearAttack(player: Player, vararg excludeEntities: LivingEntity) {

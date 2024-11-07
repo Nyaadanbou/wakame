@@ -8,7 +8,9 @@ import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.*
+import org.bukkit.Particle
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -70,7 +72,8 @@ class CudgelAttack : AttackType {
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        super.handleInteract(player, nekoStack, action, wrappedEvent)
+        if (!action.isLeftClick) return
+        if (player.toUser().attackSpeed.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 
