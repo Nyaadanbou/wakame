@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.skill.factory
 
 import cc.mewcraft.wakame.item.damage
-import cc.mewcraft.wakame.item.decreaseDurability
+import cc.mewcraft.wakame.item.hurtAndBreak
 import cc.mewcraft.wakame.item.isDamageable
 import cc.mewcraft.wakame.item.maxDamage
 import cc.mewcraft.wakame.skill.*
@@ -155,7 +155,7 @@ private class DashTick(
         val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return TickResult.ALL_DONE
         if (nekoStack.isDamageable) {
             if (nekoStack.damage < nekoStack.maxDamage) {
-                nekoStack.decreaseDurability(player, damageCount)
+                nekoStack.hurtAndBreak(player, damageCount)
             } else {
                 return TickResult.ALL_DONE
             }

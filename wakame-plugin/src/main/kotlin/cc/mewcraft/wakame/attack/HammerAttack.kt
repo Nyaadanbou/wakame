@@ -2,21 +2,15 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.Location
-import org.bukkit.Particle
-import org.bukkit.Sound
-import org.bukkit.SoundCategory
+import org.bukkit.*
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.util.NumberConversions
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
+import org.bukkit.inventory.EquipmentSlot
 
 /**
  * 自定义锤攻击.
@@ -34,12 +28,85 @@ import kotlin.math.sqrt
 class HammerAttack : AttackType {
     companion object {
         const val NAME = "hammer"
+        const val MAX_RADIUS = 32.0
     }
 
-    override fun handleDirectMeleeAttackEntity(player: Player, nekoStack: NekoStack, event: EntityDamageEvent): DamageMetadata? {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
+
         val user = player.toUser()
         // 只要这个物品的内部冷却处于激活状态就不处理
         // 内部冷却不一定是攻速组件造成的
+        if (user.attackSpeed.isActive(nekoStack.id)) {
+            return
+        }
+
+        val attributeMap = user.attributeMap
+        val hitLocation = damagee.location
+        val radius = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceIn(0.0, MAX_RADIUS)
+        val ratio = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RATIO)
+        val damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER)
+        // 范围伤害目标的判定为:
+        // 以直接受击实体的脚部坐标为起点,
+        // 向 y 轴正方向(上方) 1 格
+        // 向 x 轴, z 轴正负方向各 radius 格的长方体所碰撞到的生物
+        hitLocation.clone().add(.0, .5, .0).getNearbyLivingEntities(radius, .5) {
+            it != player && it != damagee
+        }.forEach {
+            // 锤子范围命中的生物的伤害元数据
+            val extraDamageMetadata = PlayerDamageMetadata(
+                user = user,
+                damageTags = damageTags,
+                damageBundle = damageBundle(attributeMap) {
+                    every {
+                        standard()
+                        rate {
+                            ratio * standard()
+                        }
+                    }
+                }
+            )
+            it.hurt(extraDamageMetadata, player, true)
+        }
+
+        // 特效
+        val world = player.world
+        val particleBuilder = ParticleBuilder(Particle.BLOCK)
+            .count(3)
+            .offset(0.3, 0.1, 0.3)
+            .extra(0.15)
+        // 计算正方形的左下角和右上角的坐标
+        val bottomLeftX = hitLocation.x - radius
+        val bottomLeftZ = hitLocation.z - radius
+        val topRightX = hitLocation.x + radius
+        val topRightZ = hitLocation.z + radius
+        var x = bottomLeftX
+        while (x <= topRightX) {
+            var z = bottomLeftZ
+            while (z <= topRightZ) {
+                val currentLocation = Location(world, x, hitLocation.y, z)
+                val blockData = Location(world, x, hitLocation.y - 1, z).block.blockData
+                particleBuilder
+                    .location(currentLocation)
+                    .data(blockData)
+                    .receivers(64)
+                    .spawn()
+                z += 0.5
+            }
+            x += 0.5
+        }
+        world.playSound(player.location, Sound.ITEM_MACE_SMASH_GROUND, SoundCategory.PLAYERS, 1F, 1F)
+
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
+        player.damageItemStack(EquipmentSlot.HAND, 1)
+    }
+
+    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
+        val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
@@ -48,80 +115,14 @@ class HammerAttack : AttackType {
         // 锤子直接命中的生物的伤害元数据
         val directDamageMetadata = PlayerDamageMetadata(
             user = user,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER),
-            damageBundle = damageBundle(attributeMap) {
-                every { standard() }
-            }
-        )
-        val ratio = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RATIO)
-        // 锤子范围命中的生物的伤害元数据
-        val extraDamageMetadata = PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER, DamageTag.EXTRA),
+            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.HAMMER),
             damageBundle = damageBundle(attributeMap) {
                 every {
                     standard()
-                    rate { ratio * standard() }
                 }
             }
         )
 
-        val damagee = event.entity
-        val hitLocation = damagee.location
-        val radius = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceAtLeast(0.0)
-        // 范围伤害目标的判定为:
-        // 以直接受击实体的脚部坐标向 y 轴正方向(上方)偏移 0.5 格为中心
-        // 高为 1 格, 半径为 radius 的圆柱体
-        hitLocation.clone().add(.0, .5, .0).getNearbyLivingEntities(radius, 0.5) {
-            it.uniqueId != player.uniqueId && it.uniqueId != damagee.uniqueId && distanceXZ(it.location, hitLocation) < radius
-        }.forEach {
-            it.hurt(extraDamageMetadata, player, true)
-        }
-
-        // 应用攻击冷却
-        nekoStack.applyAttackCooldown(player)
-        // TODO 扣除耐久
-
-        // 特效
-        val world = player.world
-        val n = 16
-        val angleIncrement = 2 * PI / n
-        val blockData = hitLocation.clone().add(.0, -1.0, .0).block.blockData
-        for (i in 0 until n) {
-            val angle = i * angleIncrement
-            val x = hitLocation.x + radius * cos(angle)
-            val z = hitLocation.z + radius * sin(angle)
-            ParticleBuilder(Particle.BLOCK)
-                .data(blockData)
-                .location(world, x, hitLocation.y, z)
-                .count(10)
-                .offset(0.3, 0.1, 0.3)
-                .extra(0.15)
-                .receivers(16)
-                .spawn()
-        }
-        ParticleBuilder(Particle.BLOCK)
-            .data(blockData)
-            .location(hitLocation)
-            .count(50)
-            .offset(0.3, 0.3, 0.3)
-            .extra(0.15)
-            .receivers(16)
-            .spawn()
-        world.playSound(player.location, Sound.ITEM_MACE_SMASH_GROUND, SoundCategory.PLAYERS, 1F, 1F)
-
         return directDamageMetadata
-    }
-
-    private fun distanceXZ(location1: Location, location2: Location): Double {
-        if (location1.world != null && location2.world != null) {
-            if (location1.world != location2.world) {
-                throw IllegalArgumentException("Cannot measure distance between ${location1.world.name} and ${location2.world.name}")
-            } else {
-                return sqrt(NumberConversions.square(location1.x - location2.x) + NumberConversions.square(location1.z - location2.z))
-            }
-        } else {
-            throw IllegalArgumentException("Cannot measure distance to a null world")
-        }
     }
 }

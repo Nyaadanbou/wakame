@@ -2,14 +2,8 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.item.behavior.ItemBehavior
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.behavior.ItemBehaviorTypes
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.behavior.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -48,13 +42,13 @@ object NekoItemFactory : KoinComponent {
                 if (root.contains(path)) this.put(type, type.create())
             }
 
+            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             // tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
             // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             // tryAdd("food", ItemBehaviorTypes.FOOD)
-            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
-            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             // tryAdd("tool", ItemBehaviorTypes.TOOL)
             // tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             // tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
@@ -151,14 +145,13 @@ object NekoItemFactory : KoinComponent {
                 if (root.contains(path)) this.put(type, type.create())
             }
 
+            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
+            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
-            tryAdd("max_damage", ItemBehaviorTypes.MAX_DAMAGE)
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
-            tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
-            tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             tryAdd("wearable", ItemBehaviorTypes.WEARABLE)

@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.behaviors
 
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
+import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import org.bukkit.entity.Player
+import org.bukkit.entity.*
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 
@@ -16,9 +17,16 @@ import org.bukkit.inventory.ItemStack
 interface Attack : ItemBehavior {
     private object Default : Attack {
         override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-            val nekoStack = itemStack.toNekoStack
+            val nekoStack = itemStack.projectNeko()
             val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
             attack.attackType.handleInteract(player, nekoStack, action, wrappedEvent)
+        }
+
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
+            val nekoStack = itemStack.projectNeko()
+            val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
+            if (damagee !is LivingEntity) return
+            attack.attackType.handleAttackEntity(player, nekoStack, damagee, event)
         }
     }
 

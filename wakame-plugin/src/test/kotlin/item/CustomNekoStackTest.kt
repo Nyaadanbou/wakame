@@ -1,27 +1,19 @@
 package item
 
 import assertAny
-import cc.mewcraft.wakame.attack.SwordAttack
+import cc.mewcraft.wakame.attack.HandAttack
+import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.FireResistant
-import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
-import cc.mewcraft.wakame.item.components.HideTooltip
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.VirtualCore
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
@@ -108,7 +100,21 @@ class CustomNekoStackTest : KoinTest {
     ) {
         serialization {
             assertNotNull(it)
-            assertIs<SwordAttack>(it.attackType)
+            assertIs<SpearAttack>(it.attackType)
+        }
+
+        result {
+            assertTrue(it.isEmpty())
+        }
+    }
+
+    @Test
+    fun `component - attack_empty`() = componentLifecycleTest(
+        "attack_empty", ItemTemplateTypes.ATTACK, ItemComponentTypes.EMPTY
+    ) {
+        serialization {
+            assertNotNull(it)
+            assertIs<HandAttack>(it.attackType)
         }
 
         result {

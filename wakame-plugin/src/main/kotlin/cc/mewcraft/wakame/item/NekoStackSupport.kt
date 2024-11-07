@@ -262,7 +262,7 @@ private class VanillaNekoStack(
         get() = handle.clone()
 
     override val wrapped: ItemStack
-        get() = unsupported()
+        get() = handle
 
     override val id: Key
         get() = prototype.id

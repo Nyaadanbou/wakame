@@ -95,9 +95,9 @@ enum class DamageTag {
     MAGIC,
 
     /**
-     * 标记范围伤害武器非本体攻击造成的伤害.
+     * 标记武器本体攻击造成的伤害.
      */
-    EXTRA,
+    DIRECT,
 
     /**
      * 标记玩家徒手造成的伤害.
@@ -131,11 +131,6 @@ enum class DamageTag {
     TRIDENT,
 
     /**
-     * 标记原版重锤类武器的伤害.
-     */
-    MACE,
-
-    /**
      * 标记锤类武器的伤害.
      */
     HAMMER,
@@ -144,6 +139,11 @@ enum class DamageTag {
      * 标记矛类武器的伤害.
      */
     SPEAR,
+
+    /**
+     * 标记棍类武器的伤害.
+     */
+    CUDGEL,
 
     /**
      * 标记镰刀类武器的伤害.
