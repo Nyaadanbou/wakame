@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.reforge.repair
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
  * 修复台的注册表.
@@ -22,7 +23,8 @@ object RepairingTableRegistry : Initializable {
         return tables[id]
     }
 
-    private fun load() {
+    @VisibleForTesting
+    fun load() {
         items.clear()
         items.putAll(RepairingTableSerializer.loadAllItems())
 

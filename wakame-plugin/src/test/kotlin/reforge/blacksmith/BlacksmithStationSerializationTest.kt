@@ -1,7 +1,9 @@
-package reforge.recycle
+package reforge.blacksmith
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.reforge.recycle.RecyclingStationSerializer
+import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStationSerializer
+import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
+import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -11,7 +13,7 @@ import org.koin.test.KoinTest
 import testEnv
 import kotlin.test.Test
 
-class RecyclingStationSerializationTest : KoinTest {
+class BlacksmithStationSerializationTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll
@@ -34,9 +36,12 @@ class RecyclingStationSerializationTest : KoinTest {
 
     @Test
     fun `test serialization`() {
-        val items = RecyclingStationSerializer.loadAllItems()
-        val tables = RecyclingStationSerializer.loadAllStations()
-        items.forEach(::println)
-        tables.forEach(::println)
+        // 载入依赖的实例
+        RepairingTableRegistry.load()
+        RecyclingStationRegistry.load()
+
+        // 载入 Blacksmith!
+        val stations = BlacksmithStationSerializer.loadAllStations()
+        stations.forEach(::println)
     }
 }

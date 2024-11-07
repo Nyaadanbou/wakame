@@ -73,7 +73,7 @@ data class LevelPriceModifier(
     override val operation: PriceModifier.Operation,
 ) : PriceModifier {
     companion object Shared {
-        const val NAME = "value"
+        const val NAME = "level"
     }
 
     override fun evaluate(item: ItemStack): Double {

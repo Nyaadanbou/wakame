@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.core.EconomyApi
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -14,6 +16,13 @@ import org.slf4j.Logger
 import java.util.stream.Stream
 import kotlin.random.Random
 
+/**
+ * [RecyclingSession] 的一般实现.
+ *
+ * @param station
+ * @param viewer
+ * @param maxClaims 最大可同时回收的物品数量
+ */
 internal class SimpleRecyclingSession(
     override val station: RecyclingStation,
     override val viewer: Player,
@@ -24,6 +33,18 @@ internal class SimpleRecyclingSession(
     private val economyApi: EconomyApi = get()
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 
+    private fun getItemKey(item: ItemStack): Key {
+        return item.shadowNeko()?.id ?: item.type.key
+    }
+
+    private fun getItemPrice(item: ItemStack?): PriceInstance? {
+        if (item == null) {
+            return null
+        }
+        val key = getItemKey(item)
+        return station.getPrice(key)
+    }
+
     override fun claimItem(item: ItemStack, playerSlot: Int): RecyclingSession.ClaimResult {
         if (claims.size >= maxClaims) {
             return ClaimResult.failure(
@@ -31,13 +52,18 @@ internal class SimpleRecyclingSession(
             )
         }
 
-        val displaySlot = claims.lastIndex + 1
-        val claim = Claim(playerSlot, item)
-        claims += claim
+        val price = getItemPrice(item)
+        if (price == null) {
+            return ClaimResult.failure(
+                RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM
+            )
+        }
+
+        claims += Claim(playerSlot, item, price)
 
         logger.info("${viewer.name} added a claim!")
 
-        return ClaimResult.success(displaySlot)
+        return ClaimResult.success(claims.lastIndex + 1)
     }
 
     override fun purchase(dryRun: Boolean): RecyclingSession.PurchaseResult {
@@ -123,12 +149,10 @@ internal class SimpleRecyclingSession(
     private inner class Claim(
         override val playerSlot: Int,
         override val originalItem: ItemStack,
+        override val priceInstance: PriceInstance,
     ) : RecyclingSession.Claim, Examinable {
         override val displaySlot: Int
             get() = claims.indexOf(this)
-
-        // TODO #227 从配置文件读取 PriceInstance
-        override val priceInstance: PriceInstance = PriceInstance(10.0, 15.0, mapOf())
 
         override fun examinableProperties(): Stream<out ExaminableProperty> {
             return Stream.of(

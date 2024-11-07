@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.reforge.recycle
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
+import org.jetbrains.annotations.VisibleForTesting
 
 object RecyclingStationRegistry : Initializable {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
@@ -19,7 +20,8 @@ object RecyclingStationRegistry : Initializable {
         return stations[id]
     }
 
-    private fun load() {
+    @VisibleForTesting
+    fun load() {
         items.clear()
         items.putAll(RecyclingStationSerializer.loadAllItems())
 

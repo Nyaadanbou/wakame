@@ -7,7 +7,7 @@ import java.lang.reflect.Type
 import kotlin.reflect.typeOf
 
 object PriceModifierSerializer : TypeSerializer<PriceModifier> {
-    private val TYPE_MAPPING = mapOf(
+    private val TYPE_MAPPINGS = mapOf(
         DamagePriceModifier.NAME to typeOf<DamagePriceModifier>(),
         LevelPriceModifier.NAME to typeOf<LevelPriceModifier>(),
         RarityPriceModifier.NAME to typeOf<RarityPriceModifier>(),
@@ -18,7 +18,7 @@ object PriceModifierSerializer : TypeSerializer<PriceModifier> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): PriceModifier {
         val nodeKey = node.key().toString()
-        val kType = TYPE_MAPPING[nodeKey] ?: throw IllegalArgumentException("Unknown price modifier type: $nodeKey")
+        val kType = TYPE_MAPPINGS[nodeKey] ?: throw IllegalArgumentException("Unknown price modifier type: $nodeKey")
         return node.krequire(kType)
     }
 }
