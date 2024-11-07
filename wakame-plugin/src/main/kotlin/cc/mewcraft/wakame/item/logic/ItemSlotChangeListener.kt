@@ -134,13 +134,17 @@ internal abstract class ItemSlotChangeListener {
         val everyItemSlot = ItemSlotRegistry.all()
         for (itemSlot in everyItemSlot) {
             val itemStack = itemSlot.getItem(player) ?: continue
-            val nekoStack = itemStack.tryNekoStack
+            val nekoStack = itemStack.shadowNeko()
             if (test(player, itemSlot, itemStack, nekoStack)) {
+                onBegin(player)
+
                 // 这里我们对同一个物品进行两次操作:
                 // 先从玩家身上移除物品“自己”的效果,
                 // 然后再把物品的效果添加到玩家身上.
                 handlePreviousItem(player, itemSlot, itemStack, nekoStack)
                 handleCurrentItem(player, itemSlot, itemStack, nekoStack)
+
+                onEnd(player)
             }
         }
     }
@@ -158,8 +162,8 @@ internal abstract class ItemSlotChangeListener {
             return // will it ever happen?
         }
 
-        val oldNekoStack = oldItemStack?.tryNekoStack
-        val newNekoStack = newItemStack?.tryNekoStack
+        val oldNekoStack = oldItemStack?.shadowNeko()
+        val newNekoStack = newItemStack?.shadowNeko()
 
         onBegin(player)
 

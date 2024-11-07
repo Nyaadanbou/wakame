@@ -132,6 +132,10 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeListener() {
  *
  * 物品发生变化时, 根据物品铭刻, 修改玩家的 [cc.mewcraft.wakame.kizami.KizamiMap].
  */
+// TODO 重构 Kizami 的数据结构和更新逻辑
+//  灵感: 尝试在 Kizami 中引入一个标记 dirty, 表示是否需要更新 effects.
+//  当 dirty 为 true 时, 在下一次 tick 时, 重新计算 effects.
+//  否则, 下次 tick 不需要动这个 Kizami.
 internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         return testSlot(player, slot, itemStack, nekoStack) &&
