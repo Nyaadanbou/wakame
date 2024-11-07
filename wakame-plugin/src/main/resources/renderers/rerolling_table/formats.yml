@@ -1,0 +1,18 @@
+# id: `durability`
+durability:
+  namespace: durability
+  tooltip:
+    - "[<durability>/<max_damage> 耐久度]"
+
+# id: `repair_cost`
+repair_cost:
+  namespace: repair_cost
+  tooltip:
+    - "修理花费"
+    - "- 金币: <value>"
+
+# id: `repair_usage`
+repair_usage:
+  namespace: repair_usage
+  tooltip:
+    - "点击以修理"

@@ -53,7 +53,7 @@ internal val ItemStack.customData: NBTCompound?
 
 internal val ItemStack.nekooTag: NBTCompound?
     get() {
-        return customData?.getCompoundTagOrNull(SharedConstants.PLUGIN_NAME)
+        return customData?.getCompoundTagOrNull(SharedConstants.ROOT_NBT_NAME)
     }
 
 internal val ItemStack.isNeko: Boolean

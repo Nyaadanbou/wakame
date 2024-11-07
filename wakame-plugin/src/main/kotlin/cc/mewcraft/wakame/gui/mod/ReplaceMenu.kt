@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableCont
 import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.directEdit
-import cc.mewcraft.wakame.item.setStandaloneCell
+import cc.mewcraft.wakame.item.standaloneCell
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.*
@@ -50,7 +50,7 @@ internal class ReplaceMenu(
         builder.setStructure("a * b")
         builder.addIngredient('a', ViewItem(replace))
         builder.addIngredient('b', inputSlot)
-        builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).hideTooltip(true)))
+        builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).edit { hideTooltip = true }))
     }
 
     /**
@@ -197,7 +197,7 @@ internal class ReplaceMenu(
             val core = cell.getCore()
             val icon = CoreIcons.getNekoStack(core)
 
-            icon.setStandaloneCell(StandaloneCell(cell))
+            icon.standaloneCell = StandaloneCell(cell)
             icon.directEdit { itemName = core.displayName }
             ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.Preview(session))
 

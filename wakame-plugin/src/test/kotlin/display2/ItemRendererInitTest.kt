@@ -48,5 +48,6 @@ class ItemRendererInitTest : KoinTest {
         ItemRenderers.MODDING_TABLE.initialize0()
         ItemRenderers.REROLLING_TABLE.initialize0()
         ItemRenderers.RECYCLING_STATION.initialize0()
+        ItemRenderers.REPAIRING_TABLE.initialize0()
     }
 }

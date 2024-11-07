@@ -1,0 +1,35 @@
+# id: `sell_button_title`
+sell_button_title:
+  namespace: title
+  empty_input:
+    name: "没有要出售的物品"
+    lore: [ ]
+  unconfirmed:
+    name: "你正在出售"
+    lore: [ ]
+  confirmed:
+    name: "即将要出售"
+    lore: [ ]
+
+# id: `sell_button_usage`
+sell_button_usage:
+  namespace: usage
+  empty_input:
+    - "点击自己背包中的物品"
+    - "以选择出售给铁匠"
+  unconfirmed:
+    - "点击确认"
+  confirmed:
+    - "再次点击确认"
+
+# id: `sell_button_item_list`
+sell_button_item_list:
+  namespace: items
+  with_level: "- <item_name> [<item_level>]"
+  without_level: "- <item_name>"
+
+# id: `sell_button_total_worth`
+sell_button_total_worth:
+  namespace: worth
+  total_worth:
+    - "总价值: <min_worth> - <max_worth>"

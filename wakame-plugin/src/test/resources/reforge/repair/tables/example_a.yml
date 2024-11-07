@@ -1,0 +1,4 @@
+enabled: true
+title: "修复台: example_a"
+items:
+  - repair:demo

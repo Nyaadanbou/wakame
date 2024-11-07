@@ -1,0 +1,4 @@
+enabled: true
+title: "回收站: example_a"
+items:
+  - recycle:demo

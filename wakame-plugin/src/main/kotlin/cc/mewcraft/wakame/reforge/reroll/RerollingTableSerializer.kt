@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
+import cc.mewcraft.wakame.reforge.common.*
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -16,11 +15,10 @@ import java.io.File
 import java.lang.reflect.Type
 
 internal object RerollingTableSerializer : KoinComponent {
-    private const val REFORGE_DIR_NAME = "reforge"
-    private const val REROLLING_DIR_NAME = "reroll"
+    private const val ROOT_DIR_NAME = "reroll"
 
     private val logger: Logger = get()
-    private val rerollDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(REROLLING_DIR_NAME) }
+    private val rerollDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
 
     /**
      * 从配置文件中加载所有的重造台.

@@ -17,11 +17,10 @@ import java.io.File
 import java.lang.reflect.Type
 
 internal object MergingTableSerializer : KoinComponent {
-    const val REFORGE_DIR_NAME = "reforge"
-    const val MERGING_DIR_NAME = "merge"
+    private const val ROOT_DIR_NAME = "merge"
 
     private val logger: Logger = get()
-    private val mergeDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(REFORGE_DIR_NAME).resolve(MERGING_DIR_NAME) }
+    private val mergeDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
 
     /**
      * 从配置文件夹中加载所有的合并台.

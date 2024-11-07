@@ -14,6 +14,21 @@ import java.util.stream.Stream
 sealed interface IndexedText {
     val idx: Key
     val text: List<Component>
+
+    companion object {
+        @JvmField
+        val NOP: IndexedText = NoOpIndexedText
+    }
+}
+
+/**
+ * 一个空的 [IndexedText] 实例, 用于表示该内容不应该被渲染.
+ *
+ * 推荐用法: 使用 [IndexedText.NOP] 来获取该实例.
+ */
+data object NoOpIndexedText : IndexedText {
+    override val idx: Key = Key.key("internal", "noop")
+    override val text: List<Component> = emptyList()
 }
 
 /**

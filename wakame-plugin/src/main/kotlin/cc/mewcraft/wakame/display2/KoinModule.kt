@@ -14,5 +14,6 @@ internal fun display2Module(): Module = module {
     single { ItemRenderers.MERGING_TABLE } bind Initializable::class
     single { ItemRenderers.MODDING_TABLE } bind Initializable::class
     single { ItemRenderers.RECYCLING_STATION } bind Initializable::class
+    single { ItemRenderers.REPAIRING_TABLE } bind Initializable::class
     single { ItemRenderers.REROLLING_TABLE } bind Initializable::class
 }
