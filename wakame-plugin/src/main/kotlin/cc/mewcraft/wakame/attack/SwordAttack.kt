@@ -32,7 +32,11 @@ class SwordAttack : AttackType {
         return PlayerDamageMetadata(
             user = user,
             damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.SWORD),
-            damageBundle = damageBundle(user.attributeMap) { every { standard() } }
+            damageBundle = damageBundle(user.attributeMap) {
+                every {
+                    standard()
+                }
+            }
         )
     }
 

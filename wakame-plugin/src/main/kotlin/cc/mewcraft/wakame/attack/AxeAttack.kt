@@ -32,12 +32,18 @@ class AxeAttack : AttackType {
         return PlayerDamageMetadata(
             user = user,
             damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.AXE),
-            damageBundle = damageBundle(user.attributeMap) { every { standard() } }
+            damageBundle = damageBundle(user.attributeMap) {
+                every {
+                    standard()
+                }
+            }
         )
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) return
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
 
         val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {

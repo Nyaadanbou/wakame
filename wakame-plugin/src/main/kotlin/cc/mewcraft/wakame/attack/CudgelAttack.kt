@@ -8,9 +8,7 @@ import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.Particle
-import org.bukkit.Sound
-import org.bukkit.SoundCategory
+import org.bukkit.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -44,7 +42,9 @@ class CudgelAttack : AttackType {
             user = user,
             damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.CUDGEL),
             damageBundle = damageBundle(attributeMap) {
-                every { standard() }
+                every {
+                    standard()
+                }
             }
         )
 
@@ -52,7 +52,9 @@ class CudgelAttack : AttackType {
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) return
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
 
         val user = player.toUser()
         if (user.attackSpeed.isActive(nekoStack.id)) {
@@ -94,7 +96,11 @@ class CudgelAttack : AttackType {
             val damageMetadata = PlayerDamageMetadata(
                 user = user,
                 damageTags = damageTags,
-                damageBundle = damageBundle(attributeMap) { every { standard() } }
+                damageBundle = damageBundle(attributeMap) {
+                    every {
+                        standard()
+                    }
+                }
             )
             it.hurt(damageMetadata, player, true)
         }

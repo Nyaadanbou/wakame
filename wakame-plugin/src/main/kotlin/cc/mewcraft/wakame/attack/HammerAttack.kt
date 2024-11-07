@@ -7,10 +7,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.Location
-import org.bukkit.Particle
-import org.bukkit.Sound
-import org.bukkit.SoundCategory
+import org.bukkit.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -35,7 +32,9 @@ class HammerAttack : AttackType {
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) return
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
 
         val user = player.toUser()
         // 只要这个物品的内部冷却处于激活状态就不处理
@@ -63,7 +62,9 @@ class HammerAttack : AttackType {
                 damageBundle = damageBundle(attributeMap) {
                     every {
                         standard()
-                        rate { ratio * standard() }
+                        rate {
+                            ratio * standard()
+                        }
                     }
                 }
             )
@@ -116,7 +117,9 @@ class HammerAttack : AttackType {
             user = user,
             damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.HAMMER),
             damageBundle = damageBundle(attributeMap) {
-                every { standard() }
+                every {
+                    standard()
+                }
             }
         )
 
