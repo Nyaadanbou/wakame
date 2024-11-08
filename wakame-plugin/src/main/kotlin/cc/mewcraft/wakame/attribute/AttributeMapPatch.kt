@@ -147,6 +147,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
     private val entityKeyLookup: EntityKeyLookup by inject()
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
     @EventHandler(priority = EventPriority.LOWEST)
@@ -160,7 +161,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
 
             // 触发 AttributeMap 的初始化, 例如应用原版属性
-            EntityAttributeMapAccess.get(entity).onFailure {
+            attributeMapAccess.get(entity).onFailure {
                 logger.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
             }
         }
@@ -171,7 +172,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
         // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
 
         // 触发 AttributeMap 的初始化, 例如应用原版属性
-        EntityAttributeMapAccess.get(e.entity).onFailure {
+        attributeMapAccess.get(e.entity).onFailure {
             logger.error("Failed to initialize the attribute map for entity ${e.entity}: ${it.message}")
         }
     }

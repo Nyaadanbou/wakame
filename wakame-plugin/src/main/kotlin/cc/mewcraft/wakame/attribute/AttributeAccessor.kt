@@ -9,35 +9,16 @@ import org.koin.core.component.inject
 /**
  * Provides the access to the [AttributeMap] of a specific subject.
  */
-data object AnyAttributeMapAccess : AttributeMapAccess<Any> {
+data object AttributeMapAccessImpl : KoinComponent, AttributeMapAccess {
+    private val userManager: UserManager<Player> by inject()
+
     override fun get(subject: Any): Result<AttributeMap> {
         return runCatching {
             when (subject) {
-                is Player -> PlayerAttributeMapAccess.get(subject).getOrThrow()
-                is LivingEntity -> EntityAttributeMapAccess.get(subject).getOrThrow()
+                is Player -> userManager.getUser(subject).attributeMap
+                is LivingEntity -> AttributeMap(subject)
                 else -> throw IllegalArgumentException("Unsupported subject type: ${subject::class.simpleName}")
             }
         }
-    }
-}
-
-/**
- * Provides the access to the [AttributeMap] of all (online) players.
- */
-data object PlayerAttributeMapAccess : KoinComponent, AttributeMapAccess<Player> {
-    private val userManager: UserManager<Player> by inject()
-
-    override fun get(subject: Player): Result<AttributeMap> {
-        // 该实现仅仅把对函数的调用转发到对应的 User 实例之下
-        return runCatching { userManager.getUser(subject).attributeMap }
-    }
-}
-
-/**
- * Provides the access to [AttributeMap] of all non-player entities.
- */
-data object EntityAttributeMapAccess : AttributeMapAccess<LivingEntity> {
-    override fun get(subject: LivingEntity): Result<AttributeMap> {
-        return runCatching { AttributeMap(subject) }
     }
 }

@@ -25,7 +25,7 @@ class AttributeModifierMechanic(
     }
 
     private val attributeProvider: AttributeProvider by inject()
-    private val attributeMapAccess: AttributeMapAccess<Any> by inject()
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
         ?.let { parsed -> attributeProvider.getSingleton(parsed) }

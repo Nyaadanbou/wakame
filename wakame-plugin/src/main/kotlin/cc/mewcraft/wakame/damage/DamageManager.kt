@@ -17,6 +17,7 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.entity.EntityDamageEvent.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.time.Duration
 import java.util.UUID
@@ -34,6 +35,7 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
 object DamageManager : DamageManagerApi, KoinComponent {
     private val logger: Logger = get()
     private val damageApplier: DamageApplier = DamageApplier.instance()
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
@@ -225,7 +227,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
 
             is LivingEntity -> {
-                EntityDefenseMetadata(EntityAttributeMapAccess.get(damagee).getOrElse {
+                EntityDefenseMetadata(attributeMapAccess.get(damagee).getOrElse {
                     error("Failed to generate defense metadata because the entity does not have an attribute map.")
                 })
             }

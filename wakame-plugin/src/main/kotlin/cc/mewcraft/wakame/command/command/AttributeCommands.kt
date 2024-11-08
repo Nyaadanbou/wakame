@@ -27,6 +27,7 @@ import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.parser.standard.DoubleParser
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.text.DecimalFormat
 import java.time.LocalDateTime
@@ -39,6 +40,7 @@ private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 object AttributeCommands : CommandFactory<CommandSender>, KoinComponent {
     private const val ATTRIBUTE_LITERAL = "attribute"
     private val LOGGER = get<Logger>()
+    private val ATTRIBUTE_MAP_ACCESS: AttributeMapAccess by inject()
 
     private fun sendNoAttributeMessage(sender: CommandSender, source: Entity) {
         sender.sendMessage(text {
@@ -286,11 +288,7 @@ object AttributeCommands : CommandFactory<CommandSender>, KoinComponent {
     }
 
     private fun getAttributeMap(entity: Entity): AttributeMap? {
-        return when (entity) {
-            is Player -> PlayerAttributeMapAccess.get(entity).getOrNull()
-            is LivingEntity -> EntityAttributeMapAccess.get(entity).getOrNull()
-            else -> null
-        }
+        return ATTRIBUTE_MAP_ACCESS.get(entity).getOrNull()
     }
 }
 

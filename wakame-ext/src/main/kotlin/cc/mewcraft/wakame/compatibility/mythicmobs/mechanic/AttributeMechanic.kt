@@ -24,7 +24,7 @@ class AttributeMechanic(
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val attributeMapAccess: AttributeMapAccess<Any> by inject()
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
