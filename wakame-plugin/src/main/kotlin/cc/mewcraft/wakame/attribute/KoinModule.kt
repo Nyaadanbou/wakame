@@ -14,6 +14,8 @@ internal fun attributeModule(): Module = module {
 
     single { AttributeMapPatchListener() }
 
+    single<AttributeMapAccess<Any>> { AnyAttributeMapAccess }
+
     single<AttributeMapAccess<Player>> { PlayerAttributeMapAccess } withOptions { named(AttributeMapAccess.FOR_PLAYER) }
 
     single<AttributeMapAccess<LivingEntity>> { EntityAttributeMapAccess } withOptions { named(AttributeMapAccess.FOR_ENTITY) }

@@ -6,6 +6,18 @@ import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+data object AnyAttributeMapAccess : AttributeMapAccess<Any> {
+    override fun get(subject: Any): Result<AttributeMap> {
+        return runCatching {
+            when (subject) {
+                is Player -> PlayerAttributeMapAccess.get(subject).getOrThrow()
+                is LivingEntity -> EntityAttributeMapAccess.get(subject).getOrThrow()
+                else -> throw IllegalArgumentException("Unsupported subject type: ${subject::class.simpleName}")
+            }
+        }
+    }
+}
+
 /**
  * Provides the access to the [AttributeMap] of all (online) players.
  */
