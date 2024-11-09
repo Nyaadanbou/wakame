@@ -10,6 +10,7 @@ import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -41,7 +42,7 @@ class AttributeModifierMechanic(
         val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
-        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data])
+        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)
 
         return SkillResult.SUCCESS
     }
@@ -51,13 +52,18 @@ class AttributeModifierMechanic(
         val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
-        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data])
+        addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)
 
         return SkillResult.SUCCESS
     }
 
-    private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int) {
-        attributeInstance.addModifier(modifier)
+    private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int, isPlayer: Boolean) {
+        // 给玩家添加临时的属性修饰符, 因为玩家属性应该要在玩家离开游戏时消失以避免 `AttributeModifier is already applied` 错误
+        if (isPlayer) {
+            attributeInstance.addTransientModifier(modifier)
+        } else {
+            attributeInstance.addModifier(modifier)
+        }
         if (duration > 0) {
             Schedulers.sync().runLater({
                 attributeInstance.removeModifier(modifier)
