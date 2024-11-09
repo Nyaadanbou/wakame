@@ -229,7 +229,7 @@ protected constructor(
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    val element: Element,
+    val element: Element, // TODO 用 Holder 封装
     vanilla: Boolean = false,
 ) : RangedAttribute(
     compositeId,

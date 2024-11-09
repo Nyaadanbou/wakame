@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registry.ElementRegistry
 import com.google.common.collect.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -14,14 +15,13 @@ import java.util.concurrent.ConcurrentHashMap
  * attribute constructors are just fallback values when the config provides nothing.
  */
 object Attributes : AttributeCollectionProvider<Attribute> {
-    // 一个空的属性, 本身没有任何作用.
     // 这只是一个特殊值, 供其他系统使用.
     val EMPTY = SimpleAttribute("empty", .0).register()
 
     //<editor-fold desc="原版属性">
-    // 请在这里添加/获取*原版属性*的实例.
-    // ------
+
     // 这些属性需要原版属性作为后端才能在游戏中生效.
+
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true).register()
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()
     val SWEEPING_DAMAGE_RATIO = RangedAttribute("sweeping_damage_ratio", 0.1, .0, 1.0, true).register()
@@ -35,10 +35,10 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     //</editor-fold>
 
     //<editor-fold desc="萌芽属性">
-    // 请在这里添加/获取*萌芽属性*的实例.
-    // ------
+
     // 这些属性需要我们自己实现才能在游戏中生效. 所谓“自己实现”,
     // 就是说, 我们需要通过自定义监听器或调度器等方式来实现它们.
+
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, 1.0, 16384.0).register()
@@ -58,7 +58,19 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>
 
-    // TODO 想办法把元素属性也放在这里, element 这个函数就不要了
+    //<editor-fold desc="萌芽属性 (元素)">
+
+    // 跟上面的萌芽属性一样, 只不过不是 Attribute 实例, 而是一个“中间对象”.
+    // 客户端需要再指定一次元素才可以获取到最终的 (Element)Attribute 实例.
+
+    val DEFENSE = AttributeGetter { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION = AttributeGetter { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION_RATE = AttributeGetter { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
+    val MAX_ATTACK_DAMAGE = AttributeGetter { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
+    val MIN_ATTACK_DAMAGE = AttributeGetter { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
+    val ATTACK_DAMAGE_RATE = AttributeGetter { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val INCOMING_DAMAGE_RATE = AttributeGetter { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
+    //</editor-fold>
 
     /**
      * Gets specific [ElementAttributes] by the [element].
@@ -121,29 +133,95 @@ object Attributes : AttributeCollectionProvider<Attribute> {
 }
 
 /**
+ * 代表一个用于获取 [ElementAttribute] 实例的对象.
+ *
+ * [ElementAttribute] 跟 [RangedAttribute] 的区别:
+ * [RangedAttribute] 的字段都是原始类型, 而 [ElementAttribute] 还带有一个 [Element] 的字段.
+ * 这也意味着 [ElementAttribute] 对 [Element] 实例有直接的依赖, 想要创建 [ElementAttribute] 必须得先有一个 [Element] 实例.
+ * 这也意味着, 对于一种特定的 *元素* 属性, 例如防御力, 有多少种存在的元素, 就会有多少个 [ElementAttribute] 实例.
+ */
+class AttributeGetter(
+    private val creator: (Element) -> ElementAttribute,
+) {
+    /**
+     * 获取 [ElementAttribute] 实例.
+     * 如果传入的 [id] 无法找到对应的 [Element] 实例, 则返回 `null`.
+     * 对于同一个 [id] 的字符串值, 该函数始终会返回同一个 [ElementAttribute] 实例.
+     *
+     * @param id 元素类型的唯一标识
+     */
+    fun by(id: String): ElementAttribute? {
+        val elem = ElementRegistry.INSTANCES.find(id) ?: return null
+        return by(elem)
+    }
+
+    /**
+     * 获取 [ElementAttribute] 实例.
+     * 该函数始终会返回一个 [ElementAttribute] 实例.
+     * 对于同一个 [Element] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
+     *
+     * @param element 元素类型
+     */
+    fun by(element: Element): ElementAttribute {
+        return OBJECT_POOL.computeIfAbsent(element) { x: Element -> register(creator(x)) }
+    }
+
+    private companion object Shared {
+        private val OBJECT_POOL: ConcurrentHashMap<Element, ElementAttribute> = ConcurrentHashMap()
+
+        // description id -> element attribute
+        private val BY_DESCRIPTION_ID: HashMap<String, ElementAttribute> = HashMap()
+
+        // (element object, composition id) -> set <element attributes>
+        private val BY_COMPOSITE_ID: HashBasedTable<Element, String, HashSet<ElementAttribute>> = HashBasedTable.create()
+
+        // 所有已知的 ElementAttribute 的 descriptionId
+        val descriptionIds: Set<String>
+            get() = BY_DESCRIPTION_ID.keys
+
+        @Synchronized
+        fun register(attribute: ElementAttribute): ElementAttribute {
+            BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
+            BY_COMPOSITE_ID.row(attribute.element).computeIfAbsent(attribute.compositeId) { HashSet() }.add(attribute)
+            AttributeNameInternals.register(attribute)
+            return attribute
+        }
+
+        fun getBy(descriptionId: String): ElementAttribute? {
+            return BY_DESCRIPTION_ID[descriptionId]
+        }
+
+        fun getCollectionBy(element: Element, compositeId: String): Collection<ElementAttribute> {
+            return BY_COMPOSITE_ID.get(element, compositeId) ?: throw IllegalArgumentException("unknown composite id: '$compositeId'")
+        }
+    }
+}
+
+/**
  * A container which owns all [ElementAttribute] instances for a type of [Element].
  */
 @Suppress("PropertyName", "MemberVisibilityCanBePrivate")
-class ElementAttributes internal constructor(
+class ElementAttributes
+internal constructor(
     /**
      * The element type of this container.
      */
-    val ELEMENT: Element,
+    private val element: Element,
 ) : AttributeCollectionProvider<ElementAttribute> {
-    val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, ELEMENT).register()
-    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, ELEMENT).register()
-    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, .0, 1.0, ELEMENT).register()
-    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, ELEMENT).register()
-    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, ELEMENT).register()
-    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
-    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, ELEMENT).register()
+    val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element).register()
+    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).register()
+    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element).register()
+    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).register()
+    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).register()
+    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element).register()
+    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element).register()
 
     override fun getBy(descriptionId: String): ElementAttribute? {
         return ElementAttributeInternals.getBy(descriptionId)
     }
 
     override fun getCollectionBy(compositeId: String): Collection<ElementAttribute> {
-        return ElementAttributeInternals.getCollectionBy(ELEMENT, compositeId)
+        return ElementAttributeInternals.getCollectionBy(element, compositeId)
     }
 
     private fun ElementAttribute.register(): ElementAttribute {
