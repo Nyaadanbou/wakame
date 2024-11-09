@@ -133,8 +133,13 @@ object Attributes : AttributeCollectionProvider<Attribute> {
 }
 
 /**
- * 代表一个用于获取 [ElementAttribute] 实例的对象.
+ * 代表一个用于获取 [ElementAttribute] 实例的“中间对象”.
  *
+ * ### 用法
+ * 从 [Attributes] 中获取到本类型的实例后, 有一个 [AttributeGetter.by] 函数可用.
+ * 使用这个函数指定一个元素, 那么就可以获取到这个元素所对应的 [ElementAttribute] 实例.
+ *
+ * ### 设计哲学
  * [ElementAttribute] 跟 [RangedAttribute] 的区别:
  * [RangedAttribute] 的字段都是原始类型, 而 [ElementAttribute] 还带有一个 [Element] 的字段.
  * 这也意味着 [ElementAttribute] 对 [Element] 实例有直接的依赖, 想要创建 [ElementAttribute] 必须得先有一个 [Element] 实例.
