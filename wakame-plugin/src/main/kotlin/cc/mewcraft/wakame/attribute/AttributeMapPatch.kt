@@ -300,7 +300,7 @@ private data class SerializableAttributeInstance(
     }
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
-        val attribute = Attributes.getBy(id) ?: return null
+        val attribute = Attributes.getSingleton(id) ?: return null
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }

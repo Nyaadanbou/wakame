@@ -11,7 +11,7 @@ interface Attribute : Keyed {
     /**
      * 本属性所属的融合属性的唯一标识.
      */
-    val compositeId: String
+    val compositionId: String
 
     /**
      * 本属性的唯一标识.

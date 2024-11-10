@@ -232,8 +232,8 @@ class CustomNekoStackTest : KoinTest {
 
                 fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
                     val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
-                    val modMin = modMap[Attributes.element(element).MIN_ATTACK_DAMAGE]
-                    val modMax = modMap[Attributes.element(element).MAX_ATTACK_DAMAGE]
+                    val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
+                    val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
                     assertNotNull(modMin)
                     assertNotNull(modMax)
                     assertEquals(expectedMin, modMin.amount)

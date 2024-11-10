@@ -84,50 +84,50 @@ object AttributeRegistry : Initializable {
      */
     private fun registerComposites() {
         // Register the special attribute
-        +buildComposite("empty").single().bind { EMPTY }
+        +buildComposite("empty").single().bind(Attributes.EMPTY)
 
         // Registry more composite attributes here ...
-        +buildComposite("attack_damage").ranged().element().bind({ MIN_ATTACK_DAMAGE }, { MAX_ATTACK_DAMAGE })
-        +buildComposite("attack_damage_rate").single().element().bind { ATTACK_DAMAGE_RATE }
-        +buildComposite("attack_effect_chance").single().bind { ATTACK_EFFECT_CHANCE }
-        +buildComposite("block_interaction_range").single().bind { BLOCK_INTERACTION_RANGE }
-        +buildComposite("critical_strike_chance").single().bind { CRITICAL_STRIKE_CHANCE }
-        +buildComposite("critical_strike_power").single().bind { CRITICAL_STRIKE_POWER }
-        +buildComposite("defense").single().element().bind { DEFENSE }
-        +buildComposite("defense_penetration").single().element().bind { DEFENSE_PENETRATION }
-        +buildComposite("defense_penetration_rate").single().element().bind { DEFENSE_PENETRATION_RATE }
-        +buildComposite("entity_interaction_range").single().bind { ENTITY_INTERACTION_RANGE }
-        +buildComposite("hammer_damage_range").single().bind { HAMMER_DAMAGE_RANGE }
-        +buildComposite("hammer_damage_ratio").single().bind { HAMMER_DAMAGE_RATIO }
-        +buildComposite("health_regeneration").single().bind { HEALTH_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
-        +buildComposite("incoming_damage_rate").single().element().bind { INCOMING_DAMAGE_RATE }
-        +buildComposite("lifesteal").single().bind { LIFESTEAL }
-        +buildComposite("mana_consumption_rate").single().bind { MANA_CONSUMPTION_RATE }
-        +buildComposite("mana_regeneration").single().bind { MANA_REGENERATION }.override { mutateTooltipLoreCreator1(this, 20) }
-        +buildComposite("manasteal").single().bind { MANASTEAL }
-        +buildComposite("max_absorption").single().bind { MAX_ABSORPTION }
-        +buildComposite("max_health").single().bind { MAX_HEALTH }
-        +buildComposite("max_mana").single().bind { MAX_MANA }
-        +buildComposite("mining_efficiency").single().bind { MINING_EFFICIENCY }
-        +buildComposite("movement_speed").single().bind { MOVEMENT_SPEED }
-        +buildComposite("negative_critical_strike_power").single().bind { NEGATIVE_CRITICAL_STRIKE_POWER }
-        +buildComposite("safe_fall_distance").single().bind { SAFE_FALL_DISTANCE }
-        +buildComposite("scale").single().bind { SCALE }
-        +buildComposite("step_height").single().bind { STEP_HEIGHT }
-        +buildComposite("sweeping_damage_ratio").single().bind { SWEEPING_DAMAGE_RATIO }
-        +buildComposite("universal_attack_damage").ranged().bind({ UNIVERSAL_MIN_ATTACK_DAMAGE }, { UNIVERSAL_MAX_ATTACK_DAMAGE })
-        +buildComposite("universal_defense").single().bind { UNIVERSAL_DEFENSE }
-        +buildComposite("universal_defense_penetration").single().bind { UNIVERSAL_DEFENSE_PENETRATION }
-        +buildComposite("universal_defense_penetration_rate").single().bind { UNIVERSAL_DEFENSE_PENETRATION_RATE }
+        +buildComposite("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
+        +buildComposite("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
+        +buildComposite("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
+        +buildComposite("block_interaction_range").single().bind(Attributes.BLOCK_INTERACTION_RANGE)
+        +buildComposite("critical_strike_chance").single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
+        +buildComposite("critical_strike_power").single().bind(Attributes.CRITICAL_STRIKE_POWER)
+        +buildComposite("defense").single().element().bind(Attributes.DEFENSE)
+        +buildComposite("defense_penetration").single().element().bind(Attributes.DEFENSE_PENETRATION)
+        +buildComposite("defense_penetration_rate").single().element().bind(Attributes.DEFENSE_PENETRATION_RATE)
+        +buildComposite("entity_interaction_range").single().bind(Attributes.ENTITY_INTERACTION_RANGE)
+        +buildComposite("hammer_damage_range").single().bind(Attributes.HAMMER_DAMAGE_RANGE)
+        +buildComposite("hammer_damage_ratio").single().bind(Attributes.HAMMER_DAMAGE_RATIO)
+        +buildComposite("health_regeneration").single().bind(Attributes.HEALTH_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("incoming_damage_rate").single().element().bind(Attributes.INCOMING_DAMAGE_RATE)
+        +buildComposite("lifesteal").single().bind(Attributes.LIFESTEAL)
+        +buildComposite("mana_consumption_rate").single().bind(Attributes.MANA_CONSUMPTION_RATE)
+        +buildComposite("mana_regeneration").single().bind(Attributes.MANA_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("manasteal").single().bind(Attributes.MANASTEAL)
+        +buildComposite("max_absorption").single().bind(Attributes.MAX_ABSORPTION)
+        +buildComposite("max_health").single().bind(Attributes.MAX_HEALTH)
+        +buildComposite("max_mana").single().bind(Attributes.MAX_MANA)
+        +buildComposite("mining_efficiency").single().bind(Attributes.MINING_EFFICIENCY)
+        +buildComposite("movement_speed").single().bind(Attributes.MOVEMENT_SPEED)
+        +buildComposite("negative_critical_strike_power").single().bind(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+        +buildComposite("safe_fall_distance").single().bind(Attributes.SAFE_FALL_DISTANCE)
+        +buildComposite("scale").single().bind(Attributes.SCALE)
+        +buildComposite("step_height").single().bind(Attributes.STEP_HEIGHT)
+        +buildComposite("sweeping_damage_ratio").single().bind(Attributes.SWEEPING_DAMAGE_RATIO)
+        +buildComposite("universal_attack_damage").ranged().bind(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE, Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)
+        +buildComposite("universal_defense").single().bind(Attributes.UNIVERSAL_DEFENSE)
+        +buildComposite("universal_defense_penetration").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION)
+        +buildComposite("universal_defense_penetration_rate").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
     }
 
     override fun onPreWorld() {
-        // 注册所有 composites
+        // 初始化 Attributes
+        // 这一步主要是初始化 [元素属性]
+        Attributes.bootstrap()
+
+        // 注册所有 Compositions
         registerComposites()
-        // 初始化
-        ElementRegistry.INSTANCES.forEach { (_, element) ->
-            Attributes.element(element)
-        }
     }
 }
 
@@ -250,7 +250,7 @@ private interface RangedSelection : RangedAttributeBinder {
  */
 private interface SingleAttributeBinder {
     fun bind(
-        component: Attributes.() -> Attribute,
+        component: Attribute,
     ): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS>
 }
 
@@ -259,8 +259,8 @@ private interface SingleAttributeBinder {
  */
 private interface RangedAttributeBinder {
     fun bind(
-        component1: Attributes.() -> Attribute,
-        component2: Attributes.() -> Attribute,
+        component1: Attribute,
+        component2: Attribute,
     ): AttributeFacadeOverride<ConstantCompositeAttributeR, VariableCompositeAttributeR>
 }
 
@@ -269,7 +269,7 @@ private interface RangedAttributeBinder {
  */
 private interface SingleElementAttributeBinder {
     fun bind(
-        component: ElementAttributes.() -> ElementAttribute,
+        component: AttributeGetter,
     ): AttributeFacadeOverride<ConstantCompositeAttributeSE, VariableCompositeAttributeSE>
 }
 
@@ -278,8 +278,8 @@ private interface SingleElementAttributeBinder {
  */
 private interface RangedElementAttributeBinder {
     fun bind(
-        component1: ElementAttributes.() -> ElementAttribute,
-        component2: ElementAttributes.() -> ElementAttribute,
+        component1: AttributeGetter,
+        component2: AttributeGetter,
     ): AttributeFacadeOverride<ConstantCompositeAttributeRE, VariableCompositeAttributeRE>
 }
 
@@ -441,7 +441,7 @@ private class SingleSelectionImpl(
     /**
      * Components: Operation, Single
      */
-    override fun bind(component: Attributes.() -> Attribute): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS> {
+    override fun bind(component: Attribute): AttributeFacadeOverride<ConstantCompositeAttributeS, VariableCompositeAttributeS> {
         val facade = MutableCompositeAttributeFacade(
             config = config,
             id = id,
@@ -450,7 +450,7 @@ private class SingleSelectionImpl(
             ),
             createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeS ->
                 ImmutableMap.of(
-                    Attributes.component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
+                    component, AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
             convertNode2Variable = { node: ConfigurationNode ->
@@ -495,8 +495,8 @@ private class RangedSelectionImpl(
      * Components: Operation, Ranged
      */
     override fun bind(
-        component1: Attributes.() -> Attribute,
-        component2: Attributes.() -> Attribute,
+        component1: Attribute,
+        component2: Attribute,
     ): AttributeFacadeOverride<ConstantCompositeAttributeR, VariableCompositeAttributeR> {
         val facade = MutableCompositeAttributeFacade(
             config = config,
@@ -506,8 +506,8 @@ private class RangedSelectionImpl(
             ),
             createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeR ->
                 ImmutableMap.of(
-                    Attributes.component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
-                    Attributes.component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
+                    component1, AttributeModifier(id, core.lower.toStableDouble(), core.operation),
+                    component2, AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
             convertNode2Variable = { node: ConfigurationNode ->
@@ -550,7 +550,7 @@ private class SingleElementAttributeBinderImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: ElementAttributes.() -> ElementAttribute): AttributeFacadeOverride<ConstantCompositeAttributeSE, VariableCompositeAttributeSE> {
+    override fun bind(component: AttributeGetter): AttributeFacadeOverride<ConstantCompositeAttributeSE, VariableCompositeAttributeSE> {
         val facade = MutableCompositeAttributeFacade(
             config = config,
             id = id,
@@ -559,7 +559,7 @@ private class SingleElementAttributeBinderImpl(
             ),
             createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeSE ->
                 ImmutableMap.of(
-                    Attributes.element(core.element).component(), AttributeModifier(id, core.value.toStableDouble(), core.operation)
+                    component.of(core.element), AttributeModifier(id, core.value.toStableDouble(), core.operation)
                 )
             },
             convertNode2Variable = { node: ConfigurationNode ->
@@ -604,8 +604,8 @@ private class RangedElementAttributeBinderImpl(
      * Components: Operation, Ranged, Element
      */
     override fun bind(
-        component1: ElementAttributes.() -> ElementAttribute,
-        component2: ElementAttributes.() -> ElementAttribute,
+        component1: AttributeGetter,
+        component2: AttributeGetter,
     ): AttributeFacadeOverride<ConstantCompositeAttributeRE, VariableCompositeAttributeRE> {
         val facade = MutableCompositeAttributeFacade(
             config = config,
@@ -615,8 +615,8 @@ private class RangedElementAttributeBinderImpl(
             ),
             createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeRE ->
                 ImmutableMap.of(
-                    Attributes.element(core.element).component1(), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
-                    Attributes.element(core.element).component2(), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
+                    component1.of(core.element), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
+                    component2.of(core.element), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
             convertNode2Variable = { node: ConfigurationNode ->

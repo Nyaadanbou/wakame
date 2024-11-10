@@ -8,8 +8,8 @@ fun test() {
     val element: Element = Injector.get()
 
     val defenseGetter: AttributeGetter = Attributes.DEFENSE
-    val defenseAttribute: ElementAttribute = defenseGetter.by(element)
+    val defenseAttribute: ElementAttribute = defenseGetter.of(element)
 
     val attackDamageRateGetter: AttributeGetter = Attributes.ATTACK_DAMAGE_RATE
-    val attackDamageRateAttribute: ElementAttribute = attackDamageRateGetter.by(element)
+    val attackDamageRateAttribute: ElementAttribute = attackDamageRateGetter.of(element)
 }

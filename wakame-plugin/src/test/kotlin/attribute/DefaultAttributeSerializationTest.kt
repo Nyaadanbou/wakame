@@ -61,11 +61,11 @@ class DefaultAttributeSerializationTest : KoinTest {
     private val manasteal = Attributes.MANASTEAL
     private val maxMana = Attributes.MAX_MANA
     private val maxHealth = Attributes.MAX_HEALTH
-    private val defaultMinAttackDamage = Attributes.element(defaultElement).MIN_ATTACK_DAMAGE
-    private val defaultMaxAttackDamage = Attributes.element(defaultElement).MAX_ATTACK_DAMAGE
-    private val defaultDefense = Attributes.element(defaultElement).DEFENSE
-    private val fireDefense = Attributes.element(fireElement).DEFENSE
-    private val windDefense = Attributes.element(windElement).DEFENSE
+    private val defaultMinAttackDamage = Attributes.MIN_ATTACK_DAMAGE.of(defaultElement)
+    private val defaultMaxAttackDamage = Attributes.MAX_ATTACK_DAMAGE.of(defaultElement)
+    private val defaultDefense = Attributes.DEFENSE.of(defaultElement)
+    private val fireDefense = Attributes.DEFENSE.of(fireElement)
+    private val windDefense = Attributes.DEFENSE.of(windElement)
 
     @Test
     fun `minecraft living`() {

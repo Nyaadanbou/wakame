@@ -2,19 +2,18 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry
-import com.google.common.collect.*
+import com.google.common.collect.MultimapBuilder
+import com.google.common.collect.SetMultimap
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * The container that holds all **non-elemental** [Attribute] instances.
- *
- * Use [Attributes.element] to get the container for [ElementAttribute].
+ * The container that holds all [Attribute] instances.
  *
  * The attribute instances in this singleton object are primarily served as
  * "lookup index" for other code in this project. The numeric values passing to the
  * attribute constructors are just fallback values when the config provides nothing.
  */
-object Attributes : AttributeCollectionProvider<Attribute> {
+object Attributes : AttributeProvider {
     // 这只是一个特殊值, 供其他系统使用.
     val EMPTY = SimpleAttribute("empty", .0).register()
 
@@ -63,72 +62,64 @@ object Attributes : AttributeCollectionProvider<Attribute> {
     // 跟上面的萌芽属性一样, 只不过不是 Attribute 实例, 而是一个“中间对象”.
     // 客户端需要再指定一次元素才可以获取到最终的 (Element)Attribute 实例.
 
-    val DEFENSE = AttributeGetter { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
-    val DEFENSE_PENETRATION = AttributeGetter { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
-    val DEFENSE_PENETRATION_RATE = AttributeGetter { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
-    val MAX_ATTACK_DAMAGE = AttributeGetter { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
-    val MIN_ATTACK_DAMAGE = AttributeGetter { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
-    val ATTACK_DAMAGE_RATE = AttributeGetter { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
-    val INCOMING_DAMAGE_RATE = AttributeGetter { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val DEFENSE = createGetter { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION = createGetter { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION_RATE = createGetter { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
+    val MAX_ATTACK_DAMAGE = createGetter { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
+    val MIN_ATTACK_DAMAGE = createGetter { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
+    val ATTACK_DAMAGE_RATE = createGetter { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val INCOMING_DAMAGE_RATE = createGetter { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
     //</editor-fold>
 
     /**
-     * Gets specific [ElementAttributes] by the [element].
-     *
-     * This is the only way you get [ElementAttribute] instances.
-     *
-     * You first get an [ElementAttributes] by the [element], from which
-     * you can get the [ElementAttribute] by accessing its properties.
-     *
-     * @param element the element of the attribute
-     * @return the [ElementAttributes] instance
-     *
-     * @see ElementAttributes
-     */
-    fun element(element: Element): ElementAttributes {
-        return ElementAttributeInternals.getOrCreate(element)
-    }
-
-    /**
-     * Gets all [Attribute.compositeId] of vanilla-backing attributes.
-     */
-    fun getVanillaAttributeNames(): Collection<String> {
-        return AttributeNameInternals.getVanillaAttributeNames()
-    }
-
-    /**
-     * Gets all [Attribute.compositeId] of known element attributes.
-     */
-    fun getElementAttributeNames(): Collection<String> {
-        return AttributeNameInternals.getElementAttributeNames()
-    }
-
-    /**
-     * Gets all [Attribute.descriptionId] of known attributes (including [ElementAttribute]).
+     * Gets all [Attribute.descriptionId] of known attributes.
      */
     val descriptionIds: Set<String>
-        get() = AttributeInternals.descriptionIds + ElementAttributeInternals.descriptionIds
+        get() = AttributeProviderInternals.descriptionIds + SimpleAttributeGetter.descriptionIds
 
     /**
-     * Gets specific [Attribute] instances by the [descriptionId] (including [ElementAttribute]).
+     * Gets all [Attribute.compositionId] of known vanilla-backed attributes.
      */
-    override fun getBy(descriptionId: String): Attribute? {
-        return AttributeInternals.getBy(descriptionId) ?: ElementAttributeInternals.getBy(descriptionId)
+    val vanillaAttributeNames: Collection<String>
+        get() = AttributeNamesHolder.vanillaAttributeNames
+
+    /**
+     * Gets all [Attribute.compositionId] of known element attributes.
+     */
+    val elementAttributeNames: Collection<String>
+        get() = AttributeNamesHolder.elementAttributeNames
+
+    override fun getSingleton(descriptionId: String): Attribute? {
+        return AttributeProviderInternals.getSingleton(descriptionId) ?: SimpleAttributeGetter.getSingleton(descriptionId)
+    }
+
+    override fun getComposition(compositionId: String): Collection<Attribute> {
+        return AttributeProviderInternals.getComposition(compositionId)
+    }
+
+    override fun isElementalByDescriptionId(descriptionId: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun isElementalByCompositionId(compositionId: String): Boolean {
+        TODO("Not yet implemented")
     }
 
     /**
-     * Gets specific [Attribute] instances by the [compositeId] (not including [ElementAttribute]).
-     *
-     * To get a collection of [ElementAttribute], use [Attributes.element] instead.
+     * 初始化 [Attributes] 的所有数据.
      */
-    override fun getCollectionBy(compositeId: String): Collection<Attribute> {
-        return AttributeInternals.getCollectionBy(compositeId)
+    fun bootstrap() {
+        SimpleAttributeGetter.bootstrap()
     }
 
     //////
 
-    private fun Attribute.register(): Attribute {
-        return AttributeInternals.register(this)
+    private fun <T : Attribute> T.register(): T {
+        return AttributeProviderInternals.register(this)
+    }
+
+    private fun createGetter(creator: (Element) -> ElementAttribute): AttributeGetter {
+        return SimpleAttributeGetter(creator)
     }
 }
 
@@ -136,18 +127,24 @@ object Attributes : AttributeCollectionProvider<Attribute> {
  * 代表一个用于获取 [ElementAttribute] 实例的“中间对象”.
  *
  * ### 用法
- * 从 [Attributes] 中获取到本类型的实例后, 有一个 [AttributeGetter.by] 函数可用.
+ * 从 [Attributes] 中获取到本类型的实例后, 有一个 [AttributeGetter.of] 函数可用.
  * 使用这个函数指定一个元素, 那么就可以获取到这个元素所对应的 [ElementAttribute] 实例.
  *
  * ### 设计哲学
- * [ElementAttribute] 跟 [RangedAttribute] 的区别:
+ * 首先要了解 [ElementAttribute] 跟 [RangedAttribute] 的区别.
  * [RangedAttribute] 的字段都是原始类型, 而 [ElementAttribute] 还带有一个 [Element] 的字段.
- * 这也意味着 [ElementAttribute] 对 [Element] 实例有直接的依赖, 想要创建 [ElementAttribute] 必须得先有一个 [Element] 实例.
- * 这也意味着, 对于一种特定的 *元素* 属性, 例如防御力, 有多少种存在的元素, 就会有多少个 [ElementAttribute] 实例.
+ * 也就是说, 想要创建 [ElementAttribute] 必须得先有一个 [Element] 实例, 这种依赖关系使得代码变得复杂.
+ * 这就直接导致了, 比如说, 客户端代码想要获取一个 [ElementAttribute], 那么它必须得先有一个 [Element] 实例.
+ *
+ * 而在很多时候, 客户端代码并不关心 [Element] 实例是什么, 它只是想要指定一个*任意元素*的 [ElementAttribute] 实例.
+ * 为了解决这个问题, 我们引入了 [AttributeGetter] 这个“中间对象”.
+ * 这个中间对象相当于是一个 `[Element] -> [ElementAttribute]` 的函数, 而不是一个直接的 [ElementAttribute] 实例.
+ *
+ * 事实证明这种设计极大了降低了代码的重复度, 我们不需要在 [Attributes] 的字段里为每一种可能的元素都声明一个 [ElementAttribute] 实例.
+ * 而是只需要创建一个 [AttributeGetter] 实例, 然后通过这个实例来获取 [ElementAttribute] 实例即可.
+ * 相当于把创建 [ElementAttribute] 实例的时机给推后了.
  */
-class AttributeGetter(
-    private val creator: (Element) -> ElementAttribute,
-) {
+interface AttributeGetter {
     /**
      * 获取 [ElementAttribute] 实例.
      * 如果传入的 [id] 无法找到对应的 [Element] 实例, 则返回 `null`.
@@ -155,10 +152,7 @@ class AttributeGetter(
      *
      * @param id 元素类型的唯一标识
      */
-    fun by(id: String): ElementAttribute? {
-        val elem = ElementRegistry.INSTANCES.find(id) ?: return null
-        return by(elem)
-    }
+    fun of(id: String): ElementAttribute?
 
     /**
      * 获取 [ElementAttribute] 实例.
@@ -167,175 +161,132 @@ class AttributeGetter(
      *
      * @param element 元素类型
      */
-    fun by(element: Element): ElementAttribute {
-        return OBJECT_POOL.computeIfAbsent(element) { x: Element -> register(creator(x)) }
-    }
-
-    private companion object Shared {
-        private val OBJECT_POOL: ConcurrentHashMap<Element, ElementAttribute> = ConcurrentHashMap()
-
-        // description id -> element attribute
-        private val BY_DESCRIPTION_ID: HashMap<String, ElementAttribute> = HashMap()
-
-        // (element object, composition id) -> set <element attributes>
-        private val BY_COMPOSITE_ID: HashBasedTable<Element, String, HashSet<ElementAttribute>> = HashBasedTable.create()
-
-        // 所有已知的 ElementAttribute 的 descriptionId
-        val descriptionIds: Set<String>
-            get() = BY_DESCRIPTION_ID.keys
-
-        @Synchronized
-        fun register(attribute: ElementAttribute): ElementAttribute {
-            BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
-            BY_COMPOSITE_ID.row(attribute.element).computeIfAbsent(attribute.compositeId) { HashSet() }.add(attribute)
-            AttributeNameInternals.register(attribute)
-            return attribute
-        }
-
-        fun getBy(descriptionId: String): ElementAttribute? {
-            return BY_DESCRIPTION_ID[descriptionId]
-        }
-
-        fun getCollectionBy(element: Element, compositeId: String): Collection<ElementAttribute> {
-            return BY_COMPOSITE_ID.get(element, compositeId) ?: throw IllegalArgumentException("unknown composite id: '$compositeId'")
-        }
-    }
-}
-
-/**
- * A container which owns all [ElementAttribute] instances for a type of [Element].
- */
-@Suppress("PropertyName", "MemberVisibilityCanBePrivate")
-class ElementAttributes
-internal constructor(
-    /**
-     * The element type of this container.
-     */
-    private val element: Element,
-) : AttributeCollectionProvider<ElementAttribute> {
-    val DEFENSE = ElementAttribute("defense", .0, -16384.0, 16384.0, element).register()
-    val DEFENSE_PENETRATION = ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element).register()
-    val DEFENSE_PENETRATION_RATE = ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element).register()
-    val MAX_ATTACK_DAMAGE = ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element).register()
-    val MIN_ATTACK_DAMAGE = ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element).register()
-    val ATTACK_DAMAGE_RATE = ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element).register()
-    val INCOMING_DAMAGE_RATE = ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element).register()
-
-    override fun getBy(descriptionId: String): ElementAttribute? {
-        return ElementAttributeInternals.getBy(descriptionId)
-    }
-
-    override fun getCollectionBy(compositeId: String): Collection<ElementAttribute> {
-        return ElementAttributeInternals.getCollectionBy(element, compositeId)
-    }
-
-    private fun ElementAttribute.register(): ElementAttribute {
-        return ElementAttributeInternals.register(this)
-    }
-}
-
-/**
- * Holds one or more instances of [Attribute].
- */
-interface AttributeCollectionProvider<T : Attribute> {
-    /**
-     * Gets an [Attribute] by its [descriptionId].
-     */
-    fun getBy(descriptionId: String): T?
-
-    /**
-     * Gets a collection of [Attribute]s by [compositeId].
-     *
-     * **Remember that different [Attribute] instances may have the same composite id!**
-     *
-     * The returned list may contain zero or more attributes:
-     * - `=0`: the composition is not registered
-     * - `=1`: the composition is bound to exactly one attribute
-     * - `>1`: the composition is bound to more than one attributes
-     *
-     * ## Side notes
-     *
-     * This function is primarily used by the config deserializer.
-     *
-     * @param compositeId the composite id
-     * @return zero or more attributes
-     */
-    fun getCollectionBy(compositeId: String): Collection<T>
+    fun of(element: Element): ElementAttribute
 }
 
 
 /* Internals */
 
 
-// 封装了一些内部状态, 以提供更好的接口体验
-private object AttributeInternals {
-    // 从 descriptionId 映射到单个 Attribute
-    private val BY_DESCRIPTION_ID: HashMap<String, Attribute> = HashMap()
 
-    // 从 compositeId 映射到多个 Attribute
-    private val BY_COMPOSITE_ID: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+private class SimpleAttributeGetter(
+    private val creator: (Element) -> ElementAttribute,
+) : AttributeGetter {
 
-    // 所有已知的 Attribute 的 descriptionId
-    val descriptionIds: Set<String>
-        get() = BY_DESCRIPTION_ID.keys
-
-    @Synchronized
-    fun register(attribute: Attribute): Attribute {
-        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
-        BY_COMPOSITE_ID.put(attribute.compositeId, attribute)
-        AttributeNameInternals.register(attribute)
-        return attribute
+    init {
+        register(this) // 注册到全局对象池, 方便之后遍历
     }
 
-    fun getBy(descriptionId: String): Attribute? {
-        return BY_DESCRIPTION_ID[descriptionId]
+    // element -> element attribute
+    private val mappings: ConcurrentHashMap<Element, ElementAttribute> = ConcurrentHashMap()
+
+    override fun of(id: String): ElementAttribute? {
+        val elem = ElementRegistry.INSTANCES.find(id)
+        if (elem == null) {
+            return null
+        }
+        return of(elem)
     }
 
-    fun getCollectionBy(compositeId: String): Collection<Attribute> {
-        return BY_COMPOSITE_ID.get(compositeId)
+    override fun of(element: Element): ElementAttribute {
+        return mappings.computeIfAbsent(element) { x: Element ->
+            register(creator(x))
+        }
+    }
+
+    /**
+     * 本伴生对象主要充当 [AttributeGetter] 的对象池, 以及存放一些其他需要在所有之中共享的数据.
+     */
+    companion object Shared {
+        private val objectPool: HashSet<AttributeGetter> = HashSet()
+
+        // description id -> element attribute
+        private val descriptionId2Attribute: HashMap<String, ElementAttribute> = HashMap()
+
+        // composition id -> set <element attribute>
+        private val compositionId2AttributeSet: HashMap<String, HashSet<ElementAttribute>> = HashMap()
+
+        // 所有已知的 ElementAttribute 的 descriptionId
+        val descriptionIds: Set<String>
+            get() = descriptionId2Attribute.keys
+
+        @Synchronized
+        fun bootstrap() {
+            // 初始化 ElementAttribute 的每一种 Element
+            objectPool.forEach { getter ->
+                ElementRegistry.INSTANCES.forEach { (_, element) ->
+                    getter.of(element)
+                }
+            }
+        }
+
+        @Synchronized
+        fun register(getter: AttributeGetter): AttributeGetter {
+            objectPool.add(getter)
+            return getter
+        }
+
+        @Synchronized
+        fun register(attribute: ElementAttribute): ElementAttribute {
+            descriptionId2Attribute[attribute.descriptionId] = attribute
+            compositionId2AttributeSet.computeIfAbsent(attribute.compositionId) { _ -> HashSet() }.add(attribute)
+            AttributeNamesHolder.register(attribute)
+            return attribute
+        }
+
+        fun getSingleton(descriptionId: String): ElementAttribute? {
+            return descriptionId2Attribute[descriptionId]
+        }
+
+        fun getComposition(compositionId: String): Collection<ElementAttribute> {
+            return compositionId2AttributeSet[compositionId] ?: throw IllegalArgumentException("unknown composition id: '$compositionId'")
+        }
     }
 }
 
-// 封装了一些内部状态, 以提供更好的接口体验
-private object ElementAttributeInternals {
-    // 从 descriptionId 映射到单个 ElementAttribute
-    private val BY_DESCRIPTION_ID: HashMap<String, ElementAttribute> = HashMap()
+// 封装了一些内部状态, 以提供更简洁的接口
+private object AttributeProviderInternals {
+    // description id -> attribute
+    private val descriptionId2Attribute: HashMap<String, Attribute> = HashMap()
 
-    // 从 compositeId 映射到多个 ElementAttribute
-    private val BY_COMPOSITE_ID: HashBasedTable<Element, String, HashSet<ElementAttribute>> = HashBasedTable.create()
+    // composition id -> attribute set
+    private val compositionId2AttributeSet: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
 
-    // 所有已知的 ElementAttribute 的 descriptionId
+    // 所有已知的 attribute 的 description id
     val descriptionIds: Set<String>
-        get() = BY_DESCRIPTION_ID.keys
+        get() = descriptionId2Attribute.keys
 
     @Synchronized
-    fun register(attribute: ElementAttribute): ElementAttribute {
-        BY_DESCRIPTION_ID[attribute.descriptionId] = attribute
-        BY_COMPOSITE_ID.row(attribute.element).computeIfAbsent(attribute.compositeId) { HashSet() }.add(attribute)
-        AttributeNameInternals.register(attribute)
+    fun <T : Attribute> register(attribute: T): T {
+        descriptionId2Attribute[attribute.descriptionId] = attribute
+        compositionId2AttributeSet.put(attribute.compositionId, attribute)
+        AttributeNamesHolder.register(attribute)
         return attribute
     }
 
-    fun getBy(descriptionId: String): ElementAttribute? {
-        return BY_DESCRIPTION_ID[descriptionId]
+    fun getSingleton(descriptionId: String): Attribute? {
+        return descriptionId2Attribute[descriptionId]
     }
 
-    fun getCollectionBy(element: Element, compositeId: String): Collection<ElementAttribute> {
-        return BY_COMPOSITE_ID.get(element, compositeId) ?: throw IllegalArgumentException("Unknown composite id: '$compositeId'")
-    }
-
-    // 从 Element 映射到 ElementAttributes
-    private val ELEMENT_ATTRIBUTES: ConcurrentHashMap<Element, ElementAttributes> = ConcurrentHashMap()
-
-    fun getOrCreate(element: Element): ElementAttributes {
-        return ELEMENT_ATTRIBUTES.computeIfAbsent(element, ::ElementAttributes)
+    fun getComposition(compositionId: String): Collection<Attribute> {
+        val compositionIds = compositionId2AttributeSet.get(compositionId)
+        if (compositionIds.isNotEmpty()) {
+            return compositionIds
+        }
+        return SimpleAttributeGetter.getComposition(compositionId)
     }
 }
 
-// 封装了一些内部状态, 以提供更好的接口体验
-private object AttributeNameInternals {
-    private val VANILLA_ATTRIBUTE_NAMES: HashSet<String> = HashSet()
-    private val ELEMENT_ATTRIBUTE_NAMES: HashSet<String> = HashSet()
+// 封装了一些内部状态, 以提供更简洁的接口
+private object AttributeNamesHolder {
+    private val _vanillaAttributeNames: HashSet<String> = HashSet()
+    private val _elementAttributeNames: HashSet<String> = HashSet()
+
+    val vanillaAttributeNames: Collection<String>
+        get() = _vanillaAttributeNames
+
+    val elementAttributeNames: Collection<String>
+        get() = _elementAttributeNames
 
     @Synchronized
     fun register(attribute: Attribute) {
@@ -343,23 +294,16 @@ private object AttributeNameInternals {
         tryRegisterElementAttribute(attribute)
     }
 
-    fun getVanillaAttributeNames(): Collection<String> {
-        return VANILLA_ATTRIBUTE_NAMES
-    }
-
-    fun getElementAttributeNames(): Collection<String> {
-        return ELEMENT_ATTRIBUTE_NAMES
-    }
-
     private fun tryRegisterVanillaAttribute(attribute: Attribute) {
         if (attribute.vanilla) {
-            VANILLA_ATTRIBUTE_NAMES.add(attribute.compositeId)
+            _vanillaAttributeNames.add(attribute.compositionId)
         }
     }
 
     private fun tryRegisterElementAttribute(attribute: Attribute) {
         if (attribute is ElementAttribute) {
-            ELEMENT_ATTRIBUTE_NAMES.add(attribute.compositeId)
+            _elementAttributeNames.add(attribute.compositionId.substringBefore('/'))
+            _elementAttributeNames.add(attribute.compositionId)
         }
     }
 }
