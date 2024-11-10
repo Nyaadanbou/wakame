@@ -84,7 +84,7 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
             val attackType = node.node("type").getString("")
         ) {
             AxeAttack.NAME -> {
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
                 AxeAttack(cancelVanillaDamage)
             }
 
@@ -97,28 +97,28 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
             }
 
             CudgelAttack.NAME -> {
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
                 CudgelAttack(cancelVanillaDamage)
             }
 
             HammerAttack.NAME -> {
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
                 HammerAttack(cancelVanillaDamage)
             }
 
             SpearAttack.NAME -> {
                 val size = node.node("size").getDouble(0.2)
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
-                SpearAttack(cancelVanillaDamage,size)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
+                SpearAttack(cancelVanillaDamage, size)
             }
 
             SwordAttack.NAME -> {
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
                 SwordAttack(cancelVanillaDamage)
             }
 
             TridentAttack.NAME -> {
-                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                val cancelVanillaDamage = node.getCancelVanillaDamage()
                 TridentAttack(cancelVanillaDamage)
             }
 
@@ -127,5 +127,9 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
                 HandAttack
             }
         }
+    }
+
+    private fun ConfigurationNode.getCancelVanillaDamage(): Boolean {
+        return node("cancel_vanilla_damage").getBoolean(false)
     }
 }

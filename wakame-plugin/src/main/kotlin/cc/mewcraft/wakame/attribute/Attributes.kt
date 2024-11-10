@@ -20,6 +20,7 @@ object Attributes : AttributeProvider {
     //<editor-fold desc="原版属性">
 
     // 这些属性需要原版属性作为后端才能在游戏中生效.
+
     val ATTACK_KNOCKBACK = RangedAttribute("attack_knockback", .0, .0, 5.0, true).register()
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true).register()
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()

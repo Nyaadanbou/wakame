@@ -8,7 +8,7 @@
 # 目前可用的攻击效果类型:
 #
 #   type: axe
-#   cancel_vanilla_damage: false 是否取消原版攻击生物的掉耐久事件  !!! 不存在原版攻击生物的掉耐久事件时切勿设置 !!!
+#   cancel_vanilla_damage: false # 是否取消原版攻击生物的掉耐久事件  !!! 不存在原版攻击生物的掉耐久事件时切勿设置 !!!
 #     原版斧头, 锄头, 镐子等的单体攻击
 #     伤害基于 AttributeMap
 #
@@ -32,7 +32,7 @@
 #
 #   type: spear
 #   cancel_vanilla_damage: false
-#   size: 0.2 可以理解为矛的半径粗细, 单位为格
+#   size: 0.2 # 可以理解为矛的半径粗细, 单位为格
 #     矛的攻击, 攻击范围为玩家视线前方, 最大距离由攻击距离属性决定
 #     伤害基于 AttributeMap
 #
@@ -50,5 +50,4 @@ attack:
   # 设置攻击效果的类型
   type: spear
   # 设置攻击效果的其他参数
-  # ...
   size: 0.2
