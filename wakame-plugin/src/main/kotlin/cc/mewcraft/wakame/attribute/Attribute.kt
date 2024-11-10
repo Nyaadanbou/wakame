@@ -22,8 +22,8 @@ import java.util.stream.Stream
  * are generally used as conceptual types. Instead, use the singleton [Attributes]
  * to get the instances. The same also applies to its subtypes.
  *
- * @property compositionId
- * @property descriptionId 属性的唯一标识
+ * @property compositionId 组合属性的唯一标识
+ * @property descriptionId 单个属性的唯一标识
  * @property defaultValue 属性的默认数值 (非 [Provider])
  * @property vanilla 属性是否由原版属性实现
  *
@@ -232,13 +232,25 @@ protected constructor(
     val element: Element, // TODO 用 Holder 封装
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    compositionId + "/" + element.uniqueId,
-    descriptionId + "/" + element.uniqueId,
+    compositionId + ELEMENT_SEPARATOR + element.uniqueId,
+    descriptionId + ELEMENT_SEPARATOR + element.uniqueId,
     defaultValue,
     minValue,
     maxValue,
     vanilla,
 ) {
+
+    companion object Constants {
+        /**
+         * The separator used to separate the element id from the attribute id.
+         *
+         * For example: `defense/fire` where
+         * - `defense` is the attribute id,
+         * - `fire` is the element id,
+         * - `/` is the separator
+         */
+        const val ELEMENT_SEPARATOR = '/'
+    }
 
     /**
      * Instantiates the type using the global attribute config as value providers.

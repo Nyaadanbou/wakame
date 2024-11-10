@@ -85,6 +85,11 @@ object Attributes : AttributeProvider {
 
     /**
      * Gets all [Attribute.compositionId] of known element attributes.
+     *
+     * 返回的集合中包含两种名字: 一种是不带元素的名字, 一种是带元素的名字.
+     * 例如对于 `defense` 这个属性, 会有两种名字包含在返回的集合中:
+     * - `defense` (不带元素的名字)
+     * - `defense/fire` (带了元素的名字)
      */
     val elementAttributeNames: Collection<String>
         get() = AttributeNamesHolder.elementAttributeNames
@@ -98,11 +103,11 @@ object Attributes : AttributeProvider {
     }
 
     override fun isElementalByDescriptionId(descriptionId: String): Boolean {
-        TODO("Not yet implemented")
+        return descriptionId in SimpleAttributeGetter.descriptionIds
     }
 
     override fun isElementalByCompositionId(compositionId: String): Boolean {
-        TODO("Not yet implemented")
+        return compositionId in SimpleAttributeGetter.compositionIds
     }
 
     /**
@@ -174,7 +179,7 @@ private class SimpleAttributeGetter(
 ) : AttributeGetter {
 
     init {
-        register(this) // 注册到全局对象池, 方便之后遍历
+        registerGetter(this) // 注册到全局对象池, 方便之后遍历
     }
 
     // element -> element attribute
@@ -190,7 +195,7 @@ private class SimpleAttributeGetter(
 
     override fun of(element: Element): ElementAttribute {
         return mappings.computeIfAbsent(element) { x: Element ->
-            register(creator(x))
+            registerAttribute(creator(x))
         }
     }
 
@@ -210,28 +215,32 @@ private class SimpleAttributeGetter(
         val descriptionIds: Set<String>
             get() = descriptionId2Attribute.keys
 
-        @Synchronized
-        fun bootstrap() {
-            // 初始化 ElementAttribute 的每一种 Element
-            objectPool.forEach { getter ->
-                ElementRegistry.INSTANCES.forEach { (_, element) ->
-                    getter.of(element)
-                }
-            }
-        }
+        // 所有已知的 ElementAttribute 的 compositionId
+        val compositionIds: Set<String>
+            get() = compositionId2AttributeSet.keys
 
         @Synchronized
-        fun register(getter: AttributeGetter): AttributeGetter {
+        private fun registerGetter(getter: AttributeGetter): AttributeGetter {
             objectPool.add(getter)
             return getter
         }
 
         @Synchronized
-        fun register(attribute: ElementAttribute): ElementAttribute {
+        private fun registerAttribute(attribute: ElementAttribute): ElementAttribute {
             descriptionId2Attribute[attribute.descriptionId] = attribute
             compositionId2AttributeSet.computeIfAbsent(attribute.compositionId) { _ -> HashSet() }.add(attribute)
             AttributeNamesHolder.register(attribute)
             return attribute
+        }
+
+        @Synchronized
+        fun bootstrap() {
+            // 初始化每一个 AttributeGetter 的每一种 Element
+            for (getter: AttributeGetter in objectPool) {
+                for (element: Map.Entry<String, Element> in ElementRegistry.INSTANCES) {
+                    getter.of(element.value)
+                }
+            }
         }
 
         fun getSingleton(descriptionId: String): ElementAttribute? {
@@ -302,7 +311,11 @@ private object AttributeNamesHolder {
 
     private fun tryRegisterElementAttribute(attribute: Attribute) {
         if (attribute is ElementAttribute) {
-            _elementAttributeNames.add(attribute.compositionId.substringBefore('/'))
+            // 注册两个名字, 一个是不带元素的名字, 一个是带元素的名字.
+            // 例如对于 `defense` 这个属性 (元素属性) 会注册两类名字:
+            // - defense (不带元素的名字)
+            // - defense/fire (带了元素的名字)
+            _elementAttributeNames.add(attribute.compositionId.substringBefore(ElementAttribute.ELEMENT_SEPARATOR))
             _elementAttributeNames.add(attribute.compositionId)
         }
     }
