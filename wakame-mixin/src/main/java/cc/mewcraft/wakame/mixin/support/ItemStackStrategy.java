@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * ItemStack 的自定义哈希算法.
  * <p>
@@ -27,13 +29,12 @@ public class ItemStackStrategy {
 
             CustomData customData = itemStack.get(DataComponents.CUSTOM_DATA);
             if (customData != null && customData.contains("wakame")) {
-                // 萌芽物品
-                CompoundTag nyaTag = customData.getUnsafe().getCompound("wakame");
-                h = 31 * h + nyaTag.getString("namespace").hashCode();
-                h = 31 * h + nyaTag.getString("path").hashCode();
+                // 萌芽物品, 只计算萌芽 id 的哈希
+                CompoundTag nekooTag = customData.getUnsafe().getCompound("wakame");
+                h = 31 * h + Objects.hashCode(nekooTag.get("id"));
                 return h;
             } else {
-                // 非萌芽物品
+                // 非萌芽物品, 计算所有物品组件的哈希
                 return 31 * h + itemStack.getComponents().hashCode();
             }
         }
@@ -50,18 +51,17 @@ public class ItemStackStrategy {
         }
     };
 
-    private static boolean isSameNyaItem(@NotNull ItemStack itemStack, @NotNull ItemStack itemStack2) {
-        CustomData customData = itemStack.get(DataComponents.CUSTOM_DATA);
+    private static boolean isSameNyaItem(@NotNull ItemStack itemStack1, @NotNull ItemStack itemStack2) {
+        CustomData customData1 = itemStack1.get(DataComponents.CUSTOM_DATA);
         CustomData customData2 = itemStack2.get(DataComponents.CUSTOM_DATA);
-        if (customData == null || customData2 == null) {
+        if (customData1 == null || customData2 == null) {
             return false;
         }
 
-        if (customData.contains("wakame") && customData2.contains("wakame")) {
-            CompoundTag nyaTag = customData.getUnsafe().getCompound("wakame");
-            CompoundTag nyaTag2 = customData2.getUnsafe().getCompound("wakame");
-            return nyaTag.getString("namespace").equals(nyaTag2.getString("namespace"))
-                   && nyaTag.getString("path").equals(nyaTag2.getString("path"));
+        if (customData1.contains("wakame") && customData2.contains("wakame")) {
+            CompoundTag nekooTag1 = customData1.getUnsafe().getCompound("wakame");
+            CompoundTag nekooTag2 = customData2.getUnsafe().getCompound("wakame");
+            return Objects.equals(nekooTag1.get("id"), nekooTag2.get("id"));
         }
 
         return false;

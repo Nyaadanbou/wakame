@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 @Mixin(value = Ingredient.class)
@@ -25,20 +26,20 @@ public abstract class MixinIngredient implements Predicate<ItemStack> {
      * @reason 支持自定义物品
      */
     @Overwrite
-    public boolean test(ItemStack itemstack) {
-        if (itemstack == null) {
+    public boolean test(ItemStack playerItemStack) {
+        if (playerItemStack == null) {
             return false;
         } else if (this.isEmpty()) {
-            return itemstack.isEmpty();
+            return playerItemStack.isEmpty();
         } else {
-            for (ItemStack itemstack1 : this.getItems()) {
+            for (ItemStack recipeItemStack : this.getItems()) {
                 // 玩家输入的 `minecraft:custom_data`
-                CustomData customData1 = itemstack.get(DataComponents.CUSTOM_DATA);
-                // 配方中的 `minecraft:custom_data`
-                CustomData customData2 = itemstack1.get(DataComponents.CUSTOM_DATA);
+                CustomData customData1 = playerItemStack.get(DataComponents.CUSTOM_DATA);
+                // 合成配方的 `minecraft:custom_data`
+                CustomData customData2 = recipeItemStack.get(DataComponents.CUSTOM_DATA);
 
                 if (customData1 == null && customData2 == null) {
-                    if (itemstack1.is(itemstack.getItem())) {
+                    if (recipeItemStack.is(playerItemStack.getItem())) {
                         return true;
                     }
 
@@ -51,26 +52,28 @@ public abstract class MixinIngredient implements Predicate<ItemStack> {
 
                 // 玩家输入的 `minecraft:custom_data` 中的 CompoundTag
                 CompoundTag tag1 = customData1.getUnsafe();
-                // 配方中的 `minecraft:custom_data` 中的 CompoundTag
+                // 合成配方的 `minecraft:custom_data` 中的 CompoundTag
                 CompoundTag tag2 = customData2.getUnsafe();
 
                 if (tag1.contains("wakame") != tag2.contains("wakame")) {
-                    continue;
+                    continue; // 其中一者有但另一者没有, 直接 continue
                 }
 
-                if (tag1.contains("wakame")) {
+                if (tag1.contains("wakame")) { // 两者都有
                     CompoundTag nyaTag1 = tag1.getCompound("wakame");
                     CompoundTag nyaTag2 = tag2.getCompound("wakame");
 
-                    if (nyaTag1.getString("namespace").equals(nyaTag2.getString("namespace")) &&
-                        nyaTag1.getString("path").equals(nyaTag2.getString("path"))) {
+                    if (Objects.equals(nyaTag1.get("id"), nyaTag2.get("id"))) {
                         return true;
                     }
 
                     continue;
                 }
 
-                if (itemstack1.getItem() == itemstack.getItem() && ItemStack.isSameItemSameComponents(itemstack, itemstack1)) {
+                if (
+                        recipeItemStack.getItem() == playerItemStack.getItem() &&
+                        ItemStack.isSameItemSameComponents(playerItemStack, recipeItemStack)
+                ) {
                     return true;
                 }
             }
