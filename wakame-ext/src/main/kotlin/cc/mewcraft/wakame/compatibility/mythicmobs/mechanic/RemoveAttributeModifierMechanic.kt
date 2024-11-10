@@ -11,7 +11,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import java.io.File
 
 class RemoveAttributeModifierMechanic(
@@ -26,7 +25,7 @@ class RemoveAttributeModifierMechanic(
     }
 
     private val attributeProvider: AttributeProvider by inject()
-    private val attributeMapAccess: AttributeMapAccess<LivingEntity> by inject(named(AttributeMapAccess.FOR_ENTITY))
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
         ?.let { parsed -> attributeProvider.getSingleton(parsed) }

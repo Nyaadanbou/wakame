@@ -30,37 +30,43 @@ class NekoDamageMechanic(
     }
 
     private val damageTags: DamageTags = parseDamageTags(mlc.getStringList(arrayOf("tags", "t"), ""))
-    private val damageBundle: DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
+    private val damageBundle: (SkillMetadata) -> DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
     private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
     private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
     private val knockback: Boolean = mlc.getBoolean(arrayOf("knockback", "kb"), true)
 
-    private fun parseDamageBundle(origin: List<String>): DamageBundle {
-        return DamageBundleFactory.instance().createUnsafe(
-            origin.associate { rawPacketString ->
-                val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
-                    ?.value // 提取括号内的内容 (包括括号)
-                    ?.removeSurrounding("(", ")") // 去除括号
-                    ?.split(",") // 按逗号分割
-                    ?: throw IllegalArgumentException("Invalid damage bundle: $rawPacketString")
-                when (split.size) {
-                    // 登神长阶
+    private fun parseDamageBundle(origin: List<String>): (SkillMetadata) -> DamageBundle {
+        return { data ->
+            DamageBundleFactory.instance().createUnsafe(
+                origin.associate { rawPacketString ->
+                    val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
+                        ?.value // 提取括号内的内容 (包括括号)
+                        ?.removeSurrounding("(", ")") // 去除括号
+                        ?.split(",") // 按逗号分割
+                        ?: throw IllegalArgumentException("Invalid damage bundle: $rawPacketString")
+                    when (split.size) {
+                        // 登神长阶
 
-                    // 指定 element, min, max, 其中 min = max
-                    2 -> split[0] to DamagePacket(split[0], split[1].toDouble(), split[1].toDouble())
-                    // 指定 element, min, max
-                    3 -> split[0] to DamagePacket(split[0], split[1].toDouble(), split[2].toDouble())
-                    // 指定 element, min, max, rate
-                    4 -> split[0] to DamagePacket(split[0], split[1].toDouble(), split[2].toDouble(), split[3].toDouble())
-                    // 指定 element, min, max, rate, defense_penetration
-                    5 -> split[0] to DamagePacket(split[0], split[1].toDouble(), split[2].toDouble(), split[3].toDouble(), split[4].toDouble())
-                    // 指定 element, min, max, rate, defense_penetration, defense_penetration_rate
-                    6 -> split[0] to DamagePacket(split[0], split[1].toDouble(), split[2].toDouble(), split[3].toDouble(), split[4].toDouble(), split[5].toDouble())
+                        // 配置文件内指定 element, min, 其中 min = max
+                        2 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[1].toPlaceholderDouble()[data])
+                        // 配置文件内指定 element, min, max
+                        3 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data])
+                        // 配置文件内指定 element, min, max, rate
+                        4 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data])
+                        // 配置文件内指定 element, min, max, rate, defense_penetration
+                        5 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data])
+                        // 配置文件内指定 element, min, max, rate, defense_penetration, defense_penetration_rate
+                        6 -> split[0] to DamagePacket(split[0], split[1].toPlaceholderDouble()[data], split[2].toPlaceholderDouble()[data], split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data], split[5].toPlaceholderDouble()[data])
 
-                    else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
+                        else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
+                    }
                 }
-            }
-        )
+            )
+        }
+    }
+
+    private fun String.toPlaceholderDouble(): PlaceholderDouble {
+        return PlaceholderDouble.of(this)
     }
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
@@ -83,7 +89,7 @@ class NekoDamageMechanic(
             ?: return SkillResult.INVALID_TARGET
 
         val damageMetadata = DamageMetadata(
-            damageTags, damageBundle, CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
+            damageTags, damageBundle.invoke(data), CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
         )
 
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity

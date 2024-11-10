@@ -11,7 +11,6 @@ import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.LivingEntity
 import org.koin.core.component.*
-import org.koin.core.qualifier.named
 import java.io.File
 
 class AttributeMechanic(
@@ -25,7 +24,7 @@ class AttributeMechanic(
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val attributeMapAccess: AttributeMapAccess<LivingEntity> by inject(named(AttributeMapAccess.FOR_ENTITY))
+    private val attributeMapAccess: AttributeMapAccess by inject()
 
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))

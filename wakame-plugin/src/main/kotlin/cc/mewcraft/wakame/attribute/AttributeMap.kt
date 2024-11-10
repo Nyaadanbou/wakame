@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.user.toUser
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.*
@@ -22,10 +23,22 @@ import kotlin.contracts.contract
 /**
  * A constructor function of [AttributeMap].
  *
+ * @param player the player to which this map is bound
+ * @return an existing instance of [AttributeMap]
+ */
+fun AttributeMap(player: Player): AttributeMap {
+    // 返回 User 中已经存在的 AttributeMap
+    return player.toUser().attributeMap
+}
+
+/**
+ * A constructor function of [AttributeMap].
+ *
  * @param user the user to which this map is bound
  * @return a new instance of [AttributeMap]
  */
 fun AttributeMap(user: User<Player>): AttributeMap {
+    // 创建一个全新的 AttributeMap
     val key = AttributeMapSupport.PLAYER_KEY
     val default = DefaultAttributes.getSupplier(key)
     return PlayerAttributeMap(default, user.player)
