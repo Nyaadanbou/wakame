@@ -31,7 +31,7 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, player, wrappedEvent.event)
         }
 
-        override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+        override fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
             tryCancelEvent(itemStack, player, event)
         }
 

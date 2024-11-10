@@ -7,6 +7,11 @@ import cc.mewcraft.wakame.item.behaviors.*
  */
 object ItemBehaviorTypes {
     /**
+     * 物品作为自定义箭矢的逻辑.
+     */
+    val ARROW: ItemBehaviorType<Arrow> = Arrow
+
+    /**
      * 物品发动攻击的逻辑.
      */
     val ATTACK: ItemBehaviorType<Attack> = Attack

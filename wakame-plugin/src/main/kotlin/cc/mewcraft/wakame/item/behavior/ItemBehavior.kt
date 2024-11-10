@@ -8,8 +8,11 @@ import cc.mewcraft.wakame.skill.Skill
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
@@ -53,8 +56,10 @@ interface ItemBehavior : ItemBehaviorHolder {
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 NekoItem
 
     fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
-    fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
+    fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
     fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
+    fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
+    fun handleItemProjectileHit(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
     fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
     fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
     fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
