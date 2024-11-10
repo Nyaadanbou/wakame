@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.enchantment.wrapper.implementation
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.*
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttributes
 import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.wrapper.ElementEnchantment
 import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent
@@ -16,8 +15,7 @@ internal class ElementProtection(
     Identity(elementId, "protection")
 ) {
     private val attribute: EnchantmentAttributeComponent by element
-        .map(Attributes::element)
-        .map(ElementAttributes::INCOMING_DAMAGE_RATE)
+        .map { Attributes.DEFENSE.of(elementId) ?: error("invalid element id: $elementId") }
         .map { attribute ->
             EnchantmentAttributeComponent(
                 this, setOf(

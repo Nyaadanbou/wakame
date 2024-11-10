@@ -11,9 +11,7 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.*
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
@@ -98,18 +96,18 @@ class DamageBundleDSLTest : KoinTest {
         val bundle1: DamageBundle = damageBundle(attriMap) {
             // 使用 every() 为*每个*已知的元素构建伤害包
             every {
-                min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
-                max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
-                rate { value { ATTACK_DAMAGE_RATE } }
-                defensePenetration { value { DEFENSE_PENETRATION } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION) }
-                defensePenetrationRate { value { DEFENSE_PENETRATION_RATE } + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) }
+                min { value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
+                max { value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
+                rate { value(Attributes.ATTACK_DAMAGE_RATE) }
+                defensePenetration { value(Attributes.DEFENSE_PENETRATION) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION) }
+                defensePenetrationRate { value(Attributes.DEFENSE_PENETRATION_RATE) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE) }
             }
 
             // 使用 single() 为单个元素构建伤害包, 将覆盖由 every() 统一定义的伤害包
             // 如果“fire”这个字符串 id 对应的元素不存在, 会有警告, 并且该伤害包不会被添加
             single("fire") {
-                min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
-                max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
+                min { value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
+                max { value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
                 rate { .0 }
                 defensePenetration { .0 }
                 defensePenetrationRate { .0 }
@@ -117,8 +115,8 @@ class DamageBundleDSLTest : KoinTest {
 
             // 如果已经有一个 Element 的实例, 直接传进来也行
             single(windElem) {
-                min { value { MIN_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
-                max { value { MAX_ATTACK_DAMAGE } + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
+                min { value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) }
+                max { value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) }
                 rate { 1.0 }
                 defensePenetration { .0 }
                 defensePenetrationRate { .0 }

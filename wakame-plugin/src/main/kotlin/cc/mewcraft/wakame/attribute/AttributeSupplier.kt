@@ -101,13 +101,13 @@ internal constructor(
      */
     fun getModifierValue(type: Attribute, id: Key, attributable: Attributable): Double {
         return requireNotNull(getDefault(type, attributable).getModifier(id)?.amount) {
-            "Can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
         }
     }
 
     fun getModifierValue(type: Attribute, id: Key): Double {
         return requireNotNull(getDefault(type).getModifier(id)?.amount) {
-            "Can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
         }
     }
 
@@ -145,11 +145,7 @@ internal constructor(
         return if (isAbsoluteVanilla(type)) {
             AttributeInstanceFactory.createLiveInstance(type, attributable, false)
         } else {
-            requireNotNull(prototypes[type]) {
-                val id = type.descriptionId
-                val element = (type as? ElementAttribute)?.element?.uniqueId
-                "Can't find attribute instance for attribute '$id ($element)'"
-            }
+            requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
         }
     }
 
@@ -159,11 +155,7 @@ internal constructor(
      * @throws IllegalArgumentException 如果 [type] 不在此供应者中
      */
     private fun getDefault(type: Attribute): AttributeInstance {
-        return requireNotNull(prototypes[type]) {
-            val id = type.descriptionId
-            val element = (type as? ElementAttribute)?.element?.uniqueId
-            "Can't find attribute instance for attribute '$id ($element)'"
-        }
+        return requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
     }
 
     /**
@@ -331,15 +323,15 @@ internal class AttributeSupplierDeserializer(
                 requireNotNull(
                     builders[parentKey]?.copy()
                 ) {
-                    "Can't find parent '$parentKey'. Make sure you have defined the parent before \"this\" in the configuration!"
+                    "invalid parent '$parentKey'\n\nmake sure you have defined the parent before \"this\" in the configuration!"
                 }
             } else {
                 AttributeSupplierBuilder()
             }
 
             // Put data into the builder
-            for ((compositeId, valueNode) in valuesMap) {
-                if (compositeId in Attributes.getElementAttributeNames()) {
+            for ((compositionId, valueNode) in valuesMap) {
+                if (compositionId in Attributes.elementAttributeNames) {
                     // it's a node for elemental attributes
 
                     if (valueNode.isMap) {
@@ -347,15 +339,16 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val attributes = Attributes.element(ElementRegistry.INSTANCES[elementId]).getCollectionBy(compositeId)
+                            val element = ElementRegistry.INSTANCES.find(elementId) ?: error("invalid element id: '$elementId'")
+                            val attributes = Attributes.getComposition("$compositionId/${element.uniqueId}")
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
-                        // not a map - then we assume it's a scalar -
+                        // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
                         for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val attributes = Attributes.element(elementType).getCollectionBy(compositeId)
+                            val attributes = Attributes.getComposition("$compositionId/${elementType.uniqueId}")
                             builder.add(attributes, valueNode)
                         }
                     }
@@ -363,7 +356,7 @@ internal class AttributeSupplierDeserializer(
                 } else {
                     // it's a node for any other attributes
 
-                    val attributes = Attributes.getCollectionBy(compositeId)
+                    val attributes = Attributes.getComposition(compositionId)
                     builder.add(attributes, valueNode)
                 }
             }
@@ -381,14 +374,14 @@ internal class AttributeSupplierDeserializer(
      */
     private fun validateValuesMap(valuesMap: Map<String, ConfigurationNode>): Map<String, ConfigurationNode> {
         // This will validate two things:
-        // 1. The format of the composite id is correct
+        // 1. The format of the composition id is correct
         // 2. The config node has correct structure
-        for ((compositeId, valueNode) in valuesMap) {
-            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositeId)) {
-                error("The composite id '$compositeId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
+        for ((compositionId, valueNode) in valuesMap) {
+            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
+                error("the composition id '$compositionId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
             }
-            if (compositeId in Attributes.getElementAttributeNames() && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
-                error("The attribute '$compositeId' has neither a map structure, nor a scalar value, nor a null")
+            if (compositionId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
+                error("the attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 
@@ -403,7 +396,7 @@ internal class AttributeSupplierDeserializer(
      */
     fun deserialize(): Map<Key, AttributeSupplier> {
         if (isFrozen) {
-            throw IllegalStateException("The function deserialize() can be invoked at most once for the instance")
+            throw IllegalStateException("the function deserialize() can be invoked at most once for the instance")
         }
 
         val nodeMap = this.node.childrenMap().mapKeys { (key, _) -> Key(key.toString()) }

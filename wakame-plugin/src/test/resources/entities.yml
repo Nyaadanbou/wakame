@@ -34,7 +34,6 @@ entity_attributes:
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
-      damage_reduction_rate: default
       defense_penetration: default
       entity_interaction_range: default
       health_regeneration: default
