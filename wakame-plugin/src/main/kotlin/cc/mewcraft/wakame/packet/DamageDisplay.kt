@@ -15,10 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Sound
-import org.bukkit.entity.Display
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
+import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -48,10 +45,11 @@ internal class DamageDisplay : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
         val damager = event.damageSource.causingEntity as? Player ?: return
+        val damagee = event.damagee as? LivingEntity ?: return
         val damageValueMap = event.getFinalDamageMap()
         val criticalState = event.getCriticalState()
 
-        val hologramLoc = calculateHologramLocation(damager = damager, distance = 3f)
+        val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
         val hologramText = damageValueMap
             .map { (element, value) ->
                 val damageValue = "%.1f".format(value)
@@ -89,7 +87,7 @@ internal class DamageDisplay : Listener {
     }
 
     /**
-     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的视线向量 `AB` 上,
+     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 与 [受伤实体][damagee] 的连线向量 `AB` 上,
      * 并且与玩家的 [眼睛][Player.getEyeLocation] 的距离为 [distance].
      *
      * 具体来说, 我们先找到一个平面 `P`, 使得平面垂直于 `AB` 向量.
@@ -102,10 +100,12 @@ internal class DamageDisplay : Listener {
      */
     private fun calculateHologramLocation(
         damager: Player,
+        damagee: LivingEntity,
         distance: Float,
     ): Location {
         val a = damager.eyeLocation.toVector3f()
-        val ab = damager.eyeLocation.direction.toVector3f()
+        val b = damagee.eyeLocation.toVector3f()
+        val ab = (b - a).normalize()
         val c0 = a + (ab mul distance)
 
         // 生成不平行于 AB 的任意向量
