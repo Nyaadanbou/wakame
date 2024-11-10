@@ -4,8 +4,11 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeGetter
+import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
@@ -95,7 +98,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
         +buildComposite("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
         +buildComposite("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
-        +buildComposite("knockback_resistance").single().bind(Attributes.KNOCKBACK_RESISTANCE)
+        +buildComposite("attack_knockback").single().bind(Attributes.ATTACK_KNOCKBACK)
         +buildComposite("block_interaction_range").single().bind(Attributes.BLOCK_INTERACTION_RANGE)
         +buildComposite("critical_strike_chance").single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
         +buildComposite("critical_strike_power").single().bind(Attributes.CRITICAL_STRIKE_POWER)
