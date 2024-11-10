@@ -4,12 +4,15 @@ import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
+import cc.mewcraft.wakame.item.damageItemStackByMark
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -21,9 +24,17 @@ import org.bukkit.inventory.EquipmentSlot
  *   type: trident
  * ```
  */
-class TridentAttack : AttackType {
+class TridentAttack(
+    private val cancelVanillaDamage: Boolean
+) : AttackType {
     companion object {
         const val NAME = "trident"
+    }
+
+    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
+        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
+            event.isCancelled = true
+        }
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
@@ -56,7 +67,7 @@ class TridentAttack : AttackType {
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStack(EquipmentSlot.HAND, 1)
+        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {

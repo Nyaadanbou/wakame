@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
@@ -54,6 +55,11 @@ sealed interface AttackType {
         }
         wrappedEvent.actionPerformed = true
     }
+
+    /**
+     * 玩家使用该攻击类型的物品触发原版掉耐久事件时执行的逻辑.
+     */
+    fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) = Unit
 }
 
 /**
@@ -78,7 +84,8 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
             val attackType = node.node("type").getString("")
         ) {
             AxeAttack.NAME -> {
-                AxeAttack()
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                AxeAttack(cancelVanillaDamage)
             }
 
             BowAttack.NAME -> {
@@ -90,24 +97,29 @@ internal object AttackTypeSerializer : TypeSerializer<AttackType> {
             }
 
             CudgelAttack.NAME -> {
-                CudgelAttack()
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                CudgelAttack(cancelVanillaDamage)
             }
 
             HammerAttack.NAME -> {
-                HammerAttack()
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                HammerAttack(cancelVanillaDamage)
             }
 
             SpearAttack.NAME -> {
                 val size = node.node("size").getDouble(0.2)
-                SpearAttack(size)
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                SpearAttack(cancelVanillaDamage,size)
             }
 
             SwordAttack.NAME -> {
-                SwordAttack()
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                SwordAttack(cancelVanillaDamage)
             }
 
             TridentAttack.NAME -> {
-                TridentAttack()
+                val cancelVanillaDamage = node.node("cancel_vanilla_damage").getBoolean(false)
+                TridentAttack(cancelVanillaDamage)
             }
 
             else -> {

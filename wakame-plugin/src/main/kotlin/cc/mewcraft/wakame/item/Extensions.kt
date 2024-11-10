@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.maxDamage
 import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
 
 fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
@@ -32,4 +36,13 @@ val NekoStack.isDamageable: Boolean
  */
 fun NekoStack.hurtAndBreak(player: Player, amount: Int) {
     wrapped.damage(amount, player)
+}
+
+/**
+ * 为了修改原版武器攻击生物掉耐久的数值, 引入了标记.
+ * 执行自定义.
+ */
+fun Player.damageItemStackByMark(equipmentSlot: EquipmentSlot, amount: Int) {
+    this.damageItemStack(equipmentSlot, amount)
+    ItemDamageEventMarker.markAlreadyDamaged(this)
 }

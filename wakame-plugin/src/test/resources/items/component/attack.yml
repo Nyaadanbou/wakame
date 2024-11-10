@@ -8,6 +8,7 @@
 # 目前可用的攻击效果类型:
 #
 #   type: axe
+#   cancel_vanilla_damage: false 是否取消原版攻击生物的掉耐久事件  !!! 不存在原版攻击生物的掉耐久事件时切勿设置 !!!
 #     原版斧头, 锄头, 镐子等的单体攻击
 #     伤害基于 AttributeMap
 #
@@ -20,23 +21,28 @@
 #     伤害基于 AttributeMap
 #
 #   type: cudgel
+#   cancel_vanilla_damage: false
 #     棍的攻击, 攻击范围为以玩家自身为中心的长方体, 范围大小由攻击距离属性决定
 #     伤害基于 AttributeMap
 #
 #   type: hammer
+#   cancel_vanilla_damage: false
 #     锤的攻击, 攻击范围为以直接攻击到的生物为中心的长方体, 范围大小由锤击范围属性决定
 #     伤害基于 AttributeMap, 范围伤害根据直接伤害按比率属性折算
 #
 #   type: spear
-#   size: 0.2
+#   cancel_vanilla_damage: false
+#   size: 0.2 可以理解为矛的半径粗细, 单位为格
 #     矛的攻击, 攻击范围为玩家视线前方, 最大距离由攻击距离属性决定
 #     伤害基于 AttributeMap
 #
 #   type: sword
+#   cancel_vanilla_damage: false
 #     原版剑的横扫攻击
 #     伤害基于 AttributeMap, 横扫伤害按比率属性折算
 #
 #   type: trident
+#   cancel_vanilla_damage: false
 #     原版三叉戟的攻击, 副手无法使用
 #     伤害基于 AttributeMap
 

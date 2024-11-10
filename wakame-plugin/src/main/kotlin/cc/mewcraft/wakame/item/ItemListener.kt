@@ -2,7 +2,9 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.event.*
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
@@ -11,7 +13,10 @@ import cc.mewcraft.wakame.util.takeUnlessEmpty
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.*
+import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -102,6 +107,9 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         val item = event.item.takeUnlessEmpty() ?: return
         val nekoStack = item.shadowNeko(false) ?: return
         nekoStack.behaviors.forEach { behavior ->
+            if (event.isCancelled) {
+                return
+            }
             behavior.handleDamage(event.player, item, event)
         }
     }
