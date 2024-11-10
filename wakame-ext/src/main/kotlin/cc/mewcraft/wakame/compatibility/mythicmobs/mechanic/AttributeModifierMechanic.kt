@@ -58,8 +58,8 @@ class AttributeModifierMechanic(
     }
 
     private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int, isPlayer: Boolean) {
-        // 给玩家添加临时的属性修饰符, 因为玩家属性应该要在玩家离开游戏时消失以避免 `AttributeModifier is already applied` 错误
         if (isPlayer) {
+            // 给玩家添加临时的属性修饰符, 避免属性意外永久驻留在玩家存档里
             attributeInstance.addTransientModifier(modifier)
         } else {
             attributeInstance.addModifier(modifier)

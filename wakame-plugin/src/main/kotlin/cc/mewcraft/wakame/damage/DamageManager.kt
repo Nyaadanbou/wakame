@@ -17,7 +17,6 @@ import org.bukkit.event.entity.*
 import org.bukkit.event.entity.EntityDamageEvent.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.time.Duration
 import java.util.UUID
@@ -35,7 +34,7 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
 object DamageManager : DamageManagerApi, KoinComponent {
     private val logger: Logger = get()
     private val damageApplier: DamageApplier = DamageApplier.instance()
-    private val attributeMapAccess: AttributeMapAccess by inject()
+    private val attributeMapAccess: AttributeMapAccess = get()
 
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
