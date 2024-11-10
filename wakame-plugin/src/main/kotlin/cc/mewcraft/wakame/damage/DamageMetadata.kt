@@ -7,7 +7,9 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.objectmapping.meta.NodeKey
+import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import team.unnamed.mocha.MochaEngine
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -104,7 +106,7 @@ object PlayerDamageMetadata {
                 chance = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
                 positivePower = user.attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
                 negativePower = user.attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER),
-                nonePower = 1.0 // TODO 新属性 NONE_POWER
+                nonePower = user.attributeMap.getValue(Attributes.NONE_CRITICAL_STRIKE_POWER)
             )
         )
     }

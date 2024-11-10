@@ -21,9 +21,10 @@ object Attributes : AttributeProvider {
 
     // 这些属性需要原版属性作为后端才能在游戏中生效.
 
+    val ATTACK_KNOCKBACK = RangedAttribute("attack_knockback", .0, .0, 5.0, true).register()
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true).register()
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()
-    val SWEEPING_DAMAGE_RATIO = RangedAttribute("sweeping_damage_ratio", 0.1, .0, 1.0, true).register()
+    val KNOCKBACK_RESISTANCE = RangedAttribute("knockback_resistance", .0, .0, 1.0, true).register()
     val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true).register()
     val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true).register()
     val MINING_EFFICIENCY = RangedAttribute("mining_efficiency", .0, .0, 1024.0, true).register()
@@ -31,6 +32,8 @@ object Attributes : AttributeProvider {
     val SAFE_FALL_DISTANCE = RangedAttribute("safe_fall_distance", 3.0, -1024.0, 1024.0, true).register()
     val SCALE = RangedAttribute("scale", 1.0, 0.0625, 16.0, true).register()
     val STEP_HEIGHT = RangedAttribute("step_height", 0.6, .0, 10.0, true).register()
+    val SWEEPING_DAMAGE_RATIO = RangedAttribute("sweeping_damage_ratio", 0.1, .0, 1.0, true).register()
+    val WATER_MOVEMENT_EFFICIENCY = RangedAttribute("water_movement_efficiency", .0, .0, 1.0, true).register()
     //</editor-fold>
 
     //<editor-fold desc="萌芽属性">
@@ -40,7 +43,7 @@ object Attributes : AttributeProvider {
 
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()
-    val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, 1.0, 16384.0).register()
+    val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 16384.0).register()
     val HAMMER_DAMAGE_RANGE = RangedAttribute("hammer_damage_range", .0, .0, 64.0).register()
     val HAMMER_DAMAGE_RATIO = RangedAttribute("hammer_damage_ratio", .0, .0, 1.0).register()
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).register()
@@ -49,7 +52,8 @@ object Attributes : AttributeProvider {
     val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0).register()
     val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0).register()
     val MAX_MANA = RangedAttribute("max_mana", 100.0, .0, 16384.0).register()
-    val NEGATIVE_CRITICAL_STRIKE_POWER = RangedAttribute("negative_critical_strike_power", 1.0, .0, 1.0).register()
+    val NEGATIVE_CRITICAL_STRIKE_POWER = RangedAttribute("negative_critical_strike_power", 1.0, .0, 16384.0).register()
+    val NONE_CRITICAL_STRIKE_POWER = RangedAttribute("none_critical_strike_power", 1.0, .0, 16384.0).register()
     val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).register()
     val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).register()
     val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, .0, 1.0).register()

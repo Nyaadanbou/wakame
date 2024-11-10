@@ -5,13 +5,18 @@ import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
+import cc.mewcraft.wakame.item.damageItemStackByMark
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.*
+import org.bukkit.Particle
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -25,10 +30,18 @@ import org.bukkit.inventory.EquipmentSlot
  *   type: cudgel
  * ```
  */
-class CudgelAttack : AttackType {
+class CudgelAttack(
+    private val cancelVanillaDamage: Boolean
+) : AttackType {
     companion object {
         const val NAME = "cudgel"
         const val MAX_RADIUS = 32.0
+    }
+
+    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
+        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
+            event.isCancelled = true
+        }
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
@@ -66,18 +79,19 @@ class CudgelAttack : AttackType {
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStack(EquipmentSlot.HAND, 1)
+        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        super.handleInteract(player, nekoStack, action, wrappedEvent)
+        if (!action.isLeftClick) return
+        if (player.toUser().attackSpeed.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStack(EquipmentSlot.HAND, 1)
+        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
     }
 
     private fun applyCudgelAttack(player: Player, vararg excludeEntities: LivingEntity) {

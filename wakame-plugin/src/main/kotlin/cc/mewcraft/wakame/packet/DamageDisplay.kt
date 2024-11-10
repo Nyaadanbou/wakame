@@ -12,21 +12,13 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import org.bukkit.Color
-import org.bukkit.Location
-import org.bukkit.Sound
-import org.bukkit.entity.Display
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.*
+import org.bukkit.entity.*
+import org.bukkit.event.*
 import org.joml.Vector3f
-import java.util.*
-import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.sin
+import java.util.WeakHashMap
+import kotlin.math.*
+import kotlin.random.Random
 
 /**
  * 以悬浮文字显示玩家造成的伤害.
@@ -48,10 +40,11 @@ internal class DamageDisplay : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
         val damager = event.damageSource.causingEntity as? Player ?: return
+        val damagee = event.damagee as? LivingEntity ?: return
         val damageValueMap = event.getFinalDamageMap()
         val criticalState = event.getCriticalState()
 
-        val hologramLoc = calculateHologramLocation(damager = damager, distance = 3f)
+        val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
         val hologramText = damageValueMap
             .map { (element, value) ->
                 val damageValue = "%.1f".format(value)
@@ -89,8 +82,9 @@ internal class DamageDisplay : Listener {
     }
 
     /**
-     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的视线向量 `AB` 上,
-     * 并且与玩家的 [眼睛][Player.getEyeLocation] 的距离为 [distance].
+     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的眼睛与 [受伤实体][damagee]
+     * 的眼睛的连线 `AB` 上, 并且与玩家的 [眼睛][Player.getEyeLocation]
+     * 的距离为 [distance].
      *
      * 具体来说, 我们先找到一个平面 `P`, 使得平面垂直于 `AB` 向量.
      * 平面 `P` 与点 `A` (眼睛) 之间的距离由参数 [distance] 决定.
@@ -102,10 +96,12 @@ internal class DamageDisplay : Listener {
      */
     private fun calculateHologramLocation(
         damager: Player,
+        damagee: LivingEntity,
         distance: Float,
     ): Location {
         val a = damager.eyeLocation.toVector3f()
-        val ab = damager.eyeLocation.direction.toVector3f()
+        val b = damagee.eyeLocation.toVector3f().apply { y -= damagee.height.toFloat() / 3f } // 降低一点高度, 让数字落在屏幕正中间
+        val ab = (b - a).normalize()
         val c0 = a + (ab mul distance)
 
         // 生成不平行于 AB 的任意向量
@@ -116,7 +112,8 @@ internal class DamageDisplay : Listener {
         val v2 = (ab cross v1).normalize()
 
         // 生成垂直平面的随机因子
-        val (r1, r2) = RADIAL_POINT_CYCLE.next(damager)
+        val r1 = (Random.nextFloat() - .5f) * 1f // *1 就是 -0.5 ~ +0.5, *2 就是 -1.0 ~ +1.0
+        val r2 = (Random.nextFloat() - .5f) * 1f
 
         // 计算 C
         val c = c0 + (v1 mul r1) + (v2 mul r2)
@@ -181,6 +178,8 @@ internal class DamageDisplay : Listener {
     }
 }
 
+// 经过讨论, 不使用这个算法生成坐标.
+// 保留这个类, 以便以后某天可能会用到.
 internal class RadialPointCycle {
     private val slices: Int
     private val radius: Float

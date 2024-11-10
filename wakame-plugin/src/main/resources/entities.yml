@@ -26,6 +26,7 @@ entity_attributes:
       attack_damage: default # default 意为采用全局默认值
       attack_damage_rate: default
       attack_effect_chance: default
+      attack_knockback: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
@@ -37,6 +38,7 @@ entity_attributes:
       hammer_damage_ratio: default
       health_regeneration: default
       incoming_damage_rate: default
+      knockback_resistance: default
       lifesteal: default
       manasteal: default
       mana_consumption_rate: default
@@ -46,11 +48,13 @@ entity_attributes:
       max_mana: 200.0
       movement_speed: default
       negative_critical_strike_power: default
+      none_critical_strike_power: default
       sweeping_damage_ratio: default
       universal_attack_damage: default
       universal_defense: default
       universal_defense_penetration: default
       universal_defense_penetration_rate: default
+      water_movement_efficiency: default
 
   minecraft:mob:
     parent: minecraft:living
@@ -59,19 +63,9 @@ entity_attributes:
   minecraft:damageable:
     parent: ~
     values:
-      attack_damage: 0
-      attack_damage_rate: 1.0
-      critical_strike_chance: default
-      critical_strike_power: default
       defense: 0
-      defense_penetration: 0
-      defense_penetration_rate: 0
       incoming_damage_rate: 1.0
-      negative_critical_strike_power: default
-      universal_attack_damage: 0
       universal_defense: 0
-      universal_defense_penetration: 0
-      universal_defense_penetration_rate: 0
 
   minecraft:allay:
     parent: minecraft:damageable
@@ -302,6 +296,10 @@ entity_attributes:
     values: { }
 
   minecraft:slime:
+    parent: minecraft:damageable
+    values: { }
+
+  minecraft:sliverfish:
     parent: minecraft:damageable
     values: { }
 

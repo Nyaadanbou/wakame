@@ -8,11 +8,12 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import org.bukkit.entity.*
 import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 /**
- * 物品发动攻击的逻辑
- * 用于实现各种攻击效果
+ * 物品发动攻击的逻辑.
+ * 用于实现各种攻击效果.
  */
 interface Attack : ItemBehavior {
     private object Default : Attack {
@@ -27,6 +28,12 @@ interface Attack : ItemBehavior {
             val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
             if (damagee !is LivingEntity) return
             attack.attackType.handleAttackEntity(player, nekoStack, damagee, event)
+        }
+
+        override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
+            val nekoStack = itemStack.projectNeko()
+            val attack = nekoStack.templates.get(ItemTemplateTypes.ATTACK) ?: return
+            attack.attackType.handleDamage(player, nekoStack, event)
         }
     }
 

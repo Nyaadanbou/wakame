@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.skill.Skill
@@ -16,9 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 
 interface LevelBarrier : ItemBehavior {
@@ -31,7 +29,7 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, player, wrappedEvent.event)
         }
 
-        override fun handleEntityInteract(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+        override fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
             tryCancelEvent(itemStack, player, event)
         }
 
@@ -59,7 +57,7 @@ interface LevelBarrier : ItemBehavior {
             get() = this.toUser().level
 
         private val ItemStack.levelOrZero: Int
-            get() = tryNekoStack?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+            get() = shadowNeko()?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
 
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
             val itemLevel = itemStack.levelOrZero
