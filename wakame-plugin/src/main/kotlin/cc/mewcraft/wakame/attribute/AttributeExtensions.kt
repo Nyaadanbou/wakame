@@ -23,8 +23,10 @@ fun NekoAttributeModifier.toBukkit() = BukkitAttributeModifier(id.toNamespacedKe
 fun BukkitAttributeModifier.toNeko() = NekoAttributeModifier(key, amount, operation.toNeko())
 
 private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = ImmutableBiMap.builder<NekoAttribute, BukkitAttribute>()
+    .put(Attributes.ATTACK_KNOCKBACK, BukkitAttribute.GENERIC_ATTACK_KNOCKBACK)
     .put(Attributes.BLOCK_INTERACTION_RANGE, BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE)
     .put(Attributes.ENTITY_INTERACTION_RANGE, BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE)
+    .put(Attributes.KNOCKBACK_RESISTANCE, BukkitAttribute.GENERIC_KNOCKBACK_RESISTANCE)
     .put(Attributes.MAX_HEALTH, BukkitAttribute.GENERIC_MAX_HEALTH)
     .put(Attributes.MAX_ABSORPTION, BukkitAttribute.GENERIC_MAX_ABSORPTION)
     .put(Attributes.MINING_EFFICIENCY, BukkitAttribute.PLAYER_MINING_EFFICIENCY)
@@ -33,6 +35,7 @@ private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = Immutable
     .put(Attributes.SCALE, BukkitAttribute.GENERIC_SCALE)
     .put(Attributes.STEP_HEIGHT, BukkitAttribute.GENERIC_STEP_HEIGHT)
     .put(Attributes.SWEEPING_DAMAGE_RATIO, BukkitAttribute.PLAYER_SWEEPING_DAMAGE_RATIO)
+    .put(Attributes.WATER_MOVEMENT_EFFICIENCY, BukkitAttribute.GENERIC_WATER_MOVEMENT_EFFICIENCY)
     .build()
 
 fun NekoAttribute.toBukkit(): BukkitAttribute {

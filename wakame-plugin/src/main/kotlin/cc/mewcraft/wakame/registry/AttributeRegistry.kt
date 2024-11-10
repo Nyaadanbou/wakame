@@ -5,14 +5,19 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeModifier.*
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.RandomizedValue
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.toStableDouble
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -90,6 +95,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
         +buildComposite("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
         +buildComposite("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
+        +buildComposite("knockback_resistance").single().bind(Attributes.KNOCKBACK_RESISTANCE)
         +buildComposite("block_interaction_range").single().bind(Attributes.BLOCK_INTERACTION_RANGE)
         +buildComposite("critical_strike_chance").single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
         +buildComposite("critical_strike_power").single().bind(Attributes.CRITICAL_STRIKE_POWER)
@@ -101,6 +107,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("hammer_damage_ratio").single().bind(Attributes.HAMMER_DAMAGE_RATIO)
         +buildComposite("health_regeneration").single().bind(Attributes.HEALTH_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
         +buildComposite("incoming_damage_rate").single().element().bind(Attributes.INCOMING_DAMAGE_RATE)
+        +buildComposite("knockback_resistance").single().bind(Attributes.KNOCKBACK_RESISTANCE)
         +buildComposite("lifesteal").single().bind(Attributes.LIFESTEAL)
         +buildComposite("mana_consumption_rate").single().bind(Attributes.MANA_CONSUMPTION_RATE)
         +buildComposite("mana_regeneration").single().bind(Attributes.MANA_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
@@ -111,6 +118,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("mining_efficiency").single().bind(Attributes.MINING_EFFICIENCY)
         +buildComposite("movement_speed").single().bind(Attributes.MOVEMENT_SPEED)
         +buildComposite("negative_critical_strike_power").single().bind(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER)
+        +buildComposite("none_critical_strike_power").single().bind(Attributes.NONE_CRITICAL_STRIKE_POWER)
         +buildComposite("safe_fall_distance").single().bind(Attributes.SAFE_FALL_DISTANCE)
         +buildComposite("scale").single().bind(Attributes.SCALE)
         +buildComposite("step_height").single().bind(Attributes.STEP_HEIGHT)
@@ -119,6 +127,7 @@ object AttributeRegistry : Initializable {
         +buildComposite("universal_defense").single().bind(Attributes.UNIVERSAL_DEFENSE)
         +buildComposite("universal_defense_penetration").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION)
         +buildComposite("universal_defense_penetration_rate").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
+        +buildComposite("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
     }
 
     override fun onPreWorld() {
