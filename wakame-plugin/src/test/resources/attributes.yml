@@ -106,6 +106,18 @@ attack_effect_chance:
     min: .0 # 最小值
     max: 1.0 # 最大值
 
+attack_knockback:
+  enabled: true
+  display_name: "攻击击退"
+  tooltips:
+    add: "攻击击退 <value:+#.#;-.>"
+    multiply_base: "攻击击退 <value:+#%;-.%>"
+    multiply_total: "攻击击退 ×<value:+#%;-.%>"
+  values:
+    default: .0
+    min: .0
+    max: 5.0
+
 block_interaction_range:
   enabled: true
   display_name: "方块交互距离"
@@ -322,6 +334,19 @@ incoming_damage_rate:
       min: -1.0
       max: 16384.0
 
+knockback_resistance:
+  enabled: true
+  display_name: "击退抗性"
+  tooltips:
+    add: "击退抗性 <value:+#;-.>"
+    multiply_base: "击退抗性 <value:+#%;-.%>"
+    multiply_total: "击退抗性 ×<value:+#%;-.%>"
+  values:
+    default: .0
+    min: .0
+    max: 1.0
+
+
 lifesteal:
   enabled: true
   display_name: "攻击吸血"
@@ -442,6 +467,18 @@ negative_critical_strike_power:
     min: 0.0
     max: 1.0
 
+none_critical_strike_power:
+  enabled: true
+  display_name: "无暴击伤害"
+  tooltips:
+    add: "无暴击伤害 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 0.0
+    max: 1.0
+
 safe_fall_distance:
   enabled: true
   display_name: "安全摔落高度"
@@ -536,4 +573,16 @@ universal_defense_penetration_rate:
   values:
     default: .0
     min: 0.0
+    max: 1.0
+
+water_movement_efficiency:
+  enabled: true
+  display_name: "水中移动效率"
+  tooltips:
+    add: "水中移动效率 <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: .0
     max: 1.0
