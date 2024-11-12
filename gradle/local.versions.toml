@@ -11,6 +11,7 @@ paper = "1.21.1-R0.1-SNAPSHOT"
 helper = "6.0.0"
 adventurelevel = "1.4.0"
 mythicmobs = "5.8.0-SNAPSHOT"
+economy = "2.2.0"
 
 [libraries]
 
@@ -46,3 +47,4 @@ paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" 
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
+economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }

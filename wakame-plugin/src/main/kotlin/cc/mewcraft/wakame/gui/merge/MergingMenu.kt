@@ -175,6 +175,12 @@ internal class MergingMenu(
                 val reforgeResult = session.latestResult
                 if (reforgeResult.isSuccess) {
 
+                    if (!confirmed) {
+                        confirmed = true
+                        updateOutputSlot()
+                        return
+                    }
+
                     // 玩家必须有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
                         setOutputSlot(ItemStack.of(Material.BARRIER).edit {
@@ -186,11 +192,8 @@ internal class MergingMenu(
                         return
                     }
 
-                    if (!confirmed) {
-                        confirmed = true
-                        updateOutputSlot()
-                        return
-                    }
+                    // 从玩家扣除所需的资源
+                    reforgeResult.reforgeCost.take(viewer)
 
                     // 把合并后的物品递给玩家
                     viewer.inventory.addItem(*session.getFinalOutputs())

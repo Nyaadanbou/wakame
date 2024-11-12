@@ -13,7 +13,7 @@ object ItemXSerializer : ScalarSerializer<ItemX>(typeTokenOf<ItemX>()) {
 
     override fun deserialize(type: Type, obj: Any?): ItemX {
         val uid = obj?.toString() ?: throw SerializationException(type, "Can't deserialize null value for ItemX")
-        val itemX = ItemXRegistry.byUid(uid) ?: throw SerializationException(type, "Cannot deserialize string '$uid' into ItemX")
+        val itemX = ItemXRegistry[uid] ?: throw SerializationException(type, "Cannot deserialize string '$uid' into ItemX")
         return itemX
     }
 }

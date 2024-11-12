@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.economy.Economy
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -220,6 +222,8 @@ internal object ReforgeResult {
 }
 
 internal object ReforgeCost {
+    private val economy: Economy = Injector.get()
+
     /**
      * 空的花费; 当没有需要重造的物品时, 使用这个.
      */
@@ -267,11 +271,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            // TODO 实现 take, test, description
+            economy.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return true
+            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

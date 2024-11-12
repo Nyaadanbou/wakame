@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.economy.Economy
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -313,6 +315,8 @@ internal object ReforgeType {
  * 包含了构建各种 [MergingSession.ReforgeCost] 的方法.
  */
 internal object ReforgeCost {
+    private val economy: Economy = Injector.get()
+
     /**
      * 表示没有资源消耗.
      */
@@ -369,11 +373,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : Base() {
         override fun take(viewer: Player) {
-            // TODO 实现 take, 还有下面的 test
+            economy.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return true
+            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

@@ -196,7 +196,10 @@ internal class RerollingMenu(
                     return
                 }
 
-                // 把重造后的源物品给玩家
+                // 从玩家扣除所需的资源
+                result.reforgeCost.take(viewer)
+
+                // 把重造后的物品给玩家
                 viewer.inventory.addItem(*session.getFinalOutputs())
 
                 // 重置会话状态

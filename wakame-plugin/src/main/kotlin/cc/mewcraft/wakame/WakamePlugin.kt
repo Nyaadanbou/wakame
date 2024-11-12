@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.core.coreModule
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display2.display2Module
+import cc.mewcraft.wakame.economy.economyModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
@@ -45,15 +46,15 @@ import org.koin.core.context.stopKoin
  * 直接访问 [WakamePlugin] 的实例.
  */
 val NEKO_PLUGIN: WakamePlugin
-    get() = requireNotNull(WakamePlugin.INSTANCE) { "WakamePlugin is not initialized yet" }
+    get() = requireNotNull(WakamePlugin.instance) { "WakamePlugin is not initialized yet" }
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
-        var INSTANCE: WakamePlugin? = null
+        var instance: WakamePlugin? = null
     }
 
     override suspend fun load() {
-        INSTANCE = this
+        instance = this
 
         // Start Koin container
         startKoin {
@@ -71,6 +72,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 crateModule(),
                 damageModule(),
                 display2Module(),
+                economyModule(),
                 elementModule(),
                 enchantmentModule(),
                 entityModule(),
@@ -116,7 +118,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
     override suspend fun disable() {
         Initializer.disable()
         stopKoin()
-        INSTANCE = null
+        instance = null
         NekooProvider.unregister()
     }
 }

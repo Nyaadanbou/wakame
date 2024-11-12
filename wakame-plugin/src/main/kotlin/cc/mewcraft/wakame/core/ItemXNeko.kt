@@ -62,13 +62,13 @@ object ItemXFactoryNeko : ItemXFactory {
     override val plugin: String = "wakame"
     override val isValid: Boolean = true
 
-    override fun byItemStack(itemStack: ItemStack): ItemXNeko? {
+    override fun create(itemStack: ItemStack): ItemXNeko? {
         val nekoStack = itemStack.tryNekoStack ?: return null
         val nekoStackId = nekoStack.id
         return ItemXNeko("${nekoStackId.namespace()}/${nekoStackId.value()}")
     }
 
-    override fun byUid(plugin: String, identifier: String): ItemXNeko? {
+    override fun create(plugin: String, identifier: String): ItemXNeko? {
         if (plugin != this.plugin)
             return null
         return ItemXNeko(identifier)

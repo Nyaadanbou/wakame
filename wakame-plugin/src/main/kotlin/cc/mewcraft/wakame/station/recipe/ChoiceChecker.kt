@@ -39,7 +39,7 @@ class ChoiceCheckerContextMap(
     /**
      * 使用合成站的玩家.
      */
-    val player: Player
+    val player: Player,
 ) {
     private val data: MutableMap<ChoiceChecker<*>, Any> = Reference2ObjectArrayMap()
 
@@ -47,6 +47,7 @@ class ChoiceCheckerContextMap(
         return key in data
     }
 
+    @Suppress("UNCHECKED_CAST")
     operator fun <T : ChoiceCheckerContext> get(key: ChoiceChecker<T>): T {
         return data[key] as T
     }
@@ -81,7 +82,7 @@ internal object ExpChoiceChecker : ChoiceChecker<ExpChoiceCheckerContext>, KoinC
 
 //<editor-fold desc="ChoiceCheckerContext">
 internal class ItemChoiceCheckerContext(
-    override val player: Player
+    override val player: Player,
 ) : ChoiceCheckerContext {
     val inventorySnapshot: Object2IntOpenHashMap<ItemX> = run {
         // 只搜索主背包(36格)的物品, 不搜索副手和盔甲
@@ -91,7 +92,7 @@ internal class ItemChoiceCheckerContext(
             if (itemStack == null) {
                 continue
             }
-            val itemX = ItemXRegistry.byItem(itemStack)
+            val itemX = ItemXRegistry[itemStack]
             val amount = itemStack.amount
             ret.mergeInt(itemX, amount) { old, given -> old + given }
         }
