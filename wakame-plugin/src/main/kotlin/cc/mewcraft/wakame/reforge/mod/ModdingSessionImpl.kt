@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.economy.Economy
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
@@ -321,6 +323,8 @@ internal object ReforgeResult {
 }
 
 internal object ReforgeCost {
+    private val economy: Economy = Injector.get()
+
     fun empty(): ModdingSession.ReforgeCost {
         return Empty()
     }
@@ -358,11 +362,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            // TODO 实现 take, test, description
+            economy.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return true
+            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(
