@@ -40,11 +40,11 @@ object ItemXFactoryVanilla : ItemXFactory {
 
     override val isValid: Boolean = true
 
-    override fun byItemStack(itemStack: ItemStack): ItemXVanilla {
+    override fun create(itemStack: ItemStack): ItemXVanilla {
         return ItemXVanilla(itemStack.type.key.value())
     }
 
-    override fun byUid(plugin: String, identifier: String): ItemXVanilla? {
+    override fun create(plugin: String, identifier: String): ItemXVanilla? {
         if (plugin != this.plugin)
             return null
         return ItemXVanilla(identifier)
