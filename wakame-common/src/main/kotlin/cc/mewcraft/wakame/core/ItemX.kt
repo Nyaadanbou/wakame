@@ -31,7 +31,7 @@ sealed interface ItemX : Keyed, Examinable {
     val plugin: String
 
     /**
-     * 该通用物品在其所属插件的唯一标识, , 必须符合 [net.kyori.adventure.key.KeyPattern.Value].
+     * 该通用物品在其所属插件的唯一标识, 必须符合 [net.kyori.adventure.key.KeyPattern.Value].
      */
     val identifier: String
 
