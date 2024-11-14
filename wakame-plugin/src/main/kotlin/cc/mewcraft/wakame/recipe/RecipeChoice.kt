@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.lookup.ItemModelDataLookup
+import cc.mewcraft.wakame.util.customModelData
 import cc.mewcraft.wakame.util.toSimpleString
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
@@ -38,6 +41,8 @@ data class SingleRecipeChoice(
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemStack = choice.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${choice.key}'")
+        val nekoItemId = Key.key(choice.identifier.replaceFirst('/', ':'))
+        itemStack.customModelData = ItemModelDataLookup[nekoItemId, 0]
         return BukkitRecipeChoice.ExactChoice(itemStack)
     }
 
@@ -59,6 +64,8 @@ data class MultiRecipeChoice(
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         choices.forEach {
             val itemStack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
+            val nekoItemId = Key.key(it.identifier.replaceFirst('/', ':'))
+            itemStack.customModelData = ItemModelDataLookup[nekoItemId, 0]
             itemStacks.add(itemStack)
         }
         return BukkitRecipeChoice.ExactChoice(itemStacks)
