@@ -2,14 +2,15 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.core.ItemXSerializer
-import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -70,7 +71,7 @@ internal object StationRecipeRegistry : Initializable, KoinComponent {
         }
     }
 
-    private suspend fun registerRecipes() {
+    private fun registerRecipes() {
         raw.forEach { (key, recipe) ->
             if (recipe.isValid()) {
                 recipes[key] = recipe
@@ -81,22 +82,15 @@ internal object StationRecipeRegistry : Initializable, KoinComponent {
 
         logger.info("Registered station recipes: {}", recipes.keys.joinToString())
         logger.info("Registered ${recipes.size} station recipes")
-
-        PluginEventBus.get().post(StationRecipeLoadEvent)
     }
 
-    override suspend fun onPostWorldAsync() {
+    override fun onPostWorld() {
         loadConfig()
         registerRecipes()
     }
 
-    override suspend fun onReloadAsync() {
+    override fun onReload() {
         loadConfig()
         registerRecipes()
     }
 }
-
-/**
- * 当合成站所有配方加载完毕时发生.
- */
-object StationRecipeLoadEvent
