@@ -167,7 +167,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(e: CreatureSpawnEvent) {
         // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
 
