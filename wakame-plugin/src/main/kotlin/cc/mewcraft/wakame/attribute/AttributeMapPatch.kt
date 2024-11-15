@@ -172,9 +172,17 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
         // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
 
         // 触发 AttributeMap 的初始化, 例如应用原版属性
-        attributeMapAccess.get(e.entity).onFailure {
-            logger.error("Failed to initialize the attribute map for entity ${e.entity}: ${it.message}")
-        }
+        val entity = e.entity
+        val attributeMap = attributeMapAccess.get(entity)
+            .onFailure {
+                logger.error("Failed to initialize the attribute map for entity $entity: ${it.message}")
+            }
+            .getOrNull()
+            ?: return
+
+        // 将生物血量设置到最大血量
+        val maxHealth = attributeMap.getValue(Attributes.MAX_HEALTH)
+        entity.health = maxHealth
     }
 
     // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
