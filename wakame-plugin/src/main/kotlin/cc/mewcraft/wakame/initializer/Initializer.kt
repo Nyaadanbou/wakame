@@ -15,12 +15,10 @@ import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.ItemBehaviorListener
-import cc.mewcraft.wakame.item.ItemChangeListener
-import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelListener
-import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
@@ -31,23 +29,16 @@ import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.*
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.koin.core.component.*
 
 /**
  * @see Initializable
@@ -134,7 +125,7 @@ object Initializer : KoinComponent, Listener {
     private fun registerListeners() {
         // item
         registerListenerAndBind<ArmorChangeEventSupport>()
-        registerListenerAndBind<ItemSlotChangeMonitor>()
+        registerListenerAndBind<ItemSlotChangeManager>()
         registerListenerAndBind<ItemChangeListener>()
         registerListenerAndBind<ItemBehaviorListener>()
         registerListenerAndBind<ItemMiscellaneousListener>()

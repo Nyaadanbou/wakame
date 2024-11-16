@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.Injector
 import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
 import org.koin.core.component.get
@@ -62,8 +63,12 @@ internal object DefaultResourceSynchronizer : ResourceSynchronizer {
 
         val health = pdc.get(HEALTH_KEY, PersistentDataType.DOUBLE)
         if (health != null) {
-            player.health = health
-            logger.info("[${player.name}] Loaded player health: $health")
+            try {
+                player.health = health
+                logger.info("[${player.name}] Loaded player health: $health / ${player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value}")
+            } catch (e: Exception) {
+                logger.warn("[${player.name}] ${e.message}")
+            }
         }
 
         // 考虑到 Wynn 没有保存魔法值, 我们也暂时不保存魔法值

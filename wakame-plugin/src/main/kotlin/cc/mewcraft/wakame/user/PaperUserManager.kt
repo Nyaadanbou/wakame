@@ -1,11 +1,9 @@
 package cc.mewcraft.wakame.user
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.*
 import org.bukkit.Server
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
@@ -18,12 +16,28 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
     // holds the live data of users
     private val userRepository: Cache<Player, User<Player>> = Caffeine.newBuilder()
         .weakKeys()
-        .removalListener<Player, User<Player>> { _, value, _ ->
-            value?.cleanup()
+        .removalListener<Player, User<Player>> { _, value, cause: RemovalCause ->
+            if (cause.wasEvicted()) {
+                value!!.cleanup()
+            }
         }
         .build()
 
-    @EventHandler
+    @EventHandler(
+        // 尽可能早的创建 User 对象, 以便其他系统使用
+        priority = EventPriority.LOWEST
+    )
+    private fun onJoin(e: PlayerJoinEvent) {
+        val player = e.player
+
+        // load or create user data
+        loadUser(player)
+    }
+
+    @EventHandler(
+        // 尽可能晚的移除 User 对象, 以便其他系统使用
+        priority = EventPriority.MONITOR
+    )
     private fun onQuit(e: PlayerQuitEvent) {
         val player = e.player
 
@@ -31,12 +45,9 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
         unloadUser(player)
     }
 
-    @EventHandler
-    private fun onJoin(e: PlayerJoinEvent) {
-        val player = e.player
-
-        // load or create user data
-        getUser(player)
+    private fun loadUser(player: Player): User<Player> {
+        // cache user data
+        return userRepository.get(player) { k -> PaperUser(k) }
     }
 
     private fun unloadUser(player: Player) {
@@ -45,10 +56,10 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
     }
 
     override fun getUser(uniqueId: UUID): User<Player> {
-        return getUser(requireNotNull(server.getPlayer(uniqueId)) { "Player '$uniqueId' is not online" })
+        return getUser(requireNotNull(server.getPlayer(uniqueId)) { "player '$uniqueId' is not online" })
     }
 
     override fun getUser(player: Player): User<Player> {
-        return userRepository.get(player) { k -> PaperUser(k) }
+        return loadUser(player)
     }
 }

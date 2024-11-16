@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
@@ -42,7 +42,11 @@ interface LevelBarrier : ItemBehavior {
         }
 
         override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
-            tryCancelEvent(itemStack, player, event)
+            if (equipped) {
+                // 只处理取消穿戴动作, 脱下动作一律自然发生.
+                // 防止物品在物品穿戴条件不满足时, 出现问题.
+                tryCancelEvent(itemStack, player, event)
+            }
         }
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
@@ -53,17 +57,11 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, caster, event)
         }
 
-        private val Player.levelOrZero: Int
-            get() = this.toUser().level
-
-        private val ItemStack.levelOrZero: Int
-            get() = shadowNeko()?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
-
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
-            val itemLevel = itemStack.levelOrZero
-            val playerLevel = player.levelOrZero
+            val itemLevel = itemStack.shadowNeko()?.level ?: 0
+            val playerLevel = player.toUser().level
             if (itemLevel > playerLevel) {
-                player.sendActionBar(text { content("你的冒险等级不足以使用这个物品") })
+                player.sendMessage(text { content("你的冒险等级不足以使用这个物品") })
                 e.isCancelled = true
             }
         }
