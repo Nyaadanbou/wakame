@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.isNeko
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.rarity.GlowColor
-import cc.mewcraft.wakame.util.itemName0
+import cc.mewcraft.wakame.util.itemName
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
@@ -13,11 +13,11 @@ import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.*
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Item
 import java.util.Optional
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 修改 [Item].
@@ -25,7 +25,7 @@ import java.util.UUID
 internal class ItemEntityRenderer : PacketListenerAbstract() {
 
     // 目前用于彩色物品发光的实现
-    private val entityId2EntityUniqueId = Int2ObjectOpenHashMap<UUID>()
+    private val entityId2EntityUniqueId = ConcurrentHashMap<Int, UUID>()
 
     override fun onPacketSend(event: PacketSendEvent) {
         when (event.packetType) {
@@ -74,7 +74,7 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
      * @return 如果成功添加了数据则返回 `true`, 否则返回 `false`
      */
     private fun tryAddGlowEffectEntityData(entity: Item, entityData: MutableList<EntityData>): Boolean {
-        val nekoStack = entity.itemStack.tryNekoStack ?: return false
+        val nekoStack = entity.itemStack.shadowNeko() ?: return false
         val templates = nekoStack.templates
         if (!templates.has(ItemTemplateTypes.GLOWABLE))
             return false
@@ -94,7 +94,7 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
             return false
 
         // CustomName
-        entityData.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.itemName0)))
+        entityData.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.itemName)))
 
         // CustomNameVisible
         entityData.add(EntityData(3, EntityDataTypes.BOOLEAN, true))
@@ -103,7 +103,7 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
     }
 
     private fun sendGlowColorPacket(event: PacketSendEvent, entity: Item) {
-        val nekoStack = entity.itemStack.tryNekoStack ?: return
+        val nekoStack = entity.itemStack.shadowNeko() ?: return
         val user = event.user
         val components = nekoStack.components
         val rarityColor = components.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
