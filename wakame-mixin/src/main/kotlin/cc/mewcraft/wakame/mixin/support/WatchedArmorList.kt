@@ -15,17 +15,16 @@ class WatchedArmorList(
 ) {
     @JvmField
     var initialized = false
-
-    private val serverPlayer = player as? ServerPlayer
-    private val previousStacks = Array(4) { ItemStack.EMPTY }
+    private val serverPlayer: ServerPlayer? = player as? ServerPlayer
+    private val previousStacks: Array<ItemStack> = Array(4) { ItemStack.EMPTY }
 
     override fun set(index: Int, element: ItemStack): ItemStack {
         if (initialized) {
-            if (serverPlayer !== null) {
+            if (serverPlayer != null) {
                 val previous = previousStacks[index]
-                if (ItemStack.matches(previous, element)) {
-                    return element
-                }
+                // if (ItemStack.matches(previous, element)) {
+                //     return element
+                // }
 
                 @Suppress("SENSELESS_COMPARISON")
                 if (serverPlayer.connection != null) {

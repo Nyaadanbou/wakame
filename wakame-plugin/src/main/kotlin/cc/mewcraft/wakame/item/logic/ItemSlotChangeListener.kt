@@ -127,27 +127,27 @@ internal abstract class ItemSlotChangeListener {
 
     ///
 
-    /**
-     * 用于在特殊时机强制更新物品提供给玩家的效果.
-     */
-    fun forceUpdate(player: Player) {
-        val everyItemSlot = ItemSlotRegistry.all()
-        for (itemSlot in everyItemSlot) {
-            val itemStack = itemSlot.getItem(player) ?: continue
-            val nekoStack = itemStack.shadowNeko()
-            if (test(player, itemSlot, itemStack, nekoStack)) {
-                onBegin(player)
-
-                // 这里我们对同一个物品进行两次操作:
-                // 先从玩家身上移除物品“自己”的效果,
-                // 然后再把物品的效果添加到玩家身上.
-                handlePreviousItem(player, itemSlot, itemStack, nekoStack)
-                handleCurrentItem(player, itemSlot, itemStack, nekoStack)
-
-                onEnd(player)
-            }
-        }
-    }
+    // /**
+    //  * 用于在特殊时机强制更新物品提供给玩家的效果.
+    //  */
+    // fun forceUpdate(player: Player) {
+    //     val everyItemSlot = ItemSlotRegistry.all()
+    //     for (itemSlot in everyItemSlot) {
+    //         val itemStack = itemSlot.getItem(player) ?: continue
+    //         val nekoStack = itemStack.shadowNeko()
+    //         if (test(player, itemSlot, itemStack, nekoStack)) {
+    //             onBegin(player)
+    //
+    //             // 这里我们对同一个物品进行两次操作:
+    //             // 先从玩家身上移除物品“自己”的效果,
+    //             // 然后再把物品的效果添加到玩家身上.
+    //             handlePreviousItem(player, itemSlot, itemStack, nekoStack)
+    //             handleCurrentItem(player, itemSlot, itemStack, nekoStack)
+    //
+    //             onEnd(player)
+    //         }
+    //     }
+    // }
 
     /**
      * 用于正常处理 [PlayerItemSlotChangeEvent].
@@ -167,7 +167,10 @@ internal abstract class ItemSlotChangeListener {
 
         onBegin(player)
 
-        if (oldItemStack != null && test(player, slot, oldItemStack, oldNekoStack)) {
+        if (oldItemStack != null /* && test(player, slot, oldItemStack, oldNekoStack) */) {
+            // 始终执行移除物品效果的逻辑, 无论当前玩家是否满足该物品的使用条件.
+            // 这样可以保证在一些特殊情况下 (例如强制降低冒险等级),
+            // 玩家的物品效果仍然能够被正确移除.
             handlePreviousItem(player, slot, oldItemStack, oldNekoStack)
         }
 

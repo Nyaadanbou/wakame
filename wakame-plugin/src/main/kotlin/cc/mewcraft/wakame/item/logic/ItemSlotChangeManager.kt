@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.user.toUser
-import com.destroystokyo.paper.event.server.ServerTickEndEvent
+import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -15,7 +15,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import org.koin.core.component.get
 
 /**
  * 负责扫描玩家背包的变化, 根据情况触发 [PlayerItemSlotChangeEvent].
@@ -24,19 +24,31 @@ import org.koin.core.component.inject
  * 如果第 `n` tick 扫描的结果和第 `n-1` tick 扫描的结果不同,
  * 则认为这个槽位发生了变化, 那么此时就会触发一个事件.
  */
-internal class ItemSlotChangeMonitor : Listener, KoinComponent {
-    private val server: Server by inject()
+internal class ItemSlotChangeManager : Listener, KoinComponent {
+    private val server: Server = get()
     private val lastItemRecords: LoadingCache<Player, LastItemRecord> = Caffeine
         .newBuilder()
         .weakKeys()
         .build { LastItemRecord() }
 
+    /**
+     * 每 tick **开始时** 扫描玩家背包的变化.
+     */
+    // 开发日记 2024/11/17
+    // 必须在 tick 开始时而非结束时扫描背包+应用效果,
+    // 这样可以让那些依赖装备效果的逻辑能够正确执行,
+    // 例如: 同步当前生命值.
     @EventHandler
-    fun on(e: ServerTickEndEvent) {
+    fun on(e: ServerTickStartEvent) {
         val everyItemSlot = ItemSlotRegistry.all()
         for (player in server.onlinePlayers) {
             val user = player.toUser()
             if (!user.isInventoryListenable) {
+                // 当玩家的背包不可监听时, 跳过扫描, 跳过触发事件.
+                // 换句话说, 在 isInventoryListenable 为 false 时,
+                // lastItemRecords 永远不会更新, 并且 isEmpty 为 true.
+                // 直到当 isInventoryListenable 为 true 时,
+                // lastItemRecords 才会开始更新.
                 continue
             }
 

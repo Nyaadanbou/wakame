@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.component.componentModule
 import cc.mewcraft.wakame.item.components.componentsModule
-import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
 import cc.mewcraft.wakame.item.logic.logicModule
 import cc.mewcraft.wakame.item.template.ITEM_COMPONENT_TEMPLATE_SERIALIZERS
 import cc.mewcraft.wakame.item.template.templateModule
@@ -54,5 +54,5 @@ internal fun itemModule(): Module = module {
     singleOf(::ItemChangeListener)
     singleOf(::ItemBehaviorListener)
     singleOf(::ItemMiscellaneousListener)
-    singleOf(::ItemSlotChangeMonitor)
+    singleOf(::ItemSlotChangeManager)
 }
