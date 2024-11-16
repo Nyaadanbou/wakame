@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
@@ -57,15 +57,9 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, caster, event)
         }
 
-        private val Player.levelOrDefault: Int
-            get() = this.toUser().level
-
-        private val ItemStack.levelOrDefault: Int
-            get() = shadowNeko()?.components?.get(ItemComponentTypes.LEVEL)?.level ?: 0
-
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
-            val itemLevel = itemStack.levelOrDefault
-            val playerLevel = player.levelOrDefault
+            val itemLevel = itemStack.shadowNeko()?.level ?: 0
+            val playerLevel = player.toUser().level
             if (itemLevel > playerLevel) {
                 player.sendMessage(text { content("你的冒险等级不足以使用这个物品") })
                 e.isCancelled = true
