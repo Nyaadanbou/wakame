@@ -1,9 +1,30 @@
 package cc.mewcraft.wakame.attribute
 
+import org.jetbrains.annotations.ApiStatus
+
 /**
  * Holds one or more instances of [Attribute].
  */
 interface AttributeProvider {
+    companion object Holder {
+        private var instance: AttributeProvider? = null
+
+        @JvmStatic
+        fun instance(): AttributeProvider {
+            return instance ?: throw IllegalStateException("AttributeProvider has not been initialized.")
+        }
+
+        @ApiStatus.Internal
+        fun register(provider: AttributeProvider) {
+            instance = provider
+        }
+
+        @ApiStatus.Internal
+        fun unregister() {
+            instance = null
+        }
+    }
+
     /**
      * Gets an [Attribute] by its [descriptionId].
      */
