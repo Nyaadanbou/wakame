@@ -13,4 +13,7 @@ internal fun attributeModule(): Module = module {
     single<AttributeMapAccess> { DefaultAttributeMapAccess }
 
     single { Attributes } bind AttributeProvider::class
+
+    // api
+    single { AttributeBootstrap } bind Initializable::class
 }
