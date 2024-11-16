@@ -7,6 +7,7 @@ plugins {
     `maven-publish`
 }
 
+group = "cc.mewcraft.wakame"
 version = "0.0.1"
 
 dependencies {
