@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import org.bukkit.inventory.EquipmentSlot
-import java.lang.UnsupportedOperationException
 
 class WatchedArmorList(
     player: Player,
@@ -22,12 +21,13 @@ class WatchedArmorList(
 
     override fun set(index: Int, element: ItemStack): ItemStack {
         if (initialized) {
-            if (serverPlayer != null) {
+            if (serverPlayer !== null) {
                 val previous = previousStacks[index]
                 if (ItemStack.matches(previous, element)) {
                     return element
                 }
 
+                @Suppress("SENSELESS_COMPARISON")
                 if (serverPlayer.connection != null) {
                     // 玩家初次进入游戏时, ServerPlayer#connection 可能还没来得及赋值
                     val action = when {
@@ -58,6 +58,6 @@ class WatchedArmorList(
     }
 
     override fun add(element: ItemStack?): Boolean {
-        throw UnsupportedOperationException("Cannot add to the armor list")
+        throw UnsupportedOperationException("cannot add element to the armor list")
     }
 }

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.logic
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.event.server.ServerTickEndEvent
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
@@ -34,6 +35,11 @@ internal class ItemSlotChangeMonitor : Listener, KoinComponent {
     fun on(e: ServerTickEndEvent) {
         val everyItemSlot = ItemSlotRegistry.all()
         for (player in server.onlinePlayers) {
+            val user = player.toUser()
+            if (!user.isInventoryListenable) {
+                continue
+            }
+
             for (itemSlot in everyItemSlot) {
                 val currItemStack = itemSlot.getItem(player)
                 val lastItemStack = lastItemRecords[player][itemSlot]

@@ -29,15 +29,24 @@ class PaperUser(
 
     override val uniqueId: UUID
         get() = player.uniqueId
+
     override val level: Int
         get() = levelProvider.getOrDefault(uniqueId, 1)
 
     override val kizamiMap: KizamiMap = KizamiMap(this)
+
     override val attributeMap: AttributeMap = AttributeMap(this)
+
     override val skillMap: SkillMap = SkillMap(this)
+
     override val resourceMap: ResourceMap = ResourceMap(this)
+
     override val skillState: SkillState<Player> = SkillState(this)
+
     override val attackSpeed: AttackSpeed = AttackSpeed(this)
+
+    @Volatile
+    override var isInventoryListenable: Boolean = false
 
     override fun cleanup() {
         skillMap.cleanup()

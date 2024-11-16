@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item.logic
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
+import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -33,6 +34,10 @@ internal object AdventureLevelListener : Listener {
     fun on(event: AdventureLevelDataLoadEvent) {
         val data = event.playerData
         val player = Bukkit.getPlayer(data.uuid) ?: return
+
+        val user = player.toUser()
+        // 标记玩家的背包可以被监听了
+        user.isInventoryListenable = true
 
         // 当前事件是异步触发的, 必须在主线程操作玩家的状态
         runTask {
