@@ -15,7 +15,7 @@ interface ResourcePackPublisher {
     /**
      * 推送资源包.
      */
-    fun publish()
+    fun publish(): Boolean
 
     /**
      * 执行清理逻辑.
@@ -87,7 +87,7 @@ object ResourcePackPublisherProvider {
  * 无操作.
  */
 private data object NonePublisher : ResourcePackPublisher {
-    override fun publish() = Unit
+    override fun publish(): Boolean = true
     override fun cleanup() = Unit
 }
 
@@ -105,7 +105,7 @@ private data class GithubPublisher(
     private val logger: Logger by inject()
     private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
 
-    override fun publish() {
+    override fun publish(): Boolean {
         logger.info("Publishing resource pack to Github (repo: $repo, branch: $branch, path: $remotePath)")
         val manager = GithubRepoManager(
             localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),
@@ -118,9 +118,13 @@ private data class GithubPublisher(
             commitMessage = commitMessage,
         )
 
-        manager.publishPack().onFailure {
-            logger.error("Failed to publish resource pack to Github", it)
-        }
+        manager.publishPack()
+            .onFailure {
+                logger.error("Failed to publish resource pack to Github", it)
+                return false
+            }
+
+        return true
     }
 
     override fun cleanup() {

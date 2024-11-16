@@ -62,8 +62,12 @@ object ResourcepackCommands : KoinComponent, CommandFactory<CommandSender> {
                 suspendingHandler { context ->
                     val sender = context.sender()
                     val publisher = ResourcePackPublisherProvider.get()
-                    publisher.publish()
-                    sender.sendPlainMessage("Resourcepack has been published successfully!")
+                    val result = publisher.publish()
+                    if (result) {
+                        sender.sendPlainMessage("Resourcepack has been published successfully!")
+                    } else {
+                        sender.sendPlainMessage("Resourcepack failed to publish, see console for more information")
+                    }
                 }
             }.buildAndAdd(this)
 
