@@ -189,13 +189,13 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
             if (event.isCancelled) {
                 return
             }
-            behavior.handleBreakBlock(player, item, event)
+            behavior.handleBreakBlock(player, itemStack, event)
         }
     }
 
@@ -207,13 +207,13 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = event.item.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = event.item.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
             if (event.isCancelled) {
                 return
             }
-            behavior.handleDamage(event.player, item, event)
+            behavior.handleDamage(event.player, itemStack, event)
         }
     }
 
@@ -225,10 +225,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = event.brokenItem.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = event.brokenItem.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
-            behavior.handleBreak(event.player, item, event)
+            behavior.handleBreak(event.player, itemStack, event)
         }
     }
 
@@ -266,10 +266,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = event.item.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = event.item.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
-            behavior.handleRelease(event.player, item, event)
+            behavior.handleRelease(event.player, itemStack, event)
         }
     }
 
@@ -281,13 +281,13 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = event.item.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = event.item.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
             if (event.isCancelled) {
                 return
             }
-            behavior.handleConsume(event.player, item, event)
+            behavior.handleConsume(event.player, itemStack, event)
         }
     }
 
@@ -299,13 +299,13 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val item = event.item ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = event.item ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         nekoStack.behaviors.forEach { behavior ->
             if (event.isCancelled) {
                 return
             }
-            behavior.handleSkillPrepareCast(event.caster, item, event.skill, event)
+            behavior.handleSkillPrepareCast(event.caster, itemStack, event.skill, event)
         }
     }
 }
@@ -328,26 +328,26 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
             return
         }
 
-        val item = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        val nekoStack = item.shadowNeko() ?: return
+        val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        val nekoStack = itemStack.shadowNeko() ?: return
         if (!nekoStack.slotGroup.test(slot))
             return
 
         when (event.action) {
             Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, item, event.clickedBlock?.location!!, event)
+                skillEventHandler.onLeftClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
             }
 
             Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, item, event)
+                skillEventHandler.onLeftClickAir(player, itemStack, event)
             }
 
             Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, item, event.clickedBlock?.location!!, event)
+                skillEventHandler.onRightClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
             }
 
             Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, item, event)
+                skillEventHandler.onRightClickAir(player, itemStack, event)
             }
 
             else -> return
@@ -363,8 +363,8 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
         }
 
         val entity = event.entity as? LivingEntity ?: return
-        val item = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        skillEventHandler.onAttack(damager, entity, item, event)
+        val itemStack = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        skillEventHandler.onAttack(damager, entity, itemStack, event)
     }
 
     @EventHandler
