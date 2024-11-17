@@ -24,20 +24,21 @@ class LevelCondition(
 
     override fun check(target: AbstractEntity): Boolean {
         val bukkitEntity = target.bukkitEntity
-        if (bukkitEntity !is Player) {
-            // 只会在随机生成条件为 ADD 的时候判断
+        if (bukkitEntity is Player) {
+            // 用于召唤 Boss 时检测玩家的冒险等级
+            return checkLevel(bukkitEntity)
+        } else {
+            // 用于在随机生成条件为 ADD 的时候判断
             val location = bukkitEntity.location
             return location.getNearbyPlayers(searchRadius)
                 .firstOrNull()
                 ?.let { checkLevel(it) }
                 ?: false
-        } else {
-            return checkLevel(bukkitEntity)
         }
     }
 
     override fun check(target: AbstractLocation): Boolean {
-        // 只会在随机生成条件为 ADD 的时候判断
+        // 用于在随机生成条件为 ADD 的时候判断
         val location = BukkitAdapter.adapt(target)
 
         return location.getNearbyPlayers(searchRadius)
