@@ -10,9 +10,7 @@ import io.lumine.mythic.api.skills.conditions.ILocationCondition
 import io.lumine.mythic.bukkit.BukkitAdapter
 import io.lumine.mythic.bukkit.utils.numbers.RangedInt
 import io.lumine.mythic.core.skills.SkillCondition
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-
 
 /**
  * 判断玩家的冒险等级.
@@ -25,10 +23,21 @@ class LevelCondition(
     private val searchRadius: Double = mlc.getDouble(arrayOf("radius", "r"), .0)
 
     override fun check(target: AbstractEntity): Boolean {
-        return checkLevel(target.bukkitEntity)
+        val bukkitEntity = target.bukkitEntity
+        if (bukkitEntity !is Player) {
+            // 只会在随机生成条件为 ADD 的时候判断
+            val location = bukkitEntity.location
+            return location.getNearbyPlayers(searchRadius)
+                .firstOrNull()
+                ?.let { checkLevel(it) }
+                ?: false
+        } else {
+            return checkLevel(bukkitEntity)
+        }
     }
 
     override fun check(target: AbstractLocation): Boolean {
+        // 只会在随机生成条件为 ADD 的时候判断
         val location = BukkitAdapter.adapt(target)
 
         return location.getNearbyPlayers(searchRadius)
@@ -37,14 +46,10 @@ class LevelCondition(
             ?: false
     }
 
-    private fun checkLevel(bukkitEntity: Entity): Boolean {
-        if (bukkitEntity !is Player) {
-            return false
-        } else {
-            val playerData = AdventureLevelProvider.get().playerDataManager().load(bukkitEntity)
-            val playerLevel = playerData.getLevel(LevelCategory.PRIMARY) // 数据未加载完毕时, 会返回 0
-            val levelNumber = playerLevel.level
-            return level.equals(levelNumber)
-        }
+    private fun checkLevel(player: Player): Boolean {
+        val playerData = AdventureLevelProvider.get().playerDataManager().load(player)
+        val playerLevel = playerData.getLevel(LevelCategory.PRIMARY) // 数据未加载完毕时, 会返回 0
+        val levelNumber = playerLevel.level
+        return level.equals(levelNumber)
     }
 }
