@@ -32,6 +32,9 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
 
         // load or create user data
         loadUser(player)
+
+        // set health scale to 20.0
+        player.healthScale = 20.0
     }
 
     @EventHandler(

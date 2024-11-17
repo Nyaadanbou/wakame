@@ -8,6 +8,7 @@ import org.bukkit.attribute.Attributable
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.VisibleForTesting
 import xyz.xenondevs.commons.collections.enumMap
+import java.lang.ref.WeakReference
 import java.util.EnumMap
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
@@ -77,7 +78,7 @@ object AttributeInstanceFactory {
             return@run attributable.getAttribute(bukkitAttribute)!!
         }
 
-        return VanillaAttributeInstance(handle, attributable is Player)
+        return VanillaAttributeInstance(handle, attributable as? Player)
     }
 }
 
@@ -358,8 +359,12 @@ private class WakameAttributeInstance(
  */
 private class VanillaAttributeInstance(
     private val handle: BukkitAttributeInstance, // 封装的世界状态中的对象
-    private val forPlayer: Boolean, // 是否是玩家的属性
+    player: Player?, // 是否是玩家的属性
 ) : AttributeInstance {
+    private val _player: WeakReference<Player> = WeakReference(player)
+    private val player: Player?
+        get() = _player.get()
+
     override val attribute: Attribute
         get() = handle.attribute.toNeko()
 
