@@ -7,15 +7,17 @@ import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskLater
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
+import org.bukkit.event.*
 import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.inject
 
 internal object AdventureLevelListener : Listener {
     private val resourceSynchronizer: ResourceSynchronizer by Injector.inject()
 
-    @EventHandler
+    @EventHandler(
+        // 尽可能早的储存 PDC, 让 HuskSync 能够同步到
+        priority = EventPriority.LOWEST
+    )
     fun on(e: PlayerQuitEvent) {
         val player = e.player
 
