@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.runTaskTimer
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
@@ -25,7 +23,8 @@ class ResourceTicker(
         // * 恢复定量魔法值
         // * 显示当前魔法值
 
-        runTaskTimer(
+        // TODO 移除魔法值更新/显示, 等重构技能时再加回来
+        /* runTaskTimer(
             delay = 0,
             period = 1
         ) {
@@ -36,7 +35,7 @@ class ResourceTicker(
             }
         }.also {
             resourceTickTask = it
-        }
+        } */
     }
 
     private fun regenMana(user: User<Player>) {
