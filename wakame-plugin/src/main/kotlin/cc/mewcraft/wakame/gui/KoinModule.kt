@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.gui
 
 import cc.mewcraft.wakame.gui.blacksmith.blacksmithModule
+import cc.mewcraft.wakame.gui.guidebook.guidebookModule
 import cc.mewcraft.wakame.gui.merge.mergingModule
 import cc.mewcraft.wakame.gui.mod.moddingModule
 import cc.mewcraft.wakame.gui.reroll.rerollingModule
@@ -11,6 +12,7 @@ internal fun guiModule() = module {
         mergingModule(),
         moddingModule(),
         rerollingModule(),
-        blacksmithModule()
+        blacksmithModule(),
+        guidebookModule()
     )
 }
