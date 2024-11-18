@@ -22,7 +22,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.*
@@ -179,7 +179,7 @@ internal data class MergeInputOutputRendererFormat(
     private fun renderPenalty(core: PortableCore): Component {
         return MM.deserialize(
             penaltyFormat,
-            Placeholder.component("penalty", text(core.penalty))
+            Formatter.number("penalty", core.penalty)
         )
     }
 

@@ -10,7 +10,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -49,10 +49,10 @@ internal data class StandaloneCellRendererFormat(
         val historyText = this.historyFormat.map { line ->
             MM.deserialize(
                 line,
-                Placeholder.component("reroll_penalty", text(data.reforgeHistory.rerollCount)),
-                Placeholder.component("reroll_penalty_limit", text(rerollPenaltyLimit)),
-                Placeholder.component("mod_penalty", text(data.reforgeHistory.modCount)),
-                Placeholder.component("mod_penalty_limit", text(modPenaltyLimit)),
+                Formatter.number("reroll_penalty", data.reforgeHistory.rerollCount),
+                Formatter.number("reroll_penalty_limit", rerollPenaltyLimit),
+                Formatter.number("mod_penalty", data.reforgeHistory.modCount),
+                Formatter.number("mod_penalty_limit", modPenaltyLimit),
             )
         }
 

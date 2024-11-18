@@ -370,7 +370,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
+            "<gray>花费: <yellow>${currencyAmount.toInt() + 1 /* +1 使边界情况看起来合理 */} 金币".mini
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
