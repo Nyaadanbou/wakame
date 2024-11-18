@@ -11,7 +11,7 @@ import net.kyori.adventure.translation.Translator
 import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import java.text.MessageFormat
+import java.text.*
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
@@ -167,7 +167,7 @@ private class MiniMessageTranslationRegistryImpl(
     }
 
     class ArgumentTag(
-        private val argumentComponents: List<ComponentLike>,
+        private val arguments: List<TranslationArgument>,
     ) : TagResolver {
 
         @Throws(ParsingException::class)
@@ -176,11 +176,32 @@ private class MiniMessageTranslationRegistryImpl(
                 ctx.newException("invalid argument number", arguments)
             }
 
-            if (index < 0 || index >= argumentComponents.size) {
+            if (index < 0 || index >= this.arguments.size) {
                 throw ctx.newException("invalid argument number", arguments)
             }
 
-            return Tag.inserting(argumentComponents[index])
+            val argumentAtIndex = this.arguments[index]
+            val argumentValue = argumentAtIndex.value()
+            if (argumentValue is Number && arguments.hasNext()) {
+                val decimalFormat = if (arguments.hasNext()) {
+                    val locale = arguments.pop().value()
+                    if (arguments.hasNext()) {
+                        val format = arguments.pop().value()
+                        DecimalFormat(format, DecimalFormatSymbols(Locale.forLanguageTag(locale)))
+                    } else {
+                        if (locale.contains(".")) {
+                            DecimalFormat(locale, DecimalFormatSymbols.getInstance())
+                        } else {
+                            DecimalFormat.getInstance(Locale.forLanguageTag(locale))
+                        }
+                    }
+                } else {
+                    DecimalFormat.getInstance()
+                }
+                return Tag.inserting(ctx.deserialize(decimalFormat.format(argumentValue)))
+            }
+
+            return Tag.inserting(argumentAtIndex)
         }
 
         override fun has(name: String): Boolean {

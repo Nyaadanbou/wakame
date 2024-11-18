@@ -7,4 +7,4 @@ msg_spent_x_repairing_item: "<green>花费了 {arg:0} 硬币修复了 {arg:1}."
 msg_err_not_enough_money_to_repair_item: "<red>你没有足够的硬币修复这个物品."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
-msg_number_format: "This is a decimal number: {arg:0:'#'}."
+msg_number_format: "This is a decimal number: {arg:0:'zh-CN':'#'}."
