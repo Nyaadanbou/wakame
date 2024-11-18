@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.mod
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
-import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.lang.translateBy
@@ -58,6 +58,7 @@ internal class ModdingMenu(
      */
     fun open() {
         primaryWindow.open()
+        viewer.sendMessage(MessageConstants.MSG_OPENED_MODDING_MENU)
     }
 
     /**
@@ -136,7 +137,7 @@ internal class ModdingMenu(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
             }
 
             // 玩家尝试把物品放入 inputSlot:
@@ -189,7 +190,7 @@ internal class ModdingMenu(
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
             }
 
             // 玩家从 outputSlot 中取出物品:
@@ -237,7 +238,7 @@ internal class ModdingMenu(
 
                 // 如果结果失败的话:
                 else {
-                    viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                    viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
                 }
             }
         }
