@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -141,13 +142,13 @@ internal object RecyclingStationItemRendererParts : RenderingParts(RecyclingStat
             return@configure IndexedText.NOP
         }
 
-        val minWorth = text(result.minPrice)
-        val maxWorth = text(result.maxPrice)
+        val minWorth = result.minPrice
+        val maxWorth = result.maxPrice
         val worthLines = format.totalWorth.map { line ->
             MM.deserialize(
                 line,
-                Placeholder.component("min_worth", minWorth),
-                Placeholder.component("max_worth", maxWorth)
+                Formatter.number("min_worth", minWorth),
+                Formatter.number("max_worth", maxWorth),
             )
         }
 

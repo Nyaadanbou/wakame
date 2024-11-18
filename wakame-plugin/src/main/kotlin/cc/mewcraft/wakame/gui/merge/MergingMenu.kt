@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.merge
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
-import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -37,6 +37,7 @@ internal class MergingMenu(
      */
     fun open() {
         primaryWindow.open()
+        viewer.sendMessage(MessageConstants.MSG_OPENED_MERGING_MENU)
     }
 
     /**
@@ -109,13 +110,13 @@ internal class MergingMenu(
         when {
             e.isSwap -> {
                 e.isCancelled = true
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
             }
 
             e.isAdd -> {
                 val added = newItem?.shadowNeko(true) ?: run {
                     e.isCancelled = true
-                    viewer.sendMessage(text { content("不是便携核心."); color(NamedTextColor.RED) })
+                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_AUGMENT_CORE)
                     return
                 }
 
@@ -167,7 +168,7 @@ internal class MergingMenu(
         when {
             e.isSwap || e.isAdd -> {
                 e.isCancelled = true
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
             }
 
             e.isRemove -> {

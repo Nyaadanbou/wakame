@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui.reroll
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
-import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.shadowNeko
@@ -46,6 +46,7 @@ internal class RerollingMenu(
      */
     fun open() {
         primaryWindow.open()
+        viewer.sendMessage(MessageConstants.MSG_OPENED_REROLLING_MENU)
     }
 
     /**
@@ -106,7 +107,7 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -151,13 +152,13 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 outputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 
             // 玩家尝试把物品放进 outputSlot:
             event.isAdd -> {
-                viewer.sendMessage(GuiMessages.MESSAGE_CANCELLED)
+                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 

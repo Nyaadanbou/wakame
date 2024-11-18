@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.util.*
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
@@ -74,9 +75,9 @@ internal object RepairingTableItemRendererParts : RenderingParts(RepairingTableI
 
     @JvmField
     val REPAIR_COST: RenderingPart<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("repair_cost") { context, format ->
-        val value = text(context.repairCost)
+        val value = context.repairCost + 1 // 显示上永远 +1 让边界情况看起来更合理
         format.render(
-            Placeholder.component("value", value)
+            Formatter.number("value", value)
         )
     }
 

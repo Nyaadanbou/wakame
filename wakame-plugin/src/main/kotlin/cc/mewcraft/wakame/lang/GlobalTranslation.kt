@@ -11,14 +11,23 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
+import org.bukkit.entity.Player
+import org.koin.core.component.*
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import java.text.MessageFormat
-import java.util.*
+import java.util.Locale
+
+fun Component.translateBy(locale: Locale): Component {
+    if (this !is TranslatableComponent)
+        return this
+    return GlobalTranslation.translate(this, locale) ?: this
+}
+
+fun Component.translateBy(viewer: Player): Component {
+    return translateBy(viewer.locale())
+}
 
 object GlobalTranslation : Initializable, KoinComponent {
     private val TRANSLATION_KEY = Key("wakame", "global.translation")

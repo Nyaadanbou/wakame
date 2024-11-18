@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.adventure.translator.MessageContacts
 import cc.mewcraft.wakame.command.*
 import cc.mewcraft.wakame.command.parser.*
 import cc.mewcraft.wakame.gui.blacksmith.BlacksmithMenu
@@ -57,9 +56,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val blacksmithMenu = BlacksmithMenu(table, viewer)
-                    sender.sendPlainMessage("Opening blacksmith menu ...")
-                    blacksmithMenu.open()
+                    BlacksmithMenu(table, viewer).open()
                 }
             }.buildAndAdd(this)
 
@@ -81,9 +78,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val mergingMenu = MergingMenu(table, viewer)
-                    sender.sendMessage(MessageContacts.MSG_OPEN_MERGING_MENU)
-                    mergingMenu.open()
+                    MergingMenu(table, viewer).open()
                 }
             }.buildAndAdd(this)
 
@@ -105,9 +100,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val moddingMenu = ModdingMenu(table, viewer)
-                    sender.sendPlainMessage("Opening modding menu ...")
-                    moddingMenu.open()
+                    ModdingMenu(table, viewer).open()
                 }
             }.buildAndAdd(this)
 
@@ -129,9 +122,7 @@ object ReforgeCommands : CommandFactory<CommandSender> {
                         return@suspendingHandler
                     }
 
-                    val rerollingMenu = RerollingMenu(table, viewer)
-                    sender.sendPlainMessage("Opening rerolling menu ...")
-                    rerollingMenu.open()
+                    RerollingMenu(table, viewer).open()
                 }
             }.buildAndAdd(this)
         }

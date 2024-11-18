@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.blacksmith
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationContext
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
@@ -8,9 +9,8 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.recycle.*
 import cc.mewcraft.wakame.reforge.repair.*
 import cc.mewcraft.wakame.util.*
-import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component.*
-import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.TranslationArgument
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.*
@@ -46,6 +46,7 @@ internal class BlacksmithMenu(
 
     fun open() {
         window2.open()
+        viewer.sendMessage(MessageConstants.MSG_OPENED_BLACKSMITH_MENU)
     }
 
     val recyclingStation: RecyclingStation
@@ -92,15 +93,8 @@ internal class BlacksmithMenu(
                 // 如果未能成功加入回收列表, 则向玩家发送失败信息.
                 // 本次交互后, 整个菜单里的物品也不需要发生变化.
                 when (claimResult.reason) {
-                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(text {
-                        content("回收列表已满.")
-                        color(NamedTextColor.RED)
-                    })
-
-                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(text {
-                        content("铁匠不接受此物品.")
-                        color(NamedTextColor.RED)
-                    })
+                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(MessageConstants.MSG_ERR_FULL_RECYCLING_STASH_LIST)
+                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(MessageConstants.MSG_ERR_UNSUPPORTED_RECYCLING_ITEM_TYPE)
                 }
                 event.result = Event.Result.DENY
                 return
@@ -254,10 +248,12 @@ internal class BlacksmithMenu(
                     claim.repair(viewer)
 
                     // 发送消息
-                    viewer.sendMessage(text {
-                        content("花费 ${claim.repairCost.value} 硬币修复了 ")
-                        append(claim.originalItem.itemName ?: translatable(claim.originalItem))
-                    })
+                    viewer.sendMessage(
+                        MessageConstants.MSG_SPENT_X_REPAIRING_ITEM.arguments(
+                            TranslationArgument.numeric(claim.repairCost.value),
+                            TranslationArgument.component(claim.originalItem.itemName ?: translatable(claim.originalItem))
+                        )
+                    )
 
                     // 修复物品后从 claims 列表中移除
                     repairingSession.removeClaim(slot)
@@ -266,10 +262,7 @@ internal class BlacksmithMenu(
                     syncRepairingInventory()
 
                 } else {
-                    viewer.sendMessage(text {
-                        content("你没有足够的硬币修复此物品.")
-                        color(NamedTextColor.RED)
-                    })
+                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM)
                 }
             }
         }
@@ -409,18 +402,16 @@ internal class BlacksmithMenu(
 
                 is RecyclingSession.PurchaseResult.Failure -> {
                     // 如果购买失败, 则向玩家发送失败信息.
-                    viewer.sendMessage(text {
-                        content("内部错误.")
-                        color(NamedTextColor.RED)
-                    })
+                    viewer.sendMessage(MessageConstants.MSG_ERR_INTERNAL_ERROR)
                 }
 
                 is RecyclingSession.PurchaseResult.Success -> {
                     // 如果购买成功, 则向玩家发送成功信息.
-                    viewer.sendMessage(text {
-                        content("出售获得 ${purchaseResult.fixPrice} 硬币.")
-                        color(NamedTextColor.LIGHT_PURPLE)
-                    })
+                    viewer.sendMessage(
+                        MessageConstants.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
+                            TranslationArgument.numeric(purchaseResult.fixPrice)
+                        )
+                    )
 
                     // 同步菜单里的回收列表
                     syncRecyclingInventory()

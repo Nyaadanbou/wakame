@@ -8,15 +8,17 @@ import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import java.text.MessageFormat
-import java.util.*
+import java.util.Collections
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 
 interface MiniMessageTranslator : Translator, Examinable {
     companion object : KoinComponent {
         fun translator(): MiniMessageTranslator {
-            return getKoin().get()
+            return get()
         }
     }
 
