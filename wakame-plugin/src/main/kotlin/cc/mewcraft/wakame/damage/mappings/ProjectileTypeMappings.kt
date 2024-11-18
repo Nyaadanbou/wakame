@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.damage.DirectDamageMetadataSerializable
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
@@ -35,6 +34,7 @@ import java.io.File
     runBefore = [ElementRegistry::class]
 )
 object ProjectileTypeMappings : Initializable, KoinComponent {
+    private const val PROJECTILE_TYPE_MAPPINGS_CONFIG_FILE = "damage/projectile_type_mappings.yml"
 
     private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, DirectDamageMetadataSerializable> = Reference2ObjectOpenHashMap()
 
@@ -50,7 +50,7 @@ object ProjectileTypeMappings : Initializable, KoinComponent {
 
         val root = yamlConfig {
             withDefaults()
-            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
+            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(PROJECTILE_TYPE_MAPPINGS_CONFIG_FILE).bufferedReader() }
             serializers {
                 registerAnnotatedObjects(
                     ObjectMapper.factoryBuilder()
@@ -65,8 +65,7 @@ object ProjectileTypeMappings : Initializable, KoinComponent {
         }.build().load()
 
         val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
-        root.node("projectile_type_mappings")
-            .childrenMap()
+        root.childrenMap()
             .mapKeys { (key, _) ->
                 NamespacedKey.minecraft(key.toString())
             }

@@ -3,8 +3,12 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.damage.mappings.*
+import cc.mewcraft.wakame.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
+import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
+import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
+import cc.mewcraft.wakame.damage.mappings.ProjectileTypeMappings
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
@@ -13,13 +17,15 @@ import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.*
-import org.bukkit.event.entity.EntityDamageEvent.*
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 /**
  * @see DamageManagerApi.hurt
@@ -147,7 +153,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
             // 来源实体是非玩家生物
             is LivingEntity -> {
-                val mapping = EntityAttackMappings.find(event.damageSource)
+                val mapping = EntityAttackMappings.find(causingEntity, event)
                 if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
@@ -166,7 +172,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
                     )
                 } else {
                     // 配置文件指定了该情景下生物的伤害映射
-                    return mapping.generateDamageMetadata(event)
+                    return mapping.generateDamageMetadata(causingEntity, event)
                 }
             }
             // 不可能发生

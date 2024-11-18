@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
@@ -39,6 +40,15 @@ fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower:
         }
     }
     return CriticalStrikeMetadata(power, state)
+}
+
+fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
+    return CriticalStrikeMetadata(
+        attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
+        attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
+        attributeMap.getValue(Attributes.NEGATIVE_CRITICAL_STRIKE_POWER),
+        attributeMap.getValue(Attributes.NONE_CRITICAL_STRIKE_POWER)
+    )
 }
 //</editor-fold>
 
@@ -128,10 +138,11 @@ object EntityDamageMetadata {
 //</editor-fold>
 
 //<editor-fold desc="DamageMetadata Serializable">
-interface DamageMetadataSerializable<T> {
+/**
+ * 标记接口.
+ */
+sealed interface DamageMetadataSerializable<T> {
     val damageTags: DamageTagsSerializable
-    val damageBundle: Map<String, DamagePacketSerializable<T>> // map: element unique id -> damage packet (serializable)
-    val criticalStrikeMetadata: CriticalStrikeMetadataSerializable<T>
 }
 
 interface DamageTagsSerializable {
@@ -155,15 +166,18 @@ interface CriticalStrikeMetadataSerializable<T> {
 }
 
 ////// Direct
+/**
+ * 配置文件 **直接** 指定全部内容的 [DamageMetadata] 序列化器.
+ */
 @ConfigSerializable
 data class DirectDamageMetadataSerializable(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsSerializable,
     @Required
-    override val damageBundle: Map<String, DirectDamagePacketSerializable>,
+    val damageBundle: Map<String, DirectDamagePacketSerializable>,
     @Required
-    override val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
 ) : DamageMetadataSerializable<Double> {
     fun decode(): DamageMetadata {
         val damageTags = damageTags.decode()
@@ -173,6 +187,59 @@ data class DirectDamageMetadataSerializable(
             element0 to packet0
         }.toMap().let(::DamageBundle)
         val criticalStrikeMetadata = criticalStrikeMetadata.decode()
+        return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
+    }
+}
+
+/**
+ * 配置文件 **不指定伤害** 的 [DamageMetadata] 序列化器.
+ * 只支持单元素.
+ * 用于爆炸等伤害由原版决定的地方.
+ */
+@ConfigSerializable
+data class VanillaValueDamageMetadataSerializable(
+    @Setting(nodeFromParent = true)
+    @Required
+    override val damageTags: DirectDamageTagsSerializable,
+    @Required
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
+    @Required
+    val element: Element,
+    val rate: Double = 1.0,
+    val defensePenetration: Double = 0.0,
+    val defensePenetrationRate: Double = 0.0,
+) : DamageMetadataSerializable<Double> {
+    fun decode(damageValue: Double): DamageMetadata {
+        val damageTags = damageTags.decode()
+        val damageBundle = damageBundle {
+            single(element) {
+                min(damageValue)
+                max(damageValue)
+                rate(rate)
+                defensePenetration(defensePenetration)
+                defensePenetrationRate(defensePenetrationRate)
+            }
+        }
+        val criticalStrikeMetadata = criticalStrikeMetadata.decode()
+        return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
+    }
+}
+
+/**
+ * 依赖实体的 [cc.mewcraft.wakame.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
+ */
+@ConfigSerializable
+data class AttributeMapDamageMetadataSerializable(
+    @Setting(nodeFromParent = true)
+    @Required
+    override val damageTags: DirectDamageTagsSerializable,
+) : DamageMetadataSerializable<Double> {
+    fun decode(attributeMap: AttributeMap): DamageMetadata {
+        val damageTags = damageTags.decode()
+        val damageBundle = damageBundle(attributeMap) {
+            every { standard() }
+        }
+        val criticalStrikeMetadata = CriticalStrikeMetadata(attributeMap)
         return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
     }
 }
@@ -225,9 +292,9 @@ data class MolangDamageMetadataSerializable(
     @Required
     override val damageTags: DirectDamageTagsSerializable,
     @Required
-    override val damageBundle: Map<String, MolangDamagePacketSerializable>,
+    val damageBundle: Map<String, MolangDamagePacketSerializable>,
     @Required
-    override val criticalStrikeMetadata: MolangCriticalStrikeMetadataSerializable,
+    val criticalStrikeMetadata: MolangCriticalStrikeMetadataSerializable,
 ) : DamageMetadataSerializable<Evaluable<*>> {
     fun decode(engine: MochaEngine<*>): DamageMetadata {
         val damageTags = damageTags.decode()

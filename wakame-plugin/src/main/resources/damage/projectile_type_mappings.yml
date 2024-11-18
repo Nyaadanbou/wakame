@@ -1,0 +1,98 @@
+# 默认弹射物伤害映射
+# 当弹射物没有来源实体, 或伤害只与类型有关时使用
+arrow:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 1.0
+      max: 1.0
+  critical_strike_metadata:
+    chance: 0.0
+trident:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 8.0
+      max: 8.0
+  critical_strike_metadata:
+    chance: 0.0
+egg:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 0.0
+      max: 0.0
+  critical_strike_metadata:
+    chance: 0.0
+ender_pearl:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 0.0
+      max: 0.0
+  critical_strike_metadata:
+    chance: 0.0
+fireball:
+  damage_tags: [ ]
+  damage_bundle:
+    fire:
+      min: 6.0
+      max: 6.0
+  critical_strike_metadata:
+    chance: 0.0
+llama_spit:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 1.0
+      max: 1.0
+  critical_strike_metadata:
+    chance: 0.0
+shulker_bullet:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 4.0
+      max: 4.0
+  critical_strike_metadata:
+    chance: 0.0
+small_fireball:
+  damage_tags: [ ]
+  damage_bundle:
+    fire:
+      min: 5.0
+      max: 5.0
+  critical_strike_metadata:
+    chance: 0.0
+snowball:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 0.0
+      max: 0.0
+  critical_strike_metadata:
+    chance: 0.0
+wind_charge:
+  damage_tags: [ ]
+  damage_bundle:
+    wind:
+      min: 1.0
+      max: 1.0
+  critical_strike_metadata:
+    chance: 0.0
+breeze_wind_charge:
+  damage_tags: [ ]
+  damage_bundle:
+    wind:
+      min: 1.0
+      max: 1.0
+  critical_strike_metadata:
+    chance: 0.0
+wither_skull:
+  damage_tags: [ ]
+  damage_bundle:
+    neutral:
+      min: 8.0
+      max: 8.0
+  critical_strike_metadata:
+    chance: 0.0

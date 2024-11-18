@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.DAMAGE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -38,6 +37,7 @@ import java.lang.reflect.Type
     runBefore = [ElementRegistry::class]
 )
 object DamageTypeMappings : Initializable, KoinComponent {
+    private const val DAMAGE_TYPE_MAPPINGS_CONFIG_FILE = "damage/damage_type_mappings.yml"
 
     private val DEFAULT_MAPPING: DamageTypeMapping by ReloadableProperty { DamageTypeMapping(ElementRegistry.DEFAULT, .0, .0) }
 
@@ -55,7 +55,7 @@ object DamageTypeMappings : Initializable, KoinComponent {
 
         val root = yamlConfig {
             withDefaults()
-            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_GLOBAL_CONFIG_FILE).bufferedReader() }
+            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_TYPE_MAPPINGS_CONFIG_FILE).bufferedReader() }
             serializers {
                 kregister(ElementSerializer)
                 kregister(DamageTypeMappingSerializer)
@@ -63,8 +63,7 @@ object DamageTypeMappings : Initializable, KoinComponent {
         }.build().load()
 
         val damageTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
-        root.node("damage_type_mappings")
-            .childrenMap()
+        root.childrenMap()
             .mapKeys { (key, _) ->
                 val stringKey = key.toString()
                 val adventKey = try {
