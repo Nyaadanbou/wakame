@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableCont
 import cc.mewcraft.wakame.gui.common.GuiMessages
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.lang.translateBy
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.*
 import cc.mewcraft.wakame.util.*
