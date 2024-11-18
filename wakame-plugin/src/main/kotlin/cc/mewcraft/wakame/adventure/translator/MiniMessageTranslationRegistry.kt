@@ -2,12 +2,8 @@ package cc.mewcraft.wakame.adventure.translator
 
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
-import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.minimessage.Context
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.ParsingException
+import net.kyori.adventure.text.*
+import net.kyori.adventure.text.minimessage.*
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -45,7 +41,7 @@ interface MiniMessageTranslationRegistry : Translator {
      * Register all translations from a bundle.
      */
     fun registerAll(locale: Locale, bundle: Map<String, String>) {
-        this.registerAll(locale, bundle.keys) { requireNotNull(bundle[it]) { "Missing translation for key: $it" } }
+        this.registerAll(locale, bundle.keys) { requireNotNull(bundle[it]) { "missing translation for key: $it" } }
     }
 
     /**
@@ -72,7 +68,7 @@ interface MiniMessageTranslationRegistry : Translator {
             if (errorCount == 1) {
                 throw firstError
             } else if (errorCount > 1) {
-                throw IllegalArgumentException("Invalid key (and ${errorCount - 1} more)", firstError)
+                throw IllegalArgumentException("invalid key (and ${errorCount - 1} more)", firstError)
             }
         }
     }
@@ -88,7 +84,7 @@ interface MiniMessageTranslationRegistry : Translator {
 
 private class MiniMessageTranslationRegistryImpl(
     private val name: Key,
-    private val miniMessage: MiniMessage
+    private val miniMessage: MiniMessage,
 ) : Examinable, MiniMessageTranslationRegistry {
     private val translations: MutableMap<String, Translation> = ConcurrentHashMap()
     private var defaultLocale: Locale = Locale.of("en", "US")
@@ -171,18 +167,20 @@ private class MiniMessageTranslationRegistryImpl(
     }
 
     class ArgumentTag(
-        private val argumentComponents: List<ComponentLike?>
+        private val argumentComponents: List<ComponentLike>,
     ) : TagResolver {
 
         @Throws(ParsingException::class)
         override fun resolve(name: String, arguments: ArgumentQueue, ctx: Context): Tag {
-            val index = arguments.popOr("No argument number provided").asInt().orElseThrow { ctx.newException("Invalid argument number", arguments) }
-
-            if (index < 0 || index >= argumentComponents.size) {
-                throw ctx.newException("Invalid argument number", arguments)
+            val index = arguments.popOr("no argument number provided").asInt().orElseThrow {
+                ctx.newException("invalid argument number", arguments)
             }
 
-            return Tag.inserting(argumentComponents[index]!!)
+            if (index < 0 || index >= argumentComponents.size) {
+                throw ctx.newException("invalid argument number", arguments)
+            }
+
+            return Tag.inserting(argumentComponents[index])
         }
 
         override fun has(name: String): Boolean {
@@ -199,7 +197,7 @@ private class MiniMessageTranslationRegistryImpl(
         private val formats: MutableMap<Locale, String> = ConcurrentHashMap()
 
         fun register(locale: Locale, format: String) {
-            require(formats.putIfAbsent(locale, format) == null) { "Translation already exists: ${this.key} for $locale" }
+            require(formats.putIfAbsent(locale, format) == null) { "translation already exists: ${this.key} for $locale" }
         }
 
         fun translate(locale: Locale): String? {
