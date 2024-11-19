@@ -14,7 +14,25 @@ internal class ElementDamage(
 ) : ElementEnchantment(
     Identity(elementId, "damage")
 ) {
-    private val attribute: EnchantmentAttributeComponent by element
+    private val minAttackDamageAdd: EnchantmentAttributeComponent by element
+        .map { Attributes.MIN_ATTACK_DAMAGE.of(elementId) ?: error("invalid element id: $elementId") }
+        .map { attribute ->
+            EnchantmentAttributeComponent(
+                this, setOf(
+                    Part(attribute, 5.0, 1.0, Operation.ADD)
+                )
+            )
+        }
+    private val maxAttackDamageAdd: EnchantmentAttributeComponent by element
+        .map { Attributes.MAX_ATTACK_DAMAGE.of(elementId) ?: error("invalid element id: $elementId") }
+        .map { attribute ->
+            EnchantmentAttributeComponent(
+                this, setOf(
+                    Part(attribute, 5.0, 1.0, Operation.ADD)
+                )
+            )
+        }
+    private val attackDamageRateAdd: EnchantmentAttributeComponent by element
         .map { Attributes.ATTACK_DAMAGE_RATE.of(elementId) ?: error("invalid element id: $elementId") }
         .map { attribute ->
             EnchantmentAttributeComponent(
@@ -25,6 +43,8 @@ internal class ElementDamage(
         }
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return attribute.getEffects(level, slot)
+        return minAttackDamageAdd.getEffects(level, slot) +
+                maxAttackDamageAdd.getEffects(level, slot) +
+                attackDamageRateAdd.getEffects(level, slot)
     }
 }

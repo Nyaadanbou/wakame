@@ -14,7 +14,16 @@ internal class ElementProtection(
 ) : ElementEnchantment(
     Identity(elementId, "protection")
 ) {
-    private val attribute: EnchantmentAttributeComponent by element
+    private val defenseAdd: EnchantmentAttributeComponent by element
+        .map { Attributes.DEFENSE.of(elementId) ?: error("invalid element id: $elementId") }
+        .map { attribute ->
+            EnchantmentAttributeComponent(
+                this, setOf(
+                    Part(attribute, 3.0, 2.0, Operation.ADD)
+                )
+            )
+        }
+    private val defenseMultiplyTotal: EnchantmentAttributeComponent by element
         .map { Attributes.DEFENSE.of(elementId) ?: error("invalid element id: $elementId") }
         .map { attribute ->
             EnchantmentAttributeComponent(
@@ -25,6 +34,7 @@ internal class ElementProtection(
         }
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return attribute.getEffects(level, slot)
+        return defenseAdd.getEffects(level, slot) +
+                defenseMultiplyTotal.getEffects(level, slot)
     }
 }

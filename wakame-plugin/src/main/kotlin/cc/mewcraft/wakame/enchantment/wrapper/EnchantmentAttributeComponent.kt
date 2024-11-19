@@ -58,7 +58,7 @@ internal class EnchantmentAttributeComponent(
          * @param slot 物品槽位
          */
         fun createEffect(handle: Enchantment, level: Int, slot: ItemSlot): Pair<Attribute, AttributeModifier> {
-            val id2 = handle.key.value() + "/" + slot.slotIndex
+            val id2 = handle.key.value() + "/" + slot.slotIndex + "/" + operation.id
             val amount = baseValue + perLevel * (level - 1)
             val modifier = AttributeModifier(Key.key(ATTRIBUTE_MODIFIER_NAMESPACE, id2), amount, operation)
             return attribute to modifier
