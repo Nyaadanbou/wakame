@@ -14,7 +14,7 @@ internal class ElementPenetration(
 ) : ElementEnchantment(
     Identity(elementId, "penetrate"),
 ) {
-    private val defensePenetration: EnchantmentAttributeComponent by element
+    private val defensePenetrationAdd: EnchantmentAttributeComponent by element
         .map { element -> Attributes.DEFENSE_PENETRATION.of(element) }
         .map { attribute ->
             EnchantmentAttributeComponent(
@@ -23,7 +23,7 @@ internal class ElementPenetration(
                 )
             )
         }
-    private val defensePenetrationRate: EnchantmentAttributeComponent by element
+    private val defensePenetrationRateAdd: EnchantmentAttributeComponent by element
         .map { element -> Attributes.DEFENSE_PENETRATION_RATE.of(element) }
         .map { attribute ->
             EnchantmentAttributeComponent(
@@ -34,7 +34,7 @@ internal class ElementPenetration(
         }
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return defensePenetration.getEffects(level, slot) +
-                defensePenetrationRate.getEffects(level, slot)
+        return defensePenetrationAdd.getEffects(level, slot) +
+                defensePenetrationRateAdd.getEffects(level, slot)
     }
 }

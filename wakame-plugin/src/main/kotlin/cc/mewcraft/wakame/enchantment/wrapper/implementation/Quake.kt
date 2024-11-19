@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.*
 import cc.mewcraft.wakame.item.ItemSlot
 
 internal class Quake : AbstractEnchantment(Enchantments.QUAKE) {
-    private val hammerDamageRange: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
+    private val hammerDamageRangeAdd: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
         this, setOf(
             Part(
                 Attributes.HAMMER_DAMAGE_RANGE, 0.5, 0.3, AttributeModifier.Operation.ADD
@@ -19,6 +19,6 @@ internal class Quake : AbstractEnchantment(Enchantments.QUAKE) {
     )
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return hammerDamageRange.getEffects(level, slot)
+        return hammerDamageRangeAdd.getEffects(level, slot)
     }
 }

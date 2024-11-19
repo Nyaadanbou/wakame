@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.*
 import cc.mewcraft.wakame.item.ItemSlot
 
 internal class SweepingEdge : AbstractEnchantment(Enchantments.SWEEPING_EDGE) {
-    private val sweepingEdge: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
+    private val sweepingEdgeRatioAdd: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
         this, setOf(
             Part(
                 Attributes.SWEEPING_DAMAGE_RATIO, 0.25, 0.15, AttributeModifier.Operation.ADD
@@ -19,6 +19,6 @@ internal class SweepingEdge : AbstractEnchantment(Enchantments.SWEEPING_EDGE) {
     )
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return sweepingEdge.getEffects(level, slot)
+        return sweepingEdgeRatioAdd.getEffects(level, slot)
     }
 }
