@@ -167,8 +167,10 @@ internal abstract class ItemSlotChangeListener {
 
         onBegin(player)
 
-        if (oldItemStack != null /* && test(player, slot, oldItemStack, oldNekoStack) */) {
-            // 始终执行移除物品效果的逻辑, 无论当前玩家是否满足该物品的使用条件.
+        if (oldItemStack != null &&
+            testSlot(player, slot, oldItemStack, oldNekoStack) // 移除物品效果时, 只检查 item slot 是否满足
+        ) {
+            // 移除物品效果时, 只检查 item slot 是否满足.
             // 这样可以保证在一些特殊情况下 (例如强制降低冒险等级),
             // 玩家的物品效果仍然能够被正确移除.
             handlePreviousItem(player, slot, oldItemStack, oldNekoStack)
