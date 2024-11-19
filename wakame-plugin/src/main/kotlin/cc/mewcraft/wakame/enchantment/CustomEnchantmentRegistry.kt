@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.enchantment.wrapper.implementation.*
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.enchantments.Enchantment
-import kotlin.collections.set
 
 /**
  * [CustomEnchantment] 的注册表.
@@ -56,21 +55,30 @@ private object CustomEnchantmentInternals {
 
         register(Agility())
         register(Cleave())
-        register(Pinpoint())
         register(DeepSearch())
         register(Disarray())
         register(ElementDamage("earth"))
+        register(ElementPenetration("earth"))
         register(ElementProtection("earth"))
         register(ElementDamage("fire"))
+        register(ElementPenetration("fire"))
         register(ElementProtection("fire"))
         register(ElementDamage("neutral"))
+        register(ElementPenetration("neutral"))
         register(ElementProtection("neutral"))
         register(ElementDamage("thunder"))
+        register(ElementPenetration("thunder"))
         register(ElementProtection("thunder"))
         register(ElementDamage("water"))
+        register(ElementPenetration("water"))
         register(ElementProtection("water"))
         register(ElementDamage("wind"))
+        register(ElementPenetration("wind"))
         register(ElementProtection("wind"))
+        register(Pinpoint())
+        register(Quake())
+        register(Smite())
+        register(SweepingEdge())
         register(Vitality())
     }
 }
