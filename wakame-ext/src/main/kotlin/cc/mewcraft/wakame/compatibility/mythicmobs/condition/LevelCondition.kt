@@ -30,26 +30,25 @@ class LevelCondition(
         } else {
             // 用于在随机生成条件为 ADD 的时候判断
             val location = bukkitEntity.location
-            return location.getNearbyPlayers(searchRadius)
-                .firstOrNull()
-                ?.let { checkLevel(it) }
-                ?: false
+            return location.getNearbyPlayers(searchRadius).firstOrNull()?.let { checkLevel(it) } == true
         }
     }
 
     override fun check(target: AbstractLocation): Boolean {
         // 用于在随机生成条件为 ADD 的时候判断
         val location = BukkitAdapter.adapt(target)
-
-        return location.getNearbyPlayers(searchRadius)
-            .firstOrNull()
-            ?.let { checkLevel(it) }
-            ?: false
+        return location.getNearbyPlayers(searchRadius).firstOrNull()?.let { checkLevel(it) } == true
     }
 
     private fun checkLevel(player: Player): Boolean {
         val playerData = AdventureLevelProvider.get().playerDataManager().load(player)
-        val playerLevel = playerData.getLevel(LevelCategory.PRIMARY) // 数据未加载完毕时, 会返回 0
+        if (!playerData.complete()) {
+            // 数据未加载完毕时, 返回 false.
+            // 该 if-block 通常是在玩家刚进入资源世界,
+            // 并且刚好有 MM 怪物在玩家周围刷新时执行.
+            return false
+        }
+        val playerLevel = playerData.getLevel(LevelCategory.PRIMARY)
         val levelNumber = playerLevel.level
         return level.equals(levelNumber)
     }
