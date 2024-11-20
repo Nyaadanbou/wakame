@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.Nekoo
-import cc.mewcraft.wakame.item.CustomNekoItemRealizer
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.isNeko
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
@@ -14,15 +11,11 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import kotlin.getValue
 
 /**
  * 使用插件实例来实现 Nekoo API.
  */
 internal class NekooApiProvider : Nekoo, KoinComponent {
-    private val realizer: CustomNekoItemRealizer by inject()
-
     override fun createItemStack(
         id: Key, source: Player?,
     ): ItemStack {
@@ -41,10 +34,10 @@ internal class NekooApiProvider : Nekoo, KoinComponent {
 
         val nekoStack: NekoStack
         if (source == null) {
-            nekoStack = realizer.realize(nekoItem)
+            nekoStack = CustomNekoItemRealizer.realize(nekoItem)
         } else {
             val user = source.toUser()
-            nekoStack = realizer.realize(nekoItem, user)
+            nekoStack = CustomNekoItemRealizer.realize(nekoItem, user)
         }
 
         return nekoStack.wrapped

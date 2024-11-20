@@ -1,7 +1,9 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.enchantment
 
 import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.item.DefaultItemSlotRegistry
 import cc.mewcraft.wakame.item.VanillaItemSlot
 
 internal object EnchantmentInitializer : Initializable {
@@ -25,6 +27,6 @@ internal object EnchantmentInitializer : Initializable {
             .flatMap { it.handle.activeSlotGroups }
             .flatMap { VanillaItemSlot.fromEquipmentSlotGroup(it) }
             .distinct()
-            .forEach { ItemSlotRegistry.register(it) }
+            .forEach { DefaultItemSlotRegistry.register(it) }
     }
 }

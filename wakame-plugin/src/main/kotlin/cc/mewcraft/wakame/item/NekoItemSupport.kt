@@ -35,7 +35,7 @@ internal class SimpleNekoItem(
  */
 internal object EmptyNekoItem : NekoItem {
     override val id: Key = GenericKeys.EMPTY
-    override val base: ItemBase = ItemBase.NOP
+    override val base: ItemBase = ItemBase.nop()
     override val slotGroup: ItemSlotGroup = ItemSlotGroup.empty()
     override val templates: ItemTemplateMap = ItemTemplateMap.empty()
     override val behaviors: ItemBehaviorMap = ItemBehaviorMap.empty()

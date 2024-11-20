@@ -127,6 +127,10 @@ paper {
             required = false
             load = RelativeLoadOrder.OMIT // 懒加载 class
         }
+        register("ChestSort") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
         register("MythicMobs") {
             required = false
             load = RelativeLoadOrder.OMIT // 懒加载 class

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.item.DefaultItemSlotRegistry
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -40,7 +40,7 @@ internal class ItemSlotChangeManager : Listener, KoinComponent {
     // 例如: 同步当前生命值.
     @EventHandler
     fun on(e: ServerTickStartEvent) {
-        val everyItemSlot = ItemSlotRegistry.all()
+        val everyItemSlot = DefaultItemSlotRegistry.all()
         for (player in server.onlinePlayers) {
             val user = player.toUser()
             if (!user.isInventoryListenable) {
@@ -78,7 +78,7 @@ private class LastItemRecord {
      *
      * 该映射不储存 [ItemStack.isEmpty] 为 `true` 的物品. 对于这类物品, 该映射会直接将其储存为 `null`.
      */
-    private val lastItems: Reference2ObjectOpenHashMap<ItemSlot, ItemStack?> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size)
+    private val lastItems: Reference2ObjectOpenHashMap<ItemSlot, ItemStack?> = Reference2ObjectOpenHashMap(DefaultItemSlotRegistry.size)
 
     /**
      * 获取上一个 tick 的物品.

@@ -7,8 +7,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * Represents an **item template**, or a "blueprint" in other words.
@@ -66,22 +64,20 @@ interface NekoItem : Examinable {
     val behaviors: ItemBehaviorMap
 }
 
+/* Implementations */
+
 fun NekoItem.realize(): NekoStack {
-    return NekoItemInjections.realizer.realize(this)
+    return CustomNekoItemRealizer.realize(this)
 }
 
 fun NekoItem.realize(context: ItemGenerationContext): NekoStack {
-    return NekoItemInjections.realizer.realize(this, context)
+    return CustomNekoItemRealizer.realize(this, context)
 }
 
 fun NekoItem.realize(user: User<*>): NekoStack {
-    return NekoItemInjections.realizer.realize(this, user)
+    return CustomNekoItemRealizer.realize(this, user)
 }
 
 fun NekoItem.realize(crate: Crate): NekoStack {
-    return NekoItemInjections.realizer.realize(this, crate)
-}
-
-private object NekoItemInjections : KoinComponent {
-    val realizer: CustomNekoItemRealizer by inject()
+    return CustomNekoItemRealizer.realize(this, crate)
 }

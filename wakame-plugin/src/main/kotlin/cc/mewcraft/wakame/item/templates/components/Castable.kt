@@ -16,10 +16,10 @@ data object Castable : ItemTemplate<Nothing>, ItemTemplateBridge<Castable> {
     }
 
     override fun codec(id: String): ItemTemplateType<Castable> {
-        return TemplateType(id)
+        return Codec(id)
     }
 
-    private data class TemplateType(
+    private data class Codec(
         override val id: String,
     ) : ItemTemplateType<Castable> {
         override val type: TypeToken<Castable> = typeTokenOf()

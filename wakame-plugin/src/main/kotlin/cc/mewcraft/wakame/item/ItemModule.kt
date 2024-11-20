@@ -13,8 +13,7 @@ import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
-import org.koin.dsl.bind
-import org.koin.dsl.module
+import org.koin.dsl.*
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 internal const val ITEM_PROTO_SERIALIZERS = "item_proto_serializers"
@@ -28,7 +27,9 @@ internal fun itemModule(): Module = module {
         templatesModule(),
     )
 
-    single { ItemSlotRegistry } bind Initializable::class
+    single { DefaultItemSlotRegistry } binds arrayOf(
+        Initializable::class, ItemSlotRegistry::class
+    )
     single { ImaginaryNekoStackRegistry } bind Initializable::class
     single { ImaginaryNekoItemRealizer }
     single { CustomNekoItemRealizer }

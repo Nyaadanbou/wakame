@@ -5,9 +5,7 @@ import cc.mewcraft.wakame.attack.AttackTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -23,11 +21,11 @@ data class ItemAttack(
 
     companion object : ItemTemplateBridge<ItemAttack> {
         override fun codec(id: String): ItemTemplateType<ItemAttack> {
-            return TemplateType(id)
+            return Codec(id)
         }
     }
 
-    private data class TemplateType(
+    private data class Codec(
         override val id: String,
     ) : ItemTemplateType<ItemAttack> {
         override val type: TypeToken<ItemAttack> = typeTokenOf()

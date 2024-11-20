@@ -35,11 +35,11 @@ data class ExtraLore(
 
     companion object : ItemTemplateBridge<ExtraLore> {
         override fun codec(id: String): ItemTemplateType<ExtraLore> {
-            return TemplateType(id)
+            return Codec(id)
         }
     }
 
-    private data class TemplateType(
+    private data class Codec(
         override val id: String,
     ) : ItemTemplateType<ExtraLore> {
         override val type: TypeToken<ExtraLore> = typeTokenOf()
