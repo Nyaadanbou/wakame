@@ -12,7 +12,7 @@ import xyz.xenondevs.commons.provider.immutable.map
 internal class ElementPenetration(
     elementId: String,
 ) : ElementEnchantment(
-    Identity(elementId, "penetrate"),
+    Identity(elementId, "penetration"),
 ) {
     private val defensePenetrationAdd: EnchantmentAttributeComponent by element
         .map { element -> Attributes.DEFENSE_PENETRATION.of(element) }
