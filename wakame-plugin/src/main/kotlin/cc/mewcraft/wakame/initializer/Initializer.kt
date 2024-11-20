@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
+import cc.mewcraft.wakame.compatibility.chestshort.ChestSortListener
 import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsListener
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
@@ -45,8 +46,8 @@ import org.koin.core.component.*
  */
 object Initializer : KoinComponent, Listener {
 
-    private val LOGGER: ComponentLogger by inject()
-    private val PLUGIN: WakamePlugin by inject()
+    private val logger: ComponentLogger by inject()
+    private val plugin: WakamePlugin by inject()
 
     /**
      * A registry of `Terminables`.
@@ -100,7 +101,7 @@ object Initializer : KoinComponent, Listener {
         initPreWorld()
     }
 
-    private fun saveDefaultConfiguration() = with(PLUGIN) {
+    private fun saveDefaultConfiguration() = with(plugin) {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
@@ -145,18 +146,27 @@ object Initializer : KoinComponent, Listener {
         registerListenerAndBind<ResourcePackPlayerListener>()
 
         // compatibility
-        registerListenerAndBind<AdventureLevelListener>()
-        registerListenerAndBind<MythicMobsListener>()
+        registerListenerAndBind<AdventureLevelListener>("AdventureLevel")
+        registerListenerAndBind<MythicMobsListener>("MythicMobs")
+        registerListenerAndBind<ChestSortListener>("ChestSort")
 
         // uncategorized
     }
 
-    private inline fun <reified T : Listener> registerListenerAndBind() {
-        PLUGIN.bind(PLUGIN.registerTerminableListener(get<T>()))
+    private inline fun <reified T : Listener> registerListenerAndBind(requiredPlugin: String? = null) {
+        if (requiredPlugin != null) {
+            if (plugin.isPluginPresent(requiredPlugin)) {
+                plugin.bind(plugin.registerTerminableListener(get<T>()))
+            } else {
+                logger.info("Plugin $requiredPlugin is not present. Skipping listener ${T::class.simpleName}")
+            }
+        } else {
+            plugin.bind(plugin.registerTerminableListener(get<T>()))
+        }
     }
 
     private fun registerCommands() {
-        CommandManager(PLUGIN).init()
+        CommandManager(plugin).init()
     }
 
     private suspend fun executeReload() {
@@ -172,19 +182,19 @@ object Initializer : KoinComponent, Listener {
             return Result.success(Unit)
         }
 
-        LOGGER.info("[Initializer] onReload - Start")
+        logger.info("[Initializer] onReload - Start")
         forEachReload { onReload() }.onFailure { return }
-        LOGGER.info("[Initializer] onReload - Complete")
+        logger.info("[Initializer] onReload - Complete")
 
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Reload Async")
         val onReloadAsyncJobs = mutableListOf<Job>()
         val onReloadAsyncResult = forEachReload {
             onReloadAsyncJobs += NEKO_PLUGIN.launch(asyncContext) { onReloadAsync() }
         }
-        LOGGER.info("[Initializer] onReloadAsync - Waiting")
+        logger.info("[Initializer] onReloadAsync - Waiting")
         onReloadAsyncJobs.joinAll() // wait for all async jobs
         onReloadAsyncResult.onFailure { return }
-        LOGGER.info("[Initializer] onReloadAsync - Complete")
+        logger.info("[Initializer] onReloadAsync - Complete")
     }
 
     /**
@@ -208,9 +218,9 @@ object Initializer : KoinComponent, Listener {
             return Result.success(Unit)
         }
 
-        LOGGER.info("[Initializer] onPreWorld - Start")
+        logger.info("[Initializer] onPreWorld - Start")
         forEachPreWorld { onPreWorld() }.onFailure { return }
-        LOGGER.info("[Initializer] onPreWorld - Complete")
+        logger.info("[Initializer] onPreWorld - Complete")
 
         preWorldInitialized = true
     }
@@ -231,20 +241,20 @@ object Initializer : KoinComponent, Listener {
             return Result.success(Unit)
         }
 
-        LOGGER.info("[Initializer] onPostWorld - Start")
+        logger.info("[Initializer] onPostWorld - Start")
         forEachPostWorld { onPostWorld() }.onFailure { return }
-        LOGGER.info("[Initializer] onPostWorld - Complete")
+        logger.info("[Initializer] onPostWorld - Complete")
 
-        LOGGER.info("[Initializer] onPostWorldAsync - Start")
+        logger.info("[Initializer] onPostWorldAsync - Start")
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Post World Async")
         val onPostWorldJobs = mutableListOf<Job>()
         val onPostWorldAsyncResult = forEachPostWorld {
             onPostWorldJobs += NEKO_PLUGIN.launch(asyncContext) { onPostWorldAsync() }
         }
-        LOGGER.info("[Initializer] onPostWorldAsync - Waiting")
+        logger.info("[Initializer] onPostWorldAsync - Waiting")
         onPostWorldJobs.joinAll() // wait for all async jobs
         onPostWorldAsyncResult.onFailure { return }
-        LOGGER.info("[Initializer] onPostWorldAsync - Complete")
+        logger.info("[Initializer] onPostWorldAsync - Complete")
 
         isDone = true
         NEKO_PLUGIN.launch(asyncContext) {
@@ -254,7 +264,7 @@ object Initializer : KoinComponent, Listener {
             }
         }
 
-        LOGGER.info(Component.text("Done loading", NamedTextColor.AQUA))
+        logger.info(Component.text("Done loading", NamedTextColor.AQUA))
     }
 
     /**
@@ -268,12 +278,12 @@ object Initializer : KoinComponent, Listener {
 
     private fun shutdown(message: String, throwable: Throwable) {
         if (!isDebug) {
-            LOGGER.error(message, throwable)
-            LOGGER.error("Shutting down the server to prevent further damage.")
+            logger.error(message, throwable)
+            logger.error("Shutting down the server to prevent further damage.")
             Bukkit.shutdown()
         } else {
-            LOGGER.warn(message, throwable)
-            LOGGER.warn("Scroll up to find the exception cause and check your configuration.")
+            logger.warn(message, throwable)
+            logger.warn("Scroll up to find the exception cause and check your configuration.")
         }
     }
 
@@ -289,7 +299,7 @@ object Initializer : KoinComponent, Listener {
         if (preWorldInitialized) {
             initPostWorld()
         } else {
-            LOGGER.warn("Skipping post world initialization")
+            logger.warn("Skipping post world initialization")
         }
     }
 

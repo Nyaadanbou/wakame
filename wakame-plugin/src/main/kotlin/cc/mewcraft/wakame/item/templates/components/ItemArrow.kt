@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import org.bukkit.entity.AbstractArrow.PickupStatus
+import org.bukkit.entity.AbstractArrow.*
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
@@ -53,11 +53,11 @@ data class ItemArrow(
 
     companion object : ItemTemplateBridge<ItemArrow> {
         override fun codec(id: String): ItemTemplateType<ItemArrow> {
-            return TemplateType(id)
+            return Codec(id)
         }
     }
 
-    private data class TemplateType(
+    private data class Codec(
         override val id: String,
     ) : ItemTemplateType<ItemArrow> {
         override val type: TypeToken<ItemArrow> = typeTokenOf()

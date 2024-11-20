@@ -37,12 +37,12 @@ interface ItemTemplateType<T> : Examinable {
      */
     fun decode(node: ConfigurationNode): T
 
-    // /**
-    //  * 定义如何将 [T] 写入到 [node].
-    //  */
-    // fun encode(obj: T?, node: ConfigurationNode) {
-    //     throw UnsupportedOperationException()
-    // }
+    /**
+     * 定义如何将 [T] 写入到 [node].
+     */
+    fun encode(obj: T?, node: ConfigurationNode) {
+        throw UnsupportedOperationException()
+    }
 
     /**
      * 该序列化会用到的子序列化器.
