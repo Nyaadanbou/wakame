@@ -14,8 +14,9 @@ dependencies {
     compileOnly(local.paper)
     compileOnly(local.helper)
 
-    // external
+    // plugins
     compileOnly(local.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
     compileOnly(local.adventurelevel)
     compileOnly(local.economy)
+    compileOnly(local.chestsort) { isTransitive = false }
 }
