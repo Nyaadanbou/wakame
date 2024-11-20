@@ -39,7 +39,7 @@ class NekoPercentDamageMechanic(
     private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
     private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
     private val knockback: Boolean = mlc.getBoolean(arrayOf("knockback", "kb"), true)
-    private val currentHealth: Boolean = mlc.getBoolean(arrayOf("currentHealth", "current", "ch", "c"), false);
+    private val currentHealth: Boolean = mlc.getBoolean(arrayOf("current_health", "current", "ch", "c"), false);
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata, AbstractEntity) -> DamageBundle {
         return { data, target ->
