@@ -14,7 +14,7 @@ import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
 import java.io.File
 
-class NekoDamageMechanic(
+class NekoBaseDamageMechanic(
     manager: SkillExecutor,
     file: File,
     line: String,
