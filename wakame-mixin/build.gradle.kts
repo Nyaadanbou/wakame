@@ -1,7 +1,7 @@
 plugins {
-    id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
     id("nyaadanbou-conventions.copy-jar")
+    id("wakame-conventions.kotlin")
     alias(libs.plugins.paperdev)
 }
 

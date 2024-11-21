@@ -2,10 +2,10 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.*
 
 plugins {
-    id("neko-kotlin")
-    id("neko-koin")
     id("nyaadanbou-conventions.repositories")
     id("nyaadanbou-conventions.copy-jar")
+    id("wakame-conventions.kotlin")
+    id("wakame-conventions.koin")
     alias(libs.plugins.pluginyml.paper)
 }
 

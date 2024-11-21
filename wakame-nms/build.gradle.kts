@@ -1,8 +1,8 @@
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 
 plugins {
-    id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
+    id("wakame-conventions.kotlin")
     alias(libs.plugins.paperdev)
 }
 
