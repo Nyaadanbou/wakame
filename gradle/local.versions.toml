@@ -4,6 +4,7 @@ kotlin = "2.0.21"
 kotlinx-coroutines-core = "1.9.0"
 koin = "4.0.0"
 commons = "1.17"
+fleks = "2.10"
 shadow-nbt = "1.21.1-SNAPSHOT"
 
 ignite = "1.1.0"
@@ -50,6 +51,7 @@ commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", versi
 
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
 
 # Plugin dependencies
 
