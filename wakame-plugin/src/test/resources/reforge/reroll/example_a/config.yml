@@ -21,7 +21,7 @@ rarity_number_mapping:
 #   源物品的稀有度所映射到的数值
 # query.source_level()
 #   源物品的等级
-# query.count_cell(`type`)
+# query.cell_count(`type`)
 #   返回指定类型的核孔的数量
 #   你必须传入一个参数 `type`
 #   `type` = 'all' | 'selected' | 'unselected'
