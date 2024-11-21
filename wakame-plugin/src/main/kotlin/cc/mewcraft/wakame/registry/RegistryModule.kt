@@ -46,7 +46,6 @@ const val SKILL_CONFIG_FILE = "skills.yml"
 const val SKILL_PROTO_CONFIG_DIR = "skills"
 const val SKILL_PROTO_CONFIG_LOADER = "skill_global_config_loader"
 
-const val DAMAGE_GLOBAL_CONFIG_FILE = "damage.yml"
 
 const val ATTRIBUTE_GLOBAL_CONFIG_FILE = "attributes.yml"
 const val ATTRIBUTE_GLOBAL_CONFIG_LOADER = "attribute_global_config_loader"

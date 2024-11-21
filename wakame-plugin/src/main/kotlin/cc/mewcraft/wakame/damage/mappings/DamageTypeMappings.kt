@@ -4,9 +4,10 @@ package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
@@ -25,21 +26,38 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.objectmapping.ObjectMapper
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.serialize.TypeSerializer
+import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 import java.lang.reflect.Type
 
 /**
- * 记录原版伤害类型映射到萌芽伤害的逻辑.
+ * 依据原版伤害类型来获取萌芽伤害的映射.
  */
+@PostWorldDependency(
+    runBefore = [ElementRegistry::class]
+)
 @ReloadDependency(
     runBefore = [ElementRegistry::class]
 )
 object DamageTypeMappings : Initializable, KoinComponent {
     private const val DAMAGE_TYPE_MAPPINGS_CONFIG_FILE = "damage/damage_type_mappings.yml"
 
-    private val DEFAULT_MAPPING: DamageTypeMapping by ReloadableProperty { DamageTypeMapping(ElementRegistry.DEFAULT, .0, .0) }
+    private val DEFAULT_MAPPING: DamageTypeMapping by ReloadableProperty {
+        DamageTypeMapping(
+            VanillaDamageMetadataBuilder(
+                damageTags = DirectDamageTagsBuilder(emptyList()),
+                criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
+                element = ElementRegistry.DEFAULT
+            )
+        )
+    }
 
     private val MAPPINGS: Reference2ObjectOpenHashMap<DamageType, DamageTypeMapping> = Reference2ObjectOpenHashMap()
 
@@ -57,8 +75,17 @@ object DamageTypeMappings : Initializable, KoinComponent {
             withDefaults()
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_TYPE_MAPPINGS_CONFIG_FILE).bufferedReader() }
             serializers {
+                registerAnnotatedObjects(
+                    ObjectMapper.factoryBuilder()
+                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
+                        .addNodeResolver(NodeResolver.nodeKey())
+                        .addConstraint(Required::class.java, Constraint.required())
+                        .addDiscoverer(dataClassFieldDiscoverer())
+                        .build()
+                )
                 kregister(ElementSerializer)
                 kregister(DamageTypeMappingSerializer)
+                kregister(DamageMetadataBuilderSerializer)
             }
         }.build().load()
 
@@ -90,17 +117,13 @@ object DamageTypeMappings : Initializable, KoinComponent {
 }
 
 data class DamageTypeMapping(
-    val element: Element,
-    val defensePenetration: Double,
-    val defensePenetrationRate: Double,
+    val damageMetadataBuilder: DamageMetadataBuilder<*>
 )
 
 internal object DamageTypeMappingSerializer : TypeSerializer<DamageTypeMapping> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamageTypeMapping {
-        val element = node.node("element").krequire<Element>()
-        val defensePenetration = node.node("defense_penetration").getDouble(0.0)
-        val defensePenetrationRate = node.node("defense_penetration_rate").getDouble(0.0)
-        return DamageTypeMapping(element, defensePenetration, defensePenetrationRate)
+        val damageMetadataBuilder = node.node("damage_metadata").krequire<DamageMetadataBuilder<*>>()
+        return DamageTypeMapping(damageMetadataBuilder)
     }
 
     override fun serialize(type: Type, obj: DamageTypeMapping?, node: ConfigurationNode) {

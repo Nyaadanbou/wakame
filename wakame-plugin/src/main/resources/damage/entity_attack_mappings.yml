@@ -1,55 +1,84 @@
-# 对原版生物攻击的映射
+# 依据原版生物的攻击特征来获取萌芽伤害的映射
+# 当伤害存在直接实体、且直接实体为非玩家生物时调用
 
 #blaze:  # 进行攻击的实体类型
-#  - predicates:  # 判定本次伤害事件相关场景的谓词
+#  mapping_1: # 任意不重复的键
+#    predicates:  # 判定本次伤害事件相关场景的谓词
 #      entity_data:  # 检查攻击实体的特定数据
 #        is_adult: 0  # 攻击实体是否成年, 0表示否, 1表示是, 面对无年龄的实体会不通过
 #        size: 1  # 攻击实体的尺寸, 面对非史莱姆/岩浆怪的实体会不通过
-#        puff_state: 1 # 河豚的碰撞状态, 面对非河豚的实体会不通过
-#      damage_type: # 检查本次伤害的类型, 类型必须是列表其一
+#        puff_state: 1  # 河豚的碰撞状态, 面对非河豚的实体会不通过
+#      damage_type:  # 检查本次伤害的类型, 类型必须是列表其一
 #        - mob_attack
 #        - mob_attack_no_aggro
-#      direct_entity_type: # 检查本次伤害直接实体的类型, 类型必须是列表其一
+#      direct_entity_type:  # 检查本次伤害直接实体的类型, 类型必须是列表其一
 #        - small_fireball
 #        - arrow
-#      victim_entity_type: # 检查本次伤害受伤实体的类型, 类型必须是列表其一
+#      victim_entity_type:  # 检查本次伤害受伤实体的类型, 类型必须是列表其一
 #        - blaze
 #        - cod
-#    direct:  # 本次伤害应使用的DamageMetadata, 有 direct vanilla attribute 三种类型的获取方式 (见下)
+#    damage_metadata:  # 本次伤害应使用的DamageMetadata, type 为 DamageMetadataBuilder 的类型, 类型含义见下
+#      type: direct  # 伤害的所有内容均有配置文件指定, 支持多元素
 #      damage_tags: [ ]
 #      damage_bundle:
 #        neutral:
 #          min: 3.0
 #          max: 3.0
-#          rate: 1.0
-#          defense_penetration: 0.0
-#          defense_penetration_rate: 0.0
+#          rate: 1.0  # 可省略, 默认 1.0
+#          defense_penetration: 0.0  # 可省略, 默认 0.0
+#          defense_penetration_rate: 0.0  # 可省略, 默认 0.0
 #      critical_strike_metadata:
 #        chance: 0.0
-#        positive_power: 1.0
-#        negative_power: 1.0
-#        none_power: 1.0
-#  - predicates:
+#        positive_power: 1.0  # 可省略, 默认 1.0
+#        negative_power: 1.0  # 可省略, 默认 1.0
+#        none_power: 1.0  # 可省略, 默认 1.0
+#  mapping_2:
+#    predicates:
 #      ...
-#    vanilla:  # 基于原版伤害获取, 即简单的给原版伤害加上元素等信息
+#    damage_metadata:
+#      type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
+#      damage_tags: [ ]
+#      element: fire
+#      rate: 1.0  # 可省略, 默认 1.0
+#      defense_penetration: 0.0  # 可省略, 默认 0.0
+#      defense_penetration_rate: 0.0  # 可省略, 默认 0.0
+#      critical_strike_metadata:
+#        chance: 0.0
+#        positive_power: 1.0  # 可省略, 默认 1.0
+#        negative_power: 1.0  # 可省略, 默认 1.0
+#        none_power: 1.0  # 可省略, 默认 1.0
+#  mapping_3:
+#    predicates:
+#      ...
+#    damage_metadata:
+#      type: attribute  # 基于攻击实体的AttributeMap获取
+#      damage_tags: [ ]
+#  mapping_4:
+#    predicates:
+#      ...
+#    damage_metadata:
+#      type: molang  # 基于 Molang 获取
 #      damage_tags: [ ]
 #      damage_bundle:
-#        element: fire
-#        rate: 1.0
-#        defense_penetration: 0.0
-#        defense_penetration_rate: 0.0
+#        neutral:
+#          min: <evaluable>
+#          max: <evaluable>
+#          rate: <evaluable>
+#          defense_penetration: <evaluable>
+#          defense_penetration_rate: <evaluable>
 #      critical_strike_metadata:
-#        chance: 0.0
-#  - predicates:
-#      ...
-#    attribute:  # 基于攻击实体的AttributeMap获取
-#      damage_tags: [ ]
+#        chance: <evaluable>
+#        positive_power: <evaluable>
+#        negative_power: <evaluable>
+#        none_power: <evaluable>
 
 axolotl:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -58,10 +87,12 @@ axolotl:
       critical_strike_metadata:
         chance: 0.0
 bee:
-  - predicates:
+  sting:
+    predicates:
       damage_type:
         - sting
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -70,10 +101,12 @@ bee:
       critical_strike_metadata:
         chance: 0.0
 blaze:
-  - predicates:
+  fireball:
+    predicates:
       direct_entity_type:
         - small_fireball
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -81,10 +114,12 @@ blaze:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -93,10 +128,12 @@ blaze:
       critical_strike_metadata:
         chance: 0.0
 bogged:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -104,10 +141,12 @@ bogged:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -116,10 +155,12 @@ bogged:
       critical_strike_metadata:
         chance: 0.0
 breeze:
-  - predicates:
+  wind_charge:
+    predicates:
       direct_entity_type:
         - breeze_wind_charge
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -128,10 +169,12 @@ breeze:
       critical_strike_metadata:
         chance: 0.0
 cat:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -140,10 +183,12 @@ cat:
       critical_strike_metadata:
         chance: 0.0
 cave_spider:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -152,11 +197,13 @@ cave_spider:
       critical_strike_metadata:
         chance: 0.0
 creeper:
-  - predicates:
+  self_explore:
+    predicates:
       damage_type:
         - explosion
         - player_explosion
-    vanilla:
+    damage_metadata:
+      type: vanilla
       damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
@@ -164,10 +211,12 @@ creeper:
       critical_strike_metadata:
         chance: 0.0
 dolphin:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -176,10 +225,12 @@ dolphin:
       critical_strike_metadata:
         chance: 0.0
 drowned:
-  - predicates:
+  trident:
+    predicates:
       direct_entity_type:
         - trident
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -187,10 +238,12 @@ drowned:
           max: 12
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -199,10 +252,12 @@ drowned:
       critical_strike_metadata:
         chance: 0.0
 elder_guardian:
-  - predicates:
+  laser:
+    predicates:
       damage_type:
         - indirect_magic
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -210,10 +265,12 @@ elder_guardian:
           max: 12.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  spikes:
+    predicates:
       damage_type:
         - thorns
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -223,10 +280,12 @@ elder_guardian:
         chance: 0.0
 # 末影龙数据与原版有些不一致
 ender_dragon:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -234,10 +293,12 @@ ender_dragon:
           max: 15.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  dragon_breath:
+    predicates:
       damage_type:
         - indirect_magic
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -246,10 +307,12 @@ ender_dragon:
       critical_strike_metadata:
         chance: 0.0
 enderman:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -258,10 +321,12 @@ enderman:
       critical_strike_metadata:
         chance: 0.0
 endermite:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -270,10 +335,12 @@ endermite:
       critical_strike_metadata:
         chance: 0.0
 evoker:
-  - predicates:
+  fang:
+    predicates:
       damage_type:
         - indirect_magic
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -282,10 +349,12 @@ evoker:
       critical_strike_metadata:
         chance: 0.0
 fox:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -294,10 +363,12 @@ fox:
       critical_strike_metadata:
         chance: 0.0
 frog:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -306,23 +377,27 @@ frog:
       critical_strike_metadata:
         chance: 0.0
 ghast:
-  - predicates:
+  fireball_explosion:
+    predicates:
       damage_type:
         - explosion
         - player_explosion
       direct_entity_type:
         - fireball
-    vanilla:
+    damage_metadata:
+      type: vanilla
       damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  fireball:
+    predicates:
       direct_entity_type:
         - fireball
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -331,10 +406,12 @@ ghast:
       critical_strike_metadata:
         chance: 0.0
 giant:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -343,12 +420,14 @@ giant:
       critical_strike_metadata:
         chance: 0.0
 goat:
-  - predicates:
+  adult_melee:
+    predicates:
       entity_data:
         adult: 1
       damage_type:
         - mob_attack_no_aggro
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -356,12 +435,14 @@ goat:
           max: 3.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  baby_melee:
+    predicates:
       entity_data:
         adult: 0
       damage_type:
         - mob_attack_no_aggro
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -370,10 +451,12 @@ goat:
       critical_strike_metadata:
         chance: 0.0
 guardian:
-  - predicates:
+  laser:
+    predicates:
       damage_type:
         - indirect_magic
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -381,10 +464,12 @@ guardian:
           max: 9.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  spikes:
+    predicates:
       damage_type:
         - thorns
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -393,12 +478,14 @@ guardian:
       critical_strike_metadata:
         chance: 0.0
 hoglin:
-  - predicates:
+  adult_melee:
+    predicates:
       entity_data:
         adult: 1
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -406,12 +493,14 @@ hoglin:
           max: 12.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  baby_melee:
+    predicates:
       entity_data:
         adult: 0
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -420,10 +509,12 @@ hoglin:
       critical_strike_metadata:
         chance: 0.0
 husk:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -432,10 +523,12 @@ husk:
       critical_strike_metadata:
         chance: 0.0
 illusioner:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -444,10 +537,12 @@ illusioner:
       critical_strike_metadata:
         chance: 0.0
 iron_golem:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -456,10 +551,12 @@ iron_golem:
       critical_strike_metadata:
         chance: 0.0
 llama:
-  - predicates:
+  spit:
+    predicates:
       direct_entity_type:
         - llama_spit
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -468,10 +565,12 @@ llama:
       critical_strike_metadata:
         chance: 0.0
 magma_cube:
-  - predicates:
+  size_1_melee:
+    predicates:
       entity_data:
         size: 1
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -479,10 +578,12 @@ magma_cube:
           max: 3.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  size_2_melee:
+    predicates:
       entity_data:
         size: 2
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -490,10 +591,12 @@ magma_cube:
           max: 6.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  size_4_melee:
+    predicates:
       entity_data:
         size: 4
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -502,10 +605,12 @@ magma_cube:
       critical_strike_metadata:
         chance: 0.0
 ocelot:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -514,10 +619,12 @@ ocelot:
       critical_strike_metadata:
         chance: 0.0
 panda:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -526,10 +633,12 @@ panda:
       critical_strike_metadata:
         chance: 0.0
 phantom:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -538,10 +647,12 @@ phantom:
       critical_strike_metadata:
         chance: 0.0
 piglin:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -549,10 +660,22 @@ piglin:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  firework:
+    predicates:
+      direct_entity_type:
+        - firework_rocket
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -561,10 +684,12 @@ piglin:
       critical_strike_metadata:
         chance: 0.0
 piglin_brute:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -573,10 +698,12 @@ piglin_brute:
       critical_strike_metadata:
         chance: 0.0
 pillager:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -584,11 +711,23 @@ pillager:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
+  firework:
+    predicates:
+      direct_entity_type:
+        - firework_rocket
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
 polar_bear:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -597,10 +736,12 @@ polar_bear:
       critical_strike_metadata:
         chance: 0.0
 pufferfish:
-  - predicates:
+  puff_2_melee:
+    predicates:
       entity_data:
         puff_state: 2
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -608,10 +749,12 @@ pufferfish:
           max: 4.5
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  puff_1_melee:
+    predicates:
       entity_data:
         puff_state: 1
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -620,10 +763,12 @@ pufferfish:
       critical_strike_metadata:
         chance: 0.0
 rabbit:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -633,10 +778,12 @@ rabbit:
         chance: 0.0
 # 劫掠兽无法区分普通近战和吼叫
 ravager:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -645,10 +792,12 @@ ravager:
       critical_strike_metadata:
         chance: 0.0
 shulker:
-  - predicates:
+  bullet:
+    predicates:
       direct_entity_type:
         - shulker_bullet
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -657,10 +806,12 @@ shulker:
       critical_strike_metadata:
         chance: 0.0
 silverfish:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -669,10 +820,12 @@ silverfish:
       critical_strike_metadata:
         chance: 0.0
 skeleton:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -680,10 +833,12 @@ skeleton:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -692,10 +847,12 @@ skeleton:
       critical_strike_metadata:
         chance: 0.0
 slime:
-  - predicates:
+  size_2_melee:
+    predicates:
       entity_data:
         size: 2
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -703,10 +860,12 @@ slime:
           max: 3.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  size_4_melee:
+    predicates:
       entity_data:
         size: 4
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -715,12 +874,14 @@ slime:
       critical_strike_metadata:
         chance: 0.0
 snow_golem:
-  - predicates:
+  snow_ball_to_blaze:
+    predicates:
       direct_entity_type:
         - snowball
       victim_entity_type:
         - blaze
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -728,10 +889,12 @@ snow_golem:
           max: 3.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  snowball_to_other:
+    predicates:
       direct_entity_type:
         - snowball
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -740,10 +903,12 @@ snow_golem:
       critical_strike_metadata:
         chance: 0.0
 spider:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -752,10 +917,12 @@ spider:
       critical_strike_metadata:
         chance: 0.0
 stray:
-  - predicates:
+  arrow:
+    predicates:
       direct_entity_type:
         - arrow
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -763,10 +930,12 @@ stray:
           max: 5.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -775,10 +944,12 @@ stray:
       critical_strike_metadata:
         chance: 0.0
 trader_llama:
-  - predicates:
+  spit:
+    predicates:
       direct_entity_type:
         - llama_spit
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -787,10 +958,12 @@ trader_llama:
       critical_strike_metadata:
         chance: 0.0
 vex:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -798,11 +971,24 @@ vex:
           max: 13.5
       critical_strike_metadata:
         chance: 0.0
+villager:
+  firework:
+    predicates:
+      direct_entity_type:
+        - firework_rocket
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
 vindicator:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -811,10 +997,12 @@ vindicator:
       critical_strike_metadata:
         chance: 0.0
 warden:
-  - predicates:
+  sonic_boom:
+    predicates:
       damage_type:
         - sonic_boom
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -822,10 +1010,12 @@ warden:
           max: 15.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -834,10 +1024,12 @@ warden:
       critical_strike_metadata:
         chance: 0.0
 witch:
-  - predicates:
+  potion:
+    predicates:
       damage_type:
         - indirect_magic
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -846,23 +1038,27 @@ witch:
       critical_strike_metadata:
         chance: 0.0
 wither:
-  - predicates:
+  skull_explore:
+    predicates:
       damage_type:
         - explosion
         - player_explosion
       direct_entity_type:
         - wither_skull
-    vanilla:
+    damage_metadata:
+      type: vanilla
       damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  skull:
+    predicates:
       direct_entity_type:
         - wither_skull
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -870,11 +1066,13 @@ wither:
           max: 12.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  self_explore:
+    predicates:
       damage_type:
         - explosion
         - player_explosion
-    vanilla:
+    damage_metadata:
+      type: vanilla
       damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
@@ -882,10 +1080,12 @@ wither:
       critical_strike_metadata:
         chance: 0.0
 wither_skeleton:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -894,10 +1094,12 @@ wither_skeleton:
       critical_strike_metadata:
         chance: 0.0
 wolf:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -906,12 +1108,14 @@ wolf:
       critical_strike_metadata:
         chance: 0.0
 zoglin:
-  - predicates:
+  adult_melee:
+    predicates:
       entity_data:
         adult: 1
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -919,12 +1123,14 @@ zoglin:
           max: 12.0
       critical_strike_metadata:
         chance: 0.0
-  - predicates:
+  baby_melee:
+    predicates:
       entity_data:
         adult: 0
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -933,10 +1139,12 @@ zoglin:
       critical_strike_metadata:
         chance: 0.0
 zombie:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -945,10 +1153,12 @@ zombie:
       critical_strike_metadata:
         chance: 0.0
 zombified_piglin:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:
@@ -957,10 +1167,12 @@ zombified_piglin:
       critical_strike_metadata:
         chance: 0.0
 zombie_villager:
-  - predicates:
+  melee:
+    predicates:
       damage_type:
         - mob_attack
-    direct:
+    damage_metadata:
+      type: direct
       damage_tags: [ ]
       damage_bundle:
         neutral:

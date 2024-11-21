@@ -1,19 +1,30 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
+import org.bukkit.event.entity.EntityDamageEvent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.serialize.SerializationException
+import org.spongepowered.configurate.serialize.TypeSerializer
 import team.unnamed.mocha.MochaEngine
+import java.lang.reflect.Type
 import kotlin.math.absoluteValue
 import kotlin.random.Random
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 //<editor-fold desc="CriticalStrikeMetadata">
 /**
@@ -137,32 +148,49 @@ object EntityDamageMetadata {
 }
 //</editor-fold>
 
-//<editor-fold desc="DamageMetadata Serializable">
+//<editor-fold desc="DamageMetadata Builder">
 /**
- * 标记接口.
+ * 从配置文件反序列化得到的能够构建 [DamageMetadata] 的构造器.
  */
-sealed interface DamageMetadataSerializable<T> {
-    val damageTags: DamageTagsSerializable
+sealed interface DamageMetadataBuilder<T> {
+    val damageTags: DamageTagsBuilder
+
+    fun build(event: EntityDamageEvent): DamageMetadata
 }
 
-interface DamageTagsSerializable {
+/**
+ * 从配置文件反序列化得到的能够构建 [DamageTags] 的构造器.
+ */
+interface DamageTagsBuilder {
     val damageTags: List<DamageTag>
+
+    fun build(): DamageTags
 }
 
-interface DamagePacketSerializable<T> {
+/**
+ * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
+ */
+interface DamagePacketBuilder<T> {
     val element: String
     val min: T
     val max: T
     val rate: T
     val defensePenetration: T
     val defensePenetrationRate: T
+
+    fun build(): DamagePacket
 }
 
-interface CriticalStrikeMetadataSerializable<T> {
+/**
+ * 从配置文件反序列化得到的能够构建 [CriticalStrikeMetadata] 的构造器.
+ */
+interface CriticalStrikeMetadataBuilder<T> {
     val chance: T
     val positivePower: T
     val negativePower: T
     val nonePower: T
+
+    fun build(): CriticalStrikeMetadata
 }
 
 ////// Direct
@@ -170,23 +198,28 @@ interface CriticalStrikeMetadataSerializable<T> {
  * 配置文件 **直接** 指定全部内容的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-data class DirectDamageMetadataSerializable(
+data class DirectDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsSerializable,
+    override val damageTags: DirectDamageTagsBuilder,
     @Required
-    val damageBundle: Map<String, DirectDamagePacketSerializable>,
+    val damageBundle: Map<String, DirectDamagePacketBuilder>,
     @Required
-    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
-) : DamageMetadataSerializable<Double> {
-    fun decode(): DamageMetadata {
-        val damageTags = damageTags.decode()
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
+) : DamageMetadataBuilder<Double> {
+
+    override fun build(event: EntityDamageEvent): DamageMetadata {
+        return build()
+    }
+
+    fun build(): DamageMetadata {
+        val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
             val element0 = ElementRegistry.INSTANCES[element]
-            val packet0 = packet.decode()
+            val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
-        val criticalStrikeMetadata = criticalStrikeMetadata.decode()
+        val criticalStrikeMetadata = criticalStrikeMetadata.build()
         return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
     }
 }
@@ -197,45 +230,54 @@ data class DirectDamageMetadataSerializable(
  * 用于爆炸等伤害由原版决定的地方.
  */
 @ConfigSerializable
-data class VanillaValueDamageMetadataSerializable(
+data class VanillaDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsSerializable,
+    override val damageTags: DirectDamageTagsBuilder,
     @Required
-    val criticalStrikeMetadata: DirectCriticalStrikeMetadataSerializable,
+    val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
     val element: Element,
     val rate: Double = 1.0,
     val defensePenetration: Double = 0.0,
     val defensePenetrationRate: Double = 0.0,
-) : DamageMetadataSerializable<Double> {
-    fun decode(damageValue: Double): DamageMetadata {
-        val damageTags = damageTags.decode()
+) : DamageMetadataBuilder<Double> {
+
+    override fun build(event: EntityDamageEvent): DamageMetadata {
+        val damageTags = damageTags.build()
         val damageBundle = damageBundle {
             single(element) {
-                min(damageValue)
-                max(damageValue)
+                min(event.damage)
+                max(event.damage)
                 rate(rate)
                 defensePenetration(defensePenetration)
                 defensePenetrationRate(defensePenetrationRate)
             }
         }
-        val criticalStrikeMetadata = criticalStrikeMetadata.decode()
+        val criticalStrikeMetadata = criticalStrikeMetadata.build()
         return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
     }
 }
 
 /**
- * 依赖实体的 [cc.mewcraft.wakame.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
+ * 依赖攻击实体的 [cc.mewcraft.wakame.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-data class AttributeMapDamageMetadataSerializable(
+data class AttributeDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsSerializable,
-) : DamageMetadataSerializable<Double> {
-    fun decode(attributeMap: AttributeMap): DamageMetadata {
-        val damageTags = damageTags.decode()
+    override val damageTags: DirectDamageTagsBuilder,
+) : DamageMetadataBuilder<Double>, KoinComponent {
+    private val attributeMapAccess: AttributeMapAccess = get()
+
+    override fun build(event: EntityDamageEvent): DamageMetadata {
+        val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
+            "Failed to build damage metadata by attribute map because the damager is null"
+        )
+        val attributeMap = attributeMapAccess.get(damager).getOrElse {
+            error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
+        }
+        val damageTags = damageTags.build()
         val damageBundle = damageBundle(attributeMap) {
             every { standard() }
         }
@@ -245,17 +287,18 @@ data class AttributeMapDamageMetadataSerializable(
 }
 
 @ConfigSerializable
-data class DirectDamageTagsSerializable(
+data class DirectDamageTagsBuilder(
     @Required
     override val damageTags: List<DamageTag>,
-) : DamageTagsSerializable {
-    fun decode(): DamageTags {
+) : DamageTagsBuilder {
+
+    override fun build(): DamageTags {
         return DamageTags(damageTags)
     }
 }
 
 @ConfigSerializable
-data class DirectDamagePacketSerializable(
+data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
     override val element: String,
@@ -266,50 +309,57 @@ data class DirectDamagePacketSerializable(
     override val rate: Double = 1.0,
     override val defensePenetration: Double = 0.0,
     override val defensePenetrationRate: Double = 0.0,
-) : DamagePacketSerializable<Double> {
-    fun decode(): DamagePacket {
+) : DamagePacketBuilder<Double> {
+
+    override fun build(): DamagePacket {
         val element = ElementRegistry.INSTANCES[element]
         return DamagePacket(element, min, max, rate, defensePenetration, defensePenetrationRate)
     }
 }
 
 @ConfigSerializable
-data class DirectCriticalStrikeMetadataSerializable(
+data class DirectCriticalStrikeMetadataBuilder(
     override val chance: Double = 0.0,
     override val positivePower: Double = 1.0,
     override val negativePower: Double = 1.0,
     override val nonePower: Double = 1.0,
-) : CriticalStrikeMetadataSerializable<Double> {
-    fun decode(): CriticalStrikeMetadata {
+) : CriticalStrikeMetadataBuilder<Double> {
+
+    override fun build(): CriticalStrikeMetadata {
         return CriticalStrikeMetadata(chance, positivePower, negativePower, nonePower)
     }
 }
 
 ////// Molang
 @ConfigSerializable
-data class MolangDamageMetadataSerializable(
+data class MolangDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsSerializable,
+    override val damageTags: DirectDamageTagsBuilder,
     @Required
-    val damageBundle: Map<String, MolangDamagePacketSerializable>,
+    val damageBundle: Map<String, MolangDamagePacketBuilder>,
     @Required
-    val criticalStrikeMetadata: MolangCriticalStrikeMetadataSerializable,
-) : DamageMetadataSerializable<Evaluable<*>> {
-    fun decode(engine: MochaEngine<*>): DamageMetadata {
-        val damageTags = damageTags.decode()
+    val criticalStrikeMetadata: MolangCriticalStrikeMetadataBuilder,
+) : DamageMetadataBuilder<Evaluable<*>> {
+
+    override fun build(event: EntityDamageEvent): DamageMetadata {
+        return build()
+    }
+
+    fun build(): DamageMetadata {
+        val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
             val element0 = ElementRegistry.INSTANCES[element]
-            val packet0 = packet.decode(engine)
+            val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
-        val criticalStrikeState = criticalStrikeMetadata.decode(engine)
+        val criticalStrikeState = criticalStrikeMetadata.build()
         return DamageMetadata(damageTags, damageBundle, criticalStrikeState)
     }
 }
 
 @ConfigSerializable
-data class MolangDamagePacketSerializable(
+data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
     override val element: String,
@@ -323,8 +373,9 @@ data class MolangDamagePacketSerializable(
     override val defensePenetration: Evaluable<*>,
     @Required
     override val defensePenetrationRate: Evaluable<*>,
-) : DamagePacketSerializable<Evaluable<*>> {
-    fun decode(engine: MochaEngine<*>): DamagePacket {
+) : DamagePacketBuilder<Evaluable<*>> {
+    override fun build(): DamagePacket {
+        val engine = MochaEngine.createStandard()
         val element = ElementRegistry.INSTANCES[element]
         val min = min.evaluate(engine)
         val max = max.evaluate(engine)
@@ -336,7 +387,7 @@ data class MolangDamagePacketSerializable(
 }
 
 @ConfigSerializable
-data class MolangCriticalStrikeMetadataSerializable(
+data class MolangCriticalStrikeMetadataBuilder(
     @Required
     override val chance: Evaluable<*>,
     @Required
@@ -345,8 +396,9 @@ data class MolangCriticalStrikeMetadataSerializable(
     override val negativePower: Evaluable<*>,
     @Required
     override val nonePower: Evaluable<*>,
-) : CriticalStrikeMetadataSerializable<Evaluable<*>> {
-    fun decode(engine: MochaEngine<*>): CriticalStrikeMetadata {
+) : CriticalStrikeMetadataBuilder<Evaluable<*>> {
+    override fun build(): CriticalStrikeMetadata {
+        val engine = MochaEngine.createStandard()
         return CriticalStrikeMetadata(
             chance.evaluate(engine),
             positivePower.evaluate(engine),
@@ -356,3 +408,22 @@ data class MolangCriticalStrikeMetadataSerializable(
     }
 }
 //</editor-fold>
+
+internal object DamageMetadataBuilderSerializer : TypeSerializer<DamageMetadataBuilder<*>> {
+    private val TYPE_MAPPING: Map<String, KType> = mapOf(
+        "direct" to typeOf<DirectDamageMetadataBuilder>(),
+        "vanilla" to typeOf<VanillaDamageMetadataBuilder>(),
+        "attribute" to typeOf<AttributeDamageMetadataBuilder>(),
+        "molang" to typeOf<MolangDamageMetadataBuilder>(),
+    )
+
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageMetadataBuilder<*> {
+        val key = node.node("type").getString("null")
+        val kType = TYPE_MAPPING[key] ?: throw SerializationException("Unknown damage metadata builder type: '$key'")
+        return node.krequire(kType)
+    }
+
+    override fun serialize(type: Type, obj: DamageMetadataBuilder<*>?, node: ConfigurationNode) {
+        throw UnsupportedOperationException()
+    }
+}

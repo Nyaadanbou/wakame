@@ -16,7 +16,9 @@ import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemBehaviorListener
+import cc.mewcraft.wakame.item.ItemChangeListener
+import cc.mewcraft.wakame.item.ItemMiscellaneousListener
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelListener
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
@@ -30,16 +32,23 @@ import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import com.github.shynixn.mccoroutine.bukkit.launch
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
-import org.bukkit.event.*
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 /**
  * @see Initializable
@@ -111,7 +120,6 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
-        saveResource(DAMAGE_GLOBAL_CONFIG_FILE)
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
@@ -120,6 +128,7 @@ object Initializer : KoinComponent, Listener {
         saveResource(RARITY_GLOBAL_CONFIG_FILE)
         saveResourceRecursively("renderers")
         saveResourceRecursively("station")
+        saveResourceRecursively("damage")
         // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 

@@ -2,10 +2,7 @@ package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.damage.DamageType
-import org.bukkit.entity.Ageable
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.PufferFish
-import org.bukkit.entity.Slime
+import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -31,34 +28,32 @@ data class EntityDataPredicate(
     companion object {
         const val TYPE_KEY = "entity_data"
 
-        val map: Map<String, (Int, EntityDamageEvent) -> Boolean> = mapOf(
+        val map: Map<String, (Int, LivingEntity) -> Boolean> = mapOf(
             "is_adult" to ::testIsAdult,
             "size" to ::testSize,
             "puff_state" to ::testPuffState,
         )
 
-        private fun testIsAdult(value: Int, event: EntityDamageEvent): Boolean {
-            val entity = event.entity
+        private fun testIsAdult(value: Int, entity: LivingEntity): Boolean {
             if (entity !is Ageable) return false
             return (value > 0) == entity.isAdult
         }
 
-        private fun testSize(value: Int, event: EntityDamageEvent): Boolean {
-            val entity = event.entity
+        private fun testSize(value: Int, entity: LivingEntity): Boolean {
             if (entity !is Slime) return false
             return value == entity.size
         }
 
-        private fun testPuffState(value: Int, event: EntityDamageEvent): Boolean {
-            val entity = event.entity
+        private fun testPuffState(value: Int, entity: LivingEntity): Boolean {
             if (entity !is PufferFish) return false
             return value == entity.puffState
         }
     }
 
     override fun test(event: EntityDamageEvent): Boolean {
+        val damager = event.damageSource.causingEntity as? LivingEntity ?: return false
         requiredData.forEach { (str, i) ->
-            if (map[str]?.invoke(i, event) != true) return false
+            if (map[str]?.invoke(i, damager) != true) return false
         }
         return true
     }
@@ -78,6 +73,22 @@ data class DamageTypePredicate(
         return types.contains(event.damageSource.damageType)
     }
 
+}
+
+/**
+ * 检查来源实体类型的谓词.
+ */
+data class CausingEntityTypePredicate(
+    val types: List<EntityType>
+) : DamagePredicate {
+    companion object {
+        const val TYPE_KEY = "causing_entity_type"
+    }
+
+    override fun test(event: EntityDamageEvent): Boolean {
+        val directEntity = event.damageSource.causingEntity ?: return false
+        return types.contains(directEntity.type)
+    }
 }
 
 /**
@@ -130,6 +141,11 @@ internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
                 return DamageTypePredicate(damageTypes)
             }
 
+            CausingEntityTypePredicate.TYPE_KEY -> {
+                val entityTypes = node.getList<EntityType>(emptyList())
+                return CausingEntityTypePredicate(entityTypes)
+            }
+
             DirectEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
                 return DirectEntityTypePredicate(entityTypes)
@@ -141,7 +157,7 @@ internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
             }
 
             else -> {
-                throw SerializationException("Unknown type: '$key'")
+                throw SerializationException("Unknown damage predicate type: '$key'")
             }
         }
     }
