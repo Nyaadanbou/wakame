@@ -261,8 +261,8 @@ elder_guardian:
       damage_tags: [ ]
       damage_bundle:
         neutral:
-          min: 12.0
-          max: 12.0
+          min: 7.5
+          max: 7.5
       critical_strike_metadata:
         chance: 0.0
   spikes:
@@ -276,6 +276,19 @@ elder_guardian:
         neutral:
           min: 3.0
           max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
+  melee:
+    predicates:
+      damage_type:
+        - mob_attack
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 12.0
+          max: 12.0
       critical_strike_metadata:
         chance: 0.0
 # 末影龙数据与原版有些不一致
@@ -460,8 +473,8 @@ guardian:
       damage_tags: [ ]
       damage_bundle:
         neutral:
-          min: 9.0
-          max: 9.0
+          min: 4.5
+          max: 4.5
       critical_strike_metadata:
         chance: 0.0
   spikes:
@@ -475,6 +488,19 @@ guardian:
         neutral:
           min: 3.0
           max: 3.0
+      critical_strike_metadata:
+        chance: 0.0
+  melee:
+    predicates:
+      damage_type:
+        - mob_attack
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral:
+          min: 9.0
+          max: 9.0
       critical_strike_metadata:
         chance: 0.0
 hoglin:
