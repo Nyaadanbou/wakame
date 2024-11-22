@@ -122,7 +122,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
         when (causingEntity) {
             // 无来源实体
             null -> {
-                if (DAMAGE_DIRECT_ENTITY_TYPES.contains(directEntity.type)) {
+                if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
                     // 使用默认
                     return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
                 } else {
@@ -136,9 +136,9 @@ object DamageManager : DamageManagerApi, KoinComponent {
                 // 查找弹射物是否被记录, 尝试返回记录的值
                 // 箭矢和三叉戟的伤害和词条栏有关, 会被记录
                 // 没有记录则使用默认
-                if (MARK_PROJECTILE_TYPES.contains(directEntity.type)) {
+                if (directEntity.type in MARK_PROJECTILE_TYPES) {
                     return findProjectileDamageMetadata(directEntity.uniqueId) ?: buildDirectEntityDamageMetadataByDefault(directEntity, event, true)
-                } else if (DAMAGE_DIRECT_ENTITY_TYPES.contains(directEntity.type)) {
+                } else if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
                     return buildDirectEntityDamageMetadataByDefault(directEntity, event, true)
                 }
 
@@ -244,7 +244,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
      */
     private fun buildDirectEntityDamageMetadataByDefault(directEntity: Entity, event: EntityDamageEvent, forPlayer: Boolean): DamageMetadata {
         val entityType = directEntity.type
-        if (arrowTypes.contains(entityType)) {
+        if (entityType in arrowTypes) {
             val damageBundle = buildArrowDamageBundleByCells(directEntity as AbstractArrow)
             if (damageBundle != null) {
                 return VanillaDamageMetadata(damageBundle)
