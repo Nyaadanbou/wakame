@@ -37,9 +37,9 @@ class EntityDefenseMetadata(
         )
 
         // 依次考虑防御力、元素伤害倍率、百分比伤害修正、暴击倍率
-        val criticalPower = if (damageMetadata.criticalStrikeMetadata.state == CriticalStrikeState.NONE) 1.0 else damageMetadata.criticalStrikeMetadata.power
+        val criticalStrikeMetadata = damageMetadata.criticalStrikeMetadata
         val incomingDamageRate = damageeAttributeMap.getValue(Attributes.INCOMING_DAMAGE_RATE.of(element))
 
-        return (damageAfterDefense * packet.rate * incomingDamageRate * criticalPower).coerceAtLeast(if (packet.damageValue() > 0) 1.0 else 0.0)
+        return (damageAfterDefense * packet.rate * incomingDamageRate * criticalStrikeMetadata.power).coerceAtLeast(if (packet.damageValue() > 0) 1.0 else 0.0)
     }
 }
