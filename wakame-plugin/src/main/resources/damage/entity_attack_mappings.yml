@@ -1,76 +1,79 @@
-# 依据原版生物的攻击特征来获取萌芽伤害的映射
-# 当伤害存在直接实体、且直接实体为非玩家生物时调用
+# 映射:
+# 原版生物的攻击特征 -> 萌芽伤害
+#
+# 何时使用?
+# 当伤害存在直接实体、且直接实体为非玩家生物时调用.
 
-#blaze:  # 进行攻击的实体类型
-#  mapping_1: # 任意不重复的键
-#    predicates:  # 判定本次伤害事件相关场景的谓词
-#      entity_data:  # 检查攻击实体的特定数据
-#        is_adult: 0  # 攻击实体是否成年, 0表示否, 1表示是, 面对无年龄的实体会不通过
-#        size: 1  # 攻击实体的尺寸, 面对非史莱姆/岩浆怪的实体会不通过
-#        puff_state: 1  # 河豚的碰撞状态, 面对非河豚的实体会不通过
-#      damage_type:  # 检查本次伤害的类型, 类型必须是列表其一
-#        - mob_attack
-#        - mob_attack_no_aggro
-#      direct_entity_type:  # 检查本次伤害直接实体的类型, 类型必须是列表其一
-#        - small_fireball
-#        - arrow
-#      victim_entity_type:  # 检查本次伤害受伤实体的类型, 类型必须是列表其一
-#        - blaze
-#        - cod
-#    damage_metadata:  # 本次伤害应使用的DamageMetadata, type 为 DamageMetadataBuilder 的类型, 类型含义见下
-#      type: direct  # 伤害的所有内容均有配置文件指定, 支持多元素
-#      damage_tags: [ ]
-#      damage_bundle:
-#        neutral:
-#          min: 3.0
-#          max: 3.0
-#          rate: 1.0  # 可省略, 默认 1.0
-#          defense_penetration: 0.0  # 可省略, 默认 0.0
-#          defense_penetration_rate: 0.0  # 可省略, 默认 0.0
-#      critical_strike_metadata:
-#        chance: 0.0
-#        positive_power: 1.0  # 可省略, 默认 1.0
-#        negative_power: 1.0  # 可省略, 默认 1.0
-#        none_power: 1.0  # 可省略, 默认 1.0
-#  mapping_2:
-#    predicates:
-#      ...
-#    damage_metadata:
-#      type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
-#      damage_tags: [ ]
-#      element: fire
-#      rate: 1.0  # 可省略, 默认 1.0
-#      defense_penetration: 0.0  # 可省略, 默认 0.0
-#      defense_penetration_rate: 0.0  # 可省略, 默认 0.0
-#      critical_strike_metadata:
-#        chance: 0.0
-#        positive_power: 1.0  # 可省略, 默认 1.0
-#        negative_power: 1.0  # 可省略, 默认 1.0
-#        none_power: 1.0  # 可省略, 默认 1.0
-#  mapping_3:
-#    predicates:
-#      ...
-#    damage_metadata:
-#      type: attribute  # 基于攻击实体的AttributeMap获取
-#      damage_tags: [ ]
-#  mapping_4:
-#    predicates:
-#      ...
-#    damage_metadata:
-#      type: molang  # 基于 Molang 获取
-#      damage_tags: [ ]
-#      damage_bundle:
-#        neutral:
-#          min: <evaluable>
-#          max: <evaluable>
-#          rate: <evaluable>
-#          defense_penetration: <evaluable>
-#          defense_penetration_rate: <evaluable>
-#      critical_strike_metadata:
-#        chance: <evaluable>
-#        positive_power: <evaluable>
-#        negative_power: <evaluable>
-#        none_power: <evaluable>
+#  blaze:  # 进行攻击的实体类型
+#    映射_a: # 任意不重复的键
+#      predicates:  # 判定本次伤害事件相关场景的谓词
+#        entity_data:  # 检查攻击实体的特定数据
+#          is_adult: 0  # 攻击实体是否成年, 0表示否, 1表示是, 面对无年龄的实体会不通过
+#          size: 1  # 攻击实体的尺寸, 面对非史莱姆/岩浆怪的实体会不通过
+#          puff_state: 1  # 河豚的碰撞状态, 面对非河豚的实体会不通过
+#        damage_type:  # 检查本次伤害的类型, 类型必须是列表其一
+#          - mob_attack
+#          - mob_attack_no_aggro
+#        direct_entity_type:  # 检查本次伤害直接实体的类型, 类型必须是列表其一
+#          - small_fireball
+#          - arrow
+#        victim_entity_type:  # 检查本次伤害受伤实体的类型, 类型必须是列表其一
+#          - blaze
+#          - cod
+#      damage_metadata:  # 本次伤害应使用的 DamageMetadata, type 为 DamageMetadataBuilder 的类型, 类型含义见下
+#        type: direct  # 伤害的所有内容均有配置文件指定, 支持多元素
+#        damage_tags: [ ]
+#        damage_bundle:
+#          neutral:
+#            min: 3.0
+#            max: 3.0
+#            rate: 1.0  # 可省略, 默认 1.0
+#            defense_penetration: 0.0  # 可省略, 默认 0.0
+#            defense_penetration_rate: 0.0  # 可省略, 默认 0.0
+#        critical_strike_metadata:
+#          chance: 0.0
+#          positive_power: 1.0  # 可省略, 默认 1.0
+#          negative_power: 1.0  # 可省略, 默认 1.0
+#          none_power: 1.0  # 可省略, 默认 1.0
+#    映射_b:
+#      predicates:
+#        ...
+#      damage_metadata:
+#        type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
+#        damage_tags: [ ]
+#        element: fire
+#        rate: 1.0  # 可省略, 默认 1.0
+#        defense_penetration: 0.0  # 可省略, 默认 0.0
+#        defense_penetration_rate: 0.0  # 可省略, 默认 0.0
+#        critical_strike_metadata:
+#          chance: 0.0
+#          positive_power: 1.0  # 可省略, 默认 1.0
+#          negative_power: 1.0  # 可省略, 默认 1.0
+#          none_power: 1.0  # 可省略, 默认 1.0
+#    映射_c:
+#      predicates:
+#        ...
+#      damage_metadata:
+#        type: attribute  # 基于攻击实体的 AttributeMap 获取
+#        damage_tags: [ ]
+#    映射_d:
+#      predicates:
+#        ...
+#      damage_metadata:
+#        type: molang  # 基于 Molang 获取
+#        damage_tags: [ ]
+#        damage_bundle:
+#          neutral:
+#            min: <evaluable>
+#            max: <evaluable>
+#            rate: <evaluable>
+#            defense_penetration: <evaluable>
+#            defense_penetration_rate: <evaluable>
+#        critical_strike_metadata:
+#          chance: <evaluable>
+#          positive_power: <evaluable>
+#          negative_power: <evaluable>
+#          none_power: <evaluable>
 
 axolotl:
   melee:
