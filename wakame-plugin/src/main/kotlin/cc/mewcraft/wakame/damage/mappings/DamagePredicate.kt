@@ -29,7 +29,7 @@ data class EntityDataPredicate(
         const val TYPE_KEY = "entity_data"
 
         val map: Map<String, (Int, LivingEntity) -> Boolean> = mapOf(
-            "is_adult" to ::testIsAdult,
+            "adult" to ::testAdult,
             "size" to ::testSize,
             "puff_state" to ::testPuffState,
         )
