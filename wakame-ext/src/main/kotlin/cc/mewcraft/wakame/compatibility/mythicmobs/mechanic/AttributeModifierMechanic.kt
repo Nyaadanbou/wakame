@@ -36,7 +36,7 @@ class AttributeModifierMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), .0, *emptyArray())
     private val operation: AttributeModifier.Operation = mlc.getEnum(arrayOf("operation", "op"), AttributeModifier.Operation::class.java, AttributeModifier.Operation.ADD)
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *emptyArray())
-    private val replace: Boolean = mlc.getBoolean(arrayOf("replace", "r"), false)
+    private val replace: Boolean = mlc.getBoolean(arrayOf("replace", "r"), true)
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
