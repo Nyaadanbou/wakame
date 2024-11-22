@@ -36,6 +36,7 @@ class AttributeModifierMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), .0, *emptyArray())
     private val operation: AttributeModifier.Operation = mlc.getEnum(arrayOf("operation", "op"), AttributeModifier.Operation::class.java, AttributeModifier.Operation.ADD)
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *emptyArray())
+    private val replace: Boolean = mlc.getBoolean(arrayOf("replace", "r"), false)
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
@@ -60,8 +61,14 @@ class AttributeModifierMechanic(
     private fun addModifierAndScheduleRemoval(attributeInstance: AttributeInstance, modifier: AttributeModifier, duration: Int, isPlayer: Boolean) {
         if (isPlayer) {
             // 给玩家添加临时的属性修饰符, 避免属性意外永久驻留在玩家存档里
+            if (replace) {
+                attributeInstance.removeModifier(modifier.id)
+            }
             attributeInstance.addTransientModifier(modifier)
         } else {
+            if (replace) {
+                attributeInstance.removeModifier(modifier.id)
+            }
             attributeInstance.addModifier(modifier)
         }
         if (duration > 0) {
