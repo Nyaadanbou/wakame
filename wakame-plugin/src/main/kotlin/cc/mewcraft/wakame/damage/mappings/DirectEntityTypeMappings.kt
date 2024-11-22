@@ -5,9 +5,7 @@ import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
 import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
@@ -24,9 +22,6 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.Constraint
-import org.spongepowered.configurate.objectmapping.meta.NodeResolver
-import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 
@@ -41,32 +36,42 @@ import java.io.File
 )
 object DirectEntityTypeMappings : Initializable, KoinComponent {
     private const val DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_FILE = "damage/direct_entity_type_mappings.yml"
-    private val LOGGER: Logger = get()
-    private val NO_CAUSING_MAPPINGS: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
-    private val PLAYER_MAPPINGS: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
-    fun findForNoCausing(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = NO_CAUSING_MAPPINGS[directEntityType] ?: return null
+    private val logger: Logger = get()
+    private val noCauseMappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val playerMappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+
+    fun byNoCauseEvent(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
+        val damageMappings = noCauseMappings[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) return damageMapping
+            if (damageMapping.match(event)) {
+                return damageMapping
+            }
         }
         return null
     }
 
-    fun findForPlayer(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = PLAYER_MAPPINGS[directEntityType] ?: return null
+    fun byPlayerEvent(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
+        val damageMappings = playerMappings[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) return damageMapping
+            if (damageMapping.match(event)) {
+                return damageMapping
+            }
         }
         return null
     }
 
-    override fun onPostWorld(): Unit = loadConfig()
-    override fun onReload(): Unit = loadConfig()
+    override fun onPostWorld() {
+        loadConfig()
+    }
+
+    override fun onReload() {
+        loadConfig()
+    }
 
     private fun loadConfig() {
-        NO_CAUSING_MAPPINGS.clear()
-        PLAYER_MAPPINGS.clear()
+        noCauseMappings.clear()
+        playerMappings.clear()
 
         val root = yamlConfig {
             withDefaults()
@@ -75,8 +80,6 @@ object DirectEntityTypeMappings : Initializable, KoinComponent {
                 registerAnnotatedObjects(
                     ObjectMapper.factoryBuilder()
                         .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addNodeResolver(NodeResolver.nodeKey())
-                        .addConstraint(Required::class.java, Constraint.required())
                         .addDiscoverer(dataClassFieldDiscoverer())
                         .build()
                 )
@@ -96,18 +99,18 @@ object DirectEntityTypeMappings : Initializable, KoinComponent {
             }
             .forEach { (key, node) ->
                 val entityType = entityTypeRegistry.get(key) ?: run {
-                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
+                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
                 val mappings = node.childrenMap()
                     .map { (_, node) ->
                         node.get<DamageMapping>() ?: run {
-                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
+                            logger.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
                             return@forEach
                         }
                     }
 
-                NO_CAUSING_MAPPINGS[entityType] = mappings
+                noCauseMappings[entityType] = mappings
             }
 
         root.node("player").childrenMap()
@@ -116,18 +119,18 @@ object DirectEntityTypeMappings : Initializable, KoinComponent {
             }
             .forEach { (key, node) ->
                 val entityType = entityTypeRegistry.get(key) ?: run {
-                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
+                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
                 val mappings = node.childrenMap()
                     .map { (_, node) ->
                         node.get<DamageMapping>() ?: run {
-                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
+                            logger.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
                             return@forEach
                         }
                     }
 
-                PLAYER_MAPPINGS[entityType] = mappings
+                playerMappings[entityType] = mappings
             }
     }
 }

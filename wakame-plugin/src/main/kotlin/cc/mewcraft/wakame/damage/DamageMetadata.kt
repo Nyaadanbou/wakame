@@ -1,8 +1,8 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -14,9 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.NodeKey
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
+import org.spongepowered.configurate.objectmapping.meta.*
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import team.unnamed.mocha.MochaEngine

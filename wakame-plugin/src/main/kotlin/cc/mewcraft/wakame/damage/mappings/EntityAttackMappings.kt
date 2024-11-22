@@ -7,9 +7,7 @@ import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
 import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer.*
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
@@ -27,9 +25,7 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.Constraint
-import org.spongepowered.configurate.objectmapping.meta.NodeResolver
-import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.objectmapping.meta.*
 import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 
@@ -44,26 +40,34 @@ import java.io.File
 )
 object EntityAttackMappings : Initializable, KoinComponent {
     private const val ENTITY_ATTACK_MAPPINGS_CONFIG_FILE = "damage/entity_attack_mappings.yml"
-    private val LOGGER: Logger = get()
-    private val MAPPINGS: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+
+    private val logger: Logger = get()
+    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
     /**
      * 获取某一伤害情景下原版生物的伤害映射.
      * 返回空表示未指定该情景下的伤害映射.
      */
     fun find(damager: LivingEntity, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = MAPPINGS[damager.type] ?: return null
+        val damageMappings = mappings[damager.type] ?: return null
         for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) return damageMapping
+            if (damageMapping.match(event)) {
+                return damageMapping
+            }
         }
         return null
     }
 
-    override fun onPostWorld(): Unit = loadConfig()
-    override fun onReload(): Unit = loadConfig()
+    override fun onPostWorld() {
+        loadConfig()
+    }
+
+    override fun onReload() {
+        loadConfig()
+    }
 
     private fun loadConfig() {
-        MAPPINGS.clear()
+        mappings.clear()
 
         val root = yamlConfig {
             withDefaults()
@@ -93,18 +97,18 @@ object EntityAttackMappings : Initializable, KoinComponent {
             }
             .forEach { (key, node) ->
                 val entityType = entityTypeRegistry.get(key) ?: run {
-                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
+                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
                 val mappings = node.childrenMap()
                     .map { (_, node) ->
                         node.get<DamageMapping>() ?: run {
-                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
+                            logger.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
                             return@forEach
                         }
                     }
 
-                MAPPINGS[entityType] = mappings
+                this@EntityAttackMappings.mappings[entityType] = mappings
             }
     }
 }

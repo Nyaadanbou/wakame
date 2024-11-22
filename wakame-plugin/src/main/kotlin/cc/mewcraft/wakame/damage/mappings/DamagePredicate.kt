@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.util.krequire
@@ -23,7 +25,7 @@ sealed interface DamagePredicate {
  * 目前支持检查的数据在伴生类中列举.
  */
 data class EntityDataPredicate(
-    val requiredData: Map<String, Int>
+    val requiredData: Map<String, Int>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "entity_data"
@@ -34,7 +36,7 @@ data class EntityDataPredicate(
             "puff_state" to ::testPuffState,
         )
 
-        private fun testIsAdult(value: Int, entity: LivingEntity): Boolean {
+        private fun testAdult(value: Int, entity: LivingEntity): Boolean {
             if (entity !is Ageable) return false
             return (value > 0) == entity.isAdult
         }
@@ -52,10 +54,7 @@ data class EntityDataPredicate(
 
     override fun test(event: EntityDamageEvent): Boolean {
         val damager = event.damageSource.causingEntity as? LivingEntity ?: return false
-        requiredData.forEach { (str, i) ->
-            if (map[str]?.invoke(i, damager) != true) return false
-        }
-        return true
+        return requiredData.all { (str, i) -> map[str]?.invoke(i, damager) == true }
     }
 }
 
@@ -63,7 +62,7 @@ data class EntityDataPredicate(
  * 检查伤害类型的谓词.
  */
 data class DamageTypePredicate(
-    val types: List<DamageType>
+    val types: List<DamageType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "damage_type"
@@ -72,14 +71,13 @@ data class DamageTypePredicate(
     override fun test(event: EntityDamageEvent): Boolean {
         return types.contains(event.damageSource.damageType)
     }
-
 }
 
 /**
  * 检查来源实体类型的谓词.
  */
 data class CausingEntityTypePredicate(
-    val types: List<EntityType>
+    val types: List<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "causing_entity_type"
@@ -95,7 +93,7 @@ data class CausingEntityTypePredicate(
  * 检查直接实体类型的谓词.
  */
 data class DirectEntityTypePredicate(
-    val types: List<EntityType>
+    val types: List<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "direct_entity_type"
@@ -111,7 +109,7 @@ data class DirectEntityTypePredicate(
  * 检查受伤实体类型的谓词.
  */
 data class VictimEntityTypePredicate(
-    val types: List<EntityType>
+    val types: List<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "victim_entity_type"

@@ -3,12 +3,8 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
-import cc.mewcraft.wakame.damage.mappings.DirectEntityTypeMappings
-import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
+import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.damage.mappings.*
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
@@ -17,15 +13,13 @@ import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.event.entity.EntityShootBowEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.entity.*
+import org.bukkit.event.entity.EntityDamageEvent.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import java.time.Duration
-import java.util.*
+import java.util.UUID
 
 /**
  * @see DamageManagerApi.hurt
@@ -121,7 +115,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
         // 使用伤害类型映射, 根据伤害类型调整伤害
         if (directEntity == null) {
             val mapping = DamageTypeMappings.get(damageSource.damageType)
-            return mapping.damageMetadataBuilder.build(event)
+            return mapping.builder.build(event)
         }
 
         // 存在直接实体后
@@ -257,15 +251,15 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
         }
         val damageMapping = if (forPlayer) {
-            DirectEntityTypeMappings.findForPlayer(entityType, event)
+            DirectEntityTypeMappings.byPlayerEvent(entityType, event)
         } else {
-            DirectEntityTypeMappings.findForNoCausing(entityType, event)
+            DirectEntityTypeMappings.byNoCauseEvent(entityType, event)
         }
         if (damageMapping == null) {
             logger.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not config ! Use default damage metadata.")
             return VanillaDamageMetadata(event.damage)
         }
-        return damageMapping.damageMetadataBuilder.build(event)
+        return damageMapping.builder.build(event)
     }
 
     private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {
