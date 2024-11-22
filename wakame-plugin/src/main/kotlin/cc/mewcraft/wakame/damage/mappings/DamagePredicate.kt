@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.damage.mappings
 
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
@@ -9,7 +10,6 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
-import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
 /**
@@ -62,14 +62,14 @@ data class EntityDataPredicate(
  * 检查伤害类型的谓词.
  */
 data class DamageTypePredicate(
-    val types: List<DamageType>,
+    val types: Set<DamageType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "damage_type"
     }
 
     override fun test(event: EntityDamageEvent): Boolean {
-        return types.contains(event.damageSource.damageType)
+        return event.damageSource.damageType in types
     }
 }
 
@@ -77,7 +77,7 @@ data class DamageTypePredicate(
  * 检查来源实体类型的谓词.
  */
 data class CausingEntityTypePredicate(
-    val types: List<EntityType>,
+    val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "causing_entity_type"
@@ -85,7 +85,7 @@ data class CausingEntityTypePredicate(
 
     override fun test(event: EntityDamageEvent): Boolean {
         val directEntity = event.damageSource.causingEntity ?: return false
-        return types.contains(directEntity.type)
+        return directEntity.type in types
     }
 }
 
@@ -93,7 +93,7 @@ data class CausingEntityTypePredicate(
  * 检查直接实体类型的谓词.
  */
 data class DirectEntityTypePredicate(
-    val types: List<EntityType>,
+    val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "direct_entity_type"
@@ -101,7 +101,7 @@ data class DirectEntityTypePredicate(
 
     override fun test(event: EntityDamageEvent): Boolean {
         val directEntity = event.damageSource.directEntity ?: return false
-        return types.contains(directEntity.type)
+        return directEntity.type in types
     }
 }
 
@@ -109,19 +109,18 @@ data class DirectEntityTypePredicate(
  * 检查受伤实体类型的谓词.
  */
 data class VictimEntityTypePredicate(
-    val types: List<EntityType>,
+    val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {
         const val TYPE_KEY = "victim_entity_type"
     }
 
     override fun test(event: EntityDamageEvent): Boolean {
-        return types.contains(event.entity.type)
+        return event.entity.type in types
     }
 }
 
 internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
-
     override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicate {
         val key = node.key().toString()
         return when (key) {
@@ -136,31 +135,27 @@ internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
 
             DamageTypePredicate.TYPE_KEY -> {
                 val damageTypes = node.getList<DamageType>(emptyList())
-                return DamageTypePredicate(damageTypes)
+                return DamageTypePredicate(damageTypes.toHashSet())
             }
 
             CausingEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return CausingEntityTypePredicate(entityTypes)
+                return CausingEntityTypePredicate(entityTypes.toHashSet())
             }
 
             DirectEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return DirectEntityTypePredicate(entityTypes)
+                return DirectEntityTypePredicate(entityTypes.toHashSet())
             }
 
             VictimEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return VictimEntityTypePredicate(entityTypes)
+                return VictimEntityTypePredicate(entityTypes.toHashSet())
             }
 
             else -> {
                 throw SerializationException("Unknown damage predicate type: '$key'")
             }
         }
-    }
-
-    override fun serialize(type: Type, obj: DamagePredicate?, node: ConfigurationNode) {
-        throw UnsupportedOperationException()
     }
 }
