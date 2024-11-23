@@ -44,7 +44,7 @@ private class DamageTagsImpl(
     }
 
     override fun contains(tag: DamageTag): Boolean {
-        return tagSet.contains(tag)
+        return tag in tagSet
     }
 
     override fun tags(): Set<DamageTag> {

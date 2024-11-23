@@ -1,0 +1,384 @@
+# 映射: 原版伤害类型 -> 萌芽伤害类型.
+#
+# 何时使用?
+# 当伤害没有直接实体时调用 (原版自然环境伤害, 方块伤害).
+#
+# 为了完整性, 这里涉及了原版的所有伤害类型,
+# 有些伤害类型实际上必然存在直接实体 (例如: arrow),
+# 给这些伤害类型写的映射自然没有任何作用.
+#
+
+arrow:
+  damage_metadata:
+    type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
+    damage_tags: [ ]
+    element: neutral
+    rate: 1.0  # 可省略, 默认 1.0
+    defense_penetration: 0.0  # 可省略, 默认 0.0
+    defense_penetration_rate: 0.0  # 可省略, 默认 0.0
+    critical_strike_metadata:
+      chance: 0.0
+      positive_power: 1.0  # 可省略, 默认 1.0
+      negative_power: 1.0  # 可省略, 默认 1.0
+      none_power: 1.0  # 可省略, 默认 1.0
+bad_respawn_point:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+cactus:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+campfire:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+cramming:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+dragon_breath:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+drown:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: water
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+dry_out:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+#  ender_pearl:
+#    damage_metadata:
+#      type: vanilla
+#      damage_tags: [ ]
+#      element: neutral
+#      defense_penetration_rate: 1.0
+#      critical_strike_metadata:
+#        chance: 0.0
+explosion:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+fall:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+falling_anvil:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+falling_block:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+falling_stalactite:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+fireball:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    critical_strike_metadata:
+      chance: 0.0
+fireworks:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+fly_into_wall:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+freeze:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: water
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+generic:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+generic_kill:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+hot_floor:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+in_fire:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+in_wall:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+indirect_magic:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+lava:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+lightning_bolt:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+magic:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+#  mace_smash:
+#    damage_metadata:
+#      type: vanilla
+#      damage_tags: [ ]
+#      element: neutral
+#      critical_strike_metadata:
+#        chance: 0.0
+mob_attack:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+mob_attack_no_aggro:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+mob_projectile:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+on_fire:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+out_of_world:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+outside_border:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+player_attack:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+player_explosion:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+sonic_boom:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+spit:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+stalagmite:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+starve:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    defense_penetration_rate: 1.0
+    critical_strike_metadata:
+      chance: 0.0
+sting:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+sweet_berry_bush:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+thorns:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+thrown:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+trident:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+unattributed_fireball:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: fire
+    critical_strike_metadata:
+      chance: 0.0
+wind_charge:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: wind
+    critical_strike_metadata:
+      chance: 0.0
+wither:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0
+wither_skull:
+  damage_metadata:
+    type: vanilla
+    damage_tags: [ ]
+    element: neutral
+    critical_strike_metadata:
+      chance: 0.0

@@ -53,6 +53,50 @@ object DamageManager : DamageManagerApi, KoinComponent {
         damageApplier.damage(victim, source, 4.95)
     }
 
+    /**
+     * 能够造成伤害的弹射物类型.
+     * 伤害系统会处理这些弹射物.
+     */
+    val DAMAGE_PROJECTILE_TYPES = listOf(
+        EntityType.ARROW,
+        EntityType.BREEZE_WIND_CHARGE,
+//        EntityType.DRAGON_FIREBALL,
+        EntityType.EGG,
+        EntityType.ENDER_PEARL,
+        EntityType.FIREBALL,
+        EntityType.FIREWORK_ROCKET,
+//        EntityType.FISHING_BOBBER,
+        EntityType.LLAMA_SPIT,
+        EntityType.POTION,
+        EntityType.SHULKER_BULLET,
+        EntityType.SMALL_FIREBALL,
+        EntityType.SNOWBALL,
+        EntityType.SPECTRAL_ARROW,
+        EntityType.TRIDENT,
+        EntityType.WIND_CHARGE,
+    )
+
+    /**
+     * 作为直接实体时, 能够造成伤害的实体类型.
+     * 伤害系统会处理这些实体.
+     */
+    val DAMAGE_DIRECT_ENTITY_TYPES = DAMAGE_PROJECTILE_TYPES + listOf(
+        EntityType.TNT,
+        EntityType.END_CRYSTAL,
+        EntityType.AREA_EFFECT_CLOUD,
+    )
+
+    /**
+     * 需要记录的弹射物.
+     * 伤害系统会在这些弹射物生成时就记录伤害元数据.
+     */
+    val MARK_PROJECTILE_TYPES = listOf(
+        EntityType.ARROW,
+        EntityType.SPECTRAL_ARROW,
+        EntityType.TRIDENT,
+    )
+
+
     fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {
         // 先检查是不是自定义伤害; 若是, 则直接返回自定义伤害信息
         val uuid = event.entity.uniqueId
@@ -69,24 +113,18 @@ object DamageManager : DamageManagerApi, KoinComponent {
         // 不存在直接实体
         // 自然伤害(溺水、岩浆)
         // 使用伤害类型映射, 根据伤害类型调整伤害
-        //
-        // 2024.10.30
-        // 加入非Living的TNT和末影水晶(爆炸伤害)
-        // 旨在这俩的伤害无论来源实体存在与否, 都作为自然伤害处理
-        // 毕竟通常来说爆炸的伤害和是谁引发的爆炸没有关系
-        if (directEntity == null || directEntity is TNTPrimed || directEntity is EnderCrystal) {
+        if (directEntity == null) {
             val mapping = DamageTypeMappings.get(damageSource.damageType)
-            return VanillaDamageMetadata(mapping.element, event.damage, mapping.defensePenetration, mapping.defensePenetrationRate)
+            return mapping.builder.build(event)
         }
 
         // 存在直接实体后
         when (causingEntity) {
             // 无来源实体
             null -> {
-                if (directEntity is Projectile) {
-                    // 直接实体是弹射物
+                if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
                     // 使用默认
-                    return buildProjectileDamageMetadataByDefault(directEntity)
+                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
                 } else {
                     // 不应该发生
                     return warnAndDefaultReturn(event)
@@ -94,12 +132,14 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
             // 来源实体是玩家
             is Player -> {
-                // 直接实体是弹射物
+                // 直接实体是需要记录弹射物
                 // 查找弹射物是否被记录, 尝试返回记录的值
                 // 箭矢和三叉戟的伤害和词条栏有关, 会被记录
                 // 没有记录则使用默认
-                if (directEntity is Projectile) {
-                    return findProjectileDamageMetadata(directEntity.uniqueId) ?: buildProjectileDamageMetadataByDefault(directEntity)
+                if (directEntity.type in MARK_PROJECTILE_TYPES) {
+                    return findProjectileDamageMetadata(directEntity.uniqueId) ?: buildDirectEntityDamageMetadataByDefault(directEntity, event, true)
+                } else if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
+                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, true)
                 }
 
                 val itemStack = causingEntity.inventory.itemInMainHand
@@ -147,11 +187,15 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
             // 来源实体是非玩家生物
             is LivingEntity -> {
-                val mapping = EntityAttackMappings.find(event.damageSource)
+                // 直接实体是TNT、末影水晶, 视为无源处理
+                if (directEntity.type == EntityType.TNT || directEntity.type == EntityType.END_CRYSTAL) {
+                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
+                }
+                val mapping = EntityAttackMappings.find(causingEntity, event)
                 if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
-                    logger.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config!")
+                    logger.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config! Use default damage metadata.")
                     return EntityDamageMetadata(
                         damageBundle = damageBundle {
                             default {
@@ -191,24 +235,31 @@ object DamageManager : DamageManagerApi, KoinComponent {
         return damageBundle(attributeMapSnapshot) { every { standard() } }
     }
 
+    private val arrowTypes = listOf<EntityType>(EntityType.ARROW, EntityType.SPECTRAL_ARROW)
+
     /**
-     * 默认状态下弹射物伤害元数据
-     * 使用弹射物类型映射, 根据弹射物类型获取伤害元数据
+     * 无来源实体时直接伤害实体的伤害元数据
+     * 使用直接伤害实体类型映射, 根据弹射物类型获取伤害元数据
      * 箭矢特殊处理, 计算词条栏伤害
      */
-    private fun buildProjectileDamageMetadataByDefault(projectile: Projectile): DamageMetadata {
-        if (projectile is Arrow) {
-            val damageBundle = buildArrowDamageBundleByCells(projectile)
-            if (damageBundle != null) {
-                return VanillaDamageMetadata(damageBundle)
-            }
-        } else if (projectile is SpectralArrow) {
-            val damageBundle = buildArrowDamageBundleByCells(projectile)
+    private fun buildDirectEntityDamageMetadataByDefault(directEntity: Entity, event: EntityDamageEvent, forPlayer: Boolean): DamageMetadata {
+        val entityType = directEntity.type
+        if (entityType in arrowTypes) {
+            val damageBundle = buildArrowDamageBundleByCells(directEntity as AbstractArrow)
             if (damageBundle != null) {
                 return VanillaDamageMetadata(damageBundle)
             }
         }
-        return ProjectileTypeMappings.find(projectile.type)?.decode() ?: VanillaDamageMetadata(1.0)
+        val damageMapping = if (forPlayer) {
+            DirectEntityTypeMappings.byPlayerEvent(entityType, event)
+        } else {
+            DirectEntityTypeMappings.byNoCauseEvent(entityType, event)
+        }
+        if (damageMapping == null) {
+            logger.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not config ! Use default damage metadata.")
+            return VanillaDamageMetadata(event.damage)
+        }
+        return damageMapping.builder.build(event)
     }
 
     private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {

@@ -1,0 +1,394 @@
+# 映射:
+# 直接伤害实体(direct_entity)的类型 -> 萌芽伤害
+#
+# 如果来源实体是 [非玩家生物], 应该认为是 [原版生物的攻击], 应该在 entity_attack_mappings.yml 中配置.
+# TNT和末影水晶的爆炸伤害不会 "依据原版生物的攻击特征" 处理. 虽然原版非玩家生物也可以作为这二者爆炸伤害的来源,
+# 但是为了方便, 我们在映射时认为非玩家触发的TNT和末影水晶均为无源.
+#
+# "自定义箭矢" 和 "自定义三叉戟" 的伤害与词条栏有关, 伤害不受这里配置的影响 (写了也不起作用)
+#
+
+#
+# 来源实体不存在时调用.
+# 主要是发射器弹射物, 发射器TNT, 红石激活TNT等.
+#
+no_causing:
+  tnt:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  end_crystal:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  arrow:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  egg:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  ender_pearl:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  fireball:
+    爆炸:
+      predicates:
+        damage_type:
+          - explosion
+          - player_explosion
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: fire
+        critical_strike_metadata:
+          chance: 0.0
+    接触:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          fire:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+  firework_rocket:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  area_effect_cloud:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  llama_spit:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  shulker_bullet:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 4.0
+            max: 4.0
+        critical_strike_metadata:
+          chance: 0.0
+  small_fireball:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          fire:
+            min: 5.0
+            max: 5.0
+        critical_strike_metadata:
+          chance: 0.0
+  snowball:
+    攻击烈焰人:
+      predicates:
+        victim_entity_type:
+          - blaze
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+    攻击其他实体:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  potion:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  trident:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 8.0
+            max: 8.0
+        critical_strike_metadata:
+          chance: 0.0
+  wind_charge:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          wind:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  breeze_wind_charge:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          wind:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  wither_skull:
+    爆炸:
+      predicates:
+        damage_type:
+          - explosion
+          - player_explosion
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+    接触:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 8.0
+            max: 8.0
+        critical_strike_metadata:
+          chance: 0.0
+
+#
+# 来源实体为玩家时调用.
+#
+player:
+  tnt:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  end_crystal:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  arrow:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  egg:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  ender_pearl:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  # 玩家反弹的恶魂火球算玩家发射的
+  fireball:
+    爆炸:
+      predicates:
+        damage_type:
+          - explosion
+          - player_explosion
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: fire
+        critical_strike_metadata:
+          chance: 0.0
+    攻击恶魂:
+      predicates:
+        victim_entity_type:
+          - ghast
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          fire:
+            min: 1000.0
+            max: 1000.0
+        critical_strike_metadata:
+          chance: 0.0
+    攻击其他实体:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          fire:
+            min: 6.0
+            max: 6.0
+        critical_strike_metadata:
+          chance: 0.0
+  firework_rocket:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  area_effect_cloud:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  snowball:
+    攻击烈焰人:
+      predicates:
+        victim_entity_type:
+          - blaze
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 3.0
+            max: 3.0
+        critical_strike_metadata:
+          chance: 0.0
+    攻击其他实体:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 0.0
+            max: 0.0
+        critical_strike_metadata:
+          chance: 0.0
+  potion:
+    一般:
+      damage_metadata:
+        type: vanilla
+        damage_tags: [ ]
+        element: neutral
+        critical_strike_metadata:
+          chance: 0.0
+  trident:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          neutral:
+            min: 8.0
+            max: 8.0
+        critical_strike_metadata:
+          chance: 0.0
+  wind_charge:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          wind:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
+  # 玩家反弹的旋风人风弹算玩家发射的
+  breeze_wind_charge:
+    一般:
+      damage_metadata:
+        type: direct
+        damage_tags: [ ]
+        damage_bundle:
+          wind:
+            min: 1.0
+            max: 1.0
+        critical_strike_metadata:
+          chance: 0.0
