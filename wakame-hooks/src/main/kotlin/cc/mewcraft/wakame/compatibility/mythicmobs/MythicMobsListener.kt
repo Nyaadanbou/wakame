@@ -1,13 +1,21 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs
 
-import cc.mewcraft.wakame.compatibility.mythicmobs.condition.*
+import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HasItemCondition
+import cc.mewcraft.wakame.compatibility.mythicmobs.condition.HoldingCondition
+import cc.mewcraft.wakame.compatibility.mythicmobs.condition.LevelCondition
 import cc.mewcraft.wakame.compatibility.mythicmobs.drop.NekoItemDrop
-import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.*
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeMechanic
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.AttributeModifierMechanic
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.NekoBaseDamageMechanic
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.NekoPercentDamageMechanic
+import cc.mewcraft.wakame.compatibility.mythicmobs.mechanic.RemoveAttributeModifierMechanic
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.IDrop
 import io.lumine.mythic.api.skills.ISkillMechanic
 import io.lumine.mythic.api.skills.conditions.ISkillCondition
-import io.lumine.mythic.bukkit.events.*
+import io.lumine.mythic.bukkit.events.MythicConditionLoadEvent
+import io.lumine.mythic.bukkit.events.MythicDropLoadEvent
+import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent
 import io.lumine.mythic.core.skills.SkillExecutor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

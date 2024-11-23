@@ -2,7 +2,16 @@ package cc.mewcraft.wakame.compatibility.mythicmobs.mechanic
 
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.AttributeProvider
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
+import cc.mewcraft.wakame.damage.CriticalStrikeState
+import cc.mewcraft.wakame.damage.DamageBundle
+import cc.mewcraft.wakame.damage.DamageBundleFactory
+import cc.mewcraft.wakame.damage.DamageManagerApi
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamagePacket
+import cc.mewcraft.wakame.damage.DamageTag
+import cc.mewcraft.wakame.damage.DamageTags
+import cc.mewcraft.wakame.damage.DamageTagsFactory
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill

@@ -11,10 +11,12 @@ dependencies {
     compileOnly(project(":wakame-api"))
     compileOnly(project(":wakame-common"))
     compileOnly(platform(libs.bom.caffeine))
+
+    // libraries
     compileOnly(local.paper)
-    compileOnly(local.helper)
 
     // plugins
+    compileOnly(local.helper)
     compileOnly(local.mythicmobs) { isTransitive = false /* we don't want trash from the MM jar */ }
     compileOnly(local.adventurelevel)
     compileOnly(local.economy)

@@ -43,6 +43,6 @@ rootProject.name = "wakame"
 
 include(":wakame-api")
 include(":wakame-common")
-include(":wakame-ext")
+include(":wakame-hooks")
 include(":wakame-mixin")
 include(":wakame-plugin")

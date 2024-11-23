@@ -46,11 +46,13 @@ commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider",
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 
+# Server dependencies
+
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 
 # Plugin dependencies
 
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }

@@ -1,6 +1,6 @@
 import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import net.minecrell.pluginyml.paper.PaperPluginDescription.*
+import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
     id("nyaadanbou-conventions.repositories")
@@ -19,11 +19,10 @@ dependencies {
     // internal
     compileOnly(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnly(project(":wakame-common")) // 同上
-    implementation(project(":wakame-ext"))
+    implementation(project(":wakame-hooks"))
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnly(local.helper)
     implementation(local.commons.collections)
     implementation(local.commons.guava)
     implementation(local.commons.provider)
@@ -52,6 +51,7 @@ dependencies {
     implementation(platform(libs.bom.packetevents.spigot))
 
     // other plugins (without ide pollution)
+    compileOnly(local.helper)
     compileOnly(local.adventurelevel)
 
     // test

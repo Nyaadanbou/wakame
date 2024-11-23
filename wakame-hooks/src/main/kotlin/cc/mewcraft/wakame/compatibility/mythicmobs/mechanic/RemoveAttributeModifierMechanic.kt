@@ -1,9 +1,15 @@
 package cc.mewcraft.wakame.compatibility.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.*
+import io.lumine.mythic.api.skills.INoTargetSkill
+import io.lumine.mythic.api.skills.ITargetedEntitySkill
+import io.lumine.mythic.api.skills.SkillMetadata
+import io.lumine.mythic.api.skills.SkillResult
+import io.lumine.mythic.api.skills.ThreadSafetyLevel
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
