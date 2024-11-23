@@ -4,9 +4,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.PullResult
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.lib.RepositoryState
-import org.eclipse.jgit.transport.PushResult
-import org.eclipse.jgit.transport.RemoteRefUpdate
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import org.eclipse.jgit.transport.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger

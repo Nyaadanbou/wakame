@@ -18,7 +18,6 @@ dependencies {
     compileOnly(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnly(project(":wakame-common")) // 同上
     implementation(project(":wakame-ext"))
-    implementation(project(":wakame-git"))
     compileOnly(project(":wakame-nms"))
     runtimeOnly(project(path = ":wakame-nms", configuration = "reobf")) // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
 
