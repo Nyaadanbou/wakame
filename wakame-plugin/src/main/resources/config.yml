@@ -4,6 +4,9 @@
 # 不支持热重载！
 debug: true
 
+# 只有物品堆叠的所有者可以拾起掉落的物品实体?
+only_owner_can_pickup_death_drops: false
+
 # 玩家等级算法
 # 不支持热重载！
 #
