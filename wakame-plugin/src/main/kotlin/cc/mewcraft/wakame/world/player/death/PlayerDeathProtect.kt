@@ -33,7 +33,7 @@ class PlayerDeathProtect : Listener, KoinComponent {
         // 理论上这个过期永远都不应该自动触发, 如果是那应该是 BUG.
         .expireAfterWrite(10, TimeUnit.SECONDS)
         .removalListener<ItemStack, UUID> { key, value, cause ->
-            if (cause.wasEvicted() && cause != RemovalCause.EXPLICIT) {
+            if (cause != RemovalCause.EXPLICIT) {
                 logger.warn("ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
             }
         }
