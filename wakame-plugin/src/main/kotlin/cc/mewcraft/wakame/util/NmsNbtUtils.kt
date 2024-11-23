@@ -1,15 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import net.minecraft.nbt.ByteArrayTag
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.DoubleTag
-import net.minecraft.nbt.FloatTag
-import net.minecraft.nbt.IntArrayTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.LongArrayTag
-import net.minecraft.nbt.NumericTag
-import net.minecraft.nbt.StringTag
-import net.minecraft.nbt.Tag
+import net.minecraft.nbt.*
 import net.minecraft.server.MinecraftServer
 import java.util.stream.Stream
 import net.minecraft.world.item.ItemStack as MojangStack

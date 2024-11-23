@@ -1,6 +1,11 @@
 package cc.mewcraft.wakame.util
 
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import net.kyori.adventure.nbt.*
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtIo
+import java.io.*
 
 /* Check if a key with given type exists */
 
@@ -118,3 +123,20 @@ fun ListBinaryTag(builder: ListBinaryTag.Builder<BinaryTag>.() -> Unit): ListBin
 
 fun ListBinaryTag(vararg tags: BinaryTag): ListBinaryTag =
     ListBinaryTag { tags.forEach(this::add) }
+
+private val CompoundTag.toAdventure: CompoundBinaryTag
+    get() {
+        val arrayOutputStream = FastByteArrayOutputStream()
+        val dataOutputStream = DataOutputStream(arrayOutputStream)
+        NbtIo.write(this, dataOutputStream)
+        val dataInputStream: InputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
+        return BinaryTagIO.reader().read(dataInputStream)
+    }
+
+private val CompoundBinaryTag.toMinecraft: CompoundTag
+    get() {
+        val arrayOutputStream = FastByteArrayOutputStream()
+        BinaryTagIO.writer().write(this, arrayOutputStream)
+        val dataInputStream = DataInputStream(FastByteArrayInputStream(arrayOutputStream.array))
+        return NbtIo.read(dataInputStream)
+    }

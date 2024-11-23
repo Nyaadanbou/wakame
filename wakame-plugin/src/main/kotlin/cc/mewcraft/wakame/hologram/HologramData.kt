@@ -1,11 +1,9 @@
 package cc.mewcraft.wakame.hologram
 
 import net.kyori.adventure.text.Component
-import org.bukkit.Color
-import org.bukkit.Location
-import org.bukkit.Material
+import org.bukkit.*
 import org.bukkit.entity.Display
-import org.bukkit.entity.Display.Billboard
+import org.bukkit.entity.Display.*
 import org.bukkit.entity.TextDisplay
 import org.bukkit.inventory.ItemStack
 import org.joml.Vector3f

@@ -2,16 +2,12 @@ package cc.mewcraft.wakame.shadow.inventory
 
 import cc.mewcraft.nbt.Tag
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
-import me.lucko.shadow.Field
-import me.lucko.shadow.Shadow
-import me.lucko.shadow.ShadowFactory
-import me.lucko.shadow.ShadowingStrategy
-import me.lucko.shadow.ShadowingStrategy.Unwrapper
-import me.lucko.shadow.ShadowingStrategy.Wrapper
+import me.lucko.shadow.*
+import me.lucko.shadow.ShadowingStrategy.*
 import me.lucko.shadow.Target
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.bukkit.ObcClassTarget
-import me.lucko.shadow.shadow
+import java.util.AbstractMap.SimpleEntry
 import java.util.TreeMap
 
 @ObcClassTarget("inventory.CraftMetaItem")

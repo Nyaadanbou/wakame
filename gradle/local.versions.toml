@@ -3,12 +3,13 @@
 kotlin = "2.0.21"
 kotlinx-coroutines-core = "1.9.0"
 koin = "4.0.0"
-ignite = "1.1.0"
-mixin = "0.8.6"
-mixin-extras = "0.3.6"
 commons = "1.17"
 shadow-nbt = "1.21.1-SNAPSHOT"
 
+ignite = "1.1.0"
+mixin = "0.8.6"
+mixin-extras = "0.3.6"
+paperweight = "1.7.5"
 paper = "1.21.1-R0.1-SNAPSHOT"
 helper = "6.0.0"
 adventurelevel = "1.4.0"
@@ -20,8 +21,9 @@ chestsort = "13.0.0-SNAPSHOT"
 
 # Gradle plugins
 
-plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version = "1.0" }
+plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 
 # Shaded dependencies
 

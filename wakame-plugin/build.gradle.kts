@@ -1,3 +1,4 @@
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.*
 
@@ -6,6 +7,7 @@ plugins {
     id("nyaadanbou-conventions.copy-jar")
     id("wakame-conventions.kotlin")
     id("wakame-conventions.koin")
+    id("io.papermc.paperweight.userdev")
     alias(libs.plugins.pluginyml.paper)
 }
 
@@ -18,11 +20,9 @@ dependencies {
     compileOnly(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnly(project(":wakame-common")) // 同上
     implementation(project(":wakame-ext"))
-    compileOnly(project(":wakame-nms"))
-    runtimeOnly(project(path = ":wakame-nms", configuration = "reobf")) // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
 
     // libraries
-    compileOnly(local.paper)
+    paperweight.paperDevBundle(local.versions.paper)
     compileOnly(local.helper)
     implementation(local.commons.collections)
     implementation(local.commons.guava)
@@ -56,7 +56,6 @@ dependencies {
 
     // test
     testImplementation(project(":wakame-common"))
-    testImplementation(local.paper)
     testImplementation(local.helper)
     testImplementation(libs.configurate.yaml)
     testImplementation(libs.configurate.extra.kotlin)
@@ -96,6 +95,14 @@ tasks {
         // invui
         // relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
         // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
+    }
+
+    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
+    assemble {
+        dependsOn(reobfJar)
+    }
+    paperweight {
+        reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
     }
     copyJar {
         environment = "paper"

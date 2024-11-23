@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.shadow.network
 
-import me.lucko.shadow.ClassTarget
-import me.lucko.shadow.Field
-import me.lucko.shadow.Shadow
+import me.lucko.shadow.*
 import me.lucko.shadow.Target
 import net.minecraft.network.syncher.SynchedEntityData
 
