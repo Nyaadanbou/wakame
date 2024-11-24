@@ -45,6 +45,14 @@ tasks {
     }
 }
 
+// configure java sources location
+sourceSets {
+    main {
+        java.setSrcDirs(listOf("src/main/kotlin/"))
+    }
+}
+
+
 java {
     withSourcesJar()
 }
