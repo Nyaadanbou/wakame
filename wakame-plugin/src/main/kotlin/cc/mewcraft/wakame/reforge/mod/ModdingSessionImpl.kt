@@ -2,15 +2,23 @@ package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.composite.element
-import cc.mewcraft.wakame.economy.Economy
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.mod.ModdingTable.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
+import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.isEmpty
+import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -21,8 +29,6 @@ import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -323,7 +329,7 @@ internal object ReforgeResult {
 }
 
 internal object ReforgeCost {
-    private val economy: Economy = Injector.get()
+    private val economyIntegration: EconomyIntegration = Injector.get()
 
     fun empty(): ModdingSession.ReforgeCost {
         return Empty()
@@ -362,11 +368,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            economy.take(viewer.uniqueId, currencyAmount)
+            economyIntegration.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return economyIntegration.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

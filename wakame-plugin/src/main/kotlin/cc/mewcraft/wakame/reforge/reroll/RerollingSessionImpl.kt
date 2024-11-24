@@ -1,18 +1,22 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.economy.Economy
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -22,8 +26,6 @@ import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -222,7 +224,7 @@ internal object ReforgeResult {
 }
 
 internal object ReforgeCost {
-    private val economy: Economy = Injector.get()
+    private val economyIntegration: EconomyIntegration = Injector.get()
 
     /**
      * 空的花费; 当没有需要重造的物品时, 使用这个.
@@ -271,11 +273,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            economy.take(viewer.uniqueId, currencyAmount)
+            economyIntegration.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return economyIntegration.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

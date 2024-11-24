@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.economy
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.koin.core.component.get
@@ -14,7 +15,7 @@ import java.util.UUID
  *
  * 仅用于开发与测试, 勿用于生产环境!
  */
-data object LevelEconomy : Economy {
+data object LevelEconomyIntegration : EconomyIntegration {
     private fun getPlayer(uuid: UUID): Player {
         return Injector.get<Server>().getPlayer(uuid) ?: error("player is not online.")
     }
