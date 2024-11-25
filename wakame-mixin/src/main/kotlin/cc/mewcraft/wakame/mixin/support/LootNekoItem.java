@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.NekooProvider;
+import cc.mewcraft.wakame.api.NekooProvider;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame
+package cc.mewcraft.wakame.api
 
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player

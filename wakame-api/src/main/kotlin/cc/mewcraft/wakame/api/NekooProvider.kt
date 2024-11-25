@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame
+package cc.mewcraft.wakame.api
 
 import org.jetbrains.annotations.ApiStatus
 
