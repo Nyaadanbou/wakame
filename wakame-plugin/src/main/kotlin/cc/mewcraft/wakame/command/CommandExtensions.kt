@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.scope
 import kotlinx.coroutines.CoroutineScope
@@ -15,8 +15,8 @@ import kotlin.coroutines.CoroutineContext
  * Specify a suspending command execution handler.
  */
 fun <C : Any> MutableCommandBuilder<C>.suspendingHandler(
-    scope: CoroutineScope = NEKO_PLUGIN.scope, // use our own scope
-    context: CoroutineContext = NEKO_PLUGIN.asyncDispatcher, // use our own dispatcher
+    scope: CoroutineScope = NEKO.scope, // use our own scope
+    context: CoroutineContext = NEKO.asyncDispatcher, // use our own dispatcher
     handler: SuspendingExecutionHandler<C>,
 ): MutableCommandBuilder<C> = mutate {
     it.suspendingHandler(scope, context, handler)

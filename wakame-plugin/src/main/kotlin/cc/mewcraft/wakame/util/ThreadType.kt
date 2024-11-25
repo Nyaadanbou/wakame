@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
@@ -22,7 +22,7 @@ enum class ThreadType : KoinComponent {
     private val server: Server by inject()
 
     suspend fun <T> switchContext(block: suspend () -> T): T {
-        if (!NEKO_PLUGIN.isEnabled) {
+        if (!NEKO.isEnabled) {
             return block()
         }
         if (this == REMAIN) {
@@ -31,8 +31,8 @@ enum class ThreadType : KoinComponent {
 
         return withContext(
             when (this) {
-                SYNC -> NEKO_PLUGIN.minecraftDispatcher
-                ASYNC -> NEKO_PLUGIN.asyncDispatcher
+                SYNC -> NEKO.minecraftDispatcher
+                ASYNC -> NEKO.asyncDispatcher
                 DISPATCHERS_ASYNC -> Dispatchers.IO
                 else -> throw IllegalStateException("Unknown thread type: $this")
             }
@@ -42,19 +42,19 @@ enum class ThreadType : KoinComponent {
     }
 
     fun launch(block: suspend () -> Unit): Job {
-        if (!NEKO_PLUGIN.isEnabled) {
+        if (!NEKO.isEnabled) {
             runBlocking {
                 block()
             }
             return Job()
         }
 
-        return NEKO_PLUGIN.launch(
+        return NEKO.launch(
             when (this) {
-                SYNC -> NEKO_PLUGIN.minecraftDispatcher
-                ASYNC -> NEKO_PLUGIN.asyncDispatcher
+                SYNC -> NEKO.minecraftDispatcher
+                ASYNC -> NEKO.asyncDispatcher
                 DISPATCHERS_ASYNC -> Dispatchers.IO
-                REMAIN -> if (server.isPrimaryThread) NEKO_PLUGIN.minecraftDispatcher else NEKO_PLUGIN.asyncDispatcher
+                REMAIN -> if (server.isPrimaryThread) NEKO.minecraftDispatcher else NEKO.asyncDispatcher
             }
         ) {
             block()

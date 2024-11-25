@@ -3,15 +3,19 @@ package cc.mewcraft.wakame.hook.impl.towny
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.integration.Hook
+import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["Towny"])
 object TownyHook : ProtectionIntegration {
+
+    private val TOWNY = TownyAPI.getInstance()
 
     override fun getExecutionMode(): ExecutionMode {
         return ExecutionMode.SERVER
@@ -38,6 +42,9 @@ object TownyHook : ProtectionIntegration {
     }
 
     override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
+        if (player is Player && entity is Player) {
+            return TOWNY.isPVP(entity.location)
+        }
         return hasPermission(player, entity.location, TownyPermission.ActionType.DESTROY)
     }
 

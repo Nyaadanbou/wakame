@@ -2,13 +2,14 @@
 
 package cc.mewcraft.wakame.initializer
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.damage.DamageListener
+import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
@@ -152,6 +153,7 @@ object Initializer : KoinComponent, Listener {
 
         // damage
         registerListenerAndBind<DamageListener>()
+        registerListenerAndBind<DamagePostListener>()
         registerListenerAndBind<DamageDisplay>()
 
         // rpg player
@@ -206,7 +208,7 @@ object Initializer : KoinComponent, Listener {
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Reload Async")
         val onReloadAsyncJobs = mutableListOf<Job>()
         val onReloadAsyncResult = forEachReload {
-            onReloadAsyncJobs += NEKO_PLUGIN.launch(asyncContext) { onReloadAsync() }
+            onReloadAsyncJobs += NEKO.launch(asyncContext) { onReloadAsync() }
         }
         logger.info("[Initializer] onReloadAsync - Waiting")
         onReloadAsyncJobs.joinAll() // wait for all async jobs
@@ -266,7 +268,7 @@ object Initializer : KoinComponent, Listener {
         val asyncContext = Dispatchers.IO + CoroutineName("Neko Initializer - Post World Async")
         val onPostWorldJobs = mutableListOf<Job>()
         val onPostWorldAsyncResult = forEachPostWorld {
-            onPostWorldJobs += NEKO_PLUGIN.launch(asyncContext) { onPostWorldAsync() }
+            onPostWorldJobs += NEKO.launch(asyncContext) { onPostWorldAsync() }
         }
         logger.info("[Initializer] onPostWorldAsync - Waiting")
         onPostWorldJobs.joinAll() // wait for all async jobs
@@ -274,7 +276,7 @@ object Initializer : KoinComponent, Listener {
         logger.info("[Initializer] onPostWorldAsync - Complete")
 
         isDone = true
-        NEKO_PLUGIN.launch(asyncContext) {
+        NEKO.launch(asyncContext) {
             NekoPostLoadDataEvent().run {
                 this.callEvent() // call it async
                 PluginEventBus.get().post(this)
