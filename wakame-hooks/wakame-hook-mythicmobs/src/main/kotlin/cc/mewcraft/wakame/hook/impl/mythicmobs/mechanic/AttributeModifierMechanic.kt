@@ -21,8 +21,6 @@ import io.lumine.mythic.core.skills.SkillMechanic
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 
 class AttributeModifierMechanic(
@@ -30,16 +28,13 @@ class AttributeModifierMechanic(
     file: File,
     line: String,
     mlc: MythicLineConfig,
-) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill, KoinComponent {
+) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, INoTargetSkill {
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val attributeProvider: AttributeProvider by inject()
-    private val attributeMapAccess: AttributeMapAccess by inject()
-
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> attributeProvider.getSingleton(parsed) }
+        ?.let { parsed -> AttributeProvider.getSingleton(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")
@@ -50,7 +45,7 @@ class AttributeModifierMechanic(
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)
@@ -60,7 +55,7 @@ class AttributeModifierMechanic(
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = attributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)

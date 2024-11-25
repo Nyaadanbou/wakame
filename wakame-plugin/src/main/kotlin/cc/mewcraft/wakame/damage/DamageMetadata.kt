@@ -2,7 +2,9 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.ElementRegistry
@@ -11,10 +13,11 @@ import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.objectmapping.meta.NodeKey
+import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import team.unnamed.mocha.MochaEngine
@@ -266,13 +269,11 @@ data class AttributeDamageMetadataBuilder(
     @Required
     override val damageTags: DirectDamageTagsBuilder,
 ) : DamageMetadataBuilder<Double>, KoinComponent {
-    private val attributeMapAccess: AttributeMapAccess = get()
-
     override fun build(event: EntityDamageEvent): DamageMetadata {
         val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null"
         )
-        val attributeMap = attributeMapAccess.get(damager).getOrElse {
+        val attributeMap = AttributeMapAccess.get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
         }
         val damageTags = damageTags.build()

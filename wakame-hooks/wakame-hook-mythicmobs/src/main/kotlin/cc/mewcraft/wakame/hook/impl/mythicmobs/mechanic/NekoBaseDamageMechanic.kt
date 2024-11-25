@@ -28,7 +28,6 @@ class NekoBaseDamageMechanic(
     line: String,
     mlc: MythicLineConfig,
 ) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill {
-
     companion object {
         private val DAMAGE_BUNDLE_PATTERN: Regex = Regex("\\([^)]+\\)")
     }

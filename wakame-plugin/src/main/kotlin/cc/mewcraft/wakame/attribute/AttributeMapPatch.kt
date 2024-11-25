@@ -1,10 +1,17 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.entity.EntityKeyLookup
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.CompoundBinaryTag
+import cc.mewcraft.wakame.util.ListBinaryTag
+import cc.mewcraft.wakame.util.getByteOrNull
+import cc.mewcraft.wakame.util.getDoubleOrNull
+import cc.mewcraft.wakame.util.getListOrNull
+import cc.mewcraft.wakame.util.getStringOrNull
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import me.lucko.helper.terminable.Terminable
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.nbt.BinaryTagTypes
@@ -13,15 +20,25 @@ import net.kyori.adventure.util.Codec
 import org.bukkit.NamespacedKey
 import org.bukkit.Server
 import org.bukkit.attribute.Attributable
-import org.bukkit.entity.*
-import org.bukkit.event.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.world.EntitiesLoadEvent
 import org.bukkit.event.world.EntitiesUnloadEvent
-import org.bukkit.persistence.*
-import org.koin.core.component.*
+import org.bukkit.persistence.PersistentDataAdapterContext
+import org.bukkit.persistence.PersistentDataHolder
+import org.bukkit.persistence.PersistentDataType
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.slf4j.Logger
-import java.io.*
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.io.IOException
 import java.util.UUID
 
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
@@ -147,7 +164,6 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
     private val logger: Logger by inject()
     private val server: Server by inject()
     private val entityKeyLookup: EntityKeyLookup by inject()
-    private val attributeMapAccess: AttributeMapAccess by inject()
 
     // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
     @EventHandler(priority = EventPriority.LOWEST)
@@ -161,7 +177,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
             AttributeMapPatchAccess.put(entity.uniqueId, patch)
 
             // 触发 AttributeMap 的初始化, 例如应用原版属性
-            attributeMapAccess.get(entity).onFailure {
+            AttributeMapAccess.get(entity).onFailure {
                 logger.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
             }
         }
@@ -173,7 +189,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
 
         // 触发 AttributeMap 的初始化, 例如应用原版属性
         val entity = e.entity
-        val attributeMap = attributeMapAccess.get(entity)
+        val attributeMap = AttributeMapAccess.get(entity)
             .onFailure {
                 logger.error("Failed to initialize the attribute map for entity $entity: ${it.message}")
             }

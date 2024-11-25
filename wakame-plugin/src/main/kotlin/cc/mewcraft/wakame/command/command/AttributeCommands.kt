@@ -15,7 +15,8 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.NamespacedKey
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.*
-import org.incendo.cloud.*
+import org.incendo.cloud.Command
+import org.incendo.cloud.CommandFactory
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
 import org.incendo.cloud.bukkit.parser.NamespacedKeyParser
@@ -25,22 +26,14 @@ import org.incendo.cloud.kotlin.coroutines.extension.suspendingHandler
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.parser.standard.DoubleParser
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 
-object AttributeCommands : CommandFactory<CommandSender>, KoinComponent {
+object AttributeCommands : CommandFactory<CommandSender> {
     private const val ATTRIBUTE_LITERAL = "attribute"
-    private val LOGGER = get<Logger>()
-    private val ATTRIBUTE_MAP_ACCESS: AttributeMapAccess by inject()
 
     private fun sendNoAttributeMessage(sender: CommandSender, source: Entity) {
         sender.sendMessage(text {
@@ -288,7 +281,7 @@ object AttributeCommands : CommandFactory<CommandSender>, KoinComponent {
     }
 
     private fun getAttributeMap(entity: Entity): AttributeMap? {
-        return ATTRIBUTE_MAP_ACCESS.get(entity).getOrNull()
+        return AttributeMapAccess.get(entity).getOrNull()
     }
 }
 

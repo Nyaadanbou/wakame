@@ -22,8 +22,6 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.LivingEntity
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.io.File
 
 class NekoPercentDamageMechanic(
@@ -31,10 +29,7 @@ class NekoPercentDamageMechanic(
     file: File,
     line: String,
     mlc: MythicLineConfig,
-) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, KoinComponent {
-    private val attributeProvider: AttributeProvider by inject()
-    private val attributeMapAccess: AttributeMapAccess by inject()
-
+) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill {
     companion object {
         private val DAMAGE_BUNDLE_PATTERN: Regex = Regex("\\([^)]+\\)")
     }
@@ -86,8 +81,8 @@ class NekoPercentDamageMechanic(
             val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
                 target.health * percent
             } else {
-                val maxHealthAttribute = requireNotNull(attributeProvider.getSingleton("max_health")) { "Max health attribute is Null!" }
-                val maxHealth = attributeMapAccess.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
+                val maxHealthAttribute = requireNotNull(AttributeProvider.getSingleton("max_health")) { "Max health attribute is Null!" }
+                val maxHealth = AttributeMapAccess.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }
             damage

@@ -21,7 +21,7 @@ interface DamageApplier {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object Holder : DamageApplier{
+    companion object Holder : DamageApplier {
         private var instance: DamageApplier? = null
 
         @JvmStatic
