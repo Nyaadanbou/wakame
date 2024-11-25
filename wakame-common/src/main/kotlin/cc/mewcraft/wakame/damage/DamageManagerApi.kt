@@ -21,7 +21,7 @@ interface DamageManagerApi {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object Provider {
+    companion object Holder : DamageManagerApi {
         private var instance: DamageManagerApi? = null
 
         @JvmStatic
@@ -37,6 +37,10 @@ interface DamageManagerApi {
         @ApiStatus.Internal
         fun unregister() {
             instance = null
+        }
+
+        override fun hurt(victim: LivingEntity, damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
+            instance().hurt(victim, damageMetadata, source, knockback)
         }
     }
 }

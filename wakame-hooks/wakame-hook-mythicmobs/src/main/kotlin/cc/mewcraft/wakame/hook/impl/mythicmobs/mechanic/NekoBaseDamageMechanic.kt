@@ -45,7 +45,7 @@ class NekoBaseDamageMechanic(
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata) -> DamageBundle {
         return { data ->
-            DamageBundleFactory.instance().createUnsafe(
+            DamageBundleFactory.createUnsafe(
                 origin.associate { rawPacketString ->
                     val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
                         ?.value // 提取括号内的内容 (包括括号)
@@ -79,9 +79,9 @@ class NekoBaseDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.instance().create()
+            return DamageTagsFactory.create()
         }
-        return DamageTagsFactory.instance().create(origin.map { DamageTag.valueOf(it) })
+        return DamageTagsFactory.create(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {
@@ -103,7 +103,7 @@ class NekoBaseDamageMechanic(
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
 
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.instance().hurt(entity, damageMetadata, casterEntity, knockback)
+        DamageManagerApi.hurt(entity, damageMetadata, casterEntity, knockback)
 
         return SkillResult.SUCCESS
     }

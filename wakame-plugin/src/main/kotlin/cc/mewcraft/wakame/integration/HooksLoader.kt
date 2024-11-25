@@ -94,7 +94,7 @@ internal object HooksLoader : Initializable {
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
                 ?: throw IllegalStateException("the LoadListener $loadListener is not an object class")
 
-            if (!obj.loaded.get()) {
+            if (!obj.loaded.get()) { // blocking call
                 return
             }
         }

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus
  * See the document of the subtypes for more details of usage.
  */
 interface AttributeMapAccess {
-    companion object Holder {
+    companion object Holder : AttributeMapAccess {
         private var instance: AttributeMapAccess? = null
 
         @JvmStatic
@@ -24,6 +24,10 @@ interface AttributeMapAccess {
         @ApiStatus.Internal
         fun unregister() {
             instance = null
+        }
+
+        override fun get(subject: Any): Result<AttributeMap> {
+            return instance().get(subject)
         }
     }
 

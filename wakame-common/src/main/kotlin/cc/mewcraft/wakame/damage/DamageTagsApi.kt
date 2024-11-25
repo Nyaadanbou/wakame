@@ -52,7 +52,7 @@ interface DamageTagsFactory {
     /**
      * 半生对象, 用于获取 [DamageTagsFactory] 的实例.
      */
-    companion object Provider {
+    companion object Holder : DamageTagsFactory {
         private var instance: DamageTagsFactory? = null
 
         @JvmStatic
@@ -68,6 +68,14 @@ interface DamageTagsFactory {
         @ApiStatus.Internal
         fun unregister() {
             instance = null
+        }
+
+        override fun create(vararg tags: DamageTag): DamageTags {
+            return instance().create(*tags)
+        }
+
+        override fun create(tags: List<DamageTag>): DamageTags {
+            return instance().create(tags)
         }
     }
 }

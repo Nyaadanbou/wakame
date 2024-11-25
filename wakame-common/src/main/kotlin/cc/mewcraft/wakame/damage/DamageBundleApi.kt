@@ -75,7 +75,7 @@ interface DamageBundleFactory {
     /**
      * 伴生对象, 提供 [DamageBundleFactory] 的实例.
      */
-    companion object Provider {
+    companion object Holder : DamageBundleFactory {
         private var instance: DamageBundleFactory? = null
 
         @JvmStatic
@@ -91,6 +91,14 @@ interface DamageBundleFactory {
         @ApiStatus.Internal
         fun unregister() {
             instance = null
+        }
+
+        override fun create(data: Map<Element, DamagePacket>): DamageBundle {
+            return instance().create(data)
+        }
+
+        override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
+            return instance().createUnsafe(data)
         }
     }
 }

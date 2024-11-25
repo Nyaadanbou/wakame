@@ -6,7 +6,7 @@ import org.jetbrains.annotations.ApiStatus
  * Holds one or more instances of [Attribute].
  */
 interface AttributeProvider {
-    companion object Holder {
+    companion object Holder : AttributeProvider {
         private var instance: AttributeProvider? = null
 
         @JvmStatic
@@ -22,6 +22,22 @@ interface AttributeProvider {
         @ApiStatus.Internal
         fun unregister() {
             instance = null
+        }
+
+        override fun getSingleton(descriptionId: String): Attribute? {
+            return instance().getSingleton(descriptionId)
+        }
+
+        override fun getComposition(compositionId: String): Collection<Attribute> {
+            return instance().getComposition(compositionId)
+        }
+
+        override fun isElementalByDescriptionId(descriptionId: String): Boolean {
+            return instance().isElementalByDescriptionId(descriptionId)
+        }
+
+        override fun isElementalByCompositionId(compositionId: String): Boolean {
+            return instance().isElementalByCompositionId(compositionId)
         }
     }
 
