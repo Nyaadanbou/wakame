@@ -45,7 +45,7 @@ internal object HooksLoader : Initializable {
         JarUtils.findAnnotatedClasses(
             NEKO_PLUGIN.nekooJar,
             listOf(Hook::class), emptyList(),
-            "xyz/xenondevs/nova/hook/impl/"
+            "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
             val annotation = annotations.first()
             try {
@@ -54,11 +54,13 @@ internal object HooksLoader : Initializable {
                 val requireAll = (annotation["requireAll"] as? Boolean) == true
                 val loadListener = annotation["loadListener"] as? Type
 
-                if (plugins.isEmpty())
+                if (plugins.isEmpty()) {
                     throw IllegalStateException("hook annotation on $className does not specify any plugins")
+                }
 
-                if (shouldLoadHook(plugins, unless, requireAll))
+                if (shouldLoadHook(plugins, unless, requireAll)) {
                     loadHook(className.replace('/', '.'), loadListener)
+                }
             } catch (t: Throwable) {
                 Injector.get<Logger>().error("Failed to load hook $className", t)
             }
@@ -84,8 +86,9 @@ internal object HooksLoader : Initializable {
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
                 ?: throw IllegalStateException("the LoadListener $loadListener is not an object class")
 
-            if (!obj.loaded.get())
+            if (!obj.loaded.get()) {
                 return
+            }
         }
 
         val hookClass = Class.forName(className).kotlin
