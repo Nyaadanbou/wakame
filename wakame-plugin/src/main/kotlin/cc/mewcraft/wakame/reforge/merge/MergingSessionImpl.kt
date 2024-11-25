@@ -1,15 +1,16 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
-import cc.mewcraft.wakame.economy.Economy
+import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -315,8 +316,6 @@ internal object ReforgeType {
  * 包含了构建各种 [MergingSession.ReforgeCost] 的方法.
  */
 internal object ReforgeCost {
-    private val economy: Economy = Injector.get()
-
     /**
      * 表示没有资源消耗.
      */
@@ -373,11 +372,11 @@ internal object ReforgeCost {
         val currencyAmount: Double,
     ) : Base() {
         override fun take(viewer: Player) {
-            economy.take(viewer.uniqueId, currencyAmount)
+            EconomyManager.take(viewer.uniqueId, currencyAmount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return economy.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
         override val description: List<Component> = listOf(

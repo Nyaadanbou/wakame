@@ -1,6 +1,6 @@
 plugins {
-    id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
+    id("wakame-conventions.kotlin")
     `maven-publish`
 }
 

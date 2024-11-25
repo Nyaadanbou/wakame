@@ -1,8 +1,8 @@
 plugins {
-    id("neko-kotlin")
     id("nyaadanbou-conventions.repositories")
     id("nyaadanbou-conventions.copy-jar")
-    alias(libs.plugins.paperdev)
+    id("wakame-conventions.kotlin")
+    id("io.papermc.paperweight.userdev")
 }
 
 group = "cc.mewcraft.wakame"
@@ -27,12 +27,12 @@ dependencies {
 }
 
 tasks {
+    processResources {
+        expand(project.properties)
+    }
     copyJar {
         environment = "paperMixin"
         jarFileName = "wakame-${project.version}.jar"
-    }
-    processResources {
-        expand(project.properties)
     }
 }
 

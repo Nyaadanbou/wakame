@@ -1,11 +1,12 @@
+import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import net.minecrell.pluginyml.paper.PaperPluginDescription.*
+import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
 plugins {
-    id("neko-kotlin")
-    id("neko-koin")
     id("nyaadanbou-conventions.repositories")
     id("nyaadanbou-conventions.copy-jar")
+    id("wakame-conventions.kotlin")
+    id("io.papermc.paperweight.userdev")
     alias(libs.plugins.pluginyml.paper)
 }
 
@@ -15,19 +16,26 @@ description = "The core plugin of Nyaadanbou"
 
 dependencies {
     // internal
-    compileOnly(project(":wakame-api")) // 运行时由 wakame-mixin 提供
-    compileOnly(project(":wakame-common")) // 同上
-    implementation(project(":wakame-ext"))
-    implementation(project(":wakame-git"))
-    compileOnly(project(":wakame-nms"))
-    runtimeOnly(project(path = ":wakame-nms", configuration = "reobf")) // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
+    compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
+    compileOnlyApi(project(":wakame-common")) // 同上
+    runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-towny"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-vault"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-worldguard"))
 
     // libraries
-    compileOnly(local.paper)
-    compileOnly(local.helper)
+    paperweight.paperDevBundle(local.versions.paper)
+    compileOnlyApi(platform(local.koin.bom))
+    compileOnlyApi(local.koin.core)
+    implementation(platform(local.koin.bom))
+    implementation(local.koin.core)
     implementation(local.commons.collections)
-    implementation(local.commons.guava)
     implementation(local.commons.provider)
+    implementation(local.commons.reflection)
     implementation(libs.mocha)
     compileOnly(local.shadow.nbt) // 运行时由 wakame-mixin 提供
     implementation(platform(libs.bom.adventure))
@@ -37,10 +45,7 @@ dependencies {
     implementation(platform(libs.bom.configurate.kotlin))
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
-    implementation(platform(libs.bom.cloud.kotlin)) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
+    implementation(platform(libs.bom.cloud.kotlin))
     implementation(platform(libs.bom.hephaestus)) {
         exclude("com.google.code.gson")
         exclude("net.kyori")
@@ -52,18 +57,15 @@ dependencies {
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
-    // other plugins (without ide pollution)
+    // other plugins (hard dependencies)
+    compileOnlyApi(local.helper)
     compileOnly(local.adventurelevel)
 
     // test
-    testImplementation(project(":wakame-common"))
-    testImplementation(local.paper)
+    testImplementation(project(":wakame-api"))
     testImplementation(local.helper)
-    testImplementation(libs.configurate.yaml)
-    testImplementation(libs.configurate.extra.kotlin)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(libs.mockbukkit)
     testImplementation(local.shadow.nbt)
 }
 
@@ -76,9 +78,10 @@ tasks {
             attributes["paperweight-mappings-namespace"] = "spigot"
         }
 
-        // relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-        // relocate("org.koin", "cc.mewcraft.wakame.external.koin")
-        relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
+        val shadedPattern = "cc.mewcraft.wakame.external."
+        relocate("com.github.benmanes.caffeine.cache", shadedPattern + "caffeine")
+        relocate("org.koin", shadedPattern + "koin")
+        relocate("org.spongepowered.configurate", shadedPattern + "config")
         // relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         // relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
         // relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
@@ -98,8 +101,17 @@ tasks {
         // relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
         // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
+
+    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
+    assemble {
+        dependsOn(reobfJar)
+    }
+    paperweight {
+        reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
+    }
     copyJar {
         environment = "paper"
+        jarTaskName = "reobfJar"
         jarFileName = "wakame-${project.version}.jar"
     }
 }
@@ -123,15 +135,31 @@ paper {
             required = false
             load = RelativeLoadOrder.OMIT // 懒加载 class
         }
-        register("Economy") {
-            required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
-        }
         register("ChestSort") {
             required = false
             load = RelativeLoadOrder.OMIT // 懒加载 class
         }
+        register("Economy") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
+        register("LuckPerms") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
         register("MythicMobs") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
+        register("Towny") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
+        register("Vault") {
+            required = false
+            load = RelativeLoadOrder.OMIT // 懒加载 class
+        }
+        register("WorldGuard") {
             required = false
             load = RelativeLoadOrder.OMIT // 懒加载 class
         }

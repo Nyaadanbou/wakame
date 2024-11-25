@@ -1,10 +1,15 @@
 package cc.mewcraft.wakame.reforge.repair
 
-import cc.mewcraft.wakame.economy.Economy
+import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.isDamaged
+import cc.mewcraft.wakame.util.itemName
+import cc.mewcraft.wakame.util.plain
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -18,8 +23,6 @@ internal class SimpleRepairingSession(
     override val viewer: Player,
 ) : RepairingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
-
-    private val economy: Economy = get()
 
     // 储存了当前所有的 claim.
     // 这里的 index 就是它显示在修理菜单里的位置 (display slot).
@@ -136,11 +139,11 @@ internal class SimpleRepairingSession(
         override val value: Double,
     ) : RepairingSession.RepairCost {
         override fun test(player: Player): Boolean {
-            return economy.has(player.uniqueId, value).getOrDefault(false)
+            return EconomyManager.has(player.uniqueId, value).getOrDefault(false)
         }
 
         override fun take(player: Player) {
-            economy.take(player.uniqueId, value).getOrDefault(false)
+            EconomyManager.take(player.uniqueId, value).getOrDefault(false)
         }
     }
 }

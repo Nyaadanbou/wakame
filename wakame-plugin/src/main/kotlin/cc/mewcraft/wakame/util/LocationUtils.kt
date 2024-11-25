@@ -5,6 +5,10 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.util.Vector
 
+fun Location.isBetweenXZ(min: Location, max: Location): Boolean =
+    x in min.x.rangeTo(max.x)
+            && z in min.z.rangeTo(max.z)
+
 fun Location.getTargetLocation(distance: Int, ignoreBlocks: Boolean = false): Location {
     val direction: Vector = direction
     world ?: return this

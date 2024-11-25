@@ -14,8 +14,9 @@ repositories {
 }
 
 dependencies {
-    implementation(local.plugin.kotlin.jvm)
     implementation(local.plugin.nyaadanbou.conventions)
+    implementation(local.plugin.kotlin.jvm)
+    implementation(local.plugin.paperweight.userdev)
     implementation(libs.shadow)
     implementation(libs.indra.common)
 }

@@ -1,0 +1,87 @@
+package cc.mewcraft.wakame.hook.impl.worldguard
+
+import cc.mewcraft.wakame.api.protection.ProtectionIntegration
+import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
+import cc.mewcraft.wakame.integration.Hook
+import com.sk89q.worldedit.bukkit.BukkitAdapter
+import com.sk89q.worldedit.math.BlockVector3
+import com.sk89q.worldedit.world.World
+import com.sk89q.worldguard.LocalPlayer
+import com.sk89q.worldguard.WorldGuard
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin
+import com.sk89q.worldguard.protection.flags.Flags
+import com.sk89q.worldguard.protection.flags.StateFlag
+import org.bukkit.Location
+import org.bukkit.OfflinePlayer
+import org.bukkit.entity.Entity
+import org.bukkit.inventory.ItemStack
+
+@Hook(plugins = ["WorldGuard"])
+object WorldGuardHook : ProtectionIntegration {
+
+    private val PLUGIN = WorldGuardPlugin.inst()
+    private val PLATFORM = WorldGuard.getInstance().platform
+
+    override fun getExecutionMode(): ExecutionMode {
+        return ExecutionMode.NONE
+    }
+
+    override fun canBreak(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
+        return runQuery(player, location, Flags.BLOCK_BREAK)
+    }
+
+    override fun canPlace(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
+        return runQuery(player, location, Flags.BLOCK_PLACE)
+    }
+
+    override fun canUseBlock(player: OfflinePlayer, item: ItemStack?, location: Location): Boolean {
+        return runQuery(player, location, Flags.USE)
+    }
+
+    override fun canUseItem(player: OfflinePlayer, item: ItemStack, location: Location): Boolean {
+        return runQuery(player, location, Flags.USE)
+    }
+
+    override fun canInteractWithEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
+        return runQuery(player, entity.location, Flags.INTERACT)
+    }
+
+    override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
+        return runQuery(player, entity.location, Flags.DAMAGE_ANIMALS)
+    }
+
+    // 开发日记 2024/11/24 小米
+    // 依然不明白为什么 Nova 会存在离线玩家的权限检查,
+    // 难不成一些持续运行的“机器方块”需要检查权限?
+    // 这些方块当玩家离线后也会持续运行.
+    private fun runQuery(offlinePlayer: OfflinePlayer, location: Location, vararg flags: StateFlag): Boolean {
+        val world = BukkitAdapter.adapt(location.world)
+
+        // 离线玩家没有任何权限. 如果玩家离线, 则返回 false
+        val onlinePlayer = offlinePlayer.player ?: return false
+        val localPlayer = PLUGIN.wrapPlayer(onlinePlayer)
+
+        if (hasBypass(world, localPlayer)) {
+            return true
+        }
+
+        val vector = BukkitAdapter.asBlockVector(location)
+        if (hasRegion(world, vector)) {
+            val wrappedLocation = BukkitAdapter.adapt(location)
+            val query = PLATFORM.regionContainer.createQuery()
+            return query.testBuild(wrappedLocation, localPlayer, *flags)
+        } else {
+            return true
+        }
+    }
+
+    private fun hasRegion(world: World, vector: BlockVector3): Boolean {
+        val regionManager = PLATFORM.regionContainer.get(world) ?: return true
+        return regionManager.getApplicableRegions(vector).size() > 0
+    }
+
+    private fun hasBypass(world: World, player: LocalPlayer): Boolean {
+        return PLATFORM.sessionManager.hasBypass(player, world)
+    }
+
+}

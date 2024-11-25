@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.api
 
-import cc.mewcraft.wakame.Nekoo
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.CustomNekoItemRealizer
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.isNeko
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text

@@ -3,40 +3,42 @@
 kotlin = "2.0.21"
 kotlinx-coroutines-core = "1.9.0"
 koin = "4.0.0"
-ignite = "1.1.0"
-mixin = "0.8.6"
-mixin-extras = "0.3.6"
 commons = "1.17"
 shadow-nbt = "1.21.1-SNAPSHOT"
 
+ignite = "1.1.0"
+mixin = "0.8.6"
+mixin-extras = "0.3.6"
+paperweight = "1.7.5"
 paper = "1.21.1-R0.1-SNAPSHOT"
 helper = "6.0.0"
 adventurelevel = "1.4.0"
 mythicmobs = "5.8.0-SNAPSHOT"
 economy = "2.2.0"
 chestsort = "13.0.0-SNAPSHOT"
+vault = "1.7"
+luckperms = "5.4"
+towny = "0.100.4.0"
 
 [libraries]
 
 # Gradle plugins
 
-plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version = "1.0" }
+plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 
 # Shaded dependencies
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
-
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
-
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
 koin-test = { group = "io.insert-koin", name = "koin-test" }
 koin-test-junit5 = { group = "io.insert-koin", name = "koin-test-junit5" }
-
 commons-collections = { group = "xyz.xenondevs.commons", name = "commons-collections", version.ref = "commons" }
 commons-gson = { group = "xyz.xenondevs.commons", name = "commons-gson", version.ref = "commons" }
 commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", version.ref = "commons" }
@@ -44,13 +46,19 @@ commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider",
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 
+# Server dependencies
+
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 
 # Plugin dependencies
 
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
 economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
 chestsort = { group = "de.jeff_media", name = "ChestSortAPI", version.ref = "chestsort" }
+worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version = "7.0.7" }
+vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
+luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
+towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }

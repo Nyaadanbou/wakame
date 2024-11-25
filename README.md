@@ -1,3 +1,14 @@
+## 自定义附魔 & 数据包
+
+萌芽的自定义附魔实现采取了一种“怎么方便怎么实现”的策略.
+
+萌芽完全使用了数据包来实现自定义附魔的新增/移除/获得途径/等级需求等等.
+服务端必须安装好正确的数据包, 萌芽的自定义附魔才会出现在游戏中.
+也就是说, 数据包里必须包含萌芽新增的所有附魔实例.
+
+对于附魔的其他方面, 例如提供的萌芽属性/萌芽机制, 萌芽通过监听玩家的背包变化来实现.
+这些方面仅用数据包无法实现与萌芽系统比较好的联动效果, 因此萌芽会完全接管这方面.
+
 ## 资源包分发服务器的正确用法
 
 如果想使用萌芽内置的 HTTP 服务器分发资源包 (`self_host`), 必须添加以下变量到服务端启动参数的 `-jar` 之前:
@@ -22,13 +33,11 @@ AttributeModifier 的 UUID 是肯定不与其他对象提供的 AttributeModifie
 
 ```
 Compound('wakame')
-    // 物品的命名空间
-    String('namespace'): 'short_sword'
-    
-    // 物品的路径
-    String('path'): 'demo'
+    // 物品的命名空间及 ID
+    String('id'): 'weapon:short_sword'
     
     // 物品的变体
+    // 可以不存在, 即为 `0`
     String('variant'): 0
     
     // 物品的组件
@@ -38,127 +47,13 @@ Compound('wakame')
         // 可以释放技能?
         Compound('castable')
 
-        // 核孔
-        Compound('cells')
-            // 核孔的 id
-            Compound('a')
-                 // 核孔的内容（核心）
-                Compound('core')
-                    // 核心的 id
-                    String('id'): 'attribute:attack_damage'
-                    // 核心的具体设置
-                    Short('min'): 10s
-                    Short('max'): 15s
-                    Byte('elem'): 0b
-                    Byte('op'): 0b
-                 // 重铸的元数据（可能会用到）
-                Compound('reforge')
-                    Byte('success'): 5b
-                    Byte('failure'): 1b
-                // 核孔的解锁条件
-                Compound('curse')
-                    // 诅咒的 id
-                    String('id'): 'entity_kills'
-                    // 诅咒的具体设置
-                    String('index'): 'demo_bosses_1'
-                    Short('count'): 18s
-            Compound('b')
-                Compound('core')
-                    String('id'): 'attribute:attack_damage'
-                    Short('min'): 10s
-                    Short('max'): 15s
-                    Byte('elem'): 2b
-                    Byte('op'): 0b
-                Compound('reforge')
-                    // 空, 或不存在, 都代表没有重铸数据
-                Compound('curse')
-                    // 空, 或不存在, 都代表无诅咒
-            Compound('c')
-                Compound('core'):
-                    String('id'): 'attribute:attack_damage_rate'
-                    Float('value'): 0.2f
-                    Byte('elem'): 2b
-                    Byte('op'): 0b
-                Compound('reforge')
-                Compound('curse')
-            Compound('d')
-                Compound('core')
-                    String('id'): 'ability:dash'
-                Compound('reforge')
-                Compound('curse')
-            Compound('e')
-                Compound('core')
-                     // 空, 或不存在, 都代表无核心
-                Compound('reforge')
-                Compound('curse')
-
-        // 盲盒
+        // 盲盒(未鉴定)
         Compound('crate')
             String('key'): 'common:demo'
-        
-        // 自定义名字
-        Compound('custom_name')
-            String('raw'): '<aqua>The original "displayName"'
 
         // 物品元素
         Compound('elements')
             ByteArray('raw'): [1b, 2b]
-
-        // 食物
-        Compound('food')
-            List('(String) skills')
-                String(): 'melee:demo'
-                String(): 'ranged:demo'
-
-        // 物品名字
-        Compound('item_name')
-            String('raw'): '<aqua>The name that can't be changed by anvils' 
-
-        // 物品铭刻
-        Compound('kizamiz')
-            ByteArray('raw'): [0b, 3b]
-
-        // 物品等级
-        Compound('level')
-            Byte('raw'): 12b
-
-        // 描述
-        Compound('lore')
-            List('(String) raw')
-                String(): '<red>This is the red first line'
-                String(): '<green>This is the green second line'
-                String(): '<blue>This is the blue third line'
-
-        // 物品稀有度
-        Compound('rarity')
-            Byte('raw'): 0b
         
-        // 物品皮肤
-        Compound('skin')
-            Short('raw'): 35s
-
-        // 物品皮肤所有者
-        Compound('skin_owner')
-            IntArray('raw'): [0, 1, 2, 3] // 皮肤所有者的 UUID，储存为 4 个 Int
-
-        // 物品统计数据
-        Compound('stats')
-            Compound('entity_kills')
-                Short('minecraft:zombie'): 5s
-                Short('minecraft:spider'): 2s
-                Short('minecraft:wither'): 3s
-                Short('minecraft:ender_dragon'): 4s // 数量不为 0 将储存在 NBT
-                Short('mythicmobs:gojira'): 2s
-                Short('mythicmobs:skeleton_king'): 11s
-                Short('mythicmobs:sister'): 0s // 数量为 0 则实际不会储存在 NBT
-            Compound('peak_damage')
-                Short('neutral'): 55s
-                Short('fire'): 5s
-                Short('water'): 30s
-                Short('wind'): 0s
-                Short('earth'): 0s // 没有造成过伤害的元素，不需要写进 NBT，意为 0
-                Short('thunder'): 12s
-            Compound('reforge')
-                Byte('count'): 38b // 重铸总次数
-                Short('cost'): 32767s // 重铸总花费
+        // ... 以及其他组件
 ```
