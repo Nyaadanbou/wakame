@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.protection
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntity
 import cc.mewcraft.wakame.context.Context
@@ -307,7 +307,7 @@ object ProtectionManager : Initializable {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean,
     ): Boolean {
-        if (!NEKO_PLUGIN.isEnabled) {
+        if (!NEKO.isEnabled) {
             return false
         }
 

@@ -48,7 +48,7 @@ import org.koin.core.context.stopKoin
 /**
  * 直接访问 [WakamePlugin] 的实例.
  */
-val NEKO_PLUGIN: WakamePlugin
+val NEKO: WakamePlugin
     get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
 
 class WakamePlugin : KExtendedJavaPlugin() {

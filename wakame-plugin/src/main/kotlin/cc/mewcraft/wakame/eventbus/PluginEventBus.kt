@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.eventbus
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.util.RunningEnvironment
 import com.github.shynixn.mccoroutine.bukkit.scope
 import kotlinx.coroutines.CoroutineScope
@@ -18,7 +18,7 @@ internal object PluginEventBus {
 
             // 如果是生产环境, 则使用插件的 coroutine scope
             RunningEnvironment.PRODUCTION.isRunning() -> {
-                EventBus(NEKO_PLUGIN.scope)
+                EventBus(NEKO.scope)
             }
 
             else -> {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.NEKO_PLUGIN
+import cc.mewcraft.wakame.NEKO
 import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import org.bukkit.Bukkit
 import org.bukkit.event.Event.Result
@@ -19,11 +19,11 @@ fun PlayerInteractEvent.isCompletelyDenied() = useInteractedBlock() == Result.DE
 
 //<editor-fold desc="Event Registrations">
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, NEKO_PLUGIN)
+    Bukkit.getPluginManager().registerEvents(this, NEKO)
 }
 
 fun Listener.registerSuspendingEvents() {
-    Bukkit.getPluginManager().registerSuspendingEvents(this, NEKO_PLUGIN)
+    Bukkit.getPluginManager().registerSuspendingEvents(this, NEKO)
 }
 
 fun Listener.unregisterEvents() {
