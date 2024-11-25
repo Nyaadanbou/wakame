@@ -1,20 +1,19 @@
 # 全局配置文件
 
 # 调试模式开关
-# 警告: 不支持热重载!
+# 不支持热重载！
 debug: true
 
+# 只有物品堆叠的所有者可以拾起掉落的物品实体?
+only_owner_can_pickup_death_drops: false
+
 # 玩家等级算法
-# 警告: 不支持热重载!
 #
-# 可用选项:
-# ADVENTURE_LEVEL - AdventureLevel 的等级
-# EXPERIENCE_LEVEL - Minecraft 原版经验等级
-player_level_provider: EXPERIENCE_LEVEL
+# 可用选项：
+# ADVENTURE - AdventureLevel 插件的冒险等级
+# VANILLA - Minecraft 的原版经验等级
+# ZERO - 无等级 (永远为 0)
+player_level_provider: VANILLA
 
 # 性能设置
-# 警告: 不支持热重载!
-performance:
-  neko_executor:
-    enabled: false
-    threads: 16
+performance: { }
