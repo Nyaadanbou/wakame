@@ -19,7 +19,7 @@ public abstract class MixinTippedArrowRecipe extends CustomRecipe {
     }
 
     /**
-     * @author Nailm & Flandre & g2213swo
+     * @author Nailm, Flandre, g2213swo
      * @reason 禁止萌芽箭参与药水箭配方
      */
     @Override

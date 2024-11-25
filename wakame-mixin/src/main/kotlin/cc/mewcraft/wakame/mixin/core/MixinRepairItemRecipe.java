@@ -15,7 +15,7 @@ public abstract class MixinRepairItemRecipe extends CustomRecipe {
     }
 
     /**
-     * @author Nailm & Flandre & g2213swo
+     * @author Nailm, Flandre, g2213swo
      * @reason 禁止自定义物品参与工作台修复配方
      */
     @Overwrite

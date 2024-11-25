@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinStackedContentsExtraMap {
 
     /**
-     * @author Nailm & Flandre & g2213swo
+     * @author Nailm, Flandre, g2213swo
      * @reason 让原版无序合成完全支持萌芽物品
      */
     @Redirect(

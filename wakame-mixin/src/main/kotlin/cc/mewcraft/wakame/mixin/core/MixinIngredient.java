@@ -22,7 +22,7 @@ public abstract class MixinIngredient implements Predicate<ItemStack> {
     public abstract ItemStack[] getItems();
 
     /**
-     * @author Nailm & Flandre & g2213swo
+     * @author Nailm, Flandre, g2213swo
      * @reason 支持自定义物品
      */
     @Overwrite
