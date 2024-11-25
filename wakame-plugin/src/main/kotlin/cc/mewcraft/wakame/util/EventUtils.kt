@@ -19,6 +19,10 @@ fun PlayerInteractEvent.isCompletelyDenied() = useInteractedBlock() == Result.DE
 
 //<editor-fold desc="Event Registrations">
 fun Listener.registerEvents() {
+    Bukkit.getPluginManager().registerEvents(this, NEKO_PLUGIN)
+}
+
+fun Listener.registerSuspendingEvents() {
     Bukkit.getPluginManager().registerSuspendingEvents(this, NEKO_PLUGIN)
 }
 
