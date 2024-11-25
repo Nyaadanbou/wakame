@@ -6,7 +6,6 @@ plugins {
     id("nyaadanbou-conventions.repositories")
     id("nyaadanbou-conventions.copy-jar")
     id("wakame-conventions.kotlin")
-    id("wakame-conventions.koin")
     id("io.papermc.paperweight.userdev")
     alias(libs.plugins.pluginyml.paper)
 }
