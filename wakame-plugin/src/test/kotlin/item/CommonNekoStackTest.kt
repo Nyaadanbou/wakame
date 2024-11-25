@@ -5,19 +5,32 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.entity.entityModule
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.itemModule
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprintSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.kizamiModule
-import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.EntityRegistry
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.LevelMappingRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
@@ -25,7 +38,9 @@ import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.qualifier.named
-import org.koin.test.*
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -55,7 +70,6 @@ object CommonNekoStackTest {
                 elementModule(),
                 entityModule(),
                 kizamiModule(),
-                levelModule(),
                 molangModule(),
                 rarityModule(),
                 registryModule(),
