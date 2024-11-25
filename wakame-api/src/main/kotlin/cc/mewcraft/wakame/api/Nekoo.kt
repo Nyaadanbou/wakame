@@ -13,21 +13,25 @@ interface Nekoo {
      *
      * 你可以传入一个 [source], 使得生成结果基于该玩家的信息.
      */
+    @Deprecated("Temporary API")
     fun createItemStack(id: Key, source: Player? = null): ItemStack
 
     /**
      * @see createItemStack
      */
+    @Deprecated("Temporary API")
     fun createItemStack(namespace: String, path: String, source: Player? = null): ItemStack
 
     /**
      * 判断 [itemStack] 是否为萌芽物品.
      */
+    @Deprecated("Temporary API")
     fun isNekoStack(itemStack: ItemStack): Boolean
 
     /**
      * 如果 [itemStack] 是萌芽物品, 则返回对应萌芽物品的唯一标识.
      * 如果 [itemStack] 不是萌芽物品, 则返回 null.
      */
+    @Deprecated("Temporary API")
     fun getNekoItemId(itemStack: ItemStack): Key?
 }
