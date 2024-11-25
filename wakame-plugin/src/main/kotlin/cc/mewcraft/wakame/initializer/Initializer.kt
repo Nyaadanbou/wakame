@@ -6,8 +6,6 @@ import cc.mewcraft.wakame.NEKO_PLUGIN
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
-import cc.mewcraft.wakame.compatibility.chestshort.ChestSortListener
-import cc.mewcraft.wakame.compatibility.mythicmobs.MythicMobsListener
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.damage.DamageListener
@@ -16,7 +14,9 @@ import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemBehaviorListener
+import cc.mewcraft.wakame.item.ItemChangeListener
+import cc.mewcraft.wakame.item.ItemMiscellaneousListener
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.AdventureLevelListener
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
@@ -24,23 +24,38 @@ import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
+import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
+import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
 import me.lucko.helper.terminable.composite.CompositeTerminable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
-import org.bukkit.event.*
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.server.ServerLoadEvent
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 /**
  * @see Initializable
@@ -151,8 +166,6 @@ object Initializer : KoinComponent, Listener {
 
         // compatibility
         registerListenerAndBind<AdventureLevelListener>("AdventureLevel")
-        registerListenerAndBind<MythicMobsListener>("MythicMobs")
-        registerListenerAndBind<ChestSortListener>("ChestSort")
 
         // uncategorized
     }

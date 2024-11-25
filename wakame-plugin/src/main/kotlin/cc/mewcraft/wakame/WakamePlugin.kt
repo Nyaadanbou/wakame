@@ -1,25 +1,28 @@
+@file:Suppress(
+    "UnstableApiUsage", "HasPlatformType"
+)
+
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.api.NekooApiProvider
+import cc.mewcraft.wakame.api.NekooProvider
 import cc.mewcraft.wakame.attribute.attributeModule
-import cc.mewcraft.wakame.compatibility.compatibilityModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.core.coreModule
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display2.display2Module
-import cc.mewcraft.wakame.economy.economyModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer.initializerModule
+import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.lang.langModule
-import cc.mewcraft.wakame.level.levelModule
 import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
@@ -46,12 +49,15 @@ import org.koin.core.context.stopKoin
  * 直接访问 [WakamePlugin] 的实例.
  */
 val NEKO_PLUGIN: WakamePlugin
-    get() = requireNotNull(WakamePlugin.instance) { "WakamePlugin is not initialized yet" }
+    get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
         var instance: WakamePlugin? = null
     }
+
+    val version = pluginMeta.version
+    val nekooJar = file
 
     override suspend fun load() {
         instance = this
@@ -67,21 +73,19 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 // sub modules (by alphabet order)
                 adventureModule(),
                 attributeModule(),
-                compatibilityModule(),
                 coreModule(),
                 crateModule(),
                 damageModule(),
                 display2Module(),
-                economyModule(),
                 elementModule(),
                 enchantmentModule(),
                 entityModule(),
                 guiModule(),
                 initializerModule(),
+                integrationModule(),
                 itemModule(),
                 kizamiModule(),
                 langModule(),
-                levelModule(),
                 lookupModule(),
                 molangModule(),
                 packetModule(),

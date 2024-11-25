@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.repair
 
-import cc.mewcraft.wakame.integration.economy.EconomyIntegration
+import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -23,8 +23,6 @@ internal class SimpleRepairingSession(
     override val viewer: Player,
 ) : RepairingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
-
-    private val economyIntegration: EconomyIntegration = get()
 
     // 储存了当前所有的 claim.
     // 这里的 index 就是它显示在修理菜单里的位置 (display slot).
@@ -141,11 +139,11 @@ internal class SimpleRepairingSession(
         override val value: Double,
     ) : RepairingSession.RepairCost {
         override fun test(player: Player): Boolean {
-            return this@SimpleRepairingSession.economyIntegration.has(player.uniqueId, value).getOrDefault(false)
+            return EconomyManager.has(player.uniqueId, value).getOrDefault(false)
         }
 
         override fun take(player: Player) {
-            economyIntegration.take(player.uniqueId, value).getOrDefault(false)
+            EconomyManager.take(player.uniqueId, value).getOrDefault(false)
         }
     }
 }

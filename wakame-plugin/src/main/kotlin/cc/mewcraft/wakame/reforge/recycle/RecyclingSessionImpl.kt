@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.recycle
 
-import cc.mewcraft.wakame.integration.economy.EconomyIntegration
+import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -30,7 +30,6 @@ internal class SimpleRecyclingSession(
 ) : RecyclingSession, KoinComponent {
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
 
-    private val economyIntegration: EconomyIntegration = get()
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 
     private fun getItemKey(item: ItemStack): Key {
@@ -98,7 +97,7 @@ internal class SimpleRecyclingSession(
 
             logger.info("Sold for $totalPoint in total.")
 
-            val result = economyIntegration.give(viewer.uniqueId, totalPoint)
+            val result = EconomyManager.give(viewer.uniqueId, totalPoint)
             if (result.isFailure) {
                 logger.error("Failed to give money to ${viewer.name}.")
                 return PurchaseResult.failure(

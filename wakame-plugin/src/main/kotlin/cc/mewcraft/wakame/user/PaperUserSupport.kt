@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.kizami.KizamiMap
-import cc.mewcraft.wakame.level.PlayerLevelProvider
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
 import cc.mewcraft.wakame.skill.SkillMap
@@ -13,7 +13,9 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import java.util.UUID
 import java.util.stream.Stream
 
@@ -25,7 +27,7 @@ import java.util.stream.Stream
 class PaperUser(
     override val player: Player,
 ) : User<Player>, Examinable {
-    private val levelProvider: PlayerLevelProvider = Injector.get()
+    private val levelProvider: PlayerLevelIntegration = Injector.get()
 
     override val uniqueId: UUID
         get() = player.uniqueId
