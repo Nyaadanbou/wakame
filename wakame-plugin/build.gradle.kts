@@ -114,6 +114,7 @@ tasks {
     }
     copyJar {
         environment = "paper"
+        jarTaskName = "reobfJar"
         jarFileName = "wakame-${project.version}.jar"
     }
 }
