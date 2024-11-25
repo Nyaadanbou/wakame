@@ -109,7 +109,9 @@ class NekoEntityDamageEvent(
         bukkitEvent.isCancelled = cancel
     }
 
-    override fun getHandlers(): HandlerList = HANDLER_LIST
+    override fun getHandlers(): HandlerList {
+        return HANDLER_LIST
+    }
 
     companion object {
         @JvmStatic

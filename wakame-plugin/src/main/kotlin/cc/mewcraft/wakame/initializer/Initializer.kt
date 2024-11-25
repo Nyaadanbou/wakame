@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.damage.DamageListener
+import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
@@ -152,6 +153,7 @@ object Initializer : KoinComponent, Listener {
 
         // damage
         registerListenerAndBind<DamageListener>()
+        registerListenerAndBind<DamagePostListener>()
         registerListenerAndBind<DamageDisplay>()
 
         // rpg player

@@ -258,7 +258,7 @@ object ProtectionManager : Initializable {
     /**
      * Checks if the [tileEntity] can interact with the [entity] wile holding that [item].
      */
-    suspend fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean {
+    fun canInteractWithEntity(tileEntity: TileEntity, entity: Entity, item: ItemStack?): Boolean {
         if (tileEntity.owner == null) {
             return true
         }

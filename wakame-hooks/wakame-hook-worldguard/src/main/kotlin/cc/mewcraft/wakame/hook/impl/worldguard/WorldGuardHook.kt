@@ -14,6 +14,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["WorldGuard"])
@@ -47,6 +48,9 @@ object WorldGuardHook : ProtectionIntegration {
     }
 
     override fun canHurtEntity(player: OfflinePlayer, entity: Entity, item: ItemStack?): Boolean {
+        if (player is Player && entity is Player) {
+            return runQuery(player, entity.location, Flags.PVP)
+        }
         return runQuery(player, entity.location, Flags.DAMAGE_ANIMALS)
     }
 

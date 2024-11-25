@@ -3,7 +3,10 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.initializer.Initializer
 import io.papermc.paper.event.entity.EntityKnockbackEvent
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.join
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
 import net.kyori.adventure.text.event.ClickEvent
@@ -11,8 +14,13 @@ import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Server
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.*
-import org.bukkit.event.entity.*
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityShootBowEvent
+import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -86,7 +94,6 @@ object DamageListener : Listener, KoinComponent {
             server.filterAudience { it is Player }.sendMessage(message)
         }
     }
-
 
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
