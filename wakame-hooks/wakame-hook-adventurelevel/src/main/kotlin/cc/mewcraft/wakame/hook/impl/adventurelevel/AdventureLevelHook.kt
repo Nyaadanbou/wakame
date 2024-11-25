@@ -9,7 +9,6 @@ import cc.mewcraft.adventurelevel.plugin.AdventureLevelProvider
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
-import org.koin.core.component.KoinComponent
 import java.util.UUID
 
 /**
@@ -17,7 +16,7 @@ import java.util.UUID
  * *adventure level* (i.e., the level from our AdventureLevel plugin).
  */
 @Hook(plugins = ["AdventureLevel"])
-object AdventureLevelHook : PlayerLevelIntegration, KoinComponent {
+object AdventureLevelHook : PlayerLevelIntegration {
 
     override val type: PlayerLevelType = PlayerLevelType.ADVENTURE
 

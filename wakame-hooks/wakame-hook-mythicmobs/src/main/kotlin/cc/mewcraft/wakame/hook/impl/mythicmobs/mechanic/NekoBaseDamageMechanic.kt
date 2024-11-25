@@ -20,7 +20,6 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
 import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.LivingEntity
-import org.koin.core.component.KoinComponent
 import java.io.File
 
 class NekoBaseDamageMechanic(
@@ -28,7 +27,7 @@ class NekoBaseDamageMechanic(
     file: File,
     line: String,
     mlc: MythicLineConfig,
-) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill, KoinComponent {
+) : SkillMechanic(manager, file, line, mlc), ITargetedEntitySkill {
 
     companion object {
         private val DAMAGE_BUNDLE_PATTERN: Regex = Regex("\\([^)]+\\)")

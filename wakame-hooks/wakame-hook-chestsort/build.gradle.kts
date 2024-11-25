@@ -1,7 +1,6 @@
 plugins {
     id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.kotlin")
-    id("wakame-conventions.koin")
     id("io.papermc.paperweight.userdev")
 }
 

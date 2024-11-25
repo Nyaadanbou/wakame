@@ -18,7 +18,6 @@ import io.lumine.mythic.core.skills.SkillExecutor
 import io.lumine.mythic.core.skills.SkillMechanic
 import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.io.File
 
@@ -33,12 +32,13 @@ class AttributeMechanic(
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
+    private val attributeProvider: AttributeProvider by inject()
     private val attributeMapAccess: AttributeMapAccess by inject()
 
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> get<AttributeProvider>().getSingleton(parsed) }
+        ?.let { parsed -> attributeProvider.getSingleton(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {

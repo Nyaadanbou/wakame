@@ -22,11 +22,10 @@ import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent
 import io.lumine.mythic.core.skills.SkillExecutor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.koin.core.component.KoinComponent
 import java.io.File
 
 @Hook(plugins = ["MythicMobs"])
-object MythicMobsHook : KoinComponent, Listener {
+object MythicMobsHook : Listener {
     init {
         // 注册 Listeners
         registerEvents()

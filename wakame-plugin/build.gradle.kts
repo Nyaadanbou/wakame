@@ -30,8 +30,12 @@ dependencies {
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
+    compileOnlyApi(platform(local.koin.bom))
+    compileOnlyApi(local.koin.core) { exclude("org.jetbrains.kotlin") }
+    implementation(platform(local.koin.bom))
+    implementation(local.koin.core) { exclude("org.jetbrains.kotlin") }
+
     implementation(local.commons.collections)
-    implementation(local.commons.guava)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(libs.mocha)
@@ -65,11 +69,8 @@ dependencies {
     // test
     testImplementation(project(":wakame-api"))
     testImplementation(local.helper)
-    testImplementation(libs.configurate.yaml)
-    testImplementation(libs.configurate.extra.kotlin)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(libs.mockbukkit)
     testImplementation(local.shadow.nbt)
 }
 
@@ -82,8 +83,8 @@ tasks {
             attributes["paperweight-mappings-namespace"] = "spigot"
         }
 
-        // relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-        // relocate("org.koin", "cc.mewcraft.wakame.external.koin")
+        relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
+        relocate("org.koin", "cc.mewcraft.wakame.external.koin")
         relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
         // relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         // relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
