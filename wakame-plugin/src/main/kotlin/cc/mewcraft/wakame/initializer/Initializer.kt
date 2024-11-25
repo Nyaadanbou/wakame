@@ -35,7 +35,7 @@ import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.user.PaperUserManager
-import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.registerSuspendingEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
@@ -219,7 +219,7 @@ object Initializer : KoinComponent, Listener {
      */
     private fun initPreWorld() {
         saveDefaultConfiguration()
-        registerEvents() // register `this` listener
+        registerSuspendingEvents() // register `this` listener
         registerListeners()
         registerCommands()
 
