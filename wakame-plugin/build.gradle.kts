@@ -30,9 +30,9 @@ dependencies {
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
     compileOnlyApi(platform(local.koin.bom))
-    compileOnlyApi(local.koin.core) { exclude("org.jetbrains.kotlin") }
+    compileOnlyApi(local.koin.core)
     implementation(platform(local.koin.bom))
-    implementation(local.koin.core) { exclude("org.jetbrains.kotlin") }
+    implementation(local.koin.core)
     implementation(local.commons.collections)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
@@ -45,10 +45,7 @@ dependencies {
     implementation(platform(libs.bom.configurate.kotlin))
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
-    implementation(platform(libs.bom.cloud.kotlin)) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
+    implementation(platform(libs.bom.cloud.kotlin))
     implementation(platform(libs.bom.hephaestus)) {
         exclude("com.google.code.gson")
         exclude("net.kyori")
@@ -81,9 +78,10 @@ tasks {
             attributes["paperweight-mappings-namespace"] = "spigot"
         }
 
-        relocate("com.github.benmanes.caffeine.cache", "cc.mewcraft.wakame.external.caffeine")
-        relocate("org.koin", "cc.mewcraft.wakame.external.koin")
-        relocate("org.spongepowered.configurate", "cc.mewcraft.wakame.external.config")
+        val shadedPattern = "cc.mewcraft.wakame.external."
+        relocate("com.github.benmanes.caffeine.cache", shadedPattern + "caffeine")
+        relocate("org.koin", shadedPattern + "koin")
+        relocate("org.spongepowered.configurate", shadedPattern + "config")
         // relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
         // relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
         // relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
