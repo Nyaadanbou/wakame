@@ -33,7 +33,6 @@ dependencies {
     compileOnlyApi(local.koin.core) { exclude("org.jetbrains.kotlin") }
     implementation(platform(local.koin.bom))
     implementation(local.koin.core) { exclude("org.jetbrains.kotlin") }
-
     implementation(local.commons.collections)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)

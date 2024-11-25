@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("net.kyori.indra")
     id("com.gradleup.shadow")
 }
 
@@ -7,7 +8,7 @@ plugins {
 val local = the<org.gradle.accessors.dm.LibrariesForLocal>()
 
 configurations.all {
-    // paperweight 会把 paper 自带的 configurate 加入到 test classpath,
+    // paperweight 会把 paper 自带的 configurate 加入到 compile/runtime classpath,
     // 然后一般的 exclude 对于 paperweight.paperDevBundle 没有任何效果.
     // 这导致了 paper 的 configurate 和我们自己的 fork 在 test 环境发生冲突.
     // 不过在服务端上直接跑没有这个问题 (因为 plugin classloader 有更高优先级).
@@ -16,6 +17,13 @@ configurations.all {
     exclude("org.spongepowered", "configurate-core")
     exclude("org.spongepowered", "configurate-yaml")
     exclude("org.spongepowered", "configurate-gson")
+}
+
+configurations.runtimeClasspath {
+    // 服务端已经自带 kotlin 的标准库和其他辅助库.
+    // 排除掉 runtime 中 kotlin 和 kotlinx 依赖.
+    exclude("org.jetbrains.kotlin")
+    exclude("org.jetbrains.kotlinx")
 }
 
 tasks {
@@ -64,6 +72,9 @@ sourceSets {
     }
 }
 
+indra {
+    javaVersions().target(21)
+}
 
 java {
     withSourcesJar()
