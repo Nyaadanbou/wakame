@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.integration.Hook
 import com.sk89q.worldedit.bukkit.BukkitAdapter
-import com.sk89q.worldedit.math.BlockVector3
 import com.sk89q.worldedit.world.World
 import com.sk89q.worldguard.LocalPlayer
 import com.sk89q.worldguard.WorldGuard
@@ -69,19 +68,8 @@ object WorldGuardHook : ProtectionIntegration {
             return true
         }
 
-        val vector = BukkitAdapter.asBlockVector(location)
-        if (hasRegion(world, vector)) {
-            val wrappedLocation = BukkitAdapter.adapt(location)
-            val query = PLATFORM.regionContainer.createQuery()
-            return query.testBuild(wrappedLocation, localPlayer, *flags)
-        } else {
-            return true
-        }
-    }
-
-    private fun hasRegion(world: World, vector: BlockVector3): Boolean {
-        val regionManager = PLATFORM.regionContainer.get(world) ?: return true
-        return regionManager.getApplicableRegions(vector).size() > 0
+        val query = PLATFORM.regionContainer.createQuery()
+        return query.testState(BukkitAdapter.adapt(location), localPlayer, *flags)
     }
 
     private fun hasBypass(world: World, player: LocalPlayer): Boolean {
