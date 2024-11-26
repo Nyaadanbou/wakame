@@ -68,8 +68,9 @@ object WorldGuardHook : ProtectionIntegration {
             return true
         }
 
-        val query = PLATFORM.regionContainer.createQuery()
-        return query.testState(BukkitAdapter.adapt(location), localPlayer, *flags)
+        val query = PLATFORM.regionContainer.createQuery() //
+        val queryState = query.queryState(BukkitAdapter.adapt(location), localPlayer, *flags)
+        return queryState == null || queryState == StateFlag.State.ALLOW
     }
 
     private fun hasBypass(world: World, player: LocalPlayer): Boolean {
