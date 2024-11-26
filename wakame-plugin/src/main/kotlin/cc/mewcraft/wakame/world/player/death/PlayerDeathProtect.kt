@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.world.player.death
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import com.github.benmanes.caffeine.cache.*
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.RemovalCause
 import org.bukkit.entity.EntityType
-import org.bukkit.event.*
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.ItemStack
@@ -34,7 +38,7 @@ class PlayerDeathProtect : Listener, KoinComponent {
         .expireAfterWrite(10, TimeUnit.SECONDS)
         .removalListener<ItemStack, UUID> { key, value, cause ->
             if (cause != RemovalCause.EXPLICIT) {
-                logger.warn("ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+                logger.warn("[PlayerDeathProtect] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
             }
         }
         .build()

@@ -37,8 +37,9 @@ dependencies {
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(libs.mocha)
-    compileOnly(local.shadow.nbt) // 运行时由 wakame-mixin 提供
+    compileOnlyApi(local.shadow.nbt) // 运行时由 wakame-mixin 提供
     implementation(platform(libs.bom.adventure))
+    compileOnlyApi(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
