@@ -9,14 +9,25 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.ItemStackDSL
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.editNbt
+import cc.mewcraft.wakame.util.editNyaTag
+import cc.mewcraft.wakame.util.nbt
+import cc.mewcraft.wakame.util.nyaTag
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.unsafeNbt
+import cc.mewcraft.wakame.util.unsafeNyaTag
+import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.util.stream.Stream
 
@@ -253,7 +264,7 @@ private class VanillaNekoStack(
 
     override var isClientSide: Boolean
         get() = true
-        set(_) = unsupported()
+        set(_) = Unit
 
     override val itemType: Material
         get() = handle.type
@@ -269,7 +280,7 @@ private class VanillaNekoStack(
 
     override var variant: Int
         get() = 0 // 变体永远都是 0
-        set(_) = unsupported()
+        set(_) = Unit
 
     override val slotGroup: ItemSlotGroup
         get() = prototype.slotGroup
@@ -298,7 +309,7 @@ private class VanillaNekoStack(
     }
 
     override fun erase() {
-        unsupported()
+        // 原版物品没有可以擦除的 NBT
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
