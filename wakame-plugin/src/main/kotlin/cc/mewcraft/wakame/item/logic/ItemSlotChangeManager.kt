@@ -57,8 +57,8 @@ internal class ItemSlotChangeManager : Listener, KoinComponent {
                 val lastItemStack = lastItemRecords[player][itemSlot]
                 if (currItemStack != lastItemStack) {
                     lastItemRecords[player][itemSlot] = currItemStack
-                    val event = PlayerItemSlotChangeEvent(player, itemSlot, lastItemStack, currItemStack)
-                    event.callEvent()
+                    val changeEvent = PlayerItemSlotChangeEvent(player, itemSlot, lastItemStack, currItemStack)
+                    changeEvent.callEvent()
                 }
             }
         }

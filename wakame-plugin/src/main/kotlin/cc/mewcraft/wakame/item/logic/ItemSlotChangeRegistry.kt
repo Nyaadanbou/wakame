@@ -5,31 +5,26 @@ import cc.mewcraft.wakame.initializer.Initializable
 /**
  * 储存了所有 [ItemSlotChangeListener] 实例.
  *
- * 所有需要监听物品在玩家背包里发生变化的机制, 都应该 [register].
+ * ### 实现指南
+ * 如果代码需要监听玩家背包内的物品变化, 应该继承
+ * [ItemSlotChangeListener] 然后将实例添加到
+ * [ItemSlotChangeRegistry.listeners] 中.
+ *
+ * 注意不要重复添加同一个实例.
  */
-internal object ItemSlotChangeRegistry: Initializable {
-    private val listeners: MutableList<ItemSlotChangeListener> = mutableListOf()
-
+internal object ItemSlotChangeRegistry : Initializable {
     /**
-     * 获取所有 [ItemSlotChangeListener] 实例.
+     * 当前所有已注册的 [ItemSlotChangeListener] 实例.
+     *
+     * 警告: 如果注册同一个实例多次, 将导致实例被多次调用.
      */
-    fun listeners(): List<ItemSlotChangeListener> {
-        return listeners
-    }
-
-    /**
-     * 注册一个 [ItemSlotChangeListener] 实例.
-     * 警告: 多次注册会导致多次调用.
-     */
-    fun register(listener: ItemSlotChangeListener) {
-        listeners.add(listener)
-    }
+    val listeners: MutableList<ItemSlotChangeListener> = mutableListOf()
 
     override fun onPreWorld() {
-        register(AttackSpeedItemSlotChangeListener)
-        register(AttributeItemSlotChangeListener)
-        register(EnchantmentItemSlotChangeListener)
-        register(KizamiItemSlotChangeListener)
-        register(SkillItemSlotChangeListener)
+        listeners += AttackSpeedItemSlotChangeListener
+        listeners += AttributeItemSlotChangeListener
+        listeners += EnchantmentItemSlotChangeListener
+        listeners += KizamiItemSlotChangeListener
+        listeners += SkillItemSlotChangeListener
     }
 }

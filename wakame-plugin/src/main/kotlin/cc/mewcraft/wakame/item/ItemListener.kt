@@ -2,7 +2,10 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.event.*
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
@@ -11,14 +14,27 @@ import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.Bukkit
-import org.bukkit.entity.*
-import org.bukkit.event.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.ThrowableProjectile
+import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.*
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -30,8 +46,21 @@ import org.koin.core.component.inject
 internal class ItemChangeListener : KoinComponent, Listener {
     @EventHandler
     fun on(event: PlayerItemSlotChangeEvent) {
-        for (listener in ItemSlotChangeRegistry.listeners()) {
-            listener.handleEvent(event)
+        for (listener in ItemSlotChangeRegistry.listeners) {
+            try {
+                listener.handleEvent(event)
+            } catch (_: Exception) {
+                LOGGER.error(
+                    """
+                    An error occurred while executing listener: ${listener::class.simpleName} 
+                    
+                    Player: ${event.player.name}
+                    Slot: ${event.slot}
+                    Prev: ${event.oldItemStack}
+                    Curr: ${event.newItemStack}
+                    """.trimIndent()
+                )
+            }
         }
     }
 }

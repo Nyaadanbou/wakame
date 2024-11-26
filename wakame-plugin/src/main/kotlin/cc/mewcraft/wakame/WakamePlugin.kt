@@ -42,14 +42,15 @@ import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
-/**
- * 直接访问 [WakamePlugin] 的实例.
- */
 val NEKO: WakamePlugin
     get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
+
+val LOGGER: ComponentLogger
+    get() = NEKO.componentLogger
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
