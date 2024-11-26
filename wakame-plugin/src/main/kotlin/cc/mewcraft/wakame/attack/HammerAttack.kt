@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamageTag
+import cc.mewcraft.wakame.damage.DamageTags
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
@@ -68,7 +73,7 @@ class HammerAttack(
         // 向 x 轴, z 轴正负方向各 radius 格的长方体所碰撞到的生物
         hitLocation.clone().add(.0, .5, .0).getNearbyLivingEntities(radius, .5) {
             it != player && it != damagee
-        }.forEach {
+        }.forEach { victim ->
             // 锤子范围命中的生物的伤害元数据
             val extraDamageMetadata = PlayerDamageMetadata(
                 user = user,
@@ -82,7 +87,7 @@ class HammerAttack(
                     }
                 }
             )
-            it.hurt(extraDamageMetadata, player, true)
+            victim.hurt(extraDamageMetadata, player, true)
         }
 
         // 特效

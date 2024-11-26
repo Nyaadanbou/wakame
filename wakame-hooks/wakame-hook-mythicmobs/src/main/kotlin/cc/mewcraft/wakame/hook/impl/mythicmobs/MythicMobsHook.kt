@@ -11,15 +11,19 @@ import cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic.NekoBaseDamageMechanic
 import cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic.NekoPercentDamageMechanic
 import cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic.RemoveAttributeModifierMechanic
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.util.registerEvents
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.IDrop
 import io.lumine.mythic.api.skills.ISkillMechanic
 import io.lumine.mythic.api.skills.conditions.ISkillCondition
 import io.lumine.mythic.bukkit.events.MythicConditionLoadEvent
+import io.lumine.mythic.bukkit.events.MythicDamageEvent
 import io.lumine.mythic.bukkit.events.MythicDropLoadEvent
 import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent
 import io.lumine.mythic.core.skills.SkillExecutor
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.io.File
@@ -35,8 +39,19 @@ object MythicMobsHook : Listener {
         DamageApplier.register(MythicMobsDamageApplier)
     }
 
+    // SkillAdapter#doDamage 会触发该事件, 我们必须在这个事件里修改结果使其遵循领地和保护区的规则.
+    // Bukkit 的 EntityDamageEvent 也会被触发, 但那个事件里的 DamageSource 完全没法正常使用.
+    // 原因见: MythicMobsDamageApplier.kt
     @EventHandler
-    private fun on(e: MythicConditionLoadEvent) {
+    fun on(e: MythicDamageEvent) {
+        val damager = e.caster.entity.bukkitEntity as? Player ?: return
+        val victim = e.target.bukkitEntity as? LivingEntity ?: return
+
+        e.isCancelled = !ProtectionManager.canHurtEntity(damager, victim, null)
+    }
+
+    @EventHandler
+    fun on(e: MythicConditionLoadEvent) {
         when (e.conditionName.lowercase()) {
             "nekohasitem" -> e.registerCondition(::HasItemCondition)
             "nekoholding" -> e.registerCondition(::HoldingCondition)
@@ -45,7 +60,7 @@ object MythicMobsHook : Listener {
     }
 
     @EventHandler
-    private fun on(e: MythicMechanicLoadEvent) {
+    fun on(e: MythicMechanicLoadEvent) {
         when (e.mechanicName.lowercase()) {
             "nekoattribute" -> e.registerMechanic(::AttributeMechanic)
             "nekoattributemodifier" -> e.registerMechanic(::AttributeModifierMechanic)
@@ -56,7 +71,7 @@ object MythicMobsHook : Listener {
     }
 
     @EventHandler
-    private fun on(e: MythicDropLoadEvent) {
+    fun on(e: MythicDropLoadEvent) {
         when (e.dropName.lowercase()) {
             "nekodrop" -> e.registerDrop(::NekoItemDrop)
         }

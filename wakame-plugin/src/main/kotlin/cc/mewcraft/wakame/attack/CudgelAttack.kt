@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamageTag
+import cc.mewcraft.wakame.damage.DamageTags
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
@@ -106,7 +111,7 @@ class CudgelAttack(
         // 向 x 轴, z 轴正负方向各 radius 格的长方体所碰撞到的生物
         player.location.add(.0, .5, .0).getNearbyLivingEntities(radius, .5) {
             it != player && !excludeEntities.contains(it)
-        }.forEach {
+        }.forEach { victim ->
             val damageMetadata = PlayerDamageMetadata(
                 user = user,
                 damageTags = damageTags,
@@ -116,7 +121,7 @@ class CudgelAttack(
                     }
                 }
             )
-            it.hurt(damageMetadata, player, true)
+            victim.hurt(damageMetadata, player, true)
         }
 
         ParticleBuilder(Particle.SWEEP_ATTACK)
