@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.registry.ItemRegistry.find
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.key.Key
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
@@ -45,7 +45,7 @@ class ItemParser<C : Any> : AggregateParser<C, NekoItem> {
         return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val namespace = aggregateCommandContext.get<String>("namespace")
             val path = aggregateCommandContext.get<String>("path")
-            val item = ItemRegistry.CUSTOM.find(namespace, path)
+            val item = ItemRegistry.CUSTOM.getOrNull(Key.key(namespace, path))
             if (item == null) {
                 ArgumentParseResult.failureFuture(ItemParseException(commandContext))
             } else {

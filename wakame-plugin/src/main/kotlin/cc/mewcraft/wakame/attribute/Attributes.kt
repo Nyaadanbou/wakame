@@ -190,7 +190,7 @@ private class SimpleAttributeGetter(
     private val mappings: ConcurrentHashMap<Element, ElementAttribute> = ConcurrentHashMap()
 
     override fun of(id: String): ElementAttribute? {
-        val elem = ElementRegistry.INSTANCES.find(id)
+        val elem = ElementRegistry.INSTANCES.getOrNull(id)
         if (elem == null) {
             return null
         }

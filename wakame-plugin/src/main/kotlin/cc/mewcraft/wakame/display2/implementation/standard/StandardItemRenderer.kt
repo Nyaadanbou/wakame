@@ -4,11 +4,35 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.attribute.AttributeModifier.*
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.SimpleTextMeta
+import cc.mewcraft.wakame.display2.SourceIndex
+import cc.mewcraft.wakame.display2.SourceOrdinal
+import cc.mewcraft.wakame.display2.TextAssembler
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.EnchantmentRendererFormat
+import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
@@ -20,16 +44,23 @@ import cc.mewcraft.wakame.item.components.ItemKizamiz
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.components.CustomName
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
+import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.hasComponent
 import cc.mewcraft.wakame.util.StringCombiner
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
@@ -378,7 +409,7 @@ internal data class AttributeCoreTextMeta(
     ) {
         init { // validate values
             this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid operation, check your renderer config") }
-            this.elementIndex.forEach { ElementRegistry.INSTANCES.find(it) ?: error("'$it' is not a valid element, check your renderer config") }
+            this.elementIndex.forEach { ElementRegistry.INSTANCES.getOrNull(it) ?: error("'$it' is not a valid element, check your renderer config") }
         }
     }
 }

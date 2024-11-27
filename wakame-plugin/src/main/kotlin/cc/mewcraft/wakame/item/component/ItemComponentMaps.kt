@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.item.component.ItemComponentMap.Builder
 import cc.mewcraft.wakame.item.component.ItemComponentMap.Companion.TAG_COMPONENTS
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.getCompoundOrNull
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -234,7 +236,7 @@ private class WrappingItemComponentMap(
             .unsafeNyaTagOrThrow
             .getCompoundOrNull(TAG_COMPONENTS)
             ?.keySet()
-            ?.mapNotNull(ItemComponentRegistry.TYPES::find)
+            ?.mapNotNull(ItemComponentRegistry.TYPES::getOrNull)
             ?.let(::ReferenceArraySet)
             .orEmpty()
     }

@@ -26,7 +26,7 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
         .newBuilder()
         .weakValues()
         .build { k ->
-            provider { INSTANCES.find(k) ?: DEFAULT }
+            provider { INSTANCES.getOrNull(k) ?: DEFAULT }
         }
 
     fun getProvider(id: String): Provider<Element> {
@@ -69,6 +69,6 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
 
 private object DefaultElementProvider : ElementProvider {
     override fun get(id: String): Element? {
-        return ElementRegistry.INSTANCES.find(id)
+        return ElementRegistry.INSTANCES.getOrNull(id)
     }
 }

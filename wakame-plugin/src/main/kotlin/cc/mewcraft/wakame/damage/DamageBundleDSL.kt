@@ -2,7 +2,11 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeGetter
+import cc.mewcraft.wakame.attribute.AttributeMapLike
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry
 import org.koin.core.component.KoinComponent
@@ -62,7 +66,7 @@ class DamageBundleDSL(
     private val bundle: DamageBundle = DamageBundle()
 
     private fun getElementById(id: String): Element? {
-        return ElementRegistry.INSTANCES.find(id)
+        return ElementRegistry.INSTANCES.getOrNull(id)
     }
 
     /**

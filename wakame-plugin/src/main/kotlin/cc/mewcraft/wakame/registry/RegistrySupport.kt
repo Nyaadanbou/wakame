@@ -21,14 +21,6 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     fun isEmpty(): Boolean
 
     /**
-     * Gets specified value in this registry.
-     *
-     * @param uniqueId the name from which value you want to retrieve
-     * @return the specified value or `null` if not existing
-     */
-    fun find(uniqueId: K?): V?
-
-    /**
      * Checks whether the specific value is present in this registry.
      *
      * @param uniqueId the name to be checked
@@ -44,6 +36,14 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      * @throws IllegalStateException if the specified value does not exist
      */
     operator fun get(uniqueId: K): V
+
+    /**
+     * Gets specified value in this registry.
+     *
+     * @param uniqueId the name from which value you want to retrieve
+     * @return the specified value or `null` if not existing
+     */
+    fun getOrNull(uniqueId: K?): V?
 
     /**
      * Registers a new entry into this registry.
@@ -139,7 +139,7 @@ sealed interface BiKnot<K, V, B> {
      * @return the specified object or `null`
      */
     fun findBy(binary: B): V? {
-        return INSTANCES.find(BI_LOOKUP.findUniqueIdBy(binary))
+        return INSTANCES.getOrNull(BI_LOOKUP.findUniqueIdBy(binary))
     }
 
     /**
@@ -165,16 +165,16 @@ internal class SimpleRegistry<K, V> : Registry<K, V> {
         return uniqueId2ObjectMap.isEmpty()
     }
 
-    override fun find(uniqueId: K?): V? {
+    override fun getOrNull(uniqueId: K?): V? {
         return if (uniqueId == null) null else uniqueId2ObjectMap[uniqueId]
     }
 
     override fun has(uniqueId: K?): Boolean {
-        return find(uniqueId) != null
+        return getOrNull(uniqueId) != null
     }
 
     override operator fun get(uniqueId: K): V { // TODO 无脑抛异常有点太一刀切了，考虑返回空然后逐个处理
-        return requireNotNull(find(uniqueId)) { "Can't find object by identifier `$uniqueId` in the registry" }
+        return requireNotNull(getOrNull(uniqueId)) { "Can't find object by identifier `$uniqueId` in the registry" }
     }
 
     override fun register(uniqueId: K, value: V) {

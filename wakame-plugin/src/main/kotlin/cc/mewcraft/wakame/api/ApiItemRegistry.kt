@@ -26,7 +26,7 @@ object ApiItemRegistry : NekoItemRegistry {
     }
 
     override fun getOrNull(id: Key?): NekoItem? {
-        return ItemRegistry.CUSTOM.find(id)?.let(::ApiItemWrapper)
+        return ItemRegistry.CUSTOM.getOrNull(id)?.let(::ApiItemWrapper)
     }
 
     override fun getOrNull(itemStack: ItemStack?): NekoItem? {

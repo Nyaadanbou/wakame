@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContexts
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
@@ -18,12 +20,12 @@ class ItemXNeko(
 
     override fun isValid(): Boolean {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        return ItemRegistry.CUSTOM.find(nekoItemId) != null
+        return ItemRegistry.CUSTOM.getOrNull(nekoItemId) != null
     }
 
     override fun createItemStack(): ItemStack? {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId)
+        val nekoItem = ItemRegistry.CUSTOM.getOrNull(nekoItemId)
         val context = ItemGenerationContexts.create(
             // 始终以等级 0 生成
             trigger = ItemGenerationTriggers.direct(0),
@@ -39,7 +41,7 @@ class ItemXNeko(
 
     override fun createItemStack(player: Player): ItemStack? {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId)
+        val nekoItem = ItemRegistry.CUSTOM.getOrNull(nekoItemId)
         val nekoStack = nekoItem?.realize(player.toUser())
         val itemStack = nekoStack?.itemStack
         return itemStack
@@ -53,7 +55,7 @@ class ItemXNeko(
 
     override fun displayName(): String {
         val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        val nekoItem = ItemRegistry.CUSTOM.find(nekoItemId) ?: return DEFAULT_DISPLAY_NAME
+        val nekoItem = ItemRegistry.CUSTOM.getOrNull(nekoItemId) ?: return DEFAULT_DISPLAY_NAME
         return nekoItem.templates.get(ItemTemplateTypes.ITEM_NAME)?.plainName ?: DEFAULT_DISPLAY_NAME
     }
 }

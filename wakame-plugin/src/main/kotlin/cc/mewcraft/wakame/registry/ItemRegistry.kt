@@ -94,48 +94,6 @@ object ItemRegistry : KoinComponent, Initializable {
 
     private val namespace2Paths: Object2ObjectOpenHashMap<String, ObjectArrayList<String>> = Object2ObjectOpenHashMap()
 
-    /**
-     * Gets specific [NekoItem] from the registry.
-     *
-     * @param key the key in string representation
-     * @return the specific [NekoItem]
-     */
-    fun Registry<Key, NekoItem>.get(key: String): NekoItem {
-        return this[Key.key(key)]
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry if there is one.
-     *
-     * @param key the key in string representation
-     * @return the specific [NekoItem] or `null` if not found
-     */
-    fun Registry<Key, NekoItem>.find(key: String): NekoItem? {
-        return this.find(Key.key(key))
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry.
-     *
-     * @param namespace the namespace
-     * @param path the path
-     * @return the specific [NekoItem]
-     */
-    fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem {
-        return this[Key.key(namespace, path)]
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry if there is one.
-     *
-     * @param namespace the namespace
-     * @param path the path
-     * @return the specific [NekoItem] or `null` if not found
-     */
-    fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? {
-        return this.find(Key.key(namespace, path))
-    }
-
     override fun onPreWorld() {
         loadConfiguration()
     }
@@ -256,7 +214,7 @@ private object ItemRegistryInternals {
 
     @JvmField
     val ERROR_NEKO_ITEM_PROVIDER: Provider<NekoItem> =
-        provider { ItemRegistry.CUSTOM.find(ItemRegistry.ERROR_NEKO_ITEM_ID) }.orElse(DEFAULT_ERROR_NEKO_ITEM)
+        provider { ItemRegistry.CUSTOM.getOrNull(ItemRegistry.ERROR_NEKO_ITEM_ID) }.orElse(DEFAULT_ERROR_NEKO_ITEM)
 
     @JvmField
     val ERROR_NEKO_STACK_PROVIDER: Provider<NekoStack> =

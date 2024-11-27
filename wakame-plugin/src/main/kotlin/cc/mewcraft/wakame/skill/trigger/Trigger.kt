@@ -3,7 +3,9 @@ package cc.mewcraft.wakame.skill.trigger
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -170,8 +172,8 @@ internal object SkillTriggerSerializer : ScalarSerializer<Trigger>(typeTokenOf()
         if (obj is String) {
             val triggers = SkillRegistry.TRIGGERS
             val string = obj.lowercase()
-            val trigger = triggers.find(Key(string))
-                ?: triggers.find(Key(Namespaces.TRIGGER, string))
+            val trigger = triggers.getOrNull(Key(string))
+                ?: triggers.getOrNull(Key(Namespaces.TRIGGER, string))
                 ?: throw SerializationException("Cannot find trigger with key $obj")
             return trigger
         }

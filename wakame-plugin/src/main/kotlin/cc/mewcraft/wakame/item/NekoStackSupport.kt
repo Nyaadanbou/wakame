@@ -520,13 +520,13 @@ internal object NekoStackImplementations {
 
     fun getPrototype(wakameTag: CompoundTag): NekoItem? {
         val id = getIdOrThrow(wakameTag)
-        val prototype = ItemRegistry.CUSTOM.find(id)
+        val prototype = ItemRegistry.CUSTOM.getOrNull(id)
         return prototype
     }
 
     fun getPrototypeOrThrow(wakameTag: CompoundTag): NekoItem {
         val id = getIdOrThrow(wakameTag)
-        val prototype = requireNotNull(ItemRegistry.CUSTOM.find(id)) { "Can't find item prototype by id '$id'" }
+        val prototype = requireNotNull(ItemRegistry.CUSTOM.getOrNull(id)) { "Can't find item prototype by id '$id'" }
         return prototype
     }
 
