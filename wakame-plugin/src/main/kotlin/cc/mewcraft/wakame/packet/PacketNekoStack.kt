@@ -105,48 +105,64 @@ internal interface PacketNekoStack : NekoStack {
     val packetItem: ItemStack
 
     /**
-     * 设置自定义名称. 您可以传递 `null` 来移除名称.
+     * 读写 `minecraft:custom_name`. 传递 `null` 来移除.
      */
-    fun customName(value: Component?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.CUSTOM_NAME, value)
-        } else {
-            packetItem.unset(ComponentTypes.CUSTOM_NAME)
+    var customName: Component?
+        get() {
+            return packetItem.get(ComponentTypes.CUSTOM_NAME)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.CUSTOM_NAME, value)
+            } else {
+                packetItem.unset(ComponentTypes.CUSTOM_NAME)
+            }
+        }
 
     /**
-     * 设置物品名称. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:item_name`. 传递 `null` 来移除.
      */
-    fun itemName(value: Component?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.ITEM_NAME, value)
-        } else {
-            packetItem.unset(ComponentTypes.ITEM_NAME)
+    var itemName: Component?
+        get() {
+            return packetItem.get(ComponentTypes.ITEM_NAME)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.ITEM_NAME, value)
+            } else {
+                packetItem.unset(ComponentTypes.ITEM_NAME)
+            }
+        }
 
     /**
-     * 设置物品描述. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:lore`. 传递 `null` 来移除.
      */
-    fun lore(value: List<Component>?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.LORE, ItemLore(value))
-        } else {
-            packetItem.unset(ComponentTypes.LORE)
+    var lore: List<Component>?
+        get() {
+            return packetItem.get(ComponentTypes.LORE)?.lines
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.LORE, ItemLore(value))
+            } else {
+                packetItem.unset(ComponentTypes.LORE)
+            }
+        }
 
     /**
-     * 设置自定义模型数据. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:custom_model_data`. 传递 `null` 来移除.
      */
-    fun customModelData(value: Int?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.CUSTOM_MODEL_DATA, value)
-        } else {
-            packetItem.unset(ComponentTypes.CUSTOM_MODEL_DATA)
+    var customModelData: Int?
+        get() {
+            return packetItem.get(ComponentTypes.CUSTOM_MODEL_DATA)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.CUSTOM_MODEL_DATA, value)
+            } else {
+                packetItem.unset(ComponentTypes.CUSTOM_MODEL_DATA)
+            }
+        }
 
     //<editor-fold desc="Show In Tooltip">
     fun showAttributeModifiers(value: Boolean) {

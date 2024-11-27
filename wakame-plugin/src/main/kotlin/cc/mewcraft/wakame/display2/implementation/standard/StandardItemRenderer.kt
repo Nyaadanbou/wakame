@@ -126,17 +126,25 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
         item.erase()
 
-        item.lore(itemLore)
-        item.customModelData(itemCustomModelData)
+        item.lore = run {
+            // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
+            // 如果原本的 lore 为空, 则直接使用我们渲染的 lore.
+            // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
+
+            val lore = item.lore
+            if (lore.isNullOrEmpty()) {
+                itemLore
+            } else {
+                itemLore + buildList {
+                    add(Component.empty())
+                    addAll(lore)
+                }
+            }
+        }
+        item.customModelData = itemCustomModelData
         item.showAttributeModifiers(false)
-        // item.showCanBreak(false)
-        // item.showCanPlaceOn(false)
-        // item.showDyedColor(false)
         item.showEnchantments(false)
-        // item.showJukeboxPlayable(false)
         item.showStoredEnchantments(false)
-        // item.showTrim(false)
-        // item.showUnbreakable(false)
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
