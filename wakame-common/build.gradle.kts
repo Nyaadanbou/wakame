@@ -14,20 +14,3 @@ dependencies {
     compileOnly(local.paper)
     compileOnly(local.shadow.nbt)
 }
-
-publishing {
-    repositories {
-        maven("https://repo.mewcraft.cc/private") {
-            credentials {
-                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-            }
-        }
-    }
-
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
-}

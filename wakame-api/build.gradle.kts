@@ -9,7 +9,6 @@ version = "0.0.1-SNAPSHOT"
 description = "The API of wakame system"
 
 dependencies {
-    api(project(":wakame-common")) // 运行时由服务端提供
     compileOnly(local.paper)
 }
 
@@ -24,6 +23,7 @@ publishing {
     }
     publications {
         create<MavenPublication>("maven") {
+            artifactId = "api"
             from(components["java"])
         }
     }
