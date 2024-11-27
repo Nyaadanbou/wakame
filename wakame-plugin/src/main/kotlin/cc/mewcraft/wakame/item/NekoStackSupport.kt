@@ -11,14 +11,14 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.ItemStackDSL
 import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.editNbt
-import cc.mewcraft.wakame.util.editNyaTag
-import cc.mewcraft.wakame.util.nbt
-import cc.mewcraft.wakame.util.nyaTag
+import cc.mewcraft.wakame.util.editNekooTag
+import cc.mewcraft.wakame.util.editRootTag
+import cc.mewcraft.wakame.util.nekooTagOrNull
+import cc.mewcraft.wakame.util.rootTagOrNull
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNbt
-import cc.mewcraft.wakame.util.unsafeNyaTag
-import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
+import cc.mewcraft.wakame.util.unsafeNekooTag
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
+import cc.mewcraft.wakame.util.unsafeRootTagOrNull
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -37,8 +37,8 @@ import java.util.stream.Stream
 @get:Contract(pure = true)
 val ItemStack.isNeko: Boolean
     get() {
-        val nbt = this.unsafeNyaTag
-        if (nbt != null && NekoStackImplementations.getPrototype(nbt) != null) {
+        val nbt = this.unsafeNekooTagOrNull
+        if (nbt != null && NekoStackImplementations.getArchetypeOrNull(nbt) != null) {
             return true
         }
         return ImaginaryNekoStackRegistry.has(this.type)
@@ -50,8 +50,8 @@ val ItemStack.isNeko: Boolean
 @get:Contract(pure = true)
 val ItemStack.isCustomNeko: Boolean
     get() {
-        val nbt = this.unsafeNyaTag ?: return false
-        return NekoStackImplementations.getPrototype(nbt) != null
+        val nbt = this.unsafeNekooTagOrNull ?: return false
+        return NekoStackImplementations.getArchetypeOrNull(nbt) != null
     }
 
 /**
@@ -60,7 +60,7 @@ val ItemStack.isCustomNeko: Boolean
 @get:Contract(pure = true)
 val ItemStack.isVanillaNeko: Boolean
     get() {
-        if (this.unsafeNyaTag != null) {
+        if (this.unsafeNekooTagOrNull != null) {
             return false
         }
         return ImaginaryNekoStackRegistry.has(this.type)
@@ -72,16 +72,16 @@ val ItemStack.isVanillaNeko: Boolean
  */
 @Contract(pure = true)
 fun ItemStack.shadowNeko(excludeVanilla: Boolean = false): NekoStack? {
-    val nbt = this.unsafeNyaTag
+    val nbt = this.unsafeNekooTagOrNull
     if (nbt != null) {
-        if (NekoStackImplementations.getPrototype(nbt) != null) {
+        if (NekoStackImplementations.getArchetypeOrNull(nbt) != null) {
             // 存在萌芽 NBT, 并且存在对应的物品模板,
             // 那么这是一个合法的 CustomNekoStack.
             return CustomNekoStack(this)
         } else {
             // 存在萌芽 NBT, 但是没有对应的物品模板,
             // 这意味着该物品定义已经从物品库中移除.
-            this.nbt = null
+            this.rootTagOrNull = null
         }
     } else {
         if (excludeVanilla) {
@@ -181,8 +181,8 @@ private class CustomNekoStack(
 ) : NekoStack {
 
     // 所有访问该对象的代码应该只能读取, 禁止写入!
-    private val unsafeNyaTag: CompoundTag
-        get() = handle.unsafeNyaTagOrThrow
+    private val unsafeNekooTag: CompoundTag
+        get() = handle.unsafeNekooTag
 
     override val isEmpty: Boolean
         get() = false
@@ -201,26 +201,26 @@ private class CustomNekoStack(
         get() = handle
 
     override val prototype: NekoItem
-        get() = NekoStackImplementations.getPrototypeOrThrow(unsafeNyaTag)
+        get() = NekoStackImplementations.getArchetype(unsafeNekooTag)
 
     override val id: Key
-        get() = NekoStackImplementations.getIdOrThrow(unsafeNyaTag)
+        get() = NekoStackImplementations.getId(unsafeNekooTag)
 
     override var variant: Int
-        get() = NekoStackImplementations.getVariant(unsafeNyaTag)
+        get() = NekoStackImplementations.getVariant(unsafeNekooTag)
         set(value) = NekoStackImplementations.setVariant(handle, value)
 
     override val slotGroup: ItemSlotGroup
-        get() = NekoStackImplementations.getSlotGroup(unsafeNyaTag)
+        get() = NekoStackImplementations.getSlotGroup(unsafeNekooTag)
 
     override val components: ItemComponentMap
         get() = NekoStackImplementations.getComponents(handle)
 
     override val templates: ItemTemplateMap
-        get() = NekoStackImplementations.getTemplates(unsafeNyaTag)
+        get() = NekoStackImplementations.getTemplates(unsafeNekooTag)
 
     override val behaviors: ItemBehaviorMap
-        get() = NekoStackImplementations.getBehaviors(unsafeNyaTag)
+        get() = NekoStackImplementations.getBehaviors(unsafeNekooTag)
 
     override val unsafe: NekoStack.Unsafe
         get() = Unsafe(this)
@@ -230,7 +230,7 @@ private class CustomNekoStack(
     }
 
     override fun erase() {
-        handle.nyaTag = null
+        handle.nekooTagOrNull = null
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -245,8 +245,8 @@ private class CustomNekoStack(
     class Unsafe(
         val owner: CustomNekoStack,
     ) : NekoStack.Unsafe {
-        override val nyaTag: CompoundTag
-            get() = owner.unsafeNyaTag
+        override val nekooTag: CompoundTag
+            get() = owner.unsafeNekooTag
     }
 }
 
@@ -444,14 +444,14 @@ internal object ImaginaryNekoStackRegistry : Initializable, KoinComponent {
  */
 internal object NekoStackImplementations {
     fun isClientSide(handle: ItemStack): Boolean {
-        val nbt = handle.unsafeNbt ?: return true
+        val nbt = handle.unsafeRootTagOrNull ?: return true
         // 只要*没有*这个标签就返回 true;
         // 标签类型可以用最小的 ByteTag.
         return !nbt.contains(NekoStack.CLIENT_SIDE_KEY)
     }
 
     fun setClientSide(handle: ItemStack, clientSide: Boolean) {
-        handle.editNbt { tag ->
+        handle.editRootTag { tag ->
             if (clientSide) {
                 tag.remove(NekoStack.CLIENT_SIDE_KEY)
             } else {
@@ -460,72 +460,56 @@ internal object NekoStackImplementations {
         }
     }
 
-    @Deprecated("Use 'getId' instead", ReplaceWith("getId(wakameTag)"))
-    fun getNamespace(wakameTag: CompoundTag): String? {
-        return wakameTag.getString(BaseBinaryKeys.NAMESPACE)
-    }
-
-    @Deprecated("Use 'getId' instead", ReplaceWith("getId(wakameTag)"))
-    fun getPath(wakameTag: CompoundTag): String? {
-        return wakameTag.getString(BaseBinaryKeys.PATH)
-    }
-
-    fun getId(wakameTag: CompoundTag): Key? {
-        return wakameTag.getString(BaseBinaryKeys.ID)
-            .takeIf(String::isNotEmpty)
+    fun getIdOrNull(nekoo: CompoundTag): Key? {
+        return nekoo.getString(BaseBinaryKeys.ID).takeIf(String::isNotEmpty)
             ?.runCatching { Key.key(this) }
             ?.getOrNull()
-            ?: getNamespace(wakameTag)?.let { namespace ->
-                getPath(wakameTag)?.let { path ->
-                    Key.key(namespace, path)
-                }
-            }
     }
 
-    fun getIdOrThrow(wakameTag: CompoundTag): Key {
-        return requireNotNull(getId(wakameTag)) { "Can' find 'id' on item NBT" }
+    fun getId(nekoo: CompoundTag): Key {
+        return requireNotNull(getIdOrNull(nekoo)) { "Can' find 'id' on item NBT" }
     }
 
     fun setId(handle: ItemStack, id: Key) {
-        handle.editNyaTag { tag -> setId0(tag, id) }
+        handle.editNekooTag { tag -> setId0(tag, id) }
     }
 
-    private fun setId0(wakameTag: CompoundTag, id: Key) {
-        wakameTag.putString(BaseBinaryKeys.ID, id.asString())
+    private fun setId0(nekoo: CompoundTag, id: Key) {
+        nekoo.putString(BaseBinaryKeys.ID, id.asString())
     }
 
-    fun getVariant(wakameTag: CompoundTag): Int {
+    fun getVariant(nekoo: CompoundTag): Int {
         // 如果不存在 NBT 标签, 默认返回 0
-        return wakameTag.getInt(BaseBinaryKeys.VARIANT)
+        return nekoo.getInt(BaseBinaryKeys.VARIANT)
     }
 
     fun setVariant(handle: ItemStack, variant: Int) {
-        handle.editNyaTag { tag -> setVariant0(tag, variant) }
+        handle.editNekooTag { tag -> setVariant0(tag, variant) }
     }
 
-    private fun setVariant0(wakameTag: CompoundTag, variant: Int) {
+    private fun setVariant0(nekoo: CompoundTag, variant: Int) {
         // 如果不存在 NBT 标签, 默认返回 0
         // 所以为 0 时, 应该移除 NBT 标签
         if (variant == 0) {
-            wakameTag.remove(BaseBinaryKeys.VARIANT)
+            nekoo.remove(BaseBinaryKeys.VARIANT)
             return
         }
-        wakameTag.putInt(BaseBinaryKeys.VARIANT, variant)
+        nekoo.putInt(BaseBinaryKeys.VARIANT, variant)
     }
 
-    fun getSlotGroup(wakameTag: CompoundTag): ItemSlotGroup {
-        val prototype = getPrototypeOrThrow(wakameTag)
+    fun getSlotGroup(nekoo: CompoundTag): ItemSlotGroup {
+        val prototype = getArchetype(nekoo)
         return prototype.slotGroup
     }
 
-    fun getPrototype(wakameTag: CompoundTag): NekoItem? {
-        val id = getIdOrThrow(wakameTag)
+    fun getArchetypeOrNull(nekoo: CompoundTag): NekoItem? {
+        val id = getId(nekoo)
         val prototype = ItemRegistry.CUSTOM.getOrNull(id)
         return prototype
     }
 
-    fun getPrototypeOrThrow(wakameTag: CompoundTag): NekoItem {
-        val id = getIdOrThrow(wakameTag)
+    fun getArchetype(nekoo: CompoundTag): NekoItem {
+        val id = getId(nekoo)
         val prototype = requireNotNull(ItemRegistry.CUSTOM.getOrNull(id)) { "Can't find item prototype by id '$id'" }
         return prototype
     }
@@ -538,13 +522,13 @@ internal object NekoStackImplementations {
         return ItemComponentMaps.unmodifiable(getComponents(stack))
     }
 
-    fun getTemplates(wakameTag: CompoundTag): ItemTemplateMap {
-        val prototype = getPrototypeOrThrow(wakameTag)
+    fun getTemplates(nekoo: CompoundTag): ItemTemplateMap {
+        val prototype = getArchetype(nekoo)
         return prototype.templates
     }
 
-    fun getBehaviors(wakameTag: CompoundTag): ItemBehaviorMap {
-        val prototype = getPrototypeOrThrow(wakameTag)
+    fun getBehaviors(nekoo: CompoundTag): ItemBehaviorMap {
+        val prototype = getArchetype(nekoo)
         return prototype.behaviors
     }
 }

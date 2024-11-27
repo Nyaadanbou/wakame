@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNyaTag
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -16,7 +16,7 @@ import org.koin.core.component.get
 import java.util.stream.Stream
 
 val ItemStack?.nekoItem: NekoItem?
-    get() = this?.unsafeNyaTag?.let(NekoStackImplementations::getPrototype)
+    get() = this?.unsafeNekooTagOrNull?.let(NekoStackImplementations::getArchetypeOrNull)
 
 /**
  * 一个标准的 [NekoItem].

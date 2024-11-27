@@ -19,15 +19,15 @@ class ItemStackDSL(
     internal val target: ItemStack,
 ) {
     var itemName
-        get() = target.itemName0
+        get() = target.itemName
         set(value) {
-            target.itemName0 = value
+            target.itemName = value
         }
 
     var customName
-        get() = target.customName0
+        get() = target.customName
         set(value) {
-            target.customName0 = value
+            target.customName = value
         }
 
     var lore
@@ -37,27 +37,27 @@ class ItemStackDSL(
         }
 
     var customModelData
-        get() = target.customModelData0
+        get() = target.customModelData
         set(value) {
-            target.customModelData0 = value
+            target.customModelData = value
         }
 
     var hideAdditionalTooltip: Boolean
-        get() = target.hideAdditionalTooltip0
+        get() = target.hideAdditionalTooltip
         set(value) {
-            target.hideAdditionalTooltip0 = value
+            target.hideAdditionalTooltip = value
         }
 
     var hideTooltip: Boolean
-        get() = target.hideTooltip0
+        get() = target.hideTooltip
         set(value) {
-            target.hideTooltip0 = value
+            target.hideTooltip = value
         }
 
     var customData: CompoundTag?
-        get() = target.nbt
+        get() = target.rootTagOrNull
         set(value) {
-            target.nbt = value
+            target.rootTagOrNull = value
         }
 
     //<editor-fold desc="`show_in_tooltip`">

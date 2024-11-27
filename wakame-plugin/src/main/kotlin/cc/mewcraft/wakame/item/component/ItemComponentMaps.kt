@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap.Builder
 import cc.mewcraft.wakame.item.component.ItemComponentMap.Companion.TAG_COMPONENTS
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
+import cc.mewcraft.wakame.util.unsafeNekooTag
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -233,7 +233,7 @@ private class WrappingItemComponentMap(
 
     override fun keySet(): Set<ItemComponentType<*>> {
         return stack
-            .unsafeNyaTagOrThrow
+            .unsafeNekooTag
             .getCompoundOrNull(TAG_COMPONENTS)
             ?.keySet()
             ?.mapNotNull(ItemComponentRegistry.TYPES::getOrNull)
@@ -246,7 +246,7 @@ private class WrappingItemComponentMap(
     }
 
     override fun fuzzySize(): Int {
-        return stack.unsafeNyaTagOrThrow.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
+        return stack.unsafeNekooTag.getCompoundOrNull(TAG_COMPONENTS)?.size() ?: 0
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

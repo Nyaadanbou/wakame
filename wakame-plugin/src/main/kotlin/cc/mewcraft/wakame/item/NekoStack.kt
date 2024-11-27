@@ -140,7 +140,7 @@ interface NekoStack : Examinable {
          *
          * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品本身的 NBT 数据.
          */
-        val nyaTag: CompoundTag
+        val nekooTag: CompoundTag
     }
 }
 
@@ -276,7 +276,7 @@ private object EmptyNekoStack : NekoStack {
     }
 
     object Unsafe : NekoStack.Unsafe {
-        override val nyaTag: CompoundTag
+        override val nekooTag: CompoundTag
             get() = CompoundTag.create()
     }
 }
