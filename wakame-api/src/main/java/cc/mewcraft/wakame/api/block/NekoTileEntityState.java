@@ -9,7 +9,7 @@ public interface NekoTileEntityState extends NekoBlockState {
     /**
      * Gets the {@link TileEntity} represented by this {@link NekoTileEntityState}.
      *
-     * @return The {@link TileEntity} represented by this {@link NekoTileEntityState}.
+     * @return the {@link TileEntity} represented by this {@link NekoTileEntityState}
      */
     @NotNull TileEntity getTileEntity();
 

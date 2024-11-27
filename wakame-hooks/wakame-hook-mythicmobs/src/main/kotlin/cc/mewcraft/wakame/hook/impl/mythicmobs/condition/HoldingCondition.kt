@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.api.Nekoo
 import cc.mewcraft.wakame.api.NekooProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -19,7 +18,6 @@ class HoldingCondition(
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val nekoo: Nekoo = NekooProvider.get()
     private val comparisons: Collection<Key>
 
     init {
@@ -45,8 +43,10 @@ class HoldingCondition(
             val entityEquipment = bukkitEntity.equipment
             if (entityEquipment != null) {
                 val holding = entityEquipment.itemInMainHand
+                val nekooApi = NekooProvider.get()
+                val itemRegistry = nekooApi.itemRegistry
                 for (itemKey in this.comparisons) {
-                    if (nekoo.getNekoItemId(holding) == itemKey) {
+                    if (itemKey == itemRegistry.getOrNull(holding)?.id) {
                         return true
                     }
                 }

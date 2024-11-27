@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.mixin.support;
 
 import cc.mewcraft.wakame.api.NekooProvider;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.kyori.adventure.key.Key;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -43,18 +45,24 @@ public class LootNekoItem extends LootPoolSingletonContainer {
         return LootPoolEntryInitializer.NEKO_ITEM;
     }
 
+    @SuppressWarnings("PatternValidation")
     @Override
-    public void createItemStack(Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
-        var nekoo = NekooProvider.get();
-
+    public void createItemStack(@NotNull Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
         var namespace = id.getNamespace();
         var path = id.getPath();
         var player = getLootingPlayer(context);
 
-        var bukkitItemStack = nekoo.createItemStack(namespace, path, player);
-        var nmsItemStack = CraftItemStack.unwrap(bukkitItemStack);
+        var nekooApi = NekooProvider.get();
+        var nekoItem = nekooApi.getItemRegistry().getOrNull(Key.key(namespace, path));
+        if (nekoItem == null) {
+            LogUtils.getClassLogger().error("No item type with id: {}", id);
+            return;
+        }
 
-        lootConsumer.accept(nmsItemStack);
+        var bukkitItemStack = nekoItem.createItemStack(player);
+        var mojangItemStack = CraftItemStack.unwrap(bukkitItemStack);
+
+        lootConsumer.accept(mojangItemStack);
     }
 
     /**

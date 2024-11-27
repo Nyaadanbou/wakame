@@ -35,9 +35,13 @@ internal class ApiItemWrapper(
         return itemStack
     }
 
-    override fun createItemStack(amount: Int, player: Player): ItemStack {
-        val user = player.toUser()
-        val nekoStack = item.realize(user)
+    override fun createItemStack(amount: Int, player: Player?): ItemStack {
+        val user = player?.toUser()
+        val nekoStack = if (user == null) {
+            item.realize()
+        } else {
+            item.realize(user)
+        }
         val itemStack = nekoStack.wrapped.apply { this.amount = amount }
         return itemStack
     }

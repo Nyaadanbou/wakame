@@ -13,11 +13,11 @@ object ApiItemRegistry : NekoItemRegistry {
     }
 
     override fun get(id: Key): NekoItem {
-        return getOrNull(id) ?: throw IllegalArgumentException("No nekoo item with id $id found")
+        return getOrNull(id) ?: throw IllegalArgumentException("No item type found with id: $id")
     }
 
     override fun get(itemStack: ItemStack): NekoItem {
-        return getOrNull(itemStack) ?: throw IllegalArgumentException("ItemStack is not a nekoo item")
+        return getOrNull(itemStack) ?: throw IllegalArgumentException("ItemStack is not of a nekoo item type")
     }
 
     override fun getOrNull(id: String): NekoItem? {
@@ -28,7 +28,7 @@ object ApiItemRegistry : NekoItemRegistry {
         return ItemRegistry.CUSTOM.find(id)?.let(::ApiItemWrapper)
     }
 
-    override fun getOrNull(itemStack: ItemStack): NekoItem? {
+    override fun getOrNull(itemStack: ItemStack?): NekoItem? {
         return itemStack.nekoItem?.let(::ApiItemWrapper)
     }
 

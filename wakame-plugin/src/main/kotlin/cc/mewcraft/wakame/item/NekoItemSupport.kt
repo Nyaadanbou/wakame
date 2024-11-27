@@ -15,8 +15,8 @@ import org.bukkit.inventory.ItemStack
 import org.koin.core.component.get
 import java.util.stream.Stream
 
-val ItemStack.nekoItem: NekoItem?
-    get() = this.unsafeNbt?.let(NekoStackImplementations::getPrototype)
+val ItemStack?.nekoItem: NekoItem?
+    get() = this?.unsafeNbt?.let(NekoStackImplementations::getPrototype)
 
 /**
  * 一个标准的 [NekoItem].
