@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.initializer
 
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
 import cc.mewcraft.wakame.command.CommandManager
 import cc.mewcraft.wakame.config.Configs
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import cc.mewcraft.wakame.event.NekoPostLoadDataEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
@@ -276,12 +276,10 @@ object Initializer : KoinComponent, Listener {
         logger.info("[Initializer] onPostWorldAsync - Complete")
 
         isDone = true
-        NEKO.launch(asyncContext) {
-            NekoPostLoadDataEvent().run {
-                this.callEvent() // call it async
-                PluginEventBus.get().post(this)
-            }
-        }
+
+        val event = NekoLoadDataEvent()
+        event.callEvent()
+        PluginEventBus.get().post(event)
 
         logger.info(Component.text("Done loading", NamedTextColor.AQUA))
     }
