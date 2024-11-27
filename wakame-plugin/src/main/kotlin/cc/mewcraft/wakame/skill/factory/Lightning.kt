@@ -61,9 +61,9 @@ interface Lightning : Skill {
     ) : Lightning, SkillBase(key, config) {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick<Lightning> {
-            return LightningTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
-        }
+//        override fun cast(context: SkillContext): SkillTick<Lightning> {
+//            return LightningTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
+//        }
     }
 }
 

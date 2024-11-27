@@ -1,17 +1,14 @@
 package cc.mewcraft.wakame.skill.factory
 
-import cc.mewcraft.wakame.item.damage
-import cc.mewcraft.wakame.item.hurtAndBreak
-import cc.mewcraft.wakame.item.isDamageable
-import cc.mewcraft.wakame.item.maxDamage
-import cc.mewcraft.wakame.skill.*
-import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.skill.context.SkillContextKey
-import cc.mewcraft.wakame.skill.tick.AbstractPlayerSkillTick
-import cc.mewcraft.wakame.skill.tick.SkillTick
-import cc.mewcraft.wakame.tick.TickResult
-import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill.SkillBase
+import cc.mewcraft.wakame.skill.SkillProvider
+import cc.mewcraft.wakame.skill.SkillResult
+import cc.mewcraft.wakame.skill2.external.component.Time
+import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.util.krequire
+import me.lucko.helper.metadata.Metadata
+import me.lucko.helper.metadata.MetadataKey
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.Server
@@ -21,6 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
+import kotlin.jvm.optionals.getOrNull
 
 const val STARTING_TICK: Long = 10L
 
@@ -74,39 +72,40 @@ interface Dash : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick<Dash> {
-            return DashTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
+        override fun cast(entity: LivingEntity): SkillResult<Dash> {
+            return DashResult(this, entity)
         }
     }
 }
 
-private class DashTick(
-    context: SkillContext,
-    skill: Dash,
-    override val interruptTriggers: TriggerConditions,
-    override val forbiddenTriggers: TriggerConditions,
-) : AbstractPlayerSkillTick<Dash>(skill, context) {
+private class DashResult(
+    override val skill: Dash,
+    private val entity: LivingEntity,
+) : SkillResult<Dash> {
     companion object {
-        private val DASH_DAMAGE_KEY: SkillContextKey<Int> = SkillContextKey.create("dash_damage")
-        private val DASH_EFFECT_TIME: SkillContextKey<Long> = SkillContextKey.create("dash_effect_time")
+        private val DASH_DAMAGE_KEY: MetadataKey<Int> = MetadataKey.createIntegerKey("dash_damage")
+        private val DASH_EFFECT_TIME: MetadataKey<Long> = MetadataKey.createLongKey("dash_effect_time")
     }
 
-    override fun tickCast(tickCount: Long): TickResult {
-        if (!checkConditions())
-            return TickResult.ALL_DONE
+    override fun executeCast() {
+//        if (!checkConditions())
+//            return TickResult.ALL_DONE
+        val metadata = Metadata.get(entity).getOrNull() ?: return
+        val componentMap = metadata.getOrNull(SkillBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
+        val tickCount = componentMap[skill, Time.externalKey]?.time ?: .0
         if (tickCount >= skill.duration + STARTING_TICK) {
-            return TickResult.ALL_DONE
+//            return TickResult.ALL_DONE
+            return
         }
 
-        val player = context[SkillContextKey.CASTER]?.value<Caster.Single.Player>()?.bukkitPlayer ?: return TickResult.INTERRUPT
-        val direction = player.location.direction.setY(0).normalize()
+        val direction = entity.location.direction.setY(0).normalize()
 
         val stepDistance = skill.stepDistance
         // 计算每一步的移动向量
         var stepVector = direction.clone().multiply(stepDistance)
 
         // 检查前方和脚下的方块
-        val nextLocation = player.location.add(stepVector)
+        val nextLocation = entity.location.add(stepVector)
         val blockInFront = nextLocation.block
         val blockBelow = nextLocation.clone().add(0.0, -1.0, 0.0).block
 
@@ -116,7 +115,8 @@ private class DashTick(
             if (blockAboveFront.isAccessibleForDash() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessibleForDash()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.ALL_DONE
+                componentMap
+                return
             }
         } else {
             stepVector = if (blockBelow.isAccessibleForDash()) {
@@ -129,41 +129,38 @@ private class DashTick(
         }
 
         // 应用速度到玩家对象上
-        player.velocity = stepVector
-        player.isSprinting = true
-        if (tickCount >= STARTING_TICK && !player.hasActiveItem()) {
-            return TickResult.ALL_DONE
+        entity.velocity = stepVector
+        if (tickCount >= STARTING_TICK && !entity.hasActiveItem()) {
+            return
         }
 
-        if (affectEntityNearby(player)) {
-            context[DASH_DAMAGE_KEY] = context[DASH_DAMAGE_KEY]?.plus(1) ?: 1
+        if (affectEntityNearby(entity)) {
+            metadata.put(DASH_DAMAGE_KEY, metadata.getOrDefault(DASH_DAMAGE_KEY, 0).plus(1))
             if (!skill.canContinueAfterHit) {
-                return TickResult.ALL_DONE
+                return
             }
         }
 
-        return TickResult.CONTINUE_TICK
+//        return TickResult.CONTINUE_TICK
     }
 
-    override fun tickBackswing(tickCount: Long): TickResult {
-        val player = context[SkillContextKey.CASTER]
-            ?.value<Caster.Single.Player>()
-            ?.bukkitPlayer
-            ?: return TickResult.ALL_DONE
-        player.isSprinting = false
-        val damageCount = context[DASH_DAMAGE_KEY] ?: return TickResult.ALL_DONE
-        val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return TickResult.ALL_DONE
-        if (nekoStack.isDamageable) {
-            if (nekoStack.damage < nekoStack.maxDamage) {
-                nekoStack.hurtAndBreak(player, damageCount)
-            } else {
-                return TickResult.ALL_DONE
-            }
-        }
-        return TickResult.ALL_DONE
+    override fun executeBackswing() {
+        val metadata = Metadata.get(entity).getOrNull() ?: return
+        val damageCount = metadata[DASH_DAMAGE_KEY].getOrNull()
+
+//        val nekoStack = context[SkillContextKey.NEKO_STACK] ?: return TickResult.ALL_DONE
+//        if (nekoStack.isDamageable) {
+//            if (nekoStack.damage < nekoStack.maxDamage) {
+//                nekoStack.hurtAndBreak(player, damageCount)
+//            } else {
+//                return TickResult.ALL_DONE
+//            }
+//        }
+//        return TickResult.ALL_DONE
     }
 
     private fun affectEntityNearby(livingEntity: LivingEntity): Boolean {
+        val metadata = Metadata.get(entity).getOrNull() ?: return false
         val entities = livingEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (entities.isEmpty()) {
             return false
@@ -171,14 +168,13 @@ private class DashTick(
         for (entity in entities) {
             if (entity !is LivingEntity)
                 continue
-            if (context[DASH_EFFECT_TIME]?.let { DashSupport.server.currentTick - it < skill.hitInterval } == true)
+            if (metadata[DASH_EFFECT_TIME].getOrNull()?.let { DashSupport.server.currentTick - it < skill.hitInterval } == true)
                 continue
 
             for (skillProvider in skill.hitEffects) {
                 val effect = skillProvider.get()
-                val newContext = SkillContext(CasterAdapter.adapt(livingEntity), TargetAdapter.adapt(entity))
-                Ticker.INSTANCE.schedule(effect.cast(newContext))
-                context[DASH_EFFECT_TIME] = DashSupport.server.currentTick.toLong()
+                effect.cast(entity)
+                metadata.put(DASH_EFFECT_TIME, DashSupport.server.currentTick.toLong())
             }
         }
         return true

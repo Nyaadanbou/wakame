@@ -64,9 +64,9 @@ interface Bloodrage : Skill, PassiveSkill {
         override val restartTime: Long,
         override val effects: List<BloodrageEffect>,
     ) : Bloodrage, SkillBase(key, config) {
-        override fun cast(context: SkillContext): SkillTick<Bloodrage> {
-            return BloodrageTick(context, this)
-        }
+//        override fun cast(context: SkillContext): SkillTick<Bloodrage> {
+//            return BloodrageTick(context, this)
+//        }
     }
 }
 

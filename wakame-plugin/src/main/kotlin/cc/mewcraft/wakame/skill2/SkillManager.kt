@@ -1,54 +1,28 @@
 package cc.mewcraft.wakame.skill2
 
-import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.skill2.component.CooldownComponent
-import cc.mewcraft.wakame.skill2.component.IdentifierComponent
-import cc.mewcraft.wakame.skill2.component.Remove
-import cc.mewcraft.wakame.skill2.system.CooldownSystem
-import cc.mewcraft.wakame.skill2.system.RemoveSystem
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.World.Companion.family
-import com.github.quillraven.fleks.configureWorld
+import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.component.CooldownComponent
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.Remove
+import cc.mewcraft.wakame.skill.Skill
 
 class SkillManager(
-    private val plugin: WakamePlugin,
+    private val world: WakameWorld,
 ) {
-
-    val world: World = configureWorld {
-
-        injectables {
-            add(plugin)
-        }
-
-        families {
-            val family = family {  }
-        }
-
-        systems {
-            add(RemoveSystem())
-            add(CooldownSystem())
-        }
-    }
-
-    fun addSkill(skill: String) {
-        world.entity {
-            it += IdentifierComponent(skill)
+    fun addSkill(skill: Skill) {
+        world.instance.entity {
+            it += IdentifierComponent(skill.key.asString())
             it += CooldownComponent()
-            world.systems.forEach { t -> t }
         }
     }
 
-    fun removeSkill(skill: String) {
-        with(world) {
+    fun removeSkill(skill: Skill) {
+        with(world.instance) {
             val entityToRemove = family { all(IdentifierComponent) }
-                .firstOrNull { it[IdentifierComponent].id == skill } ?: return
+                .firstOrNull { it[IdentifierComponent].id == skill.key.asString() } ?: return
             entityToRemove.configure {
                 it += Remove
             }
         }
-    }
-
-    fun tick() {
-        world.update(1f)
     }
 }

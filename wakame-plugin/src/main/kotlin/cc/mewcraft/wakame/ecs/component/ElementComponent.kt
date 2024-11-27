@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill2.component
+package cc.mewcraft.wakame.ecs.component
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ElementRegistry

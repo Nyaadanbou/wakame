@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
+import cc.mewcraft.wakame.ecs.EcsListener
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.gui.GuiManager
@@ -161,6 +162,9 @@ object Initializer : KoinComponent, Listener {
         registerListener<DamageListener>()
         registerListener<DamagePostListener>()
         registerListener<DamageDisplay>()
+
+        // ecs
+        registerListenerAndBind<EcsListener>()
 
         // rpg player
         registerListener<PaperUserManager>()

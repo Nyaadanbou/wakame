@@ -1,8 +1,8 @@
-package cc.mewcraft.wakame.skill2.system
+package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.skill2.component.BukkitEntityComponent
-import cc.mewcraft.wakame.skill2.component.CooldownComponent
-import cc.mewcraft.wakame.skill2.component.Tags
+import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CooldownComponent
+import cc.mewcraft.wakame.ecs.component.Tags
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family

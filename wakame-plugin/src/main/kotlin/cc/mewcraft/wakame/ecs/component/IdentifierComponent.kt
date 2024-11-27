@@ -1,11 +1,10 @@
-package cc.mewcraft.wakame.skill2.component
+package cc.mewcraft.wakame.ecs.component
 
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
-import net.kyori.adventure.text.Component as TextComponent
 
-data class DisplayComponent(
-    var name: TextComponent,
+data class IdentifierComponent(
+    var id: String,
 ) : Component<IdentifierComponent> {
     override fun type(): ComponentType<IdentifierComponent> = IdentifierComponent
 

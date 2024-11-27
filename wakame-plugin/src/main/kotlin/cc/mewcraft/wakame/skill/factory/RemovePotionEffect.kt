@@ -34,9 +34,9 @@ interface RemovePotionEffect : Skill {
 
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
-        override fun cast(context: SkillContext): SkillTick<RemovePotionEffect> {
-            return RemovePotionEffectTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
-        }
+//        override fun cast(context: SkillContext): SkillTick<RemovePotionEffect> {
+//            return RemovePotionEffectTick(context, this, triggerConditionGetter.interrupt, triggerConditionGetter.forbidden)
+//        }
     }
 }
 

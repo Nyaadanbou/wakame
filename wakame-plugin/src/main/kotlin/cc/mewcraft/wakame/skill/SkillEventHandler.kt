@@ -100,8 +100,8 @@ class SkillEventHandler(
                 // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
-                val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
-                skills.values().map { it.cast(context) }.forEach { ticker.schedule(it) }
+//                val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
+//                skills.values().map { it.cast(context) }.forEach { ticker.schedule(it) }
             }
         }
     }

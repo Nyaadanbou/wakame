@@ -7,11 +7,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.CasterAdapter
 import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.tick.Ticker
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -26,8 +22,7 @@ interface Food : ItemBehavior {
             val nekoStack: NekoStack = itemStack.toNekoStack
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
-            val castContext = SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack = nekoStack)
-            skills.forEach { Ticker.INSTANCE.schedule(it.cast(castContext)) }
+            skills.forEach { it.cast(player).executeCast() }
         }
     }
 

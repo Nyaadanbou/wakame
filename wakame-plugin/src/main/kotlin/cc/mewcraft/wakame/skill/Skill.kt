@@ -3,13 +3,12 @@ package cc.mewcraft.wakame.skill
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill.context.SkillContext
 import cc.mewcraft.wakame.skill.factory.SkillFactory
-import cc.mewcraft.wakame.skill.tick.SkillTick
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import org.bukkit.entity.LivingEntity
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
@@ -47,9 +46,11 @@ interface Skill : Keyed, Examinable {
     val displays: SkillDisplay
 
     /**
-     * 释放该技能.
+     * 返回一个技能执行的结果, 只有执行 [SkillResult] 才会真正执行技能逻辑.
+     *
+     * @see SkillResult
      */
-    fun cast(context: SkillContext): SkillTick<*> = SkillTick.empty()
+    fun cast(entity: LivingEntity): SkillResult<Skill> = SkillResult()
 
     companion object {
         /**

@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.skill2
 
-import cc.mewcraft.wakame.skill2.component.CooldownComponent
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill2.external.component.Cooldown
+import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.metadata.Metadata
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -14,25 +16,21 @@ class SkillListener(
     private val skillManager: SkillManager,
 ) : Listener {
     @EventHandler
-    private fun on(e: ServerTickStartEvent) {
-        skillManager.tick()
-    }
-
-    @EventHandler
     private fun on(e: PlayerInteractEvent) {
         val metadataMap = Metadata.get(e.player).getOrNull() ?: return
-        val cooldownComponent = metadataMap.getOrNull(CooldownComponent.METADATA_KEY)
+        val componentMap = metadataMap.getOrNull(SkillBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
+        val cooldownComponent = componentMap[SkillRegistry.INSTANCES[Key("g22:test")], Cooldown.externalKey]
         cooldownComponent?.cooldown?.timeout = 100f
     }
 
     @EventHandler
     private fun on(e: PlayerJoinEvent) {
-        skillManager.addSkill(e.player)
+//        skillManager.addSkill(e.player)
     }
 
 
     @EventHandler
     private fun on(e: PlayerQuitEvent) {
-        skillManager.removeSkill(e.player)
+//        skillManager.removeSkill(e.player)
     }
 }

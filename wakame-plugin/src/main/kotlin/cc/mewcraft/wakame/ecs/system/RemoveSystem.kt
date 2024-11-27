@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.skill2.system
+package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.skill2.component.Remove
+import cc.mewcraft.wakame.ecs.component.Remove
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill2.component
+package cc.mewcraft.wakame.ecs.component
 
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.entityTagOf

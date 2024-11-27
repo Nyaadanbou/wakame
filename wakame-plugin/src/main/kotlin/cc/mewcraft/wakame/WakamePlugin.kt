@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.craftingstation.stationModule
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display2.display2Module
+import cc.mewcraft.wakame.ecs.ecsModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
@@ -89,6 +90,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 crateModule(),
                 damageModule(),
                 display2Module(),
+                ecsModule(),
                 elementModule(),
                 enchantmentModule(),
                 entityModule(),

@@ -100,9 +100,9 @@ interface Projectile : Skill {
         override val effects: Map<ProjectileTrigger, SkillProvider>,
     ) : Projectile, SkillBase(key, config) {
 
-        override fun cast(context: SkillContext): SkillTick<Projectile> {
-            return ProjectileTick(context, this)
-        }
+//        override fun cast(context: SkillContext): SkillTick<Projectile> {
+//            return ProjectileTick(context, this)
+//        }
     }
 }
 
@@ -212,11 +212,11 @@ private class ArrowWrapper(
 
         val newTickCaster = CasterAdapter.adapt(tick)
         context[SkillContextKey.CASTER] = newTickCaster.toComposite(parent)
-        val startSkillTick = projectile.effects[ProjectileTrigger.START]?.get()?.cast(context)
-
-        if (startSkillTick != null) {
-            Ticker.INSTANCE.schedule(startSkillTick)
-        }
+//        val startSkillTick = projectile.effects[ProjectileTrigger.START]?.get()?.cast(context)
+//
+//        if (startSkillTick != null) {
+//            Ticker.INSTANCE.schedule(startSkillTick)
+//        }
 
         val subscriptions = buildList {
             // 注册事件监听器
@@ -247,16 +247,16 @@ private class ArrowWrapper(
             Events.subscribe(ServerTickStartEvent::class.java)
                 .handler {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                    val tickSkillTick = projectile.effects[ProjectileTrigger.TICK]?.get()?.cast(newContext) ?: return@handler
-                    Ticker.INSTANCE.schedule(tickSkillTick)
+//                    val tickSkillTick = projectile.effects[ProjectileTrigger.TICK]?.get()?.cast(newContext) ?: return@handler
+//                    Ticker.INSTANCE.schedule(tickSkillTick)
                 },
 
             Events.subscribe(ServerTickStartEvent::class.java)
                 .handler {
                     if (arrow.location.distance(summonLocation) > projectile.maximumDistance) {
                         val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(arrow.location))
-                        val disappearSkillTick = projectile.effects[ProjectileTrigger.DISAPPEAR]?.get()?.cast(newContext) ?: return@handler
-                        Ticker.INSTANCE.schedule(disappearSkillTick)
+//                        val disappearSkillTick = projectile.effects[ProjectileTrigger.DISAPPEAR]?.get()?.cast(newContext) ?: return@handler
+//                        Ticker.INSTANCE.schedule(disappearSkillTick)
                         arrow.remove()
                     }
                 }
@@ -270,8 +270,8 @@ private class ArrowWrapper(
                 val hitEntity = it.hitEntity ?: return@handler
                 if (hitEntity is LivingEntity) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitEntity))
-                    val hitEntitySkillTick = projectile.effects[ProjectileTrigger.HIT_ENTITY]?.get()?.cast(newContext) ?: return@handler
-                    Ticker.INSTANCE.schedule(hitEntitySkillTick)
+//                    val hitEntitySkillTick = projectile.effects[ProjectileTrigger.HIT_ENTITY]?.get()?.cast(newContext) ?: return@handler
+//                    Ticker.INSTANCE.schedule(hitEntitySkillTick)
                 }
             })
     }
@@ -283,8 +283,8 @@ private class ArrowWrapper(
                 val hitBlock = it.hitBlock
                 if (hitBlock != null) {
                     val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(hitBlock.location))
-                    val hitBlockSkillTick = projectile.effects[ProjectileTrigger.HIT_BLOCK]?.get()?.cast(newContext) ?: return@handler
-                    Ticker.INSTANCE.schedule(hitBlockSkillTick)
+//                    val hitBlockSkillTick = projectile.effects[ProjectileTrigger.HIT_BLOCK]?.get()?.cast(newContext) ?: return@handler
+//                    Ticker.INSTANCE.schedule(hitBlockSkillTick)
                 }
             })
     }
@@ -294,8 +294,8 @@ private class ArrowWrapper(
             .handler {
                 if (it.arrow != arrow) return@handler
                 val newContext = SkillContext(CasterAdapter.adapt(arrow).toComposite(parent), TargetAdapter.adapt(it.player))
-                val pickupSkillTick = projectile.effects[ProjectileTrigger.PICK_UP]?.get()?.cast(newContext) ?: return@handler
-                Ticker.INSTANCE.schedule(pickupSkillTick)
+//                val pickupSkillTick = projectile.effects[ProjectileTrigger.PICK_UP]?.get()?.cast(newContext) ?: return@handler
+//                Ticker.INSTANCE.schedule(pickupSkillTick)
             })
     }
 }

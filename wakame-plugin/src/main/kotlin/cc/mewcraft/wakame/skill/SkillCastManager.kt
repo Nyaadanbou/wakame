@@ -37,8 +37,9 @@ internal class SkillCastManagerImpl : SkillCastManager {
         }
 
         try {
-            val result = skill.cast(context)
-            return SkillPrepareCastResult.success(result).also { session.onSuccess(context) }
+//            val result = skill.cast(context)
+//            return SkillPrepareCastResult.success(result).also { session.onSuccess(context) }
+            return FailureSkillPrepareCastResult.UNKNOWN_FAILURE
         } catch (e: Throwable) {
             e.printStackTrace()
             return FailureSkillPrepareCastResult.UNKNOWN_FAILURE

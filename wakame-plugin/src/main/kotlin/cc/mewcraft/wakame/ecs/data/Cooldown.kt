@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill2.data
+package cc.mewcraft.wakame.ecs.data
 
 data class Cooldown(
     var timeout: Float,
