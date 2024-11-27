@@ -8,9 +8,27 @@ plugins {
 }
 
 group = "cc.mewcraft.wakame"
-version = "0.0.1"
+version = "0.0.1-SNAPSHOT"
 
 dependencies {
     compileOnly(local.paper)
     compileOnly(local.shadow.nbt)
+}
+
+publishing {
+    repositories {
+        maven("https://repo.mewcraft.cc/private") {
+            credentials {
+                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
+                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = "common"
+            from(components["java"])
+        }
+    }
 }
