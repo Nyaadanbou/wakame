@@ -46,7 +46,7 @@ sealed interface ItemX : Keyed, Examinable {
      * 该物品是否有效.
      * 即该物品是否保证可以正常创建出 [ItemStack]
      */
-    fun isValid(): Boolean
+    fun valid(): Boolean
 
     /**
      * 创建一个 [ItemStack].
@@ -93,11 +93,14 @@ abstract class ItemXAbstract(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        return other is ItemX && plugin == other.plugin && identifier == other.identifier
+        return other is ItemX &&
+                plugin == other.plugin &&
+                identifier == other.identifier
     }
 
     override fun hashCode(): Int {
-        return plugin.hashCode() + 31 * identifier.hashCode()
+        return plugin.hashCode() +
+                31 * identifier.hashCode()
     }
 
     override fun toString(): String {

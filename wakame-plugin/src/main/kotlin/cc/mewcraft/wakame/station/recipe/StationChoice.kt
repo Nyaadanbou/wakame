@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.util.krequire
@@ -41,7 +41,7 @@ internal sealed interface StationChoice : Examinable {
      * 该 [StationChoice] 是否有效.
      * 用于延迟验证配方是否能够注册.
      */
-    fun isValid(): Boolean
+    fun valid(): Boolean
 
     /**
      * 获取此 [StationChoice] 的描述.
@@ -94,8 +94,8 @@ internal data class ItemChoice(
         context.add(item, amount)
     }
 
-    override fun isValid(): Boolean {
-        return item.isValid()
+    override fun valid(): Boolean {
+        return item.valid()
     }
 
     override fun description(layout: MenuLayout): String {
@@ -147,7 +147,7 @@ internal data class ExpChoice(
         context.add(amount)
     }
 
-    override fun isValid(): Boolean {
+    override fun valid(): Boolean {
         return true
     }
 

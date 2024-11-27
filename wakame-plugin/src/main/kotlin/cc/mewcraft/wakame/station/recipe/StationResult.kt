@@ -4,11 +4,13 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.item.tryNekoStack
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.giveItemStack
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -59,7 +61,7 @@ internal data class ItemResult(
     }
 
     override fun isValid(): Boolean {
-        return item.isValid()
+        return item.valid()
     }
 
     override fun description(layout: MenuLayout): String {

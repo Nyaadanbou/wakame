@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.core
 
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -11,7 +12,7 @@ class ItemXVanilla(
         const val DEFAULT_DISPLAY_NAME = "<white>UNKNOWN</white>"
     }
 
-    override fun isValid(): Boolean {
+    override fun valid(): Boolean {
         return true
     }
 
@@ -25,8 +26,11 @@ class ItemXVanilla(
     }
 
     override fun matches(itemStack: ItemStack): Boolean {
-        // TODO 使用是否存在Custom Data判断
-        return !itemStack.hasItemMeta() && itemStack.type == Material.matchMaterial(identifier, false)
+        // 在 wakame 这个体系下, 物品没有萌芽标签则认为是原版物品.
+        // 这样的判断比 ItemStack#hasItemMeta 更能准确反应现实情况,
+        // 例如: 一个拥有附魔的原版(套皮)物品也可以被正确的认为是原版物品.
+        return itemStack.unsafeNekooTagOrNull == null &&
+                itemStack.type == Material.matchMaterial(identifier, false)
     }
 
     override fun displayName(): String {
@@ -38,7 +42,7 @@ class ItemXVanilla(
 object ItemXFactoryVanilla : ItemXFactory {
     override val plugin: String = "minecraft"
 
-    override val isValid: Boolean = true
+    override val loaded: Boolean = true
 
     override fun create(itemStack: ItemStack): ItemXVanilla {
         return ItemXVanilla(itemStack.type.key.value())
