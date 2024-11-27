@@ -47,6 +47,6 @@ data class ItemAssets(
 //  而这里却写了一个 itemType 的扩展函数. 也就是说 itemType 在设计上是 Assets 的一部分,
 //  但是 itemType 又只有在 ItemAssets 的具体实现中才有意义. 这种设计是不合理的.
 internal val Assets.itemType: Material
-    get() = requireNotNull(ItemRegistry.CUSTOM.find(key)?.base?.type) {
+    get() = requireNotNull(ItemRegistry.CUSTOM.getOrNull(key)?.base?.type) {
         "ItemType not found for item id: $key"
     }

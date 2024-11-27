@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.display2
 
 import cc.mewcraft.wakame.display2.NekoItemHolder.ObjectPool.get
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.display2.NekoItemHolder.ObjectPool.getOrDefault
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.registry.ItemRegistry
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -37,7 +40,7 @@ private constructor(
     // 所有 property 必须懒加载 (provider) 以支持重载!
 
     private val prototype: Provider<NekoItem> = provider {
-        ItemRegistry.CUSTOM.find(itemId) ?: ItemRegistry.CUSTOM.find(fallback) ?: ItemRegistry.CUSTOM[ItemRegistry.ERROR_NEKO_ITEM_ID]
+        ItemRegistry.CUSTOM.getOrNull(itemId) ?: ItemRegistry.CUSTOM.getOrNull(fallback) ?: ItemRegistry.CUSTOM[ItemRegistry.ERROR_NEKO_ITEM_ID]
     } // FIXME Provider#orElse 不触发更新
 
     private val realized: NekoStack by prototype.map(NekoItem::realize)

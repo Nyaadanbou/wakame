@@ -72,9 +72,6 @@ var BukkitStack.itemName: Component?
         }
     }
 
-@Deprecated("Use itemName instead", ReplaceWith("itemName"))
-var BukkitStack.itemName0: Component? by BukkitStack::itemName
-
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
@@ -101,117 +98,105 @@ var BukkitStack.customModelData: Int?
         }
     }
 
-@Deprecated("Use customModelData instead", ReplaceWith("customModelData"))
-var BukkitStack.customModelData0: Int? by BukkitStack::customModelData
-
 /**
  * 设置是否隐藏附加提示.
  */
 var BukkitStack.hideAdditionalTooltip: Boolean
-    get() = this.handle?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) ?: false
+    get() = this.handle?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) == true
     set(value) {
         this.handle?.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
     }
-
-@Deprecated("Use hideAdditionalTooltip instead", ReplaceWith("hideAdditionalTooltip"))
-var BukkitStack.hideAdditionalTooltip0: Boolean by BukkitStack::hideAdditionalTooltip
 
 /**
  * 设置是否隐藏提示.
  */
 var BukkitStack.hideTooltip: Boolean
-    get() = this.handle?.has(DataComponents.HIDE_TOOLTIP) ?: false
+    get() = this.handle?.has(DataComponents.HIDE_TOOLTIP) == true
     set(value) {
         this.handle?.set(DataComponents.HIDE_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
     }
 
-@Deprecated("Use hideTooltip instead", ReplaceWith("hideTooltip"))
-var BukkitStack.hideTooltip0: Boolean by BukkitStack::hideTooltip
-
 /**
  * Safe read/write.
  */
-var BukkitStack.nbt: CompoundShadowTag?
-    get() = this.handle?.nbt
+var BukkitStack.rootTagOrNull: CompoundShadowTag?
+    get() = this.handle?.rootTagOrNull
     set(value) {
-        this.handle?.nbt = value
+        this.handle?.rootTagOrNull = value
     }
 
 /**
  * Safe read.
  */
-val BukkitStack.nbtOrThrow: CompoundShadowTag
-    get() = this.nbt ?: throw NoSuchElementException("No NBT present on ItemStack")
+val BukkitStack.rootTag: CompoundShadowTag
+    get() = this.rootTagOrNull ?: throw NoSuchElementException("No tag present on ItemStack")
 
 /**
  * Safe edit.
  */
-fun BukkitStack.editNbt(block: (CompoundShadowTag) -> Unit) {
-    this.nbt = (this.nbt ?: CompoundShadowTag.create()).apply(block)
+fun BukkitStack.editRootTag(block: (CompoundShadowTag) -> Unit) {
+    this.rootTagOrNull = (this.rootTagOrNull ?: CompoundShadowTag.create()).apply(block)
 }
 
 /**
  * Unsafe read/write.
  */
-var BukkitStack.unsafeNbt: CompoundShadowTag?
-    get() = this.handle?.unsafeNbt
+var BukkitStack.unsafeRootTagOrNull: CompoundShadowTag?
+    get() = this.handle?.unsafeRootTagOrNull
     set(value) {
-        this.handle?.unsafeNbt = value
+        this.handle?.unsafeRootTagOrNull = value
     }
 
 /**
  * Unsafe read.
  */
-val BukkitStack.unsafeNbtOrThrow: CompoundShadowTag
-    get() = this.unsafeNbt ?: throw NoSuchElementException("No NBT present on ItemStack")
+val BukkitStack.unsafeRootTag: CompoundShadowTag
+    get() = this.unsafeRootTagOrNull ?: throw NoSuchElementException("No tag present on ItemStack")
 
 /**
  * Safe read/write.
  */
-var BukkitStack.nyaTag: CompoundShadowTag?
-    get() = this.handle?.nyaTag
+var BukkitStack.nekooTagOrNull: CompoundShadowTag?
+    get() = this.handle?.nekooTagOrNull
     set(value) {
         val handle: MojangStack? = this.handle
         if (handle == null) {
-            throw IllegalStateException("Can't write nya tag into empty ItemStack")
+            throw IllegalStateException("Can't write data into empty ItemStack")
         }
-        handle.nyaTag = value
+        handle.nekooTagOrNull = value
     }
 
 /**
  * Safe read.
  */
-val BukkitStack.nyaTagOrThrow: CompoundShadowTag
-    get() = this.nyaTag ?: throw NoSuchElementException("No nya tag present on ItemStack")
+val BukkitStack.nekooTag: CompoundShadowTag
+    get() = this.nekooTagOrNull ?: throw NoSuchElementException("No tag present on ItemStack")
 
 /**
  * Safe edit.
  */
-fun BukkitStack.editNyaTag(block: (CompoundShadowTag) -> Unit) {
-    this.nyaTag = (this.nyaTag ?: CompoundShadowTag.create()).apply(block)
+fun BukkitStack.editNekooTag(block: (CompoundShadowTag) -> Unit) {
+    this.nekooTagOrNull = (this.nekooTagOrNull ?: CompoundShadowTag.create()).apply(block)
 }
 
 /**
  * Unsafe read/write.
  */
-var BukkitStack.unsafeNyaTag: CompoundShadowTag?
-    get() {
-        val handle: MojangStack? = this.handle
-        return handle?.unsafeNyaTag
-    }
+var BukkitStack.unsafeNekooTagOrNull: CompoundShadowTag?
+    get() = this.handle?.unsafeNekooTagOrNull
     set(value) {
         val handle: MojangStack? = this.handle
         if (handle == null) {
             throw IllegalStateException("Can't write nya tag into empty ItemStack")
         }
-        handle.unsafeNyaTag = value
+        handle.unsafeNekooTagOrNull = value
     }
 
 /**
  * Unsafe read.
  */
-val BukkitStack.unsafeNyaTagOrThrow: CompoundShadowTag
-    get() = this.unsafeNyaTag ?: throw NoSuchElementException("No nya tag present on ItemStack")
+val BukkitStack.unsafeNekooTag: CompoundShadowTag
+    get() = this.unsafeNekooTagOrNull ?: throw NoSuchElementException("No nya tag present on ItemStack")
 //</editor-fold>
 
 
@@ -223,12 +208,12 @@ val BukkitStack.unsafeNyaTagOrThrow: CompoundShadowTag
  * `false` 表示物品堆叠不应该被网络渲染接管.
  */
 var MojangStack.isClientSide: Boolean
-    get() = this.unsafeNbt?.contains(CLIENT_SIDE_KEY) == true
+    get() = this.unsafeRootTagOrNull?.contains(CLIENT_SIDE_KEY) == true
     set(value) {
         if (value) {
-            this.editNbt { it.remove(CLIENT_SIDE_KEY) }
+            this.editRootTag { it.remove(CLIENT_SIDE_KEY) }
         } else {
-            this.editNbt { it.putByte(CLIENT_SIDE_KEY, 0) }
+            this.editRootTag { it.putByte(CLIENT_SIDE_KEY, 0) }
         }
     }
 
@@ -237,17 +222,15 @@ var MojangStack.isClientSide: Boolean
  *
  * ## Read
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
- * 然后返回副本上的根 NBT.
+ * 然后返回副本上的根标签.
  *
  * ## Write
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
- * 然后将根 NBT 写入副本,
+ * 然后将根标签写入副本,
  * 最后将副本写入物品.
  */
-private var MojangStack.nbt: CompoundShadowTag?
-    get() {
-        return this.getCustomData()?.wrap
-    }
+private var MojangStack.rootTagOrNull: CompoundShadowTag?
+    get() = this.getCustomData()?.wrap
     set(value) {
         if (value != null) {
             this.setCustomData(value.unwrap)
@@ -259,8 +242,8 @@ private var MojangStack.nbt: CompoundShadowTag?
 /**
  * Safe edit.
  */
-private fun MojangStack.editNbt(block: (CompoundShadowTag) -> Unit) {
-    this.nbt = (this.nbt ?: CompoundShadowTag.create()).apply(block)
+private fun MojangStack.editRootTag(block: (CompoundShadowTag) -> Unit) {
+    this.rootTagOrNull = (this.rootTagOrNull ?: CompoundShadowTag.create()).apply(block)
 }
 
 /**
@@ -268,17 +251,15 @@ private fun MojangStack.editNbt(block: (CompoundShadowTag) -> Unit) {
  *
  * ## Read
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
- * 然后返回引用上的根 NBT.
+ * 然后返回引用上的根标签.
  *
  * ## Write
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
- * 然后将根 NBT 写入引用,
+ * 然后将根标签写入引用,
  * 最后将引用写入物品.
  */
-private var MojangStack.unsafeNbt: CompoundShadowTag?
-    get() {
-        return this.getUnsafeCustomData()?.wrap
-    }
+private var MojangStack.unsafeRootTagOrNull: CompoundShadowTag?
+    get() = this.getUnsafeCustomData()?.wrap
     set(value) {
         if (value != null) {
             this.setUnsafeCustomData(value.unwrap)
@@ -292,19 +273,15 @@ private var MojangStack.unsafeNbt: CompoundShadowTag?
  *
  * ## Read
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
- * 然后返回副本上的萌芽 NBT.
+ * 然后返回副本上的萌芽标签.
  *
  * ## Write
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 副本,
- * 然后将萌芽 NBT 写入副本,
+ * 然后将萌芽标签写入副本,
  * 最后将副本写入物品.
  */
-private var MojangStack.nyaTag: CompoundShadowTag?
-    get() {
-        val data = this.getCustomData() ?: return null
-        val nyaTag = data.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME) ?: return null
-        return nyaTag.wrap
-    }
+private var MojangStack.nekooTagOrNull: CompoundShadowTag?
+    get() = this.getCustomData()?.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME)?.wrap
     set(value) {
         val data = this.getCustomData()
         if (data === null) {
@@ -328,19 +305,15 @@ private var MojangStack.nyaTag: CompoundShadowTag?
  *
  * ## Read
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
- * 然后返回引用上的萌芽 NBT.
+ * 然后返回引用上的萌芽标签.
  *
  * ## Write
  * 读取 `minecraft:custom_data` 的 [CompoundTag] 引用,
- * 然后将萌芽 NBT 写入引用,
+ * 然后将萌芽标签写入引用,
  * 最后将引用写入物品.
  */
-private var MojangStack.unsafeNyaTag: CompoundShadowTag?
-    get() {
-        val data = this.getUnsafeCustomData()
-        val nyaTag = data?.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME) ?: return null
-        return nyaTag.wrap
-    }
+private var MojangStack.unsafeNekooTagOrNull: CompoundShadowTag?
+    get() = this.getUnsafeCustomData()?.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME)?.wrap
     set(value) {
         val data = this.getUnsafeCustomData()
         if (data === null) {

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.api.Nekoo
 import cc.mewcraft.wakame.api.NekooProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.adapters.AbstractLocation
@@ -24,8 +23,6 @@ class HasItemCondition(
     init {
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
-
-    private val nekoo: Nekoo = NekooProvider.get()
 
     private val itemKey: Key
     private val amount: RangedInt
@@ -67,9 +64,15 @@ class HasItemCondition(
         var count = 0
         val contents = inventory.contents
 
-        for (item in contents) {
-            if (item != null && nekoo.isNekoStack(item) && nekoo.getNekoItemId(item) == itemKey) {
-                count += item.amount
+        val nekooApi = NekooProvider.get()
+
+        for (itemStack in contents) {
+            if (itemStack == null || itemStack.isEmpty) {
+                continue
+            }
+            val nekoItem = nekooApi.itemRegistry.getOrNull(itemStack)
+            if (nekoItem?.id == itemKey) {
+                count += itemStack.amount
             }
         }
 

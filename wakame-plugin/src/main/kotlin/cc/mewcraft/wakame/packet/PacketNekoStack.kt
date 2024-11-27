@@ -2,12 +2,17 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ImaginaryNekoStack
+import cc.mewcraft.wakame.item.ImaginaryNekoStackRegistry
+import cc.mewcraft.wakame.item.ItemSlotGroup
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.NekoStackImplementations
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.util.unsafeNyaTagOrThrow
+import cc.mewcraft.wakame.util.unsafeNekooTag
 import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation
 import com.github.retrooper.packetevents.protocol.attribute.Attributes
 import com.github.retrooper.packetevents.protocol.component.ComponentType
@@ -58,12 +63,12 @@ internal val ItemStack.nekooTag: NBTCompound?
 
 internal val ItemStack.isNeko: Boolean
     get() {
-        return nekooTag != null || ImaginaryNekoStackRegistry.has(id)
+        return this.nekooTag != null || ImaginaryNekoStackRegistry.has(id)
     }
 
 internal val ItemStack.isCustomNeko: Boolean
     get() {
-        return nekooTag != null
+        return this.nekooTag != null
     }
 
 internal val ItemStack.isVanillaNeko: Boolean
@@ -100,48 +105,64 @@ internal interface PacketNekoStack : NekoStack {
     val packetItem: ItemStack
 
     /**
-     * 设置自定义名称. 您可以传递 `null` 来移除名称.
+     * 读写 `minecraft:custom_name`. 传递 `null` 来移除.
      */
-    fun customName(value: Component?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.CUSTOM_NAME, value)
-        } else {
-            packetItem.unset(ComponentTypes.CUSTOM_NAME)
+    var customName: Component?
+        get() {
+            return packetItem.get(ComponentTypes.CUSTOM_NAME)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.CUSTOM_NAME, value)
+            } else {
+                packetItem.unset(ComponentTypes.CUSTOM_NAME)
+            }
+        }
 
     /**
-     * 设置物品名称. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:item_name`. 传递 `null` 来移除.
      */
-    fun itemName(value: Component?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.ITEM_NAME, value)
-        } else {
-            packetItem.unset(ComponentTypes.ITEM_NAME)
+    var itemName: Component?
+        get() {
+            return packetItem.get(ComponentTypes.ITEM_NAME)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.ITEM_NAME, value)
+            } else {
+                packetItem.unset(ComponentTypes.ITEM_NAME)
+            }
+        }
 
     /**
-     * 设置物品描述. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:lore`. 传递 `null` 来移除.
      */
-    fun lore(value: List<Component>?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.LORE, ItemLore(value))
-        } else {
-            packetItem.unset(ComponentTypes.LORE)
+    var lore: List<Component>?
+        get() {
+            return packetItem.get(ComponentTypes.LORE)?.lines
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.LORE, ItemLore(value))
+            } else {
+                packetItem.unset(ComponentTypes.LORE)
+            }
+        }
 
     /**
-     * 设置自定义模型数据. 您可以传递 `null` 来移除它.
+     * 读写 `minecraft:custom_model_data`. 传递 `null` 来移除.
      */
-    fun customModelData(value: Int?) {
-        if (value != null) {
-            packetItem.set(ComponentTypes.CUSTOM_MODEL_DATA, value)
-        } else {
-            packetItem.unset(ComponentTypes.CUSTOM_MODEL_DATA)
+    var customModelData: Int?
+        get() {
+            return packetItem.get(ComponentTypes.CUSTOM_MODEL_DATA)
         }
-    }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.CUSTOM_MODEL_DATA, value)
+            } else {
+                packetItem.unset(ComponentTypes.CUSTOM_MODEL_DATA)
+            }
+        }
 
     //<editor-fold desc="Show In Tooltip">
     fun showAttributeModifiers(value: Boolean) {
@@ -206,7 +227,7 @@ private class PacketCustomNekoStack(
     // 开发日记1: We use property initializer here as it would be called multiple times,
     // and we don't want to do the unnecessary NBT conversion again and again
     // 开发日记2: 该 NBT 标签应该只接受读操作 (虽然可以写, 但不保证生效, 也没啥用应该)
-    private val nyaTag: CompoundTag = handle.unsafeNyaTagOrThrow
+    private val nekooTag: CompoundTag = handle.unsafeNekooTag
 
     override val isEmpty: Boolean
         get() = false
@@ -224,26 +245,26 @@ private class PacketCustomNekoStack(
         get() = abortReads()
 
     override val id: Key
-        get() = NekoStackImplementations.getIdOrThrow(nyaTag)
+        get() = NekoStackImplementations.getId(nekooTag)
 
     override var variant: Int
-        get() = NekoStackImplementations.getVariant(nyaTag)
+        get() = NekoStackImplementations.getVariant(nekooTag)
         set(_) = abortWrites()
 
     override val slotGroup: ItemSlotGroup
-        get() = NekoStackImplementations.getSlotGroup(nyaTag)
+        get() = NekoStackImplementations.getSlotGroup(nekooTag)
 
     override val prototype: NekoItem
-        get() = NekoStackImplementations.getPrototypeOrThrow(nyaTag)
+        get() = NekoStackImplementations.getArchetype(nekooTag)
 
     override val components: ItemComponentMap
-        get() = NekoStackImplementations.getImmutableComponents(handle) // 使用 ImmutableMap 以禁止写入新的组件信息
+        get() = NekoStackImplementations.getComponents(handle)
 
     override val templates: ItemTemplateMap
-        get() = NekoStackImplementations.getTemplates(nyaTag)
+        get() = NekoStackImplementations.getTemplates(nekooTag)
 
     override val behaviors: ItemBehaviorMap
-        get() = NekoStackImplementations.getBehaviors(nyaTag)
+        get() = NekoStackImplementations.getBehaviors(nekooTag)
 
     override val unsafe: NekoStack.Unsafe
         get() = Unsafe(this)
@@ -268,8 +289,8 @@ private class PacketCustomNekoStack(
     }
 
     class Unsafe(val nekoStack: PacketCustomNekoStack) : NekoStack.Unsafe {
-        override val nyaTag: CompoundTag
-            get() = nekoStack.nyaTag
+        override val nekooTag: CompoundTag
+            get() = nekoStack.nekooTag
     }
 }
 

@@ -2,7 +2,17 @@ package cc.mewcraft.wakame.skill
 
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
-import cc.mewcraft.wakame.skill.factory.*
+import cc.mewcraft.wakame.skill.factory.Bloodrage
+import cc.mewcraft.wakame.skill.factory.CommandExecute
+import cc.mewcraft.wakame.skill.factory.Dash
+import cc.mewcraft.wakame.skill.factory.FlyDash
+import cc.mewcraft.wakame.skill.factory.KillEntity
+import cc.mewcraft.wakame.skill.factory.Lightning
+import cc.mewcraft.wakame.skill.factory.PotionDrop
+import cc.mewcraft.wakame.skill.factory.Projectile
+import cc.mewcraft.wakame.skill.factory.RemovePotionEffect
+import cc.mewcraft.wakame.skill.factory.SkillFactory
+import cc.mewcraft.wakame.skill.factory.Teleport
 
 /**
  * 技能工厂的集合. 用于获取用于创建技能的工厂类.
@@ -24,7 +34,7 @@ internal object SkillFactories {
     }
 
     operator fun get(registryName: String): SkillFactory<*>? {
-        return FACTORIES.find(registryName)
+        return FACTORIES.getOrNull(registryName)
     }
 
 }

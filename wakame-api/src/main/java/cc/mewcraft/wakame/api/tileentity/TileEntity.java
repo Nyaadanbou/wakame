@@ -15,28 +15,29 @@ public interface TileEntity {
     /**
      * Gets the owner of this {@link TileEntity}.
      *
-     * @return The owner of this {@link TileEntity}
+     * @return the owner of this {@link TileEntity}
      */
     @Nullable OfflinePlayer getOwner();
 
     /**
      * Gets the {@link NekoBlock} of this {@link TileEntity}.
      *
-     * @return The {@link NekoBlock} of this {@link TileEntity}
+     * @return the {@link NekoBlock} of this {@link TileEntity}
      */
     @NotNull NekoBlock getBlock();
 
     /**
      * Gets the {@link Location} of this {@link TileEntity}.
      *
-     * @return The {@link Location} of this {@link TileEntity}
+     * @return the {@link Location} of this {@link TileEntity}
      */
     @NotNull Location getLocation();
 
     /**
      * Retrieves a list of all {@link ItemStack ItemStacks} this {@link TileEntity} would drop.
      *
-     * @return A list of all {@link ItemStack ItemStacks} this {@link TileEntity} would drop.
+     * @param includeSelf whether to include the tile entity itself in the drops
+     * @return a list of all {@link ItemStack ItemStacks} this {@link TileEntity} would drop
      */
     @NotNull List<@NotNull ItemStack> getDrops(boolean includeSelf);
 

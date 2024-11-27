@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.station.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -51,7 +53,7 @@ internal class SimpleStationRecipe(
 
     override fun isValid(): Boolean {
         input.forEach {
-            if (!it.isValid()) return false
+            if (!it.valid()) return false
         }
         return output.isValid()
     }

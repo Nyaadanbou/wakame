@@ -23,7 +23,7 @@ public interface TileEntityManager {
     /**
      * Gets the {@link TileEntity} at that {@link Location} or null if there isn't one.
      *
-     * @return The {@link TileEntity} at that {@link Location} or null if there isn't one.
+     * @return the {@link TileEntity} at that {@link Location} or null if there isn't one
      */
     @Nullable
     TileEntity getTileEntity(@NotNull Location location);
@@ -31,8 +31,8 @@ public interface TileEntityManager {
     /**
      * Gets all loaded {@link TileEntity TileEntities} in the specified {@link Chunk}.
      *
-     * @param chunk The {@link Chunk} to get the {@link TileEntity TileEntities} from.
-     * @return All loaded {@link TileEntity TileEntities} in the specified {@link Chunk}.
+     * @param chunk the {@link Chunk} to get the {@link TileEntity TileEntities} from
+     * @return all loaded {@link TileEntity TileEntities} in the specified {@link Chunk}
      */
     @NotNull
     List<@NotNull TileEntity> getTileEntities(@NotNull Chunk chunk);
@@ -40,8 +40,8 @@ public interface TileEntityManager {
     /**
      * Gets all loaded {@link TileEntity TileEntities} in the specified {@link World}.
      *
-     * @param world The {@link World} to get the {@link TileEntity TileEntities} from.
-     * @return All loaded {@link TileEntity TileEntities} in the specified {@link World}.
+     * @param world the {@link World} to get the {@link TileEntity TileEntities} from
+     * @return all loaded {@link TileEntity TileEntities} in the specified {@link World}
      */
     @NotNull
     List<@NotNull TileEntity> getTileEntities(@NotNull World world);
@@ -49,7 +49,7 @@ public interface TileEntityManager {
     /**
      * Gets all loaded {@link TileEntity TileEntities}.
      *
-     * @return All loaded {@link TileEntity TileEntities}.
+     * @return all loaded {@link TileEntity TileEntities}
      */
     @NotNull
     List<@NotNull TileEntity> getTileEntities();

@@ -2,10 +2,10 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.component.ItemComponentMap.Companion.TAG_COMPONENTS
-import cc.mewcraft.wakame.util.editNyaTag
+import cc.mewcraft.wakame.util.editNekooTag
 import cc.mewcraft.wakame.util.getCompoundOrNull
 import cc.mewcraft.wakame.util.getOrPut
-import cc.mewcraft.wakame.util.unsafeNyaTag
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import org.bukkit.inventory.ItemStack
 
 internal object ItemComponentHolders {
@@ -29,8 +29,8 @@ private class ItemComponentHolderImpl(
      * 该函数返回的是直接引用, 禁止修改其任何状态!
      */
     private fun getUnsafeComponents(): CompoundTag? {
-        val nyaTag = item.unsafeNyaTag ?: return null // 并发环境下可能为 null
-        val components = nyaTag.getCompoundOrNull(TAG_COMPONENTS)
+        val nekooTag = item.unsafeNekooTagOrNull ?: return null // 并发环境下可能为 null
+        val components = nekooTag.getCompoundOrNull(TAG_COMPONENTS)
         return components
     }
 
@@ -47,7 +47,7 @@ private class ItemComponentHolderImpl(
     }
 
     override fun editTag(id: String, edit: (CompoundTag) -> Unit) {
-        item.editNyaTag { tag ->
+        item.editNekooTag { tag ->
             // 获取存放所有组件的 NBT 标签
             val components = tag.getOrPut(TAG_COMPONENTS, CompoundTag::create)
             // 获取 id 对应的组件 NBT 标签
@@ -58,9 +58,9 @@ private class ItemComponentHolderImpl(
     }
 
     override fun removeTag(id: String) {
-        item.editNyaTag {
+        item.editNekooTag {
             // 获取存放所有组件的 NBT 标签
-            val components = it.getCompoundOrNull(TAG_COMPONENTS) ?: return@editNyaTag
+            val components = it.getCompoundOrNull(TAG_COMPONENTS) ?: return@editNekooTag
             // 移除 id 对应的组件 NBT 标签
             components.remove(id)
         }

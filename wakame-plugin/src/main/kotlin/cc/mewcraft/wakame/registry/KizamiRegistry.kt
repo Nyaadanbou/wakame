@@ -2,11 +2,23 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
-import cc.mewcraft.wakame.kizami.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiEffect
+import cc.mewcraft.wakame.kizami.KizamiEffectSerializer
+import cc.mewcraft.wakame.kizami.KizamiInstance
+import cc.mewcraft.wakame.kizami.KizamiInstanceSerializer
+import cc.mewcraft.wakame.kizami.KizamiProvider
+import cc.mewcraft.wakame.kizami.KizamiSerializer
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -39,7 +51,7 @@ object KizamiRegistry : KoinComponent, Initializable {
      * 通过二进制标识符查找对象.
      */
     fun findBy(binary: Byte): Kizami? {
-        return INSTANCES.find(BI_LOOKUP.findUniqueIdBy(binary))
+        return INSTANCES.getOrNull(BI_LOOKUP.findUniqueIdBy(binary))
     }
 
     /**
@@ -114,6 +126,6 @@ object KizamiRegistry : KoinComponent, Initializable {
 
 private object DefaultKizamiProvider : KizamiProvider {
     override fun get(id: String): Kizami? {
-        return KizamiRegistry.INSTANCES.find(id)
+        return KizamiRegistry.INSTANCES.getOrNull(id)
     }
 }

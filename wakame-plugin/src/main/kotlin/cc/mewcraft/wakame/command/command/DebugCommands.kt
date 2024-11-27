@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.pack.entity.OnGroundBoneModifier
 import cc.mewcraft.wakame.util.coroutine.BukkitMain
 import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.unsafeNyaTag
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ object DebugCommands : KoinComponent, CommandFactory<CommandSender> {
                 //<editor-fold desc="handler: print_wakame_nbt_if_not_null">
                 handler { context ->
                     val sender = context.sender() as Player
-                    val nbtOrNull = sender.inventory.itemInMainHand.unsafeNyaTag
+                    val nbtOrNull = sender.inventory.itemInMainHand.unsafeNekooTagOrNull
                     sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
                 }
                 //</editor-fold>

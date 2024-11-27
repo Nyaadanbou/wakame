@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.registry
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableSet
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import org.jetbrains.annotations.TestOnly
 
 // Side note: use CMD-7 to navigate this file
@@ -16,13 +18,7 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      */
     val values: Set<V>
 
-    /**
-     * Gets specified value in this registry.
-     *
-     * @param uniqueId the name from which value you want to retrieve
-     * @return the specified value or `null` if not existing
-     */
-    fun find(uniqueId: K?): V?
+    fun isEmpty(): Boolean
 
     /**
      * Checks whether the specific value is present in this registry.
@@ -42,6 +38,14 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
     operator fun get(uniqueId: K): V
 
     /**
+     * Gets specified value in this registry.
+     *
+     * @param uniqueId the name from which value you want to retrieve
+     * @return the specified value or `null` if not existing
+     */
+    fun getOrNull(uniqueId: K?): V?
+
+    /**
      * Registers a new entry into this registry.
      *
      * @param uniqueId the unique identifier of the new entry
@@ -54,6 +58,35 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      */
     @TestOnly
     fun clear()
+}
+
+/**
+ * 用于在忽略命名空间的前提下, 查询出所有具有相同路径的实例.
+ *
+ * 例如存在这些实例:
+ * - `a:a`
+ * - `b:a`
+ * - `c:a`
+ * 那么查询 [getFuzzy] 查询 `"a"` 就会返回这三个实例.
+ */
+class FuzzyRegistry<V> {
+    private val path2Values: Object2ObjectOpenHashMap<String, ObjectArrayList<V>> = Object2ObjectOpenHashMap()
+
+    fun register(path: String, value: V) {
+        path2Values.getOrPut(path, ::ObjectArrayList).add(value)
+    }
+
+    fun getFuzzy(path: String): List<V> {
+        return path2Values[path] ?: emptyList()
+    }
+
+    fun hasAny(path: String): Boolean {
+        return getFuzzy(path).isNotEmpty()
+    }
+
+    fun clear() {
+        path2Values.clear()
+    }
 }
 
 /**
@@ -106,7 +139,7 @@ sealed interface BiKnot<K, V, B> {
      * @return the specified object or `null`
      */
     fun findBy(binary: B): V? {
-        return INSTANCES.find(BI_LOOKUP.findUniqueIdBy(binary))
+        return INSTANCES.getOrNull(BI_LOOKUP.findUniqueIdBy(binary))
     }
 
     /**
@@ -128,16 +161,20 @@ internal class SimpleRegistry<K, V> : Registry<K, V> {
     override val values: Set<V>
         get() = ImmutableSet.copyOf(uniqueId2ObjectMap.values)
 
-    override fun find(uniqueId: K?): V? {
+    override fun isEmpty(): Boolean {
+        return uniqueId2ObjectMap.isEmpty()
+    }
+
+    override fun getOrNull(uniqueId: K?): V? {
         return if (uniqueId == null) null else uniqueId2ObjectMap[uniqueId]
     }
 
     override fun has(uniqueId: K?): Boolean {
-        return find(uniqueId) != null
+        return getOrNull(uniqueId) != null
     }
 
     override operator fun get(uniqueId: K): V { // TODO 无脑抛异常有点太一刀切了，考虑返回空然后逐个处理
-        return requireNotNull(find(uniqueId)) { "Can't find object by identifier `$uniqueId` in the registry" }
+        return requireNotNull(getOrNull(uniqueId)) { "Can't find object by identifier `$uniqueId` in the registry" }
     }
 
     override fun register(uniqueId: K, value: V) {

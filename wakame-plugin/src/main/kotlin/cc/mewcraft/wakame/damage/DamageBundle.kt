@@ -22,7 +22,7 @@ fun DamageBundle(
 }
 
 private fun getElementById(id: String): Element? {
-    return ElementRegistry.INSTANCES.find(id) ?: run {
+    return ElementRegistry.INSTANCES.getOrNull(id) ?: run {
         Injector.get<Logger>().warn("Element '$id' not found")
         return null
     }

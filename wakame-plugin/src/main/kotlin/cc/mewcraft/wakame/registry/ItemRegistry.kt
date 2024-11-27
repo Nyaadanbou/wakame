@@ -1,12 +1,23 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.display2.NekoItemHolder
-import cc.mewcraft.wakame.initializer.*
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.Initializer
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.item.ItemBaseImpl
+import cc.mewcraft.wakame.item.ItemSlotGroup
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoItemFactory
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.SimpleNekoItem
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
+import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
+import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -15,7 +26,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.*
+import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.immutable.provider
 
 @PreWorldDependency(
     runBefore = [
@@ -43,80 +56,43 @@ import xyz.xenondevs.commons.provider.immutable.*
 )
 object ItemRegistry : KoinComponent, Initializable {
     /**
-     * 用于一般用途的 [NekoItem]. 这些模板可以用来生成 [ItemStack].
+     * 用于一般用途的 [NekoItem].
+     * 这些物品类型可以用来生成 [ItemStack].
      */
     @JvmField
     val CUSTOM: Registry<Key, NekoItem> = SimpleRegistry()
 
     /**
-     * 包含了虚拟的 [NekoItem]. 这些模板不应该用来生成 [ItemStack].
+     * 包含了虚拟的 [NekoItem].
+     * 这些物品类型 *不应该* 用来生成 [ItemStack].
      */
     @JvmField
     val IMAGINARY: Registry<Key, NekoItem> = SimpleRegistry()
 
     /**
-     * All namespaces of loaded items.
+     * 用于在忽略命名空间的前提下, 模糊查找具有相同路径的 [NekoItem].
+     * 这些物品类型可以用来生成 [ItemStack].
+     */
+    @JvmField
+    val CUSTOM_FUZZY: FuzzyRegistry<NekoItem> = FuzzyRegistry()
+
+    /**
+     * 所有已加载物品类型的命名空间.
      */
     @get:JvmName("namespaces")
-    val NAMESPACES: List<String> by ReloadableProperty {
-        CUSTOM.values.map { it.id.namespace() }.distinct().sorted()
-    }
+    val NAMESPACES: List<String>
+        get() = namespaces
+
+    private val namespaces: ObjectArrayList<String> = ObjectArrayList()
 
     /**
      * All paths of each available namespace.
      */
     @get:JvmName("pathsByNamespace")
-    val PATHS_BY_NAMESPACE: Map<String, List<String>> by ReloadableProperty {
-        val ret = hashMapOf<String, MutableList<String>>()
-        CUSTOM.values.forEach {
-            val namespace = it.id.namespace()
-            val path = it.id.value()
-            ret.getOrPut(namespace, ::ArrayList).add(path)
-        }
-        ret
-    }
+    val NAMESPACE_TO_PATHS: Map<String, List<String>>
+        get() = namespace2Paths
 
-    /**
-     * Gets specific [NekoItem] from the registry.
-     *
-     * @param key the key in string representation
-     * @return the specific [NekoItem]
-     */
-    fun Registry<Key, NekoItem>.get(key: String): NekoItem {
-        return this[Key.key(key)]
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry if there is one.
-     *
-     * @param key the key in string representation
-     * @return the specific [NekoItem] or `null` if not found
-     */
-    fun Registry<Key, NekoItem>.find(key: String): NekoItem? {
-        return this.find(Key.key(key))
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry.
-     *
-     * @param namespace the namespace
-     * @param path the path
-     * @return the specific [NekoItem]
-     */
-    fun Registry<Key, NekoItem>.get(namespace: String, path: String): NekoItem {
-        return this[Key.key(namespace, path)]
-    }
-
-    /**
-     * Gets specific [NekoItem] from the registry if there is one.
-     *
-     * @param namespace the namespace
-     * @param path the path
-     * @return the specific [NekoItem] or `null` if not found
-     */
-    fun Registry<Key, NekoItem>.find(namespace: String, path: String): NekoItem? {
-        return this.find(Key.key(namespace, path))
-    }
+    private val namespace2Paths: Object2ObjectOpenHashMap<String, ObjectArrayList<String>> = Object2ObjectOpenHashMap()
 
     override fun onPreWorld() {
         loadConfiguration()
@@ -158,27 +134,41 @@ object ItemRegistry : KoinComponent, Initializable {
         get() = ItemRegistryInternals.ERROR_NEKO_STACK_PROVIDER.get().itemStack
 
     private fun loadConfiguration() {
-        // 清空注册表
-        IMAGINARY.clear()
-        LOGGER.info("Unregistered all vanilla items.")
-        CUSTOM.clear()
-        LOGGER.info("Unregistered all custom items.")
+        // 清空现有的注册表
+        if (!IMAGINARY.isEmpty()) {
+            IMAGINARY.clear()
+            LOGGER.info("Unregistered all vanilla items.")
+        }
+        if (!CUSTOM.isEmpty()) {
+            CUSTOM.clear()
+            CUSTOM_FUZZY.clear()
+            namespaces.clear()
+            namespace2Paths.clear()
+            LOGGER.info("Unregistered all custom items.")
+        }
 
         // 加载所有配置文件
         for ((key, path, node) in NekoItemNodeIterator) {
-            val namespace = key.namespace()
-            if (namespace == Key.MINECRAFT_NAMESPACE) {
+            val keyNamespace = key.namespace()
+            val keyValue = key.value()
+
+            if (keyNamespace == Key.MINECRAFT_NAMESPACE) {
                 // Process as vanilla item
                 LOGGER.info("Loading vanilla item: '$key'")
                 runCatching { NekoItemFactory.createVanilla(key, path, node) }
-                    .onSuccess { IMAGINARY.register(key, it) }
-                    .onFailure { reportError(key, it) }
+                    .onSuccess { nekoItem -> IMAGINARY.register(key, nekoItem) }
+                    .onFailure { ex -> reportError(key, ex) }
             } else {
                 // Process as custom item
                 LOGGER.info("Loading custom item: '$key'")
                 runCatching { NekoItemFactory.createCustom(key, path, node) }
-                    .onSuccess { CUSTOM.register(key, it) }
-                    .onFailure { reportError(key, it) }
+                    .onSuccess { nekoItem ->
+                        CUSTOM.register(key, nekoItem)
+                        CUSTOM_FUZZY.register(keyValue, nekoItem)
+                        namespaces.add(keyNamespace)
+                        namespace2Paths.getOrPut(keyNamespace, ::ObjectArrayList).add(keyValue)
+                    }
+                    .onFailure { ex -> reportError(key, ex) }
             }
         }
         LOGGER.info("Registered all items.")
@@ -224,7 +214,7 @@ private object ItemRegistryInternals {
 
     @JvmField
     val ERROR_NEKO_ITEM_PROVIDER: Provider<NekoItem> =
-        provider { ItemRegistry.CUSTOM.find(ItemRegistry.ERROR_NEKO_ITEM_ID) }.orElse(DEFAULT_ERROR_NEKO_ITEM)
+        provider { ItemRegistry.CUSTOM.getOrNull(ItemRegistry.ERROR_NEKO_ITEM_ID) }.orElse(DEFAULT_ERROR_NEKO_ITEM)
 
     @JvmField
     val ERROR_NEKO_STACK_PROVIDER: Provider<NekoStack> =

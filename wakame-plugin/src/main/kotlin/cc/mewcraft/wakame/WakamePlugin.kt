@@ -5,7 +5,7 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.api.NekooApiProvider
+import cc.mewcraft.wakame.api.ApiNekooProvider
 import cc.mewcraft.wakame.api.NekooProvider
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
@@ -117,7 +117,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
         Initializer.start()
 
         // 注册 Nekoo API
-        NekooProvider.register(NekooApiProvider())
+        NekooProvider.register(ApiNekooProvider())
     }
 
     override suspend fun disable() {

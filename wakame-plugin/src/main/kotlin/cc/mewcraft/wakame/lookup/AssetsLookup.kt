@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.lookup
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR_NAME
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.krequire
@@ -54,12 +56,12 @@ object AssetsLookup : Initializable, KoinComponent {
     }
 
     fun getAssets(key: Key): List<Assets> {
-        require(ItemRegistry.CUSTOM.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.CUSTOM.getOrNull(key) != null) { "No such NekoItem: $key" }
         return assets[key].toList()
     }
 
     fun getAssets(key: Key, sid: Int): Assets {
-        require(ItemRegistry.CUSTOM.find(key) != null) { "No such NekoItem: $key" }
+        require(ItemRegistry.CUSTOM.getOrNull(key) != null) { "No such NekoItem: $key" }
         return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
     }
 

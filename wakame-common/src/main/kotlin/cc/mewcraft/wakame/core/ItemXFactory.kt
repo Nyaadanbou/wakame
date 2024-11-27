@@ -16,7 +16,7 @@ interface ItemXFactory {
     /**
      * 该物品库插件是否已经完成加载.
      */
-    val isValid: Boolean
+    val loaded: Boolean
 
     /**
      * 通过 *通用物品标识* [uid] 构建该物品库插件对应的 [ItemX].

@@ -39,7 +39,7 @@ class SkillParser<C : Any> : AggregateParser<C, Skill> {
     override fun mapper(): AggregateResultMapper<C, Skill> {
         return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val path = aggregateCommandContext.get<String>("path")
-            val skill = SkillRegistry.INSTANCES.find(Key(Namespaces.SKILL, path))
+            val skill = SkillRegistry.INSTANCES.getOrNull(Key(Namespaces.SKILL, path))
             if (skill == null) {
                 ArgumentParseResult.failureFuture(SkillParseException(commandContext))
             } else {

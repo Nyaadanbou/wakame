@@ -339,7 +339,7 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val element = ElementRegistry.INSTANCES.find(elementId) ?: error("invalid element id: '$elementId'")
+                            val element = ElementRegistry.INSTANCES.getOrNull(elementId) ?: error("invalid element id: '$elementId'")
                             val attributes = Attributes.getComposition("$compositionId/${element.uniqueId}")
                             builder.add(attributes, valueNodeInMap)
                         }

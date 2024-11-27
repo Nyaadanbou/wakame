@@ -33,7 +33,7 @@ class ItemPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestionPro
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<String> {
         val namespaceHint = commandContext.getOrNull<String>(ItemNamespaceParser.NAMESPACE_HINT)
-        val paths = ItemRegistry.PATHS_BY_NAMESPACE[namespaceHint]
+        val paths = ItemRegistry.NAMESPACE_TO_PATHS[namespaceHint]
                     ?: return ArgumentParseResult.failure(ItemPathParseException(commandContext))
 
         val peekString = commandInput.peekString()
@@ -47,7 +47,7 @@ class ItemPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestionPro
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
         val namespaceHint = commandContext.getOrNull<String>(ItemNamespaceParser.NAMESPACE_HINT)
-        return ItemRegistry.PATHS_BY_NAMESPACE[namespaceHint] ?: emptyList()
+        return ItemRegistry.NAMESPACE_TO_PATHS[namespaceHint] ?: emptyList()
     }
 }
 

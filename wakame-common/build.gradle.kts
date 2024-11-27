@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "cc.mewcraft.wakame"
-version = "0.0.1"
+version = "0.0.1-SNAPSHOT"
 
 dependencies {
     compileOnly(local.paper)
@@ -27,6 +27,7 @@ publishing {
 
     publications {
         create<MavenPublication>("maven") {
+            artifactId = "common"
             from(components["java"])
         }
     }

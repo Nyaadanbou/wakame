@@ -8,14 +8,14 @@ public interface NekoBlockState {
     /**
      * Gets the {@link NekoBlock} of this {@link NekoBlockState}.
      *
-     * @return The block of this block state.
+     * @return the block of this block state
      */
     @NotNull NekoBlock getBlock();
 
     /**
      * Gets the {@link Location} of this {@link NekoBlockState}.
      *
-     * @return The location of this block state.
+     * @return the location of this block state
      */
     @NotNull Location getLocation();
 
