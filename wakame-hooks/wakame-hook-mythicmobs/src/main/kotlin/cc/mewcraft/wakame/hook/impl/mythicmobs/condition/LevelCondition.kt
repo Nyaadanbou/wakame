@@ -41,6 +41,7 @@ class LevelCondition(
 
     private fun checkLevel(player: Player): Boolean {
         val level = PlayerLevelManager.get(player.uniqueId)
+            ?: return false
         return this.level.equals(level)
     }
 }
