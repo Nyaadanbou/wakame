@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.api.item;
 import cc.mewcraft.wakame.api.block.NekoBlock;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +38,7 @@ public interface NekoItem {
      *               names in resource packs (e.g. en_us).
      * @return The name of this {@link NekoItem} in plaintext.
      */
-    @NotNull String getPlaintextName(@NotNull String locale);
+    @NotNull String getPlainName(@NotNull String locale);
 
     /**
      * Creates an {@link ItemStack} of this {@link NekoItem} with the specified amount.
@@ -48,12 +49,31 @@ public interface NekoItem {
     @NotNull ItemStack createItemStack(int amount);
 
     /**
+     * Creates an {@link ItemStack} of this {@link NekoItem} with the specified amount.
+     *
+     * @param amount The amount of items in the stack.
+     * @param player The player to create the item stack for.
+     * @return An {@link ItemStack} of this {@link NekoItem} with the specified amount.
+     */
+    @NotNull ItemStack createItemStack(int amount, @NotNull Player player);
+
+    /**
      * Creates an {@link ItemStack} of this {@link NekoItem} with the amount of 1.
      *
      * @return An {@link ItemStack} of this {@link NekoItem} with the amount of 1.
      */
     default @NotNull ItemStack createItemStack() {
         return createItemStack(1);
+    }
+
+    /**
+     * Creates an {@link ItemStack} of this {@link NekoItem} with the amount of 1.
+     *
+     * @param player The player to create the item stack for.
+     * @return An {@link ItemStack} of this {@link NekoItem} with the amount of 1.
+     */
+    default @NotNull ItemStack createItemStack(@NotNull Player player) {
+        return createItemStack(1, player);
     }
 
 }

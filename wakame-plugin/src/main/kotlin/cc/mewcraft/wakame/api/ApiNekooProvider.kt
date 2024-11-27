@@ -1,5 +1,11 @@
 package cc.mewcraft.wakame.api
 
+import cc.mewcraft.wakame.api.block.BlockManager
+import cc.mewcraft.wakame.api.block.NekoBlockRegistry
+import cc.mewcraft.wakame.api.item.NekoItemRegistry
+import cc.mewcraft.wakame.api.protection.ProtectionIntegration
+import cc.mewcraft.wakame.api.tileentity.TileEntityManager
+import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.CustomNekoItemRealizer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.isNeko
@@ -17,7 +23,27 @@ import org.koin.core.component.KoinComponent
 /**
  * 使用插件实例来实现 Nekoo API.
  */
-internal class NekooApiProvider : Nekoo, KoinComponent {
+internal class ApiNekooProvider : Nekoo, KoinComponent {
+    override fun getTileEntityManager(): TileEntityManager? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getBlockManager(): BlockManager? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getBlockRegistry(): NekoBlockRegistry? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getItemRegistry(): NekoItemRegistry? {
+        return ApiItemRegistry
+    }
+
+    override fun registerProtectionIntegration(integration: ProtectionIntegration) {
+        ProtectionManager.integrations += integration
+    }
+
     override fun createItemStack(
         id: Key, source: Player?,
     ): ItemStack {

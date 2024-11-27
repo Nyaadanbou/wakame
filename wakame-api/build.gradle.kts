@@ -1,17 +1,16 @@
 plugins {
     id("nyaadanbou-conventions.repositories")
-    id("wakame-conventions.kotlin")
+    id("wakame-conventions.java")
     `maven-publish`
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0.0"
-description = "The API of the core system"
+version = "0.0.1"
+description = "The API of wakame system"
 
 dependencies {
     api(project(":wakame-common")) // 运行时由服务端提供
     compileOnly(local.paper)
-    compileOnly(libs.checker.qual)
 }
 
 publishing {

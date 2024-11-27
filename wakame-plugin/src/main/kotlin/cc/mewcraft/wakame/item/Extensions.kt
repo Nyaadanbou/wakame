@@ -9,6 +9,12 @@ import cc.mewcraft.wakame.util.maxDamage
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 
+var NekoStack.amount: Int
+    get() = wrapped.amount
+    set(value) {
+        wrapped.amount = value
+    }
+
 fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
     val attackSpeedLevel = itemAttackSpeed.level

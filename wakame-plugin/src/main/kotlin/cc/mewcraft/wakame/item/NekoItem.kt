@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
 /**
@@ -47,6 +48,16 @@ interface NekoItem : Examinable {
      * 物品的基底.
      */
     val base: ItemBase
+
+    /**
+     * 物品的名字, 用于展示给玩家.
+     */
+    val name: Component
+
+    /**
+     * 物品的名字, 用于后台日志和所有不支持 [net.kyori.adventure.text.Component] 的地方.
+     */
+    val plainName: String
 
     /**
      * The item slot group where this item can take effect.

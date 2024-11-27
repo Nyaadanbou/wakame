@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.registry
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableSet
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import org.jetbrains.annotations.TestOnly
 
 // Side note: use CMD-7 to navigate this file
@@ -15,6 +17,8 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      * All the [instances][V] in this registry.
      */
     val values: Set<V>
+
+    fun isEmpty(): Boolean
 
     /**
      * Gets specified value in this registry.
@@ -54,6 +58,35 @@ sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
      */
     @TestOnly
     fun clear()
+}
+
+/**
+ * 用于在忽略命名空间的前提下, 查询出所有具有相同路径的实例.
+ *
+ * 例如存在这些实例:
+ * - `a:a`
+ * - `b:a`
+ * - `c:a`
+ * 那么查询 [getFuzzy] 查询 `"a"` 就会返回这三个实例.
+ */
+class FuzzyRegistry<V> {
+    private val path2Values: Object2ObjectOpenHashMap<String, ObjectArrayList<V>> = Object2ObjectOpenHashMap()
+
+    fun register(path: String, value: V) {
+        path2Values.getOrPut(path, ::ObjectArrayList).add(value)
+    }
+
+    fun getFuzzy(path: String): List<V> {
+        return path2Values[path] ?: emptyList()
+    }
+
+    fun hasAny(path: String): Boolean {
+        return getFuzzy(path).isNotEmpty()
+    }
+
+    fun clear() {
+        path2Values.clear()
+    }
 }
 
 /**
@@ -127,6 +160,10 @@ internal class SimpleRegistry<K, V> : Registry<K, V> {
 
     override val values: Set<V>
         get() = ImmutableSet.copyOf(uniqueId2ObjectMap.values)
+
+    override fun isEmpty(): Boolean {
+        return uniqueId2ObjectMap.isEmpty()
+    }
 
     override fun find(uniqueId: K?): V? {
         return if (uniqueId == null) null else uniqueId2ObjectMap[uniqueId]
