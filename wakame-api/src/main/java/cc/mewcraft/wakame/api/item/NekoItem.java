@@ -34,11 +34,9 @@ public interface NekoItem {
     /**
      * Gets the plaintext name of this {@link NekoItem}.
      *
-     * @param locale The locale to get the name in. Should be in the same format as the language file
-     *               names in resource packs (e.g. en_us).
      * @return The name of this {@link NekoItem} in plaintext.
      */
-    @NotNull String getPlainName(@NotNull String locale);
+    @NotNull String getPlainName();
 
     /**
      * Creates an {@link ItemStack} of this {@link NekoItem} with the specified amount.

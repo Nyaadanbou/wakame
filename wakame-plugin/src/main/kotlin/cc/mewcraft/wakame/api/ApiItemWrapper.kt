@@ -25,7 +25,7 @@ internal class ApiItemWrapper(
         return item.name
     }
 
-    override fun getPlainName(locale: String): String {
+    override fun getPlainName(): String {
         return item.plainName
     }
 

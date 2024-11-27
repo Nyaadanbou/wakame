@@ -33,10 +33,8 @@ public interface NekoBlock {
     /**
      * Gets the plaintext name of this block type.
      *
-     * @param locale The locale to get the name in. Should be in the same format as the language file
-     *               names in resource packs (e.g. en_us).
      * @return The name of this {@link NekoBlock} in plaintext.
      */
-    @NotNull String getPlaintextName(@NotNull String locale);
+    @NotNull String getPlainName();
 
 }
