@@ -42,7 +42,7 @@ public interface NekoItemRegistry {
      * @param id the id of the item
      * @return the {@link NekoItem} with the specified id, or null if there is none
      */
-    @Nullable NekoItem getOrNull(@NotNull String id);
+    @Nullable NekoItem getOrNull(@Nullable String id);
 
     /**
      * Gets the {@link NekoItem} with the specified id, or null if there is none.
@@ -50,7 +50,7 @@ public interface NekoItemRegistry {
      * @param id the id of the item
      * @return the {@link NekoItem} with the specified id, or null if there is none
      */
-    @Nullable NekoItem getOrNull(@NotNull Key id);
+    @Nullable NekoItem getOrNull(@Nullable Key id);
 
     /**
      * Gets the {@link NekoItem} of the specified {@link ItemStack}, or null if it is not a Neko item.

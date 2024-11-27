@@ -20,11 +20,12 @@ object ApiItemRegistry : NekoItemRegistry {
         return getOrNull(itemStack) ?: throw IllegalArgumentException("ItemStack is not of a nekoo item type")
     }
 
-    override fun getOrNull(id: String): NekoItem? {
+    override fun getOrNull(id: String?): NekoItem? {
+        if (id == null) return null
         return getOrNull(Key.key(id))
     }
 
-    override fun getOrNull(id: Key): NekoItem? {
+    override fun getOrNull(id: Key?): NekoItem? {
         return ItemRegistry.CUSTOM.find(id)?.let(::ApiItemWrapper)
     }
 
