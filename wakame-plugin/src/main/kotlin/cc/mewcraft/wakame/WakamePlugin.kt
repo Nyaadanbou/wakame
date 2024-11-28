@@ -40,6 +40,7 @@ import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
+import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -50,7 +51,11 @@ val NEKO: WakamePlugin
     get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
 
 val LOGGER: ComponentLogger
-    get() = NEKO.componentLogger
+    get() = if (RunningEnvironment.PRODUCTION.isRunning()) {
+        NEKO.componentLogger
+    } else {
+        ComponentLogger.logger("Test")
+    }
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
