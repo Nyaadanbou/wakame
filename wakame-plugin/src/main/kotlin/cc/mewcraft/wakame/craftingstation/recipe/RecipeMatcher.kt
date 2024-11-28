@@ -10,28 +10,28 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
- * 用于检查一个玩家 [Player] 是否满足 [StationRecipe] 的所有要求.
+ * 用于检查一个玩家 [Player] 是否满足 [Recipe] 的所有要求.
  */
 internal object RecipeMatcher {
-    fun match(recipe: StationRecipe, player: Player): RecipeMatcherResult {
+    fun match(recipe: Recipe, player: Player): RecipeMatcherResult {
         val choices = recipe.input
 
         // 创建 ChoiceCheckerContextMap
         val contextMap = ChoiceCheckerContextMap(player)
 
         // 提取出同类的 ChoiceChecker
-        val checkers: List<ChoiceChecker<*>> = choices.map(StationChoice::checker).distinct()
+        val checkers: List<ChoiceChecker<*>> = choices.map(RecipeChoice::checker).distinct()
 
         // 同类的 ChoiceChecker 使用同一个上下文.
         // 这里初始化每一类 ChoiceChecker 的上下文.
         checkers.forEach { checker: ChoiceChecker<*> ->
-            contextMap[checker] = checker.initializeContext(player)
+            contextMap[checker] = checker.initCtx(player)
         }
 
         // 检查每个 StationChoice.
         // 组装后, 返回配方的匹配结果.
-        val result = Reference2BooleanArrayMap<StationChoice>().apply {
-            choices.forEach { choice: StationChoice -> put(choice, choice.check(contextMap)) }
+        val result = Reference2BooleanArrayMap<RecipeChoice>().apply {
+            choices.forEach { choice: RecipeChoice -> put(choice, choice.check(contextMap)) }
         }
 
         return RecipeMatcherResult(recipe, result)
@@ -41,16 +41,16 @@ internal object RecipeMatcher {
 /**
  * 合成站配方匹配器的匹配结果的封装.
  *
- * @param recipe 与该结果所关联的 [StationRecipe]
- * @param result 匹配的结果映射, 映射关系为: 配方中的材料 ([StationRecipe]) -> 是否匹配 ([Boolean])
+ * @param recipe 与该结果所关联的 [Recipe]
+ * @param result 匹配的结果映射, 映射关系为: 配方中的材料 ([Recipe]) -> 是否匹配 ([Boolean])
  */
 internal class RecipeMatcherResult(
-    recipe: StationRecipe,
-    result: Map<StationChoice, Boolean>,
+    recipe: Recipe,
+    result: Map<RecipeChoice, Boolean>,
 ) {
-    private val result: Reference2BooleanArrayMap<StationChoice> = Reference2BooleanArrayMap(result) // explicit copy
+    private val result: Reference2BooleanArrayMap<RecipeChoice> = Reference2BooleanArrayMap(result) // explicit copy
 
-    val recipe: StationRecipe = recipe
+    val recipe: Recipe = recipe
     val canCraft: Boolean = !this.result.values.contains(false)
 
     /**

@@ -1,16 +1,14 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.craftingstation.recipe.StationRecipe
-import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeRegistry
+import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -20,67 +18,64 @@ import java.lang.reflect.Type
 /**
  * 合成站.
  */
-internal sealed interface Station : Iterable<StationRecipe> {
+internal sealed interface CraftingStation : Iterable<Recipe> {
     val id: String
-    val listingLayout: MenuLayout
+    val primaryLayout: MenuLayout
     val previewLayout: MenuLayout
-    fun addRecipe(recipe: StationRecipe): Boolean
-    fun removeRecipe(key: Key): StationRecipe?
+    fun addRecipe(recipe: Recipe): Boolean
+    fun removeRecipe(key: Key): Recipe?
 }
 
 /**
  * 无分类合成站的实现.
  */
-internal class SimpleStation(
+internal class SimpleCraftingStation(
     override val id: String,
-    override val listingLayout: MenuLayout,
+    override val primaryLayout: MenuLayout,
     override val previewLayout: MenuLayout,
-) : Station, KoinComponent {
+) : CraftingStation {
     companion object {
         const val TYPE = "simple"
         val STATION_STRUCTURE_LEGAL_CHARS = charArrayOf('X', '.', '<', '>')
         val PREVIEW_STRUCTURE_LEGAL_CHARS = charArrayOf('X', 'I', 'O', 'C', 'B', '<', '>')
     }
 
-    val logger: Logger by inject()
+    private val recipes: MutableMap<Key, Recipe> = mutableMapOf()
 
-    private val recipes: MutableMap<Key, StationRecipe> = mutableMapOf()
-
-    override fun addRecipe(recipe: StationRecipe): Boolean {
+    override fun addRecipe(recipe: Recipe): Boolean {
         val success = recipes.putIfAbsent(recipe.key, recipe)
         if (success != null) {
-            logger.warn("Duplicate key. Station recipe will not be added.")
+            LOGGER.warn("Duplicate key. Station recipe will not be added.")
             return false
         }
         return true
     }
 
-    override fun removeRecipe(key: Key): StationRecipe? {
+    override fun removeRecipe(key: Key): Recipe? {
         return recipes.remove(key)
     }
 
-    override fun iterator(): Iterator<StationRecipe> {
+    override fun iterator(): Iterator<Recipe> {
         return recipes.values.iterator()
     }
 }
 
 /**
- * [Station] 的序列化器.
+ * [CraftingStation] 的序列化器.
  */
-internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
-    private val logger: Logger by inject()
+internal object StationSerializer : TypeSerializer<CraftingStation> {
     val HINT_NODE: RepresentationHint<String> = RepresentationHint.of("id", typeTokenOf<String>())
-    override fun deserialize(type: Type, node: ConfigurationNode): Station {
+    override fun deserialize(type: Type, node: ConfigurationNode): CraftingStation {
         val id = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station id is not present")
         val stationType = node.node("type").krequire<String>()
         when (stationType) {
-            SimpleStation.TYPE -> {
+            SimpleCraftingStation.TYPE -> {
                 // 获取合成站菜单布局
                 val stationLayout = node.node("layout").krequire<MenuLayout>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()
-                        .filter { !SimpleStation.STATION_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
+                        .filter { !SimpleCraftingStation.STATION_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
                     if (illegalChars.isNotEmpty()) {
                         throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station menu structure")
                     }
@@ -91,24 +86,24 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()
-                        .filter { !SimpleStation.PREVIEW_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
+                        .filter { !SimpleCraftingStation.PREVIEW_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
                     if (illegalChars.isNotEmpty()) {
                         throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station preview menu structure")
                     }
                 }
 
-                val station = SimpleStation(id, stationLayout, previewLayout)
+                val station = SimpleCraftingStation(id, stationLayout, previewLayout)
 
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
                     val stationRecipe = if (RunningEnvironment.TEST.isRunning()) {
-                        StationRecipeRegistry.raw[key]
+                        CraftingStationRecipeRegistry.raw[key]
                     } else {
-                        StationRecipeRegistry[key]
+                        CraftingStationRecipeRegistry[key]
                     }
                     if (stationRecipe == null) {
-                        logger.warn("Can't find station recipe: '$key'. Skip adding it to station: '$id'")
+                        LOGGER.warn("Can't find station recipe: '$key'. Skip adding it to station: '$id'")
                         continue
                     }
                     station.addRecipe(stationRecipe)

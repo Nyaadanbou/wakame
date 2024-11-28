@@ -7,24 +7,24 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
 
 /**
- * [StationChoice] 的消费者.
- * 用于记录某一特定的 [StationChoice] 将要应用到玩家身上的消耗.
+ * [RecipeChoice] 的消费者.
+ * 用于记录某一特定的 [RecipeChoice] 将要应用到玩家身上的消耗.
  * 同类消费者将使用同一个上下文, 由 [ChoiceConsumerContextMap] 保证.
  */
 interface ChoiceConsumer<T : ChoiceConsumerContext> {
     /**
      * 创建消耗器的初始上下文.
      */
-    fun initializeContext(player: Player): T
+    fun initCtx(player: Player): T
 
     /**
      * 应用消耗.
      */
-    fun applyConsume(player: Player, contextMap: ChoiceConsumerContextMap)
+    fun consume(player: Player, contextMap: ChoiceConsumerContextMap)
 }
 
 /**
- * [StationChoice] 的消耗器使用的上下文.
+ * [RecipeChoice] 的消耗器使用的上下文.
  */
 interface ChoiceConsumerContext {
     /**
@@ -35,7 +35,7 @@ interface ChoiceConsumerContext {
 
 /**
  * [ChoiceConsumer] -> [ChoiceConsumerContext] 的映射.
- * 用于保证整个配方的消耗过程中, 同类的消耗器, 使用的是同一个上下文.
+ * 用于保证整个配方的消耗过程中, 同类的消耗器使用的是同一个上下文.
  */
 class ChoiceConsumerContextMap(
     /**
@@ -64,11 +64,11 @@ class ChoiceConsumerContextMap(
 
 //<editor-fold desc="ChoiceConsumer">
 internal object ItemChoiceConsumer : ChoiceConsumer<ItemChoiceConsumerContext> {
-    override fun initializeContext(player: Player): ItemChoiceConsumerContext {
+    override fun initCtx(player: Player): ItemChoiceConsumerContext {
         return ItemChoiceConsumerContext(player)
     }
 
-    override fun applyConsume(player: Player, contextMap: ChoiceConsumerContextMap) {
+    override fun consume(player: Player, contextMap: ChoiceConsumerContextMap) {
         val notRemoveItems = player.removeItem(contextMap[this].get())
         if (notRemoveItems.isNotEmpty()) {
             throw RuntimeException(
@@ -79,11 +79,11 @@ internal object ItemChoiceConsumer : ChoiceConsumer<ItemChoiceConsumerContext> {
 }
 
 internal object ExpChoiceConsumer : ChoiceConsumer<ExpChoiceConsumerContext> {
-    override fun initializeContext(player: Player): ExpChoiceConsumerContext {
+    override fun initCtx(player: Player): ExpChoiceConsumerContext {
         return ExpChoiceConsumerContext(player)
     }
 
-    override fun applyConsume(player: Player, contextMap: ChoiceConsumerContextMap) {
+    override fun consume(player: Player, contextMap: ChoiceConsumerContextMap) {
         player.totalExperience -= contextMap[this].get()
     }
 }

@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
-import cc.mewcraft.wakame.command.parser.StationParser
-import cc.mewcraft.wakame.craftingstation.Station
-import cc.mewcraft.wakame.gui.station.StationMenu
+import cc.mewcraft.wakame.command.parser.CraftingStationParser
+import cc.mewcraft.wakame.craftingstation.CraftingStation
+import cc.mewcraft.wakame.gui.craftingstation.CraftingStationMenu
 import cc.mewcraft.wakame.util.ThreadType
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -40,11 +40,11 @@ object StationCommands : CommandFactory<CommandSender> {
             ) {
                 permission(CommandPermissions.STATION)
                 literal(STATION_LITERAL)
-                required("station", StationParser.stationParser())
+                required("station", CraftingStationParser.stationParser())
                 optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
                 handler { ctx ->
                     val sender = ctx.sender()
-                    val station = ctx.get<Station>("station")
+                    val station = ctx.get<CraftingStation>("station")
                     val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
                     val viewer = player?.single() ?: (sender as? Player) ?: run {
                         sender.sendPlainMessage("Player not found!")
@@ -53,7 +53,7 @@ object StationCommands : CommandFactory<CommandSender> {
 
                     ThreadType.SYNC.launch {
                         sender.sendPlainMessage("Opening crafting station ${station.id} for player ${viewer.name}")
-                        StationMenu(station, viewer).open()
+                        CraftingStationMenu(station, viewer).open()
                     }
                 }
             }.buildAndAdd(this)

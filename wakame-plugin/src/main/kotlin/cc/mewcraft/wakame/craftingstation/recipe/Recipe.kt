@@ -21,19 +21,19 @@ import java.util.stream.Stream
  * 合成站配方.
  * 包含若干项输入与若干项输出.
  */
-internal sealed interface StationRecipe : Keyed, Examinable {
+internal sealed interface Recipe : Keyed, Examinable {
     /**
      * 配方的输入.
      */
-    val input: List<StationChoice>
+    val input: List<RecipeChoice>
 
     /**
      * 配方的输出.
      */
-    val output: StationResult
+    val output: RecipeResult
 
     /**
-     * 检查该 [StationRecipe] 是否有效.
+     * 检查该 [Recipe] 是否有效.
      * 用于延迟检查配方是否能够注册到服务端.
      */
     fun valid(): Boolean
@@ -52,14 +52,14 @@ internal sealed interface StationRecipe : Keyed, Examinable {
 /**
  * 合成站配方的实现.
  */
-internal class SimpleStationRecipe(
+internal class SimpleRecipe(
     override val key: Key,
-    override val input: List<StationChoice>,
-    override val output: StationResult,
-) : StationRecipe {
+    override val input: List<RecipeChoice>,
+    override val output: RecipeResult,
+) : Recipe {
 
     override fun valid(): Boolean {
-        input.forEach { choice: StationChoice ->
+        input.forEach { choice: RecipeChoice ->
             if (!choice.valid()) {
                 return false
             }
@@ -88,17 +88,17 @@ internal class SimpleStationRecipe(
 
 
 /**
- * [StationRecipe] 的序列化器.
+ * [Recipe] 的序列化器.
  */
-internal object StationRecipeSerializer : TypeSerializer<StationRecipe>, KoinComponent {
+internal object StationRecipeSerializer : TypeSerializer<Recipe>, KoinComponent {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
-    override fun deserialize(type: Type, node: ConfigurationNode): StationRecipe {
+    override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
         val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
-        val input = node.node("input").getList<StationChoice>(emptyList())
+        val input = node.node("input").getList<RecipeChoice>(emptyList())
         require(input.isNotEmpty()) { "station recipe input is not present" }
-        val output = node.node("output").krequire<StationResult>()
+        val output = node.node("output").krequire<RecipeResult>()
 
-        return SimpleStationRecipe(key, input, output)
+        return SimpleRecipe(key, input, output)
     }
 }

@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.gui.station
+package cc.mewcraft.wakame.gui.craftingstation
 
-import cc.mewcraft.wakame.craftingstation.recipe.StationRecipe
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
@@ -27,11 +27,11 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  *
  * 这个菜单是"静态"的, 即不涉及物品和标题的变化.
  */
-internal class PreviewMenu(
+internal class CraftingPreviewMenu(
     /**
      * 该菜单所预览的配方.
      */
-    val recipe: StationRecipe,
+    val recipe: Recipe,
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
@@ -41,7 +41,7 @@ internal class PreviewMenu(
     /**
      * 该菜单的上级菜单.
      */
-    val parent: StationMenu,
+    val parent: CraftingStationMenu,
 ) : KoinComponent {
     /**
      * 该菜单的布局
@@ -144,7 +144,7 @@ internal class PreviewMenu(
      * 触发点击合成的图标 [Item].
      */
     inner class CraftItem(
-        private val recipe: StationRecipe,
+        private val recipe: Recipe,
     ) : AbstractCraftItem() {
         override fun getItemProvider(): ItemProvider {
             return layout.getIcon("craft").render0().toItemProvider()

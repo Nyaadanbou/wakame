@@ -22,26 +22,26 @@ import java.util.stream.Stream
 /**
  * 合成站的输出.
  */
-internal sealed interface StationResult : Examinable {
+internal sealed interface RecipeResult : Examinable {
     /**
-     * 执行此 [StationResult] 的效果
+     * 执行此 [RecipeResult] 的效果
      */
     fun apply(player: Player)
 
     /**
-     * 该 [StationResult] 是否有效
+     * 该 [RecipeResult] 是否有效
      * 用于延迟验证配方是否能够注册
      */
     fun valid(): Boolean
 
     /**
-     * 获取此 [StationResult] 的描述
+     * 获取此 [RecipeResult] 的描述
      * 使用MiniMessage格式的字符串
      */
     fun description(layout: MenuLayout): String
 
     /**
-     * 获取此 [StationResult] 的展示物品
+     * 获取此 [RecipeResult] 的展示物品
      */
     fun displayItemStack(): ItemStack
 
@@ -53,7 +53,7 @@ internal sealed interface StationResult : Examinable {
 internal data class ItemResult(
     val item: ItemX,
     val amount: Int,
-) : StationResult {
+) : RecipeResult {
     override fun apply(player: Player) {
         val itemStack = item.createItemStack(player)
         itemStack?.amount = amount
@@ -84,15 +84,17 @@ internal data class ItemResult(
         ExaminableProperty.of("amount", amount),
     )
 
-    override fun toString(): String = toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 
 }
 
 /**
- * [StationResult] 的序列化器.
+ * [RecipeResult] 的序列化器.
  */
-internal object StationResultSerializer : TypeSerializer<StationResult> {
-    override fun deserialize(type: Type, node: ConfigurationNode): StationResult {
+internal object StationResultSerializer : TypeSerializer<RecipeResult> {
+    override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
         val item = node.node("item").krequire<ItemX>()
         val amount = node.node("amount").getInt(1)
         require(amount >= 1) { "item amount should not less than 1" }

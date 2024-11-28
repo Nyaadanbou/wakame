@@ -21,43 +21,43 @@ import java.util.stream.Stream
 /**
  * 合成站的一项输入要求.
  */
-internal sealed interface StationChoice : Examinable {
+internal sealed interface RecipeChoice : Examinable {
     /**
-     * 用于检查该 [StationChoice] 所要求的输入是否被满足.
+     * 用于检查该 [RecipeChoice] 所要求的输入是否被满足.
      */
     val checker: ChoiceChecker<*>
 
     /**
-     * 用于消耗该 [StationChoice] 所要求的输入 (从玩家身上).
+     * 用于消耗该 [RecipeChoice] 所要求的输入 (从玩家身上).
      */
     val consumer: ChoiceConsumer<*>
 
     /**
-     * 通过上下文检查此 [StationChoice] 的满足与否.
+     * 通过上下文检查此 [RecipeChoice] 的满足与否.
      * 上下文依靠 [ChoiceCheckerContextMap] 获取.
      */
     fun check(contextMap: ChoiceCheckerContextMap): Boolean
 
     /**
-     * 将此 [StationChoice] 的消耗添加到上下文中.
+     * 将此 [RecipeChoice] 的消耗添加到上下文中.
      * 上下文依靠 [ChoiceConsumerContextMap] 获取.
      */
     fun consume(contextMap: ChoiceConsumerContextMap)
 
     /**
-     * 该 [StationChoice] 是否有效.
+     * 该 [RecipeChoice] 是否有效.
      * 用于延迟验证配方是否能够注册.
      */
     fun valid(): Boolean
 
     /**
-     * 获取此 [StationChoice] 的描述.
+     * 获取此 [RecipeChoice] 的描述.
      * 使用 MiniMessage 格式的字符串.
      */
     fun description(layout: MenuLayout): String
 
     /**
-     * 获取此 [StationChoice] 的展示物品.
+     * 获取此 [RecipeChoice] 的展示物品.
      */
     fun displayItemStack(): ItemStack
 }
@@ -72,7 +72,7 @@ internal sealed interface StationChoice : Examinable {
 internal data class ItemChoice(
     val item: ItemX,
     val amount: Int,
-) : StationChoice {
+) : RecipeChoice {
     companion object {
         const val TYPE: String = "item"
     }
@@ -135,7 +135,7 @@ internal data class ItemChoice(
  */
 internal data class ExpChoice(
     val amount: Int,
-) : StationChoice {
+) : RecipeChoice {
     companion object {
         const val TYPE: String = "exp"
     }
@@ -173,15 +173,16 @@ internal data class ExpChoice(
         ExaminableProperty.of("amount", amount),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 /**
- * [StationChoice] 的序列化器.
+ * [RecipeChoice] 的序列化器.
  */
-internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
-    override fun deserialize(type: Type, node: ConfigurationNode): StationChoice {
+internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
+    override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val choiceType = node.node("type").krequire<String>()
         when (choiceType) {
             ItemChoice.TYPE -> {

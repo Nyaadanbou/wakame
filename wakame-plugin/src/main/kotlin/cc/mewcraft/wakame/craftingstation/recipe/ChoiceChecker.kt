@@ -7,19 +7,19 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
 
 /**
- * [StationChoice] 的检查器.
- * 检查特定的 [StationChoice] 在上下文的情景中是否被满足.
+ * [RecipeChoice] 的检查器.
+ * 检查特定的 [RecipeChoice] 在上下文的情景中是否被满足.
  * 同类的检查器将使用同一个上下文, 由 [ChoiceCheckerContextMap] 保证.
  */
 interface ChoiceChecker<T : ChoiceCheckerContext> {
     /**
      * 创建检查器的初始上下文.
      */
-    fun initializeContext(player: Player): T
+    fun initCtx(player: Player): T
 }
 
 /**
- * [StationChoice] 的检查器使用的上下文.
+ * [RecipeChoice] 的检查器使用的上下文.
  */
 interface ChoiceCheckerContext {
     /**
@@ -30,7 +30,7 @@ interface ChoiceCheckerContext {
 
 /**
  * [ChoiceChecker] -> [ChoiceCheckerContext] 的映射.
- * 用于保证整个配方的检查过程中, 同类的检查器, 使用的是同一个上下文.
+ * 用于保证整个配方的检查过程中, 同类的检查器使用的是同一个上下文.
  */
 class ChoiceCheckerContextMap(
     /**
@@ -60,13 +60,13 @@ class ChoiceCheckerContextMap(
 
 //<editor-fold desc="ChoiceChecker">
 internal object ItemChoiceChecker : ChoiceChecker<ItemChoiceCheckerContext> {
-    override fun initializeContext(player: Player): ItemChoiceCheckerContext {
+    override fun initCtx(player: Player): ItemChoiceCheckerContext {
         return ItemChoiceCheckerContext(player)
     }
 }
 
 internal object ExpChoiceChecker : ChoiceChecker<ExpChoiceCheckerContext> {
-    override fun initializeContext(player: Player): ExpChoiceCheckerContext {
+    override fun initCtx(player: Player): ExpChoiceCheckerContext {
         return ExpChoiceCheckerContext(player)
     }
 }

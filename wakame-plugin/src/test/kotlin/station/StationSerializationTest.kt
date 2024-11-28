@@ -1,12 +1,12 @@
 package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.craftingstation.SimpleStation
-import cc.mewcraft.wakame.craftingstation.StationRegistry
+import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
+import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
+import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
-import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeRegistry
 import core.ItemXMock
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
@@ -46,12 +46,12 @@ class StationSerializationTest : KoinTest {
 
     @Test
     fun `simple station serialization`() = runBlocking {
-        StationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
-        StationRegistry.loadStations()
+        CraftingStationRecipeRegistry.loadConfig() // 单元测试时跳过合成站配方的有效性验证
+        CraftingStationRegistry.loadStations()
 
         val key1 = Key.key("test:raw_bronze")
 
-        val recipe1 = StationRecipeRegistry.raw[key1]
+        val recipe1 = CraftingStationRecipeRegistry.raw[key1]
         assertNotNull(recipe1)
 
         val input1 = recipe1.input
@@ -69,7 +69,7 @@ class StationSerializationTest : KoinTest {
 
         val key2 = Key.key("test:amethyst_dust")
 
-        val recipe2 = StationRecipeRegistry.raw[key2]
+        val recipe2 = CraftingStationRecipeRegistry.raw[key2]
         assertNotNull(recipe2)
 
         val input2 = recipe2.input
@@ -85,9 +85,9 @@ class StationSerializationTest : KoinTest {
 
         val id = "simple_station"
 
-        val station = StationRegistry.find(id)
+        val station = CraftingStationRegistry.get(id)
         assertNotNull(station)
-        assertIs<SimpleStation>(station)
+        assertIs<SimpleCraftingStation>(station)
         assertContentEquals(
             listOf(
                 recipe1,
