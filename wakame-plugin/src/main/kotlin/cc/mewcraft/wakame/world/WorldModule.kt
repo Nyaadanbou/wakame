@@ -3,12 +3,12 @@
 
 package cc.mewcraft.wakame.world
 
-import cc.mewcraft.wakame.world.entity.ArmorStandListener
+import cc.mewcraft.wakame.world.entity.BetterArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun worldModule(): Module = module {
-    single { ArmorStandListener() }
+    single { BetterArmorStandListener() }
     single { PlayerDeathProtect() }
 }
