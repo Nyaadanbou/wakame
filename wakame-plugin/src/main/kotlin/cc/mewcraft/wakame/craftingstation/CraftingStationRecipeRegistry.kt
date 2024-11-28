@@ -1,8 +1,12 @@
-package cc.mewcraft.wakame.craftingstation.recipe
+package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.core.ItemXSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
+import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry

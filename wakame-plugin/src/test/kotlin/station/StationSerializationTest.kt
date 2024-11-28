@@ -1,9 +1,9 @@
 package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
+import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
 import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
-import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult

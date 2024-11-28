@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.util.RunningEnvironment

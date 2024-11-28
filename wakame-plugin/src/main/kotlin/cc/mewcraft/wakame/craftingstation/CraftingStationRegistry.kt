@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.gui.MenuLayoutSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency

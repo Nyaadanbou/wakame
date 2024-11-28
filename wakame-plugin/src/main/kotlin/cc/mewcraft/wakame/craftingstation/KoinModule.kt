@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.craftingstation
 
-import cc.mewcraft.wakame.craftingstation.recipe.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.initializer.Initializable
 import org.koin.core.module.Module
 import org.koin.dsl.bind
