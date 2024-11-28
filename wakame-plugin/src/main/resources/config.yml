@@ -4,8 +4,8 @@
 # 不完全支持热重载!
 debug: true
 
-# 只有物品堆叠的所有者可以拾起掉落的物品实体?
-only_owner_can_pickup_death_drops: false
+# 性能设置
+performance: { }
 
 # 所使用的经济系统
 # 可用选项:
@@ -22,5 +22,8 @@ economy_provider: VANILLA
 # ZERO - 无等级 (永远为 0)
 player_level_provider: VANILLA
 
-# 性能设置
-performance: { }
+# 只有物品的所有者可以拾起死亡掉落的物品
+only_owner_can_pickup_death_drops: false
+
+# 要求玩家必须在潜行状态下才能够破坏盔甲架
+require_sneaking_to_break_armor_stand: false
