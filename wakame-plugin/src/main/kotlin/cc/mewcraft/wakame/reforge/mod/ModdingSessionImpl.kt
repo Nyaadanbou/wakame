@@ -57,7 +57,7 @@ internal class SimpleModdingSession(
 
     // 初始为 ReforgeResult.empty() 表示还没有输入
     override var latestResult: ModdingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
-        logger.info("Session's result updated: $old -> $new")
+        // logger.info("Session's result updated: $old -> $new")
     }
 
     // 初始为 false
@@ -67,7 +67,7 @@ internal class SimpleModdingSession(
             return@vetoable false
         }
 
-        logger.info("Session's frozen status updated: $new")
+        // logger.info("Session's frozen status updated: $new")
         return@vetoable true
     }
 
@@ -192,7 +192,7 @@ internal class SimpleModdingSession(
                 return
             }
 
-            logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
+            // logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
             val usableInput0 = _value?.shadowNeko(true) ?: run {
                 usableInput = null
@@ -249,7 +249,7 @@ internal class SimpleModdingSession(
             val old = _value
             _value = value?.clone()
 
-            logger.info("Session's usable input updated: ${old?.id} -> ${value?.id}")
+            // logger.info("Session's usable input updated: ${old?.id} -> ${value?.id}")
         }
     }
 }
@@ -510,7 +510,7 @@ private object ReforgeReplace {
             get() = true
 
         override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReforgeReplaceResult.empty()) { _, old, new ->
-            session.logger.info("Replace (changeable) result updated: $old -> $new")
+            // session.logger.info("Replace (changeable) result updated: $old -> $new")
         }
 
         private fun executeReplace0(originalInput: ItemStack?): ModdingSession.Replace.Result {

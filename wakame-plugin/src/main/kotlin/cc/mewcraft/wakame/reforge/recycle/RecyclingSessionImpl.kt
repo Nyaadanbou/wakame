@@ -60,14 +60,14 @@ internal class SimpleRecyclingSession(
 
         claims += Claim(playerSlot, item, price)
 
-        logger.info("${viewer.name} added a claim!")
+        // logger.info("${viewer.name} added a claim!")
 
         return ClaimResult.success(claims.lastIndex + 1)
     }
 
     override fun purchase(dryRun: Boolean): RecyclingSession.PurchaseResult {
         if (claims.isEmpty()) {
-            logger.info("Purchase result: (empty).")
+            // logger.info("Purchase result: (empty).")
             return PurchaseResult.empty()
         }
 
@@ -95,7 +95,7 @@ internal class SimpleRecyclingSession(
                 claim.originalItem.amount = 0
             }
 
-            logger.info("Sold for $totalPoint in total.")
+            // logger.info("Sold for $totalPoint in total.")
 
             val result = EconomyManager.give(viewer.uniqueId, totalPoint)
             if (result.isFailure) {
@@ -106,7 +106,7 @@ internal class SimpleRecyclingSession(
             }
         }
 
-        logger.info("Purchase result: (totalMin=$totalMin, totalMax=$totalMax, totalPoint=$totalPoint)")
+        // logger.info("Purchase result: (totalMin=$totalMin, totalMax=$totalMax, totalPoint=$totalPoint)")
         return PurchaseResult.success(totalMin, totalMax, totalPoint)
     }
 

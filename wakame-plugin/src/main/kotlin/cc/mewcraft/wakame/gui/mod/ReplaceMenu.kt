@@ -62,7 +62,7 @@ internal class ReplaceMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val prevItem = event.previousItem
         val newItem = event.newItem
-        parent.logger.info("Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
+        // parent.logger.info("Replace input updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (parent.session.frozen) {
             parent.logger.error("The modding session is frozen, but the player is trying to interact with the replace's input slot. This is a bug!")

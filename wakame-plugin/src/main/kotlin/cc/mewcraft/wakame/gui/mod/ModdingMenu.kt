@@ -78,7 +78,7 @@ internal class ModdingMenu(
      * 这只是个标记, 具体的作用取决于实现.
      */
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
-        logger.info("Confirmed status updated: $old -> $new")
+        // logger.info("Confirmed status updated: $old -> $new")
     }
 
     /**
@@ -132,7 +132,7 @@ internal class ModdingMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
+        // logger.info("Input item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
             event.isCancelled = true
@@ -185,7 +185,7 @@ internal class ModdingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        // logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         if (session.frozen) {
             logger.error("Modding session is frozen, but the player is trying to interact with the primary output slot. This is a bug!")

@@ -99,7 +99,7 @@ internal class RerollingMenu(
      * 这只是个标记, 具体的作用取决于实现.
      */
     var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
-        logger.info("Confirmed status updated: $old -> $new")
+        // logger.info("Confirmed status updated: $old -> $new")
     }
 
     private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
@@ -107,7 +107,7 @@ internal class RerollingMenu(
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Input slot updating: ${prevItem?.type} -> ${newItem?.type}")
+        // logger.info("Input slot updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
@@ -152,7 +152,7 @@ internal class RerollingMenu(
     private fun onOutputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
-        logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
+        // logger.info("Output item updating: ${prevItem?.type} -> ${newItem?.type}")
 
         when {
             // 玩家尝试交换 outputSlot 里面的物品:

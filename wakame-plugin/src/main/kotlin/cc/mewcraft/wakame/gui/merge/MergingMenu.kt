@@ -101,7 +101,7 @@ internal class MergingMenu(
      * 这只是个标记, 具体的作用取决于实现.
      */
     private var confirmed: Boolean by Delegates.observable(false) { _, old, new ->
-        logger.info("Confirmed status updated: $old -> $new")
+        // logger.info("Confirmed status updated: $old -> $new")
     }
 
     private enum class InputSlot {
@@ -112,7 +112,7 @@ internal class MergingMenu(
     private fun onInputSlotPreUpdate(e: ItemPreUpdateEvent, inputSlot: InputSlot) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("Input slot ($inputSlot) pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        // logger.info("Input slot ($inputSlot) pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap -> {
@@ -170,7 +170,7 @@ internal class MergingMenu(
     private fun onOutputSlotPreUpdate(e: ItemPreUpdateEvent) {
         val oldItem = e.previousItem
         val newItem = e.newItem
-        logger.info("Output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
+        // logger.info("Output slot pre-update: ${oldItem?.type} -> ${newItem?.type}")
 
         when {
             e.isSwap || e.isAdd -> {

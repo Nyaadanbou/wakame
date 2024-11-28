@@ -46,7 +46,7 @@ internal class SimpleRerollingSession(
     }
 
     override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
-        logger.info("Result status updated: $old -> $new")
+        // logger.info("Result status updated: $old -> $new")
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -55,7 +55,7 @@ internal class SimpleRerollingSession(
             return@vetoable false
         }
 
-        logger.info("Frozen status updated: $old -> $new")
+        // logger.info("Frozen status updated: $old -> $new")
         return@vetoable true
     }
 
@@ -341,7 +341,7 @@ internal object Selection {
         override val changeable: Boolean
             get() = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            logger.info("Selection status updated (cell: '$id'): $old -> $new")
+            // logger.info("Selection status updated (cell: '$id'): $old -> $new")
         }
 
         override fun invert(): Boolean {
@@ -380,7 +380,7 @@ internal object SelectionMap : KoinComponent {
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
         val templates = usableInput.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            logger.info("Usable input has no `cells` template.")
+            // logger.info("Usable input has no `cells` template.")
             return empty(session)
         }
 
@@ -411,7 +411,7 @@ internal object SelectionMap : KoinComponent {
             if (cellRule != null && template != null) {
                 selectionData[id] = Selection.changeable(session, id, cellRule, template)
             } else {
-                logger.info("Item cell '$id' does not support rerolling.")
+                // logger.info("Item cell '$id' does not support rerolling.")
                 selectionData[id] = Selection.unchangeable(session, id)
             }
         }

@@ -82,7 +82,7 @@ internal class SimpleMergingSession(
             return@vetoable false
         }
 
-        logger.info("Updating result: $new")
+        // logger.info("Updating result: $new")
         return@vetoable true
     }
 
@@ -119,7 +119,7 @@ internal class SimpleMergingSession(
             return@vetoable false
         }
 
-        logger.info("Updating frozen state: $new")
+        // logger.info("Updating frozen state: $new")
         return@vetoable true
     }
 
