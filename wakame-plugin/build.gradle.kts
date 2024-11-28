@@ -68,6 +68,7 @@ dependencies {
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
     testImplementation(local.shadow.nbt)
+    testImplementation(local.koin.test.junit5)
 }
 
 tasks {

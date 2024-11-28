@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
@@ -26,9 +25,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.component.inject
-import org.slf4j.Logger
 import java.util.stream.Stream
 
 /**
@@ -142,16 +139,10 @@ fun ItemStack.takeIfNeko(): ItemStack? {
 
 /**
  * 直接修改一个 [NekoStack] 封装的底层 [ItemStack].
- * 如果 [NekoStack] 不是一个 [CustomNekoStack],
- * 则返回一个 [ItemStack.empty].
+ * 警告: 如果底层封装的是纯原版物品, 该函数也会直接修改.
  */
-fun NekoStack.directEdit(block: ItemStackDSL.() -> Unit): ItemStack {
-    if (this is CustomNekoStack) {
-        return wrapped.edit(block)
-    } else {
-        Injector.get<Logger>().warn("Attempted to edit a non-custom NekoStack. Returning empty one.")
-        return ItemStack.empty()
-    }
+fun NekoStack.unsafeEdit(block: ItemStackDSL.() -> Unit): ItemStack {
+    return wrapped.edit(block)
 }
 
 /**
@@ -262,9 +253,20 @@ private class VanillaNekoStack(
 ) : NekoStack {
     override val isEmpty: Boolean = false
 
+    // 即便是萌芽套皮的原版物品, 也允许修改 isClientSide.
+    // 这算是个特例, 但具有其合理性, 原因如下:
+    //
+    // 按照设计原则, 我们不应该修改原版物品的任何数据, 但对于渲染来说是个特例:
+    // 渲染往往是修改非玩家拥有的物品数据 (例如网络发包和箱子菜单里的物品堆叠),
+    // 这些修改后的数据只会存在于客户端和箱子菜单里, 单纯起到展示的作用,
+    // 不会对游戏世界里的状态产生影响.
+    //
+    // 当然, 以上都是假设所有渲染逻辑都是在物品的克隆上进行的.
+    // 程序员当然可以直接对游戏内的萌芽套皮原版物品进行修改,
+    // 但这种错误应该在 code review 时就发现并修复.
     override var isClientSide: Boolean
-        get() = true
-        set(_) = Unit
+        get() = NekoStackImplementations.isClientSide(handle)
+        set(value) = NekoStackImplementations.setClientSide(handle, value)
 
     override val itemType: Material
         get() = handle.type
@@ -290,6 +292,7 @@ private class VanillaNekoStack(
 
     override val components: ItemComponentMap
         get() {
+            // base 和 patch 都是只读的数据结构
             val base = shadow.components
             val patch = ItemComponentMaps.unmodifiable(handle)
             return ItemComponentMaps.composite(base, patch)
@@ -305,7 +308,7 @@ private class VanillaNekoStack(
         get() = unsupported()
 
     override fun clone(): NekoStack {
-        return VanillaNekoStack(shadow, handle)
+        return VanillaNekoStack(shadow, itemStack)
     }
 
     override fun erase() {

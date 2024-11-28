@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
@@ -21,23 +21,30 @@ import java.util.stream.Stream
  * 合成站配方.
  * 包含若干项输入与若干项输出.
  */
-internal sealed interface StationRecipe : Keyed, Examinable {
-    val input: List<StationChoice>
-    val output: StationResult
-
+internal sealed interface Recipe : Keyed, Examinable {
     /**
-     * 检查该 [StationRecipe] 是否有效.
-     * 用于延迟验证配方是否能够注册.
+     * 配方的输入.
      */
-    fun isValid(): Boolean
+    val input: List<RecipeChoice>
 
     /**
-     * 检查一特定玩家某配方的各项要求是否分别满足.
+     * 配方的输出.
+     */
+    val output: RecipeResult
+
+    /**
+     * 检查该 [Recipe] 是否有效.
+     * 用于延迟检查配方是否能够注册到服务端.
+     */
+    fun valid(): Boolean
+
+    /**
+     * 针对 [player] 发起一次检查. 返回的结果包含了玩家已满足/不满足的条件.
      */
     fun match(player: Player): RecipeMatcherResult
 
     /**
-     * 执行此 [StationRecipe] 的消耗
+     * 针对 [player] 发起一次消耗. 该函数将消耗掉玩家背包中的物品堆叠.
      */
     fun consume(player: Player)
 }
@@ -45,17 +52,19 @@ internal sealed interface StationRecipe : Keyed, Examinable {
 /**
  * 合成站配方的实现.
  */
-internal class SimpleStationRecipe(
+internal class SimpleRecipe(
     override val key: Key,
-    override val input: List<StationChoice>,
-    override val output: StationResult
-) : StationRecipe {
+    override val input: List<RecipeChoice>,
+    override val output: RecipeResult,
+) : Recipe {
 
-    override fun isValid(): Boolean {
-        input.forEach {
-            if (!it.valid()) return false
+    override fun valid(): Boolean {
+        input.forEach { choice: RecipeChoice ->
+            if (!choice.valid()) {
+                return false
+            }
         }
-        return output.isValid()
+        return output.valid()
     }
 
     override fun match(player: Player): RecipeMatcherResult {
@@ -72,28 +81,24 @@ internal class SimpleStationRecipe(
         ExaminableProperty.of("output", output),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 
 /**
- * [StationRecipe] 的序列化器.
+ * [Recipe] 的序列化器.
  */
-internal object StationRecipeSerializer : TypeSerializer<StationRecipe>, KoinComponent {
+internal object StationRecipeSerializer : TypeSerializer<Recipe>, KoinComponent {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
-    override fun deserialize(type: Type, node: ConfigurationNode): StationRecipe {
-        val key = node.hint(HINT_NODE) ?: throw SerializationException(
-            "The hint node for station recipe key is not present"
-        )
+    override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
+        val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
+        val input = node.node("input").getList<RecipeChoice>(emptyList())
+        require(input.isNotEmpty()) { "station recipe input is not present" }
+        val output = node.node("output").krequire<RecipeResult>()
 
-        val input = node.node("input").getList<StationChoice>(emptyList()).apply {
-            require(isNotEmpty()) { "Station recipe input is not present" }
-        }
-
-        val output = node.node("output").krequire<StationResult>()
-
-        return SimpleStationRecipe(key, input, output)
+        return SimpleRecipe(key, input, output)
     }
 }

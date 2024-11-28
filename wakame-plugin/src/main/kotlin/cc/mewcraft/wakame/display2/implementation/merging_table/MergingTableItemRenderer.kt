@@ -4,28 +4,46 @@
 package cc.mewcraft.wakame.display2.implementation.merging_table
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextAssembler
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingPart2
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.util.EnumLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.objectmapping.meta.NodeKey
+import org.spongepowered.configurate.objectmapping.meta.Required
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.nio.file.Path
 import java.util.regex.Pattern
 
@@ -77,7 +95,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
 
         item.erase()
 
-        item.directEdit {
+        item.unsafeEdit {
             // 本 ItemRenderer 专门渲染放在菜单里面的物品,
             // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
             // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.

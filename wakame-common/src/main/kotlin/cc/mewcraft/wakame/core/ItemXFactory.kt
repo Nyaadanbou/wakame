@@ -19,7 +19,8 @@ interface ItemXFactory {
     val loaded: Boolean
 
     /**
-     * 通过 *通用物品标识* [uid] 构建该物品库插件对应的 [ItemX].
+     * 通过 *通用物品标识* 构建该物品库系统对应的 [ItemX].
+     * 类似 [create], 只不过调用方不需要手动拆分 [uid].
      * 构建失败则返回 `null`.
      */
     fun create(uid: String): ItemX? {
@@ -29,13 +30,13 @@ interface ItemXFactory {
     }
 
     /**
-     * 通过 *通用物品标识* [plugin] + [identifier] 构建该物品库插件对应的 [ItemX].
+     * 通过 *通用物品标识* 构建该物品库系统对应的 [ItemX].
      * 构建失败则返回 `null`.
      */
     fun create(plugin: String, identifier: String): ItemX?
 
     /**
-     * 通过已有的物品堆叠 [itemStack] 构建该物品堆叠对应的 [ItemX].
+     * 通过 *已有的物品堆叠* 构建该物品堆叠对应的 [ItemX].
      * 构建失败则返回 `null`.
      */
     fun create(itemStack: ItemStack): ItemX?

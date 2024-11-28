@@ -1,36 +1,41 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.core.ItemXSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
+import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import java.io.File
 
 @ReloadDependency(
     runBefore = [ItemRegistry::class]
 )
-internal object StationRecipeRegistry : Initializable, KoinComponent {
+internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
     private const val RECIPE_DIR_NAME = "station/recipes"
 
     @VisibleForTesting
-    val raw: MutableMap<Key, StationRecipe> = mutableMapOf()
+    val raw: MutableMap<Key, Recipe> = mutableMapOf()
 
-    private val recipes: MutableMap<Key, StationRecipe> = mutableMapOf()
+    private val recipes: MutableMap<Key, Recipe> = mutableMapOf()
 
-    fun find(key: Key): StationRecipe? {
+    operator fun get(key: Key): Recipe? {
         return recipes[key]
     }
-
-    private val logger: Logger by inject()
 
     @VisibleForTesting
     fun loadConfig() {
@@ -57,31 +62,31 @@ internal object StationRecipeRegistry : Initializable, KoinComponent {
                 // 注入 key 节点
                 recipeNode.hint(StationRecipeSerializer.HINT_NODE, key)
                 // 反序列化 Recipe
-                val stationRecipe = recipeNode.krequire<StationRecipe>()
+                val recipe = recipeNode.krequire<Recipe>()
                 // 添加进临时注册表
-                raw[key] = stationRecipe
+                raw[key] = recipe
 
             } catch (e: Throwable) {
                 val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
                 if (RunningEnvironment.TEST.isRunning()) {
                     throw IllegalArgumentException(message, e)
                 }
-                logger.warn(message, e)
+                LOGGER.warn(message, e)
             }
         }
     }
 
     private fun registerRecipes() {
         raw.forEach { (key, recipe) ->
-            if (recipe.isValid()) {
+            if (recipe.valid()) {
                 recipes[key] = recipe
             } else {
-                logger.warn("Can't register station recipe: '$key'")
+                LOGGER.warn("Can't register station recipe: '$key'")
             }
         }
 
-        logger.info("Registered station recipes: {}", recipes.keys.joinToString())
-        logger.info("Registered ${recipes.size} station recipes")
+        LOGGER.info("Registered station recipes: {}", recipes.keys.joinToString())
+        LOGGER.info("Registered ${recipes.size} station recipes")
     }
 
     override fun onPostWorld() {

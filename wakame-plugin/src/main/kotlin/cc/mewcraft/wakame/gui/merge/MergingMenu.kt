@@ -4,13 +4,20 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.merge.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.merge.MergingSession
+import cc.mewcraft.wakame.reforge.merge.MergingTable
+import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -254,7 +261,7 @@ internal class MergingMenu(
             // 渲染输出的物品
             val output = result.output
             ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
-            return output.directEdit {
+            return output.unsafeEdit {
                 itemName = "<white>结果: <green>就绪".mini
                 lore = lore.orEmpty() + buildList {
                     add(empty())

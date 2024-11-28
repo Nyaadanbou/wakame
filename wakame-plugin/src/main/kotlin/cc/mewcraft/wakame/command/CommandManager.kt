@@ -2,7 +2,16 @@
 
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.command.command.*
+import cc.mewcraft.wakame.command.command.AttributeCommands
+import cc.mewcraft.wakame.command.command.CraftCommands
+import cc.mewcraft.wakame.command.command.DebugCommands
+import cc.mewcraft.wakame.command.command.HephaestusCommands
+import cc.mewcraft.wakame.command.command.ItemCommands
+import cc.mewcraft.wakame.command.command.LootCommands
+import cc.mewcraft.wakame.command.command.PluginCommands
+import cc.mewcraft.wakame.command.command.ReforgeCommands
+import cc.mewcraft.wakame.command.command.ResourcepackCommands
+import cc.mewcraft.wakame.command.command.SkillCommands
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.incendo.cloud.SenderMapper
@@ -37,6 +46,5 @@ class CommandManager(
         command(ReforgeCommands)
         command(ResourcepackCommands)
         command(SkillCommands)
-        command(StationCommands)
     }
 }

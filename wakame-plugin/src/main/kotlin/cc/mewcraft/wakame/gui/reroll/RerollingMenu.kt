@@ -4,14 +4,19 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.reroll.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.reroll.RerollingSession
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable
+import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -251,7 +256,7 @@ internal class RerollingMenu(
 
             val previewItem = session.originalInput?.shadowNeko(true) ?: error("Result is successful but the input item is null. This is a bug!")
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
-            previewItem.directEdit {
+            previewItem.unsafeEdit {
                 lore = lore.orEmpty() + buildList {
                     add(empty())
                     addAll(reforgeResult.reforgeCost.description)

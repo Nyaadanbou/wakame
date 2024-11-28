@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
@@ -21,36 +21,43 @@ import java.util.stream.Stream
 /**
  * 合成站的一项输入要求.
  */
-internal sealed interface StationChoice : Examinable {
+internal sealed interface RecipeChoice : Examinable {
+    /**
+     * 用于检查该 [RecipeChoice] 所要求的输入是否被满足.
+     */
     val checker: ChoiceChecker<*>
+
+    /**
+     * 用于消耗该 [RecipeChoice] 所要求的输入 (从玩家身上).
+     */
     val consumer: ChoiceConsumer<*>
 
     /**
-     * 通过上下文检查此 [StationChoice] 的满足与否.
+     * 通过上下文检查此 [RecipeChoice] 的满足与否.
      * 上下文依靠 [ChoiceCheckerContextMap] 获取.
      */
     fun check(contextMap: ChoiceCheckerContextMap): Boolean
 
     /**
-     * 将此 [StationChoice] 的消耗添加到上下文中.
+     * 将此 [RecipeChoice] 的消耗添加到上下文中.
      * 上下文依靠 [ChoiceConsumerContextMap] 获取.
      */
     fun consume(contextMap: ChoiceConsumerContextMap)
 
     /**
-     * 该 [StationChoice] 是否有效.
+     * 该 [RecipeChoice] 是否有效.
      * 用于延迟验证配方是否能够注册.
      */
     fun valid(): Boolean
 
     /**
-     * 获取此 [StationChoice] 的描述.
+     * 获取此 [RecipeChoice] 的描述.
      * 使用 MiniMessage 格式的字符串.
      */
     fun description(layout: MenuLayout): String
 
     /**
-     * 获取此 [StationChoice] 的展示物品.
+     * 获取此 [RecipeChoice] 的展示物品.
      */
     fun displayItemStack(): ItemStack
 }
@@ -65,7 +72,7 @@ internal sealed interface StationChoice : Examinable {
 internal data class ItemChoice(
     val item: ItemX,
     val amount: Int,
-) : StationChoice {
+) : RecipeChoice {
     companion object {
         const val TYPE: String = "item"
     }
@@ -107,9 +114,8 @@ internal data class ItemChoice(
     }
 
     override fun displayItemStack(): ItemStack {
-        val displayItemStack = item.createItemStack()
-            ?: ItemStack(Material.BARRIER)
-        displayItemStack.render0()
+        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
+        displayItemStack.render()
         displayItemStack.amount = amount
         return displayItemStack
     }
@@ -119,8 +125,9 @@ internal data class ItemChoice(
         ExaminableProperty.of("amount", amount),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 /**
@@ -128,7 +135,7 @@ internal data class ItemChoice(
  */
 internal data class ExpChoice(
     val amount: Int,
-) : StationChoice {
+) : RecipeChoice {
     companion object {
         const val TYPE: String = "exp"
     }
@@ -166,29 +173,28 @@ internal data class ExpChoice(
         ExaminableProperty.of("amount", amount),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 /**
- * [StationChoice] 的序列化器.
+ * [RecipeChoice] 的序列化器.
  */
-internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
-    override fun deserialize(type: Type, node: ConfigurationNode): StationChoice {
+internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
+    override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val choiceType = node.node("type").krequire<String>()
         when (choiceType) {
             ItemChoice.TYPE -> {
                 val item = node.node("id").krequire<ItemX>()
-                val amount = node.node("amount").getInt(1).apply {
-                    require(this > 0) { "Item amount must more than 0" }
-                }
+                val amount = node.node("amount").getInt(1)
+                require(amount > 0) { "Item amount must more than 0" }
                 return ItemChoice(item, amount)
             }
 
             ExpChoice.TYPE -> {
-                val amount = node.node("amount").krequire<Int>().apply {
-                    require(this > 0) { "Exp amount must more than 0" }
-                }
+                val amount = node.node("amount").krequire<Int>()
+                require(amount > 0) { "Exp amount must more than 0" }
                 return ExpChoice(amount)
             }
 
@@ -202,8 +208,8 @@ internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
 /**
  * 方便函数.
  */
-private fun ItemStack.render0(): ItemStack {
-    val nekoStack = tryNekoStack ?: return this
+private fun ItemStack.render(): ItemStack {
+    val nekoStack = shadowNeko() ?: return this
     val context = CraftingStationContext(Pos.CHOICE, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
     return this

@@ -4,8 +4,25 @@
 package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.SimpleTextMeta
+import cc.mewcraft.wakame.display2.SourceIndex
+import cc.mewcraft.wakame.display2.SourceOrdinal
+import cc.mewcraft.wakame.display2.TextAssembler
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.element.Element
@@ -15,10 +32,9 @@ import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.components.CustomName
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.FireResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.templates.components.ItemCells
@@ -26,6 +42,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemCrate
 import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -103,7 +120,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
             item.erase()
         }
 
-        item.directEdit {
+        item.unsafeEdit {
             lore = itemLore
             customModelData = itemCustomModelData
             showAttributeModifiers(false)

@@ -2,12 +2,20 @@ package cc.mewcraft.wakame.display2.implementation.simple
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.*
+import cc.mewcraft.wakame.item.templates.components.CustomName
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
+import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
@@ -44,7 +52,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
-        item.directEdit {
+        item.unsafeEdit {
             lore = itemLore
             customModelData = itemCmd
             showNothing()

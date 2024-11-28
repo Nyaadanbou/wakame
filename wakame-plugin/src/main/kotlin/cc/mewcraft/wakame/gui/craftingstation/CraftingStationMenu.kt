@@ -1,16 +1,16 @@
-package cc.mewcraft.wakame.gui.station
+package cc.mewcraft.wakame.gui.craftingstation
 
+import cc.mewcraft.wakame.craftingstation.CraftingStation
+import cc.mewcraft.wakame.craftingstation.CraftingStationSession
+import cc.mewcraft.wakame.craftingstation.recipe.Recipe
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeMatcherResult
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.gui.toItemProvider
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.station.Station
-import cc.mewcraft.wakame.station.StationSession
-import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
-import cc.mewcraft.wakame.station.recipe.StationRecipe
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
@@ -20,17 +20,19 @@ import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.*
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
-internal class StationMenu(
+internal class CraftingStationMenu(
     /**
      * 该菜单所依赖的合成站.
      */
-    val station: Station,
+    val station: CraftingStation,
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
@@ -41,14 +43,14 @@ internal class StationMenu(
      * 该菜单的布局
      */
     private val layout: MenuLayout
-        get() = station.layout
+        get() = station.primaryLayout
 
     /**
      * 合成站的会话.
      * 玩家打开合成站便创建.
-     * [StationSession] 类创建时会自动初始化, 无需额外手动刷新.
+     * [CraftingStationSession] 类创建时会自动初始化, 无需额外手动刷新.
      */
-    val stationSession = StationSession(station, viewer)
+    val stationSession = CraftingStationSession(station, viewer)
 
     /**
      * 合成站菜单的 [Gui].
@@ -79,11 +81,11 @@ internal class StationMenu(
 
     /**
      * 刷新 Gui.
-     * 根据 [StationSession] 的内容刷新展示配方的物品以及标题.
+     * 根据 [CraftingStationSession] 的内容刷新展示配方的物品以及标题.
      */
     fun update() {
         // 排序已在 StationSession 的迭代器中实现
-        primaryGui.setContent(stationSession.map(::RecipeItem))
+        primaryGui.setContent(stationSession.getRecipeMatcherResults().map(::RecipeItem))
         primaryWindow.setTitle(layout.title) // TODO slot 背景颜色红绿显示
     }
 
@@ -161,7 +163,7 @@ internal class StationMenu(
             when (clickType) {
                 // 左键预览
                 ClickType.LEFT -> {
-                    PreviewMenu(recipeMatcherResult.recipe, player, this@StationMenu).open()
+                    CraftingPreviewMenu(recipeMatcherResult.recipe, player, this@CraftingStationMenu).open()
                 }
 
                 // 右键合成
@@ -218,12 +220,12 @@ internal class StationMenu(
  * 封装了合成逻辑的一个抽象 [Item].
  */
 internal abstract class AbstractCraftItem : AbstractItem() {
-    fun tryCraft(stationRecipe: StationRecipe, player: Player) {
+    fun tryCraft(recipe: Recipe, player: Player) {
         // 无法正常执行消耗就抛出异常中断代码执行
         // 不给玩家执行合成的结果
         try {
-            stationRecipe.consume(player)
-            stationRecipe.output.apply(player)
+            recipe.consume(player)
+            recipe.output.apply(player)
         } catch (e: RuntimeException) {
             e.printStackTrace()
             player.sendMessage(text {

@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.api.NekooProvider
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.core.coreModule
+import cc.mewcraft.wakame.craftingstation.stationModule
 import cc.mewcraft.wakame.crate.crateModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.display2.display2Module
@@ -36,7 +37,6 @@ import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skin.skinModule
-import cc.mewcraft.wakame.station.stationModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
