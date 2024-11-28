@@ -16,6 +16,7 @@ object MessageConstants {
     val MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM = create("msg_err_not_enough_money_to_repair_item")
     val MSG_SOLD_ITEMS_FOR_X_COINS = create("msg_sold_items_for_x_coins")
     val MSG_ERR_NOT_AUGMENT_CORE = create("msg_err_not_augment_core")
+    val MSG_SNEAK_TO_BREAK_ARMOR_STAND = create("msg_sneak_to_break_armor_stand")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

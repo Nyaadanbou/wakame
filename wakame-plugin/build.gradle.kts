@@ -64,9 +64,10 @@ dependencies {
 
     // test
     testImplementation(project(":wakame-api"))
-    testImplementation(local.helper)
+    testImplementation(project(":wakame-common"))
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
+    testImplementation(local.helper)
     testImplementation(local.shadow.nbt)
     testImplementation(local.koin.test.junit5)
 }

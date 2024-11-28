@@ -38,6 +38,7 @@ import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerSuspendingEvents
 import cc.mewcraft.wakame.util.unregisterEvents
+import cc.mewcraft.wakame.world.entity.ArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
@@ -164,6 +165,7 @@ object Initializer : KoinComponent, Listener {
         registerListenerAndBind<ResourcePackPlayerListener>()
 
         // game world
+        registerListenerAndBind<ArmorStandListener>()
         registerListenerAndBind<PlayerDeathProtect>()
 
         // compatibility
