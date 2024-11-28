@@ -2,13 +2,15 @@ package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.getCell
+import cc.mewcraft.wakame.item.standaloneCell
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.util.edit
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -63,7 +65,7 @@ private constructor(
 
             val core = cell.getCore()
             val icon = CoreIcons.getNekoStack(core)
-            icon.directEdit { itemName = core.displayName }
+            icon.unsafeEdit { itemName = core.displayName }
             icon.standaloneCell = StandaloneCell(cell)
             ItemRenderers.REROLLING_TABLE.render(icon, RerollingTableContext(session))
 

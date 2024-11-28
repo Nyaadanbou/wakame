@@ -4,13 +4,18 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lang.translateBy
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.mod.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.mod.ModdingSession
+import cc.mewcraft.wakame.reforge.mod.ModdingTable
+import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -22,7 +27,9 @@ import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.*
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
@@ -288,7 +295,7 @@ internal class ModdingMenu(
             val output = reforgeResult.output ?: error("Output item is null, but the result is successful. This is a bug!")
             val context = ModdingTableContext.Output(session)
             ItemRenderers.MODDING_TABLE.render(output, context)
-            output.directEdit {
+            output.unsafeEdit {
                 if (confirmed) {
                     lore = lore.orEmpty() + listOf(
                         empty(),

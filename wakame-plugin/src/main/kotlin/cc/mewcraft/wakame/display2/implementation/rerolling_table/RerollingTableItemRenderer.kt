@@ -3,24 +3,50 @@
  */
 package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.*
-import cc.mewcraft.wakame.display2.implementation.standard.*
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextAssembler
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingPart2
+import cc.mewcraft.wakame.display2.implementation.RenderingPart3
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.common.DifferenceFormat
+import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
+import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
+import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.standard.SkillCoreTextMetaFactory
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.item.directEdit
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.text
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -73,7 +99,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
         item.erase() // 这是呈现给玩家的最后一环, 可以 erase
 
-        item.directEdit {
+        item.unsafeEdit {
             lore = itemLore
             customModelData = itemCustomModelData
             showNothing()

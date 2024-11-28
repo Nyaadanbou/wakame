@@ -4,14 +4,17 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.item.components.StandaloneCell
-import cc.mewcraft.wakame.item.directEdit
 import cc.mewcraft.wakame.item.standaloneCell
+import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.colorRecursively
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.removeItalic
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -168,7 +171,7 @@ internal class ReplaceMenu(
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
             // 加上交互提示
-            usableInput.directEdit {
+            usableInput.unsafeEdit {
                 customName = null // 玩家可能改了名, 所以清除一下
                 itemName = "<white>结果: <green>就绪".mini
                 lore = lore.orEmpty().map {
@@ -198,7 +201,7 @@ internal class ReplaceMenu(
             val icon = CoreIcons.getNekoStack(core)
 
             icon.standaloneCell = StandaloneCell(cell)
-            icon.directEdit { itemName = core.displayName }
+            icon.unsafeEdit { itemName = core.displayName }
             ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.Preview(session))
 
             return ItemWrapper(icon.wrapped)
