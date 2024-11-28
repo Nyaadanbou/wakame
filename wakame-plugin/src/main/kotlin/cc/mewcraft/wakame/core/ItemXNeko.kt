@@ -63,7 +63,7 @@ object ItemXFactoryNeko : ItemXFactory {
     override val loaded: Boolean = true
 
     override fun create(itemStack: ItemStack): ItemXNeko? {
-        val nekoStack = itemStack.shadowNeko() ?: return null
+        val nekoStack = itemStack.shadowNeko(true) ?: return null
         val nekoStackId = nekoStack.id
         val transformed = "${nekoStackId.namespace()}/${nekoStackId.value()}"
         return ItemXNeko(transformed)
