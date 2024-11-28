@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.ecs.system.CooldownSystem
+import cc.mewcraft.wakame.skill2.system.MechanicCooldownSystem
 import cc.mewcraft.wakame.ecs.system.RemoveSystem
-import cc.mewcraft.wakame.ecs.system.TimeSystem
-import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.ecs.system.TickCountSystem
+import cc.mewcraft.wakame.skill2.system.MechanicBukkitEntityMetadataSystem
 import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.configureWorld
 
@@ -19,9 +19,9 @@ class WakameWorld(
 
         systems {
             add(RemoveSystem())
-            add(TimeSystem())
-            add(SkillBukkitEntityMetadataSystem())
-            add(CooldownSystem())
+            add(TickCountSystem())
+            add(MechanicBukkitEntityMetadataSystem())
+            add(MechanicCooldownSystem())
         }
     }
 

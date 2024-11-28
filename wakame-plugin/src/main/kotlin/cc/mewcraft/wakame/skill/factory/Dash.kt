@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.skill.Skill
 import cc.mewcraft.wakame.skill.SkillBase
 import cc.mewcraft.wakame.skill.SkillProvider
 import cc.mewcraft.wakame.skill.SkillResult
-import cc.mewcraft.wakame.skill2.external.component.Time
-import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.skill2.external.component.TickCount
+import cc.mewcraft.wakame.skill2.system.MechanicBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.util.krequire
 import me.lucko.helper.metadata.Metadata
 import me.lucko.helper.metadata.MetadataKey
@@ -91,8 +91,8 @@ private class DashResult(
 //        if (!checkConditions())
 //            return TickResult.ALL_DONE
         val metadata = Metadata.get(entity).getOrNull() ?: return
-        val componentMap = metadata.getOrNull(SkillBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
-        val tickCount = componentMap[skill, Time.externalKey]?.time ?: .0
+        val componentMap = metadata.getOrNull(MechanicBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
+        val tickCount = componentMap[skill, TickCount.externalKey]?.time ?: .0
         if (tickCount >= skill.duration + STARTING_TICK) {
 //            return TickResult.ALL_DONE
             return

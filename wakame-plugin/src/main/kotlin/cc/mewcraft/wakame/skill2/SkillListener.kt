@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.external.component.Cooldown
-import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.skill2.system.MechanicBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.util.Key
 import me.lucko.helper.metadata.Metadata
 import org.bukkit.event.EventHandler
@@ -18,7 +18,7 @@ class SkillListener(
     @EventHandler
     private fun on(e: PlayerInteractEvent) {
         val metadataMap = Metadata.get(e.player).getOrNull() ?: return
-        val componentMap = metadataMap.getOrNull(SkillBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
+        val componentMap = metadataMap.getOrNull(MechanicBukkitEntityMetadataSystem.COMPONENT_MAP_KEY) ?: return
         val cooldownComponent = componentMap[SkillRegistry.INSTANCES[Key("g22:test")], Cooldown.externalKey]
         cooldownComponent?.cooldown?.timeout = 100f
     }

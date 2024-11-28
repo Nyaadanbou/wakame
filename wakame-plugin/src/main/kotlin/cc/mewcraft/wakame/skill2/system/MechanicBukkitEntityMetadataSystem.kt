@@ -12,7 +12,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import me.lucko.helper.metadata.Metadata
 import me.lucko.helper.metadata.MetadataKey
 
-class SkillBukkitEntityMetadataSystem : IteratingSystem(
+class MechanicBukkitEntityMetadataSystem : IteratingSystem(
     family = family { all(IdentifierComponent, BukkitEntityComponent) }
 ) {
     companion object {
