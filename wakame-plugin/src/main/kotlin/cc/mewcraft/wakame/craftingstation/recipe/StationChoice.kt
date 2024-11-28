@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
@@ -22,7 +22,14 @@ import java.util.stream.Stream
  * 合成站的一项输入要求.
  */
 internal sealed interface StationChoice : Examinable {
+    /**
+     * 用于检查该 [StationChoice] 所要求的输入是否被满足.
+     */
     val checker: ChoiceChecker<*>
+
+    /**
+     * 用于消耗该 [StationChoice] 所要求的输入 (从玩家身上).
+     */
     val consumer: ChoiceConsumer<*>
 
     /**

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.gui.station
 
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipe
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.gui.toItemProvider
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.station.recipe.StationRecipe
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent

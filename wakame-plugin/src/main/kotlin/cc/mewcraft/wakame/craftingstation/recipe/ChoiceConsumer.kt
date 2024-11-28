@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.removeItem

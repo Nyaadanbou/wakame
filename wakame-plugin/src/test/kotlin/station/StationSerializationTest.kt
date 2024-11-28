@@ -1,12 +1,12 @@
 package station
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.station.SimpleStation
-import cc.mewcraft.wakame.station.StationRegistry
-import cc.mewcraft.wakame.station.recipe.ExpChoice
-import cc.mewcraft.wakame.station.recipe.ItemChoice
-import cc.mewcraft.wakame.station.recipe.ItemResult
-import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
+import cc.mewcraft.wakame.craftingstation.SimpleStation
+import cc.mewcraft.wakame.craftingstation.StationRegistry
+import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
+import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
+import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeRegistry
 import core.ItemXMock
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
@@ -16,7 +16,11 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import testEnv
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class StationSerializationTest : KoinTest {
 

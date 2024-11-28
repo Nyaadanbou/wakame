@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.station.recipe
+package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
@@ -87,7 +87,6 @@ internal data class ItemResult(
     override fun toString(): String = toSimpleString()
 
 }
-
 
 /**
  * [StationResult] 的序列化器.

@@ -1,9 +1,9 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipe
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.station.recipe.StationRecipe
-import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf

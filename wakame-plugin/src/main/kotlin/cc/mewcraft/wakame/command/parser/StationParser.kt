@@ -1,14 +1,16 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.station.Station
-import cc.mewcraft.wakame.station.StationRegistry
+import cc.mewcraft.wakame.craftingstation.Station
+import cc.mewcraft.wakame.craftingstation.StationRegistry
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.*
+import org.incendo.cloud.parser.ArgumentParseResult
+import org.incendo.cloud.parser.ArgumentParser
+import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
 internal class StationParser<C : Any> : ArgumentParser<C, Station>, BlockingSuggestionProvider.Strings<C> {

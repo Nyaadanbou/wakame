@@ -1,11 +1,11 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.gui.MenuLayoutSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire

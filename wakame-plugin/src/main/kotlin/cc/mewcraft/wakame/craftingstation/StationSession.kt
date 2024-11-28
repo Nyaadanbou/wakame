@@ -1,7 +1,7 @@
-package cc.mewcraft.wakame.station
+package cc.mewcraft.wakame.craftingstation
 
-import cc.mewcraft.wakame.station.recipe.RecipeMatcherResult
-import cc.mewcraft.wakame.station.recipe.StationRecipe
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeMatcherResult
+import cc.mewcraft.wakame.craftingstation.recipe.StationRecipe
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.bukkit.entity.Player
 
