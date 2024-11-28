@@ -5,7 +5,11 @@ import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
@@ -26,7 +30,7 @@ internal object StationRecipeRegistry : Initializable, KoinComponent {
 
     private val recipes: MutableMap<Key, StationRecipe> = mutableMapOf()
 
-    fun find(key: Key): StationRecipe? {
+    operator fun get(key: Key): StationRecipe? {
         return recipes[key]
     }
 
@@ -73,7 +77,7 @@ internal object StationRecipeRegistry : Initializable, KoinComponent {
 
     private fun registerRecipes() {
         raw.forEach { (key, recipe) ->
-            if (recipe.isValid()) {
+            if (recipe.valid()) {
                 recipes[key] = recipe
             } else {
                 logger.warn("Can't register station recipe: '$key'")

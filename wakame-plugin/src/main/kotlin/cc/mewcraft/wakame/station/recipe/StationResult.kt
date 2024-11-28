@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.giveItemStack
 import cc.mewcraft.wakame.util.krequire
@@ -32,7 +32,7 @@ internal sealed interface StationResult : Examinable {
      * 该 [StationResult] 是否有效
      * 用于延迟验证配方是否能够注册
      */
-    fun isValid(): Boolean
+    fun valid(): Boolean
 
     /**
      * 获取此 [StationResult] 的描述
@@ -60,7 +60,7 @@ internal data class ItemResult(
         player.giveItemStack(itemStack)
     }
 
-    override fun isValid(): Boolean {
+    override fun valid(): Boolean {
         return item.valid()
     }
 
@@ -73,9 +73,8 @@ internal data class ItemResult(
     }
 
     override fun displayItemStack(): ItemStack {
-        val displayItemStack = item.createItemStack()
-            ?: ItemRegistry.ERROR_ITEM_STACK
-        displayItemStack.render0()
+        val displayItemStack = item.createItemStack() ?: ItemRegistry.ERROR_ITEM_STACK
+        displayItemStack.render()
         displayItemStack.amount = amount
         return displayItemStack
     }
@@ -96,9 +95,8 @@ internal data class ItemResult(
 internal object StationResultSerializer : TypeSerializer<StationResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): StationResult {
         val item = node.node("item").krequire<ItemX>()
-        val amount = node.node("amount").getInt(1).apply {
-            require(this >= 1) { "Item amount should not less than 1" }
-        }
+        val amount = node.node("amount").getInt(1)
+        require(amount >= 1) { "item amount should not less than 1" }
         return ItemResult(item, amount)
     }
 }
@@ -106,8 +104,8 @@ internal object StationResultSerializer : TypeSerializer<StationResult> {
 /**
  * 方便函数.
  */
-private fun ItemStack.render0(): ItemStack {
-    val nekoStack = tryNekoStack ?: return this
+private fun ItemStack.render(): ItemStack {
+    val nekoStack = shadowNeko() ?: return this
     val context = CraftingStationContext(Pos.RESULT, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
     return this

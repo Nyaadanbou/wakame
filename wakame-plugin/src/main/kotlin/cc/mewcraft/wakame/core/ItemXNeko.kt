@@ -19,17 +19,12 @@ class ItemXNeko(
         const val DEFAULT_DISPLAY_NAME = "<white>未知物品</white>"
     }
 
-    private fun getItem(): NekoItem? {
-        val nekoItemId = Key.key(identifier.replaceFirst('/', ':'))
-        return ItemRegistry.CUSTOM.getOrNull(nekoItemId)
-    }
-
     override fun valid(): Boolean {
-        return getItem() != null
+        return getItem0() != null
     }
 
     override fun createItemStack(): ItemStack? {
-        val nekoItem = getItem() ?: return null
+        val nekoItem = getItem0() ?: return null
         val context = ItemGenerationContexts.create(
             // 始终以等级 0 生成
             trigger = ItemGenerationTriggers.direct(0),
@@ -44,7 +39,7 @@ class ItemXNeko(
     }
 
     override fun createItemStack(player: Player): ItemStack? {
-        return getItem()?.realize(player.toUser())?.wrapped
+        return getItem0()?.realize(player.toUser())?.wrapped
     }
 
     override fun matches(itemStack: ItemStack): Boolean {
@@ -54,7 +49,13 @@ class ItemXNeko(
     }
 
     override fun displayName(): String {
-        return getItem()?.plainName ?: return DEFAULT_DISPLAY_NAME
+        return getItem0()?.plainName ?: return DEFAULT_DISPLAY_NAME
+    }
+
+    private fun getItem0(): NekoItem? {
+        val transformed = identifier.replaceFirst('/', ':')
+        val nekoItemId = Key.key(transformed)
+        return ItemRegistry.CUSTOM.getOrNull(nekoItemId)
     }
 }
 

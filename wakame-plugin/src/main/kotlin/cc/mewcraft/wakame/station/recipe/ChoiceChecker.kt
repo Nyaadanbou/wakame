@@ -5,14 +5,11 @@ import cc.mewcraft.wakame.core.ItemXRegistry
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 
 /**
  * [StationChoice] 的检查器.
  * 检查特定的 [StationChoice] 在上下文的情景中是否被满足.
- * 同类的检查器将使用同一个上下文(由 [ChoiceCheckerContextMap] 保证).
+ * 同类的检查器将使用同一个上下文, 由 [ChoiceCheckerContextMap] 保证.
  */
 interface ChoiceChecker<T : ChoiceCheckerContext> {
     /**
@@ -32,8 +29,8 @@ interface ChoiceCheckerContext {
 }
 
 /**
- * [ChoiceChecker] 到对应上下文的映射.
- * 用于保证整个配方的检查过程中同类的检查器使用的是同一个上下文.
+ * [ChoiceChecker] -> [ChoiceCheckerContext] 的映射.
+ * 用于保证整个配方的检查过程中, 同类的检查器, 使用的是同一个上下文.
  */
 class ChoiceCheckerContextMap(
     /**
@@ -41,7 +38,7 @@ class ChoiceCheckerContextMap(
      */
     val player: Player,
 ) {
-    private val data: MutableMap<ChoiceChecker<*>, Any> = Reference2ObjectArrayMap()
+    private val data: Reference2ObjectArrayMap<ChoiceChecker<*>, Any> = Reference2ObjectArrayMap()
 
     operator fun contains(key: ChoiceChecker<*>): Boolean {
         return key in data
@@ -62,23 +59,18 @@ class ChoiceCheckerContextMap(
 
 
 //<editor-fold desc="ChoiceChecker">
-internal object ItemChoiceChecker : ChoiceChecker<ItemChoiceCheckerContext>, KoinComponent {
-    val logger: Logger by inject()
-
+internal object ItemChoiceChecker : ChoiceChecker<ItemChoiceCheckerContext> {
     override fun initializeContext(player: Player): ItemChoiceCheckerContext {
         return ItemChoiceCheckerContext(player)
     }
 }
 
-internal object ExpChoiceChecker : ChoiceChecker<ExpChoiceCheckerContext>, KoinComponent {
-    val logger: Logger by inject()
-
+internal object ExpChoiceChecker : ChoiceChecker<ExpChoiceCheckerContext> {
     override fun initializeContext(player: Player): ExpChoiceCheckerContext {
         return ExpChoiceCheckerContext(player)
     }
 }
 //</editor-fold>
-
 
 //<editor-fold desc="ChoiceCheckerContext">
 internal class ItemChoiceCheckerContext(

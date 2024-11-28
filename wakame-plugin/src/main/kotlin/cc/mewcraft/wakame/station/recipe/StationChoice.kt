@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
@@ -107,9 +107,8 @@ internal data class ItemChoice(
     }
 
     override fun displayItemStack(): ItemStack {
-        val displayItemStack = item.createItemStack()
-            ?: ItemStack(Material.BARRIER)
-        displayItemStack.render0()
+        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
+        displayItemStack.render()
         displayItemStack.amount = amount
         return displayItemStack
     }
@@ -119,8 +118,9 @@ internal data class ItemChoice(
         ExaminableProperty.of("amount", amount),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 /**
@@ -179,16 +179,14 @@ internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
         when (choiceType) {
             ItemChoice.TYPE -> {
                 val item = node.node("id").krequire<ItemX>()
-                val amount = node.node("amount").getInt(1).apply {
-                    require(this > 0) { "Item amount must more than 0" }
-                }
+                val amount = node.node("amount").getInt(1)
+                require(amount > 0) { "Item amount must more than 0" }
                 return ItemChoice(item, amount)
             }
 
             ExpChoice.TYPE -> {
-                val amount = node.node("amount").krequire<Int>().apply {
-                    require(this > 0) { "Exp amount must more than 0" }
-                }
+                val amount = node.node("amount").krequire<Int>()
+                require(amount > 0) { "Exp amount must more than 0" }
                 return ExpChoice(amount)
             }
 
@@ -202,8 +200,8 @@ internal object StationChoiceSerializer : TypeSerializer<StationChoice> {
 /**
  * 方便函数.
  */
-private fun ItemStack.render0(): ItemStack {
-    val nekoStack = tryNekoStack ?: return this
+private fun ItemStack.render(): ItemStack {
+    val nekoStack = shadowNeko() ?: return this
     val context = CraftingStationContext(Pos.CHOICE, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
     return this

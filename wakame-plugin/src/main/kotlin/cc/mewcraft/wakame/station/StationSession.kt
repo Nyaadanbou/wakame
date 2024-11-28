@@ -13,14 +13,14 @@ internal class StationSession(
     val station: Station,
     val player: Player,
 ) : Iterable<RecipeMatcherResult> {
-    private val recipeMatcherResults: Reference2ObjectLinkedOpenHashMap<StationRecipe, RecipeMatcherResult> = Reference2ObjectLinkedOpenHashMap()
 
     /**
-     * 初始化时遍历所有配方并进行匹配.
+     * 该会话中所有配方的匹配结果.
      */
-    init {
-        station.forEach {
-            recipeMatcherResults[it] = it.match(player)
+    private val stationRecipe2MatchResult = Reference2ObjectLinkedOpenHashMap<StationRecipe, RecipeMatcherResult>().apply {
+        // 初始化时遍历所有配方并进行匹配
+        station.forEach { recipe: StationRecipe ->
+            this[recipe] = recipe.match(player)
         }
     }
 
@@ -29,10 +29,10 @@ internal class StationSession(
      * 对于匹配结果不变的配方，不进行map写入操作.
      */
     fun updateRecipeMatcherResults() {
-        station.forEach {
-            val newResult = it.match(player)
-            if (!newResult.isSame(recipeMatcherResults[it])) {
-                recipeMatcherResults[it] = newResult
+        station.forEach { recipe: StationRecipe ->
+            val newResult = recipe.match(player)
+            if (!newResult.isSameResult(stationRecipe2MatchResult[recipe])) {
+                stationRecipe2MatchResult[recipe] = newResult
             }
         }
     }
@@ -42,8 +42,8 @@ internal class StationSession(
      * 获取时会先进行排序，可合成的配方会排在前面.
      */
     override fun iterator(): Iterator<RecipeMatcherResult> {
-        return recipeMatcherResults.values.sortedByDescending {
-            it.canCraft
-        }.iterator()
+        return stationRecipe2MatchResult.values
+            .sortedByDescending(RecipeMatcherResult::canCraft)
+            .iterator()
     }
 }

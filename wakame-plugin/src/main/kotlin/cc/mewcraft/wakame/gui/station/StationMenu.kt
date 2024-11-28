@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.gui.station
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.*
+import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.gui.toItemProvider
@@ -20,7 +20,9 @@ import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.*
+import xyz.xenondevs.invui.item.Item
+import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
@@ -41,7 +43,7 @@ internal class StationMenu(
      * 该菜单的布局
      */
     private val layout: MenuLayout
-        get() = station.layout
+        get() = station.listingLayout
 
     /**
      * 合成站的会话.

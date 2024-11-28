@@ -4,7 +4,9 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.MenuLayout
 import cc.mewcraft.wakame.station.recipe.StationRecipe
 import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -20,7 +22,7 @@ import java.lang.reflect.Type
  */
 internal sealed interface Station : Iterable<StationRecipe> {
     val id: String
-    val layout: MenuLayout
+    val listingLayout: MenuLayout
     val previewLayout: MenuLayout
     fun addRecipe(recipe: StationRecipe): Boolean
     fun removeRecipe(key: Key): StationRecipe?
@@ -31,8 +33,8 @@ internal sealed interface Station : Iterable<StationRecipe> {
  */
 internal class SimpleStation(
     override val id: String,
-    override val layout: MenuLayout,
-    override val previewLayout: MenuLayout
+    override val listingLayout: MenuLayout,
+    override val previewLayout: MenuLayout,
 ) : Station, KoinComponent {
     companion object {
         const val TYPE = "simple"
@@ -69,9 +71,7 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
     private val logger: Logger by inject()
     val HINT_NODE: RepresentationHint<String> = RepresentationHint.of("id", typeTokenOf<String>())
     override fun deserialize(type: Type, node: ConfigurationNode): Station {
-        val id = node.hint(HINT_NODE) ?: throw SerializationException(
-            "The hint node for station id is not present"
-        )
+        val id = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station id is not present")
         val stationType = node.node("type").krequire<String>()
         when (stationType) {
             SimpleStation.TYPE -> {
@@ -82,7 +82,7 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
                         .distinct()
                         .filter { !SimpleStation.STATION_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
                     if (illegalChars.isNotEmpty()) {
-                        throw SerializationException("The chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station menu structure")
+                        throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station menu structure")
                     }
                 }
 
@@ -93,7 +93,7 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
                         .distinct()
                         .filter { !SimpleStation.PREVIEW_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
                     if (illegalChars.isNotEmpty()) {
-                        throw SerializationException("The chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station preview menu structure")
+                        throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station preview menu structure")
                     }
                 }
 
@@ -105,10 +105,10 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
                     val stationRecipe = if (RunningEnvironment.TEST.isRunning()) {
                         StationRecipeRegistry.raw[key]
                     } else {
-                        StationRecipeRegistry.find(key)
+                        StationRecipeRegistry[key]
                     }
                     if (stationRecipe == null) {
-                        logger.warn("Can't find station recipe: '$key'. Skip add it to station: '$id'")
+                        logger.warn("Can't find station recipe: '$key'. Skip adding it to station: '$id'")
                         continue
                     }
                     station.addRecipe(stationRecipe)
@@ -118,7 +118,7 @@ internal object StationSerializer : TypeSerializer<Station>, KoinComponent {
             }
 
             else -> {
-                throw SerializationException("Unknown station type")
+                throw SerializationException("unknown station type: $stationType")
             }
         }
     }

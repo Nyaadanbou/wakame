@@ -5,14 +5,11 @@ import cc.mewcraft.wakame.util.removeItem
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 
 /**
- * [StationChoice] 的消耗器.
- * 储存某一特定的 [StationChoice] 将要应用到玩家上的消耗.
- * 同类的消耗器将使用同一个上下文(由 [ChoiceConsumerContextMap] 保证).
+ * [StationChoice] 的消费者.
+ * 用于记录某一特定的 [StationChoice] 将要应用到玩家身上的消耗.
+ * 同类消费者将使用同一个上下文, 由 [ChoiceConsumerContextMap] 保证.
  */
 interface ChoiceConsumer<T : ChoiceConsumerContext> {
     /**
@@ -20,6 +17,9 @@ interface ChoiceConsumer<T : ChoiceConsumerContext> {
      */
     fun initializeContext(player: Player): T
 
+    /**
+     * 应用消耗.
+     */
     fun applyConsume(player: Player, contextMap: ChoiceConsumerContextMap)
 }
 
@@ -34,14 +34,14 @@ interface ChoiceConsumerContext {
 }
 
 /**
- * [ChoiceConsumer] 到对应上下文的映射.
- * 用于保证整个配方的消耗过程中同类的消耗器使用的是同一个上下文.
+ * [ChoiceConsumer] -> [ChoiceConsumerContext] 的映射.
+ * 用于保证整个配方的消耗过程中, 同类的消耗器, 使用的是同一个上下文.
  */
 class ChoiceConsumerContextMap(
     /**
      * 使用合成站的玩家.
      */
-    val player: Player
+    val player: Player,
 ) {
     private val data: MutableMap<ChoiceConsumer<*>, Any> = Reference2ObjectArrayMap()
 
@@ -50,6 +50,7 @@ class ChoiceConsumerContextMap(
     }
 
     operator fun <T : ChoiceConsumerContext> get(key: ChoiceConsumer<T>): T {
+        @Suppress("UNCHECKED_CAST")
         return data[key] as T
     }
 
@@ -62,24 +63,22 @@ class ChoiceConsumerContextMap(
 
 
 //<editor-fold desc="ChoiceConsumer">
-internal object ItemChoiceConsumer : ChoiceConsumer<ItemChoiceConsumerContext>, KoinComponent {
-    val logger: Logger by inject()
-
+internal object ItemChoiceConsumer : ChoiceConsumer<ItemChoiceConsumerContext> {
     override fun initializeContext(player: Player): ItemChoiceConsumerContext {
         return ItemChoiceConsumerContext(player)
     }
 
     override fun applyConsume(player: Player, contextMap: ChoiceConsumerContextMap) {
         val notRemoveItems = player.removeItem(contextMap[this].get())
-        if (notRemoveItems.isNotEmpty()) throw RuntimeException(
-            "Station was not correctly removing all items that the player needed to consume. This should not happen."
-        )
+        if (notRemoveItems.isNotEmpty()) {
+            throw RuntimeException(
+                "crafting station was not correctly removing all items that the player needed to consume. This is a bug!"
+            )
+        }
     }
 }
 
-internal object ExpChoiceConsumer : ChoiceConsumer<ExpChoiceConsumerContext>, KoinComponent {
-    val logger: Logger by inject()
-
+internal object ExpChoiceConsumer : ChoiceConsumer<ExpChoiceConsumerContext> {
     override fun initializeContext(player: Player): ExpChoiceConsumerContext {
         return ExpChoiceConsumerContext(player)
     }
@@ -93,30 +92,32 @@ internal object ExpChoiceConsumer : ChoiceConsumer<ExpChoiceConsumerContext>, Ko
 
 //<editor-fold desc="ChoiceConsumerContext">
 internal class ItemChoiceConsumerContext(
-    override val player: Player
+    override val player: Player,
 ) : ChoiceConsumerContext {
-    private val consumeItems: Object2IntOpenHashMap<ItemX> = Object2IntOpenHashMap()
+    // 要被消耗掉的物品堆叠
+    private val items: Object2IntOpenHashMap<ItemX> = Object2IntOpenHashMap()
 
     fun add(itemX: ItemX, amount: Int) {
-        consumeItems.mergeInt(itemX, amount) { oldValue, newValue -> oldValue + newValue }
+        items.mergeInt(itemX, amount) { oldValue, newValue -> oldValue + newValue }
     }
 
-    fun get(): Object2IntOpenHashMap<ItemX> {
-        return consumeItems
+    fun get(): Map<ItemX, Int> {
+        return items
     }
 }
 
 internal class ExpChoiceConsumerContext(
     override val player: Player,
 ) : ChoiceConsumerContext {
-    private var consumeExp: Int = 0
+    // 要被消耗掉的经验值
+    private var experience: Int = 0
 
     fun add(amount: Int) {
-        consumeExp += amount
+        experience += amount
     }
 
     fun get(): Int {
-        return consumeExp
+        return experience
     }
 }
 //</editor-fold>

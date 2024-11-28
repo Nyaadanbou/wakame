@@ -22,22 +22,29 @@ import java.util.stream.Stream
  * 包含若干项输入与若干项输出.
  */
 internal sealed interface StationRecipe : Keyed, Examinable {
+    /**
+     * 配方的输入.
+     */
     val input: List<StationChoice>
+
+    /**
+     * 配方的输出.
+     */
     val output: StationResult
 
     /**
      * 检查该 [StationRecipe] 是否有效.
-     * 用于延迟验证配方是否能够注册.
+     * 用于延迟检查配方是否能够注册到服务端.
      */
-    fun isValid(): Boolean
+    fun valid(): Boolean
 
     /**
-     * 检查一特定玩家某配方的各项要求是否分别满足.
+     * 针对 [player] 发起一次检查. 返回的结果包含了玩家已满足/不满足的条件.
      */
     fun match(player: Player): RecipeMatcherResult
 
     /**
-     * 执行此 [StationRecipe] 的消耗
+     * 针对 [player] 发起一次消耗. 该函数将消耗掉玩家背包中的物品堆叠.
      */
     fun consume(player: Player)
 }
@@ -48,14 +55,16 @@ internal sealed interface StationRecipe : Keyed, Examinable {
 internal class SimpleStationRecipe(
     override val key: Key,
     override val input: List<StationChoice>,
-    override val output: StationResult
+    override val output: StationResult,
 ) : StationRecipe {
 
-    override fun isValid(): Boolean {
-        input.forEach {
-            if (!it.valid()) return false
+    override fun valid(): Boolean {
+        input.forEach { choice: StationChoice ->
+            if (!choice.valid()) {
+                return false
+            }
         }
-        return output.isValid()
+        return output.valid()
     }
 
     override fun match(player: Player): RecipeMatcherResult {
@@ -72,8 +81,9 @@ internal class SimpleStationRecipe(
         ExaminableProperty.of("output", output),
     )
 
-    override fun toString(): String =
-        toSimpleString()
+    override fun toString(): String {
+        return toSimpleString()
+    }
 }
 
 
@@ -84,14 +94,9 @@ internal object StationRecipeSerializer : TypeSerializer<StationRecipe>, KoinCom
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
     override fun deserialize(type: Type, node: ConfigurationNode): StationRecipe {
-        val key = node.hint(HINT_NODE) ?: throw SerializationException(
-            "The hint node for station recipe key is not present"
-        )
-
-        val input = node.node("input").getList<StationChoice>(emptyList()).apply {
-            require(isNotEmpty()) { "Station recipe input is not present" }
-        }
-
+        val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
+        val input = node.node("input").getList<StationChoice>(emptyList())
+        require(input.isNotEmpty()) { "station recipe input is not present" }
         val output = node.node("output").krequire<StationResult>()
 
         return SimpleStationRecipe(key, input, output)
