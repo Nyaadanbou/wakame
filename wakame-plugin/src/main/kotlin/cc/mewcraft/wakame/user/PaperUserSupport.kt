@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
+import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
@@ -45,6 +46,13 @@ class PaperUser(
 
     @Volatile
     override var isInventoryListenable: Boolean = false
+
+    init {
+        // FIXME 临时方案. 让服务端不安装 AdventureLevel 也能够正常读取玩家等级
+        if (PlayerLevelManager.integration?.type == PlayerLevelType.VANILLA) {
+            isInventoryListenable = true
+        }
+    }
 
     override fun cleanup() {
         skillMap.cleanup()
