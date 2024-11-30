@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -254,7 +255,13 @@ internal class RerollingMenu(
             // 我们重新渲染*原始物品*上要修改的核心, 这样可以准确的反映哪些部分被修改了.
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
+            val outputItem = reforgeResult.output
             val previewItem = session.originalInput?.shadowNeko(true) ?: error("Result is successful but the input item is null. This is a bug!")
+
+            // 单独把 ReforgeHistory 赋值给预览物品,
+            // 这样玩家就可以预览物品重铸后的次数是多少.
+            previewItem.reforgeHistory = outputItem.reforgeHistory
+
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
             previewItem.unsafeEdit {
                 lore = lore.orEmpty() + buildList {
