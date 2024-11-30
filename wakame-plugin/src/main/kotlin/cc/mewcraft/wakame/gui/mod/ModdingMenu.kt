@@ -126,6 +126,11 @@ internal class ModdingMenu(
 
     private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
+    init {
+        executeReforge() // 初始化时执行一次空的操作
+        updateOutputSlot()
+    }
+
     /**
      * 当 [inputSlot] 中的物品发生*变化前*调用.
      */
@@ -241,11 +246,6 @@ internal class ModdingMenu(
                     updateInputSlot()
                     recreateReplaceGuis()
                     updateOutputSlot()
-                }
-
-                // 如果结果失败的话:
-                else {
-                    viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
                 }
             }
         }

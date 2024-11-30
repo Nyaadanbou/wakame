@@ -104,6 +104,11 @@ internal class MergingMenu(
         // logger.info("Confirmed status updated: $old -> $new")
     }
 
+    init {
+        executeReforge() // 初始化时执行一次空的操作
+        updateOutputSlot()
+    }
+
     private enum class InputSlot {
         INPUT1, INPUT2
     }

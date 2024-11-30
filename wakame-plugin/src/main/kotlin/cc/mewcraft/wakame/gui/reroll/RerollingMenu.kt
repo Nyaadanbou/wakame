@@ -105,6 +105,11 @@ internal class RerollingMenu(
 
     private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
 
+    init {
+        executeReforge() // 初始化时执行一次空的操作
+        updateOutputSlot()
+    }
+
     private fun onInputInventoryPreUpdate(event: ItemPreUpdateEvent) {
         val newItem = event.newItem
         val prevItem = event.previousItem
