@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.bindInstance
+import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -36,7 +39,6 @@ internal object WtfRerollingTable : RerollingTable {
 
     private data object AnyCellRule : RerollingTable.CellRule {
         override val currencyCost: RerollingTable.CellCurrencyCost = RerollingTable.CellCurrencyCost { _, _ -> ZERO_MOCHA_FUNCTION }
-        override val maxReroll: Int = Int.MAX_VALUE
     }
 
     private data object AnyCellRuleMap : RerollingTable.CellRuleMap {
@@ -46,6 +48,7 @@ internal object WtfRerollingTable : RerollingTable {
     }
 
     private data object AnyItemRule : RerollingTable.ItemRule {
+        override val modLimit: Int = Int.MAX_VALUE
         override val cellRuleMap: RerollingTable.CellRuleMap = AnyCellRuleMap
     }
 }
@@ -74,12 +77,10 @@ internal class SimpleRerollingTable(
     override fun toString(): String = toSimpleString()
 
     data class CellRule(
-        override val maxReroll: Int,
         override val currencyCost: RerollingTable.CellCurrencyCost,
     ) : RerollingTable.CellRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("currencyCost", currencyCost),
-            ExaminableProperty.of("maxReroll", maxReroll),
         )
 
         override fun toString(): String = toSimpleString()
@@ -108,6 +109,7 @@ internal class SimpleRerollingTable(
     }
 
     data class ItemRule(
+        override val modLimit: Int,
         override val cellRuleMap: RerollingTable.CellRuleMap,
     ) : RerollingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -202,16 +204,13 @@ internal class CellCostBinding(
     val session: RerollingSession,
     val selection: RerollingSession.Selection,
 ) {
-    @Binding("max_reroll")
-    fun getMaxReroll(): Int {
-        return selection.rule.maxReroll
+    @Binding("mod_limit")
+    fun getModLimit(): Int {
+        return session.itemRule?.modLimit ?: 0
     }
 
-    @Binding("reroll_count")
-    fun getRerollCount(): Int {
-        val sourceItem = session.usableInput
-        val sourceCells = sourceItem?.components?.get(ItemComponentTypes.CELLS) ?: return 0
-        val rerollCount = sourceCells.get(selection.id)?.getReforgeHistory()?.rerollCount ?: 0
-        return rerollCount
+    @Binding("mod_count")
+    fun getModCount(): Int {
+        return session.usableInput?.reforgeHistory?.modCount ?: 0
     }
 }

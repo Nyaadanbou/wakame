@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -35,18 +34,6 @@ interface Cell : Examinable, BinarySerializable<CompoundTag> {
      */
     fun setCore(core: Core): Cell
 
-    /**
-     * 返回核孔的重铸数据.
-     */
-    fun getReforgeHistory(): ReforgeHistory
-
-    /**
-     * 设置核孔的重铸数据.
-     *
-     * @return 修改过的核孔对象
-     */
-    fun setReforgeHistory(reforgeHistory: ReforgeHistory): Cell
-
     companion object {
         /**
          * 构建一个 [Cell].
@@ -63,9 +50,8 @@ interface Cell : Examinable, BinarySerializable<CompoundTag> {
         fun of(
             id: String,
             core: Core = CoreFactory.empty(),
-            reforgeHistory: ReforgeHistory = ReforgeHistory.empty(),
         ): Cell {
-            return SimpleCell(id = id, core = core, reforgeHistory = reforgeHistory)
+            return SimpleCell(id = id, core = core)
         }
     }
 }
@@ -76,7 +62,6 @@ interface Cell : Examinable, BinarySerializable<CompoundTag> {
 private data class SimpleCell(
     private val id: String,
     private val core: Core,
-    private val reforgeHistory: ReforgeHistory,
 ) : Cell {
 
     constructor(
@@ -85,7 +70,6 @@ private data class SimpleCell(
     ) : this(
         id = id,
         core = CoreFactory.deserialize(nbt.getCompound(NBT_CORE)),
-        reforgeHistory = ReforgeHistory.of(nbt.getCompound(NBT_REFORGE))
     )
 
     override fun getId(): String {
@@ -104,27 +88,16 @@ private data class SimpleCell(
         return copy(core = core)
     }
 
-    override fun getReforgeHistory(): ReforgeHistory {
-        return reforgeHistory
-    }
-
-    override fun setReforgeHistory(reforgeHistory: ReforgeHistory): Cell {
-        return copy(reforgeHistory = reforgeHistory)
-    }
-
     override fun serializeAsTag(): CompoundTag = CompoundTag {
         put(NBT_CORE, core.serializeAsTag())
-        put(NBT_REFORGE, reforgeHistory.serializeAsTag())
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id),
         ExaminableProperty.of("core", core),
-        ExaminableProperty.of("reforge", reforgeHistory),
     )
 
     private companion object {
         const val NBT_CORE = "core"
-        const val NBT_REFORGE = "reforge"
     }
 }

@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
 import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingPart3
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
@@ -37,6 +36,7 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -90,7 +90,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
         val components = item.components
         components.process(ItemComponentTypes.CELLS) { data -> for ((id, cell) in data) renderCore(collector, id, cell, context) }
-        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingParts.STANDALONE_CELL.process(collector, data, context) }
+        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingParts.STANDALONE_CELL.process(collector, item, data, context) }
         components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY) { data -> RerollingTableRenderingParts.RARITY.process(collector, data) }
 
@@ -188,10 +188,11 @@ internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItem
     val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart2<StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { data, context, format ->
-        val selectionMap = context.session.selectionMap
-        val penaltyLimit = selectionMap[data.id].rule.maxReroll
-        format.render(data, rerollPenaltyLimit = penaltyLimit)
+    val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
+        val coreText = cell.core.description
+        val modCount = item.reforgeHistory.modCount
+        val modLimit = context.session.itemRule?.modLimit ?: 0
+        format.render(coreText, modCount, modLimit)
     }
 
     // TODO 让渲染器负责渲染重造的花费

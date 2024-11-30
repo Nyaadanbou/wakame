@@ -61,6 +61,14 @@ interface RerollingSession : Examinable {
     val usableInput: NekoStack?
 
     /**
+     * 当前 [usableInput] 的重铸规则.
+     * 该属性是否为 `null` 完全取决于 [usableInput] 是否也为 `null`.
+     * 换句话说, 该属性的 nullability 与 [usableInput] 完全一致.
+     */
+    @VariableByPlayer
+    val itemRule: RerollingTable.ItemRule?
+
+    /**
      * 每个核孔的选择状态.
      */
     @VariableByPlayer

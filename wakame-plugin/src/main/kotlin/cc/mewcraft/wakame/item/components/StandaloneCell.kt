@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.reforge.ReforgeHistory
 
 /**
  * 代表一个独立的核孔 [Core], 用于任何只需要呈现单个核孔的场景.
@@ -35,12 +37,6 @@ data class StandaloneCell(
      */
     val core: Core
         get() = cell.getCore()
-
-    /**
-     * 方便函数.
-     */
-    val reforgeHistory: ReforgeHistory
-        get() = cell.getReforgeHistory()
 
     private data class Codec(override val id: String) : ItemComponentType<StandaloneCell> {
         override fun read(holder: ItemComponentHolder): StandaloneCell? {

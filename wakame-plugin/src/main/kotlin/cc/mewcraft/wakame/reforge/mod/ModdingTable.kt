@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import net.kyori.adventure.key.Key
@@ -45,10 +46,20 @@ interface ModdingTable : Examinable {
      * 封装了一个物品的定制规则.
      */
     interface ItemRule : Examinable {
+
+        companion object {
+            fun empty(): ItemRule = EmptyItemRule
+        }
+
         /**
          * 目标萌芽物品的 id.
          */
         val itemId: Key
+
+        /**
+         * 该物品最多可以被定制的次数.
+         */
+        val modLimit: Int
 
         /**
          * 该物品每个核孔的定制规则.
@@ -82,10 +93,10 @@ interface ModdingTable : Examinable {
      * 代表一个核孔的定制规则.
      */
     interface CellRule : Examinable {
-        /**
-         * 最多可以定制本核孔多少次?
-         */
-        val modLimit: Int
+
+        companion object {
+            fun empty(): CellRule = EmptyCellRule
+        }
 
         /**
          * 是否要求输入的核心的元素类型与被定制物品的元素类型是一致的?
@@ -106,16 +117,17 @@ interface ModdingTable : Examinable {
          * 记录了哪些核心种类可以参与定制本核孔.
          */
         val acceptableCores: CoreMatchRuleContainer
-
-        companion object {
-            fun empty(): CellRule = EmptyCellRule
-        }
     }
 
     /**
      * 储存了每个核孔的定制规则.
      */
     interface CellRuleMap : Examinable {
+
+        companion object {
+            fun empty(): CellRuleMap = EmptyCellRuleMap
+        }
+
         /**
          * 关于核孔 id 的 [Comparator], 基于核孔在配置文件中的顺序.
          */
@@ -128,10 +140,6 @@ interface ModdingTable : Examinable {
          * 否则, 我们说这个核孔在定制系统中不存在定义 (无法进行定制).
          */
         operator fun get(key: String): CellRule?
-
-        companion object {
-            fun empty(): CellRuleMap = EmptyCellRuleMap
-        }
     }
 
     /**
@@ -172,8 +180,16 @@ interface ModdingTable : Examinable {
 /* Private */
 
 
+private object EmptyItemRule : ModdingTable.ItemRule {
+    override val itemId: Key
+        get() = GenericKeys.EMPTY
+    override val modLimit: Int
+        get() = 0
+    override val cellRuleMap: ModdingTable.CellRuleMap
+        get() = EmptyCellRuleMap
+}
+
 private object EmptyCellRule : ModdingTable.CellRule {
-    override val modLimit: Int = 0
     override val requireElementMatch: Boolean = false
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = CurrencyCost
     override val permission: String? = null

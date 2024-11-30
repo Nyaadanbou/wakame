@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.util.styleRecursively
 import net.kyori.adventure.extra.kotlin.plus
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
@@ -33,26 +37,21 @@ internal data class StandaloneCellRendererFormat(
     override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     /**
-     * @param data
-     * @param rerollPenaltyLimit 重铸惩罚的上限, 一般来源于渲染的上下文
-     * @param modPenaltyLimit 修改惩罚的上限, 一般来源于渲染的上下文
+     * @param coreText 核心的文本描述
+     * @param modCount 重铸次数
+     * @param modLimit 重铸次数上限
      */
     fun render(
-        data: StandaloneCell,
-        rerollPenaltyLimit: Int = 0,
-        modPenaltyLimit: Int = 0,
+        coreText: List<Component>,
+        modCount: Int,
+        modLimit: Int,
     ): IndexedText {
-        // 生成核心的文本描述
-        val coreText = data.core.description
-
         // 生成重铸历史的文本描述
         val historyText = this.historyFormat.map { line ->
             MM.deserialize(
                 line,
-                Formatter.number("reroll_penalty", data.reforgeHistory.rerollCount),
-                Formatter.number("reroll_penalty_limit", rerollPenaltyLimit),
-                Formatter.number("mod_penalty", data.reforgeHistory.modCount),
-                Formatter.number("mod_penalty_limit", modPenaltyLimit),
+                Formatter.number("mod_count", modCount),
+                Formatter.number("mod_limit", modLimit),
             )
         }
 

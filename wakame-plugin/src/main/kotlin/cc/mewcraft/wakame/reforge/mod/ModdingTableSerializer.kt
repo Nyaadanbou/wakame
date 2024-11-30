@@ -2,8 +2,16 @@ package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.reforge.common.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
+import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
+import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
@@ -104,10 +112,11 @@ internal object ModdingTableSerializer : KoinComponent {
                         }
                     }.buildAndLoadString(fileText)
 
+                    val modLimit = itemNode.node("mod_limit").getInt(0)
                     // configurate 返回的是 LinkedHashMap, 保留了顺序
                     val cellRuleMapData = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
                     val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
-                    val itemRule = SimpleModdingTable.ItemRule(itemId, cellRuleMap)
+                    val itemRule = SimpleModdingTable.ItemRule(itemId, modLimit, cellRuleMap)
 
                     itemId to itemRule
                 } catch (e: Exception) {
@@ -146,13 +155,11 @@ internal object ModdingTableSerializer : KoinComponent {
 
     private object CellRule : TypeSerializer<ModdingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CellRule {
-            val modLimit = node.node("mod_limit").getInt(Int.MAX_VALUE)
             val currencyCost = node.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>()
             val requireElementMatch = node.node("require_element_match").getBoolean(false)
             val permission = node.node("permission").string
             val acceptedCores = node.node("accepted_cores").krequire<CoreMatchRuleContainer>()
             return SimpleModdingTable.CellRule(
-                modLimit = modLimit,
                 currencyCost = currencyCost,
                 requireElementMatch = requireElementMatch,
                 permission = permission,

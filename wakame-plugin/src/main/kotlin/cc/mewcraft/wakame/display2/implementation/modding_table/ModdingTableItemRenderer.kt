@@ -38,6 +38,7 @@ import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -133,7 +134,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         }
 
         if (context is ModdingTableContext.Preview) {
-            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, data, context) }
+            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, item, data, context) }
         }
 
         if (context is ModdingTableContext.Replace) {
@@ -199,10 +200,11 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     }
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart2<StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { cell, context, format ->
-        val replaceParams = context.session.replaceParams
-        val penaltyLimit = replaceParams[cell.id].rule.modLimit
-        format.render(cell, modPenaltyLimit = penaltyLimit)
+    val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
+        val coreText = cell.core.description
+        val modCount = item.reforgeHistory.modCount
+        val modLimit = context.session.itemRule?.modLimit ?: 0
+        format.render(coreText, modCount, modLimit)
     }
 
     @JvmField
