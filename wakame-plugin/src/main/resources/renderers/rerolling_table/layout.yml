@@ -1,6 +1,20 @@
+# 在这里设置重造台物品的 *渲染布局*.
+
 primary:
-  - durability:durability
-  - (fixed)
-  - repair_cost:repair_cost
-  - (fixed)
-  - repair_usage:repair_usage
+  - reforge:standalone_cell
+
+  - (fixed:general)
+  - general:level
+  - general:rarity
+  - general:elements
+
+  - (fixed:attribute)
+  - attribute:attack_damage
+  - attribute:defense
+  - attribute:max_health
+  - attribute:movement_speed
+  - stash:cells/empty
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:custom_name

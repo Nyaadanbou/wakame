@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
 import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingPart3
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
@@ -21,6 +22,7 @@ import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.DifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
@@ -31,6 +33,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
@@ -92,7 +95,11 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
         components.process(ItemComponentTypes.CELLS) { data -> for ((id, cell) in data) renderCore(collector, id, cell, context) }
         components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingParts.STANDALONE_CELL.process(collector, item, data, context) }
         components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingParts.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.RARITY) { data -> RerollingTableRenderingParts.RARITY.process(collector, data) }
+        components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
+            val data1 = data1 ?: return@process
+            val data2 = data2 ?: ReforgeHistory.ZERO
+            RerollingTableRenderingParts.RARITY.process(collector, data1, data2)
+        }
 
         val itemLore = textAssembler.assemble(collector)
         val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
@@ -185,7 +192,7 @@ internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItem
     val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
 
     @JvmField
-    val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
 
     @JvmField
     val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->

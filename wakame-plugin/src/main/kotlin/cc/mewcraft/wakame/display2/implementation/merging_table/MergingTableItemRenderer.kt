@@ -20,12 +20,14 @@ import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -82,7 +84,11 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
         val components = item.components
         components.process(ItemComponentTypes.ELEMENTS) { data -> MergingTableRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> MergingTableRenderingParts.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.RARITY) { data -> MergingTableRenderingParts.RARITY.process(collector, data) }
+        components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
+            val data1 = data1 ?: return@process
+            val data2 = data2 ?: ReforgeHistory.ZERO
+            MergingTableRenderingParts.RARITY.process(collector, data1, data2)
+        }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data ->
             when (context) {
                 is MergingTableContext.MergeInputSlot -> MergingTableRenderingParts.MERGE_IN.process(collector, data, context)
@@ -135,7 +141,7 @@ internal object MergingTableRenderingParts : RenderingParts(MergingTableItemRend
     }
 
     @JvmField
-    val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
 }
 
 

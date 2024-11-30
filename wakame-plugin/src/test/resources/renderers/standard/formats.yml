@@ -139,7 +139,7 @@ level:
 # id: `lore`
 lore:
   namespace: general
-  # 可用标签：
+  # 可用标签
   # <line> 描述内容
   tooltip:
     line: "<line>"
@@ -154,5 +154,9 @@ portable_core:
 rarity:
   namespace: general
   # 可用标签
-  # <value> 稀有度的名字
-  tooltip: "稀有度: <value>"
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "稀有度: <rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"

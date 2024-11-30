@@ -43,4 +43,5 @@ merge_output:
 # id: `rarity`
 rarity:
   namespace: general
-  tooltip: "稀有度: <value>"
+  simple: "稀有度: <rarity_display_name>"
+  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"

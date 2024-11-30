@@ -1,49 +1,79 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedDataRenderer
+import cc.mewcraft.wakame.display2.IndexedDataRenderer2
+import cc.mewcraft.wakame.display2.IndexedDataRenderer3
+import cc.mewcraft.wakame.display2.IndexedDataRenderer4
+import cc.mewcraft.wakame.display2.IndexedDataRenderer5
+import cc.mewcraft.wakame.display2.IndexedDataRenderer6
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingPart2
+import cc.mewcraft.wakame.display2.implementation.RenderingPart3
+import cc.mewcraft.wakame.display2.implementation.RenderingPart4
+import cc.mewcraft.wakame.display2.implementation.RenderingPart5
+import cc.mewcraft.wakame.display2.implementation.RenderingPart6
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.templates.components.*
+import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.templates.components.CustomName
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.rarity.Rarity
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import org.koin.core.component.get
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
  * 包含了大部分渲染系统共有的 [RenderingPart] 实现.
  */
 internal object CommonRenderingParts {
     @JvmField
-    val CUSTOM_NAME: RenderingParts.() -> RenderingPart<CustomName, SingleValueRendererFormat> = xconfigure<CustomName, SingleValueRendererFormat>("custom_name") { data, format ->
+    val CUSTOM_NAME: RenderingParts.() -> RenderingPart<CustomName, SingleValueRendererFormat> = xconfigure("custom_name") { data, format ->
         format.render(Placeholder.parsed("value", data.plainName))
     }
 
     @JvmField
-    val ELEMENTS: RenderingParts.() -> RenderingPart<ItemElements, AggregateValueRendererFormat> = xconfigure<ItemElements, AggregateValueRendererFormat>("elements") { data, format ->
+    val ELEMENTS: RenderingParts.() -> RenderingPart<ItemElements, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
         format.render(data.elements, Element::displayName)
     }
 
     @JvmField
-    val ITEM_NAME: RenderingParts.() -> RenderingPart<ItemName, SingleValueRendererFormat> = xconfigure<ItemName, SingleValueRendererFormat>("item_name") { data, format ->
+    val ITEM_NAME: RenderingParts.() -> RenderingPart<ItemName, SingleValueRendererFormat> = xconfigure("item_name") { data, format ->
         format.render(Placeholder.parsed("value", data.plainName))
     }
 
     @JvmField
-    val LEVEL: RenderingParts.() -> RenderingPart<ItemLevel, SingleValueRendererFormat> = xconfigure<ItemLevel, SingleValueRendererFormat>("level") { data, format ->
+    val LEVEL: RenderingParts.() -> RenderingPart<ItemLevel, SingleValueRendererFormat> = xconfigure("level") { data, format ->
         format.render(Placeholder.component("value", Component.text(data.level)))
     }
 
     @JvmField
-    val LORE: RenderingParts.() -> RenderingPart<ExtraLore, ExtraLoreRendererFormat> = xconfigure<ExtraLore, ExtraLoreRendererFormat>("lore") { data, format ->
+    val LORE: RenderingParts.() -> RenderingPart<ExtraLore, ExtraLoreRendererFormat> = xconfigure("lore") { data, format ->
         format.render(data.processedLore)
     }
 
     @JvmField
-    val RARITY: RenderingParts.() -> RenderingPart<ItemRarity, SingleValueRendererFormat> = xconfigure<ItemRarity, SingleValueRendererFormat>("rarity") { data, format ->
-        format.render(Placeholder.component("value", data.rarity.displayName))
+    val RARITY: RenderingParts.() -> RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = xconfigure2("rarity") { data1, data2, format ->
+        if (data2 == ReforgeHistory.ZERO) {
+            format.renderSimple(data1.rarity)
+        } else {
+            format.renderComplex(data1.rarity, data2.modCount)
+        }
     }
 
     private inline fun <T, reified F : RendererFormat> xconfigure(id: String, block: IndexedDataRenderer<T, F>): RenderingParts.() -> RenderingPart<T, F> {
@@ -68,5 +98,43 @@ internal object CommonRenderingParts {
 
     private inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> xconfigure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingParts.() -> RenderingPart6<T1, T2, T3, T4, T5, T6, F> {
         return { configure6(id, block) }
+    }
+}
+
+@ConfigSerializable
+data class RarityRendererFormat(
+    override val namespace: String,
+    private val simple: String,
+    private val complex: String,
+) : RendererFormat.Simple {
+    override val id: String = "rarity"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+
+    fun renderSimple(rarity: Rarity): IndexedText {
+        return SimpleIndexedText(
+            index, listOf(
+                MM.deserialize(
+                    simple,
+                    Placeholder.component("rarity_display_name", rarity.displayName)
+                )
+            )
+        )
+    }
+
+    fun renderComplex(rarity: Rarity, modCount: Int): IndexedText {
+        return SimpleIndexedText(
+            index, listOf(
+                MM.deserialize(
+                    complex,
+                    Placeholder.component("rarity_display_name", rarity.displayName),
+                    Placeholder.component("reforge_mod_count", Component.text(modCount.toString()))
+                )
+            )
+        )
+    }
+
+    companion object {
+        private val MM = Injector.get<MiniMessage>()
     }
 }
