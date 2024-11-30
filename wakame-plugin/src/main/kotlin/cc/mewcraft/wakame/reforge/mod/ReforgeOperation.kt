@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.reforgeHistory
 import me.lucko.helper.text3.mini
 
 /**
@@ -46,6 +47,11 @@ private constructor(
             return ReforgeResult.failure("<gray>物品无法定制.".mini)
         }
 
+        val itemRule = session.itemRule ?: run {
+            logger.info("Skipped reforge as the item rule is null")
+            return ReforgeResult.failure("<gray>物品无法定制.".mini)
+        }
+
         // 把经过修改的核孔筛选出来
         val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.originalInput != null }
         if (changedReplaceParams.isEmpty()) {
@@ -60,9 +66,9 @@ private constructor(
         }
 
         // 检查经过修改的核孔中是否存在惩罚值过高
-        if (changedReplaceParams.any { (_, repl) -> repl.cell.getReforgeHistory().modCount >= repl.rule.modLimit }) {
-            logger.info("Skipped reforge as some replaces exceed mod limit")
-            return ReforgeResult.failure("<gray>某些核孔已消磨殆尽.".mini)
+        if (changedReplaceParams.any { (_, repl) -> (repl.usableInput?.reforgeHistory?.modCount ?: 0) >= itemRule.modLimit }) {
+            logger.info("Skipped reforge as mod count exceeds mod limit")
+            return ReforgeResult.failure("<gray>物品已经消磨殆尽.".mini)
         }
 
         // 如果源物品不合法, 则返回失败
@@ -87,14 +93,14 @@ private constructor(
 
             builder.modify(id) { cell ->
                 cell.setCore(wrappedCore)
-                    .setReforgeHistory(
-                        cell.getReforgeHistory().addModCount(1)
-                    )
             }
         }
 
         // 把修改后的核孔应用到输出物品上
         usableInput.components.set(ItemComponentTypes.CELLS, builder.build())
+
+        // 增加重铸次数
+        usableInput.reforgeHistory = usableInput.reforgeHistory.incCount(1)
 
         // 计算需要消耗的货币数量
         val reforgeCost = ReforgeCost.simple(totalFunction.evaluate())

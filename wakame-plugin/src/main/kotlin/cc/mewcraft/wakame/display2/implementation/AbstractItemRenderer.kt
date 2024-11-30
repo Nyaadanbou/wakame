@@ -5,7 +5,15 @@ package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.IndexedDataRenderer
+import cc.mewcraft.wakame.display2.IndexedDataRenderer2
+import cc.mewcraft.wakame.display2.IndexedDataRenderer3
+import cc.mewcraft.wakame.display2.IndexedDataRenderer4
+import cc.mewcraft.wakame.display2.IndexedDataRenderer5
+import cc.mewcraft.wakame.display2.IndexedDataRenderer6
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.ItemRenderer
+import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -42,18 +50,32 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
      */
     abstract val layout: AbstractRendererLayout
 
-    /**
-     * 方便函数.
-     */
+    // 方便函数
+
     protected inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
         get(type)?.apply(block)
     }
 
-    /**
-     * 方便函数.
-     */
+    protected inline fun <T1, T2> ItemTemplateMap.process(type1: ItemTemplateType<T1>, type2: ItemTemplateType<T2>, block: (T1?, T2?) -> Unit) {
+        block(get(type1), get(type2))
+    }
+
+    protected inline fun <T1, T2, T3> ItemTemplateMap.process(type1: ItemTemplateType<T1>, type2: ItemTemplateType<T2>, type3: ItemTemplateType<T3>, block: (T1?, T2?, T3?) -> Unit) {
+        block(get(type1), get(type2), get(type3))
+    }
+
+    // 方便函数
+
     protected inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
         get(type)?.apply(block)
+    }
+
+    protected inline fun <T1, T2> ItemComponentMap.process(type1: ItemComponentType<T1>, type2: ItemComponentType<T2>, block: (T1?, T2?) -> Unit) {
+        block(get(type1), get(type2))
+    }
+
+    protected inline fun <T1, T2, T3> ItemComponentMap.process(type1: ItemComponentType<T1>, type2: ItemComponentType<T2>, type3: ItemComponentType<T3>, block: (T1?, T2?, T3?) -> Unit) {
+        block(get(type1), get(type2), get(type3))
     }
 
     @VisibleForTesting

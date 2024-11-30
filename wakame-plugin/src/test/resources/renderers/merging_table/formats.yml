@@ -63,4 +63,10 @@ merge_output:
 # id: `rarity`
 rarity:
   namespace: general
-  tooltip: "稀有度: <value>"
+  # 可用标签
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "稀有度: <rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"

@@ -1,3 +1,10 @@
+# 物品重铸的次数上限.
+# 类型: int
+#
+# 准确来说, 这只是这个物品在本定制台中的限制.
+# 在不同的定制台中, 这个物品可以有不同的限制.
+mod_limit: 8
+
 # 物品核孔的定制设置.
 cells:
 
@@ -5,13 +12,6 @@ cells:
   # 如果一个核孔存在定义, 那么这个核孔就是可定制的.
   # 如果一个核孔不存在定义, 那么这个核孔就是不可定制的.
   a:
-
-    # 定义该核孔最多可定制几次.
-    # 类型: int
-    #
-    # 准确来说, 这只是这个核孔在本定制台中的限制.
-    # 在不同的定制台中, 这个核孔可以有不同的限制.
-    mod_limit: 1
 
     # 定义该核孔的货币花费.
     # 类型: molang
@@ -22,13 +22,13 @@ cells:
     # 可用的上下文:
     # query.source_item_level()
     #   被定制的物品的等级
-    # query.source_cell_mod_count()
-    #   本核孔被定制过的次数
+    # query.source_item_mod_count()
+    #   被定制的物品已经历的重铸次数
     # query.joined_item_level()
     #   参与定制的核心的物品等级
     # query.joined_item_rarity()
     #   参与定制的核心的物品稀有度所映射的数值
-    currency_cost: "100 + query.joined_item_level() * 10 + query.cell_mod_count() * 10"
+    currency_cost: "100 + query.joined_item_level() * 10 + query.source_item_mod_count() * 10"
 
     # 是否要求输入的核心的元素类型与被定制物品的元素类型是一致的?
     # 类型: bool
@@ -58,7 +58,6 @@ cells:
 
   # 这里定义了 id 为 “b” 的核孔的定制设置.
   b:
-    mod_limit: 1
     currency_cost: "100 + query.joined_item_level() * 10"
     require_element_match: true
     permission: ~

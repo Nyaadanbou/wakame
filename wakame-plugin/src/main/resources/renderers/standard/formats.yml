@@ -100,7 +100,7 @@ lore:
   namespace: general
   tooltip:
     line: "<line>"
-    header: [ ] # 空列表代表完全没有，不代表空行
+    header: [ ]
     bottom: [ ]
 
 # id: `portable_core`
@@ -110,4 +110,5 @@ portable_core:
 # id: `rarity`
 rarity:
   namespace: general
-  tooltip: "稀有度: <value>"
+  simple: "稀有度: <rarity_display_name>"
+  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"

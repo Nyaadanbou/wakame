@@ -67,6 +67,7 @@ val ItemStack.isVanillaNeko: Boolean
  * 尝试获取 [ItemStack] 在萌芽物品系统下的投影 [NekoStack].
  * 如果该 [ItemStack] 不存在投影, 则返回 `null`.
  */
+// TODO NekoStack.wrap / NekoStack.unwrap
 @Contract(pure = true)
 fun ItemStack.shadowNeko(excludeVanilla: Boolean = false): NekoStack? {
     val nbt = this.unsafeNekooTagOrNull

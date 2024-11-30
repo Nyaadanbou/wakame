@@ -23,6 +23,7 @@ import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.DifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
@@ -34,10 +35,12 @@ import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -107,7 +110,11 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         val components = item.components
         components.process(ItemComponentTypes.ELEMENTS) { data -> ModdingTableRendererParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRendererParts.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.RARITY) { data -> ModdingTableRendererParts.RARITY.process(collector, data) }
+        components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
+            val data1 = data1 ?: return@process
+            val data2 = data2 ?: ReforgeHistory.ZERO
+            ModdingTableRendererParts.RARITY.process(collector, data1, data2)
+        }
 
         if (context is ModdingTableContext.Input) {
             components.process(ItemComponentTypes.CELLS) { data ->
@@ -133,7 +140,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         }
 
         if (context is ModdingTableContext.Preview) {
-            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, data, context) }
+            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, item, data, context) }
         }
 
         if (context is ModdingTableContext.Replace) {
@@ -199,10 +206,11 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     }
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart2<StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure2("standalone_cell") { cell, context, format ->
-        val replaceParams = context.session.replaceParams
-        val penaltyLimit = replaceParams[cell.id].rule.modLimit
-        format.render(cell, modPenaltyLimit = penaltyLimit)
+    val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
+        val coreText = cell.core.description
+        val modCount = item.reforgeHistory.modCount
+        val modLimit = context.session.itemRule?.modLimit ?: 0
+        format.render(coreText, modCount, modLimit)
     }
 
     @JvmField
@@ -225,7 +233,7 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
 
     @JvmField
-    val RARITY: RenderingPart<ItemRarity, SingleValueRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
     //</editor-fold>
 }
 

@@ -2,7 +2,12 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.ItemCells
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.ReforgeHistory
+import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -22,6 +27,10 @@ var NekoStack.rarity: Rarity
         val boxedValue = ItemRarity(value)
         components.set(ItemComponentTypes.RARITY, boxedValue)
     }
+
+var NekoStack.reforgeHistory: ReforgeHistory
+    get() = components.get(ItemComponentTypes.REFORGE_HISTORY) ?: ReforgeHistory.ZERO
+    set(value) = components.set(ItemComponentTypes.REFORGE_HISTORY, value)
 
 var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)
 
@@ -56,6 +65,7 @@ var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_
 
 
 /* private */
+
 
 private fun <T> direct(type: ItemComponentType<T>): DirectComponentDelegate<T> {
     return DirectComponentDelegate(type)

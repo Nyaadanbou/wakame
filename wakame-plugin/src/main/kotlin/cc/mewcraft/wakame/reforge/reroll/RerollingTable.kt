@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.*
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRule
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRuleMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -46,7 +48,12 @@ interface RerollingTable : Examinable {
      */
     interface ItemRule : Examinable {
         /**
-         * 该物品每个核孔的重造规则.
+         * 该物品的重铸次数上限.
+         */
+        val modLimit: Int
+
+        /**
+         * 该物品的每个核孔的重造规则.
          */
         val cellRuleMap: CellRuleMap
     }
@@ -71,11 +78,6 @@ interface RerollingTable : Examinable {
      * 代表一个核孔的重造规则.
      */
     interface CellRule : Examinable {
-        /**
-         * 核孔最多能重造几次.
-         */
-        val maxReroll: Int
-
         /**
          * 该核孔的货币花费.
          */
@@ -160,7 +162,6 @@ interface RerollingTable : Examinable {
 
 
 private object EmptyCellRule : CellRule {
-    override val maxReroll: Int = 0
     override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { Double.NaN } }
 }
 

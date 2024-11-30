@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
-import cc.mewcraft.wakame.reforge.mod.ModdingSession.ReforgeResult
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
@@ -70,6 +69,14 @@ interface ModdingSession : Examinable {
      */
     @VariableByPlayer
     val usableInput: NekoStack?
+
+    /**
+     * 当前 [usableInput] 的重铸规则.
+     * 该属性是否为 `null` 完全取决于 [usableInput] 是否也为 `null`.
+     * 换句话说, 该属性的 nullability 与 [usableInput] 完全一致.
+     */
+    @VariableByPlayer
+    val itemRule: ModdingTable.ItemRule?
 
     /**
      * 储存了每个核孔的定制参数.
@@ -214,9 +221,7 @@ interface ModdingSession : Examinable {
         val session: ModdingSession
 
         /**
-         * 是否允许定制?
-         *
-         * 如果返回 `false`, 那么本 [Replace] 将实际为不可变的
+         * 该核孔是否被允许修改.
          */
         val changeable: Boolean
 
@@ -228,7 +233,7 @@ interface ModdingSession : Examinable {
         /**
          * 被定制的核孔所对应的规则.
          */
-        val rule: ModdingTable.CellRule
+        val cellRule: ModdingTable.CellRule
 
         // 开发日记 2024/8/17
         // 当一个 Replace 实例被创建时, 其对应的 cell & rule & session 也都确定了.

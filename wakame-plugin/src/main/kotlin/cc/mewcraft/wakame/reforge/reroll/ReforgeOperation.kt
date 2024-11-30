@@ -6,7 +6,12 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.template.AttributeContextData
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContexts
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.SkillContextData
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
@@ -51,6 +56,9 @@ private constructor(
         val usableInput = session.usableInput
             ?: return ReforgeResult.failure("<gray>物品无法重造.".mini)
 
+        val itemRule = session.itemRule
+            ?: return ReforgeResult.failure("<gray>物品无法重造.".mini)
+
         // 获取核孔的选择状态
         // 如果没有可重造的核孔, 返回一个失败结果
         val selectionMap = session.selectionMap
@@ -70,13 +78,11 @@ private constructor(
         val itemCells = usableInput.components.get(ItemComponentTypes.CELLS)
             ?: return ReforgeResult.failure("<gray>物品不可重造.".mini)
 
-        // 检查在已选择的核孔当中, 是否有超过了重造次数上限的核孔
-        for (selection in selectionMap.values.filter { it.selected }) {
-            val cell = itemCells.get(selection.id) ?: return ReforgeResult.error()
-            val rerollCount = cell.getReforgeHistory().rerollCount
-            if (rerollCount >= selection.rule.maxReroll) {
-                return ReforgeResult.failure("<gray>核孔已经消磨殆尽.".mini)
-            }
+        // 检查重铸次数是否超过了重铸次数上限
+        val modCount = usableInput.reforgeHistory.modCount
+        val modLimit = itemRule.modLimit
+        if (modCount >= modLimit) {
+            return ReforgeResult.failure("<gray>物品已经消磨殆尽.".mini)
         }
 
         // 获取可有可无的物品组件
@@ -112,16 +118,13 @@ private constructor(
                         val generated = selected.generate(context)
                         cell.setCore(generated)
                     }
-
-                    // 为重造过的核孔 +1 重造次数
-                    modify(id) { cell ->
-                        val oldValue = cell.getReforgeHistory()
-                        val newValue = oldValue.addRerollCount(1)
-                        cell.setReforgeHistory(newValue)
-                    }
                 }
             }
         }.build()
+
+
+        // 为物品的重铸历史次数 +1
+        usableInput.reforgeHistory = usableInput.reforgeHistory.incCount(1)
 
         // 准备作为输出的物品
         val output = usableInput.clone()

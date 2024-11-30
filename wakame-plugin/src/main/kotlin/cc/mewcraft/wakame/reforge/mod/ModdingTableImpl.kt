@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.bindInstance
@@ -35,11 +36,11 @@ internal object WtfModdingTable : ModdingTable {
     private class AnyItemRule(
         override val itemId: Key,
     ) : ModdingTable.ItemRule {
+        override val modLimit: Int = Int.MAX_VALUE
         override val cellRuleMap: ModdingTable.CellRuleMap = AnyCellRuleMap
     }
 
     private object AnyCellRule : ModdingTable.CellRule {
-        override val modLimit: Int = Int.MAX_VALUE
         override val requireElementMatch: Boolean = false
         override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = ZeroCellCurrencyCost
         override val permission: String? = null
@@ -91,10 +92,12 @@ internal class SimpleModdingTable(
 
     class ItemRule(
         override val itemId: Key,
+        override val modLimit: Int,
         override val cellRuleMap: ModdingTable.CellRuleMap,
     ) : ModdingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("itemId", itemId),
+            ExaminableProperty.of("modLimit", modLimit),
             ExaminableProperty.of("cellRuleMap", cellRuleMap),
         )
 
@@ -120,14 +123,12 @@ internal class SimpleModdingTable(
     }
 
     class CellRule(
-        override val modLimit: Int,
         override val requireElementMatch: Boolean,
         override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>,
         override val permission: String?,
         override val acceptableCores: CoreMatchRuleContainer,
     ) : ModdingTable.CellRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("modLimit", modLimit),
             ExaminableProperty.of("requireElementMatch", requireElementMatch),
             ExaminableProperty.of("currencyCost", currencyCost),
             ExaminableProperty.of("permission", permission),
@@ -260,9 +261,9 @@ internal class CellTotalBinding(
         return session.getSourceItemLevel()
     }
 
-    @Binding("source_cell_mod_count")
-    fun getSourceCellModCount(): Int {
-        return replace.cell.getReforgeHistory().modCount
+    @Binding("source_item_mod_count")
+    fun getSourceItemModCount(): Int {
+        return session.usableInput?.reforgeHistory?.modCount ?: 0
     }
 
     @Binding("joined_item_level")

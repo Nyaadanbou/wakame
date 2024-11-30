@@ -41,6 +41,8 @@ internal class SimpleRerollingSession(
 
     override var usableInput: NekoStack? by UsableInputDelegate(null)
 
+    override var itemRule: RerollingTable.ItemRule? = null
+
     override var selectionMap: RerollingSession.SelectionMap by Delegates.observable(SelectionMap.empty(this)) { _, old, new ->
         // logger.info("Selection map updated: $old -> $new")
     }
@@ -108,6 +110,7 @@ internal class SimpleRerollingSession(
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
             usableInput = value?.shadowNeko(true)
+            itemRule = usableInput?.id?.let(table.itemRuleMap::get)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }

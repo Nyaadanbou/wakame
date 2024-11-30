@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
@@ -46,6 +47,9 @@ internal class SimpleModdingSession(
 
     // 初始为 null
     override var usableInput: NekoStack? by UsableInputDelegate(null)
+
+    // 初始为 null
+    override var itemRule: ItemRule? = null
 
     // 初始为 ReplaceMap.empty() 表示还没有输入
     override var replaceParams: ModdingSession.ReplaceMap by Delegates.observable(ReforgeReplaceMap.empty(this)) { _, old, new ->
@@ -214,6 +218,7 @@ internal class SimpleModdingSession(
             }
 
             usableInput = usableInput0
+            itemRule = inputItemRule
             replaceParams = createReplaceParameters(thisRef, inputItemCells, inputItemRule)
             executeReforge()
         }
@@ -226,9 +231,9 @@ internal class SimpleModdingSession(
             val cellRuleMap = itemRule.cellRuleMap
             val replaceData = sortedMapOf<String, ModdingSession.Replace>(cellRuleMap.comparator)
             for ((id, cell) in itemCells) {
-                val rule = cellRuleMap[id]
-                if (rule != null) {
-                    replaceData[id] = ReforgeReplace.changeable(thisRef, cell, rule)
+                val cellRule = cellRuleMap[id]
+                if (cellRule != null) {
+                    replaceData[id] = ReforgeReplace.changeable(thisRef, cell, cellRule)
                 } else {
                     replaceData[id] = ReforgeReplace.unchangeable(thisRef, cell)
                 }
@@ -420,7 +425,7 @@ private object ReforgeReplace {
         override val changeable: Boolean
             get() = false
 
-        override val rule
+        override val cellRule
             get() = CellRule.empty()
 
         // unchangeable 不需要任何花费 (?)
@@ -468,9 +473,9 @@ private object ReforgeReplace {
     private class Changeable(
         override val session: SimpleModdingSession,
         override val cell: Cell,
-        override val rule: CellRule,
+        override val cellRule: CellRule,
     ) : ModdingSession.Replace, KoinComponent {
-        override val total: MochaFunction = rule.currencyCost.total.compile(session, this)
+        override val total: MochaFunction = cellRule.currencyCost.total.compile(session, this)
 
         override var originalInput: ItemStack? by OriginalInputDelegate(null)
 
@@ -525,6 +530,11 @@ private object ReforgeReplace {
                 return ReforgeReplaceResult.failure("<red>内部错误.".mini)
             }
 
+            val itemRule = session.itemRule ?: run {
+                session.logger.error("Item rule is null, but an item is being replaced. This is a bug!")
+                return ReforgeReplaceResult.failure("<red>内部错误.".mini)
+            }
+
             // TODO 检查权限
 
             // 获取耗材中的便携核心
@@ -550,12 +560,12 @@ private object ReforgeReplace {
             }
 
             // 便携式核心的类型 必须符合定制规则
-            if (!rule.acceptableCores.test(portableCore.wrapped)) {
+            if (!cellRule.acceptableCores.test(portableCore.wrapped)) {
                 return ReforgeReplaceResult.failure("<gray>核孔不兼容此核心.".mini)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
-            if (rule.requireElementMatch) {
+            if (cellRule.requireElementMatch) {
                 val elementsOnInput = usableInput.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
@@ -565,8 +575,8 @@ private object ReforgeReplace {
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
-            val modCount = usableInput.components.get(ItemComponentTypes.CELLS)?.get(cell.getId())?.getReforgeHistory()?.modCount ?: Int.MAX_VALUE
-            if (modCount >= rule.modLimit) {
+            val modCount = usableInput.reforgeHistory.modCount
+            if (modCount >= itemRule.modLimit) {
                 return ReforgeReplaceResult.failure("<gray>核孔已消磨殆尽.".mini)
             }
 
@@ -636,7 +646,7 @@ private object ReforgeReplaceResult {
 
 private object ReforgeReplaceMap {
     /**
-     * 返回一个空的 [ReforgeReplaceMap].
+     * 返回一个空的 [ModdingSession.ReplaceMap].
      *
      * 当没有可以定制的核孔时, 使用这个.
      */
@@ -645,7 +655,7 @@ private object ReforgeReplaceMap {
     }
 
     /**
-     * 返回一个一般的 [ReforgeReplaceMap].
+     * 返回一个一般的 [ModdingSession.ReplaceMap].
      *
      * 当存在可以定制的核孔时, 使用这个.
      */

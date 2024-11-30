@@ -1,0 +1,6 @@
+primary:
+  - durability:durability
+  - (fixed)
+  - repair_cost:repair_cost
+  - (fixed)
+  - repair_usage:repair_usage

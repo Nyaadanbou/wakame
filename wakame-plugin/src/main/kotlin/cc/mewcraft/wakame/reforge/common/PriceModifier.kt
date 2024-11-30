@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.level
+import cc.mewcraft.wakame.item.portableCore
+import cc.mewcraft.wakame.item.rarity
+import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.damage
 import org.bukkit.inventory.ItemStack
@@ -166,8 +170,7 @@ data class ModdingPenaltyPriceModifier(
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
-        val cells = nekoStack.cells ?: return .0
-        val value = cells.map { it.value }.sumOf { it.getReforgeHistory().modCount }
+        val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(ModdingBinding(value), "query")
         return mocha.eval(expression)
@@ -195,8 +198,7 @@ data class RerollingPenaltyPriceModifier(
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
-        val cells = nekoStack.cells ?: return .0
-        val value = cells.map { it.value }.sumOf { it.getReforgeHistory().rerollCount }
+        val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RerollingBinding(value), "query")
         return mocha.eval(expression)
