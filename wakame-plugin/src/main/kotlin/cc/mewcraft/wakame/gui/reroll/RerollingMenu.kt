@@ -178,11 +178,6 @@ internal class RerollingMenu(
             event.isRemove -> {
                 event.isCancelled = true
 
-                if (session.usableInput == null) {
-                    logger.error("An item is being removed from the output slot, but the source item is null. This is a bug!")
-                    return
-                }
-
                 // 首先获得当前的重造结果
                 val result = session.latestResult
                 if (!result.isSuccess) {
