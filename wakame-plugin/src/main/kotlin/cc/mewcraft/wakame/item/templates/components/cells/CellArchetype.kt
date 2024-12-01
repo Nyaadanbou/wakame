@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.templates.components.cells.CellArchetypeSerializer.HINT_NODE_SELECTORS
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.random3.GroupSerializer
 import cc.mewcraft.wakame.util.krequire
@@ -14,19 +15,19 @@ import java.lang.reflect.Type
 /**
  * 代表一个 [核孔][cc.mewcraft.wakame.item.components.cells.Cell] 的模板.
  */
-interface CellBlueprint {
+interface CellArchetype {
     /**
      * 核心的选择器.
      */
-    val core: Group<CoreBlueprint, ItemGenerationContext>
+    val core: Group<CoreArchetype, ItemGenerationContext>
 }
 
 /**
- * [CellBlueprint] 的标准实现.
+ * [CellArchetype] 的标准实现.
  */
-internal class SimpleCellBlueprint(
-    override val core: Group<CoreBlueprint, ItemGenerationContext>
-) : CellBlueprint
+internal class SimpleCellArchetype(
+    override val core: Group<CoreArchetype, ItemGenerationContext>
+) : CellArchetype
 
 /**
  * 核孔模板的序列化器。
@@ -41,7 +42,7 @@ internal class SimpleCellBlueprint(
  *   core: group_b # 这只是一个到指定节点的 *路径*
  * ```
  */
-internal object CellBlueprintSerializer : TypeSerializer<CellBlueprint> {
+internal object CellArchetypeSerializer : TypeSerializer<CellArchetype> {
     val HINT_NODE_SELECTORS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_selectors", typeTokenOf())
 
     /**
@@ -64,7 +65,7 @@ internal object CellBlueprintSerializer : TypeSerializer<CellBlueprint> {
      *     ...
      * ```
      */
-    override fun deserialize(type: Type, node: ConfigurationNode): CellBlueprint {
+    override fun deserialize(type: Type, node: ConfigurationNode): CellArchetype {
         val selectors: ConfigurationNode = node.hint(HINT_NODE_SELECTORS) ?: throw SerializationException(
             node, type, "Can't find hint ${HINT_NODE_SELECTORS.identifier()}. Did you forget to inject it?"
         )
@@ -77,8 +78,8 @@ internal object CellBlueprintSerializer : TypeSerializer<CellBlueprint> {
                 ?.also { groupNode -> groupNode.hint(GroupSerializer.HINT_NODE_SHARED_POOLS, selectors.node("${path}_pools")) }
         }
 
-        val core = node.find("core")?.krequire<Group<CoreBlueprint, ItemGenerationContext>>() ?: Group.empty()
-        val cell = SimpleCellBlueprint(core)
+        val core = node.find("core")?.krequire<Group<CoreArchetype, ItemGenerationContext>>() ?: Group.empty()
+        val cell = SimpleCellArchetype(core)
 
         return cell
     }

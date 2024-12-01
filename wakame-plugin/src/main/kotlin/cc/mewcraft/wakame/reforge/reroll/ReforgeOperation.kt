@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.template.SkillContextData
-import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -114,7 +114,7 @@ private constructor(
 
                     // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
                     modify(id) { cell ->
-                        val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreBlueprint
+                        val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreArchetype
                         val generated = selected.generate(context)
                         cell.setCore(generated)
                     }

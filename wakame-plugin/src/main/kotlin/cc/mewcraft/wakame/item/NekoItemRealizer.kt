@@ -2,7 +2,13 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContexts
+import cc.mewcraft.wakame.item.template.ItemGenerationTrigger
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.user.User
 
 /**
@@ -126,7 +132,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
     /**
      * Generates a NekoStack with the [context].
      *
-     * @param prototype the item blueprint
+     * @param prototype the item archetype
      * @param context the input context
      * @return a new NekoStack
      */

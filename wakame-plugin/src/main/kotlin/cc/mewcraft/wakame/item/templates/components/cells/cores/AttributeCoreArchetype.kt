@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -15,17 +15,17 @@ import java.util.stream.Stream
 
 
 /**
- * 从配置文件构建 [AttributeCoreBlueprint].
+ * 从配置文件构建 [AttributeCoreArchetype].
  *
- * @param id 核心的唯一标识, 也就是 [CoreBlueprint.id]
+ * @param id 核心的唯一标识, 也就是 [CoreArchetype.id]
  * @param node 包含该核心数据的配置节点
  *
- * @return 从配置文件构建的 [AttributeCoreBlueprint]
+ * @return 从配置文件构建的 [AttributeCoreArchetype]
  */
-fun AttributeCoreBlueprint(
+fun AttributeCoreArchetype(
     id: Key,
     node: ConfigurationNode,
-): AttributeCoreBlueprint = SimpleAttributeCoreBlueprint(
+): AttributeCoreArchetype = SimpleAttributeCoreArchetype(
     id = id,
     attribute = AttributeRegistry.FACADES[id.value()].convertNode2Variable(node)
 )
@@ -33,7 +33,7 @@ fun AttributeCoreBlueprint(
 /**
  * 代表属性核心 [AttributeCore] 的模板.
  */
-interface AttributeCoreBlueprint : CoreBlueprint {
+interface AttributeCoreArchetype : CoreArchetype {
     /**
      * 属性核心的模板.
      */
@@ -49,12 +49,12 @@ interface AttributeCoreBlueprint : CoreBlueprint {
 }
 
 /**
- * [AttributeCoreBlueprint] 的标准实现.
+ * [AttributeCoreArchetype] 的标准实现.
  */
-internal class SimpleAttributeCoreBlueprint(
+internal class SimpleAttributeCoreArchetype(
     override val id: Key,
     override val attribute: VariableCompositeAttribute,
-) : AttributeCoreBlueprint {
+) : AttributeCoreArchetype {
     override fun generate(context: ItemGenerationContext): AttributeCore {
         val (attribute, scores) = attribute.generate(context)
         return AttributeCore(id, attribute, scores.mapToArray(AttributeCore.Quality::fromZScore))

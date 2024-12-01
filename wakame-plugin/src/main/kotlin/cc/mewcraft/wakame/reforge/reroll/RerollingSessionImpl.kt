@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
@@ -308,7 +308,7 @@ internal object Selection {
         session: RerollingSession,
         id: String,
         rule: RerollingTable.CellRule,
-        template: Group<CoreBlueprint, ItemGenerationContext>,
+        template: Group<CoreArchetype, ItemGenerationContext>,
     ): RerollingSession.Selection {
         return Simple(session, id, rule, template)
     }
@@ -321,7 +321,7 @@ internal object Selection {
             get() = RerollingTable.CellRule.empty()
         override val changeable: Boolean
             get() = false
-        override val template: Group<CoreBlueprint, ItemGenerationContext>
+        override val template: Group<CoreArchetype, ItemGenerationContext>
             get() = Group.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
@@ -337,7 +337,7 @@ internal object Selection {
         override val session: RerollingSession,
         override val id: String,
         override val rule: RerollingTable.CellRule,
-        override val template: Group<CoreBlueprint, ItemGenerationContext>,
+        override val template: Group<CoreArchetype, ItemGenerationContext>,
     ) : RerollingSession.Selection, KoinComponent {
         private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)

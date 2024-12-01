@@ -5,13 +5,15 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreBlueprint
-import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
-import cc.mewcraft.wakame.item.templates.components.cells.cores.SkillCoreBlueprint
-import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
+import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
+import cc.mewcraft.wakame.item.templates.components.cells.cores.SkillCoreArchetype
+import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreArchetype
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
@@ -31,11 +33,17 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.namespace
+import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.value
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -46,7 +54,7 @@ import java.nio.file.Path
 /**
  * 代表一个 [核心][Core] 的模板.
  */
-interface CoreBlueprint : Examinable {
+interface CoreArchetype : Examinable {
     /**
      * 核心的唯一标识. 主要用于序列化实现.
      *
@@ -68,28 +76,28 @@ interface CoreBlueprint : Examinable {
 }
 
 /**
- * [CoreBlueprint] 的序列化器.
+ * [CoreArchetype] 的序列化器.
  */
-internal object CoreBlueprintSerializer : TypeSerializer<CoreBlueprint> {
-    override fun deserialize(type: Type, node: ConfigurationNode): CoreBlueprint {
+internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
+    override fun deserialize(type: Type, node: ConfigurationNode): CoreArchetype {
         val type1 = node.node("type").krequire<Key>()
         val core = when {
             type1 == GenericKeys.NOOP -> {
-                VirtualCoreBlueprint
+                VirtualCoreArchetype
             }
 
             type1 == GenericKeys.EMPTY -> {
-                EmptyCoreBlueprint
+                EmptyCoreArchetype
             }
 
             type1.namespace() == Namespaces.ATTRIBUTE -> {
                 val attributeId = type1
-                AttributeCoreBlueprint(attributeId, node)
+                AttributeCoreArchetype(attributeId, node)
             }
 
             type1.namespace() == Namespaces.SKILL -> {
                 val skillId = type1
-                SkillCoreBlueprint(skillId, node)
+                SkillCoreArchetype(skillId, node)
             }
 
             // 大概是配置文件写错了
@@ -103,15 +111,15 @@ internal object CoreBlueprintSerializer : TypeSerializer<CoreBlueprint> {
 }
 
 /**
- * [CoreBlueprint] 的 [Pool].
+ * [CoreArchetype] 的 [Pool].
  */
-internal class CoreBlueprintPool(
+internal class CoreArchetypePool(
     override val amount: Long,
-    override val samples: NodeContainer<Sample<CoreBlueprint, ItemGenerationContext>>,
+    override val samples: NodeContainer<Sample<CoreArchetype, ItemGenerationContext>>,
     override val filters: NodeContainer<Filter<ItemGenerationContext>>,
     override val isReplacement: Boolean,
-) : Pool<CoreBlueprint, ItemGenerationContext>() {
-    override fun whenSelect(value: CoreBlueprint, context: ItemGenerationContext) {
+) : Pool<CoreArchetype, ItemGenerationContext>() {
+    override fun whenSelect(value: CoreArchetype, context: ItemGenerationContext) {
         // context writes are delayed after the template is realized
     }
 }
@@ -145,17 +153,17 @@ internal class CoreBlueprintPool(
  *       value: 23
  * ```
  */
-internal object CoreBlueprintPoolSerializer : KoinComponent, PoolSerializer<CoreBlueprint, ItemGenerationContext>() {
-    override val sampleNodeFacade by inject<CoreBlueprintSampleNodeFacade>()
+internal object CoreArchetypePoolSerializer : KoinComponent, PoolSerializer<CoreArchetype, ItemGenerationContext>() {
+    override val sampleNodeFacade by inject<CoreArchetypeSampleNodeFacade>()
     override val filterNodeFacade by inject<ItemFilterNodeFacade>()
 
     override fun poolConstructor(
         amount: Long,
-        samples: NodeContainer<Sample<CoreBlueprint, ItemGenerationContext>>,
+        samples: NodeContainer<Sample<CoreArchetype, ItemGenerationContext>>,
         filters: NodeContainer<Filter<ItemGenerationContext>>,
         isReplacement: Boolean,
-    ): Pool<CoreBlueprint, ItemGenerationContext> {
-        return CoreBlueprintPool(
+    ): Pool<CoreArchetype, ItemGenerationContext> {
+        return CoreArchetypePool(
             amount = amount,
             samples = samples,
             filters = filters,
@@ -165,18 +173,18 @@ internal object CoreBlueprintPoolSerializer : KoinComponent, PoolSerializer<Core
 }
 
 /**
- * [CoreBlueprint] 的 [cc.mewcraft.wakame.random3.Group] 的序列化器.
+ * [CoreArchetype] 的 [cc.mewcraft.wakame.random3.Group] 的序列化器.
  */
-internal object CoreBlueprintGroupSerializer : KoinComponent, GroupSerializer<CoreBlueprint, ItemGenerationContext>() {
+internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<CoreArchetype, ItemGenerationContext>() {
     override val filterNodeFacade by inject<ItemFilterNodeFacade>()
 
-    override fun poolConstructor(node: ConfigurationNode): Pool<CoreBlueprint, ItemGenerationContext> {
-        return node.krequire<Pool<CoreBlueprint, ItemGenerationContext>>()
+    override fun poolConstructor(node: ConfigurationNode): Pool<CoreArchetype, ItemGenerationContext> {
+        return node.krequire<Pool<CoreArchetype, ItemGenerationContext>>()
     }
 }
 
 /**
- * 封装了类型 [CoreBlueprint] 所需要的所有 [Node] 相关的实现.
+ * 封装了类型 [CoreArchetype] 所需要的所有 [Node] 相关的实现.
  */
 @PreWorldDependency(
     runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
@@ -186,39 +194,39 @@ internal object CoreBlueprintGroupSerializer : KoinComponent, GroupSerializer<Co
     runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
     runAfter = [ItemRegistry::class]
 )
-internal class CoreBlueprintSampleNodeFacade(
+internal class CoreArchetypeSampleNodeFacade(
     override val dataDir: Path,
-) : SampleNodeFacade<CoreBlueprint, ItemGenerationContext>(), Initializable {
+) : SampleNodeFacade<CoreArchetype, ItemGenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(SKILL_EXTERNALS)))
-        kregister(CoreBlueprintSerializer)
+        kregister(CoreArchetypeSerializer)
         kregister(FilterSerializer)
     }.build()
-    override val repository: NodeRepository<Sample<CoreBlueprint, ItemGenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<CoreBlueprint> = typeTokenOf()
+    override val repository: NodeRepository<Sample<CoreArchetype, ItemGenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<CoreArchetype> = typeTokenOf()
     override val filterNodeFacade: ItemFilterNodeFacade by inject()
 
-    override fun decodeSampleData(node: ConfigurationNode): CoreBlueprint {
-        return node.krequire<CoreBlueprint>()
+    override fun decodeSampleData(node: ConfigurationNode): CoreArchetype {
+        return node.krequire<CoreArchetype>()
     }
 
-    override fun intrinsicFilters(value: CoreBlueprint): Collection<Filter<ItemGenerationContext>> {
+    override fun intrinsicFilters(value: CoreArchetype): Collection<Filter<ItemGenerationContext>> {
         val filter = when (value) {
             // A noop core should always return true
-            is VirtualCoreBlueprint -> {
+            is VirtualCoreArchetype -> {
                 Filter.alwaysTrue()
             }
 
             // An empty core should always return true
-            is EmptyCoreBlueprint -> {
+            is EmptyCoreArchetype -> {
                 Filter.alwaysTrue()
             }
 
             // By design, an attribute is considered generated
             // if there is already an attribute with all the same
             // key, operation and element in the selection context.
-            is AttributeCoreBlueprint -> {
+            is AttributeCoreArchetype -> {
                 val attributeId = value.id.value()
                 val attribute = value.attribute
                 AttributeFilter(true, attributeId, attribute.operation, attribute.element)
@@ -227,7 +235,7 @@ internal class CoreBlueprintSampleNodeFacade(
             // By design, a skill is considered generated
             // if there is already a skill with the same key
             // in the selection context, ignoring the trigger.
-            is SkillCoreBlueprint -> {
+            is SkillCoreArchetype -> {
                 val skillId = value.id
                 SkillFilter(true, skillId)
             }

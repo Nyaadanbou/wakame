@@ -9,7 +9,17 @@ import cc.mewcraft.wakame.attribute.AttributeGetter
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeSE
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.Element
@@ -175,7 +185,7 @@ interface CompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableC
     val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
 
     /**
-     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreBlueprint].
+     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype].
      */
     val convertNode2Variable: (ConfigurationNode) -> S
 

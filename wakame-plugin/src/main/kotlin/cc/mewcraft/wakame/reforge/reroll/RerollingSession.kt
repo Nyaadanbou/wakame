@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
@@ -184,7 +184,7 @@ interface RerollingSession : Examinable {
         /**
          * 用于重新随机核孔核心的掉落表.
          */
-        val template: Group<CoreBlueprint, ItemGenerationContext>
+        val template: Group<CoreArchetype, ItemGenerationContext>
 
         /**
          * 核孔花费的计算函数.
