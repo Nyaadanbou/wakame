@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
@@ -19,7 +23,7 @@ data class ItemDamage(
     override val componentType: ItemComponentType<Int> = ItemComponentTypes.DAMAGE
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<Int> {
-        val damage = this.damage.calculate().toStableInt()
+        val damage = this.damage.calculate().component1().toStableInt()
         return ItemGenerationResult.of(damage)
     }
 

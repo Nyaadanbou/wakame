@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.*
+import cc.mewcraft.wakame.BinarySerializable
+import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.*
+import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
+import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
+import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.Examinable
 
 
 /**
@@ -25,7 +29,7 @@ val Core.isEmpty: Boolean
 /**
  * 代表一个核孔中的核心. 核心是 [核孔][Cell] 中提供具体效果的东西.
  */
-interface Core : Examinable, BinarySerializable<CompoundTag> {
+interface Core : BinarySerializable<CompoundTag> {
     /**
      * 核心的唯一标识. 主要用于序列化实现.
      *
@@ -87,6 +91,38 @@ interface AttributeCore : Core {
      * 该属性核心的属性种类及其数值.
      */
     val attribute: ConstantCompositeAttribute
+
+    /**
+     * 该属性核心的数值质量.
+     * 并不是每个属性核心都有数值质量,
+     * 当 [quality] 为 `null` 时, 表示该属性核心没有数值质量.
+     */
+    val quality: Array<Quality>?
+
+    /**
+     * 属性核心的“数值质量”.
+     * [Quality.ordinal] 越小则数值质量越差, 反之越好.
+     */
+    enum class Quality {
+        L3, L2, L1, MU, H1, H2, H3;
+
+        companion object {
+            /**
+             * 从正态分布的 Z-score 转换为 [Quality].
+             */
+            fun fromZScore(score: Double): Quality {
+                return when {
+                    score < -3.0 -> L3
+                    score < -2.0 -> L2
+                    score < -1.0 -> L1
+                    score < 1.0 -> MU
+                    score < 2.0 -> H1
+                    score < 3.0 -> H2
+                    else -> H3
+                }
+            }
+        }
+    }
 }
 
 /**

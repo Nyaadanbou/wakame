@@ -108,6 +108,11 @@ data class RandomizedValue(
         }
     }
 
+    data class Result(
+        val value: Double,
+        val score: Double,
+    )
+
     companion object Factory {
         /**
          * Creates an instance from a string.
@@ -159,7 +164,7 @@ data class RandomizedValue(
      *     Z-score in the context of normal distribution
      * @return the calculated value
      */
-    fun calculate(scalingFactor: Double = .0, randomVariable: Double = ThreadLocalRandom.current().nextGaussian()): Double {
+    fun calculate(scalingFactor: Double = .0, randomVariable: Double = ThreadLocalRandom.current().nextGaussian()): Result {
         // The mean (mu), the center of the distribution
         val scaledBase = base + (scale * scalingFactor)
 
@@ -195,10 +200,13 @@ data class RandomizedValue(
         }
         val spread = spread0
 
-        // Since the mean (mu) might be scaled,
-        // we can't simply do `x = z * sigma + mu`.
-        // Instead, we calculate the relative value:
-        return scaledBase * (1 + spread)
+        return Result(
+            // Since the mean (mu) might be scaled,
+            // we can't simply do `x = z * sigma + mu`.
+            // Instead, we calculate the relative value:
+            value = scaledBase * (1 + spread),
+            score = randomVariable
+        )
     }
 
     /**
@@ -209,7 +217,7 @@ data class RandomizedValue(
      * given [Numbers][Number] values are converted to [Double] values using
      * [Number.toDouble].
      */
-    fun calculate(scalingFactor: Number = .0, randomVariable: Number = ThreadLocalRandom.current().nextGaussian()): Double {
+    fun calculate(scalingFactor: Number = .0, randomVariable: Number = ThreadLocalRandom.current().nextGaussian()): Result {
         return calculate(scalingFactor = scalingFactor.toDouble(), randomVariable = randomVariable.toDouble())
     }
 
@@ -219,7 +227,7 @@ data class RandomizedValue(
      * This is equivalent to calling [calculate] with [scaling factor] **zero**
      * and a random variable from the standard normal distribution.
      */
-    fun calculate(): Double {
+    fun calculate(): Result {
         return calculate(.0)
     }
 }

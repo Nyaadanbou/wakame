@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.collections.mapToArray
 import java.util.stream.Stream
 
 
@@ -23,12 +24,11 @@ import java.util.stream.Stream
  */
 fun AttributeCoreBlueprint(
     id: Key,
-    node: ConfigurationNode
-): AttributeCoreBlueprint {
-    val compositeAttributeId = id.value()
-    val compositeAttribute = AttributeRegistry.FACADES[compositeAttributeId].convertNode2Variable(node)
-    return SimpleAttributeCoreBlueprint(id, compositeAttribute)
-}
+    node: ConfigurationNode,
+): AttributeCoreBlueprint = SimpleAttributeCoreBlueprint(
+    id = id,
+    attribute = AttributeRegistry.FACADES[id.value()].convertNode2Variable(node)
+)
 
 /**
  * 代表属性核心 [AttributeCore] 的模板.
@@ -56,8 +56,8 @@ internal class SimpleAttributeCoreBlueprint(
     override val attribute: VariableCompositeAttribute,
 ) : AttributeCoreBlueprint {
     override fun generate(context: ItemGenerationContext): AttributeCore {
-        val compositeAttribute = attribute.generate(context)
-        return AttributeCore(id, compositeAttribute)
+        val (attribute, scores) = attribute.generate(context)
+        return AttributeCore(id, attribute, scores.mapToArray(AttributeCore.Quality::fromZScore))
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> {

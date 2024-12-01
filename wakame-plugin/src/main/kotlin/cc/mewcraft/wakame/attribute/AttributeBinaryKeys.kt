@@ -6,4 +6,5 @@ object AttributeBinaryKeys {
     const val RANGED_MAX_VALUE = "max"
     const val ELEMENT_TYPE = "elem"
     const val OPERATION_TYPE = "op"
+    const val QUALITY = "qual"
 }

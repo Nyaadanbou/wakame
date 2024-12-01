@@ -2,17 +2,17 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.CoreConstants
+import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.stream.Stream
 
 val Cell.skillCore: SkillCore?
     get() = getCore() as? SkillCore
@@ -90,14 +90,6 @@ internal data class SimpleSkillCore(
         baseTag.merge(skillTag)
 
         return baseTag
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(ExaminableProperty.of("id", id))
-    }
-
-    override fun toString(): String {
-        return toSimpleString()
     }
 
     companion object Shared {

@@ -1,15 +1,19 @@
 package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.nbt.TagType
+import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.CoreConstants
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.stream.Stream
+import xyz.xenondevs.commons.collections.mapToArray
+import xyz.xenondevs.commons.collections.mapToByteArray
 
 val Cell.attributeCore: AttributeCore?
     get() = getCore() as? AttributeCore
@@ -28,9 +32,12 @@ val Cell.attribute: ConstantCompositeAttribute?
 fun AttributeCore(
     id: Key,
     attribute: ConstantCompositeAttribute,
-): AttributeCore {
-    return SimpleAttributeCore(id, attribute)
-}
+    quality: Array<AttributeCore.Quality>?,
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = attribute,
+    quality = quality
+)
 
 /**
  * 本函数用于从 NBT 构建 [AttributeCore].
@@ -45,12 +52,11 @@ fun AttributeCore(
 fun AttributeCore(
     id: Key,
     nbt: CompoundTag,
-): AttributeCore {
-    val compositeAttributeId = id.value()
-    val compositeAttributeFacade = AttributeRegistry.FACADES[compositeAttributeId]
-    val compositeAttribute = compositeAttributeFacade.convertNBT2Constant(nbt)
-    return SimpleAttributeCore(id, compositeAttribute)
-}
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = AttributeRegistry.FACADES[id.value()].convertNBT2Constant(nbt),
+    quality = nbt.readQuality()
+)
 
 /**
  * 本函数用于从配置文件构建 [AttributeCore].
@@ -65,12 +71,11 @@ fun AttributeCore(
 fun AttributeCore(
     id: Key,
     node: ConfigurationNode,
-): AttributeCore {
-    val compositeAttributeId = id.value()
-    val compositeAttributeFacade = AttributeRegistry.FACADES[compositeAttributeId]
-    val compositeAttribute = compositeAttributeFacade.convertNode2Constant(node)
-    return SimpleAttributeCore(id, compositeAttribute)
-}
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = AttributeRegistry.FACADES[id.value()].convertNode2Constant(node),
+    quality = null // 从配置文件直接创建的属性核心应该不存在数值质量
+)
 
 /**
  * [AttributeCore] 的标准实现.
@@ -78,6 +83,7 @@ fun AttributeCore(
 internal data class SimpleAttributeCore(
     override val id: Key,
     override val attribute: ConstantCompositeAttribute,
+    override val quality: Array<AttributeCore.Quality>?,
 ) : AttributeCore {
     override val displayName: Component
         get() = attribute.displayName
@@ -102,18 +108,53 @@ internal data class SimpleAttributeCore(
         val baseTag = CompoundTag.create()
         baseTag.writeId(id)
         baseTag.merge(attributeTag)
+        baseTag.writeQuality(quality)
 
         return baseTag
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id.asString()),
-        ExaminableProperty.of("attribute", attribute),
-    )
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        if (javaClass != other?.javaClass)
+            return false
+        other as SimpleAttributeCore
+        if (id != other.id)
+            return false
+        if (attribute != other.attribute)
+            return false
+        if (!quality.contentEquals(other.quality))
+            return false
+        if (displayName != other.displayName)
+            return false
+        if (description != other.description)
+            return false
+        return true
+    }
 
-    override fun toString(): String = toSimpleString()
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + attribute.hashCode()
+        result = 31 * result + (quality?.contentHashCode() ?: 0)
+        result = 31 * result + displayName.hashCode()
+        result = 31 * result + description.hashCode()
+        return result
+    }
 }
 
 private fun CompoundTag.writeId(id: Key) {
     putString(CoreConstants.NBT_CORE_ID, id.asString())
+}
+
+private fun CompoundTag.readQuality(): Array<AttributeCore.Quality>? {
+    if (!contains(AttributeBinaryKeys.QUALITY, TagType.BYTE_ARRAY))
+        return null
+    @Suppress("UNCHECKED_CAST")
+    return getByteArray(AttributeBinaryKeys.QUALITY).mapToArray { AttributeCore.Quality.entries[it.toInt()] } as Array<AttributeCore.Quality>
+}
+
+private fun CompoundTag.writeQuality(quality: Array<AttributeCore.Quality>?) {
+    if (quality == null)
+        return
+    putByteArray(AttributeBinaryKeys.QUALITY, quality.mapToByteArray { it.ordinal.toByte() })
 }

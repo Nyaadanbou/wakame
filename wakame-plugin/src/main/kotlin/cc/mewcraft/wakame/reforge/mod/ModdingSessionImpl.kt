@@ -577,7 +577,7 @@ private object ReforgeReplace {
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = usableInput.reforgeHistory.modCount
             if (modCount >= itemRule.modLimit) {
-                return ReforgeReplaceResult.failure("<gray>核孔已消磨殆尽.".mini)
+                return ReforgeReplaceResult.failure("<gray>物品已消磨殆尽.".mini)
             }
 
             // 全部检查通过!

@@ -1,8 +1,13 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -71,18 +76,12 @@ private constructor(
 
         val attribute = core1.attribute
 
-        val resultOp = attribute.operation
-        val resultType = MergingTable.NumberMergeFunction.Type.by(resultOp)
-        val resultValue = session.numberMergeFunction(resultType).evaluate()
-        val resultCore = when (attribute /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantCompositeAttributeS -> {
-                AttributeCore(id = core1.id, attribute = attribute.copy(value = resultValue))
-            }
-
-            is ConstantCompositeAttributeSE -> {
-                AttributeCore(id = core1.id, attribute = attribute.copy(value = resultValue))
-            }
-
+        val resultedOp = attribute.operation
+        val resultedType = MergingTable.NumberMergeFunction.Type.by(resultedOp)
+        val resultedValue = session.numberMergeFunction(resultedType).evaluate()
+        val resultedCore = when (attribute /* 或者用 core2, 结果上没有区别 */) {
+            is ConstantCompositeAttributeS -> AttributeCore(id = core1.id, attribute = attribute.copy(value = resultedValue), quality = null)
+            is ConstantCompositeAttributeSE -> AttributeCore(id = core1.id, attribute = attribute.copy(value = resultedValue), quality = null)
             is ConstantCompositeAttributeR,
             is ConstantCompositeAttributeRE,
                 -> {
@@ -90,21 +89,21 @@ private constructor(
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心
                 // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种
                 // - 拥有两个数值的核心也许本来就是个设计错误...
-                logger.info("Trying to merge cores with multiple value structure.")
+                logger.info("Trying to merge cores with multi-value structure.")
                 return ReforgeResult.failure("<gray>核心无法合并.".mini)
             }
         }
 
-        val resultPenalty = session.outputPenaltyFunction.evaluate().let(::ceil).toInt()
+        val resultedPenalty = session.outputPenaltyFunction.evaluate().let(::ceil).toInt()
 
         // 合并后的惩罚值必须低于工作台指定的值
-        if (resultPenalty > session.table.maxOutputItemPenalty) {
+        if (resultedPenalty > session.table.maxOutputItemPenalty) {
             logger.info("Trying to merge cores with too high penalty.")
             return ReforgeResult.failure("<gray>过于昂贵!".mini)
         }
 
-        val resultLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
-        val resultRarity = run {
+        val resultedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
+        val resultedRarity = run {
             // 选取权重较高的稀有度作为结果的稀有度
             val rarity1 = inputItem1.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
             val rarity2 = inputItem2.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
@@ -112,17 +111,17 @@ private constructor(
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改
-        val outputItem = inputItem1
+        val resultedItem = inputItem1
 
-        outputItem.components.set(ItemComponentTypes.LEVEL, ItemLevel(resultLevel))
-        outputItem.components.set(ItemComponentTypes.RARITY, ItemRarity(resultRarity))
-        outputItem.components.set(ItemComponentTypes.PORTABLE_CORE, PortableCore(resultCore, resultPenalty))
+        resultedItem.components.set(ItemComponentTypes.LEVEL, ItemLevel(resultedLevel))
+        resultedItem.components.set(ItemComponentTypes.RARITY, ItemRarity(resultedRarity))
+        resultedItem.components.set(ItemComponentTypes.PORTABLE_CORE, PortableCore(resultedCore, resultedPenalty))
 
         val totalCost = session.currencyCostFunction.evaluate()
 
         return ReforgeResult.success(
-            item = outputItem,
-            type = ReforgeType.success(resultOp),
+            item = resultedItem,
+            type = ReforgeType.success(resultedOp),
             cost = ReforgeCost.success(totalCost)
         )
     }

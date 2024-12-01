@@ -2,18 +2,19 @@ package cc.mewcraft.wakame.attribute.composite
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeModifier.*
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.getByteOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.stream.Stream
 
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
@@ -118,7 +119,7 @@ fun ConstantCompositeAttribute(
 /**
  * 代表一个数值恒定的 [CompositeAttribute].
  */
-sealed class ConstantCompositeAttribute : Examinable, BinarySerializable<CompoundTag>, CompositeAttribute, AttributeModifierSource {
+sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, CompositeAttribute, AttributeModifierSource {
 
     val displayName: Component
         get() = AttributeRegistry.FACADES[id].createTooltipName(this)
@@ -143,13 +144,6 @@ sealed class ConstantCompositeAttribute : Examinable, BinarySerializable<Compoun
     override fun provideAttributeModifiers(sourceId: Key): Map<Attribute, AttributeModifier> {
         return AttributeRegistry.FACADES[id].createAttributeModifiers(sourceId, this)
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id),
-        ExaminableProperty.of("operation", operation),
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 internal data class ConstantCompositeAttributeS(
@@ -162,7 +156,7 @@ internal data class ConstantCompositeAttributeS(
     ) : this(
         id,
         compound.readOperation(),
-        compound.readNumber(AttributeBinaryKeys.SINGLE_VALUE)
+        compound.readNumber(AttributeBinaryKeys.SINGLE_VALUE),
     )
 
     override fun similarTo(other: ConstantCompositeAttribute): Boolean {
@@ -175,13 +169,6 @@ internal data class ConstantCompositeAttributeS(
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("value", value),
-        )
-    )
 }
 
 internal data class ConstantCompositeAttributeR(
@@ -196,7 +183,7 @@ internal data class ConstantCompositeAttributeR(
         id,
         compound.readOperation(),
         compound.readNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
-        compound.readNumber(AttributeBinaryKeys.RANGED_MAX_VALUE)
+        compound.readNumber(AttributeBinaryKeys.RANGED_MAX_VALUE),
     )
 
     override fun similarTo(other: ConstantCompositeAttribute): Boolean {
@@ -210,14 +197,6 @@ internal data class ConstantCompositeAttributeR(
         writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("lower", lower),
-            ExaminableProperty.of("upper", upper),
-        )
-    )
 }
 
 internal data class ConstantCompositeAttributeSE(
@@ -232,7 +211,7 @@ internal data class ConstantCompositeAttributeSE(
         id,
         compound.readOperation(),
         compound.readNumber(AttributeBinaryKeys.SINGLE_VALUE),
-        compound.readElement()
+        compound.readElement(),
     )
 
     override fun similarTo(other: ConstantCompositeAttribute): Boolean {
@@ -247,14 +226,6 @@ internal data class ConstantCompositeAttributeSE(
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         writeElement(element)
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("value", value),
-            ExaminableProperty.of("element", element.uniqueId),
-        )
-    )
 }
 
 internal data class ConstantCompositeAttributeRE(
@@ -271,7 +242,7 @@ internal data class ConstantCompositeAttributeRE(
         compound.readOperation(),
         compound.readNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
         compound.readNumber(AttributeBinaryKeys.RANGED_MAX_VALUE),
-        compound.readElement()
+        compound.readElement(),
     )
 
     override fun similarTo(other: ConstantCompositeAttribute): Boolean {
@@ -287,22 +258,7 @@ internal data class ConstantCompositeAttributeRE(
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
         writeElement(element)
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.concat(
-        super.examinableProperties(),
-        Stream.of(
-            ExaminableProperty.of("lower", lower),
-            ExaminableProperty.of("upper", upper),
-            ExaminableProperty.of("element", element.uniqueId),
-        )
-    )
 }
-
-// private const val NBT_TYPE_ID = "id"
-
-// private fun CompoundTag.readType(): Key {
-//     return Key(this.getString(NBT_TYPE_ID))
-// }
 
 private fun CompoundTag.readElement(): Element {
     return this.getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
@@ -310,16 +266,12 @@ private fun CompoundTag.readElement(): Element {
 
 private fun CompoundTag.readOperation(): Operation {
     val id = this.getInt(AttributeBinaryKeys.OPERATION_TYPE)
-    return Operation.byId(id) ?: error("Can't find operation with id '$id'")
+    return Operation.byId(id) ?: error("No such operation with id: $id")
 }
 
 private fun CompoundTag.readNumber(key: String): Double {
     return this.getDouble(key)
 }
-
-// private fun CompoundTag.writeId(id: Key) {
-//     this.putString(NBT_TYPE_ID, id.asString())
-// }
 
 private fun CompoundTag.writeNumber(key: String, value: Double) {
     this.putDouble(key, value)

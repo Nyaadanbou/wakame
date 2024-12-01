@@ -4,12 +4,12 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.components.cells.VirtualCore
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.ExaminableProperty
-import java.util.stream.Stream
 
 val Cell.virtualCore: VirtualCore?
     get() = getCore() as? VirtualCore
@@ -28,19 +28,11 @@ internal data object SimpleVirtualCore : VirtualCore {
     override val description: List<Component> by config.entry<List<Component>>("description")
 
     override fun similarTo(other: Core): Boolean {
-        return other === this
+        return other is SimpleVirtualCore
     }
 
     override fun serializeAsTag(): Nothing {
         error("VirtualCore does not support serialization")
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(ExaminableProperty.of("id", id))
-    }
-
-    override fun toString(): String {
-        return toSimpleString()
     }
 }
 
@@ -55,18 +47,10 @@ internal data object SimpleEmptyCore : EmptyCore {
     override val description: List<Component> by config.entry<List<Component>>("description")
 
     override fun similarTo(other: Core): Boolean {
-        return other === this
+        return other is SimpleEmptyCore
     }
 
     override fun serializeAsTag(): CompoundTag {
         return CompoundTag.create()
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(ExaminableProperty.of("id", id))
-    }
-
-    override fun toString(): String {
-        return toSimpleString()
     }
 }

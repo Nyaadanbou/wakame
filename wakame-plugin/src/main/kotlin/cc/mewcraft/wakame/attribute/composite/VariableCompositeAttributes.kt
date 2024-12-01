@@ -5,11 +5,8 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.stream.Stream
+import java.util.Objects
 import kotlin.math.max
 import kotlin.math.min
 
@@ -24,16 +21,42 @@ val VariableCompositeAttribute.element: Element?
  * 本函数用于构建 [VariableCompositeAttribute].
  */
 fun VariableCompositeAttribute(
-    type: String, node: ConfigurationNode
-): VariableCompositeAttribute {
-    return AttributeRegistry.FACADES[type].convertNode2Variable(node)
-}
+    type: String, node: ConfigurationNode,
+): VariableCompositeAttribute = AttributeRegistry.FACADES[type].convertNode2Variable(node)
 
 /**
  * 代表一个数值可以变化的 [CompositeAttribute].
  */
-interface VariableCompositeAttribute : Examinable, CompositeAttribute {
-    fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute
+interface VariableCompositeAttribute : CompositeAttribute {
+    fun generate(context: AttributeGenerationContext): Result
+
+    /**
+     * 封装了 [VariableCompositeAttribute] 的生成结果.
+     *
+     * @property value 生成的 [ConstantCompositeAttribute]
+     * @property score 生成所使用的 Z-score
+     */
+    data class Result(
+        val value: ConstantCompositeAttribute,
+        val score: Array<Double>,
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other)
+                return true
+            if (javaClass != other?.javaClass)
+                return false
+            other as Result
+            if (value != other.value)
+                return false
+            if (!score.contentEquals(other.score))
+                return false
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(value, score.contentHashCode())
+        }
+    }
 }
 
 /**
@@ -61,22 +84,14 @@ internal data class VariableCompositeAttributeR(
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
 ) : VariableCompositeAttribute, CompositeAttributeR<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttributeR {
+    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
-        val lower = lower.calculate(factor)
-        val upper = upper.calculate(factor)
-        return ConstantCompositeAttributeR(id, operation, min(lower, upper), max(lower, upper))
+        val (lower, score1) = lower.calculate(factor)
+        val (upper, score2) = upper.calculate(factor)
+        val attribute = ConstantCompositeAttributeR(id, operation, min(lower, upper), max(lower, upper))
+        return VariableCompositeAttribute.Result(attribute, arrayOf(score1, score2))
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", id),
-        ExaminableProperty.of("operation", operation),
-        ExaminableProperty.of("lower", lower),
-        ExaminableProperty.of("upper", upper)
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 internal data class VariableCompositeAttributeRE(
@@ -86,23 +101,14 @@ internal data class VariableCompositeAttributeRE(
     override val upper: RandomizedValue,
     override val element: Element,
 ) : VariableCompositeAttribute, CompositeAttributeRE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
-        val lower = lower.calculate(factor)
-        val upper = upper.calculate(factor)
-        return ConstantCompositeAttributeRE(id, operation, min(lower, upper), max(lower, upper), element)
+        val (lower, score1) = lower.calculate(factor)
+        val (upper, score2) = upper.calculate(factor)
+        val attribute = ConstantCompositeAttributeRE(id, operation, min(lower, upper), max(lower, upper), element)
+        return VariableCompositeAttribute.Result(attribute, arrayOf(score1, score2))
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", id),
-        ExaminableProperty.of("operation", operation),
-        ExaminableProperty.of("lower", lower),
-        ExaminableProperty.of("upper", upper),
-        ExaminableProperty.of("element", element),
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 internal data class VariableCompositeAttributeS(
@@ -110,20 +116,13 @@ internal data class VariableCompositeAttributeS(
     override val operation: Operation,
     override val value: RandomizedValue,
 ) : VariableCompositeAttribute, CompositeAttributeS<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
-        val value = value.calculate(factor)
-        return ConstantCompositeAttributeS(id, operation, value)
+        val (value, score) = value.calculate(factor)
+        val attribute = ConstantCompositeAttributeS(id, operation, value)
+        return VariableCompositeAttribute.Result(attribute, arrayOf(score))
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", id),
-        ExaminableProperty.of("operation", operation),
-        ExaminableProperty.of("value", value),
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 internal data class VariableCompositeAttributeSE(
@@ -132,21 +131,13 @@ internal data class VariableCompositeAttributeSE(
     override val value: RandomizedValue,
     override val element: Element,
 ) : VariableCompositeAttribute, CompositeAttributeSE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
-        val value = value.calculate(factor)
-        return ConstantCompositeAttributeSE(id, operation, value, element)
+        val (value, score) = value.calculate(factor)
+        val attribute = ConstantCompositeAttributeSE(id, operation, value, element)
+        return VariableCompositeAttribute.Result(attribute, arrayOf(score))
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("type", id),
-        ExaminableProperty.of("operation", operation),
-        ExaminableProperty.of("value", value),
-        ExaminableProperty.of("element", element),
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 private fun VariableCompositeAttribute.populateContextWithDefault(context: AttributeGenerationContext) {
