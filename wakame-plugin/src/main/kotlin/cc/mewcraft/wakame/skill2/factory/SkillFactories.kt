@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill2.factory
 
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.skill2.factory.implement.Dash
 
 /**
  * 技能工厂的集合. 用于获取用于创建技能的工厂类.
@@ -12,7 +13,7 @@ internal object SkillFactories {
     fun load() {
 //        FACTORIES.register("bloodrage", Bloodrage)
 //        FACTORIES.register("command_execute", CommandExecute)
-//        FACTORIES.register("dash", Dash)
+        FACTORIES.register("dash", Dash)
 //        FACTORIES.register("fly_dash", FlyDash)
 //        FACTORIES.register("kill_entity", KillEntity)
 //        FACTORIES.register("lightning", Lightning)
@@ -23,11 +24,7 @@ internal object SkillFactories {
     }
 
     operator fun get(registryName: String): SkillFactory<*>? {
-        return FACTORIES.find(registryName)
-    }
-
-    private fun SkillFactory<*>.register(id: String) {
-        FACTORIES.register(id, this)
+        return FACTORIES[registryName]
     }
 
 }

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.skill2.factory
 
-import cc.mewcraft.wakame.skill2.SkillFactories
 import cc.mewcraft.wakame.skill2.Skill
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
