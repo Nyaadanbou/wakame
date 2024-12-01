@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.skill.SkillMap
-import cc.mewcraft.wakame.skill.state.SkillState
+import cc.mewcraft.wakame.skill2.SkillMap
+import cc.mewcraft.wakame.skill2.state.SkillState
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty

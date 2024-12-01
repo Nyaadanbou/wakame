@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeGroupSeri
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
+import cc.mewcraft.wakame.skill2.SKILL_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf

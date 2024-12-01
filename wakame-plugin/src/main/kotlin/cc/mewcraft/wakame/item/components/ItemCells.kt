@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.TriggerVariant
+import cc.mewcraft.wakame.skill2.ConfiguredSkill
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.trigger.Trigger
+import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap

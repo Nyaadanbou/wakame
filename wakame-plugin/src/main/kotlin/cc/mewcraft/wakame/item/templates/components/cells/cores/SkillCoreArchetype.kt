@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.SkillContextData
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.ConfiguredSkill
+import cc.mewcraft.wakame.skill2.Skill
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 

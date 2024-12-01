@@ -13,9 +13,9 @@ import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillMap
-import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.SkillMap
+import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import com.google.common.collect.Multimap

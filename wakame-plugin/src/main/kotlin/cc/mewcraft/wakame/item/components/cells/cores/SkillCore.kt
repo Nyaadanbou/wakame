@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreConstants
 import cc.mewcraft.wakame.item.components.cells.SkillCore
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill2.ConfiguredSkill
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component

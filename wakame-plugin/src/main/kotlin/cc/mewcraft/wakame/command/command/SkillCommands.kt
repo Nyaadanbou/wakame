@@ -4,8 +4,12 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.SkillParser
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
+import cc.mewcraft.wakame.skill2.MechanicRecorder
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.character.TargetAdapter
+import cc.mewcraft.wakame.skill2.character.toComposite
+import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.LivingEntity
@@ -21,9 +25,12 @@ import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.jvm.optionals.getOrNull
 
 object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
+    private val mechanicRecorder: MechanicRecorder by inject()
+
     private const val SKILL_LITERAL = "skill"
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
@@ -61,7 +68,7 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    skill.cast(casterPlayer).executeCast()
+                    mechanicRecorder.addMechanic(ImmutableSkillContext(CasterAdapter.adapt(casterPlayer).toComposite(), target, skill = skill))
                 }
             }.buildAndAdd(this)
         }

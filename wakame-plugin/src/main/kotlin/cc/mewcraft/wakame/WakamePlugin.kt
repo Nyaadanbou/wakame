@@ -36,11 +36,9 @@ import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.resource.resourceModule
-import cc.mewcraft.wakame.skill.skillModule
 import cc.mewcraft.wakame.skill2.skill2Module
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
-import cc.mewcraft.wakame.tick.tickModule
 import cc.mewcraft.wakame.user.userModule
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.world.worldModule
@@ -112,11 +110,9 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 registryModule(),
                 resourceModule(),
                 skinModule(),
-                skillModule(),
                 skill2Module(),
                 stationModule(),
                 testModule(),
-                tickModule(),
                 userModule(),
                 worldModule(),
             )

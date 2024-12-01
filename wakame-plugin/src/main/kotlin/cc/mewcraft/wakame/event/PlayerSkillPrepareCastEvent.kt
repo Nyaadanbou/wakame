@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.event
 
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.Target
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.Target
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.event
 
-import cc.mewcraft.wakame.skill.state.SkillStateInfo
+import cc.mewcraft.wakame.skill2.state.SkillStateInfo
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent

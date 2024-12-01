@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken

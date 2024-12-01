@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
 import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
-import cc.mewcraft.wakame.skill.ConfiguredSkill
+import cc.mewcraft.wakame.skill2.ConfiguredSkill
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 

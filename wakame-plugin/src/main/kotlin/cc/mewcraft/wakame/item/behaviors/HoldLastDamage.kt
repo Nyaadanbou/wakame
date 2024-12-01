@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.maxDamage
 import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.Skill
 import net.kyori.adventure.text.Component.text
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player

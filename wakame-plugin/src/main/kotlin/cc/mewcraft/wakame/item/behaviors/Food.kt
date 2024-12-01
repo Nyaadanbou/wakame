@@ -7,13 +7,22 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.MechanicRecorder
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.character.TargetAdapter
+import cc.mewcraft.wakame.skill2.character.toComposite
+import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 interface Food : ItemBehavior {
-    private object Default : Food {
+    private object Default : Food, KoinComponent {
+        private val mechanicRecorder: MechanicRecorder by inject()
+
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
             if (event.isCancelled) {
                 return
@@ -22,7 +31,7 @@ interface Food : ItemBehavior {
             val nekoStack: NekoStack = itemStack.toNekoStack
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
-            skills.forEach { it.cast(player).executeCast() }
+            skills.forEach { mechanicRecorder.addMechanic(ImmutableSkillContext(CasterAdapter.adapt(player).toComposite(), TargetAdapter.adapt(player), nekoStack)) }
         }
     }
 

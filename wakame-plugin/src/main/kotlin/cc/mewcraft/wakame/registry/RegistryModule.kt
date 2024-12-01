@@ -12,11 +12,10 @@ import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill.SKILL_GROUP_SERIALIZERS
-import cc.mewcraft.wakame.skill.SkillSerializer
-import cc.mewcraft.wakame.skill.TriggersConditionsSerializer
-import cc.mewcraft.wakame.skill.factory.SKILL_FACTORY_SERIALIZERS
-import cc.mewcraft.wakame.skill.trigger.SKILL_TRIGGER_SERIALIZERS
+import cc.mewcraft.wakame.skill2.SKILL_GROUP_SERIALIZERS
+import cc.mewcraft.wakame.skill2.SkillSerializer
+import cc.mewcraft.wakame.skill2.trigger.SKILL_TRIGGER_SERIALIZERS
+import cc.mewcraft.wakame.skill2.trigger.TriggersConditionsSerializer
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
@@ -136,7 +135,6 @@ internal fun registryModule(): Module = module {
             registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
-            registerAll(get(named(SKILL_FACTORY_SERIALIZERS)))
             registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
         }
     }
