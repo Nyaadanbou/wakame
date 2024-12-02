@@ -35,26 +35,30 @@ level:
 # id: `merge_input`
 merge_input:
   namespace: reforge
-  # 便携核心的惩罚的渲染格式
-  # 可用标签
-  # <penalty> 惩罚
-  penalty_format: "惩罚: <penalty>"
-  # 内容的整体顺序
-  # - core 是核心的数值描述
-  # - penalty 是其惩罚值的描述
-  overall_ordinal:
-    - core
-    - penalty
+  # 可用标签:
+  # <desc> 属性的描述
+  # <qual> 数值的质量
+  merged: "<desc><qual>"
+  # 属性数值的好坏格式. 按顺序进行如下判断:
+  # 当 z-score <3 或 z-score >3 时, 输出 l3 或 u3
+  # 当 z-score <2 或 z-score >2 时, 输出 l2 或 u2
+  # 当 z-score <1 或 z-score >1 时, 输出 l1 或 u1
+  # 否则, 输出 mu
+  quality:
+    l3: "<red>***</red>"
+    l2: "<red>**</red>"
+    l1: "<red>*</red>"
+    mu: ""
+    u1: "<green>*</green>"
+    u2: "<green>**</green>"
+    u3: "<green>***</green>"
 
 # id: `merge_output`
 merge_output:
   namespace: reforge
-  penalty_format: "惩罚: <penalty>"
-  overall_ordinal:
-    - core
-    - penalty
-  # 便携核心的数值的混淆格式
-  obfuscation:
+  # 输出的属性值的渲染格式
+  # 这里将沿用属性本身的描述, 但支持对数值部分进行混淆
+  attribute_format:
     # 要混淆的模式 (regex)
     pattern: "[+-]?\\d+(\\.\\d+)?"
     # 混淆后的内容
