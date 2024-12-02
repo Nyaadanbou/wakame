@@ -78,7 +78,7 @@ interface MergingTable : Examinable {
      *   第二个属性修饰符的数值
      * ```
      */
-    interface ValueMergeMethod : Examinable {
+    interface ValueMergeMethod {
         fun compile(type: Type, session: MergingSession): Algorithm
 
         fun compile(type: AttributeModifier.Operation, session: MergingSession): Algorithm {
@@ -127,7 +127,7 @@ interface MergingTable : Examinable {
      *   第二个核心的等级
      * ```
      */
-    interface LevelMergeMethod : Examinable {
+    interface LevelMergeMethod {
         /**
          * 编译函数.
          */
@@ -145,7 +145,7 @@ interface MergingTable : Examinable {
      *   第二个核心的惩罚值
      * ```
      */
-    interface PenaltyMergeMethod : Examinable {
+    interface PenaltyMergeMethod {
         /**
          * 编译函数.
          */
@@ -171,7 +171,7 @@ interface MergingTable : Examinable {
      *   第二个物品的惩罚值
      * ```
      */
-    interface CurrencyCost : Examinable {
+    interface CurrencyCost {
         /**
          * 编译函数.
          */

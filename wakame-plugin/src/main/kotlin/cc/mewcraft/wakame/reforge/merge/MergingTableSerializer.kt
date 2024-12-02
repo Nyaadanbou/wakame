@@ -77,10 +77,10 @@ internal object MergingTableSerializer : KoinComponent {
             val outputPenaltyLimit = tableMainConfigNode.node("output_penalty_limit").getInt(0)
             val acceptableCoreMatcher = tableMainConfigNode.node("accepted_cores").krequire<CoreMatchRuleContainer>()
             val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
-            val totalCost = tableMainConfigNode.node("total_cost").krequire<MergingTable.CurrencyCost>()
-            val valueMergeMethod = tableMainConfigNode.node("value_merge_method").krequire<MergingTable.ValueMergeMethod>()
-            val levelMergeMethod = tableMainConfigNode.node("level_merge_method").krequire<MergingTable.LevelMergeMethod>()
-            val penaltyMergeMethod = tableMainConfigNode.node("penalty_merge_method").krequire<MergingTable.PenaltyMergeMethod>()
+            val totalCost = tableMainConfigNode.node("total_cost").krequire<SimpleMergingTable.CurrencyCost>()
+            val valueMergeMethod = tableMainConfigNode.node("value_merge_method").krequire<SimpleMergingTable.ValueMergeMethod>()
+            val levelMergeMethod = tableMainConfigNode.node("level_merge_method").krequire<SimpleMergingTable.LevelMergeMethod>()
+            val penaltyMergeMethod = tableMainConfigNode.node("penalty_merge_method").krequire<SimpleMergingTable.PenaltyMergeMethod>()
         }
 
         return SimpleMergingTable(

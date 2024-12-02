@@ -116,56 +116,36 @@ internal class SimpleMergingTable(
             val meanFunction = mocha.prepareEval(data.base)
             return MergingTable.ValueMergeMethod.Algorithm(data, meanFunction)
         }
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("methods", methods)
-        )
-
-        override fun toString(): String = toSimpleString()
     }
 
     @ConfigSerializable
-    class LevelMergeMethod(
+    data class LevelMergeMethod(
         @Setting(nodeFromParent = true)
         private val code: String,
     ) : MergingTable.LevelMergeMethod {
-
         override fun compile(session: MergingSession): MochaFunction {
             val mocha = MochaEngine.createStandard()
             val query = OutputLevelBinding(session)
             mocha.bindInstance(query, "query")
             return mocha.prepareEval(code)
         }
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("code", code)
-        )
-
-        override fun toString(): String = toSimpleString()
     }
 
     @ConfigSerializable
-    class PenaltyMergeMethod(
+    data class PenaltyMergeMethod(
         @Setting(nodeFromParent = true)
         private val code: String,
     ) : MergingTable.PenaltyMergeMethod {
-
         override fun compile(session: MergingSession): MochaFunction {
             val mocha = MochaEngine.createStandard()
             val query = OutputPenaltyBinding(session)
             mocha.bindInstance(query, "query")
             return mocha.prepareEval(code)
         }
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("code", code)
-        )
-
-        override fun toString(): String = toSimpleString()
     }
 
     @ConfigSerializable
-    class CurrencyCost(
+    data class CurrencyCost(
         @Setting(nodeFromParent = true)
         private val code: String,
     ) : MergingTable.CurrencyCost {
@@ -175,12 +155,6 @@ internal class SimpleMergingTable(
             mocha.bindInstance(query, "query")
             return mocha.prepareEval(code)
         }
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("code", code),
-        )
-
-        override fun toString(): String = toSimpleString()
     }
 }
 
