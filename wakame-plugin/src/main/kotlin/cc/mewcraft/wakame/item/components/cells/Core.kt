@@ -185,7 +185,7 @@ object CoreFactory {
 
             // 无法识别 NBT
             else -> {
-                throw IllegalArgumentException("Failed to parse NBT tag ${tag.asString()}")
+                throw IllegalArgumentException("failed to parse NBT tag ${tag.asString()}")
             }
         }
 
