@@ -24,7 +24,8 @@ data class ItemMaxDamage(
     override val componentType: ItemComponentType<Int> = ItemComponentTypes.MAX_DAMAGE
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<Int> {
-        val maxDamage = this.maxDamage.calculate().component1().toStableInt()
+        val (value, _) = this.maxDamage.calculate()
+        val maxDamage = value.toStableInt()
         return ItemGenerationResult.of(maxDamage)
     }
 

@@ -23,7 +23,8 @@ data class ItemDamage(
     override val componentType: ItemComponentType<Int> = ItemComponentTypes.DAMAGE
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<Int> {
-        val damage = this.damage.calculate().component1().toStableInt()
+        val (value, _) = this.damage.calculate()
+        val damage = value.toStableInt()
         return ItemGenerationResult.of(damage)
     }
 

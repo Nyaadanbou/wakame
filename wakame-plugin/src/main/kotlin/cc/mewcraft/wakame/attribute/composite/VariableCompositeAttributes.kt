@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.Objects
 import kotlin.math.max
 import kotlin.math.min
 
@@ -36,26 +35,12 @@ interface VariableCompositeAttribute : CompositeAttribute {
      * @property value 生成的 [ConstantCompositeAttribute]
      * @property score 生成所使用的 Z-score
      */
-    data class Result(
+    class Result(
         val value: ConstantCompositeAttribute,
         val score: Array<Double>,
     ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other)
-                return true
-            if (javaClass != other?.javaClass)
-                return false
-            other as Result
-            if (value != other.value)
-                return false
-            if (!score.contentEquals(other.score))
-                return false
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return Objects.hash(value, score.contentHashCode())
-        }
+        operator fun component1(): ConstantCompositeAttribute = value
+        operator fun component2(): Array<Double> = score
     }
 }
 
