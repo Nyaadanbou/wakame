@@ -5,8 +5,11 @@ import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.level
+import cc.mewcraft.wakame.item.portableCore
+import cc.mewcraft.wakame.item.rarity
+import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.plain
@@ -86,13 +89,14 @@ internal class SimpleMergingSession(
         return@vetoable true
     }
 
-    private val _numberMergeFunctionMap = mutableMapOf<MergingTable.NumberMergeFunction.Type, MochaFunction>()
-    override val numberMergeFunction: (MergingTable.NumberMergeFunction.Type) -> MochaFunction = { type ->
-        _numberMergeFunctionMap.getOrPut(type) { table.numberMergeFunction.compile(type, this) }
+    private val _valueMergeFunction = HashMap<AttributeModifier.Operation, MergingTable.ValueMergeMethod.Algorithm>()
+    override val valueMergeFunction: (AttributeModifier.Operation) -> MergingTable.ValueMergeMethod.Algorithm = { type ->
+        _valueMergeFunction.getOrPut(type) { table.valueMergeMethod.compile(type, this) }
     }
-    override val outputLevelFunction: MochaFunction = table.outputLevelFunction.compile(this)
-    override val outputPenaltyFunction: MochaFunction = table.outputPenaltyFunction.compile(this)
-    override val currencyCostFunction: MochaFunction = table.currencyCost.total.compile(this)
+
+    override val outputLevelFunction: MochaFunction = table.levelMergeMethod.compile(this)
+    override val outputPenaltyFunction: MochaFunction = table.penaltyMergeMethod.compile(this)
+    override val currencyCostFunction: MochaFunction = table.totalCost.compile(this)
 
     private fun executeReforge0(): MergingSession.ReforgeResult {
         return try {
@@ -125,30 +129,23 @@ internal class SimpleMergingSession(
 
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
-        val comp = inputItem?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: return .0
-        val core = comp.wrapped as? AttributeCore ?: return .0
-        val scalar = core.attribute as? CompositeAttributeComponent.Scalar<Double> ?: return .0
-        val value = scalar.value
-        return value
+        val core = inputItem?.portableCore?.wrapped as? AttributeCore ?: return .0
+        val scalar = core.attribute as? CompositeAttributeComponent.Scalar<Double>
+        return scalar?.value ?: .0
     }
 
+    // 物品不存在, 返回 .0
+    // 物品存在, 返回物品等级
     private fun getLevel(inputItem: NekoStack?): Double {
-        val comp = inputItem?.components?.get(ItemComponentTypes.LEVEL) ?: return .0
-        val value = comp.level.toDouble()
-        return value
+        return inputItem?.level?.toDouble() ?: .0
     }
 
     private fun getRarityNumber(inputItem: NekoStack?): Double {
-        val comp = inputItem?.components?.get(ItemComponentTypes.RARITY) ?: return .0
-        val rarityKey = comp.rarity.key
-        val value = table.rarityNumberMapping.get(rarityKey)
-        return value
+        return inputItem?.rarity?.key?.let(table.rarityNumberMapping::get) ?: .0
     }
 
     private fun getPenalty(inputItem: NekoStack?): Double {
-        val comp = inputItem?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: return .0
-        val value = comp.penalty.toDouble()
-        return value
+        return inputItem?.reforgeHistory?.modCount?.toDouble() ?: .0
     }
 
     override fun getValue1(): Double = getValue(inputItem1)

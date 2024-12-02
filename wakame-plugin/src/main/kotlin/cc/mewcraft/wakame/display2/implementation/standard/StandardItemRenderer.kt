@@ -28,6 +28,8 @@ import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreQualityFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -302,12 +304,16 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
-    private val ordinal: Ordinal,
+    private val merged: String,
+    @Setting @Required
+    private val quality: AttributeCoreQualityFormat,
+    @Setting @Required
+    private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
     fun render(data: AttributeCore): IndexedText {
-        return SimpleIndexedText(computeIndex(data), data.description)
+        return SimpleIndexedText(computeIndex(data), quality.decorate(merged, data))
     }
 
     /**
@@ -316,14 +322,6 @@ internal data class CellularAttributeRendererFormat(
     override fun computeIndex(data: AttributeCore): Key {
         return data.computeIndex(namespace)
     }
-
-    @ConfigSerializable
-    data class Ordinal(
-        @Setting @Required
-        val element: List<String>,
-        @Setting @Required
-        val operation: List<String>,
-    )
 }
 
 @ConfigSerializable
@@ -384,7 +382,7 @@ internal data class PortableCoreRendererFormat(
     private val unknownIndex = Key.key(namespace, "unknown")
 
     fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore
+        val core = (data.wrapped as? AttributeCore)
             ?: return SimpleIndexedText(unknownIndex, listOf())
         return SimpleIndexedText(index, core.description)
     }

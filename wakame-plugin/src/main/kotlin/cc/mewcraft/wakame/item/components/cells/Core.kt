@@ -104,7 +104,7 @@ interface AttributeCore : Core {
      * [Quality.ordinal] 越小则数值质量越差, 反之越好.
      */
     enum class Quality {
-        L3, L2, L1, MU, H1, H2, H3;
+        L3, L2, L1, MU, U1, U2, U3;
 
         companion object {
             /**
@@ -116,9 +116,9 @@ interface AttributeCore : Core {
                     score < -2.0 -> L2
                     score < -1.0 -> L1
                     score < 1.0 -> MU
-                    score < 2.0 -> H1
-                    score < 3.0 -> H2
-                    else -> H3
+                    score < 2.0 -> U1
+                    score < 3.0 -> U2
+                    else -> U3
                 }
             }
         }

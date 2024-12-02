@@ -4,10 +4,15 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.isEmpty
 import cc.mewcraft.wakame.skill.trigger.Trigger
 import cc.mewcraft.wakame.skill.trigger.TriggerVariant
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -69,7 +74,7 @@ interface CoreMatchRule : Examinable {
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
         val typeNode = node.node("type")
-        val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "Missing key: 'type'")
+        val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "missing key: 'type'")
         if (rawType == "*") {
             // 值为 “*” - 直接解析为 CoreMatchRuleAny
             return CoreMatchRuleAny
@@ -78,7 +83,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
         val (namespace, pattern) = run {
             val index = rawType.indexOf(':')
             if (index == -1) {
-                throw SerializationException(typeNode, javaTypeOf<String>(), "Invalid type: '$rawType'")
+                throw SerializationException(typeNode, javaTypeOf<String>(), "invalid type: '$rawType'")
             }
             val namespace = rawType.substring(0, index)
             val patternString = rawType.substring(index + 1)
@@ -87,7 +92,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
             } catch (e: PatternSyntaxException) {
                 throw SerializationException(typeNode, javaTypeOf<Pattern>(), e)
             } catch (e: Throwable) {
-                throw IOException("Unknown error", e)
+                throw IOException("unknown error", e)
             }
             namespace to pattern
         }
@@ -106,7 +111,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
             }
 
             else -> {
-                throw SerializationException(typeNode, javaTypeOf<String>(), "Unknown namespace: '$namespace'")
+                throw SerializationException(typeNode, javaTypeOf<String>(), "unsupported namespace: '$namespace'")
             }
         }
     }

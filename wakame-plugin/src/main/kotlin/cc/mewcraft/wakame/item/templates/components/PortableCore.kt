@@ -28,7 +28,7 @@ data class PortableCore(
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<PortableCoreData> {
         val core = coreArchetype.generate(context)
-        val portableCore = PortableCoreData(core, 0)
+        val portableCore = PortableCoreData(core)
         return ItemGenerationResult.of(portableCore)
     }
 

@@ -57,7 +57,11 @@ internal class SimpleAttributeCoreArchetype(
 ) : AttributeCoreArchetype {
     override fun generate(context: ItemGenerationContext): AttributeCore {
         val (attribute, scores) = attribute.generate(context)
-        return AttributeCore(id, attribute, scores.mapToArray(AttributeCore.Quality::fromZScore))
+        return AttributeCore(
+            id = id,
+            attribute = attribute,
+            quality = scores.mapToArray(AttributeCore.Quality::fromZScore)
+        )
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> {

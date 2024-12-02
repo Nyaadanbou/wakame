@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.shadowNeko
@@ -141,8 +140,7 @@ data class MergingPenaltyPriceModifier(
 
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
-        val portableCore = nekoStack.portableCore ?: return .0
-        val value = portableCore.penalty
+        val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(MergingBinding(value), "query")
         return mocha.eval(expression)

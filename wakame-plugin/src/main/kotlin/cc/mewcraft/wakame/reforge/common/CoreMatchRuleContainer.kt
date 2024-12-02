@@ -14,7 +14,7 @@ import java.util.stream.Stream
 /**
  * 封装了零或多个 [CoreMatchRule] 实例的容器.
  */
-interface CoreMatchRuleContainer : Examinable {
+fun interface CoreMatchRuleContainer : Examinable {
     companion object {
         /**
          * 获取一个 [CoreMatchRuleContainer] 的特殊实例, 对于所有核心都返回 `true`.
