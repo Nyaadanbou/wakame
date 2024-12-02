@@ -25,7 +25,6 @@ import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
@@ -454,18 +453,6 @@ internal data class SkillCoreTextMetaFactory(
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-}
-
-internal data class PortableCoreTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == "portable_core"
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }
 //</editor-fold>
