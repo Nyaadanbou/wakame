@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.registry.AttributeRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
-import xyz.xenondevs.commons.collections.mapToArray
 import xyz.xenondevs.commons.collections.mapToByteArray
 
 val Cell.attributeCore: AttributeCore?
@@ -149,8 +148,9 @@ private fun CompoundTag.writeId(id: Key) {
 private fun CompoundTag.readQuality(): Array<AttributeCore.Quality>? {
     if (!contains(AttributeBinaryKeys.QUALITY, TagType.BYTE_ARRAY))
         return null
-    @Suppress("UNCHECKED_CAST")
-    return getByteArray(AttributeBinaryKeys.QUALITY).mapToArray { AttributeCore.Quality.entries[it.toInt()] } as Array<AttributeCore.Quality>
+    val byteArray = getByteArray(AttributeBinaryKeys.QUALITY)
+    val objArray = Array<AttributeCore.Quality>(byteArray.size) { AttributeCore.Quality.entries[byteArray[it].toInt()] }
+    return objArray
 }
 
 private fun CompoundTag.writeQuality(quality: Array<AttributeCore.Quality>?) {

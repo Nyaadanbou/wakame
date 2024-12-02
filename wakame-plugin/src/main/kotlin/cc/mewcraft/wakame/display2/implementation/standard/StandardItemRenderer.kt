@@ -35,6 +35,7 @@ import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -367,24 +368,6 @@ internal data class CellularEmptyRendererFormat(
 
     fun render(data: EmptyCore): IndexedText {
         return tooltipCycle.next()
-    }
-}
-
-@ConfigSerializable
-internal data class PortableCoreRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-) : RendererFormat.Simple {
-    override val id = "portable_core"
-    override val index = createIndex()
-    override val textMetaFactory = PortableCoreTextMetaFactory(namespace)
-
-    private val unknownIndex = Key.key(namespace, "unknown")
-
-    fun render(data: PortableCore): IndexedText {
-        val core = (data.wrapped as? AttributeCore)
-            ?: return SimpleIndexedText(unknownIndex, listOf())
-        return SimpleIndexedText(index, core.description)
     }
 }
 //</editor-fold>

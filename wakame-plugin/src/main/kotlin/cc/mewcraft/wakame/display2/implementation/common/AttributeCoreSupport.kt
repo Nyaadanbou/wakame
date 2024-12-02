@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.util.concurrent.ThreadLocalListProvider
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -68,7 +67,7 @@ internal data class AttributeCoreQualityFormat(
         val qual = data.quality
         if (qual != null) {
             val qualText = get(qual.last())
-            val fullText = data.description.mapTo(threadLocalList) { ln ->
+            val fullText = data.description.map { ln ->
                 MM.deserialize(
                     input,
                     Placeholder.component("desc", ln),
@@ -81,9 +80,7 @@ internal data class AttributeCoreQualityFormat(
         }
     }
 
-    companion object Shared : ThreadLocalListProvider<Component>(
-        onRead = { clear() },
-    ) {
+    companion object Shared {
         private val MM = Injector.get<MiniMessage>()
     }
 }

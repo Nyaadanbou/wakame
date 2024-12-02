@@ -26,7 +26,6 @@ import cc.mewcraft.wakame.display2.implementation.RenderingPart6
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.standard.PortableCoreTextMetaFactory
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
@@ -44,6 +43,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
@@ -152,14 +152,15 @@ data class RarityRendererFormat(
 internal data class PortableCoreRendererFormat(
     @Setting @Required
     override val namespace: String,
+    @Setting @NodeKey
+    override val id: String,
     @Setting
     private val merged: String,
     @Setting
     private val quality: AttributeCoreQualityFormat,
 ) : RendererFormat.Simple {
-    override val id = "portable_core"
-    override val index = createIndex()
-    override val textMetaFactory = PortableCoreTextMetaFactory(namespace)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: SingleSimpleTextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
     private val unknownIndex = Key.key(namespace, "unknown")
 
