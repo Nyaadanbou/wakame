@@ -1,13 +1,16 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
 
 
 interface FireResistant : Examinable {
 
-    companion object : ItemComponentBridge<FireResistant> {
+    companion object : ItemComponentBridge<Boolean> {
         /**
          * 该组件的配置文件.
          */
@@ -20,7 +23,7 @@ interface FireResistant : Examinable {
             return Value
         }
 
-        override fun codec(id: String): ItemComponentType<FireResistant> {
+        override fun codec(id: String): ItemComponentType<Boolean> {
             return Codec(id)
         }
     }
@@ -29,15 +32,12 @@ interface FireResistant : Examinable {
 
     private data class Codec(
         override val id: String,
-    ) : ItemComponentType<FireResistant> {
-        override fun read(holder: ItemComponentHolder): FireResistant? {
-            if (!holder.item.itemMeta.isFireResistant) {
-                return null
-            }
-            return Value
+    ) : ItemComponentType<Boolean> {
+        override fun read(holder: ItemComponentHolder): Boolean {
+            return !holder.item.itemMeta.isFireResistant
         }
 
-        override fun write(holder: ItemComponentHolder, value: FireResistant) {
+        override fun write(holder: ItemComponentHolder, value: Boolean) {
             holder.item.editMeta { it.isFireResistant = true }
         }
 

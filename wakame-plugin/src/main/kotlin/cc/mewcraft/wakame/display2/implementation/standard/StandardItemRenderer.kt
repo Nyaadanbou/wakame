@@ -38,7 +38,6 @@ import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFor
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.components.ItemCrate
@@ -221,7 +220,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingPart<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val FIRE_RESISTANT: RenderingPart<Boolean, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
         format.render()
     }
 
