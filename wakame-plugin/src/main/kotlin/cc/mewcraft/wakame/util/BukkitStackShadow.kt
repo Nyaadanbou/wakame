@@ -56,9 +56,6 @@ var BukkitStack.customName: Component?
         }
     }
 
-@Deprecated("Use customName instead", ReplaceWith("customName"))
-var BukkitStack.customName0: Component? by BukkitStack::customName
-
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */

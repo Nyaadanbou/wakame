@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.gui.reroll
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.StandaloneCell
-import cc.mewcraft.wakame.item.getCell
 import cc.mewcraft.wakame.item.standaloneCell
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.CoreIcons
@@ -61,7 +61,7 @@ private constructor(
             val sourceItem = session.usableInput ?: return makeErrorItem(text("内部错误 (source item is null)"))
 
             val cellId = selection.id
-            val cell = sourceItem.getCell(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))
+            val cell = sourceItem.cells?.get(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))
 
             val core = cell.getCore()
             val icon = CoreIcons.getNekoStack(core)

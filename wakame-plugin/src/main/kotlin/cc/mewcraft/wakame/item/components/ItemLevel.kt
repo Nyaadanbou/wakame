@@ -34,6 +34,10 @@ data class ItemLevel(
         }
     }
 
+    init {
+        require(level > 0) { "level must be a positive integer" }
+    }
+
     private data class Codec(
         override val id: String,
     ) : ItemComponentType<ItemLevel> {
