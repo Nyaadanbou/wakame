@@ -21,7 +21,7 @@ val Cell.emptyCore: EmptyCore?
  * [VirtualCore] 的标准实现.
  */
 internal data object SimpleVirtualCore : VirtualCore {
-    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.node("virtual_core")
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).provider.node("virtual_core")
 
     override val id: Key = GenericKeys.NOOP
     override val displayName: Component by config.entry<Component>("display_name")
@@ -40,7 +40,7 @@ internal data object SimpleVirtualCore : VirtualCore {
  * [EmptyCore] 的标准实现.
  */
 internal data object SimpleEmptyCore : EmptyCore {
-    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).root.node("empty_core")
+    private val config = ItemComponentConfig.provide(ItemConstants.CELLS).provider.node("empty_core")
 
     override val id: Key = GenericKeys.EMPTY
     override val displayName: Component by config.entry<Component>("display_name")

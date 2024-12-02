@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.registry.RarityRegistry
 import kotlin.reflect.KProperty
 
 var NekoStack.level: Int
-    get() = components.get(ItemComponentTypes.LEVEL)?.level ?: 1
+    get() = components.get(ItemComponentTypes.LEVEL)?.level ?: ItemLevel.minimumLevel
     set(value) {
         require(value > 0) { "Level must be positive" }
         val boxedValue = ItemLevel(value)
