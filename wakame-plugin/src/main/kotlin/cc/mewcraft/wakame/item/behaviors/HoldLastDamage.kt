@@ -52,7 +52,9 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
-            tryCancelEvent(itemStack, player, event)
+            if (equipped) {
+                tryCancelEvent(itemStack, player, event)
+            }
         }
 
         override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
@@ -66,7 +68,7 @@ interface HoldLastDamage : ItemBehavior {
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
             val nekoStack = itemStack.projectNeko()
             if (nekoStack.damage >= nekoStack.maxDamage) {
-                player.sendActionBar(text("无法使用完全损坏的物品"))
+                player.sendMessage(text("无法使用完全损坏的物品"))
                 e.isCancelled = true
             }
         }

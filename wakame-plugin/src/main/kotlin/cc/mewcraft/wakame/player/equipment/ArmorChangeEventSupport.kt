@@ -18,8 +18,14 @@ internal object ArmorChangeEventSupport : Listener {
             return
         if (event.action == ArmorChangeEvent.Action.UNEQUIP)
             return
+        val slot = event.slot
         val player = event.player
-        val currentArmor = event.current ?: return
-        player.giveItemStack(currentArmor)
+        val current = event.current!!
+
+        // 某些代码会直接设置盔甲, 例如原版的 /minecraft:item modify 指令.
+        // 这里再次设置为 null 以确保直接设置的物品不会驻留在玩家身上.
+        player.equipment.setItem(slot, null)
+
+        player.giveItemStack(current)
     }
 }
