@@ -549,7 +549,7 @@ class CustomNekoStackTest : KoinTest {
         }
 
         unboxed {
-            assertEquals(true, it)
+            assertEquals(Unit, it)
         }
     }
 
