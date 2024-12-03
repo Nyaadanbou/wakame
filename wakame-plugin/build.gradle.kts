@@ -136,35 +136,35 @@ paper {
         }
         register("AdventureLevel") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.BEFORE
         }
         register("ChestSort") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("Economy") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("LuckPerms") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("MythicMobs") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("Towny") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("Vault") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
         register("WorldGuard") {
             required = false
-            load = RelativeLoadOrder.OMIT // 懒加载 class
+            load = RelativeLoadOrder.OMIT
         }
     }
 }

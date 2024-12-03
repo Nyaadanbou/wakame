@@ -35,9 +35,9 @@ import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.util.registerSuspendingEvents
-import cc.mewcraft.wakame.util.unregisterEvents
 import cc.mewcraft.wakame.world.entity.BetterArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
@@ -143,46 +143,46 @@ object Initializer : KoinComponent, Listener {
 
     private fun registerListeners() {
         // item
-        registerListenerAndBind<ArmorChangeEventSupport>()
-        registerListenerAndBind<ItemSlotChangeManager>()
-        registerListenerAndBind<ItemChangeListener>()
-        registerListenerAndBind<ItemBehaviorListener>()
-        registerListenerAndBind<ItemMiscellaneousListener>()
+        registerListener<ArmorChangeEventSupport>()
+        registerListener<ItemSlotChangeManager>()
+        registerListener<ItemChangeListener>()
+        registerListener<ItemBehaviorListener>()
+        registerListener<ItemMiscellaneousListener>()
 
         // attribute
-        registerListenerAndBind<AttributeMapPatchListener>()
+        registerListener<AttributeMapPatchListener>()
 
         // damage
-        registerListenerAndBind<DamageListener>()
-        registerListenerAndBind<DamagePostListener>()
-        registerListenerAndBind<DamageDisplay>()
+        registerListener<DamageListener>()
+        registerListener<DamagePostListener>()
+        registerListener<DamageDisplay>()
 
         // rpg player
-        registerListenerAndBind<PaperUserManager>()
+        registerListener<PaperUserManager>()
 
         // resourcepack
-        registerListenerAndBind<ResourcePackLifecycleListener>()
-        registerListenerAndBind<ResourcePackPlayerListener>()
+        registerListener<ResourcePackLifecycleListener>()
+        registerListener<ResourcePackPlayerListener>()
 
         // game world
-        registerListenerAndBind<BetterArmorStandListener>()
-        registerListenerAndBind<PlayerDeathProtect>()
+        registerListener<BetterArmorStandListener>()
+        registerListener<PlayerDeathProtect>()
 
         // compatibility
-        registerListenerAndBind<AdventureLevelListener>("AdventureLevel")
+        registerListener<AdventureLevelListener>("AdventureLevel")
 
         // uncategorized
     }
 
-    private inline fun <reified T : Listener> registerListenerAndBind(requiredPlugin: String? = null) {
+    private inline fun <reified T : Listener> registerListener(requiredPlugin: String? = null) {
         if (requiredPlugin != null) {
             if (plugin.isPluginPresent(requiredPlugin)) {
-                plugin.bind(plugin.registerTerminableListener(get<T>()))
+                plugin.registerListener(get<T>())
             } else {
                 logger.info("Plugin $requiredPlugin is not present. Skipping listener ${T::class.simpleName}")
             }
         } else {
-            plugin.bind(plugin.registerTerminableListener(get<T>()))
+            plugin.registerListener(get<T>())
         }
     }
 
@@ -291,7 +291,13 @@ object Initializer : KoinComponent, Listener {
      * initialized in.
      */
     fun disable() {
-        unregisterEvents()
+        // 关闭服务器时服务端不会触发任何事件,
+        // 需要我们手动执行保存玩家资源的逻辑.
+        // 如果服务器有使用 HuskSync, 我们的插件必须在 HuskSync 之前关闭,
+        // 否则 PDC 无法保存到 HuskSync 的数据库, 导致玩家资源数据丢失.
+        ResourceSynchronizer.saveAll()
+
+        // 按顺序关闭所有的 Terminable
         terminables.closeAndReportException()
     }
 
