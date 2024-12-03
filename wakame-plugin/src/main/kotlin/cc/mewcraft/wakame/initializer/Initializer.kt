@@ -59,6 +59,8 @@ import org.bukkit.event.server.ServerLoadEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.window.WindowManager
 
 /**
  * @see Initializable
@@ -116,6 +118,7 @@ object Initializer : KoinComponent, Listener {
      * Should be called before the world is loaded.
      */
     fun start() {
+        warmupStaticInitializer()
         handleDependencies()
         initPreWorld()
     }
@@ -336,6 +339,11 @@ object Initializer : KoinComponent, Listener {
     private suspend fun handlePluginReloaded(e: NekoCommandReloadEvent) {
         Configs.reload()
         executeReload()
+    }
+
+    private fun warmupStaticInitializer() {
+        InvUI.getInstance()
+        WindowManager.getInstance()
     }
 
     /**
