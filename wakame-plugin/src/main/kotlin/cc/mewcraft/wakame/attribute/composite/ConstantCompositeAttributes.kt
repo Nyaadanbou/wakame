@@ -157,12 +157,12 @@ sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, Compo
              */
             fun fromZScore(score: Double): Quality {
                 return when {
-                    score < -3.0 -> L3
-                    score < -2.0 -> L2
-                    score < -1.0 -> L1
-                    score < 1.0 -> MU
-                    score < 2.0 -> U1
-                    score < 3.0 -> U2
+                    score < -2.5 -> L3
+                    score < -1.5 -> L2
+                    score < -0.5 -> L1
+                    score < +0.5 -> MU
+                    score < +1.5 -> U1
+                    score < +2.5 -> U2
                     else -> U3
                 }
             }
