@@ -55,7 +55,7 @@ internal object ResourceSynchronizer {
                 player.health = health
                 LOGGER.info("[${player.name}] Loaded player health: $health / ${player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value}")
             } catch (e: Exception) {
-                LOGGER.warn("[${player.name}] ${e.message}")
+                LOGGER.error("[${player.name}] ${e.message}")
             }
         }
 
