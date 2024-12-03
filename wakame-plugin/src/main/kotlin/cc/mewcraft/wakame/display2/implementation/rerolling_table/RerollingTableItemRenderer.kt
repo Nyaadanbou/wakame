@@ -17,7 +17,6 @@ import cc.mewcraft.wakame.display2.implementation.RenderingPart3
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreQualityFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -262,10 +261,6 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
-    private val merged: String,
-    @Setting @Required
-    private val quality: AttributeCoreQualityFormat,
-    @Setting @Required
     private val ordinal: AttributeCoreOrdinalFormat,
     @Setting("diff_formats")
     @Required
@@ -279,7 +274,7 @@ internal data class CellularAttributeRendererFormat(
      * @param context 重造台的上下文
      */
     fun render(id: String, core: AttributeCore, context: RerollingTableContext): IndexedText {
-        val original = quality.decorate(merged, core)
+        val original = core.description
         val processed = differenceFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }

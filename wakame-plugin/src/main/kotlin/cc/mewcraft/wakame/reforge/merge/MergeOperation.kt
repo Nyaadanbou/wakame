@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
@@ -87,8 +88,8 @@ private constructor(
         val resultedOperation = attribute1.operation
         val (resultedValue, resultedScore) = session.valueMergeFunction(resultedOperation).evaluate()
         val resultedCore = when (attribute1 /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantCompositeAttributeS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue), quality = arrayOf(AttributeCore.Quality.fromZScore(resultedScore)))
-            is ConstantCompositeAttributeSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue), quality = arrayOf(AttributeCore.Quality.fromZScore(resultedScore)))
+            is ConstantCompositeAttributeS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
+            is ConstantCompositeAttributeSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
             is ConstantCompositeAttributeR, is ConstantCompositeAttributeRE -> {
                 // 我们不支持拥有两个数值的核心, 原因:
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心

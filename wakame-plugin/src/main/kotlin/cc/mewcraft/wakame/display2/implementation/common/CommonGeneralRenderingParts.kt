@@ -154,24 +154,14 @@ internal data class PortableCoreRendererFormat(
     override val namespace: String,
     @Setting @NodeKey
     override val id: String,
-    @Setting
-    private val merged: String,
-    @Setting
-    private val quality: AttributeCoreQualityFormat,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
     override val textMetaFactory: SingleSimpleTextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-
     private val unknownIndex = Key.key(namespace, "unknown")
 
     fun render(data: PortableCore): IndexedText {
         val core = (data.wrapped as? AttributeCore)
             ?: return SimpleIndexedText(unknownIndex, emptyList())
-        return SimpleIndexedText(
-            index, quality.decorate(
-                merged,
-                core
-            )
-        )
+        return SimpleIndexedText(index, core.description)
     }
 }

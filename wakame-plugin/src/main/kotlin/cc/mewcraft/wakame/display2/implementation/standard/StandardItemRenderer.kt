@@ -28,7 +28,6 @@ import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreQualityFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -303,16 +302,12 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
-    private val merged: String,
-    @Setting @Required
-    private val quality: AttributeCoreQualityFormat,
-    @Setting @Required
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
     fun render(data: AttributeCore): IndexedText {
-        return SimpleIndexedText(computeIndex(data), quality.decorate(merged, data))
+        return SimpleIndexedText(computeIndex(data), data.description)
     }
 
     /**

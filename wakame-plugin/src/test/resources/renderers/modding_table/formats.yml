@@ -14,23 +14,6 @@ cells/attributes/in:
     has_input: { }
     # 未选择要定制的核孔
     has_no_input: { }
-  # 可用标签:
-  # <desc> 属性的描述
-  # <qual> 数值的质量
-  merged: "<desc><qual>"
-  # 属性数值的好坏格式. 按顺序进行如下判断:
-  # 当 z-score <3 或 z-score >3 时, 输出 l3 或 u3
-  # 当 z-score <2 或 z-score >2 时, 输出 l2 或 u2
-  # 当 z-score <1 或 z-score >1 时, 输出 l1 或 u1
-  # 否则, 输出 mu
-  quality:
-    l3: "<red>***</red>"
-    l2: "<red>**</red>"
-    l1: "<red>*</red>"
-    mu: ""
-    u1: "<green>*</green>"
-    u2: "<green>**</green>"
-    u3: "<green>***</green>"
   ordinal:
     element:
       - neutral
@@ -56,23 +39,6 @@ cells/attributes/out:
       suffix: " <gray>???"
     has_no_input:
       style: "<!i><dark_gray>"
-  # 可用标签:
-  # <desc> 属性的描述
-  # <qual> 数值的质量
-  merged: "<desc><qual>"
-  # 属性数值的好坏格式. 按顺序进行如下判断:
-  # 当 z-score <3 或 z-score >3 时, 输出 l3 或 u3
-  # 当 z-score <2 或 z-score >2 时, 输出 l2 或 u2
-  # 当 z-score <1 或 z-score >1 时, 输出 l1 或 u1
-  # 否则, 输出 mu
-  quality:
-    l3: "<red>***</red>"
-    l2: "<red>**</red>"
-    l1: "<red>*</red>"
-    mu: ""
-    u1: "<green>*</green>"
-    u2: "<green>**</green>"
-    u3: "<green>***</green>"
   ordinal:
     element:
       - neutral

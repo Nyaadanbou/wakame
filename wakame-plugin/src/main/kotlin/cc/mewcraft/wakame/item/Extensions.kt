@@ -105,7 +105,8 @@ var NekoStack.standaloneCell: StandaloneCell? by direct(ItemComponentTypes.STAND
 
 var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_CORE)
 
-//<editor-fold desc="Support">
+
+//<editor-fold desc="Internal Implementations">
 private fun <T> direct(type: ItemComponentType<T>): SimpleComponentDelegate<T> {
     return SimpleComponentDelegate(type)
 }

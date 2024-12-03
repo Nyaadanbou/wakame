@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import xyz.xenondevs.commons.collections.mapToArray
 import java.util.stream.Stream
 
 
@@ -26,8 +25,7 @@ fun AttributeCoreArchetype(
     id: Key,
     node: ConfigurationNode,
 ): AttributeCoreArchetype = SimpleAttributeCoreArchetype(
-    id = id,
-    attribute = AttributeRegistry.FACADES[id.value()].convertNode2Variable(node)
+    id = id, attribute = AttributeRegistry.FACADES[id.value()].convertNode2Variable(node)
 )
 
 /**
@@ -55,23 +53,14 @@ internal class SimpleAttributeCoreArchetype(
     override val id: Key,
     override val attribute: VariableCompositeAttribute,
 ) : AttributeCoreArchetype {
-    override fun generate(context: ItemGenerationContext): AttributeCore {
-        val (attribute, scores) = attribute.generate(context)
-        return AttributeCore(
-            id = id,
-            attribute = attribute,
-            quality = scores.mapToArray(AttributeCore.Quality::fromZScore)
-        )
-    }
+    override fun generate(context: ItemGenerationContext): AttributeCore = AttributeCore(
+        id = id, attribute = attribute.generate(context)
+    )
 
-    override fun examinableProperties(): Stream<out ExaminableProperty?> {
-        return Stream.of(
-            ExaminableProperty.of("id", id),
-            ExaminableProperty.of("attribute", attribute)
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("id", id),
+        ExaminableProperty.of("attribute", attribute)
+    )
 
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    override fun toString(): String = toSimpleString()
 }

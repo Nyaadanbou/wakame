@@ -27,21 +27,7 @@ fun VariableCompositeAttribute(
  * 代表一个数值可以变化的 [CompositeAttribute].
  */
 interface VariableCompositeAttribute : CompositeAttribute {
-    fun generate(context: AttributeGenerationContext): Result
-
-    /**
-     * 封装了 [VariableCompositeAttribute] 的生成结果.
-     *
-     * @property value 生成的 [ConstantCompositeAttribute]
-     * @property score 生成所使用的 Z-score
-     */
-    class Result(
-        val value: ConstantCompositeAttribute,
-        val score: Array<Double>,
-    ) {
-        operator fun component1(): ConstantCompositeAttribute = value
-        operator fun component2(): Array<Double> = score
-    }
+    fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute
 }
 
 /**
@@ -69,13 +55,18 @@ internal data class VariableCompositeAttributeR(
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
 ) : VariableCompositeAttribute, CompositeAttributeR<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
+    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
-        val attribute = ConstantCompositeAttributeR(id, operation, min(lower, upper), max(lower, upper))
-        return VariableCompositeAttribute.Result(attribute, arrayOf(score1, score2))
+        return ConstantCompositeAttributeR(
+            id,
+            operation,
+            min(lower, upper),
+            max(lower, upper),
+            ConstantCompositeAttribute.Quality.fromZScore(score2)
+        )
     }
 }
 
@@ -86,13 +77,19 @@ internal data class VariableCompositeAttributeRE(
     override val upper: RandomizedValue,
     override val element: Element,
 ) : VariableCompositeAttribute, CompositeAttributeRE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
+    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
-        val attribute = ConstantCompositeAttributeRE(id, operation, min(lower, upper), max(lower, upper), element)
-        return VariableCompositeAttribute.Result(attribute, arrayOf(score1, score2))
+        return ConstantCompositeAttributeRE(
+            id,
+            operation,
+            min(lower, upper),
+            max(lower, upper),
+            element,
+            ConstantCompositeAttribute.Quality.fromZScore(score2)
+        )
     }
 }
 
@@ -101,12 +98,16 @@ internal data class VariableCompositeAttributeS(
     override val operation: Operation,
     override val value: RandomizedValue,
 ) : VariableCompositeAttribute, CompositeAttributeS<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
+    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (value, score) = value.calculate(factor)
-        val attribute = ConstantCompositeAttributeS(id, operation, value)
-        return VariableCompositeAttribute.Result(attribute, arrayOf(score))
+        return ConstantCompositeAttributeS(
+            id,
+            operation,
+            value,
+            ConstantCompositeAttribute.Quality.fromZScore(score)
+        )
     }
 }
 
@@ -116,12 +117,17 @@ internal data class VariableCompositeAttributeSE(
     override val value: RandomizedValue,
     override val element: Element,
 ) : VariableCompositeAttribute, CompositeAttributeSE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): VariableCompositeAttribute.Result {
+    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (value, score) = value.calculate(factor)
-        val attribute = ConstantCompositeAttributeSE(id, operation, value, element)
-        return VariableCompositeAttribute.Result(attribute, arrayOf(score))
+        return ConstantCompositeAttributeSE(
+            id,
+            operation,
+            value,
+            element,
+            ConstantCompositeAttribute.Quality.fromZScore(score)
+        )
     }
 }
 

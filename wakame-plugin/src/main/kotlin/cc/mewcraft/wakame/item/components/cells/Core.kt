@@ -91,38 +91,6 @@ interface AttributeCore : Core {
      * 该属性核心的属性种类及其数值.
      */
     val attribute: ConstantCompositeAttribute
-
-    /**
-     * 该属性核心的数值质量.
-     * 并不是每个属性核心都有数值质量,
-     * 当 [quality] 为 `null` 时, 表示该属性核心没有数值质量.
-     */
-    val quality: Array<Quality>?
-
-    /**
-     * 属性核心的“数值质量”.
-     * [Quality.ordinal] 越小则数值质量越差, 反之越好.
-     */
-    enum class Quality {
-        L3, L2, L1, MU, U1, U2, U3;
-
-        companion object {
-            /**
-             * 从正态分布的 Z-score 转换为 [Quality].
-             */
-            fun fromZScore(score: Double): Quality {
-                return when {
-                    score < -3.0 -> L3
-                    score < -2.0 -> L2
-                    score < -1.0 -> L1
-                    score < 1.0 -> MU
-                    score < 2.0 -> U1
-                    score < 3.0 -> U2
-                    else -> U3
-                }
-            }
-        }
-    }
 }
 
 /**
