@@ -22,29 +22,23 @@ class WatchedArmorList(
         if (initialized) {
             if (serverPlayer != null) {
                 val previous = previousStacks[index]
-                // if (ItemStack.matches(previous, element)) {
-                //     return element
-                // }
 
-                @Suppress("SENSELESS_COMPARISON")
-                if (serverPlayer.connection != null) {
-                    // 玩家初次进入游戏时, ServerPlayer#connection 可能还没来得及赋值
-                    val action = when {
-                        previous.isEmpty && !element.isEmpty -> ArmorChangeEvent.Action.EQUIP
-                        !previous.isEmpty && element.isEmpty -> ArmorChangeEvent.Action.UNEQUIP
-                        else -> ArmorChangeEvent.Action.CHANGE
-                    }
-                    val event = ArmorChangeEvent(
-                        serverPlayer.bukkitEntity,
-                        EquipmentSlot.entries[index + 2],
-                        action,
-                        previous.asBukkitMirror(),
-                        element.asBukkitMirror()
-                    )
-                    if (!event.callEvent()) {
-                        // 如果事件被取消, 返回尝试 set 的物品
-                        return element
-                    }
+                // 玩家初次进入游戏时, ServerPlayer#connection 可能还没来得及赋值
+                val action = when {
+                    previous.isEmpty && !element.isEmpty -> ArmorChangeEvent.Action.EQUIP
+                    !previous.isEmpty && element.isEmpty -> ArmorChangeEvent.Action.UNEQUIP
+                    else -> ArmorChangeEvent.Action.CHANGE
+                }
+                val event = ArmorChangeEvent(
+                    serverPlayer.bukkitEntity,
+                    EquipmentSlot.entries[index + 2],
+                    action,
+                    previous.asBukkitMirror(),
+                    element.asBukkitMirror()
+                )
+                if (!event.callEvent()) {
+                    // 如果事件被取消, 返回尝试 set 的物品
+                    return element
                 }
             }
         } else if (index == 3) {
