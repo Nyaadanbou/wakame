@@ -4,6 +4,12 @@ enabled: true
 # 定制工作台的容器GUI的标题
 title: "定制工作台: Example A"
 
+# 物品的重铸次数的计算方式
+# 可用的计算方式:
+# - PLUS_ONE: 每次重铸物品固定增加 1 重铸次数
+# - CORE_SUM: 每次重铸物品动态增加 ∑(参与定制的核心的重铸次数) + 1
+reforge_count_add_method: PLUS_ONE
+
 # 稀有度->数值的映射表.
 # 可用于所有的自定义函数.
 rarity_number_mapping:
@@ -31,7 +37,6 @@ rarity_number_mapping:
 #   被定制物品上参与了定制的核孔的数量
 # query.source_item_changed_cell_cost()
 #   被定制物品上参与了定制的核孔的总花费
-currency_cost: >-
-  200.0 * query.source_item_rarity()
-  + 100.0 * query.source_item_changed_cell_count()
+currency_cost: 200.0 * query.source_item_rarity()
+  + 100.0 * query.source_item_changed_cell_count() 
   + query.source_item_changed_cell_cost()

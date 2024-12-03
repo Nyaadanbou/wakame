@@ -23,6 +23,8 @@ internal object WtfModdingTable : ModdingTable {
 
     override val title: Component = Component.text("Modding Table (Cheat ON)")
 
+    override val reforgeCountAddMethod: ModdingTable.ReforgeCountAddMethod = ModdingTable.ReforgeCountAddMethod.PLUS_ONE
+
     override val rarityNumberMapping: RarityNumberMapping = RarityNumberMapping.constant(1.0)
 
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction> = ZeroTableCurrencyCost
@@ -73,6 +75,7 @@ internal class SimpleModdingTable(
     override val identifier: String,
     override val enabled: Boolean,
     override val title: Component,
+    override val reforgeCountAddMethod: ModdingTable.ReforgeCountAddMethod,
     override val rarityNumberMapping: RarityNumberMapping,
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>,
     override val itemRuleMap: ModdingTable.ItemRuleMap,

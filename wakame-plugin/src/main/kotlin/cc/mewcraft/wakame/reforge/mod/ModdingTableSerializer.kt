@@ -92,6 +92,7 @@ internal object ModdingTableSerializer : KoinComponent {
         val identifier = tableDir.name
         val enabled = tableMainConfigNode.node("enabled").getBoolean(true)
         val title = tableMainConfigNode.node("title").krequire<Component>()
+        val reforgeCountAddMethod = tableMainConfigNode.node("reforge_count_add_method").krequire<ModdingTable.ReforgeCountAddMethod>()
         val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
         val currencyCost = tableMainConfigNode.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>>()
 
@@ -131,6 +132,7 @@ internal object ModdingTableSerializer : KoinComponent {
             identifier = identifier,
             enabled = enabled,
             title = title,
+            reforgeCountAddMethod = reforgeCountAddMethod,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,
             itemRuleMap = itemRuleMap,
