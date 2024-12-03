@@ -42,6 +42,8 @@ merge_output:
   # 输出的属性值的渲染格式
   # 这里将沿用属性本身的描述, 但支持对数值部分进行混淆
   attribute_format:
+    # 描述的样式
+    style: "<!i><white>"
     # 要混淆的模式 (regex)
     pattern: "[+-]?\\d+(\\.\\d+)?%?(\\*+)?"
     # 混淆后的内容

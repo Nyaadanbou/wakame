@@ -34,9 +34,11 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.merge.MergingSession
+import cc.mewcraft.wakame.util.plain
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
+import net.kyori.adventure.text.format.Style
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -157,16 +159,17 @@ internal data class MergeOutputRendererFormat(
 
     fun render(data: PortableCore): IndexedText {
         return SimpleIndexedText(
-            index,
-            data.description.map { line ->
-                // 混淆属性的数值
-                line.replaceText(attributeFormat.replacementConfig)
-            }
+            index, data.description
+                .map(Component::plain)
+                .map(Component::text)
+                .map { it.replaceText(attributeFormat.replacementConfig) }
+                .map { it.style(attributeFormat.style) }
         )
     }
 
     @ConfigSerializable
     data class AttributeFormat(
+        val style: Style,
         private val pattern: Pattern,
         private val replacement: Component,
     ) {

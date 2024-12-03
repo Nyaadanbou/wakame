@@ -34,7 +34,7 @@ interface FireResistant : Examinable {
         override val id: String,
     ) : ItemComponentType<Boolean> {
         override fun read(holder: ItemComponentHolder): Boolean {
-            return !holder.item.itemMeta.isFireResistant
+            return holder.item.itemMeta.isFireResistant
         }
 
         override fun write(holder: ItemComponentHolder, value: Boolean) {
