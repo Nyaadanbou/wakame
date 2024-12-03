@@ -186,26 +186,28 @@ data class RandomizedValue(
         */
 
         // Calculate "z * sigma" (spread), applying thresholds as specified
-        var spread0 = randomVariable * sigma
-        if (isLowerBounded || isUpperBounded) {
-            if (lowerBound != null) {
-                spread0 = spread0.coerceAtLeast(lowerBound)
+        val spread = run {
+            var result = randomVariable * sigma
+            if (isLowerBounded || isUpperBounded) {
+                if (lowerBound != null) {
+                    result = result.coerceAtLeast(lowerBound)
+                }
+                if (upperBound != null) {
+                    result = result.coerceAtMost(upperBound)
+                }
+            } else {
+                result = result.coerceIn(-sigma * 3, sigma * 3)
+                // ^z-score  ^sigma         ^min spread ^max spread
             }
-            if (upperBound != null) {
-                spread0 = spread0.coerceAtMost(upperBound)
-            }
-        } else {
-            spread0 = spread0.coerceIn(-sigma * 3, sigma * 3)
-            // ^z-score  ^sigma         ^min spread ^max spread
+            result
         }
-        val spread = spread0
 
         return Result(
             // Since the mean (mu) might be scaled,
             // we can't simply do `x = z * sigma + mu`.
             // Instead, we calculate the relative value:
             value = scaledBase * (1 + spread),
-            score = randomVariable
+            score = if (sigma != .0) randomVariable else .0
         )
     }
 
