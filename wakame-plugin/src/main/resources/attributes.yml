@@ -19,14 +19,15 @@
 #   根据属性的具体种类（例如有无元素），有不同的设置可用
 #   values: { }
 
-empty:
-  enabled: true
-  display_name: "无属性"
-  tooltips:
-    add: "Empty"
-    multiply_base: "Empty"
-    multiply_total: "Empty"
-  values: { }
+__default__:
+  quality:
+    l3: "<red>***</red>"
+    l2: "<red>**</red>"
+    l1: "<red>*</red>"
+    mu: ""
+    u1: "<green>*</green>"
+    u2: "<green>**</green>"
+    u3: "<green>***</green>"
 
 attack_damage:
   enabled: true

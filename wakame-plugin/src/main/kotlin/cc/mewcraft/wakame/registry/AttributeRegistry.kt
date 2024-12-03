@@ -67,11 +67,6 @@ import kotlin.reflect.KClass
 object AttributeRegistry : Initializable {
 
     /**
-     * The key of the empty attribute.
-     */
-    val EMPTY_KEY: Key = Attributes.EMPTY.key()
-
-    /**
      * The facades of all composite attributes.
      */
     val FACADES: Registry<String, CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>> = SimpleRegistry()
@@ -101,10 +96,6 @@ object AttributeRegistry : Initializable {
      * Registers all composite attributes using DSL.
      */
     private fun registerComposites() {
-        // Register the special attribute
-        +buildComposite("empty").single().bind(Attributes.EMPTY)
-
-        // Registry more composite attributes here ...
         +buildComposite("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
         +buildComposite("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
         +buildComposite("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)

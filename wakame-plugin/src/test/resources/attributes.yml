@@ -19,13 +19,48 @@
 #   根据属性的具体种类（例如有无元素），有不同的设置可用
 #   values: { }
 
-empty:
-  enabled: true
-  display_name: "无属性"
+# 默认值
+# 如果属性的某项设置没有出现在配置文件中, 将回退到这里的默认值.
+# 目前只有 `quality` 设置存在默认值, 其他的设置没有默认值.
+__default__:
+  # 属性数值的好坏格式. 按顺序进行如下判断:
+  # 当 z-score <3 或 z-score >3 时, 输出 l3 或 u3
+  # 当 z-score <2 或 z-score >2 时, 输出 l2 或 u2
+  # 当 z-score <1 或 z-score >1 时, 输出 l1 或 u1
+  # 否则, 输出 mu
+  quality:
+    l3: "<red>***</red>"
+    l2: "<red>**</red>"
+    l1: "<red>*</red>"
+    mu: ""
+    u1: "<green>*</green>"
+    u2: "<green>**</green>"
+    u3: "<green>***</green>"
+
+# 空属性, 仅用于说明配置文件的格式, 无任何实际作用
+__empty__:
+  # 属性的名字, 将用于某些需要显示属性名字的地方
+  display_name: "空属性"
+  # 属性在提示框中的渲染格式
   tooltips:
-    add: "Empty"
-    multiply_base: "Empty"
-    multiply_total: "Empty"
+    add: "空属性: <value>"
+    multiply_base: "空属性: <value>"
+    multiply_total: "空属性: <value>"
+  # 属性在渲染前的数值缩放, 可以省略
+  scaling:
+    add: 1.0
+    multiply_base: 1.0
+    multiply_total: 1.0
+  # 属性的数值质量的渲染格式, 可以省略
+  quality:
+    l3: "<red>⭑⭑⭑</red>"
+    l2: "<red>⭑⭑</red>"
+    l1: "<red>⭑</red>"
+    mu: ""
+    u1: "<green>⭑</green>"
+    u2: "<green>⭑⭑</green>"
+    u3: "<green>⭑⭑⭑</green>"
+  # 属性的全局默认数值, 以及上下界, 不能省略
   values: { }
 
 attack_damage:

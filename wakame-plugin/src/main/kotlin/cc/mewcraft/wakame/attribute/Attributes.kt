@@ -14,9 +14,6 @@ import java.util.concurrent.ConcurrentHashMap
  * attribute constructors are just fallback values when the config provides nothing.
  */
 object Attributes : AttributeProvider {
-    // 这只是一个特殊值, 供其他系统使用.
-    val EMPTY = SimpleAttribute("empty", .0).register()
-
     //<editor-fold desc="原版属性">
 
     // 这些属性需要原版属性作为后端才能在游戏中生效.
