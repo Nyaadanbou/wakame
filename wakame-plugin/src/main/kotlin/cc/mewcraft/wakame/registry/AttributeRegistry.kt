@@ -47,7 +47,6 @@ import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.orElseLazily
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
@@ -434,9 +433,9 @@ private class NumericTooltips(
 private class NumericScaling(
     config: ConfigProvider,
 ) : Tooltips(config) {
-    private val add: Double by config.entry<Double>("scaling", "add").orElseLazily { 1.0 }
-    private val multiplyBase: Double by config.entry<Double>("scaling", "multiply_base").orElseLazily { 1.0 }
-    private val multiplyTotal: Double by config.entry<Double>("scaling", "multiply_total").orElseLazily { 1.0 }
+    private val add: Double by config.optionalEntry<Double>("scaling", "add").orElse(1.0)
+    private val multiplyBase: Double by config.optionalEntry<Double>("scaling", "multiply_base").orElse(1.0)
+    private val multiplyTotal: Double by config.optionalEntry<Double>("scaling", "multiply_total").orElse(1.0)
 
     fun scale(operation: Operation, value: Double): Double {
         return when (operation) {
@@ -450,7 +449,7 @@ private class NumericScaling(
 private class QualityText(
     config: ConfigProvider,
 ) {
-    private val quality: Map<Quality, Component> by config.entry<Map<Quality, Component>>("quality").orElse(AttributeConfigFallback.quality)
+    private val quality: Map<Quality, Component> by config.optionalEntry<Map<Quality, Component>>("quality").orElse(AttributeConfigFallback.quality)
 
     fun translate(quality: Quality?): Component {
         return this.quality[quality] ?: Component.empty()
