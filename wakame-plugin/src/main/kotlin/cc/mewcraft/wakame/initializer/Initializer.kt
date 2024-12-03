@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
+import cc.mewcraft.wakame.gui.GuiManager
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
@@ -296,6 +297,9 @@ object Initializer : KoinComponent, Listener {
         // 如果服务器有使用 HuskSync, 我们的插件必须在 HuskSync 之前关闭,
         // 否则 PDC 无法保存到 HuskSync 的数据库, 导致玩家资源数据丢失.
         ResourceSynchronizer.saveAll()
+
+        // 关闭所有打开的 GUI
+        GuiManager.closeAll()
 
         // 按顺序关闭所有的 Terminable
         terminables.closeAndReportException()
