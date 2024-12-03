@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.reforgeHistory
 import me.lucko.helper.text3.mini
 
@@ -72,7 +72,7 @@ private constructor(
         }
 
         // 如果源物品不合法, 则返回失败
-        val builder = usableInput.components.get(ItemComponentTypes.CELLS)?.builder() ?: run {
+        val builder = usableInput.cells?.builder() ?: run {
             logger.info("No cells found in source item")
             return ReforgeResult.failure("<gray>物品不存在任何核孔.".mini)
         }
@@ -97,7 +97,7 @@ private constructor(
         }
 
         // 把修改后的核孔应用到输出物品上
-        usableInput.components.set(ItemComponentTypes.CELLS, builder.build())
+        usableInput.cells = builder.build()
 
         // 增加重铸次数
         usableInput.reforgeHistory = usableInput.reforgeHistory.incCount(1)

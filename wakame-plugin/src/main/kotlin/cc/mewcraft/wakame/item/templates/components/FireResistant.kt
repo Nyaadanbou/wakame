@@ -12,11 +12,11 @@ import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 
 
-data object FireResistant : ItemTemplate<Boolean>, ItemTemplateBridge<FireResistant> {
-    override val componentType: ItemComponentType<Boolean> = ItemComponentTypes.FIRE_RESISTANT
+data object FireResistant : ItemTemplate<Unit>, ItemTemplateBridge<FireResistant> {
+    override val componentType: ItemComponentType<Unit> = ItemComponentTypes.FIRE_RESISTANT
 
-    override fun generate(context: ItemGenerationContext): ItemGenerationResult<Boolean> {
-        return ItemGenerationResult.of(true)
+    override fun generate(context: ItemGenerationContext): ItemGenerationResult<Unit> {
+        return ItemGenerationResult.of(Unit)
     }
 
     override fun codec(id: String): ItemTemplateType<FireResistant> {

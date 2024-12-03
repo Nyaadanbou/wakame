@@ -116,7 +116,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, Unit) }
         components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
         components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
@@ -219,7 +219,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingPart<Boolean, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val FIRE_RESISTANT: RenderingPart<Unit, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
         format.render()
     }
 

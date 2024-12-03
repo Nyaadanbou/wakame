@@ -141,7 +141,7 @@ internal object ItemComponentTypes {
      * 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
      */
     @JvmField
-    val FIRE_RESISTANT: ItemComponentType<Boolean> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
+    val FIRE_RESISTANT: ItemComponentType<Unit> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
 
     /**
      * 将物品作为食物.

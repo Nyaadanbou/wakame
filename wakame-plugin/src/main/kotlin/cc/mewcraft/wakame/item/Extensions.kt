@@ -87,7 +87,7 @@ var NekoStack.customName: Component? by direct(ItemComponentTypes.CUSTOM_NAME)
 
 var NekoStack.itemName: Component? by direct(ItemComponentTypes.ITEM_NAME)
 
-var NekoStack.fireResistant: Boolean by direct(ItemComponentTypes.FIRE_RESISTANT, false)
+var NekoStack.fireResistant: Unit? by direct(ItemComponentTypes.FIRE_RESISTANT)
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
 

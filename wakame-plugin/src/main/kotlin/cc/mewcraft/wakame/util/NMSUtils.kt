@@ -20,6 +20,14 @@ import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
 import org.bukkit.entity.Player
 
+typealias MojangUnit = net.minecraft.util.Unit
+
+val MojangUnit.toKotlin: Unit
+    get() = Unit
+
+val Unit.toMojang: MojangUnit
+    get() = MojangUnit.INSTANCE
+
 val World.serverLevel: ServerLevel
     get() = (this as CraftWorld).handle
 
