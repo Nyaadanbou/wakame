@@ -1,8 +1,7 @@
-package cc.mewcraft.wakame.item.logic
+package cc.mewcraft.wakame.user
 
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -11,7 +10,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 
-internal object AdventureLevelListener : Listener {
+internal object PlayerLevelListener : Listener {
     @EventHandler(
         // 尽可能早的储存 PDC, 让 HuskSync 能够同步到
         priority = EventPriority.LOWEST
@@ -26,7 +25,7 @@ internal object AdventureLevelListener : Listener {
     /**
      * ### 注意事项 2024/11/2
      *
-     * 当服务器安装了 HuskSync 时, 这个 [AdventureLevelDataLoadEvent]
+     * 当服务器安装了 HuskSync 时, 这个 [cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent]
      * 会在 HuskSync 的 *同步完成* 事件之后触发. 也就是说, 如果 HuskSync
      * 没有完成同步, 那么该事件永远不会触发.
      */

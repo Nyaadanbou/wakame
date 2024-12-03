@@ -20,7 +20,6 @@ import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
-import cc.mewcraft.wakame.item.logic.AdventureLevelListener
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
@@ -38,6 +37,7 @@ import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
+import cc.mewcraft.wakame.user.PlayerLevelListener
 import cc.mewcraft.wakame.util.registerSuspendingEvents
 import cc.mewcraft.wakame.world.entity.BetterArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
@@ -170,7 +170,7 @@ object Initializer : KoinComponent, Listener {
         registerListener<PlayerDeathProtect>()
 
         // compatibility
-        registerListener<AdventureLevelListener>("AdventureLevel")
+        registerListener<PlayerLevelListener>("AdventureLevel")
 
         // uncategorized
     }
