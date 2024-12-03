@@ -3,8 +3,10 @@ package cc.mewcraft.wakame.reforge.merge
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.RandomizedValue
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import team.unnamed.mocha.runtime.MochaFunction
 
 /**
@@ -21,14 +23,19 @@ interface MergingTable : Examinable {
     val title: Component
 
     /**
-     * 工作台接收的物品, 可以拥有的最高等级.
+     * 工作台接收的物品可以拥有的最高等级.
      */
-    val maxInputItemLevel: Int
+    val inputLevelLimit: Int
 
     /**
-     * 工作台输出的物品, 可以拥有的最高惩罚值.
+     * 工作台输出的物品可以拥有的最高等级.
      */
-    val maxOutputItemPenalty: Int
+    val outputLevelLimit: Int
+
+    /**
+     * 工作台输出的物品可以拥有的最高惩罚值.
+     */
+    val outputPenaltyLimit: Int
 
     /**
      * 用于检查玩家输入的核心, 是否允许参与合并.
@@ -41,24 +48,24 @@ interface MergingTable : Examinable {
     val rarityNumberMapping: RarityNumberMapping
 
     /**
-     * 玩家进行合并操作所需要花费的货币资源.
+     * @see ValueMergeMethod
      */
-    val currencyCost: CurrencyCost
+    val valueMergeMethod: ValueMergeMethod
 
     /**
-     * 具体见 [NumberMergeFunction].
+     * @see LevelMergeMethod
      */
-    val numberMergeFunction: NumberMergeFunction
+    val levelMergeMethod: LevelMergeMethod
 
     /**
-     * 具体见 [OutputLevelFunction].
+     * @see PenaltyMergeMethod
      */
-    val outputLevelFunction: OutputLevelFunction
+    val penaltyMergeMethod: PenaltyMergeMethod
 
     /**
-     * 具体见 [OutputPenaltyFunction].
+     * 完成合并所需要的货币花费.
      */
-    val outputPenaltyFunction: OutputPenaltyFunction
+    val totalCost: CurrencyCost
 
     /**
      * 封装了用于合并属性数值的自定义函数.
@@ -71,36 +78,39 @@ interface MergingTable : Examinable {
      *   第二个属性修饰符的数值
      * ```
      */
-    interface NumberMergeFunction : Examinable {
-        /**
-         * 获取指定的源代码.
-         *
-         * 源代码的大概样子如下:
-         * ```
-         * ( query.x + query.y ) * ( 0.7 + math.random(-0.5, 0.5) )
-         * ```
-         *
-         * @throws IllegalArgumentException 如果指定的源代码不存在
-         */
-        fun code(type: Type): String
+    interface ValueMergeMethod {
+        fun compile(type: Type, session: MergingSession): Algorithm
 
-        /**
-         * 编译指定类型 [type] 的自定义函数.
-         */
-        fun compile(type: Type, session: MergingSession): MochaFunction
+        fun compile(type: AttributeModifier.Operation, session: MergingSession): Algorithm {
+            return compile(Type.by(type), session)
+        }
 
-        /**
-         * 合并操作的类型.
-         */
-        enum class Type {
-            OP0, OP1, OP2;
+        data class Algorithm(
+            private val algorithmData: AlgorithmData, private val meanFunction: MochaFunction,
+        ) {
+            fun evaluate(): RandomizedValue.Result {
+                val base = meanFunction.evaluate()
+                val (_, spread, min, max) = algorithmData
+                val rand = RandomizedValue(base, .0, spread, min, max)
+                return rand.calculate()
+            }
+        }
+
+        @ConfigSerializable
+        data class AlgorithmData(
+            val base: String, val spread: Double, val min: Double, val max: Double,
+        )
+
+        enum class Type(val operation: AttributeModifier.Operation) {
+            ADD_VALUE(AttributeModifier.Operation.ADD),
+            ADD_MULTIPLIED_BASE(AttributeModifier.Operation.MULTIPLY_BASE),
+            ADD_MULTIPLIED_TOTAL(AttributeModifier.Operation.MULTIPLY_TOTAL);
 
             companion object {
-                @JvmStatic
                 fun by(op: AttributeModifier.Operation): Type = when (op) {
-                    AttributeModifier.Operation.ADD -> OP0
-                    AttributeModifier.Operation.MULTIPLY_BASE -> OP1
-                    AttributeModifier.Operation.MULTIPLY_TOTAL -> OP2
+                    AttributeModifier.Operation.ADD -> ADD_VALUE
+                    AttributeModifier.Operation.MULTIPLY_BASE -> ADD_MULTIPLIED_BASE
+                    AttributeModifier.Operation.MULTIPLY_TOTAL -> ADD_MULTIPLIED_TOTAL
                 }
             }
         }
@@ -117,14 +127,9 @@ interface MergingTable : Examinable {
      *   第二个核心的等级
      * ```
      */
-    interface OutputLevelFunction : Examinable {
+    interface LevelMergeMethod {
         /**
-         * 源代码.
-         */
-        val code: String
-
-        /**
-         * 编译自定义函数.
+         * 编译函数.
          */
         fun compile(session: MergingSession): MochaFunction
     }
@@ -140,51 +145,36 @@ interface MergingTable : Examinable {
      *   第二个核心的惩罚值
      * ```
      */
-    interface OutputPenaltyFunction : Examinable {
+    interface PenaltyMergeMethod {
         /**
-         * 源代码.
-         */
-        val code: String
-
-        /**
-         * 编译自定义函数.
+         * 编译函数.
          */
         fun compile(session: MergingSession): MochaFunction
     }
 
     /**
-     * 适用于整个合并台的货币花费设置.
+     * 封装了一般的货币花费.
+     *
+     * 函数的上下文:
+     * ```
+     * query.level_1()
+     *   第一个物品的等级
+     * query.level_2()
+     *   第二个物品的等级
+     * query.rarity_1()
+     *   第一个物品的稀有度对应的数值
+     * query.rarity_2()
+     *   第二个物品的稀有度对应的数值
+     * query.penalty_1()
+     *   第一个物品的惩罚值
+     * query.penalty_2()
+     *   第二个物品的惩罚值
+     * ```
      */
-    interface CurrencyCost : Examinable {
+    interface CurrencyCost {
         /**
-         * 总花费的自定义函数.
+         * 编译函数.
          */
-        val total: TotalFunction
-
-        /**
-         * 封装了用于计算合并总花费的自定义函数.
-         *
-         * 函数的上下文:
-         * ```
-         * query.level_1()
-         *   第一个物品的等级
-         * query.level_2()
-         *   第二个物品的等级
-         * query.rarity_1()
-         *   第一个物品的稀有度对应的数值
-         * query.rarity_2()
-         *   第二个物品的稀有度对应的数值
-         * query.penalty_1()
-         *   第一个物品的惩罚值
-         * query.penalty_2()
-         *   第二个物品的惩罚值
-         * ```
-         */
-        interface TotalFunction : Examinable {
-            /**
-             * 编译自定义函数.
-             */
-            fun compile(session: MergingSession): MochaFunction
-        }
+        fun compile(session: MergingSession): MochaFunction
     }
 }

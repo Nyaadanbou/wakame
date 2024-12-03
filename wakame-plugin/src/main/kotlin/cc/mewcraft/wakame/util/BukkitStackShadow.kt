@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.shadow.inventory.ShadowItemStack
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
@@ -26,49 +25,50 @@ internal val CompoundShadowTag.unwrap: CompoundTag
 
 //<editor-fold desc="BukkitStack">
 /**
+ * 将 [BukkitStack] 封装为 [MojangStack].
+ */
+internal val MojangStack.wrap: BukkitStack
+    get() = CraftItemStack.asCraftMirror(this)
+
+/**
  * 获取封装的 NMS 对象.
  * 如果 [isEmpty] 为 `true`, 将会返回 `null`.
- * 截止至 2024/8/25, 空气不存在封装的 NMS 对象.
  */
-internal val BukkitStack.handle: MojangStack?
-    get() = if (this is CraftItemStack) {
-        this.handle
-    } else {
-        BukkitShadowFactory.global().shadow<ShadowItemStack>(this).craftDelegate.handle
-    }?.takeUnless(MojangStack::isEmpty)
+internal val BukkitStack.unwrap: MojangStack?
+    get() = CraftItemStack.unwrap(this)?.takeUnless(MojangStack::isEmpty)
 
+/**
+ * 设置物品是否应该被网络渲染接管.
+ */
 var BukkitStack.isClientSide: Boolean
-    get() = this.handle?.isClientSide ?: false
+    get() = this.unwrap?.isClientSide == true
     set(value) {
-        this.handle?.isClientSide = value
+        this.unwrap?.isClientSide = value
     }
 
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.customName: Component?
-    get() = this.handle?.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.unwrap?.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+            this.unwrap?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.remove(DataComponents.CUSTOM_NAME)
+            this.unwrap?.remove(DataComponents.CUSTOM_NAME)
         }
     }
-
-@Deprecated("Use customName instead", ReplaceWith("customName"))
-var BukkitStack.customName0: Component? by BukkitStack::customName
 
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.itemName: Component?
-    get() = this.handle?.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.unwrap?.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
+            this.unwrap?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
         } else {
-            this.handle?.remove(DataComponents.ITEM_NAME)
+            this.unwrap?.remove(DataComponents.ITEM_NAME)
         }
     }
 
@@ -76,12 +76,12 @@ var BukkitStack.itemName: Component?
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.lore0: List<Component>?
-    get() = this.handle?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
+    get() = this.unwrap?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
+            this.unwrap?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
         } else {
-            this.handle?.remove(DataComponents.LORE)
+            this.unwrap?.remove(DataComponents.LORE)
         }
     }
 
@@ -89,12 +89,12 @@ var BukkitStack.lore0: List<Component>?
  * 设置自定义模型数据. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.customModelData: Int?
-    get() = this.handle?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
+    get() = this.unwrap?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
     set(value) {
         if (value != null) {
-            this.handle?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
+            this.unwrap?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
         } else {
-            this.handle?.remove(DataComponents.CUSTOM_MODEL_DATA)
+            this.unwrap?.remove(DataComponents.CUSTOM_MODEL_DATA)
         }
     }
 
@@ -102,27 +102,27 @@ var BukkitStack.customModelData: Int?
  * 设置是否隐藏附加提示.
  */
 var BukkitStack.hideAdditionalTooltip: Boolean
-    get() = this.handle?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) == true
+    get() = this.unwrap?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) == true
     set(value) {
-        this.handle?.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
+        this.unwrap?.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, if (value) MojangUnit.INSTANCE else null)
     }
 
 /**
  * 设置是否隐藏提示.
  */
 var BukkitStack.hideTooltip: Boolean
-    get() = this.handle?.has(DataComponents.HIDE_TOOLTIP) == true
+    get() = this.unwrap?.has(DataComponents.HIDE_TOOLTIP) == true
     set(value) {
-        this.handle?.set(DataComponents.HIDE_TOOLTIP, if (value) net.minecraft.util.Unit.INSTANCE else null)
+        this.unwrap?.set(DataComponents.HIDE_TOOLTIP, if (value) MojangUnit.INSTANCE else null)
     }
 
 /**
  * Safe read/write.
  */
 var BukkitStack.rootTagOrNull: CompoundShadowTag?
-    get() = this.handle?.rootTagOrNull
+    get() = this.unwrap?.rootTagOrNull
     set(value) {
-        this.handle?.rootTagOrNull = value
+        this.unwrap?.rootTagOrNull = value
     }
 
 /**
@@ -142,9 +142,9 @@ fun BukkitStack.editRootTag(block: (CompoundShadowTag) -> Unit) {
  * Unsafe read/write.
  */
 var BukkitStack.unsafeRootTagOrNull: CompoundShadowTag?
-    get() = this.handle?.unsafeRootTagOrNull
+    get() = this.unwrap?.unsafeRootTagOrNull
     set(value) {
-        this.handle?.unsafeRootTagOrNull = value
+        this.unwrap?.unsafeRootTagOrNull = value
     }
 
 /**
@@ -157,9 +157,9 @@ val BukkitStack.unsafeRootTag: CompoundShadowTag
  * Safe read/write.
  */
 var BukkitStack.nekooTagOrNull: CompoundShadowTag?
-    get() = this.handle?.nekooTagOrNull
+    get() = this.unwrap?.nekooTagOrNull
     set(value) {
-        val handle: MojangStack? = this.handle
+        val handle: MojangStack? = this.unwrap
         if (handle == null) {
             throw IllegalStateException("Can't write data into empty ItemStack")
         }
@@ -183,9 +183,9 @@ fun BukkitStack.editNekooTag(block: (CompoundShadowTag) -> Unit) {
  * Unsafe read/write.
  */
 var BukkitStack.unsafeNekooTagOrNull: CompoundShadowTag?
-    get() = this.handle?.unsafeNekooTagOrNull
+    get() = this.unwrap?.unsafeNekooTagOrNull
     set(value) {
-        val handle: MojangStack? = this.handle
+        val handle: MojangStack? = this.unwrap
         if (handle == null) {
             throw IllegalStateException("Can't write nya tag into empty ItemStack")
         }

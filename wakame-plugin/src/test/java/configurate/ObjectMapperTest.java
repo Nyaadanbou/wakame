@@ -1,5 +1,6 @@
 package configurate;
 
+import io.leangen.geantyref.TypeToken;
 import org.junit.jupiter.api.Test;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -11,7 +12,9 @@ import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ObjectMapperTest {
 
@@ -140,5 +143,24 @@ class ObjectMapperTest {
         assertNotNull(config.apiConfig);
         assertEquals("https://api.example.com", config.apiConfig.endpoint);
         assertEquals("abcdef123456", config.apiConfig.apiKey);
+    }
+
+    enum EnumAsNodeKey {
+        K1, K2, K3
+    }
+
+    @Test
+    void testEnumAsNodeKey() throws Exception {
+        final ConfigurationNode root = BasicConfigurationNode.root(ConfigurationOptions.defaults());
+        root.node("k1").set("value1");
+        root.node("k2").set("value2");
+        root.node("k3").set("value3");
+
+        final Map<EnumAsNodeKey, String> enumAsNodeKeyStringMap = root.get(new TypeToken<>() {});
+        assertNotNull(enumAsNodeKeyStringMap);
+        assertEquals(3, enumAsNodeKeyStringMap.size());
+        assertEquals("value1", enumAsNodeKeyStringMap.get(EnumAsNodeKey.K1));
+        assertEquals("value2", enumAsNodeKeyStringMap.get(EnumAsNodeKey.K2));
+        assertEquals("value3", enumAsNodeKeyStringMap.get(EnumAsNodeKey.K3));
     }
 }

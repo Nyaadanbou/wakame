@@ -2,14 +2,14 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.item.components.cells.*
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.CoreConstants
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import java.util.stream.Stream
 
 val Cell.attributeCore: AttributeCore?
     get() = getCore() as? AttributeCore
@@ -28,9 +28,10 @@ val Cell.attribute: ConstantCompositeAttribute?
 fun AttributeCore(
     id: Key,
     attribute: ConstantCompositeAttribute,
-): AttributeCore {
-    return SimpleAttributeCore(id, attribute)
-}
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = attribute,
+)
 
 /**
  * 本函数用于从 NBT 构建 [AttributeCore].
@@ -45,12 +46,10 @@ fun AttributeCore(
 fun AttributeCore(
     id: Key,
     nbt: CompoundTag,
-): AttributeCore {
-    val compositeAttributeId = id.value()
-    val compositeAttributeFacade = AttributeRegistry.FACADES[compositeAttributeId]
-    val compositeAttribute = compositeAttributeFacade.convertNBT2Constant(nbt)
-    return SimpleAttributeCore(id, compositeAttribute)
-}
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = AttributeRegistry.FACADES[id.value()].convertNBT2Constant(nbt),
+)
 
 /**
  * 本函数用于从配置文件构建 [AttributeCore].
@@ -65,12 +64,10 @@ fun AttributeCore(
 fun AttributeCore(
     id: Key,
     node: ConfigurationNode,
-): AttributeCore {
-    val compositeAttributeId = id.value()
-    val compositeAttributeFacade = AttributeRegistry.FACADES[compositeAttributeId]
-    val compositeAttribute = compositeAttributeFacade.convertNode2Constant(node)
-    return SimpleAttributeCore(id, compositeAttribute)
-}
+): AttributeCore = SimpleAttributeCore(
+    id = id,
+    attribute = AttributeRegistry.FACADES[id.value()].convertNode2Constant(node),
+)
 
 /**
  * [AttributeCore] 的标准实现.
@@ -105,13 +102,6 @@ internal data class SimpleAttributeCore(
 
         return baseTag
     }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id.asString()),
-        ExaminableProperty.of("attribute", attribute),
-    )
-
-    override fun toString(): String = toSimpleString()
 }
 
 private fun CompoundTag.writeId(id: Key) {

@@ -101,6 +101,10 @@ components:
     enabled: true
     display_name: "<!i><white>稀有度"
 
+  reforge_history:
+    enabled: true
+    display_name: "<!i><white>重铸历史"
+
   skin:
     enabled: true
     display_name: "<!i><white>皮肤"

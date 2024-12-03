@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
@@ -15,16 +19,17 @@ data class ItemMaxDamage(
     /**
      * 最大耐久损耗.
      */
-    val maxDamage: RandomizedValue
+    val maxDamage: RandomizedValue,
 ) : ItemTemplate<Int> {
     override val componentType: ItemComponentType<Int> = ItemComponentTypes.MAX_DAMAGE
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<Int> {
-        val maxDamage = this.maxDamage.calculate().toStableInt()
+        val (value, _) = this.maxDamage.calculate()
+        val maxDamage = value.toStableInt()
         return ItemGenerationResult.of(maxDamage)
     }
 
-    companion object: ItemTemplateBridge<ItemMaxDamage> {
+    companion object : ItemTemplateBridge<ItemMaxDamage> {
         override fun codec(id: String): ItemTemplateType<ItemMaxDamage> {
             return Codec(id)
         }

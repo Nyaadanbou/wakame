@@ -10,7 +10,7 @@ class RandomizedValueTest {
 
     @Test
     fun deserialize_string() {
-        RandomizedValue.create("5").calculate().apply { assertEquals(5.0, this, TOLERANCE) }
+        RandomizedValue.create("5").calculate().apply { assertEquals(5.0, this.value, TOLERANCE) }
     }
 
     @Test
@@ -20,7 +20,7 @@ class RandomizedValueTest {
             set(5.0)
         }
         RandomizedValue.create(node).calculate().apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
     }
 
@@ -31,7 +31,7 @@ class RandomizedValueTest {
             node("base").set(5.0)
         }
         RandomizedValue.create(node).calculate().apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
     }
 
@@ -43,7 +43,7 @@ class RandomizedValueTest {
             node("scale").set(1.2)
         }
         RandomizedValue.create(node).calculate(scalingFactor = 2).apply {
-            assertEquals(5.0 + 1.2 * 2, this, TOLERANCE)
+            assertEquals(5.0 + 1.2 * 2, this.value, TOLERANCE)
         }
     }
 
@@ -80,16 +80,16 @@ class RandomizedValueTest {
     fun deserialization_from_number() {
         val value = RandomizedValue.create(5.0)
         value.calculate().apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
         value.calculate(scalingFactor = 2.1).apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
         value.calculate(randomVariable = 3.8).apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
         value.calculate(scalingFactor = 2.1, randomVariable = 3.8).apply {
-            assertEquals(5.0, this, TOLERANCE)
+            assertEquals(5.0, this.value, TOLERANCE)
         }
     }
 }

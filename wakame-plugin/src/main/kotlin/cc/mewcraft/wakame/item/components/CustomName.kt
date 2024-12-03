@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.util.customName0
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.util.customName
 import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 
@@ -35,18 +38,18 @@ interface CustomName {
             // 2024/6/29
             // 设计上 custom_name 和 item_name 都不经过发包系统处理,
             // 因此这里有什么就读取什么. 整体上做到简单, 一致, 无例外.
-            return holder.item.customName0
+            return holder.item.customName
         }
 
         override fun write(holder: ItemComponentHolder, value: Component) {
             // 2024/6/29
             // 设计上 custom_name 和 item_name 都不经过发包系统处理,
             // 因此这里有什么就写入什么. 整体上做到简单, 一致, 无例外.
-            holder.item.customName0 = value
+            holder.item.customName = value
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.customName0 = null
+            holder.item.customName = null
         }
     }
 }

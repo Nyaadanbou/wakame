@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
-import cc.mewcraft.wakame.item.damageItemStackByMark
+import cc.mewcraft.wakame.item.damageItemStack2
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
@@ -121,7 +121,7 @@ class HammerAttack(
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
+        player.damageItemStack2(EquipmentSlot.HAND, 1)
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {

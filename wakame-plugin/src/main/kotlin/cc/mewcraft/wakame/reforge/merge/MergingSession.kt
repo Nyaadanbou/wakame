@@ -66,7 +66,7 @@ interface MergingSession : Examinable {
     /**
      * 用于计算当前输出核心的合并数值.
      */
-    val numberMergeFunction: (MergingTable.NumberMergeFunction.Type) -> MochaFunction
+    val valueMergeFunction: (AttributeModifier.Operation) -> MergingTable.ValueMergeMethod.Algorithm
 
     /**
      * 用于计算当前输出核心的物品等级.

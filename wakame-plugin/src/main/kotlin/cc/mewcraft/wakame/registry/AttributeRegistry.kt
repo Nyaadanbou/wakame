@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
@@ -9,7 +10,18 @@ import cc.mewcraft.wakame.attribute.AttributeGetter
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute.Quality
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeSE
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.Element
@@ -31,9 +43,10 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.provider.Provider
+import xyz.xenondevs.commons.provider.immutable.orElse
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
@@ -55,11 +68,6 @@ import kotlin.reflect.KClass
     runBefore = [ElementRegistry::class]
 )
 object AttributeRegistry : Initializable {
-
-    /**
-     * The key of the empty attribute.
-     */
-    val EMPTY_KEY: Key = Attributes.EMPTY.key()
 
     /**
      * The facades of all composite attributes.
@@ -88,13 +96,9 @@ object AttributeRegistry : Initializable {
     }
 
     /**
-     * Registers all composite attributes using DSL.
+     * Registers all [CompositeAttributeFacade] using DSL.
      */
     private fun registerComposites() {
-        // Register the special attribute
-        +buildComposite("empty").single().bind(Attributes.EMPTY)
-
-        // Registry more composite attributes here ...
         +buildComposite("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
         +buildComposite("attack_damage_rate").single().element().bind(Attributes.ATTACK_DAMAGE_RATE)
         +buildComposite("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
@@ -108,12 +112,12 @@ object AttributeRegistry : Initializable {
         +buildComposite("entity_interaction_range").single().bind(Attributes.ENTITY_INTERACTION_RANGE)
         +buildComposite("hammer_damage_range").single().bind(Attributes.HAMMER_DAMAGE_RANGE)
         +buildComposite("hammer_damage_ratio").single().bind(Attributes.HAMMER_DAMAGE_RATIO)
-        +buildComposite("health_regeneration").single().bind(Attributes.HEALTH_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("health_regeneration").single().bind(Attributes.HEALTH_REGENERATION)
         +buildComposite("incoming_damage_rate").single().element().bind(Attributes.INCOMING_DAMAGE_RATE)
         +buildComposite("knockback_resistance").single().bind(Attributes.KNOCKBACK_RESISTANCE)
         +buildComposite("lifesteal").single().bind(Attributes.LIFESTEAL)
         +buildComposite("mana_consumption_rate").single().bind(Attributes.MANA_CONSUMPTION_RATE)
-        +buildComposite("mana_regeneration").single().bind(Attributes.MANA_REGENERATION).override { mutateTooltipLoreCreator1(this, 20) }
+        +buildComposite("mana_regeneration").single().bind(Attributes.MANA_REGENERATION)
         +buildComposite("manasteal").single().bind(Attributes.MANASTEAL)
         +buildComposite("max_absorption").single().bind(Attributes.MAX_ABSORPTION)
         +buildComposite("max_health").single().bind(Attributes.MAX_HEALTH)
@@ -175,7 +179,7 @@ interface CompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableC
     val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
 
     /**
-     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreBlueprint].
+     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype].
      */
     val convertNode2Variable: (ConfigurationNode) -> S
 
@@ -201,11 +205,11 @@ interface CompositeAttributeFacade<T : ConstantCompositeAttribute, S : VariableC
 }
 
 /**
- * 一个属性的组件相关信息。
+ * 一个属性的组件相关信息.
  */
 interface CompositeAttributeMetadata {
     /**
-     * 查询该属性是否有指定的组件。
+     * 查询该属性是否有指定的组件.
      *
      * @param T 组件的类型
      * @param componentClass 组件的接口类
@@ -224,11 +228,6 @@ inline fun <reified T : CompositeAttributeComponent> CompositeAttributeMetadata.
 //
 // Mini DSL for building an composite attribute facade
 //
-
-private operator fun CompositeAttributeFacade<*, *>.unaryPlus() {
-    @Suppress("UNCHECKED_CAST")
-    FACADES.register(this.id, this as CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>)
-}
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
@@ -308,9 +307,7 @@ private class AttributeFacadeOverride<S : ConstantCompositeAttribute, V : Variab
 //
 
 //<editor-fold desc="Implementations">
-private object AttributeRegistrySupport : KoinComponent {
-    val miniMessage = get<MiniMessage>()
-}
+private val MM = Injector.get<MiniMessage>()
 
 /**
  * A mutable [CompositeAttributeFacade] (except the property [id]).
@@ -334,7 +331,8 @@ private class MutableCompositeAttributeFacade<T : ConstantCompositeAttribute, S 
     override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
 }
 
-private class CompositeAttributeMetadataImpl private constructor(
+private class CompositeAttributeMetadataImpl
+private constructor(
     components: Set<KClass<out CompositeAttributeComponent>>,
 ) : CompositeAttributeMetadata {
     constructor(vararg components: KClass<out CompositeAttributeComponent>) : this(components.toHashSet())
@@ -344,6 +342,11 @@ private class CompositeAttributeMetadataImpl private constructor(
     override fun <T : CompositeAttributeComponent> hasComponent(componentClass: KClass<T>): Boolean {
         return componentClass in components
     }
+}
+
+private object AttributeConfigFallback {
+    private val default: ConfigProvider = AttributeRegistry.CONFIG.node("__default__")
+    val quality: Provider<Map<Quality, Component>> = default.entry("quality")
 }
 
 private sealed class Tooltips(
@@ -427,6 +430,32 @@ private class NumericTooltips(
     }
 }
 
+private class NumericScaling(
+    config: ConfigProvider,
+) : Tooltips(config) {
+    private val add: Double by config.optionalEntry<Double>("scaling", "add").orElse(1.0)
+    private val multiplyBase: Double by config.optionalEntry<Double>("scaling", "multiply_base").orElse(1.0)
+    private val multiplyTotal: Double by config.optionalEntry<Double>("scaling", "multiply_total").orElse(1.0)
+
+    fun scale(operation: Operation, value: Double): Double {
+        return when (operation) {
+            Operation.ADD -> value * add
+            Operation.MULTIPLY_BASE -> value * multiplyBase
+            Operation.MULTIPLY_TOTAL -> value * multiplyTotal
+        }
+    }
+}
+
+private class QualityText(
+    config: ConfigProvider,
+) {
+    private val quality: Map<Quality, Component> by config.optionalEntry<Map<Quality, Component>>("quality").orElse(AttributeConfigFallback.quality)
+
+    fun translate(quality: Quality?): Component {
+        return this.quality[quality] ?: Component.empty()
+    }
+}
+
 private class FormatSelectionImpl(
     private val id: String,
 ) : FormatSelection {
@@ -445,6 +474,8 @@ private class SingleSelectionImpl(
     private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
+    private val scaling: NumericScaling = NumericScaling(config)
+    private val quality: QualityText = QualityText(config)
 
     override fun element(): SingleElementAttributeBinder {
         return SingleElementAttributeBinderImpl(id)
@@ -460,31 +491,32 @@ private class SingleSelectionImpl(
             components = CompositeAttributeMetadataImpl(
                 CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Scalar::class
             ),
-            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeS ->
+            createAttributeModifiers = { id, data ->
                 ImmutableMap.of(
-                    component, AttributeModifier(id, core.value.toStableDouble(), core.operation)
+                    component, AttributeModifier(id, data.value.toStableDouble(), data.operation)
                 )
             },
-            convertNode2Variable = { node: ConfigurationNode ->
+            convertNode2Variable = { node ->
                 val operation = node.getOperation()
                 val value = node.getVariableScalar()
                 VariableCompositeAttributeS(id, operation, value)
             },
-            convertNode2Constant = { node: ConfigurationNode ->
+            convertNode2Constant = { node ->
                 val operation = node.getOperation()
                 val value = node.getSimpleScalar()
                 ConstantCompositeAttributeS(id, operation, value)
             },
-            convertNBT2Constant = { tag: CompoundTag ->
+            convertNBT2Constant = { tag ->
                 ConstantCompositeAttributeS(id, tag)
             },
             createTooltipName = {
-                AttributeRegistrySupport.miniMessage.deserialize(displayName)
+                MM.deserialize(displayName)
             },
-            createTooltipLore = { core: ConstantCompositeAttributeS ->
-                val lines = tooltips.line(core.operation)
-                val resolver = tooltips.number("value", core.value)
-                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
+            createTooltipLore = { data ->
+                val input = tooltips.line(data.operation)
+                val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
+                val resolver2 = tooltips.component("quality", quality.translate(data.quality))
+                listOf(MM.deserialize(input, resolver1, resolver2))
             },
         )
 
@@ -498,6 +530,8 @@ private class RangedSelectionImpl(
     private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
+    private val scaling: NumericScaling = NumericScaling(config)
+    private val quality: QualityText = QualityText(config)
 
     override fun element(): RangedElementAttributeBinder {
         return RangedElementAttributeBinderImpl(id)
@@ -516,35 +550,36 @@ private class RangedSelectionImpl(
             components = CompositeAttributeMetadataImpl(
                 CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Ranged::class
             ),
-            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeR ->
+            createAttributeModifiers = { id, core ->
                 ImmutableMap.of(
                     component1, AttributeModifier(id, core.lower.toStableDouble(), core.operation),
                     component2, AttributeModifier(id, core.upper.toStableDouble(), core.operation),
                 )
             },
-            convertNode2Variable = { node: ConfigurationNode ->
+            convertNode2Variable = { node ->
                 val operation = node.getOperation()
                 val lower = node.getVariableMin()
                 val upper = node.getVariableMax()
                 VariableCompositeAttributeR(id, operation, lower, upper)
             },
-            convertNode2Constant = { node: ConfigurationNode ->
+            convertNode2Constant = { node ->
                 val operation = node.getOperation()
                 val lower = node.getSimpleMin()
                 val upper = node.getSimpleMax()
                 ConstantCompositeAttributeR(id, operation, lower, upper)
             },
-            convertNBT2Constant = { tag: CompoundTag ->
+            convertNBT2Constant = { tag ->
                 ConstantCompositeAttributeR(id, tag)
             },
             createTooltipName = {
-                AttributeRegistrySupport.miniMessage.deserialize(displayName)
+                MM.deserialize(displayName)
             },
-            createTooltipLore = { core: ConstantCompositeAttributeR ->
-                val lines = tooltips.line(core.operation)
-                val resolver1 = tooltips.number("min", core.lower)
-                val resolver2 = tooltips.number("max", core.upper)
-                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2))
+            createTooltipLore = { data ->
+                val lines = tooltips.line(data.operation)
+                val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
+                val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
+                val resolver3 = tooltips.component("quality", quality.translate(data.quality))
+                listOf(MM.deserialize(lines, resolver1, resolver2, resolver3))
             },
         )
 
@@ -558,6 +593,8 @@ private class SingleElementAttributeBinderImpl(
     private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
+    private val scaling: NumericScaling = NumericScaling(config)
+    private val quality: QualityText = QualityText(config)
 
     /**
      * Components: Operation, Single, Element
@@ -569,35 +606,36 @@ private class SingleElementAttributeBinderImpl(
             components = CompositeAttributeMetadataImpl(
                 CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Scalar::class, CompositeAttributeComponent.Element::class
             ),
-            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeSE ->
-                ImmutableMap.of(
-                    component.of(core.element), AttributeModifier(id, core.value.toStableDouble(), core.operation)
-                )
+            createAttributeModifiers = { id, data ->
+                val k1 = component.of(data.element)
+                val v1 = AttributeModifier(id, data.value.toStableDouble(), data.operation)
+                ImmutableMap.of(k1, v1)
             },
-            convertNode2Variable = { node: ConfigurationNode ->
+            convertNode2Variable = { node ->
                 val operation = node.getOperation()
                 val value = node.getVariableScalar()
                 val element = node.getElement()
                 VariableCompositeAttributeSE(id, operation, value, element)
             },
-            convertNode2Constant = { node: ConfigurationNode ->
+            convertNode2Constant = { node ->
                 val operation = node.getOperation()
                 val value = node.getSimpleScalar()
                 val element = node.getElement()
                 ConstantCompositeAttributeSE(id, operation, value, element)
             },
-            convertNBT2Constant = { tag: CompoundTag ->
+            convertNBT2Constant = { tag ->
                 ConstantCompositeAttributeSE(id, tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
-                AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
+                MM.deserialize(displayName, resolver)
             },
-            createTooltipLore = { core: ConstantCompositeAttributeSE ->
-                val lines = tooltips.line(core.operation)
-                val resolver1 = tooltips.number("value", core.value)
-                val resolver2 = tooltips.component("element", core.element.displayName)
-                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2))
+            createTooltipLore = { data ->
+                val input = tooltips.line(data.operation)
+                val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
+                val resolver2 = tooltips.component("element", data.element.displayName)
+                val resolver3 = tooltips.component("quality", quality.translate(data.quality))
+                listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
             },
         )
 
@@ -611,6 +649,8 @@ private class RangedElementAttributeBinderImpl(
     private val config: ConfigProvider = AttributeRegistry.CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
+    private val scaling: NumericScaling = NumericScaling(config)
+    private val quality: QualityText = QualityText(config)
 
     /**
      * Components: Operation, Ranged, Element
@@ -625,39 +665,40 @@ private class RangedElementAttributeBinderImpl(
             components = CompositeAttributeMetadataImpl(
                 CompositeAttributeComponent.Operation::class, CompositeAttributeComponent.Ranged::class, CompositeAttributeComponent.Element::class
             ),
-            createAttributeModifiers = { id: Key, core: ConstantCompositeAttributeRE ->
+            createAttributeModifiers = { id, data ->
                 ImmutableMap.of(
-                    component1.of(core.element), AttributeModifier(id, core.lower.toStableDouble(), core.operation),
-                    component2.of(core.element), AttributeModifier(id, core.upper.toStableDouble(), core.operation),
+                    component1.of(data.element), AttributeModifier(id, data.lower.toStableDouble(), data.operation),
+                    component2.of(data.element), AttributeModifier(id, data.upper.toStableDouble(), data.operation),
                 )
             },
-            convertNode2Variable = { node: ConfigurationNode ->
+            convertNode2Variable = { node ->
                 val operation = node.getOperation()
                 val lower = node.getVariableMin()
                 val upper = node.getVariableMax()
                 val element = node.getElement()
                 VariableCompositeAttributeRE(id, operation, lower, upper, element)
             },
-            convertNode2Constant = { node: ConfigurationNode ->
+            convertNode2Constant = { node ->
                 val operation = node.getOperation()
                 val lower = node.getSimpleMin()
                 val upper = node.getSimpleMax()
                 val element = node.getElement()
                 ConstantCompositeAttributeRE(id, operation, lower, upper, element)
             },
-            convertNBT2Constant = { tag: CompoundTag ->
+            convertNBT2Constant = { tag ->
                 ConstantCompositeAttributeRE(id, tag)
             },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.displayName)
-                AttributeRegistrySupport.miniMessage.deserialize(displayName, resolver)
+                MM.deserialize(displayName, resolver)
             },
-            createTooltipLore = { core: ConstantCompositeAttributeRE ->
-                val lines = tooltips.line(core.operation)
-                val resolver1 = tooltips.number("min", core.lower)
-                val resolver2 = tooltips.number("max", core.upper)
-                val resolver3 = tooltips.component("element", core.element.displayName)
-                listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver1, resolver2, resolver3))
+            createTooltipLore = { data ->
+                val input = tooltips.line(data.operation)
+                val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
+                val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
+                val resolver3 = tooltips.component("element", data.element.displayName)
+                val resolver4 = tooltips.component("quality", quality.translate(data.quality))
+                listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
             },
         )
 
@@ -700,25 +741,3 @@ private fun ConfigurationNode.getVariableMax(): RandomizedValue {
     return node("upper").krequire<RandomizedValue>()
 }
 //</editor-fold>
-
-private fun mutateTooltipLoreCreator1(
-    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeS, VariableCompositeAttributeS>,
-    scale: Int,
-) {
-    val tooltips = NumericTooltips(facade.config)
-    val creator = { core: ConstantCompositeAttributeS ->
-        val lines = tooltips.line(core.operation)
-        val resolver = if (core.operation == Operation.ADD) {
-            tooltips.number("value", core.value * scale)
-        } else {
-            tooltips.number("value", core.value)
-        }
-        listOf(AttributeRegistrySupport.miniMessage.deserialize(lines, resolver))
-    }
-    facade.createTooltipLore = creator
-}
-
-private fun mutateTooltipLoreCreator2(
-    facade: MutableCompositeAttributeFacade<ConstantCompositeAttributeR, VariableCompositeAttributeR>,
-    params: Nothing,
-) = Unit

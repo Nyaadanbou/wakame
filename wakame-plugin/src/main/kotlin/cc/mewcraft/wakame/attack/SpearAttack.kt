@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.extensions.toLocation
 import cc.mewcraft.wakame.extensions.toVector3f
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
-import cc.mewcraft.wakame.item.damageItemStackByMark
+import cc.mewcraft.wakame.item.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
@@ -92,7 +92,7 @@ data class SpearAttack(
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
+        player.damageItemStack2(EquipmentSlot.HAND, 1)
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
@@ -104,7 +104,7 @@ data class SpearAttack(
         // 应用攻击冷却
         nekoStack.applyAttackCooldown(player)
         // 扣除耐久
-        player.damageItemStackByMark(EquipmentSlot.HAND, 1)
+        player.damageItemStack2(EquipmentSlot.HAND, 1)
 
         wrappedEvent.actionPerformed = true
     }

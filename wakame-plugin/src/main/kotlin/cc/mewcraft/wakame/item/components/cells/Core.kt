@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.*
+import cc.mewcraft.wakame.BinarySerializable
+import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.item.components.cells.cores.*
+import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
+import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
+import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.examination.Examinable
 
 
 /**
@@ -25,7 +29,7 @@ val Core.isEmpty: Boolean
 /**
  * 代表一个核孔中的核心. 核心是 [核孔][Cell] 中提供具体效果的东西.
  */
-interface Core : Examinable, BinarySerializable<CompoundTag> {
+interface Core : BinarySerializable<CompoundTag> {
     /**
      * 核心的唯一标识. 主要用于序列化实现.
      *
@@ -149,7 +153,7 @@ object CoreFactory {
 
             // 无法识别 NBT
             else -> {
-                throw IllegalArgumentException("Failed to parse NBT tag ${tag.asString()}")
+                throw IllegalArgumentException("failed to parse NBT tag ${tag.asString()}")
             }
         }
 

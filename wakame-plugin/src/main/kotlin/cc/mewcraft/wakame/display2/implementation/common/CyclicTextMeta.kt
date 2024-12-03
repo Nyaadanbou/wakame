@@ -1,15 +1,24 @@
-package cc.mewcraft.wakame.display2.implementation.common
-
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.util.ThreadLocalCounterCycle
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-
-// 关于本文件:
+// 文件说明:
 //
 // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
 // 这里提供了一套通用的实现, 用来循环产生在末尾带有序数的 IndexedText#idx
 // 使得索引不再重复, 最终实现在渲染结果中出现多个相同内容的 IndexedText.
+
+
+package cc.mewcraft.wakame.display2.implementation.common
+
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.SimpleTextMeta
+import cc.mewcraft.wakame.display2.SourceIndex
+import cc.mewcraft.wakame.display2.SourceOrdinal
+import cc.mewcraft.wakame.display2.TextAssembler
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta.Shared.MAX_DISPLAY_COUNT
+import cc.mewcraft.wakame.util.ThreadLocalCounterCycle
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.text.Component
 
 internal data class CyclicTextMeta(
     override val sourceIndex: SourceIndex,

@@ -4,11 +4,21 @@ import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.item.templates.components.cells.*
-import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreBlueprint
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.templates.components.cells.CellArchetype
+import cc.mewcraft.wakame.item.templates.components.cells.CellArchetypeSerializer
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeGroupSerializer
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSerializer
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
+import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -19,7 +29,7 @@ import cc.mewcraft.wakame.item.components.ItemCells as ItemCellsData
 
 
 data class ItemCells(
-    val cells: Map<String, CellBlueprint>,
+    val cells: Map<String, CellArchetype>,
 ) : ItemTemplate<ItemCellsData> {
     val minimumSlotAmount: Int = 1 // 更加合理的最小值?
     val maximumSlotAmount: Int = cells.size
@@ -31,7 +41,7 @@ data class ItemCells(
         for ((id, templateCell) in this.cells) {
             val core = run {
                 val selected = templateCell.core.select(context)
-                val template = selected.firstOrNull() ?: EmptyCoreBlueprint
+                val template = selected.firstOrNull() ?: EmptyCoreArchetype
                 template.generate(context)
             }
 
@@ -84,12 +94,12 @@ data class ItemCells(
                 }
 
             val selectors: ConfigurationNode = node.node("selectors")
-            val templates: LinkedHashMap<String, CellBlueprint> = bucketMap
+            val templates: LinkedHashMap<String, CellArchetype> = bucketMap
                 .map { (id, node) ->
                     // 先把节点 “selectors” 注入到节点 “buckets.<id>”
-                    node.hint(CellBlueprintSerializer.HINT_NODE_SELECTORS, selectors)
+                    node.hint(CellArchetypeSerializer.HINT_NODE_SELECTORS, selectors)
                     // 再反序列化 “buckets.<id>”, 最后转成 Pair
-                    id to node.krequire<CellBlueprint>()
+                    id to node.krequire<CellArchetype>()
                 }.toMap(
                     // 显式构建为有序 Map
                     LinkedHashMap()
@@ -102,10 +112,10 @@ data class ItemCells(
             return TypeSerializerCollection.builder()
 
                 // 随机选择器
-                .kregister(CellBlueprintSerializer)
-                .kregister(CoreBlueprintSerializer)
-                .kregister(CoreBlueprintPoolSerializer)
-                .kregister(CoreBlueprintGroupSerializer)
+                .kregister(CellArchetypeSerializer)
+                .kregister(CoreArchetypeSerializer)
+                .kregister(CoreArchetypePoolSerializer)
+                .kregister(CoreArchetypeGroupSerializer)
 
                 // 技能, 部分核心会用到
                 .registerAll(get(named(SKILL_EXTERNALS)))

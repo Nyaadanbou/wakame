@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.reforgeHistory
 import me.lucko.helper.text3.mini
 
@@ -61,7 +61,7 @@ private constructor(
 
         // 检查经过修改的核孔中是否存在无效的耗材
         if (changedReplaceParams.any { (_, repl) -> !repl.latestResult.applicable }) {
-            logger.info("Skipped reforge as some replaces are not applicable")
+            logger.info("Skipped reforge as some replaces are not applicable!")
             return ReforgeResult.failure("<gray>部分修改无法应用.".mini)
         }
 
@@ -72,9 +72,9 @@ private constructor(
         }
 
         // 如果源物品不合法, 则返回失败
-        val builder = usableInput.components.get(ItemComponentTypes.CELLS)?.builder() ?: run {
+        val builder = usableInput.cells?.builder() ?: run {
             logger.info("No cells found in source item")
-            return ReforgeResult.failure("<gray>物品不存在任何核孔.".mini)
+            return ReforgeResult.failure("<gray>物品没有任何核孔.".mini)
         }
 
         for ((id, replace) in changedReplaceParams) {
@@ -97,10 +97,21 @@ private constructor(
         }
 
         // 把修改后的核孔应用到输出物品上
-        usableInput.components.set(ItemComponentTypes.CELLS, builder.build())
+        usableInput.cells = builder.build()
 
-        // 增加重铸次数
-        usableInput.reforgeHistory = usableInput.reforgeHistory.incCount(1)
+        // 增加物品的重铸次数
+        when (session.table.reforgeCountAddMethod) {
+            ModdingTable.ReforgeCountAddMethod.PLUS_ONE -> {
+                val changed = usableInput.reforgeHistory.incCount(1)
+                usableInput.reforgeHistory = changed
+            }
+
+            ModdingTable.ReforgeCountAddMethod.ALL_CORE -> {
+                val sum = changedReplaceParams.sumOf { it.value.usableInput?.reforgeHistory?.modCount ?: 0 }
+                val changed = usableInput.reforgeHistory.incCount(sum + 1)
+                usableInput.reforgeHistory = changed
+            }
+        }
 
         // 计算需要消耗的货币数量
         val reforgeCost = ReforgeCost.simple(totalFunction.evaluate())

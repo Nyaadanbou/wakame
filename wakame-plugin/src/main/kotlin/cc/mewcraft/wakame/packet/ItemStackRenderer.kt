@@ -2,11 +2,16 @@ package cc.mewcraft.wakame.packet
 
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.standard.StandardContext
+import cc.mewcraft.wakame.initializer.Initializer
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.*
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -127,7 +132,11 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
                 ItemRenderers.STANDARD.render(nekoStack, StandardContext)
                 changed = true
             } catch (e: Throwable) {
-                logger.error("An error occurred while rendering network item: ${nekoStack.id}")
+                if (Initializer.isDebug) {
+                    e.printStackTrace()
+                } else {
+                    logger.error("An error occurred while rendering network item: ${nekoStack.id}")
+                }
             }
         }
 

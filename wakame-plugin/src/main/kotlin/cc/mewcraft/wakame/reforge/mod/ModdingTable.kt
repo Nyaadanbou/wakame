@@ -28,6 +28,11 @@ interface ModdingTable : Examinable {
     val title: Component
 
     /**
+     * @see ReforgeCountAddMethod
+     */
+    val reforgeCountAddMethod: ReforgeCountAddMethod
+
+    /**
      * 稀有度到数值的映射.
      */
     val rarityNumberMapping: RarityNumberMapping
@@ -41,6 +46,14 @@ interface ModdingTable : Examinable {
      * 储存了本定制台支持的所有物品的定制规则.
      */
     val itemRuleMap: ItemRuleMap
+
+    /**
+     * 物品的重铸次数的计算方式.
+     */
+    enum class ReforgeCountAddMethod {
+        PLUS_ONE,
+        ALL_CORE
+    }
 
     /**
      * 封装了一个物品的定制规则.

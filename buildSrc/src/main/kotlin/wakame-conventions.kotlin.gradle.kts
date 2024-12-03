@@ -60,6 +60,8 @@ tasks {
     test {
         // suppress Java agent warning
         jvmArgs("-XX:+EnableDynamicAgentLoading")
+        // allow for reflection to work
+        jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
         // use JUnit 5
         useJUnitPlatform()
     }

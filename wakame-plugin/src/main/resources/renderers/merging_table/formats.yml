@@ -24,20 +24,13 @@ level:
 # id: `merge_input`
 merge_input:
   namespace: reforge
-  penalty_format: "惩罚: <penalty>"
-  overall_ordinal:
-    - core
-    - penalty
 
 # id: `merge_output`
 merge_output:
   namespace: reforge
-  penalty_format: "惩罚: <penalty>"
-  overall_ordinal:
-    - core
-    - penalty
-  obfuscation:
-    pattern: "[+-]?\\d+(\\.\\d+)?"
+  attribute_format:
+    style: "<!i><white>"
+    pattern: "[+-]?\\d+(\\.\\d+)?%?(\\*+)?"
     replacement: "???"
 
 # id: `rarity`

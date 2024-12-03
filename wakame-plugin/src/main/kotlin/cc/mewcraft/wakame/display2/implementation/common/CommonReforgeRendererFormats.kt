@@ -1,3 +1,6 @@
+// 文件说明:
+// 在不同重铸系统中通用的 [RendererFormat]
+
 package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.Injector

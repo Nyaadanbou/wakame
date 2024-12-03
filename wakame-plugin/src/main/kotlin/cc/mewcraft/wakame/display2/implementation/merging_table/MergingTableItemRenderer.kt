@@ -3,7 +3,6 @@
  */
 package cc.mewcraft.wakame.display2.implementation.merging_table
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
@@ -20,6 +19,7 @@ import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -34,14 +34,11 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.merge.MergingSession
-import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.util.plain
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.TextReplacementConfig
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
-import org.koin.core.component.get
+import net.kyori.adventure.text.format.Style
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -130,14 +127,14 @@ internal object MergingTableRenderingParts : RenderingParts(MergingTableItemRend
 
     // 渲染放在输入容器的便携核心
     @JvmField
-    val MERGE_IN: RenderingPart2<PortableCore, MergingTableContext.MergeInputSlot, MergeInputOutputRendererFormat> = configure2("merge_input") { data, context, format ->
-        format.render(data, context)
+    val MERGE_IN: RenderingPart2<PortableCore, MergingTableContext.MergeInputSlot, PortableCoreRendererFormat> = configure2("merge_input") { data, context, format ->
+        format.render(data)
     }
 
     // 渲染放在输出容器的便携核心
     @JvmField
-    val MERGE_OUT: RenderingPart2<PortableCore, MergingTableContext.MergeOutputSlot, MergeInputOutputRendererFormat> = configure2("merge_output") { data, context, format ->
-        format.render(data, context)
+    val MERGE_OUT: RenderingPart2<PortableCore, MergingTableContext.MergeOutputSlot, MergeOutputRendererFormat> = configure2("merge_output") { data, context, format ->
+        format.render(data)
     }
 
     @JvmField
@@ -149,82 +146,33 @@ internal object MergingTableRenderingParts : RenderingParts(MergingTableItemRend
 
 
 @ConfigSerializable
-internal data class MergeInputOutputRendererFormat(
+internal data class MergeOutputRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @NodeKey
     override val id: String,
-    @Setting("penalty_format")
-    private val penaltyFormat: String = "Penalty: <penalty>",
-    @Setting("overall_ordinal") @Required
-    private val _unprocessedOrdinal: List<String>,
     @Setting
-    private val obfuscation: Obfuscation = Obfuscation(Pattern.compile(""), empty()),
+    private val attributeFormat: AttributeFormat,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
     override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
 
-    private val ordinal = _unprocessedOrdinal.mapNotNull { raw -> EnumLookup.lookup<OrdinalIndex>(raw).getOrNull() }
-
-    fun render(core: PortableCore, context: MergingTableContext.MergeInputSlot): IndexedText {
-        // 暂时用不到 context, 之后再看看
-        val text = buildList {
-            ordinal.forEach {
-                when (it) {
-                    OrdinalIndex.CORE ->
-                        addAll(core.description)
-
-                    OrdinalIndex.PENALTY ->
-                        add(renderPenalty(core))
-                }
-            }
-        }
-        return SimpleIndexedText(index, text)
-    }
-
-    fun render(core: PortableCore, context: MergingTableContext.MergeOutputSlot): IndexedText {
-        val text = buildList {
-            ordinal.forEach {
-                when (it) {
-                    OrdinalIndex.CORE -> {
-                        addAll(core.description.map { line ->
-                            line.replaceText(obfuscation.textReplacementConfig)
-                        })
-                    }
-
-                    OrdinalIndex.PENALTY ->
-                        add(renderPenalty(core))
-                }
-            }
-        }
-        return SimpleIndexedText(index, text)
-    }
-
-    private fun renderPenalty(core: PortableCore): Component {
-        return MM.deserialize(
-            penaltyFormat,
-            Formatter.number("penalty", core.penalty)
+    fun render(data: PortableCore): IndexedText {
+        return SimpleIndexedText(
+            index, data.description
+                .map(Component::plain)
+                .map(Component::text)
+                .map { it.replaceText(attributeFormat.replacementConfig) }
+                .map { it.style(attributeFormat.style) }
         )
     }
 
-    enum class OrdinalIndex {
-        CORE, PENALTY
-    }
-
     @ConfigSerializable
-    data class Obfuscation(
-        @Setting @Required
-        val pattern: Pattern,
-        @Setting @Required
-        val replacement: Component,
+    data class AttributeFormat(
+        val style: Style,
+        private val pattern: Pattern,
+        private val replacement: Component,
     ) {
-        val textReplacementConfig: TextReplacementConfig = TextReplacementConfig.builder()
-            .match(pattern)
-            .replacement(replacement)
-            .build()
-    }
-
-    companion object {
-        private val MM = Injector.get<MiniMessage>()
+        val replacementConfig = TextReplacementConfig.builder().match(pattern).replacement(replacement).build()
     }
 }

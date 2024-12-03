@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
-import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprintSampleNodeFacade
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
@@ -93,7 +93,7 @@ object CommonNekoStackTest {
         with(app.koin) {
             get<ElementSampleNodeFacade>().onPreWorld()
             get<KizamiSampleNodeFacade>().onPreWorld()
-            get<CoreBlueprintSampleNodeFacade>().onPreWorld()
+            get<CoreArchetypeSampleNodeFacade>().onPreWorld()
             get<ItemFilterNodeFacade>().onPreWorld()
         }
     }

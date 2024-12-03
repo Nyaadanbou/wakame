@@ -25,18 +25,18 @@ import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
 import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.FireResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.components.ItemCrate
@@ -116,7 +116,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, data) }
+        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, Unit) }
         components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
         components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
@@ -219,7 +219,7 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingPart<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val FIRE_RESISTANT: RenderingPart<Unit, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
         format.render()
     }
 
@@ -302,7 +302,7 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
-    private val ordinal: Ordinal,
+    private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
 
@@ -316,14 +316,6 @@ internal data class CellularAttributeRendererFormat(
     override fun computeIndex(data: AttributeCore): Key {
         return data.computeIndex(namespace)
     }
-
-    @ConfigSerializable
-    data class Ordinal(
-        @Setting @Required
-        val element: List<String>,
-        @Setting @Required
-        val operation: List<String>,
-    )
 }
 
 @ConfigSerializable
@@ -369,24 +361,6 @@ internal data class CellularEmptyRendererFormat(
 
     fun render(data: EmptyCore): IndexedText {
         return tooltipCycle.next()
-    }
-}
-
-@ConfigSerializable
-internal data class PortableCoreRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-) : RendererFormat.Simple {
-    override val id = "portable_core"
-    override val index = createIndex()
-    override val textMetaFactory = PortableCoreTextMetaFactory(namespace)
-
-    private val unknownIndex = Key.key(namespace, "unknown")
-
-    fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore
-            ?: return SimpleIndexedText(unknownIndex, listOf())
-        return SimpleIndexedText(index, core.description)
     }
 }
 //</editor-fold>
@@ -473,18 +447,6 @@ internal data class SkillCoreTextMetaFactory(
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-}
-
-internal data class PortableCoreTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == "portable_core"
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }
 //</editor-fold>

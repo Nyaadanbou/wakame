@@ -108,6 +108,11 @@ data class RandomizedValue(
         }
     }
 
+    data class Result(
+        val value: Double,
+        val score: Double,
+    )
+
     companion object Factory {
         /**
          * Creates an instance from a string.
@@ -159,7 +164,7 @@ data class RandomizedValue(
      *     Z-score in the context of normal distribution
      * @return the calculated value
      */
-    fun calculate(scalingFactor: Double = .0, randomVariable: Double = ThreadLocalRandom.current().nextGaussian()): Double {
+    fun calculate(scalingFactor: Double = .0, randomVariable: Double = ThreadLocalRandom.current().nextGaussian()): Result {
         // The mean (mu), the center of the distribution
         val scaledBase = base + (scale * scalingFactor)
 
@@ -181,24 +186,33 @@ data class RandomizedValue(
         */
 
         // Calculate "z * sigma" (spread), applying thresholds as specified
-        var spread0 = randomVariable * sigma
-        if (isLowerBounded || isUpperBounded) {
-            if (lowerBound != null) {
-                spread0 = spread0.coerceAtLeast(lowerBound)
-            }
-            if (upperBound != null) {
-                spread0 = spread0.coerceAtMost(upperBound)
-            }
-        } else {
-            spread0 = spread0.coerceIn(-sigma * 3, sigma * 3)
-            // ^z-score  ^sigma         ^min spread ^max spread
-        }
-        val spread = spread0
+        val min = lowerBound ?: (sigma * -3)
+        val max = upperBound ?: (sigma * +3)
+        val spread = (randomVariable * sigma).coerceIn(
+            //        ^z-score         ^sigma
+            min,
+            //        ^min spread
+            max
+            //        ^max spread
+        )
 
-        // Since the mean (mu) might be scaled,
-        // we can't simply do `x = z * sigma + mu`.
-        // Instead, we calculate the relative value:
-        return scaledBase * (1 + spread)
+        // spread / sigma = random var
+        return Result(
+            // Since the mean (mu) might be scaled,
+            // we can't simply do `x = z * sigma + mu`.
+            // Instead, we calculate the relative value:
+            value = scaledBase * (1 + spread),
+            // The score is the z-score itself,
+            // but respects the min/max spread.
+            score = if (sigma != .0) {
+                randomVariable.coerceIn(
+                    min / sigma,
+                    max / sigma
+                )
+            } else {
+                .0 // 当 sigma 为 0 时, 结果相当于固定值, 因此不存在数值质量一说 - 始终返回 0 即可
+            }
+        )
     }
 
     /**
@@ -209,7 +223,7 @@ data class RandomizedValue(
      * given [Numbers][Number] values are converted to [Double] values using
      * [Number.toDouble].
      */
-    fun calculate(scalingFactor: Number = .0, randomVariable: Number = ThreadLocalRandom.current().nextGaussian()): Double {
+    fun calculate(scalingFactor: Number = .0, randomVariable: Number = ThreadLocalRandom.current().nextGaussian()): Result {
         return calculate(scalingFactor = scalingFactor.toDouble(), randomVariable = randomVariable.toDouble())
     }
 
@@ -219,7 +233,7 @@ data class RandomizedValue(
      * This is equivalent to calling [calculate] with [scaling factor] **zero**
      * and a random variable from the standard normal distribution.
      */
-    fun calculate(): Double {
+    fun calculate(): Result {
         return calculate(.0)
     }
 }

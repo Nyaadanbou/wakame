@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingPart3
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -260,7 +261,7 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     override val namespace: String,
     @Setting @Required
-    private val ordinal: Ordinal,
+    private val ordinal: AttributeCoreOrdinalFormat,
     @Setting("diff_formats")
     @Required
     private val differenceFormats: RerollingDifferenceFormats,
@@ -284,14 +285,6 @@ internal data class CellularAttributeRendererFormat(
     override fun computeIndex(data: AttributeCore): Key {
         return data.computeIndex(namespace)
     }
-
-    @ConfigSerializable
-    data class Ordinal(
-        @Setting @Required
-        val element: List<String>,
-        @Setting @Required
-        val operation: List<String>,
-    )
 }
 
 @ConfigSerializable

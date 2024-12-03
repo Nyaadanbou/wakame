@@ -33,15 +33,15 @@ private constructor(
     /**
      * 根配置文件.
      */
-    val root by lazy { ItemComponentRegistry.CONFIG.node(id) }
+    val provider by lazy { ItemComponentRegistry.CONFIG.node(id) }
 
     /**
      * 该组件是否启用? (具体的作用之后再逐渐完善)
      */
-    val enabled by root.entry<Boolean>("enabled")
+    val enabled by provider.entry<Boolean>("enabled")
 
     /**
      * 该组件的显示名字.
      */
-    val displayName by root.entry<Component>("display_name")
+    val displayName by provider.entry<Component>("display_name")
 }

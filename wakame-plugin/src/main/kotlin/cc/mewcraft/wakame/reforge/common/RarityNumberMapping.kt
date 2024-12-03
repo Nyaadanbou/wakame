@@ -14,7 +14,7 @@ import java.util.stream.Stream
 /**
  * 用于将 [稀有度][cc.mewcraft.wakame.rarity.Rarity] 映射成浮点数.
  */
-interface RarityNumberMapping : Examinable {
+fun interface RarityNumberMapping : Examinable {
     companion object {
         /**
          * 创建一个永远返回固定值的 [RarityNumberMapping] 实例.

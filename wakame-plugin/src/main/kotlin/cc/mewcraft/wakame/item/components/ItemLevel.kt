@@ -1,8 +1,10 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.examination.Examinable
 import xyz.xenondevs.commons.provider.immutable.orElse
@@ -21,16 +23,19 @@ data class ItemLevel(
          * 该组件的配置文件.
          */
         private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.LEVEL)
-        private val configProvider: ConfigProvider = config.root
 
         /**
          * 最小的物品等级.
          */
-        val minimumLevel: Int by configProvider.entry<Int>("minimum_level").orElse(1).require({ it >= 0 }, { "minimum_level must be greater than or equal to 0" })
+        val minimumLevel: Int by config.provider.entry<Int>("minimum_level").orElse(1).require({ it >= 0 }, { "minimum_level must be greater than or equal to 0" })
 
         override fun codec(id: String): ItemComponentType<ItemLevel> {
             return Codec(id)
         }
+    }
+
+    init {
+        require(level > 0) { "level must be a positive integer" }
     }
 
     private data class Codec(

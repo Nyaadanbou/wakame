@@ -10,11 +10,11 @@ import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
 /**
- * Represents an **item template**, or a "blueprint" in other words.
+ * Represents an **item template**, or an "archetype" in other words.
  * Essentially, this is an encapsulation of an item's configuration.
  *
  * The design philosophy of `this` is, that you can use a [NekoItem] as
- * a **blueprint** to create as many [NekoStacks][NekoStack] as you want
+ * an **archetype** to create as many [NekoStacks][NekoStack] as you want
  * by calling [NekoItemRealizer.realize], where each of the ItemStack
  * will have the data of different values, and even have the data of
  * different types. This allows us to create more possibilities for items,

@@ -124,6 +124,10 @@ components:
     enabled: true
     display_name: "稀有度"
 
+  reforge_history:
+    enabled: true
+    display_name: "重铸历史"
+
   skin:
     enabled: true
     display_name: "皮肤"

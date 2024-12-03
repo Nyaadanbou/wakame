@@ -121,12 +121,12 @@ open class ConfigProvider(
     fun <T : Any> entry(type: Type, vararg path: String): Provider<T> =
         node(*path).map { node ->
             if (node.virtual())
-                throw NoSuchElementException("Missing config entry '${path.joinToString(" > ")}' in $relPath")
+                throw NoSuchElementException("missing config entry '${path.joinToString(" > ")}' in $relPath")
 
             try {
                 return@map node.get(type)!! as T
             } catch (t: Throwable) {
-                throw IllegalStateException("Config entry '${node.path().joinToString(" > ")}' in $relPath could not be deserialized to $type", t)
+                throw IllegalStateException("config entry '${node.path().joinToString(" > ")}' in $relPath could not be deserialized to $type", t)
             }
         }
 
@@ -165,12 +165,12 @@ open class ConfigProvider(
             }
 
             if (node == null || node.virtual())
-                throw NoSuchElementException("Missing config entry ${paths.joinToString(" or ") { path -> "'${path.joinToString(" > ")}'" }} in $relPath")
+                throw NoSuchElementException("missing config entry ${paths.joinToString(" or ") { path -> "'${path.joinToString(" > ")}'" }} in $relPath")
 
             try {
                 return@map node.get(type)!! as T
             } catch (t: Throwable) {
-                throw IllegalStateException("Config entry '$relPath ${node.path().joinToString(" > ")}' could not be deserialized to $type", t)
+                throw IllegalStateException("config entry '$relPath ${node.path().joinToString(" > ")}' could not be deserialized to $type", t)
             }
         }
 

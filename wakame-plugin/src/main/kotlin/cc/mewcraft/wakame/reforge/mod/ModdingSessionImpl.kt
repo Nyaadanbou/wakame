@@ -4,12 +4,16 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.elements
+import cc.mewcraft.wakame.item.level
+import cc.mewcraft.wakame.item.portableCore
+import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
@@ -538,13 +542,13 @@ private object ReforgeReplace {
             // TODO 检查权限
 
             // 获取耗材中的便携核心
-            val customNekoStack = originalInput?.shadowNeko(true)
-            val portableCore = customNekoStack?.components?.get(ItemComponentTypes.PORTABLE_CORE) ?: run {
+            val customNekoStack = originalInput.shadowNeko(true)
+            val portableCore = customNekoStack?.portableCore ?: run {
                 return ReforgeReplaceResult.failure("<gray>非便携核心.".mini)
             }
 
             // 获取源物品上的核孔
-            val inputCells = usableInput.components.get(ItemComponentTypes.CELLS) ?: run {
+            val inputCells = usableInput.cells ?: run {
                 session.logger.error("Usable input has no cells, but an item is being replaced. This is a bug!")
                 return ReforgeReplaceResult.failure("<red>内部错误.".mini)
             }
@@ -555,7 +559,11 @@ private object ReforgeReplace {
                 return ReforgeReplaceResult.failure("<gray>物品存在相似核心.".mini)
             }
 
-            if (session.replaceParams.containsCoreSimilarTo(portableCore.wrapped)) {
+            if (
+                session.replaceParams
+                    .filter { it.key != cell.getId() } // 排除掉当前的核孔
+                    .any { it.value.usableInput?.portableCore?.wrapped?.similarTo(portableCore.wrapped) == true }
+            ) {
                 return ReforgeReplaceResult.failure("<gray>输入存在相似核心.".mini)
             }
 
@@ -566,7 +574,7 @@ private object ReforgeReplace {
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
             if (cellRule.requireElementMatch) {
-                val elementsOnInput = usableInput.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
+                val elementsOnInput = usableInput.elements
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnInput) {
@@ -577,7 +585,7 @@ private object ReforgeReplace {
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = usableInput.reforgeHistory.modCount
             if (modCount >= itemRule.modLimit) {
-                return ReforgeReplaceResult.failure("<gray>核孔已消磨殆尽.".mini)
+                return ReforgeReplaceResult.failure("<gray>物品已消磨殆尽.".mini)
             }
 
             // 全部检查通过!
@@ -585,11 +593,11 @@ private object ReforgeReplace {
         }
 
         override fun getIngredientLevel(): Int {
-            return usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level ?: 0
+            return usableInput?.level ?: 0
         }
 
         override fun getIngredientRarityNumber(): Double {
-            return usableInput?.components?.get(ItemComponentTypes.RARITY)?.rarity?.let { session.table.rarityNumberMapping.get(it.key) } ?: .0
+            return usableInput?.rarity?.let { session.table.rarityNumberMapping.get(it.key) } ?: .0
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -682,7 +690,6 @@ private object ReforgeReplaceMap {
         }
 
         override fun contains(id: String): Boolean = false
-        override fun containsCoreSimilarTo(core: Core): Boolean = false
         override fun getAllInputs(): Array<ItemStack> = emptyArray()
         override fun iterator(): Iterator<Map.Entry<String, ModdingSession.Replace>> = emptyList<Map.Entry<String, ModdingSession.Replace>>().iterator()
         override fun toString(): String = toSimpleString()
@@ -701,24 +708,12 @@ private object ReforgeReplaceMap {
             get() = data.values
 
         override fun get(id: String): ModdingSession.Replace {
-            return data.getOrPut(id) {
-                val dummyCell = Cell.of(id) // it should never be accessed
-                ReforgeReplace.unchangeable(session, dummyCell)
-            }
+            // the dummy cell should never be accessed
+            return data.getOrPut(id) { ReforgeReplace.unchangeable(session, Cell.of(id)) }
         }
 
         override fun contains(id: String): Boolean {
             return data.containsKey(id)
-        }
-
-        override fun containsCoreSimilarTo(core: Core): Boolean {
-            return data.values.any { replace ->
-                replace.usableInput
-                    ?.components
-                    ?.get(ItemComponentTypes.PORTABLE_CORE)
-                    ?.wrapped
-                    ?.similarTo(core) == true
-            }
         }
 
         override fun getAllInputs(): Array<ItemStack> {

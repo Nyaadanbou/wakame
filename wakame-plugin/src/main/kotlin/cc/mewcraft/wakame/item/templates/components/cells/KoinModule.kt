@@ -10,8 +10,8 @@ import kotlin.io.path.Path
 
 internal fun cellsModule(): Module = module {
     // Cores ...
-    single<CoreBlueprintSampleNodeFacade> {
-        CoreBlueprintSampleNodeFacade(Path("random/items/cores"))
+    single<CoreArchetypeSampleNodeFacade> {
+        CoreArchetypeSampleNodeFacade(Path("random/items/cores"))
     } bind Initializable::class
 
     // Elements ...

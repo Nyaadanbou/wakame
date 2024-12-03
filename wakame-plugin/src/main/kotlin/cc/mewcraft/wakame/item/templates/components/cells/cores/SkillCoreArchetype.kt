@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.SkillContextData
-import cc.mewcraft.wakame.item.templates.components.cells.CoreBlueprint
+import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill.ConfiguredSkill
 import cc.mewcraft.wakame.skill.Skill
@@ -12,25 +12,25 @@ import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
- * 本函数用于构建 [SkillCoreBlueprint].
+ * 本函数用于构建 [SkillCoreArchetype].
  *
- * @param id 核心的唯一标识, 也就是 [CoreBlueprint.id]
+ * @param id 核心的唯一标识, 也就是 [CoreArchetype.id]
  * @param node 包含该核心数据的配置节点
  *
- * @return 构建的 [SkillCoreBlueprint]
+ * @return 构建的 [SkillCoreArchetype]
  */
-fun SkillCoreBlueprint(
+fun SkillCoreArchetype(
     id: Key,
     node: ConfigurationNode
-): SkillCoreBlueprint {
+): SkillCoreArchetype {
     val configuredSkill = ConfiguredSkill(id, node)
-    return SimpleSkillCoreBlueprint(id, configuredSkill)
+    return SimpleSkillCoreArchetype(id, configuredSkill)
 }
 
 /**
  * 代表一个技能核心 [SkillCore] 的模板.
  */
-interface SkillCoreBlueprint : CoreBlueprint {
+interface SkillCoreArchetype : CoreArchetype {
     /**
      * 该模板包含的技能.
      */
@@ -51,12 +51,12 @@ interface SkillCoreBlueprint : CoreBlueprint {
 }
 
 /**
- * [SkillCoreBlueprint] 的标准实现.
+ * [SkillCoreArchetype] 的标准实现.
  */
-internal data class SimpleSkillCoreBlueprint(
+internal data class SimpleSkillCoreArchetype(
     override val id: Key,
     override val skill: ConfiguredSkill,
-) : SkillCoreBlueprint {
+) : SkillCoreArchetype {
     override val instance: Skill
         get() = SkillRegistry.INSTANCES[id]
 
