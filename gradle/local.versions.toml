@@ -62,3 +62,4 @@ worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", versi
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
+townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version = "1.13.0" }

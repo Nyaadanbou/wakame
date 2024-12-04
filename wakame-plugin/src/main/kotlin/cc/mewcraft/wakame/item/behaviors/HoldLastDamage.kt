@@ -61,8 +61,8 @@ interface HoldLastDamage : ItemBehavior {
             tryCancelEvent(itemStack, player, event)
         }
 
-        override fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            tryCancelEvent(itemStack, caster, event)
+        override fun handleSkillPrepareCast(player: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+            tryCancelEvent(itemStack, player, event)
         }
 
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {

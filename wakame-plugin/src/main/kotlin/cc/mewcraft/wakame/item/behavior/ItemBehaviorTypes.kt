@@ -1,6 +1,19 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behaviors.*
+import cc.mewcraft.wakame.item.behaviors.Arrow
+import cc.mewcraft.wakame.item.behaviors.Attack
+import cc.mewcraft.wakame.item.behaviors.Castable
+import cc.mewcraft.wakame.item.behaviors.Chargeable
+import cc.mewcraft.wakame.item.behaviors.Enchantable
+import cc.mewcraft.wakame.item.behaviors.Food
+import cc.mewcraft.wakame.item.behaviors.HoldLastDamage
+import cc.mewcraft.wakame.item.behaviors.LevelBarrier
+import cc.mewcraft.wakame.item.behaviors.Tool
+import cc.mewcraft.wakame.item.behaviors.TownFlight
+import cc.mewcraft.wakame.item.behaviors.Trackable
+import cc.mewcraft.wakame.item.behaviors.Wearable
+import cc.mewcraft.wakame.item.behaviors.WorldTimeControl
+import cc.mewcraft.wakame.item.behaviors.WorldWeatherControl
 
 /**
  * 所有的物品行为类型.
@@ -52,6 +65,11 @@ object ItemBehaviorTypes {
     val TOOL: ItemBehaviorType<Tool> = Tool
 
     /**
+     * 消耗后给予限时飞行的逻辑.
+     */
+    val TOWN_FLIGHT: ItemBehaviorType<TownFlight> = TownFlight
+
+    /**
      * 物品记录数据的逻辑.
      */
     val TRACKABLE: ItemBehaviorType<Trackable> = Trackable
@@ -60,4 +78,14 @@ object ItemBehaviorTypes {
      * 物品穿戴的逻辑.
      */
     val WEARABLE: ItemBehaviorType<Wearable> = Wearable
+
+    /**
+     * 消耗后控制世界时间的逻辑.
+     */
+    val WORLD_TIME_CONTROL: ItemBehaviorType<WorldTimeControl> = WorldTimeControl
+
+    /**
+     * 消耗后控制世界天气的逻辑.
+     */
+    val WORLD_WEATHER_CONTROL: ItemBehaviorType<WorldWeatherControl> = WorldWeatherControl
 }

@@ -16,7 +16,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 interface LevelBarrier : ItemBehavior {
@@ -53,8 +55,8 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, player, event)
         }
 
-        override fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-            tryCancelEvent(itemStack, caster, event)
+        override fun handleSkillPrepareCast(player: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+            tryCancelEvent(itemStack, player, event)
         }
 
         private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {

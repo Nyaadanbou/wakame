@@ -44,6 +44,8 @@ import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
+import org.bukkit.Bukkit
+import org.bukkit.Server
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
@@ -56,6 +58,9 @@ val LOGGER: ComponentLogger
     } else {
         ComponentLogger.logger("Test")
     }
+
+val SERVER: Server
+    get() = Bukkit.getServer()
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {

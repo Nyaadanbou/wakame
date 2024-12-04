@@ -57,8 +57,11 @@ object NekoItemFactory : KoinComponent {
             // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             // tryAdd("food", ItemBehaviorTypes.FOOD)
             // tryAdd("tool", ItemBehaviorTypes.TOOL)
+            tryAdd("town_flight", ItemBehaviorTypes.TOWN_FLIGHT)
             // tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             // tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
+            tryAdd("world_time_control", ItemBehaviorTypes.WORLD_TIME_CONTROL)
+            tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
 
         // read all item templates (of item components)
@@ -120,8 +123,11 @@ object NekoItemFactory : KoinComponent {
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER) { unsupported() }
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS) { unsupported() }
             tryAdd("tool", ItemTemplateTypes.TOOL) { unsupported() }
+            tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
             tryAdd("trim", ItemTemplateTypes.TRIM) { unsupported() }
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE) { unsupported() }
+            tryAdd("world_time_control", ItemTemplateTypes.WORLD_TIME_CONTROL)
+            tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
         return SimpleNekoItem(
@@ -161,8 +167,11 @@ object NekoItemFactory : KoinComponent {
             tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
             tryAdd("food", ItemBehaviorTypes.FOOD)
             tryAdd("tool", ItemBehaviorTypes.TOOL)
+            tryAdd("town_flight", ItemBehaviorTypes.TOWN_FLIGHT)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
             tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
+            tryAdd("world_time_control", ItemBehaviorTypes.WORLD_TIME_CONTROL)
+            tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
 
         // read all item templates (of item components)
@@ -204,8 +213,11 @@ object NekoItemFactory : KoinComponent {
             // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS)
             tryAdd("tool", ItemTemplateTypes.TOOL)
+            tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
             tryAdd("trim", ItemTemplateTypes.TRIM)
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
+            tryAdd("world_time_control", ItemTemplateTypes.WORLD_TIME_CONTROL)
+            tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
         return SimpleNekoItem(

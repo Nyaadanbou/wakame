@@ -28,6 +28,7 @@ import java.util.concurrent.CompletableFuture
 object PermissionManager : Initializable {
 
     internal val integrations = ArrayList<PermissionIntegration>()
+
     private val logger: Logger = Injector.get()
 
     override suspend fun onPostWorldAsync() {

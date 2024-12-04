@@ -8,10 +8,6 @@ import cc.mewcraft.wakame.context.intention.DefaultContextIntentions.BlockBreak
 import cc.mewcraft.wakame.context.intention.DefaultContextIntentions.BlockInteract
 import cc.mewcraft.wakame.context.intention.DefaultContextIntentions.BlockPlace
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.integration.HooksLoader
-import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.world.BlockPos
 import org.bukkit.Location
 import org.bukkit.Material
@@ -83,20 +79,9 @@ private data class CanHurtEntityTileArgs(override val tileEntity: TileEntity, va
  * 如果服务器用的是 Towny/WorldGuard, 它们会缓存所有保护检查, 可以不必担心缓存问题.
  * 如果是其他保护插件, 请确保它们缓存了保护检查结果. 否则将会导致性能问题.
  */
-@PostWorldDependency(
-    runBefore = [HooksLoader::class, PermissionManager::class]
-)
-object ProtectionManager : Initializable {
+object ProtectionManager {
 
     internal val integrations = ArrayList<ProtectionIntegration>()
-
-    override fun onPostWorld() {
-        init()
-    }
-
-    private fun init() {
-        // no ops
-    }
 
     /**
      * Checks whether the given [ctx] passes place permission checks.

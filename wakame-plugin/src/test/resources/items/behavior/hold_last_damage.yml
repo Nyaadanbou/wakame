@@ -1,1 +1,2 @@
-hold_last_damage: {}
+# 让物品掉到 0 耐久度时不消失
+hold_last_damage: { }

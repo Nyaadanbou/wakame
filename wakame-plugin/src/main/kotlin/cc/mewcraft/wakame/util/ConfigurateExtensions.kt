@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.config.configurate.*
+import cc.mewcraft.wakame.config.configurate.ComponentSerializer
+import cc.mewcraft.wakame.config.configurate.IntRangeSerializer
+import cc.mewcraft.wakame.config.configurate.KeySerializer
+import cc.mewcraft.wakame.config.configurate.StyleBuilderApplicableSerializer
+import cc.mewcraft.wakame.config.configurate.StyleSerializer
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -10,7 +14,9 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import kotlin.reflect.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 internal typealias NekoConfigurationLoader = YamlConfigurationLoader
 
@@ -150,7 +156,7 @@ internal inline fun <reified T> ConfigurationNode.krequire(): T {
  */
 internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
     val ret = this.get(clazz) ?: throw NoSuchElementException(
-        "Can't get the value of type '${clazz}' at '${path().joinToString(".")}'"
+        "can't get the value of type '${clazz}' at '${path().joinToString(" > ")}'"
     )
     return ret
 }
@@ -160,7 +166,7 @@ internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
  */
 internal fun <T> ConfigurationNode.krequire(type: KType): T {
     val ret = this.get(type) ?: throw NoSuchElementException(
-        "Can't get the value of type '${type}' at '${path().joinToString(".")}'"
+        "can't get the value of type '${type}' at '${path().joinToString(" > ")}'"
     )
     @Suppress("UNCHECKED_CAST")
     return ret as T

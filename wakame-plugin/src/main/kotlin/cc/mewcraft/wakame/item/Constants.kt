@@ -75,9 +75,12 @@ object ItemConstants {
     const val STANDALONE_CELL = "standalone_cell"
     const val STORED_ENCHANTMENTS = "stored_enchantments"
     const val TOOL = "tool"
+    const val TOWN_FLIGHT = "town_flight"
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
+    const val WORLD_TIME_CONTROL = "world_time_control"
+    const val WORLD_WEATHER_CONTROL = "world_weather_control"
 
     inline fun createKey(block: ItemConstants.() -> String): Key {
         return Key.key(Namespaces.ITEM_META, block(this))
