@@ -2,13 +2,31 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.skill.Skill
+import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.bukkit.Material
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import kotlin.properties.ReadOnlyProperty
@@ -130,6 +148,66 @@ interface NekoStack : Examinable {
      * This will make the item a vanilla item, where [ItemStack.isNeko] returns `false`.
      */
     fun erase()
+
+    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        behaviors.forEach { it.handleInteract(player, itemStack, action, wrappedEvent) }
+    }
+
+    fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+        behaviors.forEach { it.handleInteractAtEntity(player, itemStack, clicked, event) }
+    }
+
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        behaviors.forEach { it.handleAttackEntity(player, itemStack, damagee, event) }
+    }
+
+    fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) {
+        behaviors.forEach { it.handleItemProjectileLaunch(player, itemStack, projectile, event) }
+    }
+
+    fun handleItemProjectileHit(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) {
+        behaviors.forEach { it.handleItemProjectileHit(player, itemStack, projectile, event) }
+    }
+
+    fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
+        behaviors.forEach { it.handleBreakBlock(player, itemStack, event) }
+    }
+
+    fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
+        behaviors.forEach { it.handleDamage(player, itemStack, event) }
+    }
+
+    fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) {
+        behaviors.forEach { it.handleBreak(player, itemStack, event) }
+    }
+
+    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
+        behaviors.forEach { it.handleEquip(player, itemStack, equipped, event) }
+    }
+
+    fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryClick(player, itemStack, event) }
+    }
+
+    fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack, event) }
+    }
+
+    fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack, event) }
+    }
+
+    fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) {
+        behaviors.forEach { it.handleRelease(player, itemStack, event) }
+    }
+
+    fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
+        behaviors.forEach { it.handleConsume(player, itemStack, event) }
+    }
+
+    fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+        behaviors.forEach { it.handleSkillPrepareCast(caster, itemStack, skill, event) }
+    }
 
     /**
      * 封装了一些“不安全”的操作.

@@ -3,11 +3,13 @@ package cc.mewcraft.wakame.player.interact
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.entity.Player
-import org.bukkit.event.*
+import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.HandlerList
+import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
-
-// FIXME 该类实现很丑，尽量重写后再使用
 
 /**
  * A class wrapping Bukkit's [PlayerInteractEvent], which will not be called for the
@@ -28,10 +30,10 @@ class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event() {
     companion object : Listener {
 
         @JvmStatic
-        private val handlers = HandlerList()
+        private val HANDLERS = HandlerList()
 
         @JvmStatic
-        fun getHandlerList() = handlers
+        fun getHandlerList() = HANDLERS
 
         private val performedCustomInteractions = HashSet<Pair<Player, Action>>()
 
@@ -56,7 +58,7 @@ class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event() {
     }
 
     override fun getHandlers(): HandlerList {
-        return Companion.handlers
+        return handlers
     }
 
 }

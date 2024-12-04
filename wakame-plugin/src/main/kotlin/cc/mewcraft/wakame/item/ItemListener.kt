@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
@@ -19,7 +20,6 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.ThrowableProjectile
-import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -80,7 +80,7 @@ private fun isHandleable(player: Player): Boolean {
  */
 internal class ItemBehaviorListener : KoinComponent, Listener {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: ArmorChangeEvent) {
         val player = event.player
 
@@ -91,15 +91,11 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         val previous = event.previous?.takeUnlessEmpty()
         val current = event.current?.takeUnlessEmpty()
 
-        previous?.shadowNeko()?.behaviors?.forEach { behavior ->
-            behavior.handleEquip(player, previous, false, event)
-        }
-        current?.shadowNeko()?.behaviors?.forEach { behavior ->
-            behavior.handleEquip(player, current, true, event)
-        }
+        previous?.shadowNeko()?.handleEquip(player, previous, false, event)
+        current?.shadowNeko()?.handleEquip(player, current, true, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.NORMAL)
     fun on(wrappedEvent: WrappedPlayerInteractEvent) {
         val event = wrappedEvent.event
         val player = event.player
@@ -110,15 +106,18 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.useItemInHand() == Event.Result.DENY) {
-                return
-            }
-            behavior.handleInteract(event.player, itemStack, event.action, wrappedEvent)
+
+        val location = event.clickedBlock?.location ?: player.location
+        if (!ProtectionManager.canUseItem(player, itemStack, location)) {
+            return
         }
+
+        // 该事件比较特殊, 无论是否被“取消”, 总是传递给物品行为
+
+        nekoStack.handleInteract(event.player, itemStack, event.action, wrappedEvent)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerInteractAtEntityEvent) {
         val player = event.player
 
@@ -128,15 +127,11 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.player.inventory.itemInMainHand.takeUnlessEmpty()
         val nekoStack = itemStack?.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleInteractAtEntity(event.player, itemStack, event.rightClicked, event)
-        }
+
+        nekoStack.handleInteractAtEntity(event.player, itemStack, event.rightClicked, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: NekoEntityDamageEvent) {
         val player = event.damageSource.causingEntity as? Player ?: return
 
@@ -146,12 +141,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleAttackEntity(player, itemStack, event.damagee, event)
-        }
+        nekoStack.handleAttackEntity(player, itemStack, event.damagee, event)
     }
 
     private fun getItemFromProjectile(projectile: Projectile): ItemStack? {
@@ -170,7 +160,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: ProjectileLaunchEvent) {
         val projectile = event.entity
         val itemStack = getItemFromProjectile(projectile) ?: return
@@ -181,16 +171,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleItemProjectileLaunch(player, itemStack, projectile, event)
-        }
+        itemStack.shadowNeko()?.handleItemProjectileLaunch(player, itemStack, projectile, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: ProjectileHitEvent) {
         val projectile = event.entity
         val itemStack = getItemFromProjectile(projectile) ?: return
@@ -201,16 +185,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
             return
         }
 
-        val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleItemProjectileHit(player, itemStack, projectile, event)
-        }
+        itemStack.shadowNeko()?.handleItemProjectileHit(player, itemStack, projectile, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: BlockBreakEvent) {
         val player = event.player
 
@@ -220,15 +198,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleBreakBlock(player, itemStack, event)
-        }
+        nekoStack.handleBreakBlock(player, itemStack, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerItemDamageEvent) {
         val player = event.player
 
@@ -238,15 +211,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleDamage(event.player, itemStack, event)
-        }
+        nekoStack.handleDamage(player, itemStack, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     fun on(event: PlayerItemBreakEvent) {
         val player = event.player
 
@@ -256,9 +224,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.brokenItem.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            behavior.handleBreak(event.player, itemStack, event)
-        }
+        nekoStack.handleBreak(player, itemStack, event)
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -272,22 +238,16 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
         val clickedItem = event.currentItem
         val cursorItem = event.cursor.takeUnlessEmpty()
 
-        clickedItem?.shadowNeko()?.behaviors?.forEach { behavior ->
-            behavior.handleInventoryClick(player, clickedItem, event)
-        }
-        cursorItem?.shadowNeko()?.behaviors?.forEach { behavior ->
-            behavior.handleInventoryClickOnCursor(player, cursorItem, event)
-        }
+        clickedItem?.shadowNeko()?.handleInventoryClick(player, clickedItem, event)
+        cursorItem?.shadowNeko()?.handleInventoryClickOnCursor(player, cursorItem, event)
 
         if (event.click == ClickType.NUMBER_KEY) {
             val hotbarItem = player.inventory.getItem(event.hotbarButton)
-            hotbarItem?.shadowNeko()?.behaviors?.forEach { behavior ->
-                behavior.handleInventoryHotbarSwap(player, hotbarItem, event)
-            }
+            hotbarItem?.shadowNeko()?.handleInventoryHotbarSwap(player, hotbarItem, event)
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerStopUsingItemEvent) {
         val player = event.player
 
@@ -297,12 +257,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            behavior.handleRelease(event.player, itemStack, event)
-        }
+        nekoStack.handleRelease(player, itemStack, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerItemConsumeEvent) {
         val player = event.player
 
@@ -312,15 +270,10 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item.takeUnlessEmpty() ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleConsume(event.player, itemStack, event)
-        }
+        nekoStack.handleConsume(player, itemStack, event)
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun on(event: PlayerSkillPrepareCastEvent) {
         val player = event.caster
 
@@ -330,12 +283,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.behaviors.forEach { behavior ->
-            if (event.isCancelled) {
-                return
-            }
-            behavior.handleSkillPrepareCast(event.caster, itemStack, event.skill, event)
-        }
+        nekoStack.handleSkillPrepareCast(player, itemStack, event.skill, event)
     }
 }
 
