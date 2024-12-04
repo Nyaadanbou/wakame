@@ -33,10 +33,8 @@ object TownyFlightHook : TownFlightIntegration {
     }
 
     override fun addTempFlight(player: Player, seconds: Long, silent: Boolean) {
-        val name = player.name
         val uuid = player.uniqueId
         val formattedTimeValue = TimeMgmt.getFormattedTimeValue(seconds * 1000.0)
-        Message.of(String.format(Message.getLangString("tempFlightGrantedToPlayer"), name, formattedTimeValue)).to(player)
         MetaData.addTempFlight(uuid, seconds.toLong())
 
         if (player.isOnline) {
@@ -44,7 +42,7 @@ object TownyFlightHook : TownFlightIntegration {
             Message.of(String.format(Message.getLangString("youHaveReceivedTempFlight"), formattedTimeValue)).to(player)
 
             if (Settings.autoEnableFlight && TownyFlightAPI.getInstance().canFly(player, true)) {
-                TownyFlightAPI.getInstance().addFlight(player, Settings.autoEnableSilent)
+                TownyFlightAPI.getInstance().addFlight(player, Settings.autoEnableSilent) //
             }
         }
     }

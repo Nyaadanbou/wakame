@@ -28,8 +28,11 @@ interface TownFlight : ItemBehavior {
                     }
                 }
                 .onSuccess {
-                    if (player.isFlying && townFlight.rocketOnConsume) {
-                        player.velocity = Vector(0.0, townFlight.rocketForce, 0.0)
+                    if (TownFlightManager.canFly(player, silent = true).getOrDefault(false)) {
+                        if (townFlight.rocketOnConsume) {
+                            player.isFlying = true
+                            player.velocity = Vector(0.0, townFlight.rocketForce, 0.0)
+                        }
                     }
                 }
         }
