@@ -158,6 +158,10 @@ paper {
             required = false
             load = RelativeLoadOrder.OMIT
         }
+        register("TownyFlight") {
+            required = false
+            load = RelativeLoadOrder.OMIT
+        }
         register("Vault") {
             required = false
             load = RelativeLoadOrder.OMIT

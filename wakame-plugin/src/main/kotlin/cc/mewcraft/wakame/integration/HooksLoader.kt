@@ -14,6 +14,8 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
+import cc.mewcraft.wakame.integration.townflight.TownFlightIntegration
+import cc.mewcraft.wakame.integration.townflight.TownFlightManager
 import cc.mewcraft.wakame.util.data.JarUtils
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
@@ -121,6 +123,10 @@ internal object HooksLoader : Initializable {
 
         if (hook is ProtectionIntegration) {
             ProtectionManager.integrations += hook
+        }
+
+        if (hook is TownFlightIntegration) {
+            TownFlightManager.integration = hook
         }
     }
 }

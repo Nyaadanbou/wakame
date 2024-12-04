@@ -1,0 +1,10 @@
+base: bedrock
+
+# 该物品被消耗时, 给予玩家指定时长的限时飞行
+town_flight:
+  # 给予的飞行时长 (秒)
+  duration: 300
+  # 物品被消耗后, 让玩家冲上天
+  rocket_on_consume: true
+  # 冲天的力度
+  rocket_force: 5.0
