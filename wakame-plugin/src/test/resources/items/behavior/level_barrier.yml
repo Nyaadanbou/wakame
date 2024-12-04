@@ -1,1 +1,2 @@
-level_barrier: {}
+# 要求玩家的等级必须高于物品等级才能使用该物品
+level_barrier: { }
