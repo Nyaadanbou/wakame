@@ -1,0 +1,44 @@
+base: bedrock
+
+# 使物品被消耗后可以控制当前世界所有维度的天气.
+# 物品的使用在当前世界有全局最小使用间隔的限制:
+# 如果已经有一个玩家在当前世界修改了天气,
+# 那么任何玩家都必须等待 x 秒后才能使用.
+world_weather_control:
+  # 该组件的基本用法就是定义一系列操作,
+  # 所有操作将会在物品被消耗时依次执行.
+  #
+  # 每一项操作必须设置两个东西: type & value.
+  # 其中 type 是操作的类型, value 是应用的值.
+  # 每种 type 对应一种特定的 value, 下面将在括号里标明 value 的数据类型.
+  #
+  # 可用的 type 以及对应的数值类型:
+  # set_storm (boolean),
+  # set_weather_duration (int),
+  # set_clear_weather_duration (int),
+  # set_thundering (boolean),
+  # set_thunder_duration (int).
+  #
+  # 注意事项: set_weather_duration 会隐式的执行 set_clear_weather_duration (0).
+  #
+  # 例如, 下面的配置将会使天气下雨, 并持续 3000 刻.
+  - type: set_storm
+    value: "true"
+  - type: set_weather_duration
+    value: "3000"
+  #
+  # 例如, 下面的配置将会使天气雷暴, 并持续 4500 刻.
+  - type: set_storm
+    value: "true"
+  - type: set_thundering
+    value: "true"
+  - type: set_weather_duration
+    value: "4500"
+  #
+  # 例如, 下面的配置将会使天气变晴, 并持续 6000 刻.
+  - type: set_storm
+    value: "false"
+  - type: set_thundering
+    value: "false"
+  - type: set_clear_weather_duration
+    value: "6000"

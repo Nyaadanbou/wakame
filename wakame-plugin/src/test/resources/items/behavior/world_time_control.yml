@@ -1,0 +1,12 @@
+base: bedrock
+
+# 使物品被消耗后可以控制当前世界所有维度的时间.
+# 物品的使用在当前世界有全局最小使用间隔的限制:
+# 如果已经有一个玩家在当前世界修改了时间,
+# 那么任何玩家都必须等待 x 秒后才能使用.
+world_time_control:
+  # 操作的类型: set, add
+  type: set
+  # 应用的数值 (刻), 必须大于 0
+  # 参考: https://minecraft.wiki/w/Daylight_cycle
+  value: 24000

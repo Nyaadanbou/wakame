@@ -27,3 +27,9 @@ only_owner_can_pickup_death_drops: false
 
 # 要求玩家必须在潜行状态下才能够破坏盔甲架
 require_sneaking_to_break_armor_stand: false
+
+# 世界时间控制器的全局最小使用间隔 (刻)
+world_time_control_use_interval_ticks: 12000
+
+# 世界天气控制器的全局最小使用间隔 (刻)
+world_weather_control_use_interval_ticks: 12000
