@@ -75,7 +75,7 @@ object ItemConstants {
     const val STANDALONE_CELL = "standalone_cell"
     const val STORED_ENCHANTMENTS = "stored_enchantments"
     const val TOOL = "tool"
-    const val TOWN_FLIGHT = "towny_flight"
+    const val TOWN_FLIGHT = "town_flight"
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
