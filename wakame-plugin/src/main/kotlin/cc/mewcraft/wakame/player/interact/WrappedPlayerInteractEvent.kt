@@ -58,7 +58,7 @@ class WrappedPlayerInteractEvent(val event: PlayerInteractEvent) : Event() {
     }
 
     override fun getHandlers(): HandlerList {
-        return handlers
+        return HANDLERS
     }
 
 }
