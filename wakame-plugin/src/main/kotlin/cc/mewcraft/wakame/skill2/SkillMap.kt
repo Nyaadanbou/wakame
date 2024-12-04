@@ -98,7 +98,7 @@ private class PlayerSkillMap(
     private val uniqueId: UUID,
 ) : SkillMap {
     companion object : KoinComponent {
-        private val mechanicRecorder: MechanicRecorder by inject()
+        private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
     }
 
     private val skills: Multimap<Trigger, Key> = MultimapBuilder
@@ -133,18 +133,18 @@ private class PlayerSkillMap(
 
     override fun removeSkill(key: Key) {
         this.skills.entries().removeIf { it.value == key }
-        mechanicRecorder.interruptMechanic(key.asString())
+        mechanicWorldInteraction.interruptMechanic(key.asString())
     }
 
     override fun removeSkill(skill: Skill) {
         this.skills.entries().removeIf { it.value == skill.key }
-        mechanicRecorder.interruptMechanic(skill.key.asString())
+        mechanicWorldInteraction.interruptMechanic(skill.key.asString())
     }
 
     override fun removeSkill(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
             this.skills.remove(trigger, skill.key)
-            mechanicRecorder.interruptMechanic(skill.key.asString())
+            mechanicWorldInteraction.interruptMechanic(skill.key.asString())
         }
     }
 
@@ -157,13 +157,13 @@ private class PlayerSkillMap(
     }
 
     override fun cleanup() {
-        skills.values().forEach { mechanicRecorder.interruptMechanic(it.asString()) }
+        skills.values().forEach { mechanicWorldInteraction.interruptMechanic(it.asString()) }
         skills.clear()
     }
 
     private fun registerSkillResult(skill: Skill) {
         val user = PlayerAdapters.get<Player>().adapt(uniqueId)
-        mechanicRecorder.addMechanic(ImmutableSkillContext(caster = CasterAdapter.adapt(user).toComposite(), skill = skill))
+        mechanicWorldInteraction.addMechanic(ImmutableSkillContext(caster = CasterAdapter.adapt(user).toComposite(), skill = skill))
     }
 
     private fun getSkillByKey(key: Key): Skill {

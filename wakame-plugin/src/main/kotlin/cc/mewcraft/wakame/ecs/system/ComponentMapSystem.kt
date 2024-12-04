@@ -1,17 +1,21 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.component.ComponentMapComponent
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
+import com.github.quillraven.fleks.IntervalSystem
 
-class ComponentMapSystem : IteratingSystem(
-    family = family { all(IdentifierComponent, ComponentMapComponent) }
-) {
-    override fun onTickEntity(entity: Entity) {
-        val componentMapComponent = entity[ComponentMapComponent]
-        componentMapComponent.componentMap = ComponentMap(world.snapshotOf(entity))
+class ComponentMapSystem : IntervalSystem() {
+    override fun onTick() {
+        world.forEach { entity ->
+            if (entity.hasNo(ComponentMapComponent)) {
+                val componentMapComponent = ComponentMapComponent(ComponentMap(world.snapshotOf(entity)))
+                entity.configure {
+                    it += componentMapComponent
+                }
+            } else {
+                val componentMapComponent = entity[ComponentMapComponent]
+                world.loadSnapshotOf(entity, componentMapComponent.componentMap.toSnapshot())
+            }
+        }
     }
 }

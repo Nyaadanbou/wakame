@@ -1,19 +1,10 @@
 package cc.mewcraft.wakame.skill2.state
 
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
-import cc.mewcraft.wakame.item.takeIfNeko
-import cc.mewcraft.wakame.item.toNekoStack
-import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.SkillCastManager
-import cc.mewcraft.wakame.skill2.result.SkillResult
-import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.character.toComposite
-import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
-import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.skill2.hasTrigger
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
-import cc.mewcraft.wakame.skill2.state.exception.IllegalSkillStateException
 import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.util.EntitySubscriptionTerminator
@@ -31,8 +22,6 @@ import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.stream.Stream
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.superclasses
 
 /**
  * 代表了一个玩家技能状态的信息.
@@ -41,48 +30,22 @@ sealed interface SkillStateInfo : Examinable {
     /**
      * 当前状态的类型.
      */
-    val type: Type
-
-    /**
-     * 正在执行的 [SkillResult], 没有则返回空的 [SkillResult].
-     *
-     * 同时也可以用来判断玩家是否正在施法状态.
-     */
-    val skillResult: SkillResult<*>
+    val phase: StatePhase
 
     /**
      * 添加一个 [SingleTrigger],
      */
-    fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult
-
-    /**
-     * 进行一次状态的刷新.
-     */
-    fun tick()
+    fun addTrigger(trigger: SingleTrigger): SkillStateResult
 
     /**
      * 中断当前的状态.
      */
     fun interrupt()
-
-    enum class Type {
-        /**
-         * 很特殊的状态, 表示玩家可以使用技能.
-         *
-         * 只能拿到空的 [SkillResult] 实例.
-         */
-        IDLE,
-        CAST_POINT,
-        CASTING,
-        BACKSWING,
-        ;
-    }
 }
 
 sealed class AbstractSkillStateInfo(
     val state: PlayerSkillState,
-    final override val skillResult: SkillResult<*>,
-    override val type: SkillStateInfo.Type,
+    override val phase: StatePhase,
     registerEvents: Boolean = true,
 ) : SkillStateInfo {
 
@@ -104,17 +67,6 @@ sealed class AbstractSkillStateInfo(
         }
     }
 
-    override fun tick() {
-        try {
-            executeSkill()
-        } catch (t: Throwable) {
-            val skillKClass = skillResult.context::class
-            val skillName = skillKClass.superclasses.first { it.isSubclassOf(Skill::class) }.simpleName ?: skillKClass.simpleName
-            throw IllegalSkillStateException("在执行 $skillName 技能时发生了异常", t)
-        }
-    }
-
-    protected abstract fun executeSkill()
     protected abstract fun setNextState()
 
     private fun registerTriggerEvents() {
@@ -124,9 +76,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.player == state.user.player }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = user.player.inventory.itemInMainHand.takeIfNeko()
-                    val nekoStack = itemStack?.toNekoStack
-                    val result = user.skillState.addTrigger(SingleTrigger.JUMP, ImmutableSkillContext(CasterAdapter.adapt(user).toComposite(), TargetAdapter.adapt(user), nekoStack))
+                    val result = user.skillState.addTrigger(SingleTrigger.JUMP)
                     checkResult(result, event)
                 },
 
@@ -135,9 +85,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = event.player.inventory.itemInMainHand.takeIfNeko()
-                    val nekoStack = itemStack?.toNekoStack
-                    val result = user.skillState.addTrigger(SingleTrigger.MOVE, ImmutableSkillContext(CasterAdapter.adapt(user).toComposite(), TargetAdapter.adapt(user), nekoStack))
+                    val result = user.skillState.addTrigger(SingleTrigger.MOVE)
                     checkResult(result, event)
                 },
 
@@ -145,9 +93,7 @@ sealed class AbstractSkillStateInfo(
                 .filter { it.player == state.user.player }
                 .handler { event ->
                     val user = event.player.toUser()
-                    val itemStack = event.player.inventory.itemInMainHand.takeIfNeko()
-                    val nekoStack = itemStack?.toNekoStack
-                    val result = user.skillState.addTrigger(SingleTrigger.SNEAK, ImmutableSkillContext(CasterAdapter.adapt(user).toComposite(), TargetAdapter.adapt(user), nekoStack))
+                    val result = user.skillState.addTrigger(SingleTrigger.SNEAK)
                     checkResult(result, event)
                 }
         )
@@ -168,7 +114,7 @@ sealed class AbstractSkillStateInfo(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("type", type)
+            ExaminableProperty.of("type", phase)
         )
     }
 
@@ -182,21 +128,17 @@ sealed class AbstractSkillStateInfo(
  */
 class IdleStateInfo(
     state: PlayerSkillState,
-) : AbstractSkillStateInfo(state, SkillResult(), SkillStateInfo.Type.IDLE, false), KoinComponent {
+) : AbstractSkillStateInfo(state, StatePhase.IDLE, false), KoinComponent {
     companion object {
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
     }
 
     private val stateDisplay: StateDisplay<Player> by inject()
-    private val skillCastManager: SkillCastManager by inject()
-
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
-    private var sequenceCounter: Long = 0
-
     private var castableSkill: Skill? = null
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         castableSkill = null
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
@@ -205,13 +147,15 @@ class IdleStateInfo(
             if (addSequenceSkills(castTrigger)) {
                 stateDisplay.displaySuccess(currentSequence.readAll(), state.user)
                 currentSequence.clear()
-                return handleSkills(context)
+                setNextState()
+                return SkillStateResult.CANCEL_EVENT
             }
         }
 
         // Single trigger skills
         if (addSingleSkills(castTrigger)) {
-            return handleSkills(context)
+            setNextState()
+            return SkillStateResult.CANCEL_EVENT
         }
 
         return SkillStateResult.SILENT_FAILURE
@@ -263,32 +207,8 @@ class IdleStateInfo(
         return true
     }
 
-    private fun handleSkills(context: SkillContext): SkillStateResult {
-        val castableSkill = castableSkill ?: return SkillStateResult.SILENT_FAILURE
-        val skillTick = skillCastManager.tryCast(castableSkill, context).skillTick as? PlayerSkillTick ?: return SkillStateResult.SILENT_FAILURE
-        state.setInfo(CastPointStateInfo(state, skillTick))
-        return SkillStateResult.CANCEL_EVENT
-    }
-
-    override fun tick() {
-        // Invalidate the sequence if it's not empty
-        if (!currentSequence.isEmpty()) {
-            sequenceCounter++
-            if (sequenceCounter >= 30) {
-                stateDisplay.displayFailure(currentSequence.readAll(), state.user)
-                currentSequence.clear()
-            }
-        } else {
-            sequenceCounter = 0
-        }
-    }
-
-    override fun executeSkill() {
-        throw UnsupportedOperationException("IdleStateInfo does not support tickSkill")
-    }
-
     override fun setNextState() {
-        throw UnsupportedOperationException("IdleStateInfo does not support setNextState")
+        state.setInfo(CastPointStateInfo(state))
     }
 
     override fun interrupt() {
@@ -302,11 +222,10 @@ class IdleStateInfo(
  */
 class CastPointStateInfo(
     state: PlayerSkillState,
-    skillResult: SkillResult<*>,
-) : AbstractSkillStateInfo(state, skillResult, SkillStateInfo.Type.CAST_POINT) {
+) : AbstractSkillStateInfo(state, StatePhase.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -317,12 +236,8 @@ class CastPointStateInfo(
         return SkillStateResult.SUCCESS
     }
 
-    override fun executeSkill() {
-        return skillResult.tickCastPoint()
-    }
-
     override fun setNextState() {
-        state.setInfo(CastingStateInfo(state, skillResult))
+        state.setInfo(CastingStateInfo(state))
     }
 
     override fun interrupt() {
@@ -335,11 +250,10 @@ class CastPointStateInfo(
  */
 class CastingStateInfo(
     state: PlayerSkillState,
-    skillResult: SkillResult<*>,
-) : AbstractSkillStateInfo(state, skillResult, SkillStateInfo.Type.CASTING) {
+) : AbstractSkillStateInfo(state, StatePhase.CASTING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -350,12 +264,8 @@ class CastingStateInfo(
         return SkillStateResult.SUCCESS
     }
 
-    override fun executeSkill() {
-        return skillResult.tickCast()
-    }
-
     override fun setNextState() {
-        state.setInfo(BackswingStateInfo(state, skillResult))
+        state.setInfo(BackswingStateInfo(state))
     }
 
     override fun interrupt() {
@@ -368,11 +278,10 @@ class CastingStateInfo(
  */
 class BackswingStateInfo(
     state: PlayerSkillState,
-    skillResult: SkillResult<*>,
-) : AbstractSkillStateInfo(state, skillResult, SkillStateInfo.Type.BACKSWING) {
+) : AbstractSkillStateInfo(state, StatePhase.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
-    override fun addTrigger(trigger: SingleTrigger, context: SkillContext): SkillStateResult {
+    override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (triggerConditionManager.isForbidden(trigger)) {
             return SkillStateResult.CANCEL_EVENT
         }
@@ -380,10 +289,6 @@ class BackswingStateInfo(
             interrupt()
         }
         return SkillStateResult.SUCCESS
-    }
-
-    override fun executeSkill() {
-        return skillResult.tickBackswing()
     }
 
     override fun setNextState() {

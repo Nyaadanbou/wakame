@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.skill2.trigger
 
 import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.state.SkillStateInfo
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.Multimap
@@ -9,7 +10,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
 /**
- * A collection of [SingleTrigger]s that are valid in a certain [SkillStateInfo.Type].
+ * A collection of [SingleTrigger]s that are valid in a certain [StatePhase].
  */
 sealed interface TriggerConditions {
     companion object {
@@ -21,22 +22,22 @@ sealed interface TriggerConditions {
         /**
          * Creates a [TriggerConditions] from a multimap of [SkillStateInfo] to a list of [SingleTrigger]s.
          */
-        fun of(values: Multimap<SkillStateInfo.Type, SingleTrigger>): TriggerConditions = TriggerConditionsImpl(values)
+        fun of(values: Multimap<StatePhase, SingleTrigger>): TriggerConditions = TriggerConditionsImpl(values)
     }
 
     /**
      * A multimap of [SkillStateInfo] to a list of [SingleTrigger]s.
      */
-    val values: Multimap<SkillStateInfo.Type, SingleTrigger>
+    val values: Multimap<StatePhase, SingleTrigger>
 
     private data object Empty : TriggerConditions {
-        override val values: Multimap<SkillStateInfo.Type, SingleTrigger> = MultimapBuilder.hashKeys()
+        override val values: Multimap<StatePhase, SingleTrigger> = MultimapBuilder.hashKeys()
             .arrayListValues()
             .build()
     }
 
     private data class TriggerConditionsImpl(
-        override val values: Multimap<SkillStateInfo.Type, SingleTrigger>
+        override val values: Multimap<StatePhase, SingleTrigger>
     ) : TriggerConditions
 }
 
@@ -55,9 +56,9 @@ sealed interface TriggerConditions {
  */
 internal object TriggersConditionsSerializer : SchemaSerializer<TriggerConditions> {
     override fun deserialize(type: Type, node: ConfigurationNode): TriggerConditions {
-        val values = MultimapBuilder.hashKeys().arrayListValues().build<SkillStateInfo.Type, SingleTrigger>()
+        val values = MultimapBuilder.hashKeys().arrayListValues().build<StatePhase, SingleTrigger>()
         for ((key, value) in node.childrenMap()) {
-            val stateType = SkillStateInfo.Type.entries.find { it.name.equals(key.toString(), ignoreCase = true) }
+            val stateType = StatePhase.entries.find { it.name.equals(key.toString(), ignoreCase = true) }
                 ?: throw IllegalArgumentException("Unknown state type: $key")
 
             for (triggerNode in value.childrenList()) {

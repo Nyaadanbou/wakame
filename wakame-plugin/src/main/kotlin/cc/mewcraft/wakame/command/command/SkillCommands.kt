@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.SkillParser
-import cc.mewcraft.wakame.skill2.MechanicRecorder
+import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
@@ -29,7 +29,7 @@ import org.koin.core.component.inject
 import kotlin.jvm.optionals.getOrNull
 
 object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
-    private val mechanicRecorder: MechanicRecorder by inject()
+    private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
 
     private const val SKILL_LITERAL = "skill"
 
@@ -68,7 +68,7 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    mechanicRecorder.addMechanic(ImmutableSkillContext(CasterAdapter.adapt(casterPlayer).toComposite(), target, skill = skill))
+                    mechanicWorldInteraction.addMechanic(ImmutableSkillContext(CasterAdapter.adapt(casterPlayer).toComposite(), target, skill = skill))
                 }
             }.buildAndAdd(this)
         }

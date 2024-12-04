@@ -27,7 +27,7 @@ fun skill2Module(): Module = module {
     singleOf(::PlayerStateDisplay) bind StateDisplay::class
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class
 
-    singleOf(::MechanicRecorder)
+    singleOf(::MechanicWorldInteraction)
     singleOf(::SkillListener)
     singleOf(::SkillEventHandler)
 

@@ -35,6 +35,9 @@ class EntitySubscriptionTerminator<E : Event> private constructor(
         private var predicate: ((E) -> Boolean)? = null
         private val subscriptions = ReferenceArraySet<Subscription>()
 
+        /**
+         * 当收到 [terminatorEvent], 取消所有 [subscriptions].
+         */
         fun terminatorEvent(terminatorEvent: Class<E>): Builder<E> {
             this.terminatorEvent = terminatorEvent
             return this

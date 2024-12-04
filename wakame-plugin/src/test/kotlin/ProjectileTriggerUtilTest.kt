@@ -1,5 +1,5 @@
-import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
-import cc.mewcraft.wakame.skill.trigger.SingleTrigger
+import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
+import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import org.junit.jupiter.api.Test
 
 class ProjectileTriggerUtilTest {

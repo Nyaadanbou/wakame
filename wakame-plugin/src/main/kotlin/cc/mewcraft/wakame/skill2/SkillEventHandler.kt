@@ -4,11 +4,8 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.Target
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.character.toComposite
-import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
 import cc.mewcraft.wakame.skill2.state.SkillStateResult
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
@@ -54,7 +51,7 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK, ImmutableSkillContext(CasterAdapter.adapt(player).toComposite(), target, nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK)
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
@@ -84,14 +81,14 @@ class SkillEventHandler {
         val user = player.toUser()
         val nekoStack = itemStack.toNekoStack
         val target = targetProvider.invoke()
-        val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK, ImmutableSkillContext(CasterAdapter.adapt(player).toComposite(), target, nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK)
         checkResult(result, event)
     }
 
     fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
         val nekoStack = itemStack?.tryNekoStack ?: return // 非萌芽物品应该完全不用处理吧?
-        val result = user.skillState.addTrigger(SingleTrigger.ATTACK, ImmutableSkillContext(CasterAdapter.adapt(player).toComposite(), TargetAdapter.adapt(entity), nekoStack))
+        val result = user.skillState.addTrigger(SingleTrigger.ATTACK)
         checkResult(result, event)
     }
 

@@ -10,16 +10,17 @@ import me.lucko.helper.metadata.Metadata
 import me.lucko.helper.metadata.MetadataKey
 
 class MechanicBukkitEntityMetadataSystem : IteratingSystem(
-    family = family { all(BukkitEntityComponent, ComponentMapComponent) }
+    family = family { all(ComponentMapComponent, BukkitEntityComponent) }
 ) {
     companion object {
         val COMPONENT_MAP_KEY: MetadataKey<ComponentMap> = MetadataKey.create("component_map", ComponentMap::class.java)
     }
 
     override fun onTickEntity(entity: Entity) {
-        val bukkitEntity = entity[BukkitEntityComponent].entity
+        val bukkitEntity = entity[BukkitEntityComponent].entity ?: return
         val metadata = Metadata.provide(bukkitEntity)
+        val componentMap = entity[ComponentMapComponent].componentMap
 
-        metadata.put(COMPONENT_MAP_KEY, entity[ComponentMapComponent].componentMap)
+        metadata.put(COMPONENT_MAP_KEY, componentMap)
     }
 }

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillProvider
@@ -74,9 +75,17 @@ private class DashSkillResult(
     private val skill: Dash
 ) : SkillResult<Dash> {
 
-    override fun tickCast(tickCount: Double, componentMap: ComponentMap) {
-        val bukkitEntity = componentMap[skill.key.asString(), BukkitEntityComponent]?.entity ?: return
+    override fun tickIdle(tickCount: Double, componentMap: ComponentMap): TickResult {
+        val bukkitEntity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT
 
-        bukkitEntity.sendPlainMessage("Dash, tickCount: $tickCount")
+        bukkitEntity.sendPlainMessage("Dash Idle, tickCount: $tickCount")
+        return TickResult.ALL_DONE
+    }
+
+    override fun tickCast(tickCount: Double, componentMap: ComponentMap): TickResult {
+        val bukkitEntity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT
+
+        bukkitEntity.sendPlainMessage("Dash Cast, tickCount: $tickCount")
+        return TickResult.ALL_DONE
     }
 }

@@ -1,9 +1,9 @@
-import cc.mewcraft.wakame.skill.condition.ConditionPhase
-import cc.mewcraft.wakame.skill.condition.SkillCondition
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
-import cc.mewcraft.wakame.skill.condition.SkillConditionSession
-import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.skill2.condition.ConditionPhase
+import cc.mewcraft.wakame.skill2.condition.SkillCondition
+import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill2.condition.SkillConditionGroupImpl
+import cc.mewcraft.wakame.skill2.condition.SkillConditionSession
+import cc.mewcraft.wakame.skill2.context.SkillContext
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

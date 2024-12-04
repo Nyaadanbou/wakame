@@ -6,16 +6,16 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 internal class SkillListener(
-    private val mechanicRecorder: MechanicRecorder,
+    private val mechanicWorldInteraction: MechanicWorldInteraction,
 ) : Listener {
     @EventHandler
     private fun on(e: PlayerJoinEvent) {
-//        mechanicRecorder.addSkill(e.player)
+//        mechanicWorldInteraction.addSkill(e.player)
     }
 
 
     @EventHandler
     private fun on(e: PlayerQuitEvent) {
-//        mechanicRecorder.removeSkill(e.player)
+//        mechanicWorldInteraction.removeSkill(e.player)
     }
 }
