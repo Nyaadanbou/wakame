@@ -5,8 +5,8 @@ base: bedrock
 # 如果已经有一个玩家在当前世界修改了时间,
 # 那么任何玩家都必须等待 x 秒后才能使用.
 world_time_control:
-  # 操作的类型: set, add
-  type: set
+  # 操作的类型: set_time, add_time
+  type: set_time
   # 应用的数值 (刻), 必须大于 0
   # 参考: https://minecraft.wiki/w/Daylight_cycle
   value: 24000

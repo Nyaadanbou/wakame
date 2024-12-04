@@ -12,6 +12,10 @@ msg_sold_items_for_x_coins: "<green>出售获得 <arg:0:'zh-CN':'#'> 个硬币!"
 msg_err_not_augment_core: "<red>不是便携核心."
 msg_sneak_to_break_armor_stand: "<gray>提示: 在潜行状态下攻击可以摧毁盔甲架."
 msg_err_not_inside_town: "<red>你不在城镇内."
+msg_err_world_weather_control_not_ready: "<red>天气控制器还没有准备好, 剩余时间: <arg:0>"
+msg_err_world_time_control_not_ready: "<red>时间控制器还没有准备好, 剩余时间: <arg:0>"
+msg_world_time_control_executed: "<green>时间控制器已启动..."
+msg_world_weather_control_executed: "<green>天气控制器已启动..."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."
