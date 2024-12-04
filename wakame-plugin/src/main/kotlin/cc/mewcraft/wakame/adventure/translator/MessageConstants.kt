@@ -18,6 +18,10 @@ object MessageConstants {
     val MSG_ERR_NOT_AUGMENT_CORE = create("msg_err_not_augment_core")
     val MSG_SNEAK_TO_BREAK_ARMOR_STAND = create("msg_sneak_to_break_armor_stand")
     val MSG_ERR_NOT_INSIDE_TOWN = create("msg_err_not_inside_town")
+    val MSG_ERR_WORLD_WEATHER_CONTROL_NOT_READY = create("msg_err_world_weather_control_not_ready")
+    val MSG_ERR_WORLD_TIME_CONTROL_NOT_READY = create("msg_err_world_time_control_not_ready")
+    val MSG_WORLD_TIME_CONTROL_EXECUTED = create("msg_world_time_control_executed")
+    val MSG_WORLD_WEATHER_CONTROL_EXECUTED = create("msg_world_weather_control_executed")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

@@ -30,6 +30,8 @@ import cc.mewcraft.wakame.item.templates.components.ItemTownFlight
 import cc.mewcraft.wakame.item.templates.components.PortableCore
 import cc.mewcraft.wakame.item.templates.components.Tool
 import cc.mewcraft.wakame.item.templates.components.Unbreakable
+import cc.mewcraft.wakame.item.templates.components.WorldTimeControl
+import cc.mewcraft.wakame.item.templates.components.WorldWeatherControl
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
@@ -218,6 +220,18 @@ object ItemTemplateTypes {
      */
     @JvmField
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
+
+    /**
+     * 组件: n/a
+     */
+    @JvmField
+    val WORLD_TIME_CONTROL: ItemTemplateType<WorldTimeControl> = WorldTimeControl.codec(ItemConstants.WORLD_TIME_CONTROL).register()
+
+    /**
+     * 组件: n/a
+     */
+    @JvmField
+    val WORLD_WEATHER_CONTROL: ItemTemplateType<WorldWeatherControl> = WorldWeatherControl.codec(ItemConstants.WORLD_WEATHER_CONTROL).register()
 
     /**
      * 获取所有模板的序列化器.

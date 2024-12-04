@@ -12,6 +12,8 @@ import cc.mewcraft.wakame.item.behaviors.Tool
 import cc.mewcraft.wakame.item.behaviors.TownFlight
 import cc.mewcraft.wakame.item.behaviors.Trackable
 import cc.mewcraft.wakame.item.behaviors.Wearable
+import cc.mewcraft.wakame.item.behaviors.WorldTimeControl
+import cc.mewcraft.wakame.item.behaviors.WorldWeatherControl
 
 /**
  * 所有的物品行为类型.
@@ -76,4 +78,14 @@ object ItemBehaviorTypes {
      * 物品穿戴的逻辑.
      */
     val WEARABLE: ItemBehaviorType<Wearable> = Wearable
+
+    /**
+     * 消耗后控制世界时间的逻辑.
+     */
+    val WORLD_TIME_CONTROL: ItemBehaviorType<WorldTimeControl> = WorldTimeControl
+
+    /**
+     * 消耗后控制世界天气的逻辑.
+     */
+    val WORLD_WEATHER_CONTROL: ItemBehaviorType<WorldWeatherControl> = WorldWeatherControl
 }

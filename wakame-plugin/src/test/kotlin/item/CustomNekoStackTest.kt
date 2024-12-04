@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.world.TimeControl
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
@@ -899,6 +900,34 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             assertTrue(it.showInTooltip)
+        }
+    }
+
+    @Test
+    fun `component - world_time_control`() = componentLifecycleTest(
+        "world_time_control", ItemTemplateTypes.WORLD_TIME_CONTROL, ItemComponentTypes.EMPTY
+    ) {
+        serialization {
+            assertNotNull(it)
+            assertEquals(TimeControl.ActionType.SET_TIME, it.type)
+            assertEquals(24000, it.time)
+        }
+
+        result {
+            assertTrue(it.isEmpty())
+        }
+    }
+
+    @Test
+    fun `component - world_weather_control`() = componentLifecycleTest(
+        "world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL, ItemComponentTypes.EMPTY
+    ) {
+        serialization {
+            assertNotNull(it)
+        }
+
+        result {
+            assertTrue(it.isEmpty())
         }
     }
     //</editor-fold>

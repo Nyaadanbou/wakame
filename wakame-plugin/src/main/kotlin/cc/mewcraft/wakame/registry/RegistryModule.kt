@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
 import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_SERIALIZERS
@@ -106,6 +107,7 @@ internal fun registryModule(): Module = module {
 
     single<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
+            registerAnnotatedObjects(ObjectMappers.DEFAULT)
             registerAll(get<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)))
         }
     }
