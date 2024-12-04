@@ -1,23 +1,19 @@
 package cc.mewcraft.wakame.integration.playerlevel
 
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.integration.HooksLoader
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager.getOrDefault
 import cc.mewcraft.wakame.integration.playerlevel.intrinsics.VanillaLevelIntegration
-import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import java.util.UUID
 
-@PostWorldDependency(
-    runBefore = [HooksLoader::class]
-)
-object PlayerLevelManager : KoinComponent {
+object PlayerLevelManager {
+
     internal var integration: PlayerLevelIntegration? = null
 
     init {
         // 初始化时, 将 VanillaLevelProvider 作为默认的等级系统.
         // 如果有其他等级系统存在并且需要被使用, 该字段应该被重新赋值.
-        integration = get<VanillaLevelIntegration>()
+        integration = Injector.get<VanillaLevelIntegration>()
     }
 
     /**
