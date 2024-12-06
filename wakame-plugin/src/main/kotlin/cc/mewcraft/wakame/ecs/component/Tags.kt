@@ -4,5 +4,5 @@ import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.entityTagOf
 
 enum class Tags : EntityTags by entityTagOf() {
-    CAN_TICK
+    CAN_TICK, CAN_NEXT_STATE
 }

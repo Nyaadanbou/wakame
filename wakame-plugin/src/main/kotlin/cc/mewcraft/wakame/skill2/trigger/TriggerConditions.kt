@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2.trigger
 
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.skill2.state.SkillStateInfo
+import cc.mewcraft.wakame.skill2.state.StateInfo
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.Multimap
 import com.google.common.collect.MultimapBuilder
@@ -20,13 +20,13 @@ sealed interface TriggerConditions {
         fun empty(): TriggerConditions = Empty
 
         /**
-         * Creates a [TriggerConditions] from a multimap of [SkillStateInfo] to a list of [SingleTrigger]s.
+         * Creates a [TriggerConditions] from a multimap of [StateInfo] to a list of [SingleTrigger]s.
          */
         fun of(values: Multimap<StatePhase, SingleTrigger>): TriggerConditions = TriggerConditionsImpl(values)
     }
 
     /**
-     * A multimap of [SkillStateInfo] to a list of [SingleTrigger]s.
+     * A multimap of [StateInfo] to a list of [SingleTrigger]s.
      */
     val values: Multimap<StatePhase, SingleTrigger>
 

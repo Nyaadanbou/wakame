@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.*
+import cc.mewcraft.wakame.BinarySerializable
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
@@ -12,6 +13,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
@@ -162,39 +164,10 @@ internal data class SimpleConfiguredSkill(
 }
 
 /**
- * [ConfiguredSkill] 的序列化器.
- *
- * ## Node structure
- * ```yaml
- * <node>:
- *   type: <key>
- *   trigger: <trigger>
- *   variant: <variant>
- * ```
- */
-internal object ConfiguredSkillSerializer : SchemaSerializer<ConfiguredSkill> {
-    override fun deserialize(type: Type, node: ConfigurationNode): ConfiguredSkill {
-        val id = node.node("type").krequire<Key>()
-        val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
-        val variantNode = node.node("variant")
-        val variant = if (variantNode.isNull) {
-            TriggerVariant.any()
-        } else {
-            variantNode.krequire<TriggerVariant>()
-        }
-
-        return SimpleConfiguredSkill(id, trigger, variant)
-    }
-}
-
-/**
  * [TriggerVariant] 的序列化器.
  */
 internal object TriggerVariantSerializer : ScalarSerializer<TriggerVariant>(typeTokenOf()) {
-    override fun deserialize(type: Type?, obj: Any?): TriggerVariant {
-        if (obj == null)
-            return TriggerVariant.any()
-
+    override fun deserialize(type: Type, obj: Any): TriggerVariant {
         val value = obj.toString()
 
         try {
@@ -206,6 +179,10 @@ internal object TriggerVariantSerializer : ScalarSerializer<TriggerVariant>(type
 
     override fun serialize(item: TriggerVariant?, typeSupported: Predicate<Class<*>>?): Any {
         throw UnsupportedOperationException()
+    }
+
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): TriggerVariant {
+        return TriggerVariant.any()
     }
 }
 

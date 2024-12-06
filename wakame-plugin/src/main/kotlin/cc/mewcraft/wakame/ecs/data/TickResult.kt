@@ -5,12 +5,12 @@ package cc.mewcraft.wakame.ecs.data
  */
 enum class TickResult {
     /**
-     * Tick 完成, 会继续执行下一个 Tick.
+     * 此 Tick 完成, 会继续执行下一个 Tick.
      */
     CONTINUE_TICK,
 
     /**
-     * 此 Tick **整个执行**完成, 不再执行下一个 Tick.
+     * 此 Tick **整个执行**完成, 不再执行下一个 Tick, 并推到下个阶段.
      */
     ALL_DONE,
 

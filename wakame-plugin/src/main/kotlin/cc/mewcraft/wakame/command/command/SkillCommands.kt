@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.character.toComposite
-import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
+import cc.mewcraft.wakame.skill2.context.skillContext
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.LivingEntity
@@ -68,7 +68,12 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    mechanicWorldInteraction.addMechanic(ImmutableSkillContext(CasterAdapter.adapt(casterPlayer).toComposite(), target, skill = skill))
+                    val context = skillContext {
+                        skill(skill)
+                        caster(CasterAdapter.adapt(casterPlayer).toComposite())
+                        target(target)
+                    }
+                    mechanicWorldInteraction.addMechanic(context)
                 }
             }.buildAndAdd(this)
         }

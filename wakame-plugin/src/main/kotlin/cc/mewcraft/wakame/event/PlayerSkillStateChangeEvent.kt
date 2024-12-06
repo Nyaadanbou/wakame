@@ -1,14 +1,16 @@
 package cc.mewcraft.wakame.event
 
-import cc.mewcraft.wakame.skill2.state.SkillStateInfo
+import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.skill2.Skill
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 
 class PlayerSkillStateChangeEvent(
     player: Player,
-    val oldState: SkillStateInfo,
-    val newState: SkillStateInfo
+    val skill: Skill,
+    val oldPhase: StatePhase,
+    val newPhase: StatePhase
 ) : PlayerEvent(player) {
 
     override fun getHandlers(): HandlerList {

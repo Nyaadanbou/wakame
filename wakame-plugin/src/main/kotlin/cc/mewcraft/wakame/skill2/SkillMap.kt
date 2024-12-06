@@ -3,12 +3,10 @@ package cc.mewcraft.wakame.skill2
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.toComposite
-import cc.mewcraft.wakame.skill2.context.ImmutableSkillContext
+import cc.mewcraft.wakame.skill2.context.skillContext
 import cc.mewcraft.wakame.skill2.trigger.Trigger
-import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
-import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -85,7 +83,7 @@ inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
 }
 
 fun SkillMap(user: User<Player>): SkillMap {
-    return PlayerSkillMap(user.uniqueId)
+    return PlayerSkillMap(user)
 }
 
 /**
@@ -95,75 +93,67 @@ fun SkillMap(user: User<Player>): SkillMap {
  * then check whether the input has triggered a skill or not.
  */
 private class PlayerSkillMap(
-    private val uniqueId: UUID,
+    private val user: User<Player>,
 ) : SkillMap {
     companion object : KoinComponent {
         private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
     }
 
-    private val skills: Multimap<Trigger, Key> = MultimapBuilder
-        .hashKeys(8)
-        .arrayListValues(5)
-        .build()
-
     override fun addSkill(skill: ConfiguredSkill) {
-        this.skills.put(skill.trigger, skill.id)
         val skillInstance = getSkillByKey(skill.id)
-        registerSkillResult(skillInstance)
+        recordSkill(skillInstance, skill.trigger)
     }
 
     override fun addSkillsByKey(skills: Multimap<Trigger, Key>) {
-        this.skills.putAll(skills)
-        for (key in skills.values()) {
+        for ((trigger, key) in skills.entries()) {
             val skillInstance = getSkillByKey(key)
-            registerSkillResult(skillInstance)
+            recordSkill(skillInstance, trigger)
         }
     }
 
     override fun addSkillsByInstance(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
-            this.skills.put(trigger, skill.key)
-            registerSkillResult(skill)
+            recordSkill(skill, trigger)
         }
     }
 
     override fun getSkill(trigger: Trigger): Collection<Skill> {
-        return this.skills[trigger].map { getSkillByKey(it) }
+        return mechanicWorldInteraction.getMechanicsBy(trigger)
     }
 
     override fun removeSkill(key: Key) {
-        this.skills.entries().removeIf { it.value == key }
-        mechanicWorldInteraction.interruptMechanic(key.asString())
+        mechanicWorldInteraction.interruptMechanicBy(key.asString())
     }
 
     override fun removeSkill(skill: Skill) {
-        this.skills.entries().removeIf { it.value == skill.key }
-        mechanicWorldInteraction.interruptMechanic(skill.key.asString())
+        mechanicWorldInteraction.interruptMechanicBy(skill.key.asString())
     }
 
     override fun removeSkill(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
-            this.skills.remove(trigger, skill.key)
-            mechanicWorldInteraction.interruptMechanic(skill.key.asString())
+            mechanicWorldInteraction.interruptMechanicBy(trigger, skill)
         }
     }
 
     override fun getTriggers(): Set<Trigger> {
-        return skills.keySet()
+        return mechanicWorldInteraction.getAllActiveMechanicTriggers(user.player)
     }
 
     override fun hasTrigger(clazz: Class<out Trigger>): Boolean {
-        return skills.keys().any { clazz.isInstance(it) }
+        return getTriggers().any { clazz.isInstance(it) }
     }
 
     override fun cleanup() {
-        skills.values().forEach { mechanicWorldInteraction.interruptMechanic(it.asString()) }
-        skills.clear()
+        mechanicWorldInteraction.interruptMechanicBy(user.player)
     }
 
-    private fun registerSkillResult(skill: Skill) {
-        val user = PlayerAdapters.get<Player>().adapt(uniqueId)
-        mechanicWorldInteraction.addMechanic(ImmutableSkillContext(caster = CasterAdapter.adapt(user).toComposite(), skill = skill))
+    private fun recordSkill(skill: Skill, trigger: Trigger) {
+        val context = skillContext {
+            caster(CasterAdapter.adapt(user).toComposite())
+            trigger(trigger)
+            skill(skill)
+        }
+        mechanicWorldInteraction.addMechanic(context)
     }
 
     private fun getSkillByKey(key: Key): Skill {

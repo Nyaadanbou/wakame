@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.skill2.trigger
  *
  * ## 用途
  * 触发技能的逻辑在检测一个玩家动作是否能触发技能时,
- * 还会额外检测技能的变体 ([cc.mewcraft.wakame.skill.ConfiguredSkill.variant])
+ * 还会额外检测技能的变体 ([cc.mewcraft.wakame.skill2.ConfiguredSkill.variant])
  * 是否与物品的变体 ([cc.mewcraft.wakame.item.NekoStack.variant]) 相匹配.
  * 如果物品变体不匹配, 即使玩家按对了触发器 ([Trigger]), 技能最终也不会释放.
  */

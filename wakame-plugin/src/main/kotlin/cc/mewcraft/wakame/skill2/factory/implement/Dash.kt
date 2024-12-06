@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillProvider
 import cc.mewcraft.wakame.skill2.context.SkillContext
-import cc.mewcraft.wakame.skill2.context.toMutable
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
 import cc.mewcraft.wakame.skill2.result.SkillResult
 import cc.mewcraft.wakame.util.krequire
@@ -64,28 +63,33 @@ interface Dash : Skill {
         private val triggerConditionGetter: TriggerConditionGetter = TriggerConditionGetter()
 
         override fun result(context: SkillContext): SkillResult<Dash> {
-            val newContext = context.toMutable().also { it.setSkill(this)  }
-            return DashSkillResult(newContext, this)
+            return DashSkillResult(context, this)
         }
     }
 }
 
 private class DashSkillResult(
     override val context: SkillContext,
-    private val skill: Dash
+    private val skill: Dash,
 ) : SkillResult<Dash> {
 
-    override fun tickIdle(tickCount: Double, componentMap: ComponentMap): TickResult {
+    private var castTick: Double = .0
+
+    override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         val bukkitEntity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT
 
-        bukkitEntity.sendPlainMessage("Dash Idle, tickCount: $tickCount")
-        return TickResult.ALL_DONE
+        bukkitEntity.sendPlainMessage("Dash Idle, totalTickCount: $tickCount")
+        return TickResult.CONTINUE_TICK
     }
 
-    override fun tickCast(tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         val bukkitEntity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT
 
-        bukkitEntity.sendPlainMessage("Dash Cast, tickCount: $tickCount")
-        return TickResult.ALL_DONE
+        bukkitEntity.sendPlainMessage("Dash Cast, totalTickCount: $tickCount")
+        if (castTick >= 40) {
+            return TickResult.ALL_DONE
+        }
+        castTick += deltaTime
+        return TickResult.CONTINUE_TICK
     }
 }

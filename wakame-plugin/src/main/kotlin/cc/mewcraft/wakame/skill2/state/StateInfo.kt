@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2.state
 
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
-import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
 import cc.mewcraft.wakame.skill2.hasTrigger
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
 import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
@@ -26,7 +26,7 @@ import java.util.stream.Stream
 /**
  * 代表了一个玩家技能状态的信息.
  */
-sealed interface SkillStateInfo : Examinable {
+sealed interface StateInfo : Examinable {
     /**
      * 当前状态的类型.
      */
@@ -36,18 +36,17 @@ sealed interface SkillStateInfo : Examinable {
      * 添加一个 [SingleTrigger],
      */
     fun addTrigger(trigger: SingleTrigger): SkillStateResult
-
-    /**
-     * 中断当前的状态.
-     */
-    fun interrupt()
 }
 
-sealed class AbstractSkillStateInfo(
-    val state: PlayerSkillState,
+sealed class AbstractStateInfo(
+    val player: Player,
     override val phase: StatePhase,
     registerEvents: Boolean = true,
-) : SkillStateInfo {
+) : StateInfo {
+
+    companion object : KoinComponent {
+        private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
+    }
 
     init {
         if (registerEvents) {
@@ -67,13 +66,19 @@ sealed class AbstractSkillStateInfo(
         }
     }
 
-    protected abstract fun setNextState()
+    protected fun interrupt() {
+        mechanicWorldInteraction.interruptMechanicBy(player)
+    }
+
+    protected fun setNextState() {
+        mechanicWorldInteraction.markNextState(player)
+    }
 
     private fun registerTriggerEvents() {
         // FIXME: 检查可能出现的对象残留问题.
         val subscriptions = listOf(
             Events.subscribe(PlayerJumpEvent::class.java)
-                .filter { it.player == state.user.player }
+                .filter { it.player == player }
                 .handler { event ->
                     val user = event.player.toUser()
                     val result = user.skillState.addTrigger(SingleTrigger.JUMP)
@@ -81,7 +86,7 @@ sealed class AbstractSkillStateInfo(
                 },
 
             Events.subscribe(PlayerMoveEvent::class.java)
-                .filter { it.player == state.user.player }
+                .filter { it.player == player }
                 .filter { it.from.blockX != it.to.blockX || it.from.blockY != it.to.blockY || it.from.blockZ != it.to.blockZ }
                 .handler { event ->
                     val user = event.player.toUser()
@@ -90,7 +95,7 @@ sealed class AbstractSkillStateInfo(
                 },
 
             Events.subscribe(PlayerToggleSneakEvent::class.java)
-                .filter { it.player == state.user.player }
+                .filter { it.player == player }
                 .handler { event ->
                     val user = event.player.toUser()
                     val result = user.skillState.addTrigger(SingleTrigger.SNEAK)
@@ -100,7 +105,7 @@ sealed class AbstractSkillStateInfo(
 
         EntitySubscriptionTerminator.newBuilder<PlayerSkillStateChangeEvent>()
             .terminatorEvent(PlayerSkillStateChangeEvent::class.java)
-            .predicate { it.player == state.user.player }
+            .predicate { it.player == player }
             .addSubscriptions(subscriptions)
             .build()
             .startListen()
@@ -127,25 +132,24 @@ sealed class AbstractSkillStateInfo(
  * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
  */
 class IdleStateInfo(
-    state: PlayerSkillState,
-) : AbstractSkillStateInfo(state, StatePhase.IDLE, false), KoinComponent {
-    companion object {
+    player: Player,
+) : AbstractStateInfo(player, StatePhase.IDLE, false) {
+    companion object : KoinComponent {
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+
+        private val stateDisplay: StateDisplay<Player> by inject()
     }
 
-    private val stateDisplay: StateDisplay<Player> by inject()
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
-    private var castableSkill: Skill? = null
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
-        castableSkill = null
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
         // Sequence trigger skills
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
             if (addSequenceSkills(castTrigger)) {
-                stateDisplay.displaySuccess(currentSequence.readAll(), state.user)
+                stateDisplay.displaySuccess(currentSequence.readAll(),player)
                 currentSequence.clear()
                 setNextState()
                 return SkillStateResult.CANCEL_EVENT
@@ -162,7 +166,7 @@ class IdleStateInfo(
     }
 
     private fun addSequenceSkills(trigger: SingleTrigger): Boolean {
-        val user = state.user
+        val user = player.toUser()
         val skillMap = user.skillMap
         // isFirstRightClickAndHasTrigger 的真值表:
         // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | skillMap.hasTrigger<SequenceTrigger>() -> isFirstRightClickAndHasTrigger
@@ -181,17 +185,16 @@ class IdleStateInfo(
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
             val completeSequence = currentSequence.readAll()
-            stateDisplay.displayProgress(completeSequence, user)
+            stateDisplay.displayProgress(completeSequence, player)
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.of(completeSequence)
                 val skillsOnSequence = skillMap.getSkill(sequence).firstOrNull()
                 if (skillsOnSequence == null) {
                     currentSequence.clear()
-                    stateDisplay.displayFailure(completeSequence, user)
+                    stateDisplay.displayFailure(completeSequence, player)
                     return false
                 }
-                castableSkill = skillsOnSequence
                 return true
             }
         }
@@ -200,20 +203,10 @@ class IdleStateInfo(
     }
 
     private fun addSingleSkills(trigger: SingleTrigger): Boolean {
-        val user = state.user
+        val user = player.toUser()
         val skillMap = user.skillMap
-        val skills = skillMap.getSkill(trigger)
-        castableSkill = skills.firstOrNull() ?: return false
+        skillMap.getSkill(trigger).takeIf { it.isNotEmpty() } ?: return false
         return true
-    }
-
-    override fun setNextState() {
-        state.setInfo(CastPointStateInfo(state))
-    }
-
-    override fun interrupt() {
-        currentSequence.clear()
-        castableSkill = null
     }
 }
 
@@ -221,8 +214,8 @@ class IdleStateInfo(
  * 表示玩家技能状态的前摇状态, 即玩家正在试图使用技能.
  */
 class CastPointStateInfo(
-    state: PlayerSkillState,
-) : AbstractSkillStateInfo(state, StatePhase.CAST_POINT) {
+    player: Player,
+) : AbstractStateInfo(player, StatePhase.CAST_POINT) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
@@ -234,14 +227,6 @@ class CastPointStateInfo(
             return SkillStateResult.SILENT_FAILURE
         }
         return SkillStateResult.SUCCESS
-    }
-
-    override fun setNextState() {
-        state.setInfo(CastingStateInfo(state))
-    }
-
-    override fun interrupt() {
-        state.setInfo(IdleStateInfo(state))
     }
 }
 
@@ -249,8 +234,8 @@ class CastPointStateInfo(
  * 表示玩家技能状态的释放状态, 即玩家正在释放技能.
  */
 class CastingStateInfo(
-    state: PlayerSkillState,
-) : AbstractSkillStateInfo(state, StatePhase.CASTING) {
+    player: Player,
+) : AbstractStateInfo(player, StatePhase.CASTING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
@@ -263,22 +248,14 @@ class CastingStateInfo(
         }
         return SkillStateResult.SUCCESS
     }
-
-    override fun setNextState() {
-        state.setInfo(BackswingStateInfo(state))
-    }
-
-    override fun interrupt() {
-        state.setInfo(IdleStateInfo(state))
-    }
 }
 
 /**
  * 表示玩家技能状态的后摇状态, 即玩家释放技能后的状态.
  */
 class BackswingStateInfo(
-    state: PlayerSkillState,
-) : AbstractSkillStateInfo(state, StatePhase.BACKSWING) {
+    player: Player,
+) : AbstractStateInfo(player, StatePhase.BACKSWING) {
     private val triggerConditionManager: TriggerConditionManager = TriggerConditionManager()
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
@@ -289,13 +266,5 @@ class BackswingStateInfo(
             interrupt()
         }
         return SkillStateResult.SUCCESS
-    }
-
-    override fun setNextState() {
-        state.setInfo(IdleStateInfo(state))
-    }
-
-    override fun interrupt() {
-        state.setInfo(IdleStateInfo(state))
     }
 }

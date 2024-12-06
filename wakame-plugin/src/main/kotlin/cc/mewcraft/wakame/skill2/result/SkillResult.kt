@@ -20,18 +20,18 @@ interface SkillResult<out S : Skill> : Result {
      */
     val context: SkillContext
 
-    override fun tick(tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
             val state = componentMap[StatePhaseComponent]
             if (state == null) {
-                return tickCast(tickCount, componentMap)
+                return tickCast(deltaTime, tickCount, componentMap)
             }
 
             return when (state.phase) {
-                StatePhase.IDLE -> tickIdle(tickCount, componentMap)
-                StatePhase.CAST_POINT -> tickCastPoint(tickCount, componentMap)
-                StatePhase.CASTING -> tickCast(tickCount, componentMap)
-                StatePhase.BACKSWING -> tickBackswing(tickCount, componentMap)
+                StatePhase.IDLE -> tickIdle(deltaTime, tickCount, componentMap)
+                StatePhase.CAST_POINT -> tickCastPoint(deltaTime, tickCount, componentMap)
+                StatePhase.CASTING -> tickCast(deltaTime, tickCount, componentMap)
+                StatePhase.BACKSWING -> tickBackswing(deltaTime, tickCount, componentMap)
             }
         } catch (t: Throwable) {
             val skillKClass = context.skill::class
@@ -40,22 +40,25 @@ interface SkillResult<out S : Skill> : Result {
         }
     }
 
-    fun tickIdle(tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
+    /**
+     * 一般不会在 [StatePhase.IDLE] 中进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.skill2.state.IdleStateInfo].
+     */
+    fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 执行此技能施法前摇逻辑.
      */
-    fun tickCastPoint(tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
+    fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 执行此技能的施法时逻辑.
      */
-    fun tickCast(tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
+    fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 执行此技能施法后摇逻辑
      */
-    fun tickBackswing(tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
+    fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 是否是空的执行逻辑.

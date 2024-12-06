@@ -191,7 +191,7 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
 /**
  * 技能.
  *
- * 物品发生变化时, 根据物品技能, 修改玩家的 [cc.mewcraft.wakame.skill.SkillMap].
+ * 物品发生变化时, 根据物品技能, 修改玩家的 [cc.mewcraft.wakame.skill2.SkillMap].
  */
 internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {

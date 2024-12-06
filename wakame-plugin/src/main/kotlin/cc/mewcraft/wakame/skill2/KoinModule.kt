@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.skill2.display.SkillDisplaySerializer
-import cc.mewcraft.wakame.skill2.state.display.PlayerStateDisplay
+import cc.mewcraft.wakame.skill2.state.display.EntityStateDisplay
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
 import cc.mewcraft.wakame.skill2.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.skill2.trigger.skillTriggerModule
@@ -24,7 +24,7 @@ fun skill2Module(): Module = module {
         skillTriggerModule(),
     )
 
-    singleOf(::PlayerStateDisplay) bind StateDisplay::class
+    singleOf(::EntityStateDisplay) bind StateDisplay::class
     singleOf(::SkillCastManagerImpl) bind SkillCastManager::class
 
     singleOf(::MechanicWorldInteraction)
@@ -36,7 +36,6 @@ fun skill2Module(): Module = module {
         TypeSerializerCollection.builder()
             .kregister(SkillSerializer)
             .kregister(SkillTriggerSerializer)
-            .kregister(ConfiguredSkillSerializer)
             .kregister(TriggerVariantSerializer)
             .build()
     }
