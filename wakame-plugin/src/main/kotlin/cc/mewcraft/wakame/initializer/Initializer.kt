@@ -164,7 +164,7 @@ object Initializer : KoinComponent, Listener {
         registerListener<DamageDisplay>()
 
         // ecs
-        registerListenerAndBind<EcsListener>()
+        registerListener<EcsListener>()
 
         // rpg player
         registerListener<PaperUserManager>()
