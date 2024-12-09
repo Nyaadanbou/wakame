@@ -12,17 +12,17 @@ import java.lang.reflect.Type
 /**
  * A collection of [SingleTrigger]s that are valid in a certain [StatePhase].
  */
-sealed interface TriggerConditions {
+sealed interface TriggerCondition {
     companion object {
         /**
-         * An empty [TriggerConditions].
+         * An empty [TriggerCondition].
          */
-        fun empty(): TriggerConditions = Empty
+        fun empty(): TriggerCondition = Empty
 
         /**
-         * Creates a [TriggerConditions] from a multimap of [StateInfo] to a list of [SingleTrigger]s.
+         * Creates a [TriggerCondition] from a multimap of [StateInfo] to a list of [SingleTrigger]s.
          */
-        fun of(values: Multimap<StatePhase, SingleTrigger>): TriggerConditions = TriggerConditionsImpl(values)
+        fun of(values: Multimap<StatePhase, SingleTrigger>): TriggerCondition = TriggerConditionImpl(values)
     }
 
     /**
@@ -30,19 +30,23 @@ sealed interface TriggerConditions {
      */
     val values: Multimap<StatePhase, SingleTrigger>
 
-    private data object Empty : TriggerConditions {
+    fun isMatched(state: StatePhase, trigger: SingleTrigger): Boolean {
+        return values[state].contains(trigger)
+    }
+
+    private data object Empty : TriggerCondition {
         override val values: Multimap<StatePhase, SingleTrigger> = MultimapBuilder.hashKeys()
             .arrayListValues()
             .build()
     }
 
-    private data class TriggerConditionsImpl(
+    private data class TriggerConditionImpl(
         override val values: Multimap<StatePhase, SingleTrigger>
-    ) : TriggerConditions
+    ) : TriggerCondition
 }
 
 /**
- * A serializer for [TriggerConditions].
+ * A serializer for [TriggerCondition].
  *
  * Format:
  * ```yaml
@@ -54,8 +58,8 @@ sealed interface TriggerConditions {
  *     - RIGHT_CLICK
  * ```
  */
-internal object TriggersConditionsSerializer : SchemaSerializer<TriggerConditions> {
-    override fun deserialize(type: Type, node: ConfigurationNode): TriggerConditions {
+internal object TriggersConditionsSerializer : SchemaSerializer<TriggerCondition> {
+    override fun deserialize(type: Type, node: ConfigurationNode): TriggerCondition {
         val values = MultimapBuilder.hashKeys().arrayListValues().build<StatePhase, SingleTrigger>()
         for ((key, value) in node.childrenMap()) {
             val stateType = StatePhase.entries.find { it.name.equals(key.toString(), ignoreCase = true) }
@@ -66,7 +70,6 @@ internal object TriggersConditionsSerializer : SchemaSerializer<TriggerCondition
                 values.put(stateType, trigger)
             }
         }
-        return TriggerConditions.of(values)
+        return TriggerCondition.of(values)
     }
-
 }

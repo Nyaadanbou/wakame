@@ -31,16 +31,16 @@ class EntityStateDisplay : StateDisplay<Player> {
     private val failureMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("failure_message").orElse(AudienceMessageGroup.empty())
     private val progressMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("progress_message").orElse(AudienceMessageGroup.empty())
 
-    override fun displayProgress(triggers: List<SingleTrigger>, audience: Player) {
+    override fun displaySuccess(triggers: List<SingleTrigger>, audience: Player) {
         successMessages.send(audience, getTagResolver(triggers))
+    }
+
+    override fun displayProgress(triggers: List<SingleTrigger>, audience: Player) {
+        progressMessages.send(audience, getTagResolver(triggers))
     }
 
     override fun displayFailure(triggers: List<SingleTrigger>, audience: Player) {
         failureMessages.send(audience, getTagResolver(triggers))
-    }
-
-    override fun displaySuccess(triggers: List<SingleTrigger>, audience: Player) {
-        progressMessages.send(audience, getTagResolver(triggers))
     }
 
     private fun getTagResolver(triggers: List<SingleTrigger>): TagResolver {

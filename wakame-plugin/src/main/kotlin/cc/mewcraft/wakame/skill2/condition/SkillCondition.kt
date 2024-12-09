@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.skill2.condition
 
 import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.context.SkillContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.ConfigurationNode
@@ -49,7 +50,7 @@ interface SkillCondition {
     /**
      * 创建一个新的条件判断的会话.
      */
-    fun newSession(context: SkillContext): SkillConditionSession
+    fun newSession(componentMap: ComponentMap): SkillConditionSession
 }
 
 /**

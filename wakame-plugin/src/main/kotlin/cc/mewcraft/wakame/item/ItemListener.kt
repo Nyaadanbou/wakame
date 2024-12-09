@@ -313,19 +313,19 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         when (event.action) {
             Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
+                skillEventHandler.onLeftClickBlock(player, event)
             }
 
             Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, itemStack, event)
+                skillEventHandler.onLeftClickAir(player, event)
             }
 
             Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
+                skillEventHandler.onRightClickBlock(player, event)
             }
 
             Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, itemStack, event)
+                skillEventHandler.onRightClickAir(player, event)
             }
 
             else -> return
@@ -342,7 +342,7 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         val entity = event.entity as? LivingEntity ?: return
         val itemStack = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        skillEventHandler.onAttack(damager, entity, itemStack, event)
+        skillEventHandler.onAttack(damager, itemStack, event)
     }
 
     @EventHandler

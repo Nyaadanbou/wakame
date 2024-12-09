@@ -7,12 +7,9 @@ import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.character.Caster
 import cc.mewcraft.wakame.skill2.character.CasterUtils
 import cc.mewcraft.wakame.skill2.context.SkillContext
-import cc.mewcraft.wakame.skill2.state.StateInfo
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
-import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
-import org.bukkit.entity.Player
 
 /**
  * 用于内部记录一个技能状态.
@@ -32,7 +29,6 @@ internal class MechanicWorldInteraction(
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
             it += TriggerComponent(context.trigger)
-            it += Tags.CAN_TICK
         }
     }
 
@@ -46,6 +42,22 @@ internal class MechanicWorldInteraction(
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id
                     skills.add(SkillRegistry.INSTANCES[Key(id)])
+                }
+            }
+        }
+
+        return skills
+    }
+
+    fun getAllActiveMechanic(bukkitEntity: Entity): Set<Skill> {
+        val skills = mutableSetOf<Skill>()
+        with(world.instance) {
+            forEach { entity ->
+                val family = family { all(BukkitEntityComponent, IdentifierComponent) }
+                if (!family.contains(entity))
+                    return@forEach
+                if (entity[BukkitEntityComponent].entity == bukkitEntity) {
+                    skills.add(SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)])
                 }
             }
         }
@@ -111,34 +123,6 @@ internal class MechanicWorldInteraction(
                     }
                 }
         }
-    }
-
-    fun getStates(bukkitEntity: Entity): Map<Key, StatePhase> {
-        val states = mutableMapOf<Key, StatePhase>()
-        with(world.instance) {
-            family { all(IdentifierComponent, StatePhaseComponent, BukkitEntityComponent) }
-                .forEach { entity ->
-                    if (entity[BukkitEntityComponent].entity != bukkitEntity)
-                        return@forEach
-                    states[Key(entity[IdentifierComponent].id)] = entity[StatePhaseComponent].phase
-                }
-        }
-
-        return states
-    }
-
-    fun getStateInfos(player: Player): Map<Key, StateInfo> {
-        val stateInfos = mutableMapOf<Key, StateInfo>()
-        with(world.instance) {
-            family { all(IdentifierComponent, StatePhaseComponent, BukkitEntityComponent, StateInfoComponent) }
-                .forEach { entity ->
-                    if (entity[BukkitEntityComponent].entity != player)
-                        return@forEach
-                    stateInfos[Key(entity[IdentifierComponent].id)] = entity[StateInfoComponent].stateInfo
-                }
-        }
-
-        return stateInfos
     }
 
     fun markNextState(bukkitEntity: Entity) {

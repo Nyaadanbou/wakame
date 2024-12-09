@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.skill2.state
 
-import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
+import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
@@ -8,6 +9,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.cooldown.Cooldown
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -40,7 +42,7 @@ class PlayerSkillState(
     private val uniqueId: UUID,
 ) : SkillState<Player> {
     companion object : KoinComponent {
-        private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
+        private val server: Server by inject()
 
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
@@ -48,19 +50,32 @@ class PlayerSkillState(
 
     private val cooldown: Cooldown = Cooldown.ofTicks(2)
 
+    private val player: Player
+        get() = requireNotNull(server.getPlayer(uniqueId))
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
+
+    private var stateInfo: StateInfo = createStateInfo(player, StatePhase.IDLE)
+
+    private fun createStateInfo(player: Player, phase: StatePhase): StateInfo {
+        return when (phase) {
+            StatePhase.IDLE -> IdleStateInfo(player)
+            StatePhase.CAST_POINT -> CastPointStateInfo(player)
+            StatePhase.CASTING -> CastingStateInfo(player)
+            StatePhase.BACKSWING -> BackswingStateInfo(player)
+        }
+    }
+
+    fun onStateChange(event: PlayerSkillStateChangeEvent) {
+        stateInfo = createStateInfo(event.player, event.newPhase)
+    }
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
 
-        val results = mechanicWorldInteraction.getStateInfos(user.player).entries.map { it.value.addTrigger(trigger) }
-
-        return if (results.any { result -> result == SkillStateResult.CANCEL_EVENT }) SkillStateResult.CANCEL_EVENT
-        else if (results.any { result -> result == SkillStateResult.SILENT_FAILURE }) SkillStateResult.SILENT_FAILURE
-        else SkillStateResult.SUCCESS
+        return stateInfo.addTrigger(trigger)
     }
 
     override fun clear() {

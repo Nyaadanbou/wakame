@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
 import cc.mewcraft.wakame.skill2.SKILL_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.skill2.SkillSerializer
 import cc.mewcraft.wakame.skill2.trigger.SKILL_TRIGGER_SERIALIZERS
+import cc.mewcraft.wakame.skill2.trigger.TriggerHandleDataSerializer
 import cc.mewcraft.wakame.skill2.trigger.TriggersConditionsSerializer
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
@@ -132,6 +133,7 @@ internal fun registryModule(): Module = module {
             register(SkillSerializer)
             kregister(PotionEffectSerializer)
             kregister(TriggersConditionsSerializer)
+            kregister(TriggerHandleDataSerializer)
             registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
             registerAll(get(named(SKILL_GROUP_SERIALIZERS)))

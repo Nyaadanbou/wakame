@@ -33,9 +33,7 @@ interface Food : ItemBehavior {
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
 
             for (skill in skills) {
-                val context = skillContext {
-                    skill(skill)
-                    caster(CasterAdapter.adapt(player).toComposite())
+                val context = skillContext(skill, CasterAdapter.adapt(player).toComposite()) {
                     target(TargetAdapter.adapt(player))
                     castItem(nekoStack)
                 }

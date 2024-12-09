@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.skill2.condition
 
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.context.SkillContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
@@ -24,7 +25,7 @@ interface SkillConditionGroup {
     /**
      * 创建一个新的条件判断的会话.
      */
-    fun newSession(time: ConditionPhase, context: SkillContext): SkillConditionSession
+    fun newSession(time: ConditionPhase, componentMap: ComponentMap): SkillConditionSession
 
     companion object {
         /**
@@ -42,7 +43,7 @@ interface SkillConditionGroup {
 
 private data object EmptySkillConditionGroup : SkillConditionGroup {
     override fun getResolver(time: ConditionPhase): TagResolver = TagResolver.empty()
-    override fun newSession(time: ConditionPhase, context: SkillContext): SkillConditionSession {
+    override fun newSession(time: ConditionPhase, componentMap: ComponentMap): SkillConditionSession {
         return SkillConditionSession.alwaysSuccess()
     }
 }

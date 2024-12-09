@@ -2,14 +2,12 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.skill2.character.Target
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.state.SkillStateResult
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.Location
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -27,67 +25,45 @@ class SkillEventHandler {
 
     /* 玩家的技能触发逻辑 */
 
-    fun onLeftClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
-        onLeftClick(player, itemStack, event) { TargetAdapter.adapt(location) }
+    fun onLeftClickBlock(player: Player, event: PlayerInteractEvent) {
+        onLeftClick(player, event)
     }
 
-    fun onLeftClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
-        onLeftClick(player, itemStack, event) {
-            val targetEntity = player.getTargetEntity(16)
-            if (targetEntity == null || targetEntity !is LivingEntity) {
-                TargetAdapter.adapt(player)
-            } else {
-                TargetAdapter.adapt(targetEntity)
-            }
-        }
+    fun onLeftClickAir(player: Player, event: PlayerInteractEvent) {
+        onLeftClick(player, event)
     }
 
     private fun onLeftClick(
         player: Player,
-        itemStack: ItemStack,
         event: PlayerInteractEvent,
-        targetProvider: () -> Target,
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
-        val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.LEFT_CLICK)
         if (result == SkillStateResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
     }
 
-    fun onRightClickBlock(player: Player, itemStack: ItemStack, location: Location, event: PlayerInteractEvent) {
-        onRightClick(player, itemStack, event) { TargetAdapter.adapt(location) }
+    fun onRightClickBlock(player: Player, event: PlayerInteractEvent) {
+        onRightClick(player, event)
     }
 
-    fun onRightClickAir(player: Player, itemStack: ItemStack, event: PlayerInteractEvent) {
-        onRightClick(player, itemStack, event) {
-            val targetEntity = player.getTargetEntity(16)
-            if (targetEntity == null || targetEntity !is LivingEntity) {
-                TargetAdapter.adapt(player)
-            } else {
-                TargetAdapter.adapt(targetEntity)
-            }
-        }
+    fun onRightClickAir(player: Player, event: PlayerInteractEvent) {
+        onRightClick(player, event)
     }
 
     private fun onRightClick(
         player: Player,
-        itemStack: ItemStack,
         event: PlayerInteractEvent,
-        targetProvider: () -> Target,
     ) {
         val user = player.toUser()
-        val nekoStack = itemStack.toNekoStack
-        val target = targetProvider.invoke()
         val result = user.skillState.addTrigger(SingleTrigger.RIGHT_CLICK)
         checkResult(result, event)
     }
 
-    fun onAttack(player: Player, entity: LivingEntity, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
+    fun onAttack(player: Player, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
-        val nekoStack = itemStack?.tryNekoStack ?: return // 非萌芽物品应该完全不用处理吧?
+        itemStack?.shadowNeko(false) ?: return // 非萌芽物品应该完全不用处理吧?
         val result = user.skillState.addTrigger(SingleTrigger.ATTACK)
         checkResult(result, event)
     }

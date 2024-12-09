@@ -16,7 +16,7 @@ class MechanicBukkitEntityMetadataSystem(
     family = family { all(BukkitEntityComponent) }
 ) {
     companion object {
-        val COMPONENT_MAP_KEY: MetadataKey<ComponentMap> = MetadataKey.create("component_map", ComponentMap::class.java)
+        val COMPONENT_MAP_KEY: MetadataKey<ComponentMap> = MetadataKey.create("mechanic_component_map", ComponentMap::class.java)
     }
 
     override fun onTickEntity(entity: Entity) {

@@ -68,9 +68,7 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    val context = skillContext {
-                        skill(skill)
-                        caster(CasterAdapter.adapt(casterPlayer).toComposite())
+                    val context = skillContext(skill, CasterAdapter.adapt(casterPlayer).toComposite()) {
                         target(target)
                     }
                     mechanicWorldInteraction.addMechanic(context)

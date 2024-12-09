@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.skill2.condition
 
 import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.util.EnumLookup
 import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -34,9 +34,9 @@ internal class SkillConditionGroupImpl(
         return TagResolver.resolver(child.map { it.resolver })
     }
 
-    override fun newSession(time: ConditionPhase, context: SkillContext): SkillConditionSession {
+    override fun newSession(time: ConditionPhase, componentMap: ComponentMap): SkillConditionSession {
         val child = this.children[time] ?: return SkillConditionSession.alwaysSuccess()
-        return SessionImpl(child.map { it.newSession(context) })
+        return SessionImpl(child.map { it.newSession(componentMap) })
     }
 
     private inner class SessionImpl(
@@ -44,12 +44,12 @@ internal class SkillConditionGroupImpl(
     ) : SkillConditionSession {
         override val isSuccess: Boolean = children.all { it.isSuccess }
 
-        override fun onSuccess(context: SkillContext) {
+        override fun onSuccess(componentMap: ComponentMap) {
             // 所有条件满足, 执行每个条件的 onSuccess
-            children.forEach { it.onSuccess(context) }
+            children.forEach { it.onSuccess(componentMap) }
         }
 
-        override fun onFailure(context: SkillContext) {
+        override fun onFailure(componentMap: ComponentMap) {
             // 存在条件不满足, 执行第一个不满足的条件的 onFailure
             val sessionWithFailure = children.firstOrNull { !it.isSuccess }
             if (sessionWithFailure == null) {
@@ -57,7 +57,7 @@ internal class SkillConditionGroupImpl(
                 return
             }
 
-            sessionWithFailure.onFailure(context)
+            sessionWithFailure.onFailure(componentMap)
         }
     }
 }

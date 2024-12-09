@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
 import cc.mewcraft.wakame.skill2.result.SkillResult
+import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -43,6 +44,11 @@ interface Skill : Keyed, Examinable {
     val conditions: SkillConditionGroup
 
     /**
+     * 在触发对 [cc.mewcraft.wakame.skill2.trigger.Trigger] 进行的判断
+     */
+    val triggerHandleData: TriggerHandleData
+
+    /**
      * The display infos of this skill.
      */
     val displays: SkillDisplay
@@ -66,6 +72,7 @@ private data object EmptySkill : Skill {
     override val key: Key = Key(Namespaces.SKILL, "empty")
     override val displays: SkillDisplay = SkillDisplay.empty()
     override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
+    override val triggerHandleData: TriggerHandleData = TriggerHandleData()
     override fun result(context: SkillContext): SkillResult<Skill> = SkillResult()
 }
 

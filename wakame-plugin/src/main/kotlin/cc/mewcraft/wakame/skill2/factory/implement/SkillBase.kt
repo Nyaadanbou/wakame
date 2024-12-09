@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2.factory.implement
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
-import cc.mewcraft.wakame.skill2.trigger.TriggerConditions
+import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -20,18 +20,7 @@ abstract class SkillBase(
 ) : Skill {
     override val displays: SkillDisplay = config.node("displays").get<SkillDisplay>() ?: SkillDisplay.Companion.empty()
     override val conditions: SkillConditionGroup = config.node("conditions").get<SkillConditionGroup>() ?: SkillConditionGroup.empty()
-
-    protected inner class TriggerConditionGetter {
-        /**
-         * 在技能执行时无法执行的操作.
-         */
-        val forbidden: TriggerConditions = config.node("forbidden_triggers").get<TriggerConditions>() ?: TriggerConditions.empty()
-
-        /**
-         * 在执行下列操作时会打断技能.
-         */
-        val interrupt: TriggerConditions = config.node("interrupt_triggers").get<TriggerConditions>() ?: TriggerConditions.Companion.empty()
-    }
+    override val triggerHandleData: TriggerHandleData = config.node("triggers").get<TriggerHandleData>() ?: TriggerHandleData()
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

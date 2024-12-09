@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.skill2.condition
 
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill2.character.Caster
-import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.skill2.character.value
+import cc.mewcraft.wakame.skill2.context.skillContext
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -34,7 +35,8 @@ interface MoLangExpression : SkillCondition {
         override val evaluable: Evaluable<*> = config.node("eval").krequire<Evaluable<*>>()
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
-        override fun newSession(context: SkillContext): SkillConditionSession {
+        override fun newSession(componentMap: ComponentMap): SkillConditionSession {
+            val context = skillContext(componentMap)
             val engine = context.mochaEngine
             val isSuccess = evaluable.evaluate(engine) != .0
             return SessionImpl(isSuccess)
@@ -45,7 +47,8 @@ interface MoLangExpression : SkillCondition {
         ) : SkillConditionSession {
             private val notification: Notification = Notification()
 
-            override fun onSuccess(context: SkillContext) {
+            override fun onSuccess(componentMap: ComponentMap) {
+                val context = skillContext(componentMap)
                 // 用预设的实现发消息
                 notification.notifySuccess(context)
 
@@ -53,7 +56,8 @@ interface MoLangExpression : SkillCondition {
                 context.caster.value<Caster.Single.Player>()?.bukkitPlayer?.heal(2.0)
             }
 
-            override fun onFailure(context: SkillContext) {
+            override fun onFailure(componentMap: ComponentMap) {
+                val context = skillContext(componentMap)
                 // 用预设的实现发消息
                 notification.notifyFailure(context)
 

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2.state
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
-import cc.mewcraft.wakame.skill2.hasTrigger
+import cc.mewcraft.wakame.skill2.hasTriggerType
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
 import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
@@ -56,13 +56,15 @@ sealed class AbstractStateInfo(
 
     protected inner class TriggerConditionManager {
         fun isForbidden(trigger: SingleTrigger): Boolean {
-//            return skillResult.isForbidden(type, trigger)
-            return false
+            val skills = mechanicWorldInteraction.getAllActiveMechanic(player)
+            val skill = skills.firstOrNull { it.triggerHandleData.isForbidden(phase, trigger) }
+            return skill != null
         }
 
         fun isInterrupt(trigger: SingleTrigger): Boolean {
-//            return skillResult.isInterrupted(type, trigger)
-            return false
+            val skills = mechanicWorldInteraction.getAllActiveMechanic(player)
+            val skill = skills.firstOrNull { it.triggerHandleData.isInterrupt(phase, trigger) }
+            return skill != null
         }
     }
 
@@ -168,8 +170,9 @@ class IdleStateInfo(
     private fun addSequenceSkills(trigger: SingleTrigger): Boolean {
         val user = player.toUser()
         val skillMap = user.skillMap
+        // 第一个按下的是右键并且 skillMap 内有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
-        // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | skillMap.hasTrigger<SequenceTrigger>() -> isFirstRightClickAndHasTrigger
+        // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | skillMap.hasTriggerType<SequenceTrigger>() -> isFirstRightClickAndHasTrigger
         // f | f | f -> f
         // f | f | t -> t
         // f | t | f -> f
@@ -178,8 +181,8 @@ class IdleStateInfo(
         // t | f | t -> f
         // t | t | f -> f
         // t | t | t -> t
-        // 可计算出最终表达式为: Result = skillMap.hasTrigger<SequenceTrigger>() && (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK)
-        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK) && skillMap.hasTrigger<SequenceTrigger>()
+        // 可计算出最终表达式为: Result = skillMap.hasTriggerType<SequenceTrigger>() && (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK)
+        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK) && skillMap.hasTriggerType<SequenceTrigger>()
 
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence

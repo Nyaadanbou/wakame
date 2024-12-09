@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.skill2.condition
 
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.resource.ResourceTypeRegistry
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.skillContext
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -31,7 +32,8 @@ interface ManaCondition : SkillCondition {
         override val mana: Evaluable<*> = config.node("mana").krequire()
         override val resolver: TagResolver = TagResolver.empty()
 
-        override fun newSession(context: SkillContext): SkillConditionSession {
+        override fun newSession(componentMap: ComponentMap): SkillConditionSession {
+            val context = skillContext(componentMap)
             val user = context.user ?: return SkillConditionSession.alwaysFailure()
             val engine = context.mochaEngine
             val isSuccess = user.resourceMap.current(ResourceTypeRegistry.MANA) >= mana.evaluate(engine)
@@ -43,7 +45,8 @@ interface ManaCondition : SkillCondition {
         ) : SkillConditionSession {
             private val notification: Notification = Notification()
 
-            override fun onSuccess(context: SkillContext) {
+            override fun onSuccess(componentMap: ComponentMap) {
+                val context = skillContext(componentMap)
                 val user = context.user ?: error("User not found")
                 val engine = context.mochaEngine
                 val value = mana.evaluate(engine).toStableInt()
@@ -51,7 +54,8 @@ interface ManaCondition : SkillCondition {
                 notification.notifySuccess(context)
             }
 
-            override fun onFailure(context: SkillContext) {
+            override fun onFailure(componentMap: ComponentMap) {
+                val context = skillContext(componentMap)
                 notification.notifyFailure(context)
             }
         }

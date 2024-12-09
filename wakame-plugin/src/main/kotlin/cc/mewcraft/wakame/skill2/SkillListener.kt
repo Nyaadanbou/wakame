@@ -1,21 +1,17 @@
 package cc.mewcraft.wakame.skill2
 
+import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
+import cc.mewcraft.wakame.skill2.state.PlayerSkillState
+import cc.mewcraft.wakame.user.toUser
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerQuitEvent
 
-internal class SkillListener(
-    private val mechanicWorldInteraction: MechanicWorldInteraction,
-) : Listener {
+internal class SkillListener : Listener {
     @EventHandler
-    private fun on(e: PlayerJoinEvent) {
-//        mechanicWorldInteraction.addSkill(e.player)
-    }
+    private fun onStateChange(event: PlayerSkillStateChangeEvent) {
+        val user = event.player.toUser()
+        val skillState = user.skillState as? PlayerSkillState ?: return
 
-
-    @EventHandler
-    private fun on(e: PlayerQuitEvent) {
-//        mechanicWorldInteraction.removeSkill(e.player)
+        skillState.onStateChange(event)
     }
 }

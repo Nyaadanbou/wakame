@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.skill2.system.MechanicBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.skill2.system.MechanicConditionSessionSystem
+import cc.mewcraft.wakame.skill2.system.MechanicConditionSystem
 import cc.mewcraft.wakame.skill2.system.MechanicCooldownSystem
 import com.github.quillraven.fleks.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
@@ -37,16 +39,29 @@ class WakameWorld(
         }
 
         systems {
-            // 关于顺序: 删除系统优先于一切系统, 随后是将当前 entity 信息存入外部结构.
+            // 关于顺序: 删除系统优先于一切系统.
             add(RemoveSystem())
-            add(InitSystem())
-            add(TickCountSystem())
-            add(MechanicBukkitEntityMetadataSystem())
+
+            // 修改标记的系统
+
             add(MechanicCooldownSystem())
-            add(StatePhaseSystem())
-            add(StateInfoSystem())
+            add(MechanicConditionSystem())
+            add(MechanicConditionSessionSystem())
+
+            // 同步 ComponentMap 给外部
+
+            add(MechanicBukkitEntityMetadataSystem())
+
+            // 根据标记与组件进行交互的系统
+
+            add(TickCountSystem())
             add(ResultSystem())
             add(TickResultSystem())
+            add(StatePhaseSystem())
+
+            // 将所有标记重置到默认状态, 应当放在末尾.
+
+            add(InitSystem())
         }
     }
 
@@ -106,6 +121,6 @@ class WakameWorld(
     }
 
     fun componentMap(entity: Entity): ComponentMap {
-        return this.componentMapCache.computeIfAbsent(entity, Object2ObjectFunction { ComponentMap(instance, entity, instance.snapshotOf(entity)) })
+        return this.componentMapCache.computeIfAbsent(entity, Object2ObjectFunction { ComponentMap(instance, entity) })
     }
 }

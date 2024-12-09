@@ -23,8 +23,7 @@ data class ComponentMap(
     constructor(
         world: World,
         entity: Entity,
-        snapshot: Snapshot,
-    ) : this(world, entity, snapshot.components.associate { it.type() to it }.toMap(), snapshot.tags.toList())
+    ) : this(world, entity, world.snapshotOf(entity).components.associate { it.type() to it }.toMap(), world.snapshotOf(entity).tags.toList())
 
     operator fun <T : Component<out Any>> get(type: ComponentType<T>): T? {
         @Suppress("UNCHECKED_CAST")

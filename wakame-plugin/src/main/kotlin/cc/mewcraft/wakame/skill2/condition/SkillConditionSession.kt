@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill2.condition
 
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 
 /**
  * 代表执行一次条件判断的会话.
@@ -17,16 +17,16 @@ interface SkillConditionSession {
     val isSuccess: Boolean
 
     /**
-     * 当条件**满足时**执行的逻辑. 可能会修改 [context] 的状态.
+     * 当条件**满足时**执行的逻辑. 可能会修改 [componentMap] 的状态.
      *
      * 这包括消耗相应的资源, 发送消息提示等等.
      */
-    fun onSuccess(context: SkillContext)
+    fun onSuccess(componentMap: ComponentMap)
 
     /**
-     * 当条件**不满足时**执行的逻辑. 可能会修改 [context] 的状态.
+     * 当条件**不满足时**执行的逻辑. 可能会修改 [componentMap] 的状态.
      */
-    fun onFailure(context: SkillContext)
+    fun onFailure(componentMap: ComponentMap)
 
     companion object {
         /**
@@ -47,12 +47,12 @@ interface SkillConditionSession {
 
 private data object AlwaysSuccessSession : SkillConditionSession {
     override val isSuccess: Boolean = true
-    override fun onSuccess(context: SkillContext) {}
-    override fun onFailure(context: SkillContext) {}
+    override fun onSuccess(componentMap: ComponentMap) {}
+    override fun onFailure(componentMap: ComponentMap) {}
 }
 
 private data object AlwaysFailureSession : SkillConditionSession {
     override val isSuccess: Boolean = false
-    override fun onSuccess(context: SkillContext) {}
-    override fun onFailure(context: SkillContext) {}
+    override fun onSuccess(componentMap: ComponentMap) {}
+    override fun onFailure(componentMap: ComponentMap) {}
 }

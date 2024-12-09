@@ -63,7 +63,7 @@ interface SkillMap {
     /**
      * Checks whether the skill map has a trigger of the given class.
      */
-    fun hasTrigger(clazz: Class<out Trigger>): Boolean
+    fun hasTriggerType(clazz: Class<out Trigger>): Boolean
 
     /**
      * Clears all skills in the skill map.
@@ -78,8 +78,8 @@ interface SkillMap {
     operator fun get(uniqueId: UUID, trigger: Trigger): Collection<Skill> = getSkill(trigger)
 }
 
-inline fun <reified T : Trigger> SkillMap.hasTrigger(): Boolean {
-    return hasTrigger(T::class.java)
+inline fun <reified T : Trigger> SkillMap.hasTriggerType(): Boolean {
+    return hasTriggerType(T::class.java)
 }
 
 fun SkillMap(user: User<Player>): SkillMap {
@@ -139,7 +139,7 @@ private class PlayerSkillMap(
         return mechanicWorldInteraction.getAllActiveMechanicTriggers(user.player)
     }
 
-    override fun hasTrigger(clazz: Class<out Trigger>): Boolean {
+    override fun hasTriggerType(clazz: Class<out Trigger>): Boolean {
         return getTriggers().any { clazz.isInstance(it) }
     }
 
@@ -148,10 +148,8 @@ private class PlayerSkillMap(
     }
 
     private fun recordSkill(skill: Skill, trigger: Trigger) {
-        val context = skillContext {
-            caster(CasterAdapter.adapt(user).toComposite())
+        val context = skillContext(skill, CasterAdapter.adapt(user).toComposite()) {
             trigger(trigger)
-            skill(skill)
         }
         mechanicWorldInteraction.addMechanic(context)
     }

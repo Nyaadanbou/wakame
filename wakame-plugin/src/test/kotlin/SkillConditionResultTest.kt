@@ -32,11 +32,11 @@ class SkillConditionResultTest : KoinTest {
     }
 
     private fun testGroup(group: SkillConditionGroup, context: SkillContext): SkillConditionSession {
-        val session = group.newSession(ConditionPhase.CAST_POINT, context)
+        val session = group.newSession(ConditionPhase.CAST_POINT,)
         if (session.isSuccess) {
-            session.onSuccess(context)
+            session.onSuccess()
         } else {
-            session.onFailure(context)
+            session.onFailure()
         }
 
         return session
@@ -54,13 +54,13 @@ class SkillConditionResultTest : KoinTest {
             mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
         )
 
-        every { mockCondition.newSession(mockContext) } returns session
+        every { mockCondition.newSession() } returns session
 
         val result = testGroup(skillConditions, mockContext)
         assert(result.isSuccess)
-        verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 1) { session.onSuccess(mockContext) }
-        verify(exactly = 0) { session.onFailure(mockContext) }
+        verify(exactly = 1) { mockCondition.newSession() }
+        verify(exactly = 1) { session.onSuccess() }
+        verify(exactly = 0) { session.onFailure() }
     }
 
     @Test
@@ -71,7 +71,7 @@ class SkillConditionResultTest : KoinTest {
 
         every { session.isSuccess } returns false
 
-        every { mockCondition.newSession(mockContext) } returns session
+        every { mockCondition.newSession() } returns session
 
         val skillConditions = SkillConditionGroupImpl(
             mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
@@ -79,8 +79,8 @@ class SkillConditionResultTest : KoinTest {
 
         val result = testGroup(skillConditions, mockContext)
         assert(!result.isSuccess)
-        verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 0) { session.onSuccess(mockContext) }
-        verify(exactly = 1) { session.onFailure(mockContext) }
+        verify(exactly = 1) { mockCondition.newSession() }
+        verify(exactly = 0) { session.onSuccess() }
+        verify(exactly = 1) { session.onFailure() }
     }
 }

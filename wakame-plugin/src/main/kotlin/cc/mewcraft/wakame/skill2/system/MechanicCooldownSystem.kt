@@ -16,9 +16,9 @@ class MechanicCooldownSystem : IteratingSystem(
         if (cooldown.testCooldown()) {
             // 不在冷却了, 将技能设置成可触发.
             cooldown.elapsed = 0f
-            entity.configure { entity -> entity += Tags.CAN_TICK }
         } else {
             // 正在冷却, 将等待时间添加.
+            entity.configure { entity -> entity -= Tags.CAN_TICK }
             cooldown.elapsed += deltaTime
             sendCooldownTo(entity)
         }
