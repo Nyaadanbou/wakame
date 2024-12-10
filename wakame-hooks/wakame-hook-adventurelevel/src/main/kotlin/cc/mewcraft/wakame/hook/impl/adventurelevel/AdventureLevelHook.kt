@@ -22,14 +22,9 @@ object AdventureLevelHook : PlayerLevelIntegration {
 
     override fun get(uuid: UUID): Int? {
         val api = AdventureLevelProvider.get()
-        val playerDataManager = api.playerDataManager()
-        val playerData = playerDataManager.load(uuid)
-
-        if (!playerData.complete()) {
-            return null
-        }
-
-        val primaryLevel = playerData.getLevel(LevelCategory.PRIMARY)
+        val userDataRepository = api.userDataRepository
+        val userData = userDataRepository.getCached(uuid) ?: return null
+        val primaryLevel = userData.getLevel(LevelCategory.PRIMARY)
         return primaryLevel.level
     }
 

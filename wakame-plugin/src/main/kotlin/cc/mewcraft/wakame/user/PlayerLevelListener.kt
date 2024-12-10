@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
+import cc.mewcraft.wakame.util.concurrent.isServerThread
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -31,16 +32,23 @@ internal object PlayerLevelListener : Listener {
      */
     @EventHandler
     fun on(event: AdventureLevelDataLoadEvent) {
-        val data = event.playerData
+        val data = event.userData
         val player = Bukkit.getPlayer(data.uuid) ?: return
         val user = player.toUser()
 
         // 标记玩家的背包可以被监听了
-        user.isInventoryListenable = true
+        if (!user.isInventoryListenable) {
+            user.isInventoryListenable = true
+        }
 
-        // 当前事件是异步触发的, 必须在主线程操作玩家的状态
-        runTask {
+        if (isServerThread) {
+            // 如果事件是同步触发的, 那么直接操作玩家的状态
             syncResource(player)
+        } else {
+            // 如果事件是异步触发的, 必须在主线程操作玩家的状态
+            runTask {
+                syncResource(player)
+            }
         }
     }
 

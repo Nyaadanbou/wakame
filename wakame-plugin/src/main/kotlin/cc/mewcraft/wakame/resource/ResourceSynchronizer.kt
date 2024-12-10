@@ -50,7 +50,7 @@ internal object ResourceSynchronizer {
         val pdc = player.persistentDataContainer
 
         val health = pdc.get(HEALTH_KEY, PersistentDataType.DOUBLE)
-        if (health != null) {
+        if (health != null) { // 只有当 PDC 存在才恢复玩家的生命值
             try {
                 player.health = health
                 LOGGER.info("[${player.name}] Loaded player health: $health / ${player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value}")
@@ -58,6 +58,13 @@ internal object ResourceSynchronizer {
                 LOGGER.error("[${player.name}] ${e.message}")
             }
         }
+
+        // 移除 PDC, 避免重复加载.
+        //
+        // 这是因为 #load 函数被调用时, 在某些情况下并不是玩家刚进入服务器.
+        // 例如 AdventureLevel 插件重载时会让缓存失效, 届时会再触发一次
+        // AdventureLevelDataLoadEvent, 从而触发 #load 函数.
+        pdc.remove(HEALTH_KEY)
 
         // 考虑到 Wynn 没有保存魔法值, 我们也暂时不保存魔法值
         // val mana = pdc.get(MANA_KEY, PersistentDataType.INTEGER)
