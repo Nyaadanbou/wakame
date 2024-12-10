@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.skill2.context
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.CooldownComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
+import cc.mewcraft.wakame.ecs.component.NekoStackComponent
+import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.component.TriggerComponent
 import cc.mewcraft.wakame.ecs.data.Cooldown
 import cc.mewcraft.wakame.ecs.external.ComponentMap
@@ -35,7 +38,10 @@ interface SkillContext {
      */
     val skill: Skill
 
-    val caster: Caster.Composite
+    /**
+     * 这次技能的施法者 [Caster].
+     */
+    val caster: Caster
 
     /**
      * [skill] 的初始冷却时间.
@@ -52,10 +58,19 @@ interface SkillContext {
      */
     val user: User<*>?
 
+    /**
+     * 此次技能的目标 [Target], null 表示没有目标.
+     */
     val target: Target?
 
+    /**
+     * 此次技能的施法物品 [NekoStack], null 表示没有施法物品.
+     */
     val castItem: NekoStack?
 
+    /**
+     * 此次技能的计算引擎 [MochaEngine].
+     */
     val mochaEngine: MochaEngine<*>
 
     fun toBuilder(): SkillContextDSL
@@ -66,7 +81,7 @@ interface SkillContext {
 @DslMarker
 annotation class SkillContextMarker
 
-fun skillContext(skill: Skill, caster: Caster.Composite, initializer: SkillContextDSL.() -> Unit): SkillContext {
+fun skillContext(skill: Skill, caster: Caster, initializer: SkillContextDSL.() -> Unit): SkillContext {
     return SkillContextDSL(skill, caster).apply(initializer).build()
 }
 
@@ -77,7 +92,7 @@ fun skillContext(componentMap: ComponentMap): SkillContext {
 @SkillContextMarker
 class SkillContextDSL(
     private val skill: Skill,
-    private val caster: Caster.Composite,
+    private val caster: Caster,
 ) {
     private var cooldown: Cooldown = Cooldown(0f)
     private var trigger: Trigger = SingleTrigger.NOOP
@@ -105,13 +120,13 @@ class SkillContextDSL(
 /* Implementations */
 
 private class SimpleSkillContext(
-    override val caster: Caster.Composite,
+    override val skill: Skill,
+    override val caster: Caster,
     override val cooldown: Cooldown,
     override val trigger: Trigger,
     override val target: Target?,
     override val castItem: NekoStack?,
     override val mochaEngine: MochaEngine<*>,
-    override val skill: Skill,
 ) : SkillContext, Examinable {
 
     /**
@@ -149,7 +164,7 @@ private class ComponentMapSkillContext(
 ) : SkillContext, Examinable {
     override val skill: Skill
         get() = requireNotNull(componentMap[IdentifierComponent]?.id?. let { SkillRegistry.INSTANCES[Key(it)] }) { "Skill not found in componentMap" }
-    override val caster: Caster.Composite
+    override val caster: Caster
         get() = requireNotNull(componentMap[BukkitEntityComponent]?.entity?.let { CasterAdapter.adapt(it).toComposite() }) { "Caster not found in componentMap" }
     override val cooldown: Cooldown
         get() = requireNotNull(componentMap[CooldownComponent]?.cooldown) { "Cooldown not found in componentMap" }
@@ -158,11 +173,11 @@ private class ComponentMapSkillContext(
     override val user: User<*>?
         get() = caster.value<Caster.Single.Player>()?.bukkitPlayer?.toUser()
     override val target: Target?
-        get() = TODO("Not yet implemented")
+        get() = componentMap[TargetComponent]?.target
     override val castItem: NekoStack?
-        get() = TODO("Not yet implemented")
+        get() = componentMap[NekoStackComponent]?.nekoStack
     override val mochaEngine: MochaEngine<*>
-        get() = TODO("Not yet implemented")
+        get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
     override fun toBuilder(): SkillContextDSL {
         return SkillContextDSL(skill, caster)
@@ -174,13 +189,13 @@ private class ComponentMapSkillContext(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("skill", skill),
         ExaminableProperty.of("caster", caster),
         ExaminableProperty.of("cooldown", cooldown),
         ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("target", target),
-//        ExaminableProperty.of("castItem", castItem),
-//        ExaminableProperty.of("mochaEngine", mochaEngine),
-//        ExaminableProperty.of("skill", skill),
+        ExaminableProperty.of("castItem", castItem),
+        ExaminableProperty.of("mochaEngine", mochaEngine),
     )
 
     override fun toString(): String {

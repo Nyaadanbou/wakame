@@ -4,7 +4,10 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.tryNekoStack
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
+import cc.mewcraft.wakame.skill2.character.toComposite
+import cc.mewcraft.wakame.skill2.context.skillContext
 import cc.mewcraft.wakame.skill2.state.SkillStateResult
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
@@ -21,7 +24,9 @@ import org.bukkit.inventory.ItemStack
  * - 根据玩家的操作, 处理玩家的技能触发逻辑
  * - 根据玩家的物品, 从玩家身上添加/移除技能
  */
-class SkillEventHandler {
+internal class SkillEventHandler (
+    private val worldInteraction: MechanicWorldInteraction,
+) {
 
     /* 玩家的技能触发逻辑 */
 
@@ -71,13 +76,18 @@ class SkillEventHandler {
     fun onProjectileHit(projectile: Projectile, hitEntity: Entity?) {
         when (projectile) {
             is AbstractArrow -> {
-                val nekoStack = projectile.itemStack.tryNekoStack ?: return
+                val nekoStack = projectile.itemStack.shadowNeko(false) ?: return
                 val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
                 // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
-//                val context = SkillContext(CasterAdapter.adapt(projectile), target, nekoStack)
-//                skills.values().map { it.cast(context) }.forEach { ticker.schedule(it) }
+                for (skill in skills.values()) {
+                    val context = skillContext(skill, CasterAdapter.adapt(projectile).toComposite()) {
+                        target(target)
+                        castItem(nekoStack)
+                    }
+                    worldInteraction.addMechanic(context)
+                }
             }
         }
     }

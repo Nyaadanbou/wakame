@@ -15,11 +15,31 @@ import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.Player as BukkitPlayer
 
 /**
- * 技能的施法者.
+ * 技能的施法者. 一个施法者代表着一个复合结构, 包含了施法者本身, 以及施法者的父节点和子节点.
  */
 sealed interface Caster {
 
-    sealed interface Single : Caster {
+    val parent: Caster?
+
+    val children: Set<Caster>?
+
+    fun addChild(child: Caster)
+
+    fun removeChild(child: Caster)
+
+    fun <T : Single> value(clazz: Class<T>): T?
+
+    fun <T : Single> valueNonNull(clazz: Class<T>): T {
+        return requireNotNull(value(clazz)) { "Value of type $clazz is null." }
+    }
+
+    fun <T : Single> root(clazz: Class<T>): T?
+
+    fun <T : Single> rootNonNull(clazz: Class<T>): T {
+        return requireNotNull(root(clazz)) { "Root value of type $clazz is null." }
+    }
+
+    sealed interface Single {
         /**
          * 代表一个生物施法者, 不包括玩家.
          */
@@ -41,50 +61,25 @@ sealed interface Caster {
             val skillResult: SkillResult<*>
         }
     }
-
-    /**
-     * 代表一个复合施法者, 由一个父施法者和多个子施法者组成.
-     */
-    interface Composite : Caster {
-        val parent: Composite?
-
-        val children: Set<Composite>?
-
-        fun addChild(child: Composite)
-
-        fun removeChild(child: Composite)
-
-        fun <T : Single> value(clazz: Class<T>): T?
-
-        fun <T : Single> valueNonNull(clazz: Class<T>): T {
-            return requireNotNull(value(clazz)) { "Value of type $clazz is null." }
-        }
-
-        fun <T : Single> root(clazz: Class<T>): T?
-
-        fun <T : Single> rootNonNull(clazz: Class<T>): T {
-            return requireNotNull(root(clazz)) { "Root value of type $clazz is null." }
-        }
-    }
 }
 
-fun Caster.Single.toComposite(parent: Caster.Composite? = null): Caster.Composite {
+fun Caster.Single.toComposite(parent: Caster? = null): Caster {
     return CasterAdapter.composite(this, parent)
 }
 
-inline fun <reified T : Caster.Single> Caster.Composite.value(): T? {
+inline fun <reified T : Caster.Single> Caster.value(): T? {
     return value(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.Composite.valueNonNull(): T {
+inline fun <reified T : Caster.Single> Caster.valueNonNull(): T {
     return valueNonNull(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.Composite.root(): T? {
+inline fun <reified T : Caster.Single> Caster.root(): T? {
     return root(T::class.java)
 }
 
-inline fun <reified T : Caster.Single> Caster.Composite.rootNonNull(): T {
+inline fun <reified T : Caster.Single> Caster.rootNonNull(): T {
     return rootNonNull(T::class.java)
 }
 
@@ -109,13 +104,10 @@ object CasterAdapter {
     }
 
     fun composite(
-        value: Caster,
-        parent: Caster.Composite? = null,
-    ): Caster.Composite {
-        return when (value) {
-            is Caster.Single -> CompositeCaster(parent, value)
-            is Caster.Composite -> value
-        }
+        value: Caster.Single,
+        parent: Caster? = null,
+    ): Caster {
+        return CompositeCaster(parent, value)
     }
 }
 
@@ -176,12 +168,12 @@ private data class SkillCaster(
 ) : Caster.Single.Skill
 
 private class CompositeCaster(
-    override var parent: Caster.Composite?,
+    override var parent: Caster?,
     private val value: Caster.Single
-) : Caster.Composite, Examinable {
-    override var children: MutableSet<Caster.Composite>? = null
+) : Caster, Examinable {
+    override var children: MutableSet<Caster>? = null
 
-    override fun addChild(child: Caster.Composite) {
+    override fun addChild(child: Caster) {
         if (children == null) {
             children = Collections.newSetFromMap(WeakHashMap(1))
         }
@@ -192,7 +184,7 @@ private class CompositeCaster(
         children!!.add(child)
     }
 
-    override fun removeChild(child: Caster.Composite) {
+    override fun removeChild(child: Caster) {
         if (child is CompositeCaster) {
             child.parent = null
         }
@@ -208,9 +200,9 @@ private class CompositeCaster(
     }
 
     override fun <T : Caster.Single> root(clazz: Class<T>): T? {
-        var current: Caster.Composite = this
+        var current: Caster = this
         while (current.parent != null) {
-            current = current.parent as Caster.Composite
+            current = current.parent as Caster
         }
         return current.value(clazz)
     }

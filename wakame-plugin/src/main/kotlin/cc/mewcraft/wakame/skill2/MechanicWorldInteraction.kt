@@ -25,10 +25,13 @@ internal class MechanicWorldInteraction(
             it += CooldownComponent(context.cooldown)
             it += EntityType.MECHANIC
             CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.let { bukkitEntity -> it += BukkitEntityComponent(bukkitEntity.uniqueId) }
+            context.target?.let { target -> it += TargetComponent(target) }
+            context.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
             it += ResultComponent(context.skill.result(context))
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
             it += TriggerComponent(context.trigger)
+            it += MochaEngineComponent(context.mochaEngine)
         }
     }
 
