@@ -42,7 +42,7 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
     /**
      * 渲染格式.
      */
-    abstract val formats: AbstractRendererFormats
+    abstract val formats: AbstractRendererFormatRegistry
 
     /**
      * 渲染布局.
@@ -99,16 +99,16 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
     }
 }
 
-/* RenderingParts: 包含通用的代码 */
+/* RenderingHandlerRegistry: 包含通用的代码 */
 
 /**
  * 这个类在设计上应该使用 `object class` 实现, 然后使用 [configure]
- * 系列函数创建 [RenderingPart] 实例并将其声明为 `val`, 并且附带上
+ * 系列函数创建 [RenderingHandler] 实例并将其声明为 `val`, 并且附带上
  * [JvmField] 的注解 (避免函数调用).
  *
  * 具体的推荐用法, 请参考已经存在的实现.
  */
-internal abstract class RenderingParts(
+internal abstract class RenderingHandlerRegistry(
     private val renderer: AbstractItemRenderer<*, *>,
 ) {
     /**
@@ -120,31 +120,31 @@ internal abstract class RenderingParts(
      * @param id 用来定位配置文件中的节点, 必须唯一
      * @param block 将数据渲染成 [IndexedText] 的逻辑
      */
-    inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingPart<T, F> {
-        return RenderingPart(provideParams<F>(id).format, block)
+    inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingHandler<T, F> {
+        return RenderingHandler(provideParams<F>(id).format, block)
     }
 
-    inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): RenderingPart2<T1, T2, F> {
-        return RenderingPart2(provideParams<F>(id).format, block)
+    inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): RenderingHandler2<T1, T2, F> {
+        return RenderingHandler2(provideParams<F>(id).format, block)
     }
 
-    inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): RenderingPart3<T1, T2, T3, F> {
-        return RenderingPart3(provideParams<F>(id).format, block)
+    inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): RenderingHandler3<T1, T2, T3, F> {
+        return RenderingHandler3(provideParams<F>(id).format, block)
     }
 
-    inline fun <T1, T2, T3, T4, reified F : RendererFormat> configure4(id: String, block: IndexedDataRenderer4<T1, T2, T3, T4, F>): RenderingPart4<T1, T2, T3, T4, F> {
-        return RenderingPart4(provideParams<F>(id).format, block)
+    inline fun <T1, T2, T3, T4, reified F : RendererFormat> configure4(id: String, block: IndexedDataRenderer4<T1, T2, T3, T4, F>): RenderingHandler4<T1, T2, T3, T4, F> {
+        return RenderingHandler4(provideParams<F>(id).format, block)
     }
 
-    inline fun <T1, T2, T3, T4, T5, reified F : RendererFormat> configure5(id: String, block: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>): RenderingPart5<T1, T2, T3, T4, T5, F> {
-        return RenderingPart5(provideParams<F>(id).format, block)
+    inline fun <T1, T2, T3, T4, T5, reified F : RendererFormat> configure5(id: String, block: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>): RenderingHandler5<T1, T2, T3, T4, T5, F> {
+        return RenderingHandler5(provideParams<F>(id).format, block)
     }
 
-    inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> configure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingPart6<T1, T2, T3, T4, T5, T6, F> {
-        return RenderingPart6(provideParams<F>(id).format, block)
+    inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> configure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingHandler6<T1, T2, T3, T4, T5, T6, F> {
+        return RenderingHandler6(provideParams<F>(id).format, block)
     }
 
-    private inline fun <reified F : RendererFormat> provideParams(id: String): PartParams<F> {
+    private inline fun <reified F : RendererFormat> provideParams(id: String): HandlerParams<F> {
         val format = try {
             renderer.formats.registerRendererFormat<F>(id)
             renderer.formats.getRendererFormatProvider<F>(id)
@@ -152,11 +152,11 @@ internal abstract class RenderingParts(
             throw ExceptionInInitializerError(e)
         }
 
-        return PartParams(format)
+        return HandlerParams(format)
     }
 
     // subclasses should not use it
-    protected data class PartParams<F : RendererFormat>(
+    protected data class HandlerParams<F : RendererFormat>(
         val format: Provider<F>,
     )
 
@@ -166,7 +166,7 @@ internal abstract class RenderingParts(
     }
 }
 
-/* RenderingPart: 渲染的一部分 */
+/* RenderingHandler: 渲染的一部分 */
 
 /**
  * 聚合了 *一部分渲染* 所需要的数据和逻辑.
@@ -177,7 +177,7 @@ internal abstract class RenderingParts(
  * @param format 渲染格式
  * @param renderer 渲染逻辑
  */
-internal class RenderingPart<T, F : RendererFormat>(
+internal class RenderingHandler<T, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer<T, F>,
 ) {
@@ -188,7 +188,7 @@ internal class RenderingPart<T, F : RendererFormat>(
     }
 }
 
-internal class RenderingPart2<T1, T2, F : RendererFormat>(
+internal class RenderingHandler2<T1, T2, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer2<T1, T2, F>,
 ) {
@@ -199,7 +199,7 @@ internal class RenderingPart2<T1, T2, F : RendererFormat>(
     }
 }
 
-internal class RenderingPart3<T1, T2, T3, F : RendererFormat>(
+internal class RenderingHandler3<T1, T2, T3, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer3<T1, T2, T3, F>,
 ) {
@@ -210,7 +210,7 @@ internal class RenderingPart3<T1, T2, T3, F : RendererFormat>(
     }
 }
 
-internal class RenderingPart4<T1, T2, T3, T4, F : RendererFormat>(
+internal class RenderingHandler4<T1, T2, T3, T4, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer4<T1, T2, T3, T4, F>,
 ) {
@@ -221,7 +221,7 @@ internal class RenderingPart4<T1, T2, T3, T4, F : RendererFormat>(
     }
 }
 
-internal class RenderingPart5<T1, T2, T3, T4, T5, F : RendererFormat>(
+internal class RenderingHandler5<T1, T2, T3, T4, T5, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>,
 ) {
@@ -232,7 +232,7 @@ internal class RenderingPart5<T1, T2, T3, T4, T5, F : RendererFormat>(
     }
 }
 
-internal class RenderingPart6<T1, T2, T3, T4, T5, T6, F : RendererFormat>(
+internal class RenderingHandler6<T1, T2, T3, T4, T5, T6, F : RendererFormat>(
     format: Provider<F>,
     renderer: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>,
 ) {

@@ -4,14 +4,14 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingPart2
-import cc.mewcraft.wakame.display2.implementation.RenderingPart3
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.HardcodedRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
@@ -39,7 +39,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
 
-internal class ModdingTableRendererFormats(renderer: ModdingTableItemRenderer) : AbstractRendererFormats(renderer)
+internal class ModdingTableRendererFormatRegistry(renderer: ModdingTableItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
 internal class ModdingTableRendererLayout(renderer: ModdingTableItemRenderer) : AbstractRendererLayout(renderer)
 
@@ -69,12 +69,12 @@ internal sealed interface ModdingTableContext {
 
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
     override val name: String = "modding_table"
-    override val formats = ModdingTableRendererFormats(this)
+    override val formats = ModdingTableRendererFormatRegistry(this)
     override val layout = ModdingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        ModdingTableRendererParts.bootstrap()
+        ModdingTableRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -87,24 +87,24 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> ModdingTableRendererParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> ModdingTableRendererParts.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
 
         val components = item.components
-        components.process(ItemComponentTypes.ELEMENTS) { data -> ModdingTableRendererParts.ELEMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRendererParts.LEVEL.process(collector, data) }
+        components.process(ItemComponentTypes.ELEMENTS) { data -> ModdingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
             val data2 = data2 ?: ReforgeHistory.ZERO
-            ModdingTableRendererParts.RARITY.process(collector, data1, data2)
+            ModdingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
 
         if (context is ModdingTableContext.Input) {
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                    is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
+                    is SkillCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
                 }
             }
         }
@@ -112,24 +112,24 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         if (context is ModdingTableContext.Output) {
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRendererParts.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                    is SkillCore -> ModdingTableRendererParts.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRendererParts.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
+                    is SkillCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
                 }
             }
 
             // 输出物品需要渲染定制花费
-            ModdingTableRendererParts.REFORGE_COST.process(collector, context)
+            ModdingTableRenderingHandlerRegistry.REFORGE_COST.process(collector, context)
         }
 
         if (context is ModdingTableContext.Preview) {
-            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRendererParts.STANDALONE_CELL.process(collector, item, data, context) }
+            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRenderingHandlerRegistry.STANDALONE_CELL.process(collector, item, data, context) }
         }
 
         if (context is ModdingTableContext.Replace) {
             val augment = context.replace.augment
             if (augment != null) {
-                ModdingTableRendererParts.REPLACE_IN.process(collector, augment, context)
+                ModdingTableRenderingHandlerRegistry.REPLACE_IN.process(collector, augment, context)
             }
         }
 
@@ -150,45 +150,45 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 //////
 
 
-internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRenderer) {
+internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(ModdingTableItemRenderer) {
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingPart3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, context, format ->
+    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, context, format ->
         format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingPart3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
+    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
         format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_SKILL_IN: RenderingPart3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, context, format ->
+    val CELLULAR_SKILL_IN: RenderingHandler3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, context, format ->
         format.render(id, skill, context)
     }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingPart3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, context, format ->
+    val CELLULAR_SKILL_OUT: RenderingHandler3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, context, format ->
         format.render(id, skill, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_IN: RenderingPart2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/in") { id, context, format ->
+    val CELLULAR_EMPTY_IN: RenderingHandler2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/in") { id, context, format ->
         format.render(id, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_OUT: RenderingPart2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, context, format ->
+    val CELLULAR_EMPTY_OUT: RenderingHandler2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, context, format ->
         format.render(id, context)
     }
 
     @JvmField
-    val REPLACE_IN: RenderingPart2<PortableCore, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
+    val REPLACE_IN: RenderingHandler2<PortableCore, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
         SimpleIndexedText(format.index, core.description)
     }
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
+    val STANDALONE_CELL: RenderingHandler3<NekoStack, StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
         val coreText = cell.core.description
         val modCount = item.reforgeHistory.modCount
         val modLimit = context.session.itemRule?.modLimit ?: 0
@@ -196,22 +196,22 @@ internal object ModdingTableRendererParts : RenderingParts(ModdingTableItemRende
     }
 
     @JvmField
-    val REFORGE_COST: RenderingPart<ModdingTableContext, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
+    val REFORGE_COST: RenderingHandler<ModdingTableContext, HardcodedRendererFormat> = configure("reforge_cost") { context, format ->
         SimpleIndexedText(format.index, context.session.latestResult.reforgeCost.description.removeItalic)
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = CommonRenderingParts.ELEMENTS(this)
+    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
+    val LEVEL: RenderingHandler<ItemLevel, SingleValueRendererFormat> = CommonRenderingHandlers.LEVEL(this)
 
     @JvmField
-    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 }

@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.display2.implementation.standard
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingPart2
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
@@ -45,7 +45,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import java.nio.file.Path
 
 
-internal class StandardRendererFormats(renderer: StandardItemRenderer) : AbstractRendererFormats(renderer)
+internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
@@ -53,7 +53,7 @@ internal data object StandardContext // 等之后需要的时候, 改成 class �
 
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
-    override val formats = StandardRendererFormats(this)
+    override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
 
@@ -61,7 +61,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         formatPath: Path,
         layoutPath: Path,
     ) {
-        StandardRenderingParts.bootstrap()
+        StandardRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath) // formats 必须在 layout 之前初始化
         layout.initialize(layoutPath)
     }
@@ -72,30 +72,30 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingParts.ARROW.process(collector, data) }
+        templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
 
         // 对于最可能被频繁修改的 `custom_name`, `item_name`, `lore` 直接读取配置模板里的内容
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> StandardRenderingParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> StandardRenderingParts.ITEM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.LORE) { data -> StandardRenderingParts.LORE.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
 
         val components = item.components
-        components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingParts.ATTACK_SPEED.process(collector, data) }
+        components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
         components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.getCore()) }
-        components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingParts.CRATE.process(collector, data) }
-        components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingParts.ELEMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingParts.FIRE_RESISTANT.process(collector, Unit) }
-        components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingParts.FOOD.process(collector, data) }
-        components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingParts.KIZAMIZ.process(collector, data) }
-        components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
+        components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
+        components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingHandlerRegistry.FIRE_RESISTANT.process(collector, Unit) }
+        components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
+        components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
+        components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
+        components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1: ItemRarity = data1 ?: return@process
             val data2: ReforgeHistory = data2 ?: ReforgeHistory.ZERO
-            StandardRenderingParts.RARITY.process(collector, data1, data2)
+            StandardRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
-        components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
         val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
@@ -125,16 +125,16 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
-            is AttributeCore -> StandardRenderingParts.CELLULAR_ATTRIBUTE.process(collector, core)
-            is SkillCore -> StandardRenderingParts.CELLULAR_SKILL.process(collector, core)
-            is EmptyCore -> StandardRenderingParts.CELLULAR_EMPTY.process(collector, core)
+            is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
+            is SkillCore -> StandardRenderingHandlerRegistry.CELLULAR_SKILL.process(collector, core)
+            is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
         }
     }
 }
 
-internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
+internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(StandardItemRenderer) {
     @JvmField
-    val ARROW: RenderingPart<ItemArrow, ListValueRendererFormat> = configure("arrow") { data, format ->
+    val ARROW: RenderingHandler<ItemArrow, ListValueRendererFormat> = configure("arrow") { data, format ->
         format.render(
             Placeholder.component("pierce_level", Component.text(data.pierceLevel)),
             Placeholder.component("fire_ticks", Component.text(data.fireTicks)),
@@ -145,27 +145,27 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val ATTACK_SPEED: RenderingPart<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
+    val ATTACK_SPEED: RenderingHandler<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
         format.render(data.level)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE: RenderingPart<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
+    val CELLULAR_ATTRIBUTE: RenderingHandler<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_SKILL: RenderingPart<SkillCore, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
+    val CELLULAR_SKILL: RenderingHandler<SkillCore, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_EMPTY: RenderingPart<EmptyCore, CellularEmptyRendererFormat> = configure("cells/empty") { data, format ->
+    val CELLULAR_EMPTY: RenderingHandler<EmptyCore, CellularEmptyRendererFormat> = configure("cells/empty") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CRATE: RenderingPart<ItemCrate, SingleValueRendererFormat> = configure("crate") { data, format ->
+    val CRATE: RenderingHandler<ItemCrate, SingleValueRendererFormat> = configure("crate") { data, format ->
         format.render(
             Placeholder.component("id", Component.text(data.identity)),
             Placeholder.component("name", Component.text(data.identity)), // TODO display2 盲盒完成时再写这里)
@@ -173,23 +173,23 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = CommonRenderingParts.ELEMENTS(this)
+    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
 
     @JvmField
-    val ENCHANTMENTS: RenderingPart<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
+    val ENCHANTMENTS: RenderingHandler<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
         format.render(data.enchantments)
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingPart<Unit, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val FIRE_RESISTANT: RenderingHandler<Unit, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
         format.render()
     }
 
     @JvmField
-    val FOOD: RenderingPart<FoodProperties, ListValueRendererFormat> = configure("food") { data, format ->
+    val FOOD: RenderingHandler<FoodProperties, ListValueRendererFormat> = configure("food") { data, format ->
         format.render(
             Placeholder.component("nutrition", Component.text(data.nutrition)),
             Placeholder.component("saturation", Component.text(data.saturation)),
@@ -198,24 +198,24 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     }
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val KIZAMIZ: RenderingPart<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
+    val KIZAMIZ: RenderingHandler<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
         format.render(data.kizamiz, Kizami::displayName)
     }
 
     @JvmField
-    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
+    val LEVEL: RenderingHandler<ItemLevel, SingleValueRendererFormat> = CommonRenderingHandlers.LEVEL(this)
 
     @JvmField
-    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingParts.LORE(this)
+    val LORE: RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingHandlers.LORE(this)
 
     @JvmField
-    val PORTABLE_CORE: RenderingPart<PortableCore, PortableCoreRendererFormat> = configure("portable_core") { data, format ->
+    val PORTABLE_CORE: RenderingHandler<PortableCore, PortableCoreRendererFormat> = configure("portable_core") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 }

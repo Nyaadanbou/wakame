@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.display2.implementation.merging_table
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingPart2
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
@@ -30,7 +30,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
 
-internal class MergingTableRendererFormats(renderer: MergingTableItemRenderer) : AbstractRendererFormats(renderer)
+internal class MergingTableRendererFormatRegistry(renderer: MergingTableItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
 internal class MergingTableRendererLayout(renderer: MergingTableItemRenderer) : AbstractRendererLayout(renderer)
 
@@ -41,12 +41,12 @@ internal sealed interface MergingTableContext {
 
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
-    override val formats = MergingTableRendererFormats(this)
+    override val formats = MergingTableRendererFormatRegistry(this)
     override val layout = MergingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        MergingTableRenderingParts.bootstrap()
+        MergingTableRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -59,21 +59,21 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> MergingTableRenderingParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> MergingTableRenderingParts.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> MergingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> MergingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
 
         val components = item.components
-        components.process(ItemComponentTypes.ELEMENTS) { data -> MergingTableRenderingParts.ELEMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.LEVEL) { data -> MergingTableRenderingParts.LEVEL.process(collector, data) }
+        components.process(ItemComponentTypes.ELEMENTS) { data -> MergingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        components.process(ItemComponentTypes.LEVEL) { data -> MergingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
             val data2 = data2 ?: ReforgeHistory.ZERO
-            MergingTableRenderingParts.RARITY.process(collector, data1, data2)
+            MergingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data ->
             when (context) {
-                is MergingTableContext.MergeInputSlot -> MergingTableRenderingParts.MERGE_IN.process(collector, data, context)
-                is MergingTableContext.MergeOutputSlot -> MergingTableRenderingParts.MERGE_OUT.process(collector, data, context)
+                is MergingTableContext.MergeInputSlot -> MergingTableRenderingHandlerRegistry.MERGE_IN.process(collector, data, context)
+                is MergingTableContext.MergeOutputSlot -> MergingTableRenderingHandlerRegistry.MERGE_OUT.process(collector, data, context)
             }
         }
 
@@ -96,31 +96,31 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
     }
 }
 
-internal object MergingTableRenderingParts : RenderingParts(MergingTableItemRenderer) {
+internal object MergingTableRenderingHandlerRegistry : RenderingHandlerRegistry(MergingTableItemRenderer) {
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = CommonRenderingParts.ELEMENTS(this)
+    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
+    val LEVEL: RenderingHandler<ItemLevel, SingleValueRendererFormat> = CommonRenderingHandlers.LEVEL(this)
 
     // 渲染放在输入容器的便携核心
     @JvmField
-    val MERGE_IN: RenderingPart2<PortableCore, MergingTableContext.MergeInputSlot, PortableCoreRendererFormat> = configure2("merge_input") { data, context, format ->
+    val MERGE_IN: RenderingHandler2<PortableCore, MergingTableContext.MergeInputSlot, PortableCoreRendererFormat> = configure2("merge_input") { data, context, format ->
         format.render(data)
     }
 
     // 渲染放在输出容器的便携核心
     @JvmField
-    val MERGE_OUT: RenderingPart2<PortableCore, MergingTableContext.MergeOutputSlot, MergeOutputRendererFormat> = configure2("merge_output") { data, context, format ->
+    val MERGE_OUT: RenderingHandler2<PortableCore, MergingTableContext.MergeOutputSlot, MergeOutputRendererFormat> = configure2("merge_output") { data, context, format ->
         format.render(data)
     }
 
     @JvmField
-    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 }

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.display2.implementation
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.RendererFormats
+import cc.mewcraft.wakame.display2.RendererFormatRegistry
 import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
 import cc.mewcraft.wakame.util.krequire
@@ -22,15 +22,15 @@ import kotlin.reflect.typeOf
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormats 实现 */
 
-internal abstract class AbstractRendererFormats(
+internal abstract class AbstractRendererFormatRegistry(
     protected val renderer: AbstractItemRenderer<*, *>,
-) : RendererFormats, KoinComponent {
+) : RendererFormatRegistry, KoinComponent {
     protected val logger = get<Logger>()
 
     /**
      * `配置中的节点路径` -> `typeOf<RendererFormat>`, 用于引导配置文件的序列化.
      *
-     * 该映射在 [RenderingParts.bootstrap] 执行时就已经确定和冻结, 后续禁止更新!
+     * 该映射在 [RenderingHandlerRegistry.bootstrap] 执行时就已经确定和冻结, 后续禁止更新!
      */
     private val rendererFormatTypeById = HashMap<String, KType>()
 

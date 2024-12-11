@@ -3,14 +3,14 @@ package cc.mewcraft.wakame.display2.implementation.rerolling_table
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingPart2
-import cc.mewcraft.wakame.display2.implementation.RenderingPart3
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
@@ -35,7 +35,7 @@ import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
-internal class RerollingTableRendererFormats(renderer: RerollingTableItemRenderer) : AbstractRendererFormats(renderer)
+internal class RerollingTableRendererFormatRegistry(renderer: RerollingTableItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
 internal class RerollingTableRendererLayout(renderer: RerollingTableItemRenderer) : AbstractRendererLayout(renderer)
 
@@ -50,12 +50,12 @@ internal data class RerollingTableContext(
 
 internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
-    override val formats = RerollingTableRendererFormats(this)
+    override val formats = RerollingTableRendererFormatRegistry(this)
     override val layout = RerollingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        RerollingTableRenderingParts.bootstrap()
+        RerollingTableRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -68,17 +68,17 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> RerollingTableRenderingParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> RerollingTableRenderingParts.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> RerollingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> RerollingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
 
         val components = item.components
         components.process(ItemComponentTypes.CELLS) { data -> for ((id, cell) in data) renderCore(collector, id, cell, context) }
-        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingParts.STANDALONE_CELL.process(collector, item, data, context) }
-        components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingParts.LEVEL.process(collector, data) }
+        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingHandlerRegistry.STANDALONE_CELL.process(collector, item, data, context) }
+        components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1: ItemRarity = data1 ?: return@process
             val data2: ReforgeHistory = data2 ?: ReforgeHistory.ZERO
-            RerollingTableRenderingParts.RARITY.process(collector, data1, data2)
+            RerollingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
 
         val itemLore = textAssembler.assemble(collector)
@@ -99,17 +99,17 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
         when (slot) {
             RerollingTableContext.Slot.INPUT -> {
                 when (core) {
-                    is AttributeCore -> RerollingTableRenderingParts.CELLULAR_ATTRIBUTE_IN.process(collector, id, core, context)
-                    is SkillCore -> RerollingTableRenderingParts.CELLULAR_SKILL_IN.process(collector, id, core, context)
-                    is EmptyCore -> RerollingTableRenderingParts.CELLULAR_EMPTY_IN.process(collector, id, core, context)
+                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_IN.process(collector, id, core, context)
+                    is SkillCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_SKILL_IN.process(collector, id, core, context)
+                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, core, context)
                 }
             }
 
             RerollingTableContext.Slot.OUTPUT -> {
                 when (core) {
-                    is AttributeCore -> RerollingTableRenderingParts.CELLULAR_ATTRIBUTE_OUT.process(collector, id, core, context)
-                    is SkillCore -> RerollingTableRenderingParts.CELLULAR_SKILL_OUT.process(collector, id, core, context)
-                    is EmptyCore -> RerollingTableRenderingParts.CELLULAR_EMPTY_OUT.process(collector, id, core, context)
+                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_OUT.process(collector, id, core, context)
+                    is SkillCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_SKILL_OUT.process(collector, id, core, context)
+                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, core, context)
                 }
             }
 
@@ -118,60 +118,60 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
     }
 }
 
-internal object RerollingTableRenderingParts : RenderingParts(RerollingTableItemRenderer) {
+internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistry(RerollingTableItemRenderer) {
     @JvmField
-    val CELLULAR_ATTRIBUTE_IN: RenderingPart3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
+    val CELLULAR_ATTRIBUTE_IN: RenderingHandler3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
         configure3("cells/attributes/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_OUT: RenderingPart3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
+    val CELLULAR_ATTRIBUTE_OUT: RenderingHandler3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
         configure3("cells/attributes/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_SKILL_IN: RenderingPart3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
+    val CELLULAR_SKILL_IN: RenderingHandler3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
         configure3("cells/skills/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingPart3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
+    val CELLULAR_SKILL_OUT: RenderingHandler3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
         configure3("cells/skills/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_EMPTY_IN: RenderingPart3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
+    val CELLULAR_EMPTY_IN: RenderingHandler3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
         configure3("cells/empty/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_EMPTY_OUT: RenderingPart3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
+    val CELLULAR_EMPTY_OUT: RenderingHandler3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
         configure3("cells/empty/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingPart<ItemElements, AggregateValueRendererFormat> = CommonRenderingParts.ELEMENTS(this)
+    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val LEVEL: RenderingPart<ItemLevel, SingleValueRendererFormat> = CommonRenderingParts.LEVEL(this)
+    val LEVEL: RenderingHandler<ItemLevel, SingleValueRendererFormat> = CommonRenderingHandlers.LEVEL(this)
 
     @JvmField
-    val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
+    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 
     @JvmField
-    val STANDALONE_CELL: RenderingPart3<NekoStack, StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
+    val STANDALONE_CELL: RenderingHandler3<NekoStack, StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
         val coreText = cell.core.description
         val modCount = item.reforgeHistory.modCount
         val modLimit = context.session.itemRule?.modLimit ?: 0

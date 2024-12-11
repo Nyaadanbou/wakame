@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
@@ -22,7 +22,7 @@ import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
 
-internal class RepairingTableItemRendererFormats : AbstractRendererFormats(RepairingTableItemRenderer)
+internal class RepairingTableRendererFormatRegistry : AbstractRendererFormatRegistry(RepairingTableItemRenderer)
 
 internal class RepairingTableItemRendererLayout : AbstractRendererLayout(RepairingTableItemRenderer)
 
@@ -30,12 +30,12 @@ internal data class RepairingTableItemRendererContext(val damage: Int, val maxDa
 
 internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
-    override val formats: AbstractRendererFormats = RepairingTableItemRendererFormats()
+    override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()
     private val textAssembler: TextAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        RepairingTableRenderingParts.bootstrap()
+        RepairingTableRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -50,9 +50,9 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
         // 渲染 `minecraft:lore`
         val collector = ReferenceOpenHashSet<IndexedText>()
-        RepairingTableRenderingParts.DURABILITY.process(collector, context)
-        RepairingTableRenderingParts.REPAIR_COST.process(collector, context)
-        RepairingTableRenderingParts.REPAIR_USAGE.process(collector, context)
+        RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)
+        RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
+        RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
         item.lore0 = textAssembler.assemble(collector)
 
         // 渲染 `minecraft:custom_model_data`
@@ -66,9 +66,9 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
     }
 }
 
-internal object RepairingTableRenderingParts : RenderingParts(RepairingTableItemRenderer) {
+internal object RepairingTableRenderingHandlerRegistry : RenderingHandlerRegistry(RepairingTableItemRenderer) {
     @JvmField
-    val DURABILITY: RenderingPart<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("durability") { context, format ->
+    val DURABILITY: RenderingHandler<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("durability") { context, format ->
         val damage = text(context.damage)
         val maxDamage = text(context.maxDamage)
         val durability = text(context.maxDamage - context.damage)
@@ -80,7 +80,7 @@ internal object RepairingTableRenderingParts : RenderingParts(RepairingTableItem
     }
 
     @JvmField
-    val REPAIR_COST: RenderingPart<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("repair_cost") { context, format ->
+    val REPAIR_COST: RenderingHandler<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("repair_cost") { context, format ->
         val value = context.repairCost + 1 // 显示上永远 +1 让边界情况看起来更合理
         format.render(
             Formatter.number("value", value)
@@ -88,7 +88,7 @@ internal object RepairingTableRenderingParts : RenderingParts(RepairingTableItem
     }
 
     @JvmField
-    val REPAIR_USAGE: RenderingPart<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("repair_usage") { _, format ->
+    val REPAIR_USAGE: RenderingHandler<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("repair_usage") { _, format ->
         format.render()
     }
 }

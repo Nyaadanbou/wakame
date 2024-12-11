@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.recycle.RecyclingSession
@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
 
-internal class RecyclingStationRendererFormats(renderer: RecyclingStationItemRenderer) : AbstractRendererFormats(renderer)
+internal class RecyclingStationRendererFormatRegistry(renderer: RecyclingStationItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
 internal class RecyclingStationRendererLayout(renderer: RecyclingStationItemRenderer) : AbstractRendererLayout(renderer)
 
@@ -54,12 +54,12 @@ internal sealed interface RecyclingStationContext {
 
 internal object RecyclingStationItemRenderer : AbstractItemRenderer<ItemStack, RecyclingStationContext>() {
     override val name: String = "recycling_station"
-    override val formats = RecyclingStationRendererFormats(this)
+    override val formats = RecyclingStationRendererFormatRegistry(this)
     override val layout: AbstractRendererLayout = RecyclingStationRendererLayout(this)
     private val textAssembler: TextAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        RecyclingStationRenderingParts.bootstrap()
+        RecyclingStationRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -81,10 +81,10 @@ internal object RecyclingStationItemRenderer : AbstractItemRenderer<ItemStack, R
         item.itemName = itemName
 
         // 渲染 `minecraft:lore`
-        RecyclingStationRenderingParts.SELL_BUTTON_TITLE.process(collector, context)
-        RecyclingStationRenderingParts.SELL_BUTTON_USAGE.process(collector, context)
-        RecyclingStationRenderingParts.SELL_BUTTON_ITEM_LIST.process(collector, context)
-        RecyclingStationRenderingParts.SELL_BUTTON_TOTAL_WORTH.process(collector, context)
+        RecyclingStationRenderingHandlerRegistry.SELL_BUTTON_TITLE.process(collector, context)
+        RecyclingStationRenderingHandlerRegistry.SELL_BUTTON_USAGE.process(collector, context)
+        RecyclingStationRenderingHandlerRegistry.SELL_BUTTON_ITEM_LIST.process(collector, context)
+        RecyclingStationRenderingHandlerRegistry.SELL_BUTTON_TOTAL_WORTH.process(collector, context)
         item.lore0 = textAssembler.assemble(collector)
 
         // 渲染其他可见数据
@@ -92,9 +92,9 @@ internal object RecyclingStationItemRenderer : AbstractItemRenderer<ItemStack, R
     }
 }
 
-internal object RecyclingStationRenderingParts : RenderingParts(RecyclingStationItemRenderer) {
+internal object RecyclingStationRenderingHandlerRegistry : RenderingHandlerRegistry(RecyclingStationItemRenderer) {
     @JvmField
-    val SELL_BUTTON_TITLE: RenderingPart<RecyclingStationContext, SellButtonTitleRendererFormat> = configure("sell_button_title") { context, format ->
+    val SELL_BUTTON_TITLE: RenderingHandler<RecyclingStationContext, SellButtonTitleRendererFormat> = configure("sell_button_title") { context, format ->
         when (context) {
             is RecyclingStationContext.Empty -> SimpleIndexedText(format.index, format.emptyInput.lore)
             is RecyclingStationContext.Confirmed -> SimpleIndexedText(format.index, format.confirmed.lore)
@@ -103,7 +103,7 @@ internal object RecyclingStationRenderingParts : RenderingParts(RecyclingStation
     }
 
     @JvmField
-    val SELL_BUTTON_USAGE: RenderingPart<RecyclingStationContext, SellButtonUsageRendererFormat> = configure("sell_button_usage") { context, format ->
+    val SELL_BUTTON_USAGE: RenderingHandler<RecyclingStationContext, SellButtonUsageRendererFormat> = configure("sell_button_usage") { context, format ->
         when (context) {
             is RecyclingStationContext.Empty -> SimpleIndexedText(format.index, format.emptyInput)
             is RecyclingStationContext.Confirmed -> SimpleIndexedText(format.index, format.confirmed)
@@ -112,7 +112,7 @@ internal object RecyclingStationRenderingParts : RenderingParts(RecyclingStation
     }
 
     @JvmField
-    val SELL_BUTTON_ITEM_LIST: RenderingPart<RecyclingStationContext, SellButtonItemListRendererFormat> = configure("sell_button_item_list") { context, format ->
+    val SELL_BUTTON_ITEM_LIST: RenderingHandler<RecyclingStationContext, SellButtonItemListRendererFormat> = configure("sell_button_item_list") { context, format ->
         if (context !is RecyclingStationContext.Items) {
             return@configure IndexedText.NOP
         }
@@ -138,7 +138,7 @@ internal object RecyclingStationRenderingParts : RenderingParts(RecyclingStation
     }
 
     @JvmField
-    val SELL_BUTTON_TOTAL_WORTH: RenderingPart<RecyclingStationContext, SellButtonTotalWorthRendererFormat> = configure("sell_button_total_worth") { context, format ->
+    val SELL_BUTTON_TOTAL_WORTH: RenderingHandler<RecyclingStationContext, SellButtonTotalWorthRendererFormat> = configure("sell_button_total_worth") { context, format ->
         if (context !is RecyclingStationContext.Result) {
             return@configure IndexedText.NOP
         }
