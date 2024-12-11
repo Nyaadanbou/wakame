@@ -119,6 +119,7 @@ internal fun interface CyclicIndexRule {
         /**
          * 用 `/` 分割原本的索引, 然后加上循环出现的序号.
          */
+        @JvmField
         val SLASH: CyclicIndexRule = CyclicIndexRule { i, n ->
             Key.key("${i.namespace()}:${i.value()}/$n")
         }

@@ -21,9 +21,10 @@ import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
 internal class SimpleItemRendererFormats : AbstractRendererFormats(SimpleItemRenderer)
+
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-internal class SimpleItemRendererContext
+internal data object SimpleItemRendererContext
 
 internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
@@ -32,7 +33,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
     private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        SimpleItemRendererParts.bootstrap()
+        SimpleRenderingParts.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -45,9 +46,9 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> SimpleItemRendererParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> SimpleItemRendererParts.ITEM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.LORE) { data -> SimpleItemRendererParts.LORE.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> SimpleRenderingParts.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> SimpleRenderingParts.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.LORE) { data -> SimpleRenderingParts.LORE.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
@@ -60,7 +61,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
     }
 }
 
-internal object SimpleItemRendererParts : RenderingParts(SimpleItemRenderer) {
+internal object SimpleRenderingParts : RenderingParts(SimpleItemRenderer) {
     @JvmField
     val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
 

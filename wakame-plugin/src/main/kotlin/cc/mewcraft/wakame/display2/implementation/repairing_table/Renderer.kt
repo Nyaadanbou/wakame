@@ -2,25 +2,31 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingPart
+import cc.mewcraft.wakame.display2.implementation.RenderingParts
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.customModelData
+import cc.mewcraft.wakame.util.isClientSide
+import cc.mewcraft.wakame.util.lore0
+import cc.mewcraft.wakame.util.showNothing
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.text.Component.*
+import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
 
+
 internal class RepairingTableItemRendererFormats : AbstractRendererFormats(RepairingTableItemRenderer)
+
 internal class RepairingTableItemRendererLayout : AbstractRendererLayout(RepairingTableItemRenderer)
 
-internal data class RepairingTableItemRendererContext(
-    val damage: Int,
-    val maxDamage: Int,
-    val repairCost: Double,
-)
+internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
 internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
@@ -29,7 +35,7 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
     private val textAssembler: TextAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        RepairingTableItemRendererParts.bootstrap()
+        RepairingTableRenderingParts.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -44,9 +50,9 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
         // 渲染 `minecraft:lore`
         val collector = ReferenceOpenHashSet<IndexedText>()
-        RepairingTableItemRendererParts.DURABILITY.process(collector, context)
-        RepairingTableItemRendererParts.REPAIR_COST.process(collector, context)
-        RepairingTableItemRendererParts.REPAIR_USAGE.process(collector, context)
+        RepairingTableRenderingParts.DURABILITY.process(collector, context)
+        RepairingTableRenderingParts.REPAIR_COST.process(collector, context)
+        RepairingTableRenderingParts.REPAIR_USAGE.process(collector, context)
         item.lore0 = textAssembler.assemble(collector)
 
         // 渲染 `minecraft:custom_model_data`
@@ -60,7 +66,7 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
     }
 }
 
-internal object RepairingTableItemRendererParts : RenderingParts(RepairingTableItemRenderer) {
+internal object RepairingTableRenderingParts : RenderingParts(RepairingTableItemRenderer) {
     @JvmField
     val DURABILITY: RenderingPart<RepairingTableItemRendererContext, ListValueRendererFormat> = configure("durability") { context, format ->
         val damage = text(context.damage)

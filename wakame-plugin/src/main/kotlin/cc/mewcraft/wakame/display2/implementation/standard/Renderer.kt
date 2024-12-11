@@ -1,20 +1,7 @@
-/**
- * 有关*标准*的渲染器实现.
- */
 package cc.mewcraft.wakame.display2.implementation.standard
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
-import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.SimpleTextMeta
-import cc.mewcraft.wakame.display2.SourceIndex
-import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
@@ -25,17 +12,10 @@ import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
-import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
 import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemAttackSpeed
@@ -59,22 +39,11 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.registry.hasComponent
-import cc.mewcraft.wakame.util.StringCombiner
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import org.koin.core.component.get
-import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.nio.file.Path
+
 
 internal class StandardRendererFormats(renderer: StandardItemRenderer) : AbstractRendererFormats(renderer)
 
@@ -122,8 +91,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingParts.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingParts.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1 = data1 ?: return@process
-            val data2 = data2 ?: ReforgeHistory.ZERO
+            val data1: ItemRarity = data1 ?: return@process
+            val data2: ReforgeHistory = data2 ?: ReforgeHistory.ZERO
             StandardRenderingParts.RARITY.process(collector, data1, data2)
         }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingParts.ENCHANTMENTS.process(collector, data) }
@@ -162,10 +131,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         }
     }
 }
-
-
-//////
-
 
 internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     @JvmField
@@ -254,199 +219,3 @@ internal object StandardRenderingParts : RenderingParts(StandardItemRenderer) {
     @JvmField
     val RARITY: RenderingPart2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingParts.RARITY(this)
 }
-
-
-//////
-
-
-//<editor-fold desc="RendererFormat">
-@ConfigSerializable
-internal data class AttackSpeedRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-    @Setting
-    private val tooltip: Tooltip = Tooltip(),
-) : RendererFormat.Simple {
-    override val id = "attack_speed"
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-
-    fun render(data: AttackSpeedLevel): IndexedText {
-        val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.ordinal, UNKNOWN_LEVEL))
-        return SimpleIndexedText(index, listOf(MM.deserialize(tooltip.line, resolver)))
-    }
-
-    @ConfigSerializable
-    data class Tooltip(
-        @Setting
-        val line: String = "Attack Speed: <value>",
-        @Setting
-        val level: Map<Int, Component> = mapOf(
-            0 to Component.text("Very Slow"),
-            1 to Component.text("Slow"),
-            2 to Component.text("Normal"),
-            3 to Component.text("Fast"),
-            4 to Component.text("Very Fast"),
-            // 等攻速可自定义的时候, 这部分也要跟着重构一下
-        ),
-    )
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-        private val UNKNOWN_LEVEL = Component.text("???")
-    }
-}
-
-@ConfigSerializable
-internal data class CellularAttributeRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-    @Setting @Required
-    private val ordinal: AttributeCoreOrdinalFormat,
-) : RendererFormat.Dynamic<AttributeCore> {
-    override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-
-    fun render(data: AttributeCore): IndexedText {
-        return SimpleIndexedText(computeIndex(data), data.description)
-    }
-
-    /**
-     * 实现要求: 返回值必须是 [AttributeCoreTextMeta.derivedIndexes] 的子集.
-     */
-    override fun computeIndex(data: AttributeCore): Key {
-        return data.computeIndex(namespace)
-    }
-}
-
-@ConfigSerializable
-internal data class CellularSkillRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-) : RendererFormat.Dynamic<SkillCore> {
-    override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
-
-    fun render(data: SkillCore): IndexedText {
-        val instance = data.skill.instance
-        val tooltip = instance.displays.tooltips.map(MM::deserialize)
-        return SimpleIndexedText(computeIndex(data), tooltip)
-    }
-
-    override fun computeIndex(data: SkillCore): Key {
-        val dataId = data.skill.id
-        val indexId = dataId.namespace() + "/" + dataId.value()
-        return Key.key(namespace, indexId)
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
-}
-
-@ConfigSerializable
-internal data class CellularEmptyRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-    @Setting
-    private val tooltip: List<Component> = listOf(Component.text("Empty Slot")),
-) : RendererFormat.Simple {
-    override val id = "cells/empty"
-    override val index = createIndex()
-
-    private val cyclicIndexRule = CyclicIndexRule.SLASH
-    override val textMetaFactory = CyclicTextMetaFactory(namespace, id, cyclicIndexRule)
-
-    private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
-        SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
-    }
-
-    fun render(data: EmptyCore): IndexedText {
-        return tooltipCycle.next()
-    }
-}
-//</editor-fold>
-
-
-//////
-
-
-//<editor-fold desc="TextMeta">
-internal data class AttributeCoreTextMeta(
-    override val sourceIndex: SourceIndex,
-    override val sourceOrdinal: SourceOrdinal,
-    override val defaultText: List<Component>?,
-    private val derivation: DerivationRule,
-) : SimpleTextMeta {
-    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
-
-    /**
-     * 实现要求: 返回的列表必须是 [CellularAttributeRendererFormat.computeIndex] 的超集.
-     */
-    override fun deriveIndexes(): List<DerivedIndex> {
-        val sourceNamespace = sourceIndex.namespace()
-        val sourceId = sourceIndex.value()
-        val combiner = StringCombiner(sourceId, ".") {
-            addList(derivation.operationIndex)
-            addList(derivation.elementIndex, AttributeRegistry.FACADES[sourceId].components.hasComponent<CompositeAttributeComponent.Element>())
-        }
-        val combinations = combiner.combine()
-        return combinations.map { Key.key(sourceNamespace, it) }
-    }
-
-    data class DerivationRule(
-        val operationIndex: List<String>,
-        val elementIndex: List<String>,
-    ) {
-        init { // validate values
-            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid operation, check your renderer config") }
-            this.elementIndex.forEach { ElementRegistry.INSTANCES.getOrNull(it) ?: error("'$it' is not a valid element, check your renderer config") }
-        }
-    }
-}
-
-internal data class AttributeCoreTextMetaFactory(
-    override val namespace: String,
-    private val operationIndex: List<String>,
-    private val elementIndex: List<String>,
-) : TextMetaFactory {
-    override fun test(sourceIndex: Key): Boolean {
-        return sourceIndex.namespace() == namespace && AttributeRegistry.FACADES.has(sourceIndex.value())
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        val derivationRule = AttributeCoreTextMeta.DerivationRule(operationIndex, elementIndex)
-        return AttributeCoreTextMeta(sourceIndex, sourceOrdinal, defaultText, derivationRule)
-    }
-}
-
-internal data class SkillCoreTextMeta(
-    override val sourceIndex: SourceIndex,
-    override val sourceOrdinal: SourceOrdinal,
-    override val defaultText: List<Component>?,
-) : SimpleTextMeta {
-    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
-
-    override fun deriveIndexes(): List<DerivedIndex> {
-        return listOf(sourceIndex)
-    }
-}
-
-internal data class SkillCoreTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        // val key = Key.key(
-        //     sourceIndex.value().substringBefore('/'),
-        //     sourceIndex.value().substringAfter('/')
-        // )
-        // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
-        //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
-        //  那么对应的技能的 key 应该是 buff:potion_drop (???)
-
-        return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
-    }
-}
-//</editor-fold>
