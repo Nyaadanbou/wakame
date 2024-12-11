@@ -27,7 +27,6 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.map
 import java.nio.file.Path
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
@@ -122,27 +121,27 @@ internal abstract class RenderingParts(
      * @param block 将数据渲染成 [IndexedText] 的逻辑
      */
     inline fun <T, reified F : RendererFormat> configure(id: String, block: IndexedDataRenderer<T, F>): RenderingPart<T, F> {
-        return provideParams<F>(id).let { params -> RenderingPart(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart(params.format, block) }
     }
 
     inline fun <T1, T2, reified F : RendererFormat> configure2(id: String, block: IndexedDataRenderer2<T1, T2, F>): RenderingPart2<T1, T2, F> {
-        return provideParams<F>(id).let { params -> RenderingPart2(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart2(params.format, block) }
     }
 
     inline fun <T1, T2, T3, reified F : RendererFormat> configure3(id: String, block: IndexedDataRenderer3<T1, T2, T3, F>): RenderingPart3<T1, T2, T3, F> {
-        return provideParams<F>(id).let { params -> RenderingPart3(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart3(params.format, block) }
     }
 
     inline fun <T1, T2, T3, T4, reified F : RendererFormat> configure4(id: String, block: IndexedDataRenderer4<T1, T2, T3, T4, F>): RenderingPart4<T1, T2, T3, T4, F> {
-        return provideParams<F>(id).let { params -> RenderingPart4(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart4(params.format, block) }
     }
 
     inline fun <T1, T2, T3, T4, T5, reified F : RendererFormat> configure5(id: String, block: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>): RenderingPart5<T1, T2, T3, T4, T5, F> {
-        return provideParams<F>(id).let { params -> RenderingPart5(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart5(params.format, block) }
     }
 
     inline fun <T1, T2, T3, T4, T5, T6, reified F : RendererFormat> configure6(id: String, block: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>): RenderingPart6<T1, T2, T3, T4, T5, T6, F> {
-        return provideParams<F>(id).let { params -> RenderingPart6(params.show, params.format, block) }
+        return provideParams<F>(id).let { params -> RenderingPart6(params.format, block) }
     }
 
     private inline fun <reified F : RendererFormat> provideParams(id: String): PartParams<F> {
@@ -153,16 +152,11 @@ internal abstract class RenderingParts(
             throw ExceptionInInitializerError(e)
         }
 
-        val show = format.map { f ->
-            true
-        }
-
-        return PartParams(show, format)
+        return PartParams(format)
     }
 
     // subclasses should not use it
     protected data class PartParams<F : RendererFormat>(
-        val show: Provider<Boolean>,
         val format: Provider<F>,
     )
 
@@ -180,90 +174,71 @@ internal abstract class RenderingParts(
  * @param T 被渲染的数据的类型
  * @param F 渲染格式的类型
  *
- * @param show 是否渲染这个部分
  * @param format 渲染格式
  * @param renderer 渲染逻辑
  */
 internal class RenderingPart<T, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer<T, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data: T) {
-        // if (!show) return
         collector += renderer.render(data, format)
     }
 }
 
 internal class RenderingPart2<T1, T2, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer2<T1, T2, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2) {
-        // if (!show) return
         collector += renderer.render(data1, data2, format)
     }
 }
 
 internal class RenderingPart3<T1, T2, T3, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer3<T1, T2, T3, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3) {
-        // if (!show) return
         collector += renderer.render(data1, data2, data3, format)
     }
 }
 
 internal class RenderingPart4<T1, T2, T3, T4, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer4<T1, T2, T3, T4, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4) {
-        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, format)
     }
 }
 
 internal class RenderingPart5<T1, T2, T3, T4, T5, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer5<T1, T2, T3, T4, T5, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5) {
-        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, data5, format)
     }
 }
 
 internal class RenderingPart6<T1, T2, T3, T4, T5, T6, F : RendererFormat>(
-    show: Provider<Boolean>,
     format: Provider<F>,
     renderer: IndexedDataRenderer6<T1, T2, T3, T4, T5, T6, F>,
 ) {
-    private val show by show
     private val format by format
     private val renderer = renderer
     fun process(collector: ReferenceOpenHashSet<IndexedText>, data1: T1, data2: T2, data3: T3, data4: T4, data5: T5, data6: T6) {
-        // if (!show) return
         collector += renderer.render(data1, data2, data3, data4, data5, data6, format)
     }
 }
