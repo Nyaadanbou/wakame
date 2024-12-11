@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.util.customModelData

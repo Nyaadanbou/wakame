@@ -10,8 +10,6 @@ import cc.mewcraft.wakame.display2.IndexedDataRenderer4
 import cc.mewcraft.wakame.display2.IndexedDataRenderer5
 import cc.mewcraft.wakame.display2.IndexedDataRenderer6
 import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingPart2
 import cc.mewcraft.wakame.display2.implementation.RenderingPart3
@@ -19,7 +17,6 @@ import cc.mewcraft.wakame.display2.implementation.RenderingPart4
 import cc.mewcraft.wakame.display2.implementation.RenderingPart5
 import cc.mewcraft.wakame.display2.implementation.RenderingPart6
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel

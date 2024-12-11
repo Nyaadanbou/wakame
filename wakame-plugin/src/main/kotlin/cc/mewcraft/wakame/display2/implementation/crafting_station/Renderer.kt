@@ -5,13 +5,13 @@ import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.RenderingPart
 import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack

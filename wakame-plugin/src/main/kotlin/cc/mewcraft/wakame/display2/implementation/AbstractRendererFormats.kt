@@ -1,23 +1,20 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.RendererFormats
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
-import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.*
-import org.spongepowered.configurate.util.NamingSchemes
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import java.nio.file.Path
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.reflect.KType
@@ -65,17 +62,7 @@ internal abstract class AbstractRendererFormats(
 
         val loader = yamlConfig {
             withDefaults()
-            serializers {
-                registerAnnotatedObjects(
-                    ObjectMapper.factoryBuilder()
-                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addNodeResolver(NodeResolver.nodeKey())
-                        // .addNodeResolver(NodeResolver.onlyWithSetting())
-                        .addConstraint(Required::class.java, Constraint.required())
-                        .addDiscoverer(dataClassFieldDiscoverer())
-                        .build()
-                )
-            }
+            serializers { registerAnnotatedObjects(ObjectMappers.DEFAULT) }
         }
         val root = loader.buildAndLoadString(formatPath.readText())
 
