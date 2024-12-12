@@ -69,16 +69,21 @@ abstract class Pool<S, C : RandomSelectorContext> {
         return PoolSupport.select(this, context).onEach { whenSelect(it, context) }
     }
 
+    // FIXME 无法在这里使用 property initializer,
+    //  因为这里是代码先于上面的那几个 abstract val 执行的.
+    //  理想情况应该是上面的 abstract val 先赋值, 再执行这里.
+
     /**
      *  单次随机可以产生的最大 [Sample] 数量.
      */
-    val maximumSampleAmount: Int = amount.toInt()
+    val maximumSampleAmount: Int
+        get() = amount.toInt()
 
     /**
      * 所有可能的 [Sample]. 返回的集合忽略任何 [Filter].
      */
-    val allPossibleSamples: Set<S> = samples.map { it.data }.toSet()
-
+    val allPossibleSamples: Set<S>
+        get() = samples.map { it.data }.toSet()
 }
 
 /**
