@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.skill2.condition
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.config.PatchedConfigurationNode
 import cc.mewcraft.wakame.skill2.SkillSupport
-import cc.mewcraft.wakame.skill2.character.Caster
-import cc.mewcraft.wakame.skill2.character.value
 import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
@@ -14,7 +12,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
  * 包含了 [SkillCondition] 实现类的共同逻辑.
  */
 abstract class SkillConditionBase(
-    conditionConfig: ConfigurationNode
+    conditionConfig: ConfigurationNode,
 ) : SkillCondition {
     /* 每个条件都有的数据配置 */
     final override val type: String = conditionConfig.node("type").krequire<String>()
@@ -37,20 +35,16 @@ abstract class SkillConditionBase(
          * 发送条件满足时的消息提示.
          */
         fun notifySuccess(context: SkillContext) {
-            val caster = context.caster.value<Caster.Single.Entity>()
-            if (caster != null) {
-                caster.bukkitEntity?.let { successMessage.send(it) }
-            }
+            val caster = context.caster
+            successMessage.send(caster.entity)
         }
 
         /**
          * 发送条件不满足时的消息提示.
          */
         fun notifyFailure(context: SkillContext) {
-            val caster = context.caster.value<Caster.Single.Entity>()
-            if (caster != null) {
-                caster.bukkitEntity?.let { failureMessage.send(it) }
-            }
+            val caster = context.caster
+            failureMessage.send(caster.entity)
         }
     }
 }

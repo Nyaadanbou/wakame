@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.skill2.condition
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
-import cc.mewcraft.wakame.skill2.character.Caster
-import cc.mewcraft.wakame.skill2.character.value
 import cc.mewcraft.wakame.skill2.context.skillContext
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.Component
@@ -53,7 +51,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifySuccess(context)
 
                 // 自定义的逻辑
-                context.caster.value<Caster.Single.Player>()?.bukkitPlayer?.heal(2.0)
+                context.caster.player?.heal(2.0)
             }
 
             override fun onFailure(componentMap: ComponentMap) {
@@ -62,7 +60,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifyFailure(context)
 
                 // 自定义的逻辑
-                context.caster.value<Caster.Single.Player>()?.bukkitPlayer?.damage(2.0)
+                context.caster.player?.damage(2.0)
             }
         }
     }

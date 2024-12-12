@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.skill2.system
 
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.EntityType
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
@@ -17,7 +18,7 @@ import com.github.quillraven.fleks.World.Companion.inject
 class MechanicConditionSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
-    family = family { all(IdentifierComponent, BukkitEntityComponent, StatePhaseComponent) }
+    family = family { all(IdentifierComponent, CasterComponent, StatePhaseComponent, EntityType.MECHANIC) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val skill = SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)]

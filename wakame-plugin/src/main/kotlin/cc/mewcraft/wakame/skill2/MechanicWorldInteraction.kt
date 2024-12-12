@@ -4,8 +4,6 @@ import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.character.Caster
-import cc.mewcraft.wakame.skill2.character.CasterUtils
 import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
@@ -24,7 +22,7 @@ internal class MechanicWorldInteraction(
         world.createEntity(context.skill.key.asString()) {
             it += CooldownComponent(context.cooldown)
             it += EntityType.MECHANIC
-            CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity?.let { bukkitEntity -> it += BukkitEntityComponent(bukkitEntity.uniqueId) }
+            it += CasterComponent(context.caster)
             context.target?.let { target -> it += TargetComponent(target) }
             context.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
             it += ResultComponent(context.skill.result(context))
@@ -56,10 +54,10 @@ internal class MechanicWorldInteraction(
         val skills = mutableSetOf<Skill>()
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(BukkitEntityComponent, IdentifierComponent) }
+                val family = family { all(CasterComponent, IdentifierComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[BukkitEntityComponent].entity == bukkitEntity) {
+                if (entity[CasterComponent].caster == bukkitEntity) {
                     skills.add(SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)])
                 }
             }
@@ -72,10 +70,10 @@ internal class MechanicWorldInteraction(
         val triggers = mutableSetOf<Trigger>()
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(BukkitEntityComponent, TriggerComponent) }
+                val family = family { all(CasterComponent, TriggerComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[BukkitEntityComponent].entity == bukkitEntity) {
+                if (entity[CasterComponent].entity == bukkitEntity) {
                     triggers.add(entity[TriggerComponent].trigger)
                 }
             }
@@ -119,9 +117,9 @@ internal class MechanicWorldInteraction(
      */
     fun interruptMechanicBy(bukkitEntity: Entity) {
         with(world.instance) {
-            family { all(BukkitEntityComponent) }
+            family { all(CasterComponent) }
                 .forEach {
-                    if (it[BukkitEntityComponent].entityUniqueId == bukkitEntity.uniqueId) {
+                    if (it[CasterComponent].caster.uniqueId == bukkitEntity.uniqueId) {
                         world.removeEntity(it)
                     }
                 }
@@ -130,9 +128,9 @@ internal class MechanicWorldInteraction(
 
     fun markNextState(bukkitEntity: Entity) {
         world.editEntities(
-            family = { family { all(BukkitEntityComponent, StatePhaseComponent) } }
+            family = { family { all(CasterComponent, StatePhaseComponent) } }
         ) { entity ->
-            if (entity[BukkitEntityComponent].entity != bukkitEntity)
+            if (entity[CasterComponent].entity != bukkitEntity)
                 return@editEntities
             entity += Tags.CAN_NEXT_STATE
         }

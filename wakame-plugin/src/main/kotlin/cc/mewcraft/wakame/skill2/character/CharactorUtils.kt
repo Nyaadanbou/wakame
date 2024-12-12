@@ -2,25 +2,13 @@ package cc.mewcraft.wakame.skill2.character
 
 import cc.mewcraft.wakame.skill2.context.SkillContext
 
-object CasterUtils {
-    fun <T : Caster.Single> getCaster(clazz: Class<T>, context: SkillContext): T? {
-        val caster = context.caster
-        return caster.value(clazz)
-            ?: caster.root(clazz)
-    }
-
-    inline fun <reified T : Caster.Single> getCaster(context: SkillContext): T? {
-        return getCaster(T::class.java, context)
-    }
-}
-
 object TargetUtil {
     fun getEntity(context: SkillContext, casterWhenNull: Boolean = false): Target.LivingEntity? {
         return when (val target = context.target) {
             is Target.LivingEntity -> {
-                val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
+                val casterEntity = context.caster.entity
                 val targetEntity = target.bukkitEntity
-                if (caster != null && caster == targetEntity && casterWhenNull) null
+                if (casterEntity == targetEntity && casterWhenNull) null
                 else target
             }
             is Target.Location -> {
@@ -35,9 +23,9 @@ object TargetUtil {
         return when (val target = context.target) {
             is Target.Location -> target
             is Target.LivingEntity -> {
-                val caster = CasterUtils.getCaster<Caster.Single.Entity>(context)?.bukkitEntity
+                val casterEntity = context.caster.entity
                 val targetEntity = target.bukkitEntity
-                if (caster != null && caster == targetEntity && casterWhenNull) null else targetEntity?.location?.let { TargetAdapter.adapt(it) }
+                if (casterEntity == targetEntity && casterWhenNull) null else targetEntity?.location?.let { TargetAdapter.adapt(it) }
             }
             else -> null
         }

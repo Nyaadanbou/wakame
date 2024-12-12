@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CasterComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
 import cc.mewcraft.wakame.ecs.component.Tags
@@ -17,12 +17,12 @@ import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.entity.Player
 
 class StatePhaseSystem : IteratingSystem(
-    family = family { all(IdentifierComponent, BukkitEntityComponent, StatePhaseComponent, Tags.CAN_NEXT_STATE) }
+    family = family { all(IdentifierComponent, CasterComponent, StatePhaseComponent, Tags.CAN_NEXT_STATE) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val oldPhase = entity[StatePhaseComponent].phase
         val newPhase = oldPhase.next()
-        val player = entity[BukkitEntityComponent].entity as? Player ?: return
+        val player = entity[CasterComponent].entity as? Player ?: return
         val id = entity[IdentifierComponent].id
 
         entity[StatePhaseComponent].phase = newPhase

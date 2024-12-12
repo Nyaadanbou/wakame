@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CasterComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
@@ -85,7 +85,7 @@ private class DashSkillResult(
     }
 
     override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val bukkitEntity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT
+        val bukkitEntity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT
 
         bukkitEntity.sendPlainMessage("Dash Idle, totalTickCount: $tickCount")
         return TickResult.CONTINUE_TICK
@@ -96,7 +96,7 @@ private class DashSkillResult(
             // 超过了执行时间, 直接完成技能
             return TickResult.ALL_DONE
         }
-        val entity = componentMap[BukkitEntityComponent]?.entity ?: return TickResult.INTERRUPT // 无效生物
+        val entity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT // 无效生物
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = skill.stepDistance
         // 计算每一步的移动向量

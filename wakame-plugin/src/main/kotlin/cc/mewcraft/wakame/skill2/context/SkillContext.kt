@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill2.context
 
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CasterComponent
 import cc.mewcraft.wakame.ecs.component.CooldownComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
@@ -14,10 +14,7 @@ import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.Caster
-import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.Target
-import cc.mewcraft.wakame.skill2.character.toComposite
-import cc.mewcraft.wakame.skill2.character.value
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
@@ -133,7 +130,7 @@ private class SimpleSkillContext(
      * 如果 [caster] 可以转变成一个 [User], 则返回它的 [User] 实例.
      */
     override val user: User<*>?
-        get() = caster.value<Caster.Single.Player>()?.bukkitPlayer?.toUser()
+        get() = caster.player?.toUser()
 
     override fun toBuilder(): SkillContextDSL {
         return SkillContextDSL(skill, caster)
@@ -165,13 +162,13 @@ private class ComponentMapSkillContext(
     override val skill: Skill
         get() = requireNotNull(componentMap[IdentifierComponent]?.id?. let { SkillRegistry.INSTANCES[Key(it)] }) { "Skill not found in componentMap" }
     override val caster: Caster
-        get() = requireNotNull(componentMap[BukkitEntityComponent]?.entity?.let { CasterAdapter.adapt(it).toComposite() }) { "Caster not found in componentMap" }
+        get() = requireNotNull(componentMap[CasterComponent]?.caster) { "Caster not found in componentMap" }
     override val cooldown: Cooldown
         get() = requireNotNull(componentMap[CooldownComponent]?.cooldown) { "Cooldown not found in componentMap" }
     override val trigger: Trigger
         get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
     override val user: User<*>?
-        get() = caster.value<Caster.Single.Player>()?.bukkitPlayer?.toUser()
+        get() = caster.player?.toUser()
     override val target: Target?
         get() = componentMap[TargetComponent]?.target
     override val castItem: NekoStack?

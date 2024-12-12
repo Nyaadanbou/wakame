@@ -6,11 +6,6 @@ import org.bukkit.entity.Player
 import org.bukkit.Location as BukkitLocation
 
 sealed interface Target {
-    data object Void : Target {
-        override fun <T : Target> value(clazz: Class<T>): T? = null
-        override fun <T : Target> valueNonNull(clazz: Class<T>): T = throw IllegalStateException("No value")
-    }
-
     interface Location : Target {
         val bukkitLocation: BukkitLocation
     }
@@ -39,17 +34,8 @@ object TargetAdapter {
         return BukkitLocationTarget(location)
     }
 
-    fun adapt(caster: Caster.Single): Target {
-        when (caster) {
-            is Caster.Single.Entity -> return adapt(caster.bukkitEntity as BukkitLivingEntity)
-            is Caster.Single.Skill -> throw UnsupportedOperationException()
-        }
-    }
-
     fun adapt(caster: Caster): Target {
-        val single = caster.value<Caster.Single>()
-            ?: caster.root<Caster.Single>()
-            ?: throw IllegalStateException("No single caster")
-        return adapt(single)
+        val entity = caster.entity as? BukkitLivingEntity ?: throw IllegalArgumentException("Caster must be a living entity")
+        return BukkitLivingEntityTarget(entity)
     }
 }

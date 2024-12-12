@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.skill2.system
 
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.CasterComponent
 import cc.mewcraft.wakame.ecs.component.CooldownComponent
+import cc.mewcraft.wakame.ecs.component.EntityType
 import cc.mewcraft.wakame.ecs.component.Tags
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -9,7 +10,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import net.kyori.adventure.text.Component
 
 class MechanicCooldownSystem : IteratingSystem(
-    family = family { all(CooldownComponent) }
+    family = family { all(CooldownComponent, EntityType.MECHANIC) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val cooldown = entity[CooldownComponent].cooldown
@@ -25,7 +26,7 @@ class MechanicCooldownSystem : IteratingSystem(
     }
 
     private fun sendCooldownTo(entity: Entity) {
-        val bukkitEntity = entity.getOrNull(BukkitEntityComponent)?.entity ?: return
+        val bukkitEntity = entity.getOrNull(CasterComponent)?.entity ?: return
         val data = entity[CooldownComponent].cooldown
 
         bukkitEntity.sendMessage(Component.text("剩余时间 tick: ${data.cooldownTime}"))
