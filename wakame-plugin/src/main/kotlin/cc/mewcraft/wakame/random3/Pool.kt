@@ -68,6 +68,17 @@ abstract class Pool<S, C : RandomSelectorContext> {
     open fun select(context: C): List<S> {
         return PoolSupport.select(this, context).onEach { whenSelect(it, context) }
     }
+
+    /**
+     *  单次随机可以产生的最大 [Sample] 数量.
+     */
+    val maximumSampleAmount: Int = amount.toInt()
+
+    /**
+     * 所有可能的 [Sample]. 返回的集合忽略任何 [Filter].
+     */
+    val allPossibleSamples: Set<S> = samples.map { it.data }.toSet()
+
 }
 
 /**
@@ -324,7 +335,7 @@ private object PoolSupport : KoinComponent {
                 count++
                 if (count > 500) {
                     // 防止因为似循环而导致的严重问题, 记录日志并中断.
-                    logger.warn("Stuck in an endless loop while selecting samples. This is a bug!")
+                    logger.error("Stuck in an endless loop while selecting samples. This is a config error!")
                     break
                 }
 

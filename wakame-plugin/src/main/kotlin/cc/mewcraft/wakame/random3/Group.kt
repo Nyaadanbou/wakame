@@ -26,6 +26,7 @@ interface Group<S, C : RandomSelectorContext> {
      */
     companion object Factory {
         fun <S, C : RandomSelectorContext> empty(): Group<S, C> {
+            @Suppress("UNCHECKED_CAST")
             return GroupEmpty as Group<S, C>
         }
     }
@@ -63,12 +64,19 @@ interface Group<S, C : RandomSelectorContext> {
      *    * 如果 [default] 也没有结果, 最终将返回空列表
      */
     fun select(context: C): List<S>
-}
 
-interface GroupBuilder<S, C : RandomSelectorContext> {
-    val pools: MutableMap<String, Pool<S, C>>
-    val filters: NodeContainer<Filter<C>>
-    var default: Pool<S, C>
+    /**
+     * 单次随机可以产生的最大 [Sample] 数量.
+     *
+     * 例如该 [Group] 包含了 3 个 [Pool], 这 3 个 [Pool] 分别可以选择 1 个, 2 个, 3 个 [Sample],
+     * 那么该 [Group] 的 [maximumSampleAmount] 就是 3.
+     */
+    val maximumSampleAmount: Int
+
+    /**
+     * 所有可能的 [Sample]. 返回的集合忽略任何 [Filter].
+     */
+    val allPossibleSamples: Set<S>
 }
 
 /**
@@ -196,6 +204,9 @@ private object GroupEmpty : Group<Nothing, RandomSelectorContext> {
     override val pools: Map<String, Pool<Nothing, RandomSelectorContext>> = emptyMap()
     override val filters: NodeContainer<Filter<RandomSelectorContext>> = NodeContainer.empty()
     override val default: Pool<Nothing, RandomSelectorContext> = Pool.empty()
+    override val maximumSampleAmount: Int = 0
+    override val allPossibleSamples: Set<Nothing> = emptySet()
+
     override fun select(context: RandomSelectorContext): List<Nothing> = Collections.emptyList()
 }
 
@@ -204,6 +215,9 @@ private class GroupImpl<S, C : RandomSelectorContext>(
     override val filters: NodeContainer<Filter<C>>,
     override val default: Pool<S, C>,
 ) : Group<S, C> {
+    override val maximumSampleAmount: Int = pools.values.maxOf { it.maximumSampleAmount }
+    override val allPossibleSamples: Set<S> = pools.values.flatMap { it.allPossibleSamples }.toSet()
+
     override fun select(context: C): List<S> {
         val test = filters.all {
             it.test(context)

@@ -138,9 +138,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
 
     @JvmField
     val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = configure("elements") { data, format ->
-        val collection = data.possibleElements
-        val resolver = Placeholder.component("count", Component.text(collection.size))
-        format.render(collection, Element::displayName, resolver)
+        val selector = data.selector
+        val allPossibleElements = selector.allPossibleSamples
+        val maximumElementAmount = selector.maximumSampleAmount
+        val resolver = Placeholder.component("count", Component.text(maximumElementAmount))
+        format.render(allPossibleElements, Element::displayName, resolver)
     }
 
     @JvmField
@@ -166,9 +168,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     val KIZAMIZ: RenderingHandler<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
-        val collection = data.possibleKizamiz
-        val resolver = Placeholder.component("count", Component.text(collection.size))
-        format.render(collection, Kizami::displayName, resolver)
+        val selector = data.selector
+        val allPossibleKizamiz = selector.allPossibleSamples
+        val maximumKizamiAmount = selector.maximumSampleAmount
+        val resolver = Placeholder.component("count", Component.text(maximumKizamiAmount))
+        format.render(allPossibleKizamiz, Kizami::displayName, resolver)
     }
 
     @JvmField

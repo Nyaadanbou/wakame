@@ -1,21 +1,43 @@
 package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.*
-import cc.mewcraft.wakame.random3.*
+import cc.mewcraft.wakame.kizami.KIZAMI_EXTERNALS
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiSerializer
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.Node
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -25,12 +47,8 @@ import cc.mewcraft.wakame.item.components.ItemKizamiz as ItemKizamizData
 
 
 data class ItemKizamiz(
-    private val selector: Group<Kizami, ItemGenerationContext>,
+    val selector: Group<Kizami, ItemGenerationContext>,
 ) : ItemTemplate<ItemKizamizData> {
-    val possibleKizamiz: Collection<Kizami> = selector.pools.flatMap { pool ->
-        pool.value.samples.values().map { sample -> sample.data }.distinct()
-    }
-
     override val componentType: ItemComponentType<ItemKizamizData> = ItemComponentTypes.KIZAMIZ
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemKizamizData> {
