@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.util.plain
 import net.kyori.adventure.text.Component
@@ -28,12 +28,13 @@ internal data class MergeOutputRendererFormat(
     private val attributeFormat: AttributeFormat,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(data: PortableCore): IndexedText {
         return SimpleIndexedText(
             index, data.description
-                .map(Component::plain)
+                .map(Component::plain) // 先转成纯文本, 使得 regex 可以正常匹配
                 .map(Component::text)
                 .map { it.replaceText(attributeFormat.replacementConfig) }
                 .map { it.style(attributeFormat.style) }

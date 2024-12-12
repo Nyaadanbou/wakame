@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.util.styleRecursively
 import net.kyori.adventure.extra.kotlin.plus
@@ -37,7 +37,8 @@ internal data class StandaloneCellRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "standalone_cell"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * @param coreText 核心的文本描述

@@ -1,9 +1,20 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.argument.StringArgumentQueue
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.DerivedOrdinal
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererLayout
+import cc.mewcraft.wakame.display2.SimpleTextMeta
+import cc.mewcraft.wakame.display2.SourceIndex
+import cc.mewcraft.wakame.display2.SourceOrdinal
+import cc.mewcraft.wakame.display2.StaticIndexedText
+import cc.mewcraft.wakame.display2.StaticTextMeta
+import cc.mewcraft.wakame.display2.TextMeta
 import cc.mewcraft.wakame.util.yamlConfig
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -124,7 +135,7 @@ internal abstract class AbstractRendererLayout(
             group1 != null -> {
                 val argsQueue = StringArgumentQueue(group1.split(':'))
                 when (
-                    val category = argsQueue.pop() // 取出第一个参数, 要么是 "default", 要么是 "fixed"
+                    argsQueue.pop() // 取出第一个参数, 要么是 "default", 要么是 "fixed"
                 ) {
                     // 类型为 static indexed text
                     StaticTextMeta.STATIC_IDENTIFIER -> {
@@ -194,7 +205,7 @@ internal abstract class AbstractRendererLayout(
     private fun parseSourceIndex(unprocessed: String): Key? {
         try {
             return Key.key(unprocessed)
-        } catch (e: InvalidKeyException) {
+        } catch (_: InvalidKeyException) {
             logger.warn("Invalid source index while reading line '$unprocessed'")
             return null
         }
@@ -215,47 +226,6 @@ internal abstract class AbstractRendererLayout(
             logger.warn("Can't find metadata for derived index '$index'")
         }
         return ret as T?
-    }
-}
-
-/**
- * 用来描述不会衍生并且只有一个 [SourceIndex] 的 [IndexedText].
- *
- * 例如: 标准渲染器中的 `lore`, `level`, `enchantment` 等.
- * 与之相反的是那些会衍生的 [IndexedText], 例如 `attribute`.
- */
-internal data class SingleSimpleTextMeta(
-    override val sourceIndex: SourceIndex,
-    override val sourceOrdinal: SourceOrdinal,
-    override val defaultText: List<Component>?,
-) : SimpleTextMeta {
-    override fun createDefault(): List<IndexedText>? {
-        return defaultText?.let { listOf(SimpleIndexedText(sourceIndex, it)) }
-    }
-
-    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
-
-    override fun deriveIndexes(): List<DerivedIndex> {
-        return listOf(sourceIndex)
-    }
-}
-
-/**
- * 负责创建 [SingleSimpleTextMeta] 的工厂.
- *
- * @param namespace 命名空间
- * @param id 对应的 id
- */
-internal data class SingleSimpleTextMetaFactory(
-    override val namespace: String,
-    private val id: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == id
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }
 

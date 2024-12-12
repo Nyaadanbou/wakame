@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.rarity.Rarity
@@ -42,8 +42,9 @@ internal data class HardcodedRendererFormat(
     @Setting @NodeKey
     override val id: String, // id 是配置文件指定的
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 }
 
 /**
@@ -63,8 +64,9 @@ internal data class SingleValueRendererFormat(
     @Setting
     private val tooltip: String, // mini message format
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
@@ -100,8 +102,9 @@ internal data class ListValueRendererFormat(
     @Setting
     private val tooltip: List<String>, // mini message format,
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip.map(MM::deserialize))
@@ -134,8 +137,9 @@ internal data class AggregateValueRendererFormat(
     @Setting
     private val tooltip: Tooltip, // mini message format
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * A convenience function to stylize a list of objects.
@@ -203,9 +207,10 @@ internal data class ExtraLoreRendererFormat(
     @Setting
     private val tooltip: Tooltip = Tooltip(),
 ) : RendererFormat.Simple {
-    override val id = "lore"
-    override val index = Key.key(namespace, id)
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val id: String = "lore"
+    override val index: DerivedIndex = Key.key(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * @param data 额外的物品描述
@@ -248,9 +253,10 @@ internal data class EnchantmentRendererFormat(
     @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Simple {
-    override val id = "enchantments"
-    override val index = Key.key(namespace, id)
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val id: String = "enchantments"
+    override val index: DerivedIndex = Key.key(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * @param data 魔咒和等级的映射
@@ -268,7 +274,8 @@ data class RarityRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "rarity"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun renderSimple(rarity: Rarity): IndexedText {
         return SimpleIndexedText(
@@ -306,8 +313,9 @@ internal data class PortableCoreRendererFormat(
     override val id: String,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: SingleSimpleTextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-    private val unknownIndex = Key.key(namespace, "unknown")
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
+    private val unknownIndex: Key = Key.key(namespace, "unknown")
 
     fun render(data: PortableCore): IndexedText {
         val core = (data.wrapped as? AttributeCore)

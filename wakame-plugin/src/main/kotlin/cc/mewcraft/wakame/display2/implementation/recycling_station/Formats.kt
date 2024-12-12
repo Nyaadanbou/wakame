@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.display2.implementation.recycling_station
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
@@ -22,7 +22,8 @@ internal data class SellButtonTitleRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_title"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     @ConfigSerializable
     data class Part(
@@ -44,7 +45,8 @@ internal data class SellButtonUsageRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_usage"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 }
 
 @ConfigSerializable
@@ -58,7 +60,8 @@ internal data class SellButtonItemListRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_item_list"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 }
 
 @ConfigSerializable
@@ -70,5 +73,6 @@ internal data class SellButtonTotalWorthRendererFormat(
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_total_worth"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 }

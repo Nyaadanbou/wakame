@@ -76,7 +76,7 @@ internal abstract class AbstractRendererFormatRegistry(
             // will overwrite the one already existing
             registeredRendererFormats[id] = format
             // create & register the text meta factory
-            textMetaFactoryRegistry.registerFactory(format.textMetaFactory)
+            textMetaFactoryRegistry.registerFactory(format.textMetaFactory, format.textMetaPredicate)
         }
 
         // reload all renderer formats of this renderer

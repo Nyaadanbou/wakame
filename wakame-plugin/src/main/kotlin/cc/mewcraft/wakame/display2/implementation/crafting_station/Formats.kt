@@ -4,12 +4,8 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.SimpleTextMeta
-import cc.mewcraft.wakame.display2.SourceIndex
-import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMeta
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import net.kyori.adventure.key.Key
@@ -29,9 +25,10 @@ internal data class FuzzyEnchantmentRendererFormat(
     @Setting
     private val tooltip: String = "<name> <level>",
 ) : RendererFormat.Simple {
-    override val id = "enchantments"
-    override val index = Key.key(namespace, id)
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val id: String = "enchantments"
+    override val index: Key = Key.key(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * @param data 魔咒和等级的映射
@@ -57,8 +54,10 @@ internal data class FuzzyPortableCoreRendererFormat(
     @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Dynamic<PortableCore> {
+    override val textMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, "portable_core")
+
     private val unknownIndex = Key.key(namespace, "unknown")
-    override val textMetaFactory = FuzzyPortableCoreTextMetaFactory(namespace)
 
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore
@@ -69,17 +68,5 @@ internal data class FuzzyPortableCoreRendererFormat(
 
     override fun computeIndex(data: PortableCore): Key {
         throw UnsupportedOperationException() // 直接在 render(...) 函数中处理
-    }
-}
-
-internal data class FuzzyPortableCoreTextMetaFactory(
-    override val namespace: String,
-) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == "portable_core"
-    }
-
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SingleSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }

@@ -52,14 +52,10 @@ internal data class CyclicTextMeta(
 }
 
 internal data class CyclicTextMetaFactory(
-    override val namespace: String,
+    private val namespace: String,
     private val id: String,
     private val indexRule: CyclicIndexRule,
 ) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == id
-    }
-
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return CyclicTextMeta(sourceIndex, sourceOrdinal, defaultText, indexRule)
     }

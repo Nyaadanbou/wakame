@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -15,6 +17,8 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -32,7 +36,8 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
-    override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
+    override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AttributeRegistry.FACADES::has)
 
     fun render(data: AttributeCore): IndexedText {
         return SimpleIndexedText(computeIndex(data), data.description)
@@ -51,7 +56,8 @@ internal data class CellularSkillRendererFormat(
     @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Dynamic<SkillCore> {
-    override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
+    override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, SkillRegistry.INSTANCES::has)
 
     fun render(data: SkillCore): IndexedText {
         val instance = data.skill.instance
@@ -77,14 +83,13 @@ internal data class CellularEmptyRendererFormat(
     @Setting
     private val tooltip: List<Component> = listOf(Component.text("Empty Slot")),
 ) : RendererFormat.Simple {
-    override val id = "cells/empty"
-    override val index = createIndex()
-
-    private val cyclicIndexRule = CyclicIndexRule.SLASH
-    override val textMetaFactory = CyclicTextMetaFactory(namespace, id, cyclicIndexRule)
+    override val id: String = "cells/empty"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = CyclicTextMetaFactory(namespace, id, CyclicIndexRule.SLASH)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
-        SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
+        SimpleIndexedText(CyclicIndexRule.SLASH.make(index, i), tooltip)
     }
 
     fun render(data: EmptyCore): IndexedText {
@@ -99,9 +104,10 @@ internal data class AttackSpeedRendererFormat(
     @Setting
     private val tooltip: Tooltip = Tooltip(),
 ) : RendererFormat.Simple {
-    override val id = "attack_speed"
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val id: String = "attack_speed"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(data: AttackSpeedLevel): IndexedText {
         val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.ordinal, UNKNOWN_LEVEL))

@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.registry.hasComponent
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.key.Key
@@ -50,14 +49,10 @@ internal data class AttributeCoreTextMeta(
 }
 
 internal data class AttributeCoreTextMetaFactory(
-    override val namespace: String,
+    private val namespace: String,
     private val operationIndex: List<String>,
     private val elementIndex: List<String>,
 ) : TextMetaFactory {
-    override fun test(sourceIndex: Key): Boolean {
-        return sourceIndex.namespace() == namespace && AttributeRegistry.FACADES.has(sourceIndex.value())
-    }
-
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         val derivationRule = AttributeCoreTextMeta.DerivationRule(operationIndex, elementIndex)
         return AttributeCoreTextMeta(sourceIndex, sourceOrdinal, defaultText, derivationRule)
@@ -77,19 +72,19 @@ internal data class SkillCoreTextMeta(
 }
 
 internal data class SkillCoreTextMetaFactory(
-    override val namespace: String,
+    private val namespace: String,
 ) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        // val key = Key.key(
-        //     sourceIndex.value().substringBefore('/'),
-        //     sourceIndex.value().substringAfter('/')
-        // )
-        // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
-        //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
-        //  那么对应的技能的 key 应该是 buff:potion_drop (???)
-
-        return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
-    }
+    // override fun test(sourceIndex: SourceIndex): Boolean {
+    //     // val key = Key.key(
+    //     //     sourceIndex.value().substringBefore('/'),
+    //     //     sourceIndex.value().substringAfter('/')
+    //     // )
+    //     // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
+    //     //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
+    //     //  那么对应的技能的 key 应该是 buff:potion_drop (???)
+    //
+    //     return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
+    // }
 
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)

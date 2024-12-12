@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
+import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
@@ -15,6 +18,8 @@ import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.SkillCoreTextMetaFactory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.SkillRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -71,7 +76,8 @@ internal data class CellularAttributeRendererFormat(
     @Setting @Required
     private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
-    override val textMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
+    override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AttributeRegistry.FACADES::has)
 
     /**
      * @param id 核孔的 id
@@ -97,7 +103,8 @@ internal data class CellularSkillRendererFormat(
     @Setting @Required
     private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Dynamic<SkillCore> {
-    override val textMetaFactory = SkillCoreTextMetaFactory(namespace)
+    override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, SkillRegistry.INSTANCES::has)
 
     fun render(id: String, core: SkillCore, context: ModdingTableContext): IndexedText {
         val original = core.description
@@ -122,14 +129,13 @@ internal data class CellularEmptyRendererFormat(
     @Setting @Required
     private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Simple {
-    override val id = "cells/empty"
-    override val index = createIndex()
-
-    private val cyclicIndexRule = CyclicIndexRule.SLASH
-    override val textMetaFactory = CyclicTextMetaFactory(namespace, id, cyclicIndexRule)
+    override val id: String = "cells/empty"
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = CyclicTextMetaFactory(namespace, id, CyclicIndexRule.SLASH)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     private val tooltipCycle = IndexedTextCycle(limit = CyclicTextMeta.MAX_DISPLAY_COUNT) { i ->
-        SimpleIndexedText(cyclicIndexRule.make(index, i), tooltip)
+        SimpleIndexedText(CyclicIndexRule.SLASH.make(index, i), tooltip)
     }
 
     fun render(id: String, context: ModdingTableContext): IndexedText {
