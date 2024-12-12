@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFor
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.DifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
@@ -27,10 +27,10 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
 internal data class ModdingDifferenceFormats(
-    val changeable: DifferenceFormat = DifferenceFormat(),
-    val unchangeable: DifferenceFormat = DifferenceFormat(),
-    val hasInput: DifferenceFormat = DifferenceFormat(),
-    val hasNoInput: DifferenceFormat = DifferenceFormat(),
+    val changeable: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val unchangeable: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val hasInput: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val hasNoInput: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
 ) {
     /**
      * @param id 核孔的 id

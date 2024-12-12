@@ -84,7 +84,7 @@ internal data class StandaloneCellRendererFormat(
  * @param suffix 应用在核心上的后缀
  */
 @ConfigSerializable
-internal data class DifferenceFormat(
+internal data class ReforgeDifferenceFormat(
     // 我们想让 style 的默认值含义是 [不修改核心原有的样式].
     // 经验证, 不能用 Style.empty(), 因为会清空原有样式.
     // 所以这里用 null 来表示 [不修改核心原有的样式].

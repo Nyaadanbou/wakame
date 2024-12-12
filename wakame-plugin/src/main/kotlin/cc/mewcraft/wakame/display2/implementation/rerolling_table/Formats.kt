@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFor
 import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.DifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
@@ -24,7 +24,6 @@ import cc.mewcraft.wakame.registry.SkillRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 
 // 开发日记 2024/10/25
@@ -34,10 +33,10 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 internal data class RerollingDifferenceFormats(
-    val changeable: DifferenceFormat = DifferenceFormat(),
-    val unchangeable: DifferenceFormat = DifferenceFormat(),
-    val selected: DifferenceFormat = DifferenceFormat(),
-    val unselected: DifferenceFormat = DifferenceFormat(),
+    val changeable: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val unchangeable: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val selected: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
+    val unselected: ReforgeDifferenceFormat = ReforgeDifferenceFormat(),
 ) {
     /**
      * @param id 核孔的 id
@@ -72,8 +71,7 @@ internal data class RerollingDifferenceFormats(
 internal data class CellularAttributeRendererFormat(
     override val namespace: String,
     private val ordinal: AttributeCoreOrdinalFormat,
-    @Setting("diff_formats")
-    private val differenceFormats: RerollingDifferenceFormats,
+    private val diffFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AttributeRegistry.FACADES::has)
@@ -85,7 +83,7 @@ internal data class CellularAttributeRendererFormat(
      */
     fun render(id: String, core: AttributeCore, context: RerollingTableContext): IndexedText {
         val original = core.description
-        val processed = differenceFormats.render(id, original, context)
+        val processed = diffFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }
 
@@ -100,8 +98,7 @@ internal data class CellularAttributeRendererFormat(
 @ConfigSerializable
 internal data class CellularSkillRendererFormat(
     override val namespace: String,
-    @Setting("diff_formats")
-    private val differenceFormats: RerollingDifferenceFormats,
+    private val diffFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, SkillRegistry.INSTANCES::has)
@@ -113,7 +110,7 @@ internal data class CellularSkillRendererFormat(
      */
     fun render(id: String, core: SkillCore, context: RerollingTableContext): IndexedText {
         val original = core.description
-        val processed = differenceFormats.render(id, original, context)
+        val processed = diffFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }
 
@@ -129,8 +126,7 @@ internal data class CellularSkillRendererFormat(
 internal data class CellularEmptyRendererFormat(
     override val namespace: String,
     private val tooltip: List<Component>,
-    @Setting("diff_formats")
-    private val differenceFormats: RerollingDifferenceFormats,
+    private val diffFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Simple {
     override val id: String = "cells/empty"
     override val index: DerivedIndex = createIndex()
@@ -149,7 +145,7 @@ internal data class CellularEmptyRendererFormat(
     fun render(id: String, core: EmptyCore, context: RerollingTableContext): IndexedText {
         val next = tooltipCycle.next()
         val original = next.text
-        val processed = differenceFormats.render(id, original, context)
+        val processed = diffFormats.render(id, original, context)
         return next.copy(text = processed)
     }
 }

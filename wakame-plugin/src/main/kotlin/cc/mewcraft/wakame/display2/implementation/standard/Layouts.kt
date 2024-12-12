@@ -74,18 +74,6 @@ internal data class SkillCoreTextMeta(
 internal data class SkillCoreTextMetaFactory(
     private val namespace: String,
 ) : TextMetaFactory {
-    // override fun test(sourceIndex: SourceIndex): Boolean {
-    //     // val key = Key.key(
-    //     //     sourceIndex.value().substringBefore('/'),
-    //     //     sourceIndex.value().substringAfter('/')
-    //     // )
-    //     // FIXME 临时方案, 理想中的技能 key 应该如上面注释所示
-    //     //  也就是说, 如果 sourceIndex 是 skill:buff/potion_drop,
-    //     //  那么对应的技能的 key 应该是 buff:potion_drop (???)
-    //
-    //     return sourceIndex.namespace() == namespace && SkillRegistry.INSTANCES.has(sourceIndex)
-    // }
-
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }

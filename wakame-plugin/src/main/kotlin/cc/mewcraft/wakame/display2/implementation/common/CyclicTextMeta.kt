@@ -1,5 +1,4 @@
 // 文件说明:
-//
 // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
 // 这里提供了一套通用的实现, 用来循环产生在末尾带有序数的 IndexedText#idx
 // 使得索引不再重复, 最终实现在渲染结果中出现多个相同内容的 IndexedText.
