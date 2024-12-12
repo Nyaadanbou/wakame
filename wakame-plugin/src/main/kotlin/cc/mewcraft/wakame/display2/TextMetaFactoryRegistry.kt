@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display2
 
-import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.slf4j.Logger
@@ -22,7 +21,7 @@ class TextMetaFactoryRegistry : KoinComponent {
         predicate: TextMetaFactoryPredicate,
     ) {
         factories += Entry(factory, predicate)
-        logger.info("Registered TextMetaFactory: {}", factory)
+        // logger.info("Registered TextMetaFactory: {}", factory)
     }
 
     /**
@@ -31,7 +30,7 @@ class TextMetaFactoryRegistry : KoinComponent {
      * @param identity 配置文件中的原始字符串, 未经任何修改
      * @return 返回一个合适的 [TextMetaFactory]
      */
-    fun getApplicableFactory(identity: Key): TextMetaFactory? {
+    fun getApplicableFactory(identity: SourceIndex): TextMetaFactory? {
         return factories.firstOrNull { entry -> entry.predicate.test(identity) }?.factory
     }
 

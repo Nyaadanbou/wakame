@@ -25,15 +25,11 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 
 @ConfigSerializable
 internal data class CellularAttributeRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @Required
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
@@ -53,7 +49,6 @@ internal data class CellularAttributeRendererFormat(
 
 @ConfigSerializable
 internal data class CellularSkillRendererFormat(
-    @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
@@ -78,10 +73,8 @@ internal data class CellularSkillRendererFormat(
 
 @ConfigSerializable
 internal data class CellularEmptyRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting
-    private val tooltip: List<Component> = listOf(Component.text("Empty Slot")),
+    private val tooltip: List<Component>,
 ) : RendererFormat.Simple {
     override val id: String = "cells/empty"
     override val index: DerivedIndex = createIndex()
@@ -99,9 +92,7 @@ internal data class CellularEmptyRendererFormat(
 
 @ConfigSerializable
 internal data class AttackSpeedRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting
     private val tooltip: Tooltip = Tooltip(),
 ) : RendererFormat.Simple {
     override val id: String = "attack_speed"
@@ -116,9 +107,7 @@ internal data class AttackSpeedRendererFormat(
 
     @ConfigSerializable
     data class Tooltip(
-        @Setting
         val line: String = "Attack Speed: <value>",
-        @Setting
         val level: Map<Int, Component> = mapOf(
             0 to Component.text("Very Slow"),
             1 to Component.text("Slow"),

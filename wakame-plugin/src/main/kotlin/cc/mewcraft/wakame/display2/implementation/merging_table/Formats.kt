@@ -13,18 +13,14 @@ import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.Style
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.util.regex.Pattern
 
 
 @ConfigSerializable
 internal data class MergeOutputRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val attributeFormat: AttributeFormat,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()

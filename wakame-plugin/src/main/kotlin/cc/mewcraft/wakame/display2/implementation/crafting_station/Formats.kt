@@ -15,15 +15,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 internal data class FuzzyEnchantmentRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting
-    private val tooltip: String = "<name> <level>",
+    private val tooltip: String,
 ) : RendererFormat.Simple {
     override val id: String = "enchantments"
     override val index: Key = Key.key(namespace, id)
@@ -51,7 +47,6 @@ internal data class FuzzyEnchantmentRendererFormat(
 
 @ConfigSerializable
 internal data class FuzzyPortableCoreRendererFormat(
-    @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Dynamic<PortableCore> {
     override val textMetaFactory = TextMetaFactory()

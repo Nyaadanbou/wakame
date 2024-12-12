@@ -24,8 +24,6 @@ import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
@@ -37,9 +35,8 @@ import xyz.xenondevs.commons.collections.takeUnlessEmpty
  */
 @ConfigSerializable
 internal data class HardcodedRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String, // id 是配置文件指定的
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
@@ -57,11 +54,9 @@ internal data class HardcodedRendererFormat(
  */
 @ConfigSerializable
 internal data class SingleValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: String, // mini message format
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
@@ -95,11 +90,9 @@ internal data class SingleValueRendererFormat(
  */
 @ConfigSerializable
 internal data class ListValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: List<String>, // mini message format,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
@@ -130,11 +123,9 @@ internal data class ListValueRendererFormat(
  */
 @ConfigSerializable
 internal data class AggregateValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: Tooltip, // mini message format
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()
@@ -182,12 +173,9 @@ internal data class AggregateValueRendererFormat(
      */
     @ConfigSerializable
     data class Tooltip(
-        @Setting
-        val single: String = "<single>",
-        @Setting
-        val separator: String = ", ",
-        @Setting
-        val merged: String = "FIXME: <merged>",
+        val single: String,
+        val separator: String,
+        val merged: String,
     )
 
     companion object Shared {
@@ -202,10 +190,8 @@ internal data class AggregateValueRendererFormat(
  */
 @ConfigSerializable
 internal data class ExtraLoreRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting
-    private val tooltip: Tooltip = Tooltip(),
+    private val tooltip: Tooltip,
 ) : RendererFormat.Simple {
     override val id: String = "lore"
     override val index: DerivedIndex = Key.key(namespace, id)
@@ -232,11 +218,8 @@ internal data class ExtraLoreRendererFormat(
      */
     @ConfigSerializable
     data class Tooltip(
-        @Setting
-        val line: String = "<line>",
-        @Setting
+        val line: String,
         val header: List<String> = listOf(),
-        @Setting
         val bottom: List<String> = listOf(),
     )
 
@@ -250,7 +233,6 @@ internal data class ExtraLoreRendererFormat(
  */
 @ConfigSerializable
 internal data class EnchantmentRendererFormat(
-    @Setting @Required
     override val namespace: String,
 ) : RendererFormat.Simple {
     override val id: String = "enchantments"
@@ -307,9 +289,8 @@ data class RarityRendererFormat(
 
 @ConfigSerializable
 internal data class PortableCoreRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
 ) : RendererFormat.Simple {
     override val index: DerivedIndex = createIndex()

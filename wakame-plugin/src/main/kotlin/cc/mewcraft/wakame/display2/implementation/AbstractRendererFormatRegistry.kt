@@ -66,10 +66,11 @@ internal abstract class AbstractRendererFormatRegistry(
         }
         val root = loader.buildAndLoadString(formatPath.readText())
 
+        val relativeTo = formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))
         for ((id, type) in rendererFormatTypeById) {
             val node = root.node(id)
             if (node.virtual()) {
-                logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'")
+                logger.warn("Renderer format '$id' is not found in '$relativeTo'")
             }
             val format = node.krequire<RendererFormat>(type)
 
@@ -78,6 +79,8 @@ internal abstract class AbstractRendererFormatRegistry(
             // create & register the text meta factory
             textMetaFactoryRegistry.registerFactory(format.textMetaFactory, format.textMetaPredicate)
         }
+
+        logger.info("Registered ${textMetaFactoryRegistry.getKnownFactories().size} TextMetaFactory from '$relativeTo'")
 
         // reload all renderer formats of this renderer
         registeredFormatProviders.values.forEach { provider -> provider.update() }

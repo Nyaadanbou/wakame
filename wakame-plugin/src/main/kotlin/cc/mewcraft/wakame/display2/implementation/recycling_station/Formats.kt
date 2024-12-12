@@ -6,18 +6,13 @@ import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
 
 
 @ConfigSerializable
 internal data class SellButtonTitleRendererFormat(
-    @Required
     override val namespace: String,
-    @Required
     val emptyInput: Part,
-    @Required
     val unconfirmed: Part,
-    @Required
     val confirmed: Part,
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_title"
@@ -34,13 +29,9 @@ internal data class SellButtonTitleRendererFormat(
 
 @ConfigSerializable
 internal data class SellButtonUsageRendererFormat(
-    @Required
     override val namespace: String,
-    @Required
     val emptyInput: List<Component>,
-    @Required
     val unconfirmed: List<Component>,
-    @Required
     val confirmed: List<Component>,
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_usage"
@@ -51,11 +42,8 @@ internal data class SellButtonUsageRendererFormat(
 
 @ConfigSerializable
 internal data class SellButtonItemListRendererFormat(
-    @Required
     override val namespace: String,
-    @Required
     val withLevel: String,
-    @Required
     val withoutLevel: String,
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_item_list"
@@ -66,9 +54,7 @@ internal data class SellButtonItemListRendererFormat(
 
 @ConfigSerializable
 internal data class SellButtonTotalWorthRendererFormat(
-    @Required
     override val namespace: String,
-    @Required
     val totalWorth: List<String>,
 ) : RendererFormat.Simple {
     override val id: String = "sell_button_total_worth"

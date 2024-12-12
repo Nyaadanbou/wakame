@@ -20,19 +20,14 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 /**
  * 一个用来渲染 [StandaloneCell] 的 [RendererFormat].
  */
 @ConfigSerializable
 internal data class StandaloneCellRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @Required
     private val historyFormat: List<String>,
-    @Setting @Required
     private val overallOrdinal: List<OrdinalIndex>,
 ) : RendererFormat.Simple {
     override val id: String = "standalone_cell"
@@ -93,11 +88,8 @@ internal data class DifferenceFormat(
     // 我们想让 style 的默认值含义是 [不修改核心原有的样式].
     // 经验证, 不能用 Style.empty(), 因为会清空原有样式.
     // 所以这里用 null 来表示 [不修改核心原有的样式].
-    @Setting
     val style: Style? = null,
-    @Setting
     val prefix: Component = empty(),
-    @Setting
     val suffix: Component = empty(),
 ) {
     fun process(source: List<Component>): List<Component> {

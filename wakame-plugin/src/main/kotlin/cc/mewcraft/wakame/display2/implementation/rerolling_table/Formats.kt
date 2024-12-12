@@ -23,9 +23,7 @@ import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.SkillRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
 
@@ -36,13 +34,9 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 internal data class RerollingDifferenceFormats(
-    @Setting
     val changeable: DifferenceFormat = DifferenceFormat(),
-    @Setting
     val unchangeable: DifferenceFormat = DifferenceFormat(),
-    @Setting
     val selected: DifferenceFormat = DifferenceFormat(),
-    @Setting
     val unselected: DifferenceFormat = DifferenceFormat(),
 ) {
     /**
@@ -76,12 +70,9 @@ internal data class RerollingDifferenceFormats(
 
 @ConfigSerializable
 internal data class CellularAttributeRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @Required
     private val ordinal: AttributeCoreOrdinalFormat,
     @Setting("diff_formats")
-    @Required
     private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
@@ -108,10 +99,8 @@ internal data class CellularAttributeRendererFormat(
 
 @ConfigSerializable
 internal data class CellularSkillRendererFormat(
-    @Setting @Required
     override val namespace: String,
     @Setting("diff_formats")
-    @Required
     private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<SkillCore> {
     override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
@@ -138,12 +127,9 @@ internal data class CellularSkillRendererFormat(
 
 @ConfigSerializable
 internal data class CellularEmptyRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting
-    private val tooltip: List<Component> = listOf(text("Empty Slot")),
+    private val tooltip: List<Component>,
     @Setting("diff_formats")
-    @Required
     private val differenceFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Simple {
     override val id: String = "cells/empty"
