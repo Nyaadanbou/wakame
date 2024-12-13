@@ -81,8 +81,8 @@ internal class SimpleRepairingSession(
         // 清空旧的, 因为背包可能已经发生变化
         claims.clear()
 
-        // 遍历背包, 找出所有需要修复的物品
-        for (itemStack /* mirror */ in inventory.storageContents) {
+        // 遍历背包和盔甲, 找出所有需要修复的物品
+        for (itemStack /* mirror */ in inventory.contents) {
             if (itemStack == null) {
                 continue
             }
