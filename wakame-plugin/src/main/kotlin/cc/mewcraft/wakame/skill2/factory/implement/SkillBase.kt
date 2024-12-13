@@ -15,8 +15,8 @@ import java.util.stream.Stream
  * 包含 [Skill] 共同的实现.
  */
 abstract class SkillBase(
-    override val key: Key,
-    private val config: ConfigurationNode,
+    final override val key: Key,
+    config: ConfigurationNode,
 ) : Skill {
     override val displays: SkillDisplay = config.node("displays").get<SkillDisplay>() ?: SkillDisplay.Companion.empty()
     override val conditions: SkillConditionGroup = config.node("conditions").get<SkillConditionGroup>() ?: SkillConditionGroup.empty()
@@ -24,7 +24,10 @@ abstract class SkillBase(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("key", key)
+            ExaminableProperty.of("key", key),
+            ExaminableProperty.of("displays", displays),
+            ExaminableProperty.of("conditions", conditions),
+            ExaminableProperty.of("triggerHandleData", triggerHandleData),
         )
     }
 

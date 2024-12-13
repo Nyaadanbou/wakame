@@ -43,7 +43,7 @@ interface SkillResult<out S : Skill> : Result {
     /**
      * 一般不会在 [StatePhase.IDLE] 中进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.skill2.state.IdleStateInfo].
      */
-    fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
+    fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
 
     /**
      * 执行此技能施法前摇逻辑.

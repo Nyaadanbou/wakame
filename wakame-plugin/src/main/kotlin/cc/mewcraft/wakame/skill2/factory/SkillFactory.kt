@@ -19,7 +19,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * interface MySkill : Skill {
  *    val myProperty: String
  *
- *    companion object Factory : SkillType<MySkill> {
+ *    companion object Factory : SkillFactory<MySkill> {
  *        override fun create(config: ConfigProvider, key: Key): MySkill {
  *            return DefaultMySkill(config.entry("myProperty"))
  *        }

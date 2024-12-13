@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill2.factory
 
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.skill2.factory.implement.Blink
 import cc.mewcraft.wakame.skill2.factory.implement.Dash
 
 /**
@@ -13,6 +14,7 @@ internal object SkillFactories {
     fun load() {
 //        FACTORIES.register("bloodrage", Bloodrage)
 //        FACTORIES.register("command_execute", CommandExecute)
+        FACTORIES.register("blink", Blink)
         FACTORIES.register("dash", Dash)
 //        FACTORIES.register("fly_dash", FlyDash)
 //        FACTORIES.register("kill_entity", KillEntity)

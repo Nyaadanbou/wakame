@@ -9,16 +9,22 @@ import cc.mewcraft.wakame.skill2.context.SkillContext
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
 import cc.mewcraft.wakame.skill2.result.SkillResult
 import cc.mewcraft.wakame.util.krequire
+import me.lucko.helper.Events
+import me.lucko.helper.event.Subscription
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
+import org.bukkit.event.player.PlayerMoveEvent
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
+/**
+ * 冲刺技能.
+ */
 interface Dash : Skill {
 
     /**
@@ -58,7 +64,7 @@ interface Dash : Skill {
     }
 
     private class Impl(
-        override val key: Key,
+        key: Key,
         config: ConfigurationNode,
         override val stepDistance: Double,
         override val duration: Long,
@@ -84,6 +90,18 @@ private class DashSkillResult(
         private const val STARTING_TICK: Long = 10L
     }
 
+    private lateinit var subscription: Subscription
+
+    override fun onEnable(componentMap: ComponentMap) {
+        subscription = Events.subscribe(PlayerMoveEvent::class.java)
+            .filter { it.hasExplicitlyChangedPosition() }
+            .handler { event -> event.player.sendMessage("PlayerMoveEvent") }
+    }
+
+    override fun onDisable(componentMap: ComponentMap) {
+        subscription.unregister()
+    }
+
     override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         val bukkitEntity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT
 
@@ -106,16 +124,16 @@ private class DashSkillResult(
         val blockInFront = nextLocation.block
         val blockBelow = nextLocation.clone().add(0.0, -1.0, 0.0).block
 
-        if (!blockInFront.isAccessibleForDash()) {
+        if (!blockInFront.isAccessible()) {
             // 如果前方有方块，尝试向上移动一格高度
             val blockAboveFront = nextLocation.clone().add(0.0, 1.0, 0.0).block
-            if (blockAboveFront.isAccessibleForDash() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessibleForDash()) {
+            if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
                 return TickResult.ALL_DONE
             }
         } else {
-            stepVector = if (blockBelow.isAccessibleForDash()) {
+            stepVector = if (blockBelow.isAccessible()) {
                 // 如果脚下没有方块，尝试向下移动一格高度
                 stepVector.setY(-1.0)
             } else {
@@ -154,7 +172,7 @@ private class DashSkillResult(
         return true
     }
 
-    private fun Block.isAccessibleForDash(): Boolean {
+    private fun Block.isAccessible(): Boolean {
         return when {
             this.type == Material.AIR -> true
             this.isReplaceable -> true

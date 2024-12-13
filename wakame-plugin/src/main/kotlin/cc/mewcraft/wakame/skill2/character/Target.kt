@@ -6,12 +6,18 @@ import org.bukkit.entity.Player
 import org.bukkit.Location as BukkitLocation
 
 sealed interface Target {
+
+    val bukkitLocation: BukkitLocation
+
     interface Location : Target {
-        val bukkitLocation: BukkitLocation
+        override val bukkitLocation: BukkitLocation
     }
 
     interface LivingEntity : Target {
         val bukkitEntity: BukkitLivingEntity?
+
+        override val bukkitLocation: BukkitLocation
+            get() = bukkitEntity?.location ?: throw IllegalStateException("Entity is null")
     }
 
     fun <T : Target> value(clazz: Class<T>): T?

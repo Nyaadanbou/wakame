@@ -59,6 +59,8 @@ class WakameWorld(
             add(TickResultSystem())
             add(StatePhaseSystem())
 
+            add(ParticleSystem())
+
             // 将所有标记重置到默认状态, 应当放在末尾.
 
             add(InitSystem())
