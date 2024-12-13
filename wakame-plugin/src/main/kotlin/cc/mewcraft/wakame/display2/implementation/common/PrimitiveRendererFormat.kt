@@ -1,26 +1,22 @@
-package cc.mewcraft.wakame.display2.implementation
+package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.extra.kotlin.join
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.*
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-import org.bukkit.enchantments.Enchantment
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.*
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
-import kotlin.collections.component1
-import kotlin.collections.component2
-
-/* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
+import org.spongepowered.configurate.objectmapping.meta.NodeKey
 
 /**
  * 硬编码的渲染格式.
@@ -29,13 +25,13 @@ import kotlin.collections.component2
  */
 @ConfigSerializable
 internal data class HardcodedRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String, // id 是配置文件指定的
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 }
 
 /**
@@ -48,15 +44,14 @@ internal data class HardcodedRendererFormat(
  */
 @ConfigSerializable
 internal data class SingleValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: String, // mini message format
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip)))
@@ -85,15 +80,14 @@ internal data class SingleValueRendererFormat(
  */
 @ConfigSerializable
 internal data class ListValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: List<String>, // mini message format,
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     fun render(): IndexedText {
         return SimpleIndexedText(index, tooltip.map(MM::deserialize))
@@ -119,15 +113,14 @@ internal data class ListValueRendererFormat(
  */
 @ConfigSerializable
 internal data class AggregateValueRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @NodeKey
+    @NodeKey
     override val id: String,
-    @Setting
     private val tooltip: Tooltip, // mini message format
 ) : RendererFormat.Simple {
-    override val index = createIndex()
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val index: DerivedIndex = createIndex()
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * A convenience function to stylize a list of objects.
@@ -170,84 +163,12 @@ internal data class AggregateValueRendererFormat(
      */
     @ConfigSerializable
     data class Tooltip(
-        @Setting
-        val single: String = "<single>",
-        @Setting
-        val separator: String = ", ",
-        @Setting
-        val merged: String = "FIXME: <merged>",
+        val single: String,
+        val separator: String,
+        val merged: String,
     )
 
     companion object Shared {
         private val MM = Injector.get<MiniMessage>()
-    }
-}
-
-/**
- * 一种专用于额外的物品描述 (lore) 的渲染格式.
- *
- * @param tooltip 内容的格式
- */
-@ConfigSerializable
-internal data class ExtraLoreRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-    @Setting
-    private val tooltip: Tooltip = Tooltip(),
-) : RendererFormat.Simple {
-    override val id = "lore"
-    override val index = Key.key(namespace, id)
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-
-    /**
-     * @param data 额外的物品描述
-     */
-    fun render(data: List<Component>): IndexedText {
-        val size = tooltip.header.size + data.size + tooltip.bottom.size
-        val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
-        lines.addAll(0, header)
-        lines.addAll(bottom)
-        return SimpleIndexedText(index, lines)
-    }
-
-    /**
-     * @param line 每一行内容的格式, 可用的占位符 `<line>`
-     * @param header 描述的头部文本, 没有可用的占位符
-     * @param bottom 描述的底部文本, 没有可用的占位符
-     */
-    @ConfigSerializable
-    data class Tooltip(
-        @Setting
-        val line: String = "<line>",
-        @Setting
-        val header: List<String> = listOf(),
-        @Setting
-        val bottom: List<String> = listOf(),
-    )
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
-}
-
-/**
- * 一种专用于物品魔咒 (enchantments) 的渲染格式.
- */
-@ConfigSerializable
-internal data class EnchantmentRendererFormat(
-    @Setting @Required
-    override val namespace: String,
-) : RendererFormat.Simple {
-    override val id = "enchantments"
-    override val index = Key.key(namespace, id)
-    override val textMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
-
-    /**
-     * @param data 魔咒和等级的映射
-     */
-    fun render(data: Map<Enchantment, Int>): IndexedText {
-        return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level).removeItalic })
     }
 }

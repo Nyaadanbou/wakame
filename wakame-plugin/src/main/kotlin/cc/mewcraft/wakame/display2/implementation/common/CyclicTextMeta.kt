@@ -1,5 +1,4 @@
 // 文件说明:
-//
 // 由于索引相同的 IndexedText 经过 TextAssembler 的处理后会去重,
 // 这里提供了一套通用的实现, 用来循环产生在末尾带有序数的 IndexedText#idx
 // 使得索引不再重复, 最终实现在渲染结果中出现多个相同内容的 IndexedText.
@@ -52,14 +51,10 @@ internal data class CyclicTextMeta(
 }
 
 internal data class CyclicTextMetaFactory(
-    override val namespace: String,
+    private val namespace: String,
     private val id: String,
     private val indexRule: CyclicIndexRule,
 ) : TextMetaFactory {
-    override fun test(sourceIndex: SourceIndex): Boolean {
-        return sourceIndex.namespace() == namespace && sourceIndex.value() == id
-    }
-
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         return CyclicTextMeta(sourceIndex, sourceOrdinal, defaultText, indexRule)
     }
@@ -119,6 +114,7 @@ internal fun interface CyclicIndexRule {
         /**
          * 用 `/` 分割原本的索引, 然后加上循环出现的序号.
          */
+        @JvmField
         val SLASH: CyclicIndexRule = CyclicIndexRule { i, n ->
             Key.key("${i.namespace()}:${i.value()}/$n")
         }

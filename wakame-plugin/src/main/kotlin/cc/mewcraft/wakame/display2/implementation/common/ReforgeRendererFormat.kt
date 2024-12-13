@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.SingleSimpleTextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.util.styleRecursively
 import net.kyori.adventure.extra.kotlin.plus
@@ -20,24 +20,20 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 /**
  * 一个用来渲染 [StandaloneCell] 的 [RendererFormat].
  */
 @ConfigSerializable
 internal data class StandaloneCellRendererFormat(
-    @Setting @Required
     override val namespace: String,
-    @Setting @Required
     private val historyFormat: List<String>,
-    @Setting @Required
     private val overallOrdinal: List<OrdinalIndex>,
 ) : RendererFormat.Simple {
     override val id: String = "standalone_cell"
     override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = SingleSimpleTextMetaFactory(namespace, id)
+    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
     /**
      * @param coreText 核心的文本描述
@@ -88,15 +84,12 @@ internal data class StandaloneCellRendererFormat(
  * @param suffix 应用在核心上的后缀
  */
 @ConfigSerializable
-internal data class DifferenceFormat(
+internal data class ReforgeDifferenceFormat(
     // 我们想让 style 的默认值含义是 [不修改核心原有的样式].
     // 经验证, 不能用 Style.empty(), 因为会清空原有样式.
     // 所以这里用 null 来表示 [不修改核心原有的样式].
-    @Setting
     val style: Style? = null,
-    @Setting
     val prefix: Component = empty(),
-    @Setting
     val suffix: Component = empty(),
 ) {
     fun process(source: List<Component>): List<Component> {

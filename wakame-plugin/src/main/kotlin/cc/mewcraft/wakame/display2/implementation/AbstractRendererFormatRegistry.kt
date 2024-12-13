@@ -1,23 +1,20 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.RendererFormatRegistry
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
-import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
-import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.*
-import org.spongepowered.configurate.util.NamingSchemes
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import java.nio.file.Path
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.reflect.KType
@@ -25,15 +22,15 @@ import kotlin.reflect.typeOf
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormats 实现 */
 
-internal abstract class AbstractRendererFormats(
+internal abstract class AbstractRendererFormatRegistry(
     protected val renderer: AbstractItemRenderer<*, *>,
-) : RendererFormats, KoinComponent {
+) : RendererFormatRegistry, KoinComponent {
     protected val logger = get<Logger>()
 
     /**
      * `配置中的节点路径` -> `typeOf<RendererFormat>`, 用于引导配置文件的序列化.
      *
-     * 该映射在 [RenderingParts.bootstrap] 执行时就已经确定和冻结, 后续禁止更新!
+     * 该映射在 [RenderingHandlerRegistry.bootstrap] 执行时就已经确定和冻结, 后续禁止更新!
      */
     private val rendererFormatTypeById = HashMap<String, KType>()
 
@@ -65,32 +62,25 @@ internal abstract class AbstractRendererFormats(
 
         val loader = yamlConfig {
             withDefaults()
-            serializers {
-                registerAnnotatedObjects(
-                    ObjectMapper.factoryBuilder()
-                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addNodeResolver(NodeResolver.nodeKey())
-                        // .addNodeResolver(NodeResolver.onlyWithSetting())
-                        .addConstraint(Required::class.java, Constraint.required())
-                        .addDiscoverer(dataClassFieldDiscoverer())
-                        .build()
-                )
-            }
+            serializers { registerAnnotatedObjects(ObjectMappers.DEFAULT) }
         }
         val root = loader.buildAndLoadString(formatPath.readText())
 
+        val relativeTo = formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))
         for ((id, type) in rendererFormatTypeById) {
             val node = root.node(id)
             if (node.virtual()) {
-                logger.warn("Renderer format '$id' is not found in '${formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))}'")
+                logger.warn("Renderer format '$id' is not found in '$relativeTo'")
             }
             val format = node.krequire<RendererFormat>(type)
 
             // will overwrite the one already existing
             registeredRendererFormats[id] = format
             // create & register the text meta factory
-            textMetaFactoryRegistry.registerFactory(format.textMetaFactory)
+            textMetaFactoryRegistry.registerFactory(format.textMetaFactory, format.textMetaPredicate)
         }
+
+        logger.info("Registered ${textMetaFactoryRegistry.getKnownFactories().size} TextMetaFactory from '$relativeTo'")
 
         // reload all renderer formats of this renderer
         registeredFormatProviders.values.forEach { provider -> provider.update() }

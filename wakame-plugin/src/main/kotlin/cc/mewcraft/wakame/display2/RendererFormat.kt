@@ -2,19 +2,6 @@ package cc.mewcraft.wakame.display2
 
 import net.kyori.adventure.key.Key
 
-// 开发日记 2024/9/17
-// 读取配置文件时, 应该先读 formats.yml, 再读 layout.yml
-
-/**
- * 封装了一个 [ItemRenderer] 包含的所有渲染格式.
- */
-interface RendererFormats {
-    /**
-     * 获取指定的 [RendererFormat].
-     */
-    fun <T : RendererFormat> get(id: String): T?
-}
-
 /**
  * 代表一种内容的渲染格式.
  *
@@ -37,10 +24,18 @@ interface RendererFormat {
     //  只有在 RendererFormat 创建好之后才能知道. 因此获取 TextMetaFactory
     //  的职责由 RendererFormat 来承担就比较合适了.
 
+    // 开发日记 2024/12/12 小米
+    //  为了更好的将代码模块化, 将 TextMetaFactory 的 create 和 test 分离开来.
+
     /**
-     * 该内容对应的 [TextMetaFactory] 实例.
+     * 该渲染格式对应的 [TextMetaFactory] 实例.
      */
     val textMetaFactory: TextMetaFactory
+
+    /**
+     * 该渲染格式对应的 [TextMetaFactoryPredicate] 实例.
+     */
+    val textMetaPredicate: TextMetaFactoryPredicate
 
     /**
      * 代表一个索引在编译时已经确定的 [RendererFormat].

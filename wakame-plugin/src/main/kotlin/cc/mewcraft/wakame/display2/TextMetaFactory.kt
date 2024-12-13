@@ -1,27 +1,21 @@
 package cc.mewcraft.wakame.display2
 
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
 
-interface TextMetaFactory {
-    /**
-     * [IndexedText] 的命名空间, 由用户提供.
-     */
-    val namespace: String
+/**
+ * 用于创建 [TextMetaFactory] 实例的工厂函数.
+ */
+fun interface TextMetaFactory {
 
-    /**
-     * 检查该工厂是否可以从 [sourceIndex] 创建一个 [SimpleTextMeta].
-     *
-     * @param sourceIndex the source index (without any derivation)
-     * @return `true` if this factory can handle the [sourceIndex]
-     */
-    fun test(sourceIndex: SourceIndex): Boolean
+    companion object {
+        /**
+         * 创建一个 [TextMetaFactory] 实例, 用于创建 [FixedSimpleTextMeta] 实例.
+         */
+        fun fixed(): TextMetaFactory = TextMetaFactory(::FixedSimpleTextMeta)
+    }
 
     /**
-     * 创建一个新的 [SimpleTextMeta], 其命名空间应该与 [namespace] 一致.
+     * 创建一个新的 [SimpleTextMeta], 其命名空间应该与 *预设的* 一致.
      *
      * @param sourceIndex the line identity (without any derivation)
      * @param sourceOrdinal the source ordinal
@@ -34,43 +28,28 @@ interface TextMetaFactory {
 }
 
 /**
- * 该注册表存放了所有已知的 [TextMetaFactory] 实例.
+ * 如果要创建的 [TextMeta] 符合 [FixedSimpleTextMeta] 的描述, 可以使用这个构造函数.
  */
-class TextMetaFactoryRegistry : KoinComponent {
-    private val logger = get<Logger>()
-
-    // namespace -> factory
-    private val factories: MutableSet<TextMetaFactory> = LinkedHashSet()
-
-    /**
-     * 注册一个 [TextMetaFactory]. 多次注册将重复添加.
-     */
-    fun registerFactory(factory: TextMetaFactory) {
-        factories += factory
-        logger.info("Registered TextMetaFactory: {}", factory)
+fun TextMetaFactory(): TextMetaFactory {
+    return TextMetaFactory { sourceIndex, sourceOrdinal, defaultText ->
+        FixedSimpleTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
+}
 
-    /**
-     * 获取一个适用于 [identity] 的 [TextMetaFactory].
-     *
-     * @param identity 配置文件中的原始字符串, 未经任何修改
-     * @return 返回一个合适的 [TextMetaFactory]
-     */
-    fun getApplicableFactory(identity: Key): TextMetaFactory? {
-        return factories.firstOrNull { factory -> factory.test(identity) }
-    }
+/**
+ * 用来描述不会衍生并且只有一个 [SourceIndex] 的 [IndexedText].
+ *
+ * 例如: 标准渲染器中的 `lore`, `level`, `enchantment` 等.
+ * 与之相反的是那些会衍生的 [IndexedText], 例如 `attribute`.
+ */
+private data class FixedSimpleTextMeta(
+    override val sourceIndex: SourceIndex,
+    override val sourceOrdinal: SourceOrdinal,
+    override val defaultText: List<Component>?,
+) : SimpleTextMeta {
+    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
 
-    /**
-     * 返回所有已知的 [TextMetaFactory].
-     */
-    fun getKnownFactories(): Set<TextMetaFactory> {
-        return factories // namespace -> factory
-    }
-
-    /**
-     * 清空所有已知的 [TextMetaFactory].
-     */
-    fun reset() {
-        factories.clear()
+    override fun deriveIndexes(): List<DerivedIndex> {
+        return listOf(sourceIndex)
     }
 }

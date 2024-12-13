@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.display2.implementation.simple
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormats
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
 import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.RenderingPart
-import cc.mewcraft.wakame.display2.implementation.RenderingParts
-import cc.mewcraft.wakame.display2.implementation.SingleValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingParts
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
+import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
@@ -20,19 +20,20 @@ import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
-internal class SimpleItemRendererFormats : AbstractRendererFormats(SimpleItemRenderer)
+internal class SimpleRendererFormatRegistry : AbstractRendererFormatRegistry(SimpleItemRenderer)
+
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-internal class SimpleItemRendererContext
+internal data object SimpleItemRendererContext
 
 internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
-    override val formats: AbstractRendererFormats = SimpleItemRendererFormats()
+    override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()
     private val textAssembler = TextAssembler(layout)
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
-        SimpleItemRendererParts.bootstrap()
+        SimpleRenderingHandlerRegistry.bootstrap()
         formats.initialize(formatPath)
         layout.initialize(layoutPath)
     }
@@ -45,9 +46,9 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> SimpleItemRendererParts.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> SimpleItemRendererParts.ITEM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.LORE) { data -> SimpleItemRendererParts.LORE.process(collector, data) }
+        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> SimpleRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        templates.process(ItemTemplateTypes.LORE) { data -> SimpleRenderingHandlerRegistry.LORE.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
         val itemCmd = ItemModelDataLookup[item.id, item.variant]
@@ -60,14 +61,14 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
     }
 }
 
-internal object SimpleItemRendererParts : RenderingParts(SimpleItemRenderer) {
+internal object SimpleRenderingHandlerRegistry : RenderingHandlerRegistry(SimpleItemRenderer) {
     @JvmField
-    val CUSTOM_NAME: RenderingPart<CustomName, SingleValueRendererFormat> = CommonRenderingParts.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ITEM_NAME: RenderingPart<ItemName, SingleValueRendererFormat> = CommonRenderingParts.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val LORE: RenderingPart<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingParts.LORE(this)
+    val LORE: RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingHandlers.LORE(this)
 }
 

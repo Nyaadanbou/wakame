@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 /**
  * 用于生成 [AttributeCore] 的 [DerivedIndex].
@@ -33,8 +31,6 @@ internal fun AttributeCore.computeIndex(namespace: String): DerivedIndex {
  */
 @ConfigSerializable
 internal data class AttributeCoreOrdinalFormat(
-    @Setting @Required
     val element: List<String>,
-    @Setting @Required
     val operation: List<String>,
 )
