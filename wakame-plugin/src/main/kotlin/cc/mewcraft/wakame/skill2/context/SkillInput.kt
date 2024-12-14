@@ -29,9 +29,9 @@ import java.util.stream.Stream
 /**
  * 一次技能执行的上下文.
  */
-interface SkillContext {
+interface SkillInput {
     /**
-     * 执行此 [cc.mewcraft.wakame.skill2.context.SkillContext] 的技能.
+     * 执行此 [cc.mewcraft.wakame.skill2.context.SkillInput] 的技能.
      */
     val skill: Skill
 
@@ -70,24 +70,24 @@ interface SkillContext {
      */
     val mochaEngine: MochaEngine<*>
 
-    fun toBuilder(): SkillContextDSL
+    fun toBuilder(): SkillInputDSL
 }
 
 /* DSL */
 
 @DslMarker
-annotation class SkillContextMarker
+annotation class SkillInputMarker
 
-fun skillContext(skill: Skill, caster: Caster, initializer: SkillContextDSL.() -> Unit): SkillContext {
-    return SkillContextDSL(skill, caster).apply(initializer).build()
+fun skillInput(skill: Skill, caster: Caster, initializer: SkillInputDSL.() -> Unit): SkillInput {
+    return SkillInputDSL(skill, caster).apply(initializer).build()
 }
 
-fun skillContext(componentMap: ComponentMap): SkillContext {
-    return ComponentMapSkillContext(componentMap)
+fun skillInput(componentMap: ComponentMap): SkillInput {
+    return ComponentMapSkillInput(componentMap)
 }
 
-@SkillContextMarker
-class SkillContextDSL(
+@SkillInputMarker
+class SkillInputDSL(
     private val skill: Skill,
     private val caster: Caster,
 ) {
@@ -103,7 +103,7 @@ class SkillContextDSL(
     fun castItem(castItem: NekoStack?) = apply { this.castItem = castItem }
     fun mochaEngine(mochaEngine: MochaEngine<*>) = apply { this.mochaEngine = mochaEngine }
 
-    fun build(): SkillContext = SimpleSkillContext(
+    fun build(): SkillInput = SimpleSkillInput(
         skill = skill,
         caster = caster,
         cooldown = cooldown,
@@ -116,7 +116,7 @@ class SkillContextDSL(
 
 /* Implementations */
 
-private class SimpleSkillContext(
+private class SimpleSkillInput(
     override val skill: Skill,
     override val caster: Caster,
     override val cooldown: Cooldown,
@@ -124,7 +124,7 @@ private class SimpleSkillContext(
     override val target: Target?,
     override val castItem: NekoStack?,
     override val mochaEngine: MochaEngine<*>,
-) : SkillContext, Examinable {
+) : SkillInput, Examinable {
 
     /**
      * 如果 [caster] 可以转变成一个 [User], 则返回它的 [User] 实例.
@@ -132,8 +132,8 @@ private class SimpleSkillContext(
     override val user: User<*>?
         get() = caster.player?.toUser()
 
-    override fun toBuilder(): SkillContextDSL {
-        return SkillContextDSL(skill, caster)
+    override fun toBuilder(): SkillInputDSL {
+        return SkillInputDSL(skill, caster)
             .cooldown(cooldown)
             .trigger(trigger)
             .target(target)
@@ -156,9 +156,9 @@ private class SimpleSkillContext(
     }
 }
 
-private class ComponentMapSkillContext(
+private class ComponentMapSkillInput(
     private val componentMap: ComponentMap
-) : SkillContext, Examinable {
+) : SkillInput, Examinable {
     override val skill: Skill
         get() = requireNotNull(componentMap[IdentifierComponent]?.id?. let { SkillRegistry.INSTANCES[Key(it)] }) { "Skill not found in componentMap" }
     override val caster: Caster
@@ -176,8 +176,8 @@ private class ComponentMapSkillContext(
     override val mochaEngine: MochaEngine<*>
         get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
-    override fun toBuilder(): SkillContextDSL {
-        return SkillContextDSL(skill, caster)
+    override fun toBuilder(): SkillInputDSL {
+        return SkillInputDSL(skill, caster)
             .cooldown(cooldown)
             .trigger(trigger)
             .target(target)

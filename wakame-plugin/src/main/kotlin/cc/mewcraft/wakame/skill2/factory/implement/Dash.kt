@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillProvider
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
 import cc.mewcraft.wakame.skill2.result.SkillResult
 import cc.mewcraft.wakame.util.krequire
@@ -72,14 +72,14 @@ interface Dash : Skill {
         override val hitEffects: List<SkillProvider>,
         override val hitInterval: Long,
     ) : Dash, SkillBase(key, config) {
-        override fun result(context: SkillContext): SkillResult<Dash> {
+        override fun result(context: SkillInput): SkillResult<Dash> {
             return DashSkillResult(context, this)
         }
     }
 }
 
 private class DashSkillResult(
-    override val context: SkillContext,
+    override val context: SkillInput,
     private val skill: Dash,
 ) : SkillResult<Dash> {
 

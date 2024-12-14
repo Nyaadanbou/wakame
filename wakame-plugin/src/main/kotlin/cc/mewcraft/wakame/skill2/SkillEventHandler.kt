@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.state.SkillStateResult
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
@@ -80,7 +80,7 @@ internal class SkillEventHandler (
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 for (skill in skills.values()) {
-                    val context = skillContext(skill, CasterAdapter.adapt(projectile)) {
+                    val context = skillInput(skill, CasterAdapter.adapt(projectile)) {
                         target(target)
                         castItem(nekoStack)
                     }

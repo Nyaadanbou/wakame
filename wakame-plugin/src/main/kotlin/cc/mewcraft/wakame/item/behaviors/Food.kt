@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -32,7 +32,7 @@ interface Food : ItemBehavior {
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
 
             for (skill in skills) {
-                val context = skillContext(skill, CasterAdapter.adapt(player)) {
+                val context = skillInput(skill, CasterAdapter.adapt(player)) {
                     target(TargetAdapter.adapt(player))
                     castItem(nekoStack)
                 }

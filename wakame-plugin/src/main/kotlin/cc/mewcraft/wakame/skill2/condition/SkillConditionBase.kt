@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2.condition
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.config.PatchedConfigurationNode
 import cc.mewcraft.wakame.skill2.SkillSupport
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.util.krequire
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -34,7 +34,7 @@ abstract class SkillConditionBase(
         /**
          * 发送条件满足时的消息提示.
          */
-        fun notifySuccess(context: SkillContext) {
+        fun notifySuccess(context: SkillInput) {
             val caster = context.caster
             successMessage.send(caster.entity)
         }
@@ -42,7 +42,7 @@ abstract class SkillConditionBase(
         /**
          * 发送条件不满足时的消息提示.
          */
-        fun notifyFailure(context: SkillContext) {
+        fun notifyFailure(context: SkillInput) {
             val caster = context.caster
             failureMessage.send(caster.entity)
         }

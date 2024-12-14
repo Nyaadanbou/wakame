@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2.condition
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -34,7 +34,7 @@ interface MoLangExpression : SkillCondition {
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.evaluable.evaluate(MoLangSupport.createEngine()))) // TODO: Support MoLang tag resolver
 
         override fun newSession(componentMap: ComponentMap): SkillConditionSession {
-            val context = skillContext(componentMap)
+            val context = skillInput(componentMap)
             val engine = context.mochaEngine
             val isSuccess = evaluable.evaluate(engine) != .0
             return SessionImpl(isSuccess)
@@ -46,7 +46,7 @@ interface MoLangExpression : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 // 用预设的实现发消息
                 notification.notifySuccess(context)
 
@@ -55,7 +55,7 @@ interface MoLangExpression : SkillCondition {
             }
 
             override fun onFailure(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 // 用预设的实现发消息
                 notification.notifyFailure(context)
 

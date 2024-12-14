@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.state.exception.IllegalSkillStateException
 import kotlin.reflect.full.isSubclassOf
@@ -18,7 +18,7 @@ interface SkillResult<out S : Skill> : Result {
     /**
      * 产生此结果的技能上下文.
      */
-    val context: SkillContext
+    val context: SkillInput
 
     override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
@@ -71,5 +71,5 @@ fun SkillResult(): SkillResult<Skill> {
 }
 
 private data object EmptySkillResult : SkillResult<Skill> {
-    override val context: SkillContext = throw UnsupportedOperationException("Empty SkillResult doesn't have context")
+    override val context: SkillInput = throw UnsupportedOperationException("Empty SkillResult doesn't have context")
 }

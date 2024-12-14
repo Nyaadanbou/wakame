@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
 import cc.mewcraft.wakame.skill2.result.SkillResult
 import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
@@ -58,7 +58,7 @@ interface Skill : Keyed, Examinable {
      *
      * @see cc.mewcraft.wakame.skill2.result.SkillResult
      */
-    fun result(context: SkillContext): SkillResult<Skill>
+    fun result(context: SkillInput): SkillResult<Skill>
 
     companion object {
         /**
@@ -73,7 +73,7 @@ private data object EmptySkill : Skill {
     override val displays: SkillDisplay = SkillDisplay.empty()
     override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
     override val triggerHandleData: TriggerHandleData = TriggerHandleData()
-    override fun result(context: SkillContext): SkillResult<Skill> = SkillResult()
+    override fun result(context: SkillInput): SkillResult<Skill> = SkillResult()
 }
 
 internal object SkillSerializer : ScalarSerializer<SkillProvider>(typeTokenOf()) {

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.skill2.condition
 
 import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.skill2.context.SkillContext
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 
 /**

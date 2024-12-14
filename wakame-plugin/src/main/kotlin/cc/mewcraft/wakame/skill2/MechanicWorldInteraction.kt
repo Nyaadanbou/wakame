@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Entity
@@ -18,7 +18,7 @@ internal class MechanicWorldInteraction(
     /**
      * 添加一个 [Skill] 状态.
      */
-    fun addMechanic(context: SkillContext) {
+    fun addMechanic(context: SkillInput) {
         world.createEntity(context.skill.key.asString()) {
             it += CooldownComponent(context.cooldown)
             it += EntityType.MECHANIC

@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.skill2.character
 
-import cc.mewcraft.wakame.skill2.context.SkillContext
+import cc.mewcraft.wakame.skill2.context.SkillInput
 
 object TargetUtil {
-    fun getEntity(context: SkillContext, casterWhenNull: Boolean = false): Target.LivingEntity? {
+    fun getEntity(context: SkillInput, casterWhenNull: Boolean = false): Target.LivingEntity? {
         return when (val target = context.target) {
             is Target.LivingEntity -> {
                 val casterEntity = context.caster.entity
@@ -19,7 +19,7 @@ object TargetUtil {
         }
     }
 
-    fun getLocation(context: SkillContext, casterWhenNull: Boolean = false): Target.Location? {
+    fun getLocation(context: SkillInput, casterWhenNull: Boolean = false): Target.Location? {
         return when (val target = context.target) {
             is Target.Location -> target
             is Target.LivingEntity -> {

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import com.google.common.collect.Multimap
@@ -147,7 +147,7 @@ private class PlayerSkillMap(
     }
 
     private fun recordSkill(skill: Skill, trigger: Trigger) {
-        val context = skillContext(skill, CasterAdapter.adapt(user)) {
+        val context = skillInput(skill, CasterAdapter.adapt(user)) {
             trigger(trigger)
         }
         mechanicWorldInteraction.addMechanic(context)

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2.condition
 
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.inventory.meta.Damageable
@@ -32,7 +32,7 @@ interface VanillaDurability : SkillCondition {
         override val resolver: TagResolver = TagResolver.empty()
 
         override fun newSession(componentMap: ComponentMap): SkillConditionSession {
-            val context = skillContext(componentMap)
+            val context = skillInput(componentMap)
             val itemStack = context.castItem?.itemStack ?: return SkillConditionSession.alwaysFailure()
             val itemMeta = itemStack.itemMeta as? Damageable ?: return SkillConditionSession.alwaysFailure()
             val engine = context.mochaEngine
@@ -46,12 +46,12 @@ interface VanillaDurability : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 notification.notifySuccess(context)
             }
 
             override fun onFailure(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 notification.notifyFailure(context)
             }
         }

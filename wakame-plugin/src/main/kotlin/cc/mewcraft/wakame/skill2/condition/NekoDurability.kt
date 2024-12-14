@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.skill2.condition
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toStableInt
 import net.kyori.adventure.text.Component
@@ -35,7 +35,7 @@ internal interface NekoDurability : SkillCondition {
         override val resolver: TagResolver = Placeholder.component(this.type, Component.text(this.durability.evaluate()))
 
         override fun newSession(componentMap: ComponentMap): SkillConditionSession {
-            val context = skillContext(componentMap)
+            val context = skillInput(componentMap)
             val nekoStack = context.castItem ?: return SkillConditionSession.alwaysFailure()
             if (!nekoStack.isDamageable) return SkillConditionSession.alwaysFailure()
             val maxDamage = nekoStack.maxDamage
@@ -52,7 +52,7 @@ internal interface NekoDurability : SkillCondition {
             private val notification: Notification = Notification()
 
             override fun onSuccess(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 val nekoStack = context.castItem ?: return
                 if (!nekoStack.isDamageable) return
                 val damage = nekoStack.damage
@@ -63,7 +63,7 @@ internal interface NekoDurability : SkillCondition {
             }
 
             override fun onFailure(componentMap: ComponentMap) {
-                val context = skillContext(componentMap)
+                val context = skillInput(componentMap)
                 notification.notifyFailure(context)
             }
         }

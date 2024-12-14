@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.context.skillContext
+import cc.mewcraft.wakame.skill2.context.skillInput
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.LivingEntity
@@ -67,7 +67,7 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    val context = skillContext(skill, CasterAdapter.adapt(casterPlayer)) {
+                    val context = skillInput(skill, CasterAdapter.adapt(casterPlayer)) {
                         target(target)
                     }
                     mechanicWorldInteraction.addMechanic(context)
