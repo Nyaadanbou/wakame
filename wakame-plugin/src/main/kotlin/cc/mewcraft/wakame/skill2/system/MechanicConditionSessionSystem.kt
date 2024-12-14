@@ -12,7 +12,7 @@ import com.github.quillraven.fleks.World.Companion.inject
 class MechanicConditionSessionSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
-    family = family { all(MechanicSessionComponent, EntityType.MECHANIC) }
+    family = family { all(MechanicSessionComponent, EntityType.SKILL) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val session = entity[MechanicSessionComponent].session

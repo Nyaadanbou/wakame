@@ -14,7 +14,7 @@ import me.lucko.helper.metadata.MetadataKey
 class MechanicBukkitEntityMetadataSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
-    family = family { all(CasterComponent, EntityType.MECHANIC) }
+    family = family { all(CasterComponent, EntityType.SKILL) }
 ) {
     companion object {
         val COMPONENT_MAP_KEY: MetadataKey<ComponentMap> = MetadataKey.create("mechanic_component_map", ComponentMap::class.java)

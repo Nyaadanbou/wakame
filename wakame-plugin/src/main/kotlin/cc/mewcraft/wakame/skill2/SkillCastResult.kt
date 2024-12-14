@@ -1,22 +1,22 @@
 package cc.mewcraft.wakame.skill2
 
-import cc.mewcraft.wakame.skill2.result.SkillResult
+import cc.mewcraft.wakame.skill2.result.SkillMechanic
 import net.kyori.adventure.translation.Translatable
 
 interface SkillPrepareCastResult {
-    val skillResult: SkillResult<*>
+    val skillMechanic: SkillMechanic<*>
 
     fun isSuccessful(): Boolean
 
     companion object {
-        fun success(skillResult: SkillResult<*>): SkillPrepareCastResult {
+        fun success(skillResult: SkillMechanic<*>): SkillPrepareCastResult {
             return SuccessSkillPrepareCastResult(skillResult)
         }
     }
 }
 
 private data class SuccessSkillPrepareCastResult(
-    override val skillResult: SkillResult<*>
+    override val skillMechanic: SkillMechanic<*>
 ) : SkillPrepareCastResult {
 
     override fun isSuccessful(): Boolean {
@@ -32,7 +32,7 @@ enum class FailureSkillPrepareCastResult(
     UNKNOWN_FAILURE("skill.result.unknown_failure"),
     ;
 
-    override val skillResult: SkillResult<*> = SkillResult()
+    override val skillMechanic: SkillMechanic<*> = SkillMechanic()
 
     override fun translationKey(): String = translateKey
 

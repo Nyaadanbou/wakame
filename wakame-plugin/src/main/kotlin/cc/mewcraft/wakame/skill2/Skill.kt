@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
-import cc.mewcraft.wakame.skill2.result.SkillResult
+import cc.mewcraft.wakame.skill2.result.SkillMechanic
 import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -54,11 +54,11 @@ interface Skill : Keyed, Examinable {
     val displays: SkillDisplay
 
     /**
-     * 返回一个技能执行的结果, 只有执行 [cc.mewcraft.wakame.skill2.result.SkillResult] 才会真正执行技能逻辑.
+     * 返回一个技能执行的结果, 只有执行 [cc.mewcraft.wakame.skill2.result.SkillMechanic] 才会真正执行技能逻辑.
      *
-     * @see cc.mewcraft.wakame.skill2.result.SkillResult
+     * @see cc.mewcraft.wakame.skill2.result.SkillMechanic
      */
-    fun result(context: SkillInput): SkillResult<Skill>
+    fun mechanic(input: SkillInput): SkillMechanic<Skill>
 
     companion object {
         /**
@@ -73,7 +73,7 @@ private data object EmptySkill : Skill {
     override val displays: SkillDisplay = SkillDisplay.empty()
     override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
     override val triggerHandleData: TriggerHandleData = TriggerHandleData()
-    override fun result(context: SkillInput): SkillResult<Skill> = SkillResult()
+    override fun mechanic(input: SkillInput): SkillMechanic<Skill> = SkillMechanic()
 }
 
 internal object SkillSerializer : ScalarSerializer<SkillProvider>(typeTokenOf()) {

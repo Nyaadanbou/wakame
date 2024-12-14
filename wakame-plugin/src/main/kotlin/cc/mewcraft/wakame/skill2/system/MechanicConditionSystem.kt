@@ -18,7 +18,7 @@ import com.github.quillraven.fleks.World.Companion.inject
 class MechanicConditionSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
-    family = family { all(IdentifierComponent, CasterComponent, StatePhaseComponent, EntityType.MECHANIC) }
+    family = family { all(IdentifierComponent, CasterComponent, StatePhaseComponent, EntityType.SKILL) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val skill = SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)]

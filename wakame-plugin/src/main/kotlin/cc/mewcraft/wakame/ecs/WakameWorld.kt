@@ -55,7 +55,7 @@ class WakameWorld(
             // 根据标记与组件进行交互的系统
 
             add(TickCountSystem())
-            add(ResultSystem())
+            add(MechanicSystem())
             add(TickResultSystem())
             add(StatePhaseSystem())
 

@@ -10,7 +10,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import net.kyori.adventure.text.Component
 
 class MechanicCooldownSystem : IteratingSystem(
-    family = family { all(CooldownComponent, EntityType.MECHANIC) }
+    family = family { all(CooldownComponent, EntityType.SKILL) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val cooldown = entity[CooldownComponent].cooldown

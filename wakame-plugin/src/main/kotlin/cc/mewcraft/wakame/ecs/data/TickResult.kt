@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ecs.data
 
 /**
- * 代表 [cc.mewcraft.wakame.ecs.Result] 的执行结果.
+ * 代表 [cc.mewcraft.wakame.ecs.Mechanic] 的执行结果.
  */
 enum class TickResult {
     /**

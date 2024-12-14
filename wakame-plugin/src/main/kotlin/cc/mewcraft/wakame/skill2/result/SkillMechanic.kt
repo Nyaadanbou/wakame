@@ -1,25 +1,18 @@
 package cc.mewcraft.wakame.skill2.result
 
-import cc.mewcraft.wakame.ecs.Result
+import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
-import cc.mewcraft.wakame.skill2.context.SkillInput
-import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.state.exception.IllegalSkillStateException
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.superclasses
 
 /**
  * 代表了一个技能执行的结果.
  */
-interface SkillResult<out S : Skill> : Result {
-    /**
-     * 产生此结果的技能上下文.
-     */
-    val context: SkillInput
-
+interface SkillMechanic<out S : Skill> : Mechanic {
     override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
             val state = componentMap[StatePhaseComponent]
@@ -34,8 +27,7 @@ interface SkillResult<out S : Skill> : Result {
                 StatePhase.BACKSWING -> tickBackswing(deltaTime, tickCount, componentMap)
             }
         } catch (t: Throwable) {
-            val skillKClass = context.skill::class
-            val skillName = skillKClass.superclasses.first { it.isSubclassOf(Skill::class) }.simpleName ?: skillKClass.simpleName
+            val skillName = componentMap[IdentifierComponent]?.id ?: "未知技能"
             throw IllegalSkillStateException("在执行 $skillName 技能时发生了异常", t)
         }
     }
@@ -66,10 +58,8 @@ interface SkillResult<out S : Skill> : Result {
     fun isEmpty(): Boolean = true
 }
 
-fun SkillResult(): SkillResult<Skill> {
-    return EmptySkillResult
+fun SkillMechanic(): SkillMechanic<Skill> {
+    return EmptySkillMechanic
 }
 
-private data object EmptySkillResult : SkillResult<Skill> {
-    override val context: SkillInput = throw UnsupportedOperationException("Empty SkillResult doesn't have context")
-}
+private data object EmptySkillMechanic : SkillMechanic<Skill>

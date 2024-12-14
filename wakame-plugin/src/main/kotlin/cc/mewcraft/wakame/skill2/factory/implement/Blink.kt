@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
-import cc.mewcraft.wakame.skill2.result.SkillResult
+import cc.mewcraft.wakame.skill2.result.SkillMechanic
 import cc.mewcraft.wakame.util.krequire
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.entity.TeleportFlag
@@ -52,23 +52,33 @@ interface Blink : Skill {
         override val distance: Int,
         override val teleportedMessages: AudienceMessageGroup,
     ) : Blink, SkillBase(key, config) {
-        override fun result(context: SkillInput): SkillResult<Skill> {
-            return BlinkSkillResult(context, distance, teleportedMessages)
+        override fun mechanic(input: SkillInput): SkillMechanic<Skill> {
+            return BlinkSkillMechanic(distance, teleportedMessages)
         }
     }
 }
 
-private class BlinkSkillResult(
-    override val context: SkillInput,
+private class BlinkSkillMechanic(
     val distance: Int,
     val teleportedMessages: AudienceMessageGroup,
-) : SkillResult<Blink> {
+) : SkillMechanic<Blink> {
 
     private var isTeleported: Boolean = false
+
+    override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+        isTeleported = false
+        return TickResult.CONTINUE_TICK
+    }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         val entity = componentMap[CasterComponent]?.entity as? LivingEntity ?: return TickResult.INTERRUPT // 无效生物
         val location = entity.location.clone()
+
+        // 如果玩家面前方块过近, 无法传送
+        if (entity.getTargetBlockExact(3) != null) {
+            entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
+            return TickResult.ALL_DONE
+        }
 
         // 计算目标位置
         val target = location.clone()

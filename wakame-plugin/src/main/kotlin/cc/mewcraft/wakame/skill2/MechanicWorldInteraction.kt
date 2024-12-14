@@ -21,11 +21,11 @@ internal class MechanicWorldInteraction(
     fun addMechanic(context: SkillInput) {
         world.createEntity(context.skill.key.asString()) {
             it += CooldownComponent(context.cooldown)
-            it += EntityType.MECHANIC
+            it += EntityType.SKILL
             it += CasterComponent(context.caster)
             context.target?.let { target -> it += TargetComponent(target) }
             context.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
-            it += ResultComponent(context.skill.result(context))
+            it += MechanicComponent(context.skill.mechanic(context))
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
             it += TriggerComponent(context.trigger)
