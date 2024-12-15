@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.SkillParser
-import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
@@ -23,13 +22,9 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import kotlin.jvm.optionals.getOrNull
 
-object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
-    private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
-
+object SkillCommands : CommandFactory<CommandSender> {
     private const val SKILL_LITERAL = "skill"
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
@@ -67,10 +62,10 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    val context = skillInput(skill, CasterAdapter.adapt(casterPlayer)) {
+                    val input = skillInput(CasterAdapter.adapt(casterPlayer)) {
                         target(target)
                     }
-                    mechanicWorldInteraction.addMechanic(context)
+                    skill.cast(input)
                 }
             }.buildAndAdd(this)
         }

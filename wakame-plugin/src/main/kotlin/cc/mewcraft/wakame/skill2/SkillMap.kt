@@ -95,7 +95,7 @@ private class PlayerSkillMap(
     private val user: User<Player>,
 ) : SkillMap {
     companion object : KoinComponent {
-        private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
+        private val skillWorldInteraction: SkillWorldInteraction by inject()
     }
 
     override fun addSkill(skill: ConfiguredSkill) {
@@ -117,25 +117,25 @@ private class PlayerSkillMap(
     }
 
     override fun getSkill(trigger: Trigger): Collection<Skill> {
-        return mechanicWorldInteraction.getMechanicsBy(trigger)
+        return skillWorldInteraction.getMechanicsBy(trigger)
     }
 
     override fun removeSkill(key: Key) {
-        mechanicWorldInteraction.interruptMechanicBy(key.asString())
+        skillWorldInteraction.interruptMechanicBy(key.asString())
     }
 
     override fun removeSkill(skill: Skill) {
-        mechanicWorldInteraction.interruptMechanicBy(skill.key.asString())
+        skillWorldInteraction.interruptMechanicBy(skill.key.asString())
     }
 
     override fun removeSkill(skills: Multimap<Trigger, Skill>) {
         for ((trigger, skill) in skills.entries()) {
-            mechanicWorldInteraction.interruptMechanicBy(trigger, skill)
+            skillWorldInteraction.interruptMechanicBy(trigger, skill)
         }
     }
 
     override fun getTriggers(): Set<Trigger> {
-        return mechanicWorldInteraction.getAllActiveMechanicTriggers(user.player)
+        return skillWorldInteraction.getAllActiveMechanicTriggers(user.player)
     }
 
     override fun hasTriggerType(clazz: Class<out Trigger>): Boolean {
@@ -143,14 +143,14 @@ private class PlayerSkillMap(
     }
 
     override fun cleanup() {
-        mechanicWorldInteraction.interruptMechanicBy(user.player)
+        skillWorldInteraction.interruptMechanicBy(user.player)
     }
 
     private fun recordSkill(skill: Skill, trigger: Trigger) {
-        val context = skillInput(skill, CasterAdapter.adapt(user)) {
+        val input = skillInput(CasterAdapter.adapt(user)) {
             trigger(trigger)
         }
-        mechanicWorldInteraction.addMechanic(context)
+        skill.cast(input)
     }
 
     private fun getSkillByKey(key: Key): Skill {

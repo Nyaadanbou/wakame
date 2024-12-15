@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.skill2.context
 
 import cc.mewcraft.wakame.ecs.component.CasterComponent
 import cc.mewcraft.wakame.ecs.component.CooldownComponent
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
 import cc.mewcraft.wakame.ecs.component.NekoStackComponent
 import cc.mewcraft.wakame.ecs.component.TargetComponent
@@ -11,15 +10,12 @@ import cc.mewcraft.wakame.ecs.data.Cooldown
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.MoLangSupport
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.Caster
 import cc.mewcraft.wakame.skill2.character.Target
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -30,10 +26,6 @@ import java.util.stream.Stream
  * 一次技能执行的上下文.
  */
 interface SkillInput {
-    /**
-     * 执行此 [cc.mewcraft.wakame.skill2.context.SkillInput] 的技能.
-     */
-    val skill: Skill
 
     /**
      * 这次技能的施法者 [Caster].
@@ -41,7 +33,7 @@ interface SkillInput {
     val caster: Caster
 
     /**
-     * [skill] 的初始冷却时间.
+     * [cc.mewcraft.wakame.skill2.Skill] 的初始冷却时间.
      */
     val cooldown: Cooldown
 
@@ -78,8 +70,8 @@ interface SkillInput {
 @DslMarker
 annotation class SkillInputMarker
 
-fun skillInput(skill: Skill, caster: Caster, initializer: SkillInputDSL.() -> Unit): SkillInput {
-    return SkillInputDSL(skill, caster).apply(initializer).build()
+fun skillInput(caster: Caster, initializer: SkillInputDSL.() -> Unit): SkillInput {
+    return SkillInputDSL(caster).apply(initializer).build()
 }
 
 fun skillInput(componentMap: ComponentMap): SkillInput {
@@ -88,7 +80,6 @@ fun skillInput(componentMap: ComponentMap): SkillInput {
 
 @SkillInputMarker
 class SkillInputDSL(
-    private val skill: Skill,
     private val caster: Caster,
 ) {
     private var cooldown: Cooldown = Cooldown(0f)
@@ -104,7 +95,6 @@ class SkillInputDSL(
     fun mochaEngine(mochaEngine: MochaEngine<*>) = apply { this.mochaEngine = mochaEngine }
 
     fun build(): SkillInput = SimpleSkillInput(
-        skill = skill,
         caster = caster,
         cooldown = cooldown,
         trigger = trigger,
@@ -117,7 +107,6 @@ class SkillInputDSL(
 /* Implementations */
 
 private class SimpleSkillInput(
-    override val skill: Skill,
     override val caster: Caster,
     override val cooldown: Cooldown,
     override val trigger: Trigger,
@@ -133,7 +122,7 @@ private class SimpleSkillInput(
         get() = caster.player?.toUser()
 
     override fun toBuilder(): SkillInputDSL {
-        return SkillInputDSL(skill, caster)
+        return SkillInputDSL(caster)
             .cooldown(cooldown)
             .trigger(trigger)
             .target(target)
@@ -148,7 +137,6 @@ private class SimpleSkillInput(
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("castItem", castItem),
         ExaminableProperty.of("mochaEngine", mochaEngine),
-        ExaminableProperty.of("skill", skill),
     )
 
     override fun toString(): String {
@@ -159,8 +147,6 @@ private class SimpleSkillInput(
 private class ComponentMapSkillInput(
     private val componentMap: ComponentMap
 ) : SkillInput, Examinable {
-    override val skill: Skill
-        get() = requireNotNull(componentMap[IdentifierComponent]?.id?. let { SkillRegistry.INSTANCES[Key(it)] }) { "Skill not found in componentMap" }
     override val caster: Caster
         get() = requireNotNull(componentMap[CasterComponent]?.caster) { "Caster not found in componentMap" }
     override val cooldown: Cooldown
@@ -177,7 +163,7 @@ private class ComponentMapSkillInput(
         get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
     override fun toBuilder(): SkillInputDSL {
-        return SkillInputDSL(skill, caster)
+        return SkillInputDSL(caster)
             .cooldown(cooldown)
             .trigger(trigger)
             .target(target)
@@ -186,7 +172,6 @@ private class ComponentMapSkillInput(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("skill", skill),
         ExaminableProperty.of("caster", caster),
         ExaminableProperty.of("cooldown", cooldown),
         ExaminableProperty.of("trigger", trigger),

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2.state
 
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
-import cc.mewcraft.wakame.skill2.MechanicWorldInteraction
+import cc.mewcraft.wakame.skill2.SkillWorldInteraction
 import cc.mewcraft.wakame.skill2.hasTriggerType
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
 import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
@@ -45,7 +45,7 @@ sealed class AbstractStateInfo(
 ) : StateInfo {
 
     companion object : KoinComponent {
-        private val mechanicWorldInteraction: MechanicWorldInteraction by inject()
+        private val skillWorldInteraction: SkillWorldInteraction by inject()
     }
 
     init {
@@ -56,24 +56,24 @@ sealed class AbstractStateInfo(
 
     protected inner class TriggerConditionManager {
         fun isForbidden(trigger: SingleTrigger): Boolean {
-            val skills = mechanicWorldInteraction.getAllActiveMechanic(player)
+            val skills = skillWorldInteraction.getAllActiveMechanic(player)
             val skill = skills.firstOrNull { it.triggerHandleData.isForbidden(phase, trigger) }
             return skill != null
         }
 
         fun isInterrupt(trigger: SingleTrigger): Boolean {
-            val skills = mechanicWorldInteraction.getAllActiveMechanic(player)
+            val skills = skillWorldInteraction.getAllActiveMechanic(player)
             val skill = skills.firstOrNull { it.triggerHandleData.isInterrupt(phase, trigger) }
             return skill != null
         }
     }
 
     protected fun interrupt() {
-        mechanicWorldInteraction.interruptMechanicBy(player)
+        skillWorldInteraction.interruptMechanicBy(player)
     }
 
     protected fun setNextState() {
-        mechanicWorldInteraction.markNextState(player)
+        skillWorldInteraction.markNextState(player)
     }
 
     private fun registerTriggerEvents() {

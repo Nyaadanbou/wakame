@@ -22,9 +22,7 @@ import org.bukkit.inventory.ItemStack
  * - 根据玩家的操作, 处理玩家的技能触发逻辑
  * - 根据玩家的物品, 从玩家身上添加/移除技能
  */
-internal class SkillEventHandler (
-    private val worldInteraction: MechanicWorldInteraction,
-) {
+internal class SkillEventHandler {
 
     /* 玩家的技能触发逻辑 */
 
@@ -80,11 +78,11 @@ internal class SkillEventHandler (
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 for (skill in skills.values()) {
-                    val context = skillInput(skill, CasterAdapter.adapt(projectile)) {
+                    val input = skillInput(CasterAdapter.adapt(projectile)) {
                         target(target)
                         castItem(nekoStack)
                     }
-                    worldInteraction.addMechanic(context)
+                    skill.cast(input)
                 }
             }
         }

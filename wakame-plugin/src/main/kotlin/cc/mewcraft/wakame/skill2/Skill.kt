@@ -54,6 +54,13 @@ interface Skill : Keyed, Examinable {
     val displays: SkillDisplay
 
     /**
+     * 执行技能的逻辑.
+     *
+     * 具体是先调用 [mechanic], 再将返回结果添加到 ECS 中.
+     */
+    fun cast(input: SkillInput)
+
+    /**
      * 返回一个技能执行的结果, 只有执行 [cc.mewcraft.wakame.skill2.result.SkillMechanic] 才会真正执行技能逻辑.
      *
      * @see cc.mewcraft.wakame.skill2.result.SkillMechanic
@@ -73,6 +80,7 @@ private data object EmptySkill : Skill {
     override val displays: SkillDisplay = SkillDisplay.empty()
     override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
     override val triggerHandleData: TriggerHandleData = TriggerHandleData()
+    override fun cast(input: SkillInput) = Unit
     override fun mechanic(input: SkillInput): SkillMechanic<Skill> = SkillMechanic()
 }
 

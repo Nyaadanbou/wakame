@@ -66,7 +66,10 @@ private class BlinkSkillMechanic(
     private var isTeleported: Boolean = false
 
     override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        isTeleported = false
+        if (isTeleported) {
+            // 如果已经传送过了, 重置状态.
+            isTeleported = false
+        }
         return TickResult.CONTINUE_TICK
     }
 
