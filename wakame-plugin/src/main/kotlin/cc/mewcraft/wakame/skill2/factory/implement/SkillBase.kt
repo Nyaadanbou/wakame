@@ -42,9 +42,9 @@ abstract class SkillBase(
     private fun addMechanic(input: SkillInput) {
         wakameWorld.createEntity(key.asString()) {
             it += EntityType.SKILL
-            it += CooldownComponent(input.cooldown)
             it += CasterComponent(input.caster)
-            input.target?.let { target -> it += TargetComponent(target) }
+            it += TargetComponent(input.target)
+            it += CooldownComponent(input.cooldown)
             input.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
             it += MechanicComponent(mechanic(input))
             it += StatePhaseComponent(StatePhase.IDLE)
@@ -65,5 +65,16 @@ abstract class SkillBase(
 
     override fun toString(): String {
         return toSimpleString()
+    }
+
+    override fun hashCode(): Int {
+        return key.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SkillBase) return false
+
+        return key == other.key
     }
 }

@@ -63,7 +63,7 @@ object SkillCommands : CommandFactory<CommandSender> {
 
                     val skill = context.get<Skill>("skill")
                     val input = skillInput(CasterAdapter.adapt(casterPlayer)) {
-                        target(target)
+                        target?.let { target(it) }
                     }
                     skill.cast(input)
                 }

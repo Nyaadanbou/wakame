@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.util.Key
 import org.bukkit.entity.Entity
 
 /**
- * 用于内部记录一个技能状态.
+ * 技能与 ECS 系统交互的工具类.
  */
 internal class SkillWorldInteraction(
     private val world: WakameWorld,
