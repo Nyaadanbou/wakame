@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.data.Cooldown
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
@@ -33,13 +34,18 @@ abstract class SkillBase(
     override val triggerHandleData: TriggerHandleData = config.node("triggers").get<TriggerHandleData>() ?: TriggerHandleData()
 
     override fun cast(input: SkillInput) {
-        addMechanic(input)
+        addMechanic {
+            input.toBuilder()
+                .cooldown(Cooldown(100f))
+                .build()
+        }
     }
 
     /**
      * 添加一个 [Skill] 状态.
      */
-    private fun addMechanic(input: SkillInput) {
+    private fun addMechanic(inputProvider: () -> SkillInput) {
+        val input = inputProvider()
         wakameWorld.createEntity(key.asString()) {
             it += EntityType.SKILL
             it += CasterComponent(input.caster)

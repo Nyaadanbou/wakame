@@ -5,19 +5,18 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillProvider
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.context.SkillInput
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
 import cc.mewcraft.wakame.skill2.result.SkillMechanic
 import cc.mewcraft.wakame.util.krequire
-import me.lucko.helper.Events
-import me.lucko.helper.event.Subscription
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
-import org.bukkit.event.player.PlayerMoveEvent
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -89,25 +88,6 @@ private class DashSkillMechanic(
         private const val STARTING_TICK: Long = 10L
     }
 
-    private lateinit var subscription: Subscription
-
-    override fun onEnable(componentMap: ComponentMap) {
-        subscription = Events.subscribe(PlayerMoveEvent::class.java)
-            .filter { it.player == componentMap[CasterComponent]?.entity && it.hasExplicitlyChangedPosition() }
-            .handler { event -> event.player.sendMessage("PlayerMoveEvent") }
-    }
-
-    override fun onDisable(componentMap: ComponentMap) {
-        subscription.unregister()
-    }
-
-    override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val bukkitEntity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT
-
-        bukkitEntity.sendPlainMessage("Dash Idle, totalTickCount: $tickCount")
-        return TickResult.CONTINUE_TICK
-    }
-
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         if (tickCount >= skill.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
@@ -162,10 +142,12 @@ private class DashSkillMechanic(
             if (entity !is LivingEntity)
                 continue
 
-            casterEntity.sendMessage("你创到了 ".mini.append(entity.name()))
             for (skillProvider in skill.hitEffects) {
                 val effect = skillProvider.get()
-//                effect.cast(entity)
+                val input = skillInput(CasterAdapter.adapt(casterEntity)) {
+                    target(TargetAdapter.adapt(entity))
+                }
+                effect.cast(input)
             }
         }
         return true

@@ -15,6 +15,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 import java.util.stream.Stream
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * 技能状态
@@ -55,8 +57,7 @@ class PlayerSkillState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo? = null
-        get() = createStateInfo(player, StatePhase.IDLE)
+    private var stateInfo: StateInfo by SkillStateProvider { createStateInfo(player, StatePhase.IDLE) }
 
     private fun createStateInfo(player: Player, phase: StatePhase): StateInfo {
         return when (phase) {
@@ -75,7 +76,6 @@ class PlayerSkillState(
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
-        val stateInfo = stateInfo ?: return SkillStateResult.SILENT_FAILURE
         return stateInfo.addTrigger(trigger)
     }
 
@@ -91,5 +91,19 @@ class PlayerSkillState(
 
     override fun toString(): String {
         return toSimpleString()
+    }
+}
+
+private class SkillStateProvider(
+    private val initializer: () -> StateInfo
+) : ReadWriteProperty<Any, StateInfo> {
+    private var stateInfo: StateInfo? = null
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): StateInfo {
+        return stateInfo ?: initializer().also { stateInfo = it }
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: StateInfo) {
+        stateInfo = value
     }
 }
