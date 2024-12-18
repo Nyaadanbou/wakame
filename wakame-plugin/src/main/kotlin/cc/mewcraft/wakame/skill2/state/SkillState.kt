@@ -55,7 +55,8 @@ class PlayerSkillState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo = createStateInfo(player, StatePhase.IDLE)
+    private var stateInfo: StateInfo? = null
+        get() = createStateInfo(player, StatePhase.IDLE)
 
     private fun createStateInfo(player: Player, phase: StatePhase): StateInfo {
         return when (phase) {
@@ -74,7 +75,7 @@ class PlayerSkillState(
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
-
+        val stateInfo = stateInfo ?: return SkillStateResult.SILENT_FAILURE
         return stateInfo.addTrigger(trigger)
     }
 

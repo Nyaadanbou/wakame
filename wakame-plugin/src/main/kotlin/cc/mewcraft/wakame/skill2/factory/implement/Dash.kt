@@ -93,7 +93,7 @@ private class DashSkillMechanic(
 
     override fun onEnable(componentMap: ComponentMap) {
         subscription = Events.subscribe(PlayerMoveEvent::class.java)
-            .filter { it.hasExplicitlyChangedPosition() }
+            .filter { it.player == componentMap[CasterComponent]?.entity && it.hasExplicitlyChangedPosition() }
             .handler { event -> event.player.sendMessage("PlayerMoveEvent") }
     }
 
