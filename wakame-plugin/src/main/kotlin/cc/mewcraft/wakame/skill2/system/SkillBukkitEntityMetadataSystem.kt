@@ -11,7 +11,7 @@ import com.github.quillraven.fleks.World.Companion.inject
 import me.lucko.helper.metadata.Metadata
 import me.lucko.helper.metadata.MetadataKey
 
-class MechanicBukkitEntityMetadataSystem(
+class SkillBukkitEntityMetadataSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
     family = family { all(CasterComponent, EntityType.SKILL) }

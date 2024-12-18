@@ -5,10 +5,9 @@ import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.system.*
-import cc.mewcraft.wakame.skill2.system.MechanicBukkitEntityMetadataSystem
-import cc.mewcraft.wakame.skill2.system.MechanicConditionSessionSystem
-import cc.mewcraft.wakame.skill2.system.MechanicConditionSystem
-import cc.mewcraft.wakame.skill2.system.MechanicCooldownSystem
+import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.skill2.system.SkillConditionSessionSystem
+import cc.mewcraft.wakame.skill2.system.SkillConditionSystem
 import com.github.quillraven.fleks.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -44,13 +43,12 @@ class WakameWorld(
 
             // 修改标记的系统
 
-            add(MechanicCooldownSystem())
-            add(MechanicConditionSystem())
-            add(MechanicConditionSessionSystem())
+            add(SkillConditionSystem())
+            add(SkillConditionSessionSystem())
 
             // 同步 ComponentMap 给外部
 
-            add(MechanicBukkitEntityMetadataSystem())
+            add(SkillBukkitEntityMetadataSystem())
 
             // 根据标记与组件进行交互的系统
 

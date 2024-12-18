@@ -1,8 +1,15 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.*
-import cc.mewcraft.wakame.ecs.data.Cooldown
+import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.EntityType
+import cc.mewcraft.wakame.ecs.component.MechanicComponent
+import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
+import cc.mewcraft.wakame.ecs.component.NekoStackComponent
+import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
+import cc.mewcraft.wakame.ecs.component.TargetComponent
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.TriggerComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
@@ -33,14 +40,6 @@ abstract class SkillBase(
     override val conditions: SkillConditionGroup = config.node("conditions").get<SkillConditionGroup>() ?: SkillConditionGroup.empty()
     override val triggerHandleData: TriggerHandleData = config.node("triggers").get<TriggerHandleData>() ?: TriggerHandleData()
 
-    override fun cast(input: SkillInput) {
-        addMechanic {
-            input.toBuilder()
-                .cooldown(Cooldown(100f))
-                .build()
-        }
-    }
-
     /**
      * 添加一个 [Skill] 状态.
      */
@@ -50,7 +49,6 @@ abstract class SkillBase(
             it += EntityType.SKILL
             it += CasterComponent(input.caster)
             it += TargetComponent(input.target)
-            it += CooldownComponent(input.cooldown)
             input.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
             it += MechanicComponent(mechanic(input))
             it += StatePhaseComponent(StatePhase.IDLE)
@@ -58,6 +56,10 @@ abstract class SkillBase(
             it += TriggerComponent(input.trigger)
             it += MochaEngineComponent(input.mochaEngine)
         }
+    }
+
+    override fun cast(input: SkillInput) {
+        addMechanic { input }
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

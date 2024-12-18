@@ -12,7 +12,8 @@ import cc.mewcraft.wakame.skill2.state.exception.IllegalSkillStateException
 /**
  * 代表了一个技能执行的结果.
  */
-interface SkillMechanic<out S : Skill> : Mechanic {
+abstract class SkillMechanic<out S : Skill> : Mechanic {
+
     override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
             val state = componentMap[StatePhaseComponent]
@@ -35,22 +36,22 @@ interface SkillMechanic<out S : Skill> : Mechanic {
     /**
      * 一般不会在 [StatePhase.IDLE] 中进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.skill2.state.IdleStateInfo].
      */
-    fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
+    open fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.CONTINUE_TICK
 
     /**
      * 执行此技能施法前摇逻辑.
      */
-    fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
+    open fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 执行此技能的施法时逻辑.
      */
-    fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
+    open fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 执行此技能施法后摇逻辑
      */
-    fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
+    open fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = TickResult.ALL_DONE
 
     /**
      * 是否是空的执行逻辑.
@@ -62,4 +63,4 @@ fun SkillMechanic(): SkillMechanic<Skill> {
     return EmptySkillMechanic
 }
 
-private data object EmptySkillMechanic : SkillMechanic<Skill>
+private data object EmptySkillMechanic : SkillMechanic<Skill>()

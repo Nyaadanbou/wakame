@@ -8,7 +8,6 @@ class InitSystem : IntervalSystem() {
         world.forEach { entity ->
             entity.configure {
                 it += Tags.CAN_TICK
-                it -= Tags.CAN_NEXT_STATE
             }
         }
     }

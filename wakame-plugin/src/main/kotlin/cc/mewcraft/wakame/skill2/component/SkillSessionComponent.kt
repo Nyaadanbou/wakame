@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.skill2.condition.SkillConditionSession
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
-data class MechanicSessionComponent(
+data class SkillSessionComponent(
     var session: SkillConditionSession
-) : Component<MechanicSessionComponent> {
-    override fun type(): ComponentType<MechanicSessionComponent> = MechanicSessionComponent
+) : Component<SkillSessionComponent> {
+    override fun type(): ComponentType<SkillSessionComponent> = SkillSessionComponent
 
-    companion object : ComponentType<MechanicSessionComponent>()
+    companion object : ComponentType<SkillSessionComponent>()
 }

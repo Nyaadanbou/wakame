@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.skill2.context
 
 import cc.mewcraft.wakame.ecs.component.CasterComponent
-import cc.mewcraft.wakame.ecs.component.CooldownComponent
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
 import cc.mewcraft.wakame.ecs.component.NekoStackComponent
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.component.TriggerComponent
-import cc.mewcraft.wakame.ecs.data.Cooldown
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.MoLangSupport
@@ -37,11 +35,6 @@ interface SkillInput {
      * 此次技能的目标 [Target], 默认为 [caster] 本身.
      */
     val target: Target
-
-    /**
-     * [cc.mewcraft.wakame.skill2.Skill] 的初始冷却时间.
-     */
-    val cooldown: Cooldown
 
     /**
      * 此次技能的触发器 [Trigger].
@@ -83,13 +76,11 @@ fun skillInput(componentMap: ComponentMap): SkillInput {
 class SkillInputDSL(
     private val caster: Caster,
 ) {
-    private var cooldown: Cooldown = Cooldown(0f)
     private var target: Target = TargetAdapter.adapt(caster)
     private var trigger: Trigger = SingleTrigger.NOOP
     private var castItem: NekoStack? = null
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
-    fun cooldown(cooldown: Cooldown) = apply { this.cooldown = cooldown }
     fun trigger(trigger: Trigger) = apply { this.trigger = trigger }
     fun target(target: Target) = apply { this.target = target }
     fun castItem(castItem: NekoStack?) = apply { this.castItem = castItem }
@@ -98,7 +89,6 @@ class SkillInputDSL(
     fun build(): SkillInput = SimpleSkillInput(
         caster = caster,
         target = target,
-        cooldown = cooldown,
         trigger = trigger,
         castItem = castItem,
         mochaEngine = mochaEngine
@@ -110,7 +100,6 @@ class SkillInputDSL(
 private class SimpleSkillInput(
     override val caster: Caster,
     override val target: Target,
-    override val cooldown: Cooldown,
     override val trigger: Trigger,
     override val castItem: NekoStack?,
     override val mochaEngine: MochaEngine<*>,
@@ -124,7 +113,6 @@ private class SimpleSkillInput(
 
     override fun toBuilder(): SkillInputDSL {
         return SkillInputDSL(caster)
-            .cooldown(cooldown)
             .trigger(trigger)
             .target(target)
             .castItem(castItem)
@@ -134,7 +122,6 @@ private class SimpleSkillInput(
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("caster", caster),
         ExaminableProperty.of("target", target),
-        ExaminableProperty.of("cooldown", cooldown),
         ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("castItem", castItem),
         ExaminableProperty.of("mochaEngine", mochaEngine),
@@ -152,8 +139,6 @@ private class ComponentMapSkillInput(
         get() = requireNotNull(componentMap[CasterComponent]?.caster) { "Caster not found in componentMap" }
     override val target: Target
         get() = requireNotNull(componentMap[TargetComponent]?.target) { "Target not found in componentMap" }
-    override val cooldown: Cooldown
-        get() = requireNotNull(componentMap[CooldownComponent]?.cooldown) { "Cooldown not found in componentMap" }
     override val trigger: Trigger
         get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
     override val user: User<*>?
@@ -165,7 +150,6 @@ private class ComponentMapSkillInput(
 
     override fun toBuilder(): SkillInputDSL {
         return SkillInputDSL(caster)
-            .cooldown(cooldown)
             .trigger(trigger)
             .target(target)
             .castItem(castItem)
@@ -175,7 +159,6 @@ private class ComponentMapSkillInput(
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("caster", caster),
         ExaminableProperty.of("target", target),
-        ExaminableProperty.of("cooldown", cooldown),
         ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("castItem", castItem),
         ExaminableProperty.of("mochaEngine", mochaEngine),

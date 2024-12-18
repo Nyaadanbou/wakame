@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.component.MechanicSessionComponent
+import cc.mewcraft.wakame.skill2.component.SkillSessionComponent
 import cc.mewcraft.wakame.skill2.condition.ConditionPhase
 import cc.mewcraft.wakame.util.Key
 import com.github.quillraven.fleks.Entity
@@ -15,7 +15,7 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
 
-class MechanicConditionSystem(
+class SkillConditionSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
     family = family { all(IdentifierComponent, CasterComponent, StatePhaseComponent, EntityType.SKILL) }
@@ -26,7 +26,7 @@ class MechanicConditionSystem(
         val componentMap = wakameWorld.componentMap(entity)
         val session = skill.conditions.newSession(phase, componentMap)
         entity.configure {
-            it += MechanicSessionComponent(session)
+            it += SkillSessionComponent(session)
         }
     }
 

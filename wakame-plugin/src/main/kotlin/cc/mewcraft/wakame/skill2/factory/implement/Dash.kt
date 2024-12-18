@@ -79,7 +79,7 @@ interface Dash : Skill {
 
 private class DashSkillMechanic(
     private val skill: Dash,
-) : SkillMechanic<Dash> {
+) : SkillMechanic<Dash>() {
 
     companion object : KoinComponent {
         /**

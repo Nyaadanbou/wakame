@@ -28,6 +28,7 @@ class StatePhaseSystem : IteratingSystem(
         entity[StatePhaseComponent].phase = newPhase
 
         onStateChange(player, SkillRegistry.INSTANCES[Key(id)], oldPhase, newPhase)
+        entity.configure { it -= Tags.CAN_NEXT_STATE }
     }
 
     private fun onStateChange(player: Player, skill: Skill, old: StatePhase, new: StatePhase) {

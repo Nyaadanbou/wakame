@@ -151,7 +151,7 @@ class IdleStateInfo(
         // Sequence trigger skills
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
             if (addSequenceSkills(castTrigger)) {
-                stateDisplay.displaySuccess(currentSequence.readAll(),player)
+                stateDisplay.displaySuccess(currentSequence.readAll(), player)
                 currentSequence.clear()
                 setNextState()
                 return SkillStateResult.CANCEL_EVENT

@@ -61,7 +61,7 @@ interface Blink : Skill {
 private class BlinkSkillMechanic(
     val distance: Int,
     val teleportedMessages: AudienceMessageGroup,
-) : SkillMechanic<Blink> {
+) : SkillMechanic<Blink>() {
 
     private var isTeleported: Boolean = false
 
