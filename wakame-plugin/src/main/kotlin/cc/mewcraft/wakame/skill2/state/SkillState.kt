@@ -73,6 +73,9 @@ class PlayerSkillState(
     }
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
+        if (stateInfo.phase != StatePhase.IDLE) {
+            return SkillStateResult.SILENT_FAILURE
+        }
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
