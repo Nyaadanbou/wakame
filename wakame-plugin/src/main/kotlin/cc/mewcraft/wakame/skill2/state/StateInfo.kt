@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill2.state
 
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
+import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillWorldInteraction
 import cc.mewcraft.wakame.skill2.hasTriggerType
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
@@ -72,8 +73,8 @@ sealed class AbstractStateInfo(
         skillWorldInteraction.interruptMechanicBy(player)
     }
 
-    protected fun setNextState() {
-        skillWorldInteraction.markNextState(player)
+    protected fun markNextState(skills: Collection<Skill>) {
+        skillWorldInteraction.markNextState(player, phase, skills)
     }
 
     private fun registerTriggerEvents() {
@@ -150,24 +151,26 @@ class IdleStateInfo(
 
         // Sequence trigger skills
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
-            if (addSequenceSkills(castTrigger)) {
+            val sequenceSkills = trySequenceSkills(castTrigger)
+            if (sequenceSkills.isNotEmpty()) {
                 stateDisplay.displaySuccess(currentSequence.readAll(), player)
                 currentSequence.clear()
-                setNextState()
+                markNextState(sequenceSkills)
                 return SkillStateResult.CANCEL_EVENT
             }
         }
 
         // Single trigger skills
-        if (addSingleSkills(castTrigger)) {
-            setNextState()
+        val singleSkills = trySingleSkills(castTrigger)
+        if (singleSkills.isNotEmpty()) {
+            markNextState(singleSkills)
             return SkillStateResult.CANCEL_EVENT
         }
 
         return SkillStateResult.SILENT_FAILURE
     }
 
-    private fun addSequenceSkills(trigger: SingleTrigger): Boolean {
+    private fun trySequenceSkills(trigger: SingleTrigger): Collection<Skill> {
         val user = player.toUser()
         val skillMap = user.skillMap
         // 第一个按下的是右键并且 skillMap 内有 Sequence 类型的 Trigger
@@ -192,24 +195,23 @@ class IdleStateInfo(
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.of(completeSequence)
-                val skillsOnSequence = skillMap.getSkill(sequence).firstOrNull()
-                if (skillsOnSequence == null) {
+                val skillsOnSequence = skillMap.getSkill(sequence)
+                if (skillsOnSequence.isEmpty()) {
                     currentSequence.clear()
                     stateDisplay.displayFailure(completeSequence, player)
-                    return false
+                    return emptyList()
                 }
-                return true
+                return skillsOnSequence
             }
         }
 
-        return false
+        return emptyList()
     }
 
-    private fun addSingleSkills(trigger: SingleTrigger): Boolean {
+    private fun trySingleSkills(trigger: SingleTrigger): Collection<Skill> {
         val user = player.toUser()
         val skillMap = user.skillMap
-        skillMap.getSkill(trigger).takeIf { it.isNotEmpty() } ?: return false
-        return true
+        return skillMap.getSkill(trigger)
     }
 }
 

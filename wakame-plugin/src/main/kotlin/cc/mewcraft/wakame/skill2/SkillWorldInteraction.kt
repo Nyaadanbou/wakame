@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
@@ -106,11 +107,15 @@ internal class SkillWorldInteraction(
         }
     }
 
-    fun markNextState(bukkitEntity: Entity) {
+    fun markNextState(bukkitEntity: Entity, phase: StatePhase, skills: Collection<Skill>) {
         world.editEntities(
             family = { family { all(EntityType.SKILL, CasterComponent, StatePhaseComponent) } }
         ) { entity ->
             if (entity[CasterComponent].entity != bukkitEntity)
+                return@editEntities
+            if (entity[StatePhaseComponent].phase != phase)
+                return@editEntities
+            if (entity[IdentifierComponent].id !in skills.map { it.key.asString() })
                 return@editEntities
             entity += Tags.CAN_NEXT_STATE
         }
