@@ -109,7 +109,7 @@ internal class SkillWorldInteraction(
 
     fun markNextState(bukkitEntity: Entity, phase: StatePhase, skills: Collection<Skill>) {
         world.editEntities(
-            family = { family { all(EntityType.SKILL, CasterComponent, StatePhaseComponent) } }
+            family = { family { all(EntityType.SKILL, IdentifierComponent, CasterComponent, StatePhaseComponent) } }
         ) { entity ->
             if (entity[CasterComponent].entity != bukkitEntity)
                 return@editEntities

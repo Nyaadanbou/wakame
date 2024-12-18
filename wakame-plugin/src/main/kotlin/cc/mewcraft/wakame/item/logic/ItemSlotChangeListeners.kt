@@ -208,6 +208,12 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
         modifySkillMap(player, nekoStack) { skillMap, skills -> skillMap.addSkillsByInstance(skills) }
     }
 
+    override fun onEnd(player: Player) {
+        // 清空技能状态.
+        val user = player.toUser()
+        user.skillState.reset()
+    }
+
     private fun modifySkillMap(player: Player, nekoStack: NekoStack?, update: (SkillMap, Multimap<Trigger, Skill>) -> Unit) {
         val skills = nekoStack?.getSkills() ?: return
         val skillMap = player.toUser().skillMap

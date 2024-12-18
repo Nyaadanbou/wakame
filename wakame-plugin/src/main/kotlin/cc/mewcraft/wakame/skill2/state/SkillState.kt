@@ -32,7 +32,7 @@ sealed interface SkillState<U> : Examinable {
     /**
      * 将技能状态恢复为默认
      */
-    fun clear()
+    fun reset()
 }
 
 fun SkillState(user: User<Player>): SkillState<Player> {
@@ -73,16 +73,14 @@ class PlayerSkillState(
     }
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
-        if (stateInfo.phase != StatePhase.IDLE) {
-            return SkillStateResult.SILENT_FAILURE
-        }
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
             return SkillStateResult.SILENT_FAILURE
         }
         return stateInfo.addTrigger(trigger)
     }
 
-    override fun clear() {
+    override fun reset() {
+        stateInfo = createStateInfo(player, StatePhase.IDLE)
         cooldown.reset()
     }
 

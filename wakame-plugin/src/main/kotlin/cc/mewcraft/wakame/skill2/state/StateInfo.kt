@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.skill2.state
 
+import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.SkillWorldInteraction
@@ -138,13 +141,27 @@ class IdleStateInfo(
     player: Player,
 ) : AbstractStateInfo(player, StatePhase.IDLE, false) {
     companion object : KoinComponent {
+        private const val MECHANIC_NAME = "IdleResetMechanic"
+        private const val SEQUENCE_SIZE = 3
+
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
 
         private val stateDisplay: StateDisplay<Player> by inject()
+        private val wakameWorld: WakameWorld by inject()
     }
 
-    private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(3)
+    private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
+
+    private val idleResetMechanic: Mechanic = Mechanic(
+        tick = { deltaTime, tickCount, componentMap ->
+            if (tickCount <= 40) {
+                return@Mechanic TickResult.CONTINUE_TICK
+            }
+            currentSequence.clear()
+            TickResult.ALL_DONE
+        }
+    )
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
@@ -190,6 +207,7 @@ class IdleStateInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
+            wakameWorld.createMechanic(MECHANIC_NAME) { idleResetMechanic }
             val completeSequence = currentSequence.readAll()
             stateDisplay.displayProgress(completeSequence, player)
 

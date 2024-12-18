@@ -4,7 +4,7 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
 data class TickCountComponent(
-    var tick: Double
+    var tick: Double = .0,
 ) : Component<TickCountComponent> {
     override fun type(): ComponentType<TickCountComponent> = TickCountComponent
 

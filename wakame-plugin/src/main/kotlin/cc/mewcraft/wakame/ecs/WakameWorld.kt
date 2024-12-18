@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
+import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
@@ -74,9 +77,23 @@ class WakameWorld(
     }
 
     fun createEntity(identifier: String, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
-        instance.entity {
-            it += IdentifierComponent(identifier)
-            configuration.invoke(this, it)
+        with(instance) {
+            val entity = family { all(IdentifierComponent) }.firstOrNull { it[IdentifierComponent].id == identifier }
+            if (entity != null) {
+                removeEntity(entity)
+            }
+            entity {
+                it += IdentifierComponent(identifier)
+                configuration.invoke(this, it)
+            }
+        }
+    }
+
+    fun createMechanic(identifier: String, mechanicProvider: () -> Mechanic) {
+        createEntity(identifier) {
+            it += Tags.DISPOSABLE
+            it += MechanicComponent(mechanicProvider())
+            it += TickCountComponent()
         }
     }
 
