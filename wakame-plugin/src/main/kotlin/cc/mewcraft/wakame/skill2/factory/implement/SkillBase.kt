@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.EntityType
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.NekoStackComponent
+import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
+import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TriggerComponent
@@ -47,9 +48,10 @@ abstract class SkillBase(
         val input = inputProvider()
         wakameWorld.createEntity(key.asString()) {
             it += EntityType.SKILL
-            it += CasterComponent(input.caster)
+            it += Tags.DISPOSABLE
+            it += CastBy(input.castBy)
             it += TargetComponent(input.target)
-            input.castItem?.let { castItem -> it += NekoStackComponent(castItem) }
+            input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second) }
             it += MechanicComponent(mechanic(input))
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
@@ -58,7 +60,7 @@ abstract class SkillBase(
         }
     }
 
-    override fun cast(input: SkillInput) {
+    override fun recordBy(input: SkillInput) {
         addMechanic { input }
     }
 

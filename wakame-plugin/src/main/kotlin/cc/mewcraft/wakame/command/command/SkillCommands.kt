@@ -65,7 +65,7 @@ object SkillCommands : CommandFactory<CommandSender> {
                     val input = skillInput(CasterAdapter.adapt(casterPlayer)) {
                         target?.let { target(it) }
                     }
-                    skill.cast(input)
+                    skill.recordBy(input)
                 }
             }.buildAndAdd(this)
         }

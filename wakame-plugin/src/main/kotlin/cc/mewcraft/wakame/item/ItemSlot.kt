@@ -38,6 +38,10 @@ enum class VanillaItemSlot(
     companion object {
         const val NAMESPACE = "vanilla"
 
+        fun fromEquipmentSlot(slot: EquipmentSlot): VanillaItemSlot? {
+            return entries.find { it.slot == slot }
+        }
+
         fun fromEquipmentSlotGroup(group: EquipmentSlotGroup): Set<VanillaItemSlot> {
             return entries.filterTo(HashSet()) { group.test(it.slot) }
         }

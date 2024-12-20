@@ -14,12 +14,14 @@ import org.bukkit.entity.Entity
 internal class SkillWorldInteraction(
     private val world: WakameWorld,
 ) {
-    fun getMechanicsBy(trigger: Trigger): List<Skill> {
+    fun getMechanicsBy(bukkitEntity: Entity, trigger: Trigger): List<Skill> {
         val skills = mutableListOf<Skill>()
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(EntityType.SKILL, TriggerComponent, IdentifierComponent) }
+                val family = family { all(EntityType.SKILL, CastBy, TriggerComponent, IdentifierComponent) }
                 if (!family.contains(entity))
+                    return@forEach
+                if (entity[CastBy].entity != bukkitEntity)
                     return@forEach
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id
@@ -31,14 +33,14 @@ internal class SkillWorldInteraction(
         return skills
     }
 
-    fun getAllActiveMechanic(bukkitEntity: Entity): Set<Skill> {
+    fun getAllActiveSkill(bukkitEntity: Entity): Set<Skill> {
         val skills = mutableSetOf<Skill>()
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(EntityType.SKILL, CasterComponent, IdentifierComponent) }
+                val family = family { all(EntityType.SKILL, CastBy, IdentifierComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[CasterComponent].caster == bukkitEntity) {
+                if (entity[CastBy].caster == bukkitEntity) {
                     skills.add(SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)])
                 }
             }
@@ -47,16 +49,16 @@ internal class SkillWorldInteraction(
         return skills
     }
 
-    fun getAllActiveMechanicTriggers(bukkitEntity: Entity): Set<Trigger> {
+    fun getAllActiveSkillTriggers(bukkitEntity: Entity): Set<Trigger> {
         val triggers = mutableSetOf<Trigger>()
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(EntityType.SKILL, CasterComponent, TriggerComponent) }
+                val family = family { all(EntityType.SKILL, CastBy, TriggerComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[CasterComponent].entity == bukkitEntity) {
-                    triggers.add(entity[TriggerComponent].trigger)
-                }
+                if (entity[CastBy].entity != bukkitEntity)
+                    return@forEach
+                triggers.add(entity[TriggerComponent].trigger)
             }
         }
 
@@ -64,56 +66,73 @@ internal class SkillWorldInteraction(
     }
 
     /**
-     * 中断一个 [Skill].
+     * 中断一个指定 [bukkitEntity] 的 [Skill].
      */
-    fun interruptMechanicBy(skill: Skill) {
-        interruptMechanicBy(skill.key.asString())
+    fun interruptSkillBy(bukkitEntity: Entity, skill: Skill) {
+        interruptSkillBy(bukkitEntity, skill.key.asString())
     }
 
     /**
-     * 中断一个指定 [trigger] 的 [Skill].
+     * 中断一个指定 [bukkitEntity] 的 [Skill]. 并且由 [trigger] 触发.
      */
-    fun interruptMechanicBy(trigger: Trigger, skill: Skill) {
+    fun interruptSkillBy(bukkitEntity: Entity, trigger: Trigger, skill: Skill) {
         with(world.instance) {
             forEach { entity ->
-                val family = family { all(EntityType.SKILL, TriggerComponent, IdentifierComponent) }
+                val family = family { all(EntityType.SKILL, CastBy, TriggerComponent, IdentifierComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[TriggerComponent].trigger == trigger && entity[IdentifierComponent].id == skill.key.asString()) {
-                    world.removeEntity(entity)
+                if (entity[CastBy].entity != bukkitEntity) {
+                    return@forEach
                 }
+                if (entity[TriggerComponent].trigger != trigger) {
+                    return@forEach
+                }
+                if (entity[IdentifierComponent].id != skill.key.asString()) {
+                    return@forEach
+                }
+                world.removeEntity(entity)
             }
         }
     }
 
     /**
-     * 中断一个 [Skill], 使用 [Skill.key].
+     * 中断指定 [bukkitEntity] [identifier] 的 [Skill].
      */
-    fun interruptMechanicBy(identifier: String) {
-        world.removeEntity(identifier)
-    }
-
-    /**
-     * 中断一个 [Skill], 使用 [Entity].
-     */
-    fun interruptMechanicBy(bukkitEntity: Entity) {
+    fun interruptSkillBy(bukkitEntity: Entity, identifier: String) {
         with(world.instance) {
-            family { all(EntityType.SKILL, CasterComponent) }
+            family { all(EntityType.SKILL, CastBy, IdentifierComponent) }
                 .forEach {
-                    if (it[CasterComponent].caster.uniqueId == bukkitEntity.uniqueId) {
-                        world.removeEntity(it)
-                    }
+                    if (it[CastBy].entity != bukkitEntity)
+                        return@forEach
+                    if (it[IdentifierComponent].id != identifier)
+                        return@forEach
+                    world.removeEntity(it)
                 }
         }
     }
 
-    fun markNextState(bukkitEntity: Entity, phase: StatePhase, skills: Collection<Skill>) {
+    /**
+     * 中断所有 [Entity] 下的 [Skill].
+     */
+    fun interruptSkillBy(bukkitEntity: Entity) {
+        with(world.instance) {
+            family { all(EntityType.SKILL, CastBy) }
+                .forEach {
+                    if (it[CastBy].caster.uniqueId != bukkitEntity.uniqueId)
+                        return@forEach
+                    world.removeEntity(it)
+                }
+        }
+    }
+
+    fun markNextState(bukkitEntity: Entity, skills: Collection<Skill>) {
         world.editEntities(
-            family = { family { all(EntityType.SKILL, IdentifierComponent, CasterComponent, StatePhaseComponent) } }
+            family = { family { all(EntityType.SKILL, IdentifierComponent, CastBy, StatePhaseComponent) } }
         ) { entity ->
-            if (entity[CasterComponent].entity != bukkitEntity)
+            if (entity[CastBy].entity != bukkitEntity)
                 return@editEntities
-            if (entity[StatePhaseComponent].phase != phase)
+            if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
+                // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
             if (entity[IdentifierComponent].id !in skills.map { it.key.asString() })
                 return@editEntities

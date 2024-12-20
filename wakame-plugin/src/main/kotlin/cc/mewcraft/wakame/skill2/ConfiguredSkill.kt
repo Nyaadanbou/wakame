@@ -4,6 +4,8 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.skill2.character.Caster
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
@@ -126,6 +128,11 @@ interface ConfiguredSkill : BinarySerializable<CompoundTag> {
     val description: List<Component>
 
     /**
+     * 使用 [caster] 记录技能的信息到 ECS 中.
+     */
+    fun recordBy(caster: Caster)
+
+    /**
      * 将此对象序列化为 NBT, 拥有以下结构:
      *
      * ```NBT
@@ -152,6 +159,13 @@ internal data class SimpleConfiguredSkill(
         get() = instance.displays.name.let(MM::deserialize)
     override val description: List<Component>
         get() = instance.displays.tooltips.map(MM::deserialize)
+
+    override fun recordBy(caster: Caster) {
+        val input = skillInput(caster) {
+            trigger(trigger)
+        }
+        instance.recordBy(input)
+    }
 
     override fun serializeAsTag(): CompoundTag = CompoundTag {
         writeTrigger(trigger)

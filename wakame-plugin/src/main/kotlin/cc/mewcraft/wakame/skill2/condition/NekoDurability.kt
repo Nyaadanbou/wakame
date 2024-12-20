@@ -36,7 +36,7 @@ internal interface NekoDurability : SkillCondition {
 
         override fun newSession(componentMap: ComponentMap): SkillConditionSession {
             val context = skillInput(componentMap)
-            val nekoStack = context.castItem ?: return SkillConditionSession.alwaysFailure()
+            val nekoStack = context.holdBy?.second ?: return SkillConditionSession.alwaysFailure()
             if (!nekoStack.isDamageable) return SkillConditionSession.alwaysFailure()
             val maxDamage = nekoStack.maxDamage
             val damage = nekoStack.damage
@@ -53,7 +53,7 @@ internal interface NekoDurability : SkillCondition {
 
             override fun onSuccess(componentMap: ComponentMap) {
                 val context = skillInput(componentMap)
-                val nekoStack = context.castItem ?: return
+                val nekoStack = context.holdBy?.second ?: return
                 if (!nekoStack.isDamageable) return
                 val damage = nekoStack.damage
                 val engine = context.mochaEngine

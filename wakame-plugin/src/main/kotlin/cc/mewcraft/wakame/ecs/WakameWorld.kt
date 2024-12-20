@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.skill2.system.SkillConditionSessionSystem
 import cc.mewcraft.wakame.skill2.system.SkillConditionSystem
+import cc.mewcraft.wakame.skill2.system.SkillMechanicRemoveSystem
 import com.github.quillraven.fleks.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -59,6 +60,7 @@ class WakameWorld(
             add(MechanicSystem())
             add(TickResultSystem())
             add(StatePhaseSystem())
+            add(SkillMechanicRemoveSystem())
 
             add(ParticleSystem())
 
@@ -78,10 +80,6 @@ class WakameWorld(
 
     fun createEntity(identifier: String, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
         with(instance) {
-            val entity = family { all(IdentifierComponent) }.firstOrNull { it[IdentifierComponent].id == identifier }
-            if (entity != null) {
-                removeEntity(entity)
-            }
             entity {
                 it += IdentifierComponent(identifier)
                 configuration.invoke(this, it)
@@ -89,11 +87,21 @@ class WakameWorld(
         }
     }
 
-    fun createMechanic(identifier: String, mechanicProvider: () -> Mechanic) {
-        createEntity(identifier) {
-            it += Tags.DISPOSABLE
-            it += MechanicComponent(mechanicProvider())
-            it += TickCountComponent()
+    fun createMechanic(identifier: String, replace: Boolean = true, mechanicProvider: () -> Mechanic) {
+        with(instance) {
+            val identifierFamily = family { all(IdentifierComponent, MechanicComponent) }
+            val entityToModify = identifierFamily.firstOrNull { it[IdentifierComponent].id == identifier }
+            if (entityToModify != null) {
+                if (replace) {
+                    entityToModify[MechanicComponent].mechanic = mechanicProvider()
+                }
+                return
+            }
+            createEntity(identifier) {
+                it += Tags.DISPOSABLE
+                it += MechanicComponent(mechanicProvider())
+                it += TickCountComponent()
+            }
         }
     }
 

@@ -80,9 +80,8 @@ internal class SkillEventHandler {
                 for (skill in skills.values()) {
                     val input = skillInput(CasterAdapter.adapt(projectile)) {
                         target(target)
-                        castItem(nekoStack)
                     }
-                    skill.cast(input)
+                    skill.recordBy(input)
                 }
             }
         }

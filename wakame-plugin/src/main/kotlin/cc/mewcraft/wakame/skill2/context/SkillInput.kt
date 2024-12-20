@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.skill2.context
 
-import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.NekoStackComponent
+import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.component.TriggerComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill2.character.Caster
@@ -29,10 +30,10 @@ interface SkillInput {
     /**
      * 这次技能的施法者 [Caster].
      */
-    val caster: Caster
+    val castBy: Caster
 
     /**
-     * 此次技能的目标 [Target], 默认为 [caster] 本身.
+     * 此次技能的目标 [Target], 默认为 [castBy] 本身.
      */
     val target: Target
 
@@ -42,14 +43,14 @@ interface SkillInput {
     val trigger: Trigger
 
     /**
-     * 如果 [caster] 可以转变成一个 [User], 则返回它的 [User] 实例.
+     * 如果 [castBy] 可以转变成一个 [User], 则返回它的 [User] 实例.
      */
     val user: User<*>?
 
     /**
      * 此次技能的施法物品 [NekoStack], null 表示没有施法物品.
      */
-    val castItem: NekoStack?
+    val holdBy: Pair<ItemSlot, NekoStack>?
 
     /**
      * 此次技能的计算引擎 [MochaEngine].
@@ -74,23 +75,23 @@ fun skillInput(componentMap: ComponentMap): SkillInput {
 
 @SkillInputMarker
 class SkillInputDSL(
-    private val caster: Caster,
+    private val castBy: Caster,
 ) {
-    private var target: Target = TargetAdapter.adapt(caster)
+    private var target: Target = TargetAdapter.adapt(castBy)
     private var trigger: Trigger = SingleTrigger.NOOP
-    private var castItem: NekoStack? = null
+    private var holdBy: Pair<ItemSlot, NekoStack>? = null
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
     fun trigger(trigger: Trigger) = apply { this.trigger = trigger }
     fun target(target: Target) = apply { this.target = target }
-    fun castItem(castItem: NekoStack?) = apply { this.castItem = castItem }
+    fun holdBy(holdBy: Pair<ItemSlot, NekoStack>?) = apply { this.holdBy = holdBy }
     fun mochaEngine(mochaEngine: MochaEngine<*>) = apply { this.mochaEngine = mochaEngine }
 
     fun build(): SkillInput = SimpleSkillInput(
-        caster = caster,
+        castBy = castBy,
         target = target,
         trigger = trigger,
-        castItem = castItem,
+        holdBy = holdBy,
         mochaEngine = mochaEngine
     )
 }
@@ -98,32 +99,32 @@ class SkillInputDSL(
 /* Implementations */
 
 private class SimpleSkillInput(
-    override val caster: Caster,
+    override val castBy: Caster,
     override val target: Target,
     override val trigger: Trigger,
-    override val castItem: NekoStack?,
+    override val holdBy: Pair<ItemSlot, NekoStack>?,
     override val mochaEngine: MochaEngine<*>,
 ) : SkillInput, Examinable {
 
     /**
-     * 如果 [caster] 可以转变成一个 [User], 则返回它的 [User] 实例.
+     * 如果 [castBy] 可以转变成一个 [User], 则返回它的 [User] 实例.
      */
     override val user: User<*>?
-        get() = caster.player?.toUser()
+        get() = castBy.player?.toUser()
 
     override fun toBuilder(): SkillInputDSL {
-        return SkillInputDSL(caster)
+        return SkillInputDSL(castBy)
             .trigger(trigger)
             .target(target)
-            .castItem(castItem)
+            .holdBy(holdBy)
             .mochaEngine(mochaEngine)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("caster", caster),
+        ExaminableProperty.of("caster", castBy),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("castItem", castItem),
+        ExaminableProperty.of("castItem", holdBy),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )
 
@@ -135,32 +136,36 @@ private class SimpleSkillInput(
 private class ComponentMapSkillInput(
     private val componentMap: ComponentMap
 ) : SkillInput, Examinable {
-    override val caster: Caster
-        get() = requireNotNull(componentMap[CasterComponent]?.caster) { "Caster not found in componentMap" }
+    override val castBy: Caster
+        get() = requireNotNull(componentMap[CastBy]?.caster) { "Caster not found in componentMap" }
     override val target: Target
         get() = requireNotNull(componentMap[TargetComponent]?.target) { "Target not found in componentMap" }
     override val trigger: Trigger
         get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
     override val user: User<*>?
-        get() = caster.player?.toUser()
-    override val castItem: NekoStack?
-        get() = componentMap[NekoStackComponent]?.nekoStack
+        get() = castBy.player?.toUser()
+    override val holdBy: Pair<ItemSlot, NekoStack>?
+        get() {
+            val slot = componentMap[HoldBy]?.slot ?: return null
+            val nekoStack = componentMap[HoldBy]?.nekoStack ?: return null
+            return slot to nekoStack
+        }
     override val mochaEngine: MochaEngine<*>
         get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
     override fun toBuilder(): SkillInputDSL {
-        return SkillInputDSL(caster)
+        return SkillInputDSL(castBy)
             .trigger(trigger)
             .target(target)
-            .castItem(castItem)
+            .holdBy(holdBy)
             .mochaEngine(mochaEngine)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("caster", caster),
+        ExaminableProperty.of("caster", castBy),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("castItem", castItem),
+        ExaminableProperty.of("castItem", holdBy),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )
 

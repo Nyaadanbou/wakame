@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
-import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.skill2.Skill
@@ -91,9 +91,9 @@ private class DashSkillMechanic(
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         if (tickCount >= skill.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.ALL_DONE
+            return TickResult.NEXT_STATE
         }
-        val entity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT // 无效生物
+        val entity = componentMap[CastBy]?.entity ?: return TickResult.INTERRUPT // 无效生物
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = skill.stepDistance
         // 计算每一步的移动向量
@@ -109,7 +109,7 @@ private class DashSkillMechanic(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.ALL_DONE
+                return TickResult.NEXT_STATE
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -126,7 +126,7 @@ private class DashSkillMechanic(
 
         if (affectEntityNearby(entity)) {
             if (!skill.canContinueAfterHit) {
-                return TickResult.ALL_DONE
+                return TickResult.NEXT_STATE
             }
         }
 
@@ -147,7 +147,7 @@ private class DashSkillMechanic(
                 val input = skillInput(CasterAdapter.adapt(casterEntity)) {
                     target(TargetAdapter.adapt(entity))
                 }
-                effect.cast(input)
+                effect.recordBy(input)
             }
         }
         return true

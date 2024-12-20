@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.skill2.state
 
-import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
@@ -15,8 +13,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 import java.util.stream.Stream
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 /**
  * 技能状态
@@ -57,20 +53,7 @@ class PlayerSkillState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo by SkillStateProvider { createStateInfo(player, StatePhase.IDLE) }
-
-    private fun createStateInfo(player: Player, phase: StatePhase): StateInfo {
-        return when (phase) {
-            StatePhase.IDLE -> IdleStateInfo(player)
-            StatePhase.CAST_POINT -> CastPointStateInfo(player)
-            StatePhase.CASTING -> CastingStateInfo(player)
-            StatePhase.BACKSWING -> BackswingStateInfo(player)
-        }
-    }
-
-    fun onStateChange(event: PlayerSkillStateChangeEvent) {
-        stateInfo = createStateInfo(event.player, event.newPhase)
-    }
+    private var stateInfo: StateInfo = IdleStateInfo(player)
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
@@ -80,7 +63,6 @@ class PlayerSkillState(
     }
 
     override fun reset() {
-        stateInfo = createStateInfo(player, StatePhase.IDLE)
         cooldown.reset()
     }
 
@@ -92,19 +74,5 @@ class PlayerSkillState(
 
     override fun toString(): String {
         return toSimpleString()
-    }
-}
-
-private class SkillStateProvider(
-    private val initializer: () -> StateInfo
-) : ReadWriteProperty<Any, StateInfo> {
-    private var stateInfo: StateInfo? = null
-
-    override fun getValue(thisRef: Any, property: KProperty<*>): StateInfo {
-        return stateInfo ?: initializer().also { stateInfo = it }
-    }
-
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: StateInfo) {
-        stateInfo = value
     }
 }

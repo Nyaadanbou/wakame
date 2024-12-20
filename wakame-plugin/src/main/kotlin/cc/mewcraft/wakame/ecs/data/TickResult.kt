@@ -10,7 +10,12 @@ enum class TickResult {
     CONTINUE_TICK,
 
     /**
-     * 此 Tick **整个执行**完成, 不再执行下一个 Tick, 并推到下个阶段.
+     * 此 Tick 完成, 并且可以进行到下一个 [cc.mewcraft.wakame.ecs.data.StatePhase].
+     */
+    NEXT_STATE,
+
+    /**
+     * 此 Tick 执行完成, 不再执行下一个 Tick. (即从 ECS 系统中移除)
      */
     ALL_DONE,
 

@@ -35,7 +35,7 @@ abstract class SkillConditionBase(
          * 发送条件满足时的消息提示.
          */
         fun notifySuccess(context: SkillInput) {
-            val caster = context.caster
+            val caster = context.castBy
             successMessage.send(caster.entity)
         }
 
@@ -43,7 +43,7 @@ abstract class SkillConditionBase(
          * 发送条件不满足时的消息提示.
          */
         fun notifyFailure(context: SkillInput) {
-            val caster = context.caster
+            val caster = context.castBy
             failureMessage.send(caster.entity)
         }
     }

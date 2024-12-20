@@ -3,8 +3,9 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
-import cc.mewcraft.wakame.ecs.component.CasterComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
+import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -70,17 +71,18 @@ private class BlinkSkillMechanic(
             // 如果已经传送过了, 重置状态.
             isTeleported = false
         }
+        componentMap += Tags.READY_TO_REMOVE
         return TickResult.CONTINUE_TICK
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val entity = componentMap[CasterComponent]?.entity as? LivingEntity ?: return TickResult.INTERRUPT // 无效生物
+        val entity = componentMap[CastBy]?.entity as? LivingEntity ?: return TickResult.INTERRUPT // 无效生物
         val location = entity.location.clone()
 
         // 如果玩家面前方块过近, 无法传送
         if (entity.getTargetBlockExact(3) != null) {
             entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
-            return TickResult.ALL_DONE
+            return TickResult.NEXT_STATE
         }
 
         // 计算目标位置
@@ -105,7 +107,7 @@ private class BlinkSkillMechanic(
         // 如果没有找到可传送的方块，那么就不传送
         if (!isTeleported) {
             entity.sendMessage("无法传送至目标位置".mini)
-            return TickResult.ALL_DONE
+            return TickResult.NEXT_STATE
         }
 
         entity.teleport(target, TeleportFlag.Relative.X, TeleportFlag.Relative.Y, TeleportFlag.Relative.Z, TeleportFlag.Relative.YAW, TeleportFlag.Relative.PITCH)
@@ -125,13 +127,13 @@ private class BlinkSkillMechanic(
         )
         componentMap += TargetComponent(TargetAdapter.adapt(target))
 
-        return TickResult.ALL_DONE
+        return TickResult.NEXT_STATE
     }
 
     override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val entity = componentMap[CasterComponent]?.entity ?: return TickResult.INTERRUPT
+        val entity = componentMap[CastBy]?.entity ?: return TickResult.INTERRUPT
         if (!isTeleported) {
-            return TickResult.ALL_DONE
+            return TickResult.NEXT_STATE
         }
 
         componentMap -= ParticleEffectComponent
@@ -141,6 +143,6 @@ private class BlinkSkillMechanic(
         entity.velocity = entity.location.direction.normalize()
 
         teleportedMessages.send(entity)
-        return TickResult.ALL_DONE
+        return TickResult.NEXT_STATE
     }
 }

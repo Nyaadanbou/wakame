@@ -33,7 +33,7 @@ interface VanillaDurability : SkillCondition {
 
         override fun newSession(componentMap: ComponentMap): SkillConditionSession {
             val context = skillInput(componentMap)
-            val itemStack = context.castItem?.itemStack ?: return SkillConditionSession.alwaysFailure()
+            val itemStack = context.holdBy?.second?.itemStack ?: return SkillConditionSession.alwaysFailure()
             val itemMeta = itemStack.itemMeta as? Damageable ?: return SkillConditionSession.alwaysFailure()
             val engine = context.mochaEngine
             val isSuccess = (itemMeta.maxDamage - itemMeta.damage) >= durability.evaluate(engine)

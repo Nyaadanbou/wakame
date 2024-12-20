@@ -37,7 +37,6 @@ import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
-import cc.mewcraft.wakame.skill2.SkillListener
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
 import cc.mewcraft.wakame.util.registerSuspendingEvents
@@ -168,9 +167,6 @@ object Initializer : KoinComponent, Listener {
 
         // rpg player
         registerListener<PaperUserManager>()
-
-        // skill
-        registerListener<SkillListener>()
 
         // resourcepack
         registerListener<ResourcePackLifecycleListener>()

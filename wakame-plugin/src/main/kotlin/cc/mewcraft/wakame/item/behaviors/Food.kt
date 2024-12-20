@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.VanillaItemSlot
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -29,9 +30,9 @@ interface Food : ItemBehavior {
             for (skill in skills) {
                 val input = skillInput(CasterAdapter.adapt(player)) {
                     target(TargetAdapter.adapt(player))
-                    castItem(nekoStack)
+                    holdBy(VanillaItemSlot.fromEquipmentSlot(event.hand)!! to nekoStack)
                 }
-                skill.cast(input)
+                skill.recordBy(input)
             }
         }
     }

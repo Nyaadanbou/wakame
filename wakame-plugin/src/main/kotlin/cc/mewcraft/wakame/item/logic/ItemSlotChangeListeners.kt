@@ -14,7 +14,8 @@ import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
 import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.SkillMap
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
@@ -191,7 +192,7 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
 /**
  * 技能.
  *
- * 物品发生变化时, 根据物品技能, 修改玩家的 [cc.mewcraft.wakame.skill2.SkillMap].
+ * 物品发生变化时, 根据物品技能, 修改玩家可执行的 [Skill].
  */
 internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
@@ -201,11 +202,13 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifySkillMap(player, nekoStack) { skillMap, skills -> skillMap.removeSkill(skills) }
+        // do nothing
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifySkillMap(player, nekoStack) { skillMap, skills -> skillMap.addSkillsByInstance(skills) }
+        nekoStack ?: return
+        val skills = nekoStack.getSkills() ?: return
+        skills.forEach { trigger, skill -> recordSkill(player, skill, trigger, slot, nekoStack) }
     }
 
     override fun onEnd(player: Player) {
@@ -214,16 +217,18 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
         user.skillState.reset()
     }
 
-    private fun modifySkillMap(player: Player, nekoStack: NekoStack?, update: (SkillMap, Multimap<Trigger, Skill>) -> Unit) {
-        val skills = nekoStack?.getSkills() ?: return
-        val skillMap = player.toUser().skillMap
-        update(skillMap, skills)
-    }
-
     private fun NekoStack.getSkills(): Multimap<Trigger, Skill>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
         // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
         val skills = cells.collectSkillModifiers(this, ItemSlot.imaginary())
         return skills
+    }
+
+    private fun recordSkill(player: Player, skill: Skill, trigger: Trigger, slot: ItemSlot, nekoStack: NekoStack) {
+        val input = skillInput(CasterAdapter.adapt(player)) {
+            trigger(trigger)
+            holdBy(slot to nekoStack)
+        }
+        skill.recordBy(input)
     }
 }

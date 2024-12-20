@@ -28,14 +28,18 @@ class TickResultSystem(
 
             TickResult.CONTINUE_TICK -> return
 
-            TickResult.ALL_DONE -> {
+            TickResult.NEXT_STATE -> {
                 entity[TickCountComponent].tick = .0
+                entity.configure {
+                    it += Tags.CAN_NEXT_STATE
+                }
+                return
+            }
+
+            TickResult.ALL_DONE -> {
                 if (entity.has(Tags.DISPOSABLE)) {
                     // 这个是临时实体, 在下一个阶段会被删除.
                     wakameWorld.removeEntity(entity)
-                }
-                entity.configure {
-                    it += Tags.CAN_NEXT_STATE
                 }
             }
         }

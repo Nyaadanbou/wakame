@@ -27,7 +27,6 @@ fun skill2Module(): Module = module {
     singleOf(::EntityStateDisplay) bind StateDisplay::class
 
     singleOf(::SkillWorldInteraction)
-    singleOf(::SkillListener)
     singleOf(::SkillEventHandler)
 
     // 用于外部代码

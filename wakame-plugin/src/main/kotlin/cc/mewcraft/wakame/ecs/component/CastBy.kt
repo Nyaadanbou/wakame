@@ -5,14 +5,14 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import org.bukkit.entity.Entity as BukkitEntity
 
-data class CasterComponent(
+data class CastBy(
     var caster: Caster
-) : Component<CasterComponent> {
+) : Component<CastBy> {
 
     val entity: BukkitEntity?
         get() = caster.entity
 
-    override fun type(): ComponentType<CasterComponent> = CasterComponent
+    override fun type(): ComponentType<CastBy> = CastBy
 
-    companion object : ComponentType<CasterComponent>()
+    companion object : ComponentType<CastBy>()
 }

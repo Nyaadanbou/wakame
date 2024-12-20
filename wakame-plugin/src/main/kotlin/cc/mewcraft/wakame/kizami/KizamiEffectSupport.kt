@@ -7,9 +7,11 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.skill2.ConfiguredSkill
 import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -93,11 +95,11 @@ internal data class KizamiSkill(
     override val effect: ConfiguredSkill,
 ) : KizamiEffect.Single<ConfiguredSkill> {
     override fun apply(user: User<*>) {
-        user.skillMap.addSkill(effect)
+        effect.recordBy(CasterAdapter.adapt(user.player as Player))
     }
 
     override fun remove(user: User<*>) {
-        user.skillMap.removeSkill(effect.id)
+        // user.skillMap.removeSkill(effect.id)
     }
 }
 

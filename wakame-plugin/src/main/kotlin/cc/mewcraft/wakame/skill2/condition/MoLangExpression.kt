@@ -51,7 +51,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifySuccess(context)
 
                 // 自定义的逻辑
-                context.caster.player?.heal(2.0)
+                context.castBy.player?.heal(2.0)
             }
 
             override fun onFailure(componentMap: ComponentMap) {
@@ -60,7 +60,7 @@ interface MoLangExpression : SkillCondition {
                 notification.notifyFailure(context)
 
                 // 自定义的逻辑
-                context.caster.player?.damage(2.0)
+                context.castBy.player?.damage(2.0)
             }
         }
     }
