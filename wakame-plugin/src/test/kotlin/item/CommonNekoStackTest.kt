@@ -31,7 +31,7 @@ import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.skill.skillModule
+import cc.mewcraft.wakame.skill2.skill2Module
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -73,7 +73,7 @@ object CommonNekoStackTest {
                 molangModule(),
                 rarityModule(),
                 registryModule(),
-                skillModule(),
+                skill2Module(),
                 worldModule(),
             )
         }

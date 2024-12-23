@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.VanillaItemSlot
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
-import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.CasterAdapter
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.character.TargetAdapter
+import cc.mewcraft.wakame.skill2.context.skillInput
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -23,11 +23,17 @@ interface Food : ItemBehavior {
                 return
             }
 
-            val nekoStack: NekoStack = itemStack.toNekoStack
+            val nekoStack: NekoStack = itemStack.projectNeko(false)
             val food: FoodProperties = nekoStack.components.get(ItemComponentTypes.FOOD) ?: return
             val skills: List<Skill> = food.skills.map { SkillRegistry.INSTANCES[it] }
-            val castContext = SkillContext(CasterAdapter.adapt(player), TargetAdapter.adapt(player), nekoStack = nekoStack)
-            skills.forEach { Ticker.INSTANCE.schedule(it.cast(castContext)) }
+
+            for (skill in skills) {
+                val input = skillInput(CasterAdapter.adapt(player)) {
+                    target(TargetAdapter.adapt(player))
+                    holdBy(VanillaItemSlot.fromEquipmentSlot(event.hand)!! to nekoStack)
+                }
+                skill.recordBy(input)
+            }
         }
     }
 

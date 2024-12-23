@@ -37,6 +37,9 @@ dependencies {
     implementation(local.commons.collections)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
+    implementation(local.fleks) {
+        exclude("org.jetbrains")
+    }
     implementation(libs.mocha)
     compileOnlyApi(local.shadow.nbt) // 运行时由 wakame-mixin 提供
     implementation(platform(libs.bom.adventure))

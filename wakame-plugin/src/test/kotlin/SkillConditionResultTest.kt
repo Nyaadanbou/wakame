@@ -1,9 +1,9 @@
-import cc.mewcraft.wakame.skill.condition.ConditionPhase
-import cc.mewcraft.wakame.skill.condition.SkillCondition
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroup
-import cc.mewcraft.wakame.skill.condition.SkillConditionGroupImpl
-import cc.mewcraft.wakame.skill.condition.SkillConditionSession
-import cc.mewcraft.wakame.skill.context.SkillContext
+import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.skill2.condition.ConditionPhase
+import cc.mewcraft.wakame.skill2.condition.SkillCondition
+import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
+import cc.mewcraft.wakame.skill2.condition.SkillConditionGroupImpl
+import cc.mewcraft.wakame.skill2.condition.SkillConditionSession
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -31,12 +31,12 @@ class SkillConditionResultTest : KoinTest {
         }
     }
 
-    private fun testGroup(group: SkillConditionGroup, context: SkillContext): SkillConditionSession {
-        val session = group.newSession(ConditionPhase.CAST_POINT, context)
+    private fun testGroup(group: SkillConditionGroup, componentMap: ComponentMap): SkillConditionSession {
+        val session = group.newSession(ConditionPhase.CAST_POINT, componentMap)
         if (session.isSuccess) {
-            session.onSuccess(context)
+            session.onSuccess(componentMap)
         } else {
-            session.onFailure(context)
+            session.onFailure(componentMap)
         }
 
         return session
@@ -44,7 +44,7 @@ class SkillConditionResultTest : KoinTest {
 
     @Test
     fun `test skill condition result`() {
-        val mockContext = mockk<SkillContext>()
+        val mockComponentMap = mockk<ComponentMap>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
         val session = mockk<SkillConditionSession>(relaxed = true)
 
@@ -54,33 +54,33 @@ class SkillConditionResultTest : KoinTest {
             mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
         )
 
-        every { mockCondition.newSession(mockContext) } returns session
+        every { mockCondition.newSession(mockComponentMap) } returns session
 
-        val result = testGroup(skillConditions, mockContext)
+        val result = testGroup(skillConditions, mockComponentMap)
         assert(result.isSuccess)
-        verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 1) { session.onSuccess(mockContext) }
-        verify(exactly = 0) { session.onFailure(mockContext) }
+        verify(exactly = 1) { mockCondition.newSession(mockComponentMap) }
+        verify(exactly = 1) { session.onSuccess(mockComponentMap) }
+        verify(exactly = 0) { session.onFailure(mockComponentMap) }
     }
 
     @Test
     fun `test skill condition failure`() {
-        val mockContext = mockk<SkillContext>()
+        val mockComponentMap = mockk<ComponentMap>()
         val mockCondition = mockk<SkillCondition>(relaxed = true)
         val session = mockk<SkillConditionSession>(relaxed = true)
 
         every { session.isSuccess } returns false
 
-        every { mockCondition.newSession(mockContext) } returns session
+        every { mockCondition.newSession(mockComponentMap) } returns session
 
         val skillConditions = SkillConditionGroupImpl(
             mapOf(ConditionPhase.CAST_POINT to listOf(mockCondition))
         )
 
-        val result = testGroup(skillConditions, mockContext)
+        val result = testGroup(skillConditions, mockComponentMap)
         assert(!result.isSuccess)
-        verify(exactly = 1) { mockCondition.newSession(mockContext) }
-        verify(exactly = 0) { session.onSuccess(mockContext) }
-        verify(exactly = 1) { session.onFailure(mockContext) }
+        verify(exactly = 1) { mockCondition.newSession(mockComponentMap) }
+        verify(exactly = 0) { session.onSuccess(mockComponentMap) }
+        verify(exactly = 1) { session.onFailure(mockComponentMap) }
     }
 }

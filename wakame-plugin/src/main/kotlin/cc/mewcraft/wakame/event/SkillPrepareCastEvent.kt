@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.event
 
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.Skill
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 

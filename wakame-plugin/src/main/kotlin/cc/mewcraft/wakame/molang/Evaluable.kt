@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.molang
 import cc.mewcraft.wakame.SchemaSerializer
 import me.lucko.helper.function.Numbers
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
@@ -26,6 +27,8 @@ interface Evaluable<T : Any> {
         fun parseNumber(value: Number): Evaluable<Number> = NumberEval(value)
     }
 
+    fun asString(): String
+
     fun evaluate(engine: MochaEngine<*>) : Double
 
     fun evaluate(): Double
@@ -41,6 +44,10 @@ internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
         val evalString = string?.let { Evaluable.parseExpression(it) }
         return evalString ?: throw IllegalArgumentException("Cannot deserialize Evaluable from ${node.path()}")
     }
+
+    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): Evaluable<*> {
+        return Evaluable.parseNumber(0)
+    }
 }
 
 /**
@@ -52,6 +59,10 @@ private data class StringEval(val value: String) : Evaluable<String> {
         val engine = MoLangSupport.createEngine()
         return evaluate(engine)
     }
+
+    override fun asString(): String {
+        return value
+    }
 }
 
 /**
@@ -60,4 +71,7 @@ private data class StringEval(val value: String) : Evaluable<String> {
 private data class NumberEval(val value: Number) : Evaluable<Number> {
     override fun evaluate(engine: MochaEngine<*>): Double = value.toDouble()
     override fun evaluate(): Double = value.toDouble()
+    override fun asString(): String {
+        return value.toString()
+    }
 }

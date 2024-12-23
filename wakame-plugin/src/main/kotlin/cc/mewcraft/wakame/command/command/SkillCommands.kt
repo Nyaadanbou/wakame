@@ -4,11 +4,10 @@ import cc.mewcraft.wakame.command.CommandConstants
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.SkillParser
-import cc.mewcraft.wakame.skill.CasterAdapter
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.TargetAdapter
-import cc.mewcraft.wakame.skill.context.SkillContext
-import cc.mewcraft.wakame.tick.Ticker
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.skill2.character.TargetAdapter
+import cc.mewcraft.wakame.skill2.context.skillInput
 import org.bukkit.Location
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.LivingEntity
@@ -23,10 +22,9 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.commandBuilder
-import org.koin.core.component.KoinComponent
 import kotlin.jvm.optionals.getOrNull
 
-object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
+object SkillCommands : CommandFactory<CommandSender> {
     private const val SKILL_LITERAL = "skill"
 
     override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
@@ -64,8 +62,10 @@ object SkillCommands : CommandFactory<CommandSender>, KoinComponent {
                         ?: targetLocation?.let { TargetAdapter.adapt(it) }
 
                     val skill = context.get<Skill>("skill")
-                    val castContext = SkillContext(CasterAdapter.adapt(casterPlayer), target)
-                    Ticker.INSTANCE.schedule(skill.cast(castContext))
+                    val input = skillInput(CasterAdapter.adapt(casterPlayer)) {
+                        target?.let { target(it) }
+                    }
+                    skill.recordBy(input)
                 }
             }.buildAndAdd(this)
         }

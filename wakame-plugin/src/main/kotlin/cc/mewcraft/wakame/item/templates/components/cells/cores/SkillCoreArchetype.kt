@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.SkillContextData
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.Skill
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -23,8 +23,8 @@ fun SkillCoreArchetype(
     id: Key,
     node: ConfigurationNode
 ): SkillCoreArchetype {
-    val configuredSkill = ConfiguredSkill(id, node)
-    return SimpleSkillCoreArchetype(id, configuredSkill)
+    val playerSkill = PlayerSkill(id, node)
+    return SimpleSkillCoreArchetype(id, playerSkill)
 }
 
 /**
@@ -34,7 +34,7 @@ interface SkillCoreArchetype : CoreArchetype {
     /**
      * 该模板包含的技能.
      */
-    val skill: ConfiguredSkill
+    val skill: PlayerSkill
 
     /**
      * 该模板包含的技能所对应的实例.
@@ -55,7 +55,7 @@ interface SkillCoreArchetype : CoreArchetype {
  */
 internal data class SimpleSkillCoreArchetype(
     override val id: Key,
-    override val skill: ConfiguredSkill,
+    override val skill: PlayerSkill,
 ) : SkillCoreArchetype {
     override val instance: Skill
         get() = SkillRegistry.INSTANCES[id]

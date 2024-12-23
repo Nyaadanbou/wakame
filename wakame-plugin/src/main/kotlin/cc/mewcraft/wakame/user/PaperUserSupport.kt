@@ -6,8 +6,7 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.skill.SkillMap
-import cc.mewcraft.wakame.skill.state.SkillState
+import cc.mewcraft.wakame.skill2.state.SkillState
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -36,8 +35,6 @@ class PaperUser(
 
     override val attributeMap: AttributeMap = AttributeMap(this)
 
-    override val skillMap: SkillMap = SkillMap(this)
-
     override val resourceMap: ResourceMap = ResourceMap(this)
 
     override val skillState: SkillState<Player> = SkillState(this)
@@ -55,7 +52,7 @@ class PaperUser(
     }
 
     override fun cleanup() {
-        skillMap.cleanup()
+        skillState
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

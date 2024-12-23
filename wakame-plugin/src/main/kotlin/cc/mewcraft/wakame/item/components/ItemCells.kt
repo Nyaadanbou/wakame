@@ -5,10 +5,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.skill.ConfiguredSkill
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.TriggerVariant
+import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
@@ -109,9 +107,9 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
 
     /**
-     * 获取所有核孔上的 [ConfiguredSkill].
+     * 获取所有核孔上的 [PlayerSkill].
      */
-    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill>
+    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -222,24 +220,23 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return ret.build()
         }
 
-        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Multimap<Trigger, Skill> {
-            val ret = ImmutableListMultimap.builder<Trigger, Skill>()
+        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill> {
+            val ret = ArrayList<PlayerSkill>()
             for ((_, cell) in this) {
                 val core = cell.getCore() as? SkillCore ?: continue
                 val skill = core.skill
 
                 val skillVariant = skill.variant
-                val skillInstance = skill.instance
                 if (skillVariant == TriggerVariant.any()) {
-                    ret.put(skill.trigger, skillInstance)
+                    ret.add(skill)
                     continue
                 }
                 if (skillVariant.id != context.variant) {
                     continue
                 }
-                ret.put(skill.trigger, skillInstance)
+                ret.add(skill)
             }
-            return ret.build()
+            return ret
         }
 
         override fun containSimilarCore(core: Core): Boolean {

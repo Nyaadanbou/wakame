@@ -18,8 +18,8 @@ conditions:
 
 display:
   triggers:
-    trigger:generic/left_click: "<green>Left Click"
-    trigger:generic/right_click: "<green>Right Click"
+    trigger:generic/left_click: "<green><b>L"
+    trigger:generic/right_click: "<green><b>R"
 
   player_state:
     connector: "<gray>-"
@@ -34,3 +34,11 @@ display:
     progress_message:
       - type: actionbar
         text: "<trigger_completed>"
+
+    mana_cost_message:
+      - type: actionbar
+        text: "<aqua><gray>-</gray> <aqua><count></aqua> <blue>[</blue>●<blue>]</blue></aqua>"
+
+    no_enough_mana_message:
+      - type: chat
+        text: "<red>You don't have enough mana to use this skill. </red>"

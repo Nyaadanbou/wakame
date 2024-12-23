@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.Skill
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable

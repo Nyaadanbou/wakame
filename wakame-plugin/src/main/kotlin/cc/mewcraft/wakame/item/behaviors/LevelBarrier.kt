@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill.Skill
+import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.entity.Entity

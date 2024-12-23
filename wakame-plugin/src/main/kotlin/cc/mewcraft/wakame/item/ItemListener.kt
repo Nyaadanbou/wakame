@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill.SkillEventHandler
+import cc.mewcraft.wakame.skill2.SkillEventHandler
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -38,6 +38,7 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.getValue
 
 /**
  * 监听玩家物品栏中的物品所发生的变化.
@@ -312,19 +313,19 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         when (event.action) {
             Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
+                skillEventHandler.onLeftClickBlock(player, event)
             }
 
             Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, itemStack, event)
+                skillEventHandler.onLeftClickAir(player, event)
             }
 
             Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, itemStack, event.clickedBlock?.location!!, event)
+                skillEventHandler.onRightClickBlock(player, event)
             }
 
             Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, itemStack, event)
+                skillEventHandler.onRightClickAir(player, event)
             }
 
             else -> return
@@ -341,7 +342,7 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         val entity = event.entity as? LivingEntity ?: return
         val itemStack = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        skillEventHandler.onAttack(damager, entity, itemStack, event)
+        skillEventHandler.onAttack(damager, itemStack, event)
     }
 
     @EventHandler

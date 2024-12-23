@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.SkillCore
 import cc.mewcraft.wakame.item.components.cells.isEmpty
-import cc.mewcraft.wakame.skill.trigger.Trigger
-import cc.mewcraft.wakame.skill.trigger.TriggerVariant
+import cc.mewcraft.wakame.skill2.trigger.Trigger
+import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString

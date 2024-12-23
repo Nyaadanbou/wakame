@@ -9,7 +9,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
-import cc.mewcraft.wakame.skill.SKILL_EXTERNALS
+import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
+import cc.mewcraft.wakame.skill2.SKILL_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -56,6 +57,7 @@ data class PortableCore(
             return TypeSerializerCollection.builder()
                 .kregister(CoreArchetypeSerializer)
                 .registerAll(get(named(SKILL_EXTERNALS))) // 技能, 部分核心会用到
+                .registerAll(get(named(EVALUABLE_SERIALIZERS))) // 可计算值, 部分核心会用到
                 .build()
         }
     }

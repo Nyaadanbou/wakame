@@ -5,15 +5,11 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PreWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.skill.Skill
-import cc.mewcraft.wakame.skill.SkillFactories
-import cc.mewcraft.wakame.skill.condition.ManaCondition
-import cc.mewcraft.wakame.skill.condition.MoLangExpression
-import cc.mewcraft.wakame.skill.condition.NekoDurability
-import cc.mewcraft.wakame.skill.condition.SkillConditionFactory
-import cc.mewcraft.wakame.skill.trigger.SequenceTrigger
-import cc.mewcraft.wakame.skill.trigger.SingleTrigger
-import cc.mewcraft.wakame.skill.trigger.Trigger
+import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.skill2.factory.SkillFactories
+import cc.mewcraft.wakame.skill2.trigger.SequenceTrigger
+import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
+import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -42,11 +38,6 @@ object SkillRegistry : Initializable, KoinComponent {
     val INSTANCES: Registry<Key, Skill> = SimpleRegistry()
 
     /**
-     * 技能条件.
-     */
-    val CONDITIONS: Registry<String, SkillConditionFactory<*>> = SimpleRegistry()
-
-    /**
      * 技能触发器.
      */
     val TRIGGERS: Registry<Key, Trigger> = SimpleRegistry()
@@ -55,12 +46,6 @@ object SkillRegistry : Initializable, KoinComponent {
         get() = INSTANCES.mapTo(ObjectArraySet(1)) { it.key.value() }
 
     private val LOGGER: Logger by inject()
-
-    private fun loadSkillConditions() {
-        CONDITIONS.register("durability", NekoDurability)
-        CONDITIONS.register("molang", MoLangExpression)
-        CONDITIONS.register("mana", ManaCondition)
-    }
 
     private fun loadTriggers() {
         val GENERIC_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.ATTACK, SingleTrigger.JUMP)
@@ -112,7 +97,6 @@ object SkillRegistry : Initializable, KoinComponent {
 
     override fun onPreWorld() {
         SkillFactories.load()
-        loadSkillConditions()
         loadConfiguration()
         loadTriggers()
     }
