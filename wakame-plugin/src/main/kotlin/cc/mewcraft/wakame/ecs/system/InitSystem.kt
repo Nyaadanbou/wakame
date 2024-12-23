@@ -7,7 +7,6 @@ class InitSystem : IntervalSystem() {
     override fun onTick() {
         world.forEach { entity ->
             entity.configure {
-                it += Tags.CAN_TICK
                 it -= Tags.READY_TO_REMOVE
             }
         }

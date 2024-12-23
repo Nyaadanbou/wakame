@@ -13,13 +13,11 @@ import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
+import cc.mewcraft.wakame.skill2.PlayerSkill
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
-import cc.mewcraft.wakame.skill2.context.skillInput
-import cc.mewcraft.wakame.skill2.trigger.Trigger
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
-import com.google.common.collect.Multimap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import kotlin.collections.component1
@@ -208,7 +206,7 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
         nekoStack ?: return
         val skills = nekoStack.getSkills() ?: return
-        skills.forEach { trigger, skill -> recordSkill(player, skill, trigger, slot, nekoStack) }
+        skills.forEach { skill -> recordSkill(player, skill, slot to nekoStack) }
     }
 
     override fun onEnd(player: Player) {
@@ -217,18 +215,14 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
         user.skillState.reset()
     }
 
-    private fun NekoStack.getSkills(): Multimap<Trigger, Skill>? {
+    private fun NekoStack.getSkills(): Collection<PlayerSkill>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
         // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
         val skills = cells.collectSkillModifiers(this, ItemSlot.imaginary())
         return skills
     }
 
-    private fun recordSkill(player: Player, skill: Skill, trigger: Trigger, slot: ItemSlot, nekoStack: NekoStack) {
-        val input = skillInput(CasterAdapter.adapt(player)) {
-            trigger(trigger)
-            holdBy(slot to nekoStack)
-        }
-        skill.recordBy(input)
+    private fun recordSkill(player: Player, skill: PlayerSkill, holdBy: Pair<ItemSlot, NekoStack>?) {
+        skill.recordBy(CasterAdapter.adapt(player), null, holdBy)
     }
 }

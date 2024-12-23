@@ -3,8 +3,12 @@ package cc.mewcraft.wakame.skill2
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.SkillRegistry
 import cc.mewcraft.wakame.skill2.character.Caster
+import cc.mewcraft.wakame.skill2.character.Target
 import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
@@ -24,45 +28,47 @@ import java.util.function.Predicate
 
 
 /**
- * 本函数用于直接构建 [ConfiguredSkill].
+ * 本函数用于直接构建 [PlayerSkill].
  *
- * @param id 技能的唯一标识, 也就是 [ConfiguredSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
  * @param trigger 触发此技能的触发器
  * @param variant 可以触发此技能的物品变体
  *
- * @return 构建的 [ConfiguredSkill]
+ * @return 构建的 [PlayerSkill]
  */
-fun ConfiguredSkill(
-    id: Key, trigger: Trigger, variant: TriggerVariant,
-): ConfiguredSkill {
-    return SimpleConfiguredSkill(id, trigger, variant)
+fun PlayerSkill(
+    id: Key, trigger: Trigger, variant: TriggerVariant, manaCost: Evaluable<*>,
+): PlayerSkill {
+    return SimplePlayerSkill(id, trigger, variant, manaCost)
 }
 
 /**
- * 本函数用于从 NBT 构建 [ConfiguredSkill].
+ * 本函数用于从 NBT 构建 [PlayerSkill].
  *
  * 给定的 NBT 的结构必须是以下结构:
  *
  * ```NBT
  * string('trigger'): <trigger>
  * int('variant'): <variant>
+ * string('mana_cost'): <manaCost>
  * ```
  *
- * @param id 技能的唯一标识, 也就是 [ConfiguredSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
  * @param tag 包含该技能数据的 NBT
  *
- * @return 从 NBT 构建的 [ConfiguredSkill]
+ * @return 从 NBT 构建的 [PlayerSkill]
  */
-fun ConfiguredSkill(
+fun PlayerSkill(
     id: Key, tag: CompoundTag,
-): ConfiguredSkill {
+): PlayerSkill {
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
-    return SimpleConfiguredSkill(id, trigger, variant)
+    val manaCost = tag.readEvaluable()
+    return SimplePlayerSkill(id, trigger, variant, manaCost)
 }
 
 /**
- * 本函数用于从配置文件构建 [ConfiguredSkill].
+ * 本函数用于从配置文件构建 [PlayerSkill].
  *
  * 给定的 [ConfigurationNode] 必须是以下结构:
  *
@@ -70,19 +76,21 @@ fun ConfiguredSkill(
  * <node>:
  *  trigger: <trigger>
  *  variant: <variant>
+ *  mana_cost: <manaCost>
  * ```
  *
- * @param id 技能的唯一标识, 也就是 [ConfiguredSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
  * @param node 包含技能数据的配置节点
  *
- * @return 从配置文件构建的 [ConfiguredSkill]
+ * @return 从配置文件构建的 [PlayerSkill]
  */
-fun ConfiguredSkill(
+fun PlayerSkill(
     id: Key, node: ConfigurationNode,
-): ConfiguredSkill {
+): PlayerSkill {
     val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
     val variant = node.node("variant").krequire<TriggerVariant>()
-    return SimpleConfiguredSkill(id, trigger, variant)
+    val manaCost = node.node("mana_cost").krequire<Evaluable<*>>()
+    return SimplePlayerSkill(id, trigger, variant, manaCost)
 }
 
 /**
@@ -96,7 +104,8 @@ fun ConfiguredSkill(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
-interface ConfiguredSkill : BinarySerializable<CompoundTag> {
+// FIXME: 改名为 PlayerAbility
+interface PlayerSkill : BinarySerializable<CompoundTag> {
     /**
      * 技能的唯一标识.
      */
@@ -118,6 +127,11 @@ interface ConfiguredSkill : BinarySerializable<CompoundTag> {
     val instance: Skill
 
     /**
+     * 技能的法力消耗.
+     */
+    val manaCost: Evaluable<*>
+
+    /**
      * 技能的显示名称.
      */
     val displayName: Component
@@ -130,7 +144,7 @@ interface ConfiguredSkill : BinarySerializable<CompoundTag> {
     /**
      * 使用 [caster] 记录技能的信息到 ECS 中.
      */
-    fun recordBy(caster: Caster)
+    fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?)
 
     /**
      * 将此对象序列化为 NBT, 拥有以下结构:
@@ -146,13 +160,14 @@ interface ConfiguredSkill : BinarySerializable<CompoundTag> {
 }
 
 /**
- * [ConfiguredSkill] 的标准实现.
+ * [PlayerSkill] 的标准实现.
  */
-internal data class SimpleConfiguredSkill(
+internal data class SimplePlayerSkill(
     override val id: Key,
     override val trigger: Trigger,
     override val variant: TriggerVariant,
-) : ConfiguredSkill {
+    override val manaCost: Evaluable<*>,
+) : PlayerSkill {
     override val instance: Skill
         get() = SkillRegistry.INSTANCES[id]
     override val displayName: Component
@@ -160,9 +175,12 @@ internal data class SimpleConfiguredSkill(
     override val description: List<Component>
         get() = instance.displays.tooltips.map(MM::deserialize)
 
-    override fun recordBy(caster: Caster) {
+    override fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val input = skillInput(caster) {
             trigger(trigger)
+            manaCost(manaCost)
+            holdBy(holdBy)
+            target?.let { target(it) }
         }
         instance.recordBy(input)
     }
@@ -170,6 +188,7 @@ internal data class SimpleConfiguredSkill(
     override fun serializeAsTag(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
+        writeEvaluable(manaCost)
     }
 
     companion object Shared {
@@ -203,6 +222,7 @@ internal object TriggerVariantSerializer : ScalarSerializer<TriggerVariant>(type
 //<editor-fold desc="Convenient extension functions">
 private const val NBT_SKILL_TRIGGER = "trigger"
 private const val NBT_SKILL_TRIGGER_VARIANT = "variant"
+private const val NBT_SKILL_MANA_COST = "mana_cost"
 
 private fun CompoundTag.readTrigger(): Trigger {
     return getStringOrNull(NBT_SKILL_TRIGGER)?.let { SkillRegistry.TRIGGERS[Key(it)] } ?: SingleTrigger.NOOP
@@ -215,6 +235,10 @@ private fun CompoundTag.readVariant(): TriggerVariant {
     return TriggerVariant.of(variant)
 }
 
+private fun CompoundTag.readEvaluable(): Evaluable<*> {
+    return getStringOrNull(NBT_SKILL_MANA_COST)?.let { Evaluable.parseExpression(it) } ?: Evaluable.parseNumber(0)
+}
+
 private fun CompoundTag.writeTrigger(trigger: Trigger) {
     if (trigger == SingleTrigger.NOOP)
         return
@@ -225,5 +249,9 @@ private fun CompoundTag.writeVariant(variant: TriggerVariant) {
     if (variant == TriggerVariant.any())
         return
     putInt(NBT_SKILL_TRIGGER_VARIANT, variant.id)
+}
+
+private fun CompoundTag.writeEvaluable(evaluable: Evaluable<*>) {
+    putString(NBT_SKILL_MANA_COST, evaluable.asString())
 }
 //</editor-fold>

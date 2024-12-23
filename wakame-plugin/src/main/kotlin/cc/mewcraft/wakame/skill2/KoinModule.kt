@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.skill2.condition.SkillConditionGroupSerializer
 import cc.mewcraft.wakame.skill2.display.SkillDisplaySerializer
 import cc.mewcraft.wakame.skill2.state.display.EntityStateDisplay
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
@@ -42,7 +41,6 @@ fun skill2Module(): Module = module {
     single<TypeSerializerCollection>(named(SKILL_GROUP_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .kregister(SkillDisplaySerializer)
-            .kregister(SkillConditionGroupSerializer)
             .registerAll(get(named(EVALUABLE_SERIALIZERS)))
             .build()
     }

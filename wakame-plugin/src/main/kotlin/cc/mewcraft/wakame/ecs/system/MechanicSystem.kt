@@ -10,7 +10,7 @@ import com.github.quillraven.fleks.World.Companion.inject
 class MechanicSystem(
     private val wakameWorld: WakameWorld = inject()
 ) : IteratingSystem(
-    family = family { all(MechanicComponent, TickCountComponent, Tags.CAN_TICK) }
+    family = family { all(MechanicComponent, TickCountComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val tick = entity[TickCountComponent].tick

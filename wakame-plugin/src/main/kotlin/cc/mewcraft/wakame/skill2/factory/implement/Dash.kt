@@ -88,10 +88,14 @@ private class DashSkillMechanic(
         private const val STARTING_TICK: Long = 10L
     }
 
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+        return TickResult.NEXT_STATE
+    }
+
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         if (tickCount >= skill.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.NEXT_STATE
+            return TickResult.NEXT_STATE_NO_CONSUME
         }
         val entity = componentMap[CastBy]?.entity ?: return TickResult.INTERRUPT // 无效生物
         val direction = entity.location.direction.setY(0).normalize()
@@ -109,7 +113,7 @@ private class DashSkillMechanic(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.NEXT_STATE
+                return TickResult.NEXT_STATE_NO_CONSUME
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -126,7 +130,7 @@ private class DashSkillMechanic(
 
         if (affectEntityNearby(entity)) {
             if (!skill.canContinueAfterHit) {
-                return TickResult.NEXT_STATE
+                return TickResult.NEXT_STATE_NO_CONSUME
             }
         }
 

@@ -3,11 +3,13 @@ package cc.mewcraft.wakame.skill2.context
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
 import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.ManaCostComponent
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.component.TriggerComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.skill2.character.Caster
 import cc.mewcraft.wakame.skill2.character.Target
@@ -53,6 +55,11 @@ interface SkillInput {
     val holdBy: Pair<ItemSlot, NekoStack>?
 
     /**
+     * 此次技能的法力消耗 [Evaluable], 用于计算法力消耗.
+     */
+    val manaCost: Evaluable<*>
+
+    /**
      * 此次技能的计算引擎 [MochaEngine].
      */
     val mochaEngine: MochaEngine<*>
@@ -80,11 +87,13 @@ class SkillInputDSL(
     private var target: Target = TargetAdapter.adapt(castBy)
     private var trigger: Trigger = SingleTrigger.NOOP
     private var holdBy: Pair<ItemSlot, NekoStack>? = null
+    private var manaCost: Evaluable<*> = Evaluable.parseNumber(0)
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
     fun trigger(trigger: Trigger) = apply { this.trigger = trigger }
     fun target(target: Target) = apply { this.target = target }
     fun holdBy(holdBy: Pair<ItemSlot, NekoStack>?) = apply { this.holdBy = holdBy }
+    fun manaCost(manaCost: Evaluable<*>) = apply { this.manaCost = manaCost }
     fun mochaEngine(mochaEngine: MochaEngine<*>) = apply { this.mochaEngine = mochaEngine }
 
     fun build(): SkillInput = SimpleSkillInput(
@@ -92,6 +101,7 @@ class SkillInputDSL(
         target = target,
         trigger = trigger,
         holdBy = holdBy,
+        manaCost = manaCost,
         mochaEngine = mochaEngine
     )
 }
@@ -103,6 +113,7 @@ private class SimpleSkillInput(
     override val target: Target,
     override val trigger: Trigger,
     override val holdBy: Pair<ItemSlot, NekoStack>?,
+    override val manaCost: Evaluable<*>,
     override val mochaEngine: MochaEngine<*>,
 ) : SkillInput, Examinable {
 
@@ -117,14 +128,16 @@ private class SimpleSkillInput(
             .trigger(trigger)
             .target(target)
             .holdBy(holdBy)
+            .manaCost(manaCost)
             .mochaEngine(mochaEngine)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("caster", castBy),
+        ExaminableProperty.of("castBy", castBy),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("castItem", holdBy),
+        ExaminableProperty.of("holdBy", holdBy),
+        ExaminableProperty.of("manaCost", manaCost),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )
 
@@ -150,6 +163,8 @@ private class ComponentMapSkillInput(
             val nekoStack = componentMap[HoldBy]?.nekoStack ?: return null
             return slot to nekoStack
         }
+    override val manaCost: Evaluable<*>
+        get() = requireNotNull(componentMap[ManaCostComponent]?.expression) { "ManaCost not found in componentMap" }
     override val mochaEngine: MochaEngine<*>
         get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
@@ -158,14 +173,16 @@ private class ComponentMapSkillInput(
             .trigger(trigger)
             .target(target)
             .holdBy(holdBy)
+            .manaCost(manaCost)
             .mochaEngine(mochaEngine)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("caster", castBy),
+        ExaminableProperty.of("castBy", castBy),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("castItem", holdBy),
+        ExaminableProperty.of("holdBy", holdBy),
+        ExaminableProperty.of("manaCost", manaCost),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )
 

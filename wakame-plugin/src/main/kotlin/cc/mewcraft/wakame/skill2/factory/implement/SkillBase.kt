@@ -1,22 +1,11 @@
 package cc.mewcraft.wakame.skill2.factory.implement
 
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.EntityType
-import cc.mewcraft.wakame.ecs.component.MechanicComponent
-import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
-import cc.mewcraft.wakame.ecs.component.Tags
-import cc.mewcraft.wakame.ecs.component.TargetComponent
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.TriggerComponent
+import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
-import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -37,21 +26,20 @@ abstract class SkillBase(
         private val wakameWorld: WakameWorld by inject()
     }
 
-    override val displays: SkillDisplay = config.node("displays").get<SkillDisplay>() ?: SkillDisplay.Companion.empty()
-    override val conditions: SkillConditionGroup = config.node("conditions").get<SkillConditionGroup>() ?: SkillConditionGroup.empty()
-    override val triggerHandleData: TriggerHandleData = config.node("triggers").get<TriggerHandleData>() ?: TriggerHandleData()
+    override val displays: SkillDisplay = config.node("displays").get<SkillDisplay>() ?: SkillDisplay.empty()
 
     /**
      * 添加一个 [Skill] 状态.
      */
-    private fun addMechanic(inputProvider: () -> SkillInput) {
-        val input = inputProvider()
+    private fun addMechanic(input: SkillInput) {
         wakameWorld.createEntity(key.asString()) {
             it += EntityType.SKILL
             it += Tags.DISPOSABLE
             it += CastBy(input.castBy)
+            HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
             it += TargetComponent(input.target)
-            input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second) }
+            input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
+            it += ManaCostComponent(input.manaCost)
             it += MechanicComponent(mechanic(input))
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
@@ -61,15 +49,13 @@ abstract class SkillBase(
     }
 
     override fun recordBy(input: SkillInput) {
-        addMechanic { input }
+        addMechanic(input)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("key", key),
             ExaminableProperty.of("displays", displays),
-            ExaminableProperty.of("conditions", conditions),
-            ExaminableProperty.of("triggerHandleData", triggerHandleData),
         )
     }
 

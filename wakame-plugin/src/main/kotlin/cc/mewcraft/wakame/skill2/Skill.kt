@@ -2,11 +2,9 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.skill2.condition.SkillConditionGroup
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
 import cc.mewcraft.wakame.skill2.result.SkillMechanic
-import cc.mewcraft.wakame.skill2.trigger.TriggerHandleData
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -35,18 +33,6 @@ interface Skill : Keyed, Examinable {
      * [Skill] will be found by the [key].
      */
     override val key: Key
-
-    /**
-     * The conditions that must be met in order to cast this skill.
-     *
-     * @see SkillConditionGroup
-     */
-    val conditions: SkillConditionGroup
-
-    /**
-     * 在触发对 [cc.mewcraft.wakame.skill2.trigger.Trigger] 进行的判断
-     */
-    val triggerHandleData: TriggerHandleData
 
     /**
      * The display infos of this skill.
@@ -78,8 +64,6 @@ interface Skill : Keyed, Examinable {
 private data object EmptySkill : Skill {
     override val key: Key = Key(Namespaces.SKILL, "empty")
     override val displays: SkillDisplay = SkillDisplay.empty()
-    override val conditions: SkillConditionGroup = SkillConditionGroup.empty()
-    override val triggerHandleData: TriggerHandleData = TriggerHandleData()
     override fun recordBy(input: SkillInput) = Unit
     override fun mechanic(input: SkillInput): SkillMechanic<Skill> = SkillMechanic()
 }

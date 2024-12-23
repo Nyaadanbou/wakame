@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
-import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.state.SkillStateResult
 import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.toUser
@@ -77,11 +76,8 @@ internal class SkillEventHandler {
                 // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
-                for (skill in skills.values()) {
-                    val input = skillInput(CasterAdapter.adapt(projectile)) {
-                        target(target)
-                    }
-                    skill.recordBy(input)
+                for (skill in skills) {
+                    skill.recordBy(CasterAdapter.adapt(projectile.shooter as Player), target, ItemSlot.imaginary() to nekoStack)
                 }
             }
         }

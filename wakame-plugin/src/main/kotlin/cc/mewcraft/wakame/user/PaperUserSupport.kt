@@ -52,7 +52,7 @@ class PaperUser(
     }
 
     override fun cleanup() {
-//        skillMap.cleanup()
+        skillState
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

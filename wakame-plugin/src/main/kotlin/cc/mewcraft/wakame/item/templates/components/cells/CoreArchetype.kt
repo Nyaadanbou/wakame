@@ -18,6 +18,7 @@ import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.SkillFilter
+import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.GroupSerializer
 import cc.mewcraft.wakame.random3.Node
@@ -200,6 +201,7 @@ internal class CoreArchetypeSampleNodeFacade(
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(SKILL_EXTERNALS)))
+        registerAll(get(named(EVALUABLE_SERIALIZERS)))
         kregister(CoreArchetypeSerializer)
         kregister(FilterSerializer)
     }.build()

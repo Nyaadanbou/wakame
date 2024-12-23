@@ -33,22 +33,6 @@ internal class SkillWorldInteraction(
         return skills
     }
 
-    fun getAllActiveSkill(bukkitEntity: Entity): Set<Skill> {
-        val skills = mutableSetOf<Skill>()
-        with(world.instance) {
-            forEach { entity ->
-                val family = family { all(EntityType.SKILL, CastBy, IdentifierComponent) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[CastBy].caster == bukkitEntity) {
-                    skills.add(SkillRegistry.INSTANCES[Key(entity[IdentifierComponent].id)])
-                }
-            }
-        }
-
-        return skills
-    }
-
     fun getAllActiveSkillTriggers(bukkitEntity: Entity): Set<Trigger> {
         val triggers = mutableSetOf<Trigger>()
         with(world.instance) {
@@ -65,78 +49,30 @@ internal class SkillWorldInteraction(
         return triggers
     }
 
-    /**
-     * 中断一个指定 [bukkitEntity] 的 [Skill].
-     */
-    fun interruptSkillBy(bukkitEntity: Entity, skill: Skill) {
-        interruptSkillBy(bukkitEntity, skill.key.asString())
-    }
-
-    /**
-     * 中断一个指定 [bukkitEntity] 的 [Skill]. 并且由 [trigger] 触发.
-     */
-    fun interruptSkillBy(bukkitEntity: Entity, trigger: Trigger, skill: Skill) {
-        with(world.instance) {
-            forEach { entity ->
-                val family = family { all(EntityType.SKILL, CastBy, TriggerComponent, IdentifierComponent) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[CastBy].entity != bukkitEntity) {
-                    return@forEach
-                }
-                if (entity[TriggerComponent].trigger != trigger) {
-                    return@forEach
-                }
-                if (entity[IdentifierComponent].id != skill.key.asString()) {
-                    return@forEach
-                }
-                world.removeEntity(entity)
-            }
-        }
-    }
-
-    /**
-     * 中断指定 [bukkitEntity] [identifier] 的 [Skill].
-     */
-    fun interruptSkillBy(bukkitEntity: Entity, identifier: String) {
-        with(world.instance) {
-            family { all(EntityType.SKILL, CastBy, IdentifierComponent) }
-                .forEach {
-                    if (it[CastBy].entity != bukkitEntity)
-                        return@forEach
-                    if (it[IdentifierComponent].id != identifier)
-                        return@forEach
-                    world.removeEntity(it)
-                }
-        }
-    }
-
-    /**
-     * 中断所有 [Entity] 下的 [Skill].
-     */
-    fun interruptSkillBy(bukkitEntity: Entity) {
-        with(world.instance) {
-            family { all(EntityType.SKILL, CastBy) }
-                .forEach {
-                    if (it[CastBy].caster.uniqueId != bukkitEntity.uniqueId)
-                        return@forEach
-                    world.removeEntity(it)
-                }
-        }
-    }
-
-    fun markNextState(bukkitEntity: Entity, skills: Collection<Skill>) {
+    fun setNextState(bukkitEntity: Entity, skill: Skill) {
         world.editEntities(
-            family = { family { all(EntityType.SKILL, IdentifierComponent, CastBy, StatePhaseComponent) } }
+            family = { family { all(EntityType.SKILL, IdentifierComponent, CastBy, StatePhaseComponent, TickResultComponent) } }
         ) { entity ->
             if (entity[CastBy].entity != bukkitEntity)
                 return@editEntities
             if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
                 // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
-            if (entity[IdentifierComponent].id !in skills.map { it.key.asString() })
+            if (entity[IdentifierComponent].id != skill.key.asString())
                 return@editEntities
-            entity += Tags.CAN_NEXT_STATE
+            entity.configure { it += Tags.NEXT_STATE }
+        }
+    }
+
+    fun setCostPenalty(bukkitEntity: Entity, skillId: String, penalty: ManaCostPenalty) {
+        world.editEntities(
+            family = { family { all(EntityType.SKILL, IdentifierComponent, CastBy, MochaEngineComponent) } }
+        ) { entity ->
+            if (entity[CastBy].entity != bukkitEntity)
+                return@editEntities
+            if (entity[IdentifierComponent].id != skillId)
+                return@editEntities
+            entity[ManaCostComponent].penalty = penalty
         }
     }
 }

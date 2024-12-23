@@ -13,6 +13,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 import java.util.stream.Stream
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * 技能状态
@@ -29,6 +31,8 @@ sealed interface SkillState<U> : Examinable {
      * 将技能状态恢复为默认
      */
     fun reset()
+
+    fun cleanup()
 }
 
 fun SkillState(user: User<Player>): SkillState<Player> {
@@ -53,7 +57,7 @@ class PlayerSkillState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo = IdleStateInfo(player)
+    private var stateInfo: StateInfo by SkillStateProvider { IdleStateInfo(player) }
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
@@ -66,6 +70,11 @@ class PlayerSkillState(
         cooldown.reset()
     }
 
+    override fun cleanup() {
+        cooldown.reset()
+        stateInfo.cleanup()
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("uniqueId", uniqueId)
@@ -74,5 +83,19 @@ class PlayerSkillState(
 
     override fun toString(): String {
         return toSimpleString()
+    }
+}
+
+private class SkillStateProvider(
+    private val initializer: () -> StateInfo
+) : ReadWriteProperty<Any, StateInfo> {
+    private var stateInfo: StateInfo? = null
+
+    override fun getValue(thisRef: Any, property: KProperty<*>): StateInfo {
+        return stateInfo ?: initializer().also { stateInfo = it }
+    }
+
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: StateInfo) {
+        stateInfo = value
     }
 }

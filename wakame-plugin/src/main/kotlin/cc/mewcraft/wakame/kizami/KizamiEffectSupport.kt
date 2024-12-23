@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.skill2.ConfiguredSkill
+import cc.mewcraft.wakame.skill2.PlayerSkill
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.user.User
@@ -67,7 +67,7 @@ internal object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             ) {
                 Namespaces.SKILL -> {
                     val configuredSkillId = type1
-                    val configuredSkill = ConfiguredSkill(configuredSkillId, childNode)
+                    val configuredSkill = PlayerSkill(configuredSkillId, childNode)
                     builtEffects += KizamiSkill(configuredSkill)
                 }
 
@@ -92,10 +92,10 @@ internal object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
  * A [skill][Skill] provided by a kizami.
  */
 internal data class KizamiSkill(
-    override val effect: ConfiguredSkill,
-) : KizamiEffect.Single<ConfiguredSkill> {
+    override val effect: PlayerSkill,
+) : KizamiEffect.Single<PlayerSkill> {
     override fun apply(user: User<*>) {
-        effect.recordBy(CasterAdapter.adapt(user.player as Player))
+        effect.recordBy(CasterAdapter.adapt(user.player as Player), null, null)
     }
 
     override fun remove(user: User<*>) {

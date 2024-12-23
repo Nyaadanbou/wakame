@@ -13,3 +13,7 @@ data class HoldBy(
 
     companion object : ComponentType<HoldBy>()
 }
+
+fun HoldBy(pair: Pair<ItemSlot, NekoStack>?): HoldBy? {
+    return pair?.let { HoldBy(it.second, it.first) }
+}

@@ -28,11 +28,8 @@ class TickResultSystem(
 
             TickResult.CONTINUE_TICK -> return
 
-            TickResult.NEXT_STATE -> {
+            TickResult.NEXT_STATE, TickResult.NEXT_STATE_NO_CONSUME, TickResult.RESET_STATE -> {
                 entity[TickCountComponent].tick = .0
-                entity.configure {
-                    it += Tags.CAN_NEXT_STATE
-                }
                 return
             }
 

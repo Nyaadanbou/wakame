@@ -35,6 +35,10 @@ data class ComponentMap(
         return componentsMap[type] as? T
     }
 
+    operator fun contains(type: ComponentType<out Any>): Boolean = componentsMap.containsKey(type)
+
+    operator fun contains(tag: EntityTags): Boolean = tags.contains(tag)
+
     internal inline operator fun <reified T : Component<T>> plusAssign(component: T) {
         wakameWorld.editEntity(entity) {
             it += component

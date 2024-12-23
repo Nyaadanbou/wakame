@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.skill2.trigger.SingleTrigger
 import cc.mewcraft.wakame.skill2.trigger.Trigger
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.Player
@@ -18,6 +19,8 @@ interface StateDisplay<A : Audience> {
     fun displaySuccess(triggers: List<SingleTrigger>, audience: A)
     fun displayFailure(triggers: List<SingleTrigger>, audience: A)
     fun displayProgress(triggers: List<SingleTrigger>, audience: A)
+    fun displayManaCost(count: Int, audience: A)
+    fun displayNoEnoughMana(audience: A)
 }
 
 class EntityStateDisplay : StateDisplay<Player> {
@@ -30,6 +33,8 @@ class EntityStateDisplay : StateDisplay<Player> {
     private val successMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("success_message").orElse(AudienceMessageGroup.empty())
     private val failureMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("failure_message").orElse(AudienceMessageGroup.empty())
     private val progressMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("progress_message").orElse(AudienceMessageGroup.empty())
+    private val manaCostMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("mana_cost_message").orElse(AudienceMessageGroup.empty())
+    private val noEnoughManaMessages: AudienceMessageGroup by playerConfig.optionalEntry<AudienceMessageGroup>("no_enough_mana_message").orElse(AudienceMessageGroup.empty())
 
     override fun displaySuccess(triggers: List<SingleTrigger>, audience: Player) {
         successMessages.send(audience, getTagResolver(triggers))
@@ -41,6 +46,14 @@ class EntityStateDisplay : StateDisplay<Player> {
 
     override fun displayFailure(triggers: List<SingleTrigger>, audience: Player) {
         failureMessages.send(audience, getTagResolver(triggers))
+    }
+
+    override fun displayManaCost(count: Int, audience: Player) {
+        manaCostMessages.send(audience, Formatter.number("count", count))
+    }
+
+    override fun displayNoEnoughMana(audience: Player) {
+        noEnoughManaMessages.send(audience)
     }
 
     private fun getTagResolver(triggers: List<SingleTrigger>): TagResolver {
