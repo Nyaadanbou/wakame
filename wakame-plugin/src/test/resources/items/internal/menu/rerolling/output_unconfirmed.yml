@@ -1,0 +1,7 @@
+menu_name: "<item_name>"
+menu_lore:
+  - "$<item_lore>"
+  - ""
+  - "<!i>花费: <reforge_cost> 硬币"
+  - ""
+  - "<!i>点击确认重造物品"

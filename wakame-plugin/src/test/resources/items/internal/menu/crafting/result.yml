@@ -1,0 +1,3 @@
+menu_name: "<item_name>"
+menu_lore:
+  - "$<item_lore>"

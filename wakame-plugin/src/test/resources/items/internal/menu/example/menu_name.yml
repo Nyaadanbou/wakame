@@ -1,0 +1,11 @@
+base: bedrock
+
+# 此组件专门用于生成菜单图标的 `minecraft:item_name`.
+# 与 `ItemName` 组件相比, 该组件支持任意占位符.
+#
+# 对于程序员:
+# 参考 MenuLore.
+#
+# 对于用户:
+# 参考 MenuLore.
+menu_name: "你正在出售 <item_count> 组物品"

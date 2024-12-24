@@ -1,0 +1,3 @@
+menu_name: "<white>结果: <red>失败"
+menu_lore:
+  - "<!i><failure_reason>"

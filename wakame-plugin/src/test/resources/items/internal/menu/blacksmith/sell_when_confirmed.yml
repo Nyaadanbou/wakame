@@ -1,0 +1,9 @@
+base: writable_book
+menu_name: "即将要出售"
+menu_lore:
+  - "!<!i>* <item_list>"
+  - ""
+  - "<!i>再次点击确认"
+menu_placeholders:
+  with_level: "<item_name> [lv. <item_level>]"
+  without_level: "<item_name>"

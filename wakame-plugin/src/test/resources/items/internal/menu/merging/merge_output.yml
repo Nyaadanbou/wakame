@@ -1,0 +1,5 @@
+# 该图标对应合并台里[输出]的核心.
+
+menu_name: "<item_name>"
+menu_lore:
+  - "$<item_lore>"
