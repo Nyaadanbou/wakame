@@ -27,7 +27,7 @@ layout:
   lang:
     prefix:
       sufficient: "<green>✔</green>"
-      insufficient: "<red>✖</red>"
+      insufficient: "<red>✘</red>"
     choices:
       # 可用占位符:
       # <prefix>
