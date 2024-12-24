@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.skill2.result
+package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -7,16 +7,14 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.state.exception.IllegalSkillStateException
 
 /**
  * 代表了一个技能执行的结果.
  */
-abstract class SkillMechanic<out S : Skill> : Mechanic {
+abstract class SkillMechanic : Mechanic {
 
     /**
-     * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.skill2.state.IdleStateInfo].
+     * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.skill2.state.PlayerStateInfo].
      */
     open fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         // 默认将技能标记为准备移除.
@@ -65,13 +63,9 @@ abstract class SkillMechanic<out S : Skill> : Mechanic {
             }
         } catch (t: Throwable) {
             val skillName = componentMap[IdentifierComponent]?.id ?: "未知技能"
-            throw IllegalSkillStateException("在执行 $skillName 技能时发生了异常", t)
+            throw IllegalStateException("在执行 $skillName 技能时发生了异常", t)
         }
     }
 }
 
-fun SkillMechanic(): SkillMechanic<Skill> {
-    return EmptySkillMechanic
-}
-
-private data object EmptySkillMechanic : SkillMechanic<Skill>()
+data object EmptySkillMechanic : SkillMechanic()

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreConstants
 import cc.mewcraft.wakame.item.components.cells.SkillCore
-import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.PlayerAbility
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -17,7 +17,7 @@ import org.spongepowered.configurate.ConfigurationNode
 val Cell.skillCore: SkillCore?
     get() = getCore() as? SkillCore
 
-val Cell.skill: PlayerSkill?
+val Cell.skill: PlayerAbility?
     get() = skillCore?.skill
 
 /**
@@ -29,7 +29,7 @@ val Cell.skill: PlayerSkill?
  * @return 构建的 [SkillCore]
  */
 fun SkillCore(
-    id: Key, skill: PlayerSkill,
+    id: Key, skill: PlayerAbility,
 ): SkillCore {
     return SimpleSkillCore(id, skill)
 }
@@ -37,7 +37,7 @@ fun SkillCore(
 /**
  * 本函数用于从 NBT 构建 [SkillCore].
  *
- * 参考 [PlayerSkill] 了解给定的 [CompoundTag] 需要满足的结构.
+ * 参考 [PlayerAbility] 了解给定的 [CompoundTag] 需要满足的结构.
  *
  * @param id 核心的唯一标识, 也就是 [Core.id]
  * @param tag 包含该核心数据的 NBT
@@ -47,7 +47,7 @@ fun SkillCore(
 fun SkillCore(
     id: Key, tag: CompoundTag,
 ): SkillCore {
-    return SimpleSkillCore(id, PlayerSkill(id, tag))
+    return SimpleSkillCore(id, PlayerAbility(id, tag))
 }
 
 /**
@@ -61,7 +61,7 @@ fun SkillCore(
 fun SkillCore(
     id: Key, node: ConfigurationNode,
 ): SkillCore {
-    return SimpleSkillCore(id, PlayerSkill(id, node))
+    return SimpleSkillCore(id, PlayerAbility(id, node))
 }
 
 /**
@@ -69,7 +69,7 @@ fun SkillCore(
  */
 internal data class SimpleSkillCore(
     override val id: Key,
-    override val skill: PlayerSkill,
+    override val skill: PlayerAbility,
 ) : SkillCore {
     override val displayName: Component
         get() = skill.instance.displays.name.let(MM::deserialize)

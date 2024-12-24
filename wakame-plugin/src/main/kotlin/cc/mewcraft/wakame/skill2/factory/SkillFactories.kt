@@ -12,17 +12,8 @@ internal object SkillFactories {
     private val FACTORIES: Registry<String, SkillFactory<*>> = SimpleRegistry()
 
     fun load() {
-//        FACTORIES.register("bloodrage", Bloodrage)
-//        FACTORIES.register("command_execute", CommandExecute)
         FACTORIES.register("blink", Blink)
         FACTORIES.register("dash", Dash)
-//        FACTORIES.register("fly_dash", FlyDash)
-//        FACTORIES.register("kill_entity", KillEntity)
-//        FACTORIES.register("lightning", Lightning)
-//        FACTORIES.register("potion_drop", PotionDrop)
-//        FACTORIES.register("projectile", Projectile)
-//        FACTORIES.register("remove_potion_effect", RemovePotionEffect)
-//        FACTORIES.register("teleport", Teleport)
     }
 
     operator fun get(registryName: String): SkillFactory<*>? {

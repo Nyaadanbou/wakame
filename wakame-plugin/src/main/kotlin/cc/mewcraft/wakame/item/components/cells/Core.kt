@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
 import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
-import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.PlayerAbility
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
@@ -94,13 +94,13 @@ interface AttributeCore : Core {
 }
 
 /**
- * [SkillCore] 是一个技能核心, 用于表示一个 [PlayerSkill].
+ * [SkillCore] 是一个技能核心, 用于表示一个 [PlayerAbility].
  */
 interface SkillCore : Core {
     /**
      * 该技能核心的技能种类及其变体.
      */
-    val skill: PlayerSkill
+    val skill: PlayerAbility
 }
 
 /**

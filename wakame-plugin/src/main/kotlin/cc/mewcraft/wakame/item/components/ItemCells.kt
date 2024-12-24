@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.PlayerAbility
 import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
@@ -107,9 +107,9 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
 
     /**
-     * 获取所有核孔上的 [PlayerSkill].
+     * 获取所有核孔上的 [PlayerAbility].
      */
-    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill>
+    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -220,8 +220,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return ret.build()
         }
 
-        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill> {
-            val ret = ArrayList<PlayerSkill>()
+        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility> {
+            val ret = ArrayList<PlayerAbility>()
             for ((_, cell) in this) {
                 val core = cell.getCore() as? SkillCore ?: continue
                 val skill = core.skill

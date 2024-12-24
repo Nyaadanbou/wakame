@@ -40,7 +40,7 @@ sealed interface StateInfo : Examinable {
 /**
  * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
  */
-class IdleStateInfo(
+class PlayerStateInfo(
     player: Player,
 ) : StateInfo {
     private val weakPlayer: WeakReference<Player> = WeakReference(player)

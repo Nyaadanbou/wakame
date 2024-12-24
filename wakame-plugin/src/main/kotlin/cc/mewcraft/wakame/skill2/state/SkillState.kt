@@ -39,10 +39,9 @@ fun SkillState(user: User<Player>): SkillState<Player> {
     return PlayerSkillState(user.uniqueId)
 }
 
-// TODO 进一步封装 PlayerSkillState
 class PlayerSkillState(
     private val uniqueId: UUID,
-) : SkillState<Player> {
+) : SkillState<Player>, Examinable {
     companion object : KoinComponent {
         private val server: Server by inject()
 
@@ -57,7 +56,7 @@ class PlayerSkillState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo by SkillStateProvider { IdleStateInfo(player) }
+    private var stateInfo: StateInfo by SkillStateProvider { PlayerStateInfo(player) }
 
     override fun addTrigger(trigger: SingleTrigger): SkillStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {

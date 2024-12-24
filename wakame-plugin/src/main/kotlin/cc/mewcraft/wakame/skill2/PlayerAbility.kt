@@ -28,22 +28,22 @@ import java.util.function.Predicate
 
 
 /**
- * 本函数用于直接构建 [PlayerSkill].
+ * 本函数用于直接构建 [PlayerAbility].
  *
- * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerAbility.id]
  * @param trigger 触发此技能的触发器
  * @param variant 可以触发此技能的物品变体
  *
- * @return 构建的 [PlayerSkill]
+ * @return 构建的 [PlayerAbility]
  */
-fun PlayerSkill(
+fun PlayerAbility(
     id: Key, trigger: Trigger, variant: TriggerVariant, manaCost: Evaluable<*>,
-): PlayerSkill {
-    return SimplePlayerSkill(id, trigger, variant, manaCost)
+): PlayerAbility {
+    return SimplePlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
- * 本函数用于从 NBT 构建 [PlayerSkill].
+ * 本函数用于从 NBT 构建 [PlayerAbility].
  *
  * 给定的 NBT 的结构必须是以下结构:
  *
@@ -53,22 +53,22 @@ fun PlayerSkill(
  * string('mana_cost'): <manaCost>
  * ```
  *
- * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerAbility.id]
  * @param tag 包含该技能数据的 NBT
  *
- * @return 从 NBT 构建的 [PlayerSkill]
+ * @return 从 NBT 构建的 [PlayerAbility]
  */
-fun PlayerSkill(
+fun PlayerAbility(
     id: Key, tag: CompoundTag,
-): PlayerSkill {
+): PlayerAbility {
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
     val manaCost = tag.readEvaluable()
-    return SimplePlayerSkill(id, trigger, variant, manaCost)
+    return SimplePlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
- * 本函数用于从配置文件构建 [PlayerSkill].
+ * 本函数用于从配置文件构建 [PlayerAbility].
  *
  * 给定的 [ConfigurationNode] 必须是以下结构:
  *
@@ -79,18 +79,18 @@ fun PlayerSkill(
  *  mana_cost: <manaCost>
  * ```
  *
- * @param id 技能的唯一标识, 也就是 [PlayerSkill.id]
+ * @param id 技能的唯一标识, 也就是 [PlayerAbility.id]
  * @param node 包含技能数据的配置节点
  *
- * @return 从配置文件构建的 [PlayerSkill]
+ * @return 从配置文件构建的 [PlayerAbility]
  */
-fun PlayerSkill(
+fun PlayerAbility(
     id: Key, node: ConfigurationNode,
-): PlayerSkill {
+): PlayerAbility {
     val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
     val variant = node.node("variant").krequire<TriggerVariant>()
     val manaCost = node.node("mana_cost").krequire<Evaluable<*>>()
-    return SimplePlayerSkill(id, trigger, variant, manaCost)
+    return SimplePlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -104,8 +104,7 @@ fun PlayerSkill(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
-// FIXME: 改名为 PlayerAbility
-interface PlayerSkill : BinarySerializable<CompoundTag> {
+interface PlayerAbility : BinarySerializable<CompoundTag> {
     /**
      * 技能的唯一标识.
      */
@@ -160,14 +159,14 @@ interface PlayerSkill : BinarySerializable<CompoundTag> {
 }
 
 /**
- * [PlayerSkill] 的标准实现.
+ * [PlayerAbility] 的标准实现.
  */
-internal data class SimplePlayerSkill(
+internal data class SimplePlayerAbility(
     override val id: Key,
     override val trigger: Trigger,
     override val variant: TriggerVariant,
     override val manaCost: Evaluable<*>,
-) : PlayerSkill {
+) : PlayerAbility {
     override val instance: Skill
         get() = SkillRegistry.INSTANCES[id]
     override val displayName: Component

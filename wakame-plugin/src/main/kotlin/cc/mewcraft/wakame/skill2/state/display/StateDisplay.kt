@@ -23,7 +23,7 @@ interface StateDisplay<A : Audience> {
     fun displayNoEnoughMana(audience: A)
 }
 
-class EntityStateDisplay : StateDisplay<Player> {
+class PlayerStateDisplay : StateDisplay<Player> {
     private val triggerNames: Map<Trigger, String> by SkillSupport.GLOBAL_STATE_DISPLAY_CONFIG.entry("triggers")
 
     private val playerConfig = SkillSupport.GLOBAL_STATE_DISPLAY_CONFIG.node("player_state")

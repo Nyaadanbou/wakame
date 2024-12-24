@@ -73,7 +73,6 @@ internal class SkillEventHandler {
             is AbstractArrow -> {
                 val nekoStack = projectile.itemStack.shadowNeko(false) ?: return
                 val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
-                // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
                 val skills = cells.collectSkillModifiers(nekoStack, ItemSlot.imaginary())
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 for (skill in skills) {

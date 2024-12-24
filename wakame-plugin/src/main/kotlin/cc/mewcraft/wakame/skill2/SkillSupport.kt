@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.skill2
 
-import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.registry.SKILL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_LOADER
@@ -10,12 +9,6 @@ import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 internal object SkillSupport : KoinComponent {
-    val GLOBAL_SKILL_CONDITIONS: ConfigProvider by lazy {
-        Configs.YAML.build(SKILL_CONFIG_FILE) {
-            defaultOptions { get<YamlConfigurationLoader.Builder>(named((SKILL_PROTO_CONFIG_LOADER))).defaultOptions() }
-        }.node("conditions")
-    }
-
     val GLOBAL_STATE_CONFIG by lazy {
         Configs.YAML.build(SKILL_CONFIG_FILE) {
             defaultOptions { get<YamlConfigurationLoader.Builder>(named((SKILL_PROTO_CONFIG_LOADER))).defaultOptions() }

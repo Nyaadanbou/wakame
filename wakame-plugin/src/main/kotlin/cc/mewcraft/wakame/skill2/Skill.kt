@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.display.SkillDisplay
-import cc.mewcraft.wakame.skill2.result.SkillMechanic
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -47,11 +46,11 @@ interface Skill : Keyed, Examinable {
     fun recordBy(input: SkillInput)
 
     /**
-     * 返回一个技能执行的结果, 只有执行 [cc.mewcraft.wakame.skill2.result.SkillMechanic] 才会真正执行技能逻辑.
+     * 返回一个技能执行的结果, 只有执行 [SkillMechanic] 才会真正执行技能逻辑.
      *
-     * @see cc.mewcraft.wakame.skill2.result.SkillMechanic
+     * @see SkillMechanic
      */
-    fun mechanic(input: SkillInput): SkillMechanic<Skill>
+    fun mechanic(input: SkillInput): SkillMechanic
 
     companion object {
         /**
@@ -65,7 +64,7 @@ private data object EmptySkill : Skill {
     override val key: Key = Key(Namespaces.SKILL, "empty")
     override val displays: SkillDisplay = SkillDisplay.empty()
     override fun recordBy(input: SkillInput) = Unit
-    override fun mechanic(input: SkillInput): SkillMechanic<Skill> = SkillMechanic()
+    override fun mechanic(input: SkillInput): SkillMechanic = EmptySkillMechanic
 }
 
 internal object SkillSerializer : ScalarSerializer<SkillProvider>(typeTokenOf()) {

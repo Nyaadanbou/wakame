@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
-import cc.mewcraft.wakame.skill2.result.SkillMechanic
+import cc.mewcraft.wakame.skill2.SkillMechanic
 import cc.mewcraft.wakame.util.krequire
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.entity.TeleportFlag
@@ -53,7 +53,7 @@ interface Blink : Skill {
         override val distance: Int,
         override val teleportedMessages: AudienceMessageGroup,
     ) : Blink, SkillBase(key, config) {
-        override fun mechanic(input: SkillInput): SkillMechanic<Skill> {
+        override fun mechanic(input: SkillInput): SkillMechanic {
             return BlinkSkillMechanic(distance, teleportedMessages)
         }
     }
@@ -62,7 +62,7 @@ interface Blink : Skill {
 private class BlinkSkillMechanic(
     val distance: Int,
     val teleportedMessages: AudienceMessageGroup,
-) : SkillMechanic<Blink>() {
+) : SkillMechanic() {
 
     private var isTeleported: Boolean = false
 

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.skill2
 
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.skill2.display.SkillDisplaySerializer
-import cc.mewcraft.wakame.skill2.state.display.EntityStateDisplay
+import cc.mewcraft.wakame.skill2.state.display.PlayerStateDisplay
 import cc.mewcraft.wakame.skill2.state.display.StateDisplay
 import cc.mewcraft.wakame.skill2.trigger.SkillTriggerSerializer
 import cc.mewcraft.wakame.skill2.trigger.skillTriggerModule
@@ -23,7 +23,7 @@ fun skill2Module(): Module = module {
         skillTriggerModule(),
     )
 
-    singleOf(::EntityStateDisplay) bind StateDisplay::class
+    singleOf(::PlayerStateDisplay) bind StateDisplay::class
 
     singleOf(::SkillWorldInteraction)
     singleOf(::SkillEventHandler)

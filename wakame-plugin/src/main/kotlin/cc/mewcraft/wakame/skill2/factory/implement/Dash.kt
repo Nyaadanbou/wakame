@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.skill2.character.TargetAdapter
 import cc.mewcraft.wakame.skill2.context.SkillInput
 import cc.mewcraft.wakame.skill2.context.skillInput
 import cc.mewcraft.wakame.skill2.factory.SkillFactory
-import cc.mewcraft.wakame.skill2.result.SkillMechanic
+import cc.mewcraft.wakame.skill2.SkillMechanic
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -71,7 +71,7 @@ interface Dash : Skill {
         override val hitEffects: List<SkillProvider>,
         override val hitInterval: Long,
     ) : Dash, SkillBase(key, config) {
-        override fun mechanic(input: SkillInput): SkillMechanic<Dash> {
+        override fun mechanic(input: SkillInput): SkillMechanic {
             return DashSkillMechanic(this)
         }
     }
@@ -79,7 +79,7 @@ interface Dash : Skill {
 
 private class DashSkillMechanic(
     private val skill: Dash,
-) : SkillMechanic<Dash>() {
+) : SkillMechanic() {
 
     companion object : KoinComponent {
         /**

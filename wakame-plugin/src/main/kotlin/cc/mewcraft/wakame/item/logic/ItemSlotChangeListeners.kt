@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
-import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.skill2.PlayerAbility
 import cc.mewcraft.wakame.skill2.Skill
 import cc.mewcraft.wakame.skill2.character.CasterAdapter
 import cc.mewcraft.wakame.user.User
@@ -215,14 +215,14 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
         user.skillState.reset()
     }
 
-    private fun NekoStack.getSkills(): Collection<PlayerSkill>? {
+    private fun NekoStack.getSkills(): Collection<PlayerAbility>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
         // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
         val skills = cells.collectSkillModifiers(this, ItemSlot.imaginary())
         return skills
     }
 
-    private fun recordSkill(player: Player, skill: PlayerSkill, holdBy: Pair<ItemSlot, NekoStack>?) {
+    private fun recordSkill(player: Player, skill: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
         skill.recordBy(CasterAdapter.adapt(player), null, holdBy)
     }
 }
