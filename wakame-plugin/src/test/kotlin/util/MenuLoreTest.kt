@@ -41,7 +41,7 @@ class MenuLoreTest : KoinTest {
         // Resolve the MenuLore
         val resolvedComponents = lore.resolve {
             standard(Placeholder.component("world_name", text("overworld")))
-            folded("choice_list", listOf("choice 1", "choice 2", "choice 3"))
+            folded("choice_list", listOf(text("choice 1"), text("choice 2"), text("choice 3")))
         }
 
         // Expected components after resolving

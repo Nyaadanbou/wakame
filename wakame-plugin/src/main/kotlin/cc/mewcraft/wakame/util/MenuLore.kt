@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.Injector
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.koin.core.component.get
 
@@ -31,8 +32,8 @@ data class MenuLore(
                     val folded = config.getFoldedText(key) ?: return@flatMap emptyList()
                     val tagResolver = config.getTagResolver()
                     folded.map { line ->
-                        val replaced = rawText.replace("<$key>", line)
-                        MM.deserialize(replaced, tagResolver)
+                        val tagResolver = TagResolver.resolver(tagResolver, Placeholder.component(key, line))
+                        MM.deserialize(rawText, tagResolver)
                     }
                 }
             }
@@ -83,13 +84,13 @@ data class MenuLore(
      */
     class LineConfig(
         private val tagResolverList: TagResolver,
-        private val foldedLineMap: Map<String, List<String>>,
+        private val foldedLineMap: Map<String, List<Component>>,
     ) {
         fun getTagResolver(): TagResolver {
             return tagResolverList
         }
 
-        fun getFoldedText(tag: String): List<String>? {
+        fun getFoldedText(tag: String): List<Component>? {
             return foldedLineMap[tag]
         }
     }
@@ -121,13 +122,13 @@ fun menuLore(init: MenuLoreBuilder.() -> Unit): MenuLore {
 @MenuLoreDsl
 class LineConfigBuilder {
     private val tagResolverList = mutableListOf<TagResolver>()
-    private val foldedLineMap = mutableMapOf<String, List<String>>()
+    private val foldedLineMap = mutableMapOf<String, List<Component>>()
 
     fun standard(resolver: TagResolver) {
         tagResolverList.add(resolver)
     }
 
-    fun folded(key: String, lines: List<String>) {
+    fun folded(key: String, lines: List<Component>) {
         foldedLineMap[key] = lines
     }
 
