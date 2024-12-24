@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSeria
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.skill2.SKILL_EXTERNALS
+import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -119,7 +119,7 @@ data class ItemCells(
                 .kregister(CoreArchetypeGroupSerializer)
 
                 // 技能, 部分核心会用到
-                .registerAll(get(named(SKILL_EXTERNALS)))
+                .registerAll(get(named(ABILITY_EXTERNALS)))
 
                 // 可计算值, 部分核心会用到
                 .registerAll(get(named(EVALUABLE_SERIALIZERS)))

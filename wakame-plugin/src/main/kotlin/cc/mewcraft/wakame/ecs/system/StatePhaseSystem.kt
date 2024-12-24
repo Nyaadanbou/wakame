@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.event.PlayerSkillStateChangeEvent
-import cc.mewcraft.wakame.registry.SkillRegistry
-import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.event.PlayerAbilityStateChangeEvent
+import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.util.Key
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -45,12 +45,12 @@ class StatePhaseSystem(
 
         entity[StatePhaseComponent].phase = newPhase
         val player = entity[CastBy].entity as? Player ?: return
-        onStateChange(id, player, SkillRegistry.INSTANCES[Key(id)], oldPhase, newPhase)
+        onStateChange(id, player, AbilityRegistry.INSTANCES[Key(id)], oldPhase, newPhase)
         entity.configure { it -= Tags.NEXT_STATE }
     }
 
-    private fun onStateChange(identifier: String, player: Player, skill: Skill, old: StatePhase, new: StatePhase) {
-        PlayerSkillStateChangeEvent(player, skill, old, new).callEvent()
+    private fun onStateChange(identifier: String, player: Player, ability: Ability, old: StatePhase, new: StatePhase) {
+        PlayerAbilityStateChangeEvent(player, ability, old, new).callEvent()
         player.sendMessage("技能 $identifier 状态已切换为 $new".mini.hoverEvent(HoverEvent.showText("技能状态变更: $old -> $new. Tick: ${plugin.server.currentTick}".mini)))
     }
 }

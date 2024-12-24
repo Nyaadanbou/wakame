@@ -12,9 +12,9 @@ import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
-import cc.mewcraft.wakame.skill2.SKILL_GROUP_SERIALIZERS
-import cc.mewcraft.wakame.skill2.SkillSerializer
-import cc.mewcraft.wakame.skill2.trigger.SKILL_TRIGGER_SERIALIZERS
+import cc.mewcraft.wakame.ability.ABILITY_GROUP_SERIALIZERS
+import cc.mewcraft.wakame.ability.AbilitySerializer
+import cc.mewcraft.wakame.ability.trigger.ABILITY_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.skin.SKIN_SERIALIZERS
 import cc.mewcraft.wakame.util.buildYamlLoader
 import cc.mewcraft.wakame.util.createYamlLoader
@@ -32,19 +32,19 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.util.NamingSchemes
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
+const val ABILITY_CONFIG_FILE = "ability.yml"
+const val ABILITY_PROTO_CONFIG_DIR = "ability"
+const val ABILITY_PROTO_CONFIG_LOADER = "ability_global_config_loader"
+
 const val CRATE_PROTO_CONFIG_DIR = "crates"
+
 const val CRATE_PROTO_CONFIG_LOADER = "crate_prototype_config_loader"
-
 const val ITEM_PROTO_CONFIG_DIR = "items"
+
 const val ITEM_PROTO_CONFIG_LOADER = "item_prototype_config_loader"
-
 const val LANG_PROTO_CONFIG_DIR = "lang"
+
 const val LANG_PROTO_CONFIG_LOADER = "lang_prototype_config_loader"
-
-const val SKILL_CONFIG_FILE = "skills.yml"
-const val SKILL_PROTO_CONFIG_DIR = "skills"
-const val SKILL_PROTO_CONFIG_LOADER = "skill_global_config_loader"
-
 
 const val ATTRIBUTE_GLOBAL_CONFIG_FILE = "attributes.yml"
 const val ATTRIBUTE_GLOBAL_CONFIG_LOADER = "attribute_global_config_loader"
@@ -83,7 +83,7 @@ internal fun registryModule(): Module = module {
     single { KizamiRegistry } bind Initializable::class
     single { LevelMappingRegistry } bind Initializable::class
     single { RarityRegistry } bind Initializable::class
-    single { SkillRegistry } bind Initializable::class
+    single { AbilityRegistry } bind Initializable::class
 
     single<YamlConfigurationLoader>(named(ELEMENT_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(ELEMENT_GLOBAL_CONFIG_FILE) {
@@ -116,7 +116,7 @@ internal fun registryModule(): Module = module {
         }
     }
 
-    single<YamlConfigurationLoader.Builder>(named(SKILL_PROTO_CONFIG_LOADER)) {
+    single<YamlConfigurationLoader.Builder>(named(ABILITY_PROTO_CONFIG_LOADER)) {
         buildYamlLoader {
             registerAnnotatedObjects(
                 ObjectMapper.factoryBuilder()
@@ -128,12 +128,12 @@ internal fun registryModule(): Module = module {
             )
             register(MaterialSerializer)
             register(PotionEffectTypeSerializer)
-            register(SkillSerializer)
+            register(AbilitySerializer)
             kregister(PotionEffectSerializer)
             registerAll(get(named(ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS)))
             registerAll(get(named(ELEMENT_SERIALIZERS)))
-            registerAll(get(named(SKILL_GROUP_SERIALIZERS)))
-            registerAll(get(named(SKILL_TRIGGER_SERIALIZERS)))
+            registerAll(get(named(ABILITY_GROUP_SERIALIZERS)))
+            registerAll(get(named(ABILITY_TRIGGER_SERIALIZERS)))
         }
     }
 

@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.entity.Entity
@@ -55,7 +55,7 @@ interface LevelBarrier : ItemBehavior {
             tryCancelEvent(itemStack, player, event)
         }
 
-        override fun handleSkillPrepareCast(player: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
+        override fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
             tryCancelEvent(itemStack, player, event)
         }
 

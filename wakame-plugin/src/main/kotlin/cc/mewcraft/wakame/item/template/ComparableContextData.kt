@@ -66,7 +66,7 @@ class AttributeContextData(
 /**
  * 技能.
  */
-class SkillContextData(
+class AbilityContextData(
     val id: Key,
 ) : ComparableContextData {
     override fun examinableProperties(): Stream<out ExaminableProperty?> {
@@ -78,7 +78,7 @@ class SkillContextData(
     override fun equals(other: Any?): Boolean {
         if (this === other)
             return true
-        if (other !is SkillContextData)
+        if (other !is AbilityContextData)
             return false
 
         if (id != other.id)

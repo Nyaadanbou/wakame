@@ -1,7 +1,0 @@
-displays:
-  name: "药水移除2"
-  tooltips:
-    - ""
-
-# 技能模板的 type
-type: remove_potion_effect

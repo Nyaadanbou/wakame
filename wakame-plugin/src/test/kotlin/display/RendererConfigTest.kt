@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
-import cc.mewcraft.wakame.skill.skillModule
+import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.world.worldModule
@@ -58,7 +58,7 @@ class RendererConfigTest : KoinTest {
                     molangModule(),
                     registryModule(),
                     rarityModule(),
-                    skillModule(),
+                    abilityModule(),
                     skinModule(),
                     worldModule()
                 )
@@ -67,14 +67,14 @@ class RendererConfigTest : KoinTest {
             // registries
             AttributeRegistry.onPreWorld()
             ElementRegistry.onPreWorld()
-            SkillRegistry.onPreWorld()
+            AbilityRegistry.onPreWorld()
             KizamiRegistry.onPreWorld()
             RarityRegistry.onPreWorld()
 
             // item cells
             AttributeCoreBootstrap.onPostWorld()
             EmptyCoreBootstrap.onPostWorld()
-            SkillCoreBootstrap.onPostWorld()
+            AbilityCoreBootstrap.onPostWorld()
 
             // item meta
             ItemMetaBootstrap.onPostWorld()
@@ -139,9 +139,9 @@ class RendererConfigTest : KoinTest {
             simpleCoreLoreLine("attribute:attack_effect_chance.add"),
             simpleCoreLoreLine("attribute:critical_strike_chance.add"),
             simpleCoreLoreLine("attribute:max_mana.add"),
-            simpleCoreLoreLine("skill:blink"),
-            simpleCoreLoreLine("skill:frost"),
-            simpleCoreLoreLine("skill:leapfrog"),
+            simpleCoreLoreLine("ability:blink"),
+            simpleCoreLoreLine("ability:frost"),
+            simpleCoreLoreLine("ability:leapfrog"),
             emptyCoreLoreLine(),
             emptyCoreLoreLine(),
         )
@@ -154,7 +154,7 @@ class RendererConfigTest : KoinTest {
             componentLoreLine("meta:rarity"),
             simpleCoreLoreLine("attribute:max_health.add"),
             simpleCoreLoreLine("attribute:max_mana.add"),
-            simpleCoreLoreLine("skill:frost"),
+            simpleCoreLoreLine("ability:frost"),
             emptyCoreLoreLine(),
             emptyCoreLoreLine(),
         )
@@ -170,7 +170,7 @@ class RendererConfigTest : KoinTest {
             simpleCoreLoreLine("attribute:attack_damage.multiply_base.fire"),
             simpleCoreLoreLine("attribute:attack_damage.multiply_base.water"),
             simpleCoreLoreLine("attribute:attack_effect_chance.add"),
-            simpleCoreLoreLine("skill:frost"),
+            simpleCoreLoreLine("ability:frost"),
             emptyCoreLoreLine(),
             emptyCoreLoreLine(),
         )
@@ -186,7 +186,7 @@ class RendererConfigTest : KoinTest {
             simpleCoreLoreLine("attribute:attack_damage.multiply_base.fire"),
             simpleCoreLoreLine("attribute:attack_damage.multiply_base.water"),
             simpleCoreLoreLine("attribute:attack_effect_chance.add"),
-            simpleCoreLoreLine("skill:frost"),
+            simpleCoreLoreLine("ability:frost"),
             emptyCoreLoreLine(),
             emptyCoreLoreLine(),
         )

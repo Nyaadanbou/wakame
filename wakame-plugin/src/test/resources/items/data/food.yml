@@ -24,6 +24,6 @@ food:
   #     ambient: false
   #     particles: true
   #     icon: false
-  skills:
+  abilities:
     - "foo:bar/a"
     - "foo:bar/b"

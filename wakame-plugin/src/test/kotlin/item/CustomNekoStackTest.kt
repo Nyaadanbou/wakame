@@ -601,12 +601,12 @@ class CustomNekoStackTest : KoinTest {
             }
             */
 
-            // 测试 skills
-            val possibleSkills = setOf(
+            // 测试 abilities
+            val possibleAbilities = setOf(
                 Key.key("foo:bar/a"),
                 Key.key("foo:bar/b")
             )
-            assertTrue(it.skills.all { it in possibleSkills })
+            assertTrue(it.abilities.all { it in possibleAbilities })
         }
     }
 

@@ -30,7 +30,7 @@ import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
@@ -126,7 +126,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
             is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
-            is SkillCore -> StandardRenderingHandlerRegistry.CELLULAR_SKILL.process(collector, core)
+            is AbilityCore -> StandardRenderingHandlerRegistry.CELLULAR_ABILITY.process(collector, core)
             is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
         }
     }
@@ -155,7 +155,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val CELLULAR_SKILL: RenderingHandler<SkillCore, CellularSkillRendererFormat> = configure("cells/skills") { data, format ->
+    val CELLULAR_ABILITY: RenderingHandler<AbilityCore, CellularAbilityRendererFormat> = configure("cells/abilities") { data, format ->
         format.render(data)
     }
 

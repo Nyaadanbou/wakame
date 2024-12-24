@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.AbilityRegistry
 
 /**
  * 定制台的注册表.
@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.registry.SkillRegistry
 // 在 PreWorld 早已加载的依赖不需要指定 PostWorld
 @ReloadDependency(
     runBefore = [
-        // 我们仍然直接依赖 Skill 相关的实例, 而不是实例的引用, 因此 Skill 必须在我们之前加载完毕
-        SkillRegistry::class
+        // 我们仍然直接依赖 Ability 相关的实例, 而不是实例的引用, 因此 Ability 必须在我们之前加载完毕
+        AbilityRegistry::class
     ]
 )
 object ModdingTableRegistry : Initializable {

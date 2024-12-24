@@ -31,12 +31,12 @@ cells/attributes/out:
       - multiply_total
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/skills/in:
-  namespace: skill
+cells/abilities/in:
+  namespace: ability
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/skills/out:
-  namespace: skill
+cells/abilities/out:
+  namespace: ability
 
 # id: `cells/empty`
 cells/empty/in:

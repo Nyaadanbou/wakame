@@ -13,9 +13,9 @@ import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
-import cc.mewcraft.wakame.skill2.PlayerAbility
-import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
@@ -190,9 +190,9 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
 /**
  * 技能.
  *
- * 物品发生变化时, 根据物品技能, 修改玩家可执行的 [Skill].
+ * 物品发生变化时, 根据物品技能, 修改玩家可执行的 [Ability].
  */
-internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
+internal object AbilityItemSlotChangeListener : ItemSlotChangeListener() {
     override fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         return testSlot(player, slot, itemStack, nekoStack) &&
                 testLevel(player, slot, itemStack, nekoStack) &&
@@ -205,24 +205,24 @@ internal object SkillItemSlotChangeListener : ItemSlotChangeListener() {
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
         nekoStack ?: return
-        val skills = nekoStack.getSkills() ?: return
-        skills.forEach { skill -> recordSkill(player, skill, slot to nekoStack) }
+        val abilities = nekoStack.getAbilities() ?: return
+        abilities.forEach { ability -> recordAbility(player, ability, slot to nekoStack) }
     }
 
     override fun onEnd(player: Player) {
         // 清空技能状态.
         val user = player.toUser()
-        user.skillState.reset()
+        user.abilityState.reset()
     }
 
-    private fun NekoStack.getSkills(): Collection<PlayerAbility>? {
+    private fun NekoStack.getAbilities(): Collection<PlayerAbility>? {
         val cells = components.get(ItemComponentTypes.CELLS) ?: return null
         // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
-        val skills = cells.collectSkillModifiers(this, ItemSlot.imaginary())
-        return skills
+        val abilities = cells.collectAbilityModifiers(this, ItemSlot.imaginary())
+        return abilities
     }
 
-    private fun recordSkill(player: Player, skill: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
-        skill.recordBy(CasterAdapter.adapt(player), null, holdBy)
+    private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
+        ability.recordBy(CasterAdapter.adapt(player), null, holdBy)
     }
 }

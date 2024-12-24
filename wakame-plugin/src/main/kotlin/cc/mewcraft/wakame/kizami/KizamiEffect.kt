@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.user.User
  */
 sealed interface KizamiEffect {
     /**
-     * The collection of effects, such as attributes (modifiers) and skills.
+     * The collection of effects, such as attributes (modifiers) and abilities.
      */
     val effects: List<Single<*>>
 

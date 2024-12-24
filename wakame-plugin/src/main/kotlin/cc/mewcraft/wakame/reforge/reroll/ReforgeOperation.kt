@@ -5,13 +5,13 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.SkillContextData
+import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
@@ -172,8 +172,8 @@ private constructor(
                 when (
                     val core = cell.getCore()
                 ) {
-                    is SkillCore -> {
-                        context.skills += SkillContextData(
+                    is AbilityCore -> {
+                        context.abilities += AbilityContextData(
                             id = core.id
                         )
                     }

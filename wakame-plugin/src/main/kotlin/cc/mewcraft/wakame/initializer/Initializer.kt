@@ -35,7 +35,7 @@ import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.SKILL_PROTO_CONFIG_DIR
+import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
@@ -131,7 +131,7 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(KIZAMI_DIR_NAME)
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively("reforge")
-        saveResourceRecursively(SKILL_PROTO_CONFIG_DIR)
+        saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ELEMENT_GLOBAL_CONFIG_FILE)

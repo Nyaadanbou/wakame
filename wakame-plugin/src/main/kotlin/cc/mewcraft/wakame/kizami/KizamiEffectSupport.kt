@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.skill2.PlayerAbility
-import cc.mewcraft.wakame.skill2.Skill
-import cc.mewcraft.wakame.skill2.character.CasterAdapter
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
@@ -65,10 +65,10 @@ internal object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
             when (
                 val namespace = type1.namespace()
             ) {
-                Namespaces.SKILL -> {
-                    val configuredSkillId = type1
-                    val configuredSkill = PlayerAbility(configuredSkillId, childNode)
-                    builtEffects += KizamiSkill(configuredSkill)
+                Namespaces.ABILITY -> {
+                    val playerAbilityId = type1
+                    val playerAbility = PlayerAbility(playerAbilityId, childNode)
+                    builtEffects += KizamiAbility(playerAbility)
                 }
 
                 Namespaces.ATTRIBUTE -> {
@@ -89,9 +89,9 @@ internal object KizamiEffectSerializer : SchemaSerializer<KizamiEffect> {
 }
 
 /**
- * A [skill][Skill] provided by a kizami.
+ * A [ability][Ability] provided by a kizami.
  */
-internal data class KizamiSkill(
+internal data class KizamiAbility(
     override val effect: PlayerAbility,
 ) : KizamiEffect.Single<PlayerAbility> {
     override fun apply(user: User<*>) {
@@ -99,7 +99,7 @@ internal data class KizamiSkill(
     }
 
     override fun remove(user: User<*>) {
-        // user.skillMap.removeSkill(effect.id)
+        // do nothing
     }
 }
 

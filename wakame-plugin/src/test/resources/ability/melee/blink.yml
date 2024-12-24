@@ -1,0 +1,16 @@
+displays:
+  name: "位移"
+  tooltips:
+    - "<red>位移！"
+
+# 技能模板的 type
+type: blink
+
+# 冲刺距离
+distance: 20
+
+teleported_messages:
+  - type: sound
+    name: "entity.player.teleport"
+    source: "master"
+    emitter: self

@@ -12,12 +12,12 @@ import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.item.templates.components.cells.cores.SkillCoreArchetype
+import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreArchetype
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.item.templates.filters.SkillFilter
+import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.GroupSerializer
@@ -33,7 +33,7 @@ import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.skill2.SKILL_EXTERNALS
+import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.namespace
@@ -96,9 +96,9 @@ internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
                 AttributeCoreArchetype(attributeId, node)
             }
 
-            type1.namespace() == Namespaces.SKILL -> {
-                val skillId = type1
-                SkillCoreArchetype(skillId, node)
+            type1.namespace() == Namespaces.ABILITY -> {
+                val abilityId = type1
+                AbilityCoreArchetype(abilityId, node)
             }
 
             // 大概是配置文件写错了
@@ -200,7 +200,7 @@ internal class CoreArchetypeSampleNodeFacade(
 ) : SampleNodeFacade<CoreArchetype, ItemGenerationContext>(), Initializable {
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         registerAll(get(named(ELEMENT_EXTERNALS)))
-        registerAll(get(named(SKILL_EXTERNALS)))
+        registerAll(get(named(ABILITY_EXTERNALS)))
         registerAll(get(named(EVALUABLE_SERIALIZERS)))
         kregister(CoreArchetypeSerializer)
         kregister(FilterSerializer)
@@ -234,12 +234,12 @@ internal class CoreArchetypeSampleNodeFacade(
                 AttributeFilter(true, attributeId, attribute.operation, attribute.element)
             }
 
-            // By design, a skill is considered generated
-            // if there is already a skill with the same key
+            // By design, a ability is considered generated
+            // if there is already a ability with the same key
             // in the selection context, ignoring the trigger.
-            is SkillCoreArchetype -> {
-                val skillId = value.id
-                SkillFilter(true, skillId)
+            is AbilityCoreArchetype -> {
+                val abilityId = value.id
+                AbilityFilter(true, abilityId)
             }
 
             // Throw if we see an unknown schema core type

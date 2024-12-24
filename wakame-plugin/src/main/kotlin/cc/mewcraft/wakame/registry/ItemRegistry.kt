@@ -39,7 +39,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
         KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
-        SkillRegistry::class,
+        AbilityRegistry::class,
     ]
 )
 @ReloadDependency(
@@ -51,7 +51,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
         KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
-        SkillRegistry::class,
+        AbilityRegistry::class,
     ]
 )
 object ItemRegistry : KoinComponent, Initializable {

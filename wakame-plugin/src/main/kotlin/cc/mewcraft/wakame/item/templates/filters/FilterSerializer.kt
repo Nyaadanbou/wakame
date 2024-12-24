@@ -22,9 +22,9 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
         val inverted = node.node("invert").getBoolean(false) // check if we should invert the original result
 
         val ret: Filter<ItemGenerationContext> = when (rawType) {
-            SkillFilter.TYPE -> {
-                val key = node.node("skill").krequire<Key>()
-                SkillFilter(inverted, key)
+            AbilityFilter.TYPE -> {
+                val key = node.node("ability").krequire<Key>()
+                AbilityFilter(inverted, key)
             }
 
             AttributeFilter.TYPE -> {

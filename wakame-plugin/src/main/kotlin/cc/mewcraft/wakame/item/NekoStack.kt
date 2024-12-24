@@ -3,14 +3,14 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.ability.Ability
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -205,8 +205,8 @@ interface NekoStack : Examinable {
         behaviors.forEach { it.handleConsume(player, itemStack, event) }
     }
 
-    fun handleSkillPrepareCast(caster: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) {
-        behaviors.forEach { it.handleSkillPrepareCast(caster, itemStack, skill, event) }
+    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
+        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, ability, event) }
     }
 
     /**

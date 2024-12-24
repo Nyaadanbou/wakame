@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.command.command.LootCommands
 import cc.mewcraft.wakame.command.command.PluginCommands
 import cc.mewcraft.wakame.command.command.ReforgeCommands
 import cc.mewcraft.wakame.command.command.ResourcepackCommands
-import cc.mewcraft.wakame.command.command.SkillCommands
+import cc.mewcraft.wakame.command.command.AbilityCommands
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.Plugin
 import org.incendo.cloud.SenderMapper
@@ -45,6 +45,6 @@ class CommandManager(
         command(PluginCommands)
         command(ReforgeCommands)
         command(ResourcepackCommands)
-        command(SkillCommands)
+        command(AbilityCommands)
     }
 }

@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.system.*
-import cc.mewcraft.wakame.skill2.system.SkillBukkitEntityMetadataSystem
-import cc.mewcraft.wakame.skill2.system.SkillManaCostSystem
-import cc.mewcraft.wakame.skill2.system.SkillMechanicRemoveSystem
+import cc.mewcraft.wakame.ability.system.AbilityBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
+import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
 import com.github.quillraven.fleks.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -46,7 +46,7 @@ class WakameWorld(
 
             // 同步 ComponentMap 给外部
 
-            add(SkillBukkitEntityMetadataSystem())
+            add(AbilityBukkitEntityMetadataSystem())
 
             // 根据标记与组件进行交互的系统
 
@@ -55,12 +55,12 @@ class WakameWorld(
 
             // 消耗类系统, 可能会阻止进行下一阶段的系统
 
-            add(SkillManaCostSystem())
+            add(AbilityManaCostSystem())
 
             // 会改变状态的系统
 
             add(StatePhaseSystem())
-            add(SkillMechanicRemoveSystem())
+            add(AbilityMechanicRemoveSystem())
             add(TickResultSystem())
 
             add(ParticleSystem())

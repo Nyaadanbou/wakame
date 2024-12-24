@@ -83,7 +83,7 @@
         - "attribute:critical_strike_chance"
         - "attribute:defense/fire"
         - "attribute:lifesteal"
-        - "skill:*"
+        - "ability:*"
         - "*:*"
 ```
 
@@ -209,7 +209,7 @@ items:
       accepted_runes:
         - "gold:sword_plus"
       accepted_cores:
-        - "skill:*"
+        - "ability:*"
     some_cell_identifier_3:
       accepted_runes:
         - "*:*"
