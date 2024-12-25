@@ -32,6 +32,8 @@ import cc.mewcraft.wakame.item.templates.components.Tool
 import cc.mewcraft.wakame.item.templates.components.Unbreakable
 import cc.mewcraft.wakame.item.templates.components.WorldTimeControl
 import cc.mewcraft.wakame.item.templates.components.WorldWeatherControl
+import cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore
+import cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object ItemTemplateTypes {
@@ -178,6 +180,17 @@ object ItemTemplateTypes {
      */
     @JvmField
     val MAX_DAMAGE: ItemTemplateType<ItemMaxDamage> = ItemMaxDamage.codec(ItemConstants.MAX_DAMAGE).register()
+
+    /**
+     * 组件: n/a
+     */
+    @JvmField
+    val MENU_ICON_LORE: ItemTemplateType<ItemMenuIconLore> = ItemMenuIconLore.codec(ItemConstants.MENU_ICON_LORE).register()
+
+    /**
+     * 组件: n/a
+     */
+    val MENU_ICON_NAME: ItemTemplateType<ItemMenuIconName> = ItemMenuIconName.codec(ItemConstants.MENU_ICON_NAME).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.PortableCore]
