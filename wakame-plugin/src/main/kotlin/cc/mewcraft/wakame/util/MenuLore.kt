@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.Injector
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -57,24 +58,29 @@ data class MenuLore(
          * ```yaml
          * - "*something* <some_tag>!"
          * ```
+         *
+         * @param rawText 用于解析的文本, 可以包含普通的 [Tag]
          */
         class Standard(rawText: String) : Line(rawText)
 
         /**
-         * 包含折叠的占位符, 也可以包含普通的 [Tag].
+         * 包含最多1个折叠的占位符, 也可以包含0或多个普通的 [Tag].
          * 解析后变成一个 [Component] 的列表, 替换当前行为多行内容.
          *
          * 例如在配置文件中:
          * ```yaml
-         * - "*prefix* <choice_list>"
+         * - "*any prefix* <choice_list>" # <choice_list> 是一个折叠的占位符
          * ```
          *
-         * 然后这个 <choice_list> 有3个 [Component], 那么解析后就会变成:
+         * 然后这个 <choice_list> 有3个 [Component] 分别是 "abc", "def", "ghi", 那么解析后就会变成:
          * ```yaml
-         * - "*prefix* abc"
-         * - "*prefix* def"
-         * - "*prefix* ghi"
+         * - "*any prefix* abc"
+         * - "*any prefix* def"
+         * - "*any prefix* ghi"
          * ```
+         *
+         * @param key 折叠的占位符的标识符, 用于在 [LineConfig] 中查找对应的 [Component] 列表
+         * @param rawText 用于解析的文本, 必须包含一个占位符 [key], 可以包含若干普通的 [Tag]
          */
         class Folded(val key: String, rawText: String) : Line(rawText)
     }
@@ -128,11 +134,43 @@ class LineConfigBuilder {
         tagResolverList.add(resolver)
     }
 
+    fun standard(dsl: PlaceholderTagResolverBuilder.() -> Unit) {
+        val resolver = PlaceholderTagResolverBuilder().apply(dsl).build()
+        tagResolverList.add(resolver)
+    }
+
     fun folded(key: String, lines: List<Component>) {
         foldedLineMap[key] = lines
     }
 
+    fun folded(key: String, vararg lines: Component) {
+        foldedLineMap[key] = lines.toList()
+    }
+
     fun build(): MenuLore.LineConfig = MenuLore.LineConfig(TagResolver.resolver(tagResolverList), foldedLineMap)
+}
+
+@MenuLoreDsl
+class PlaceholderTagResolverBuilder {
+    private val tagResolverList = mutableListOf<TagResolver>()
+
+    fun parsed(key: String, value: Component) {
+        tagResolverList.add(Placeholder.component(key, value))
+    }
+
+    fun unparsed(key: String, value: String) {
+        tagResolverList.add(Placeholder.unparsed(key, value))
+    }
+
+    fun component(key: String, value: Component) {
+        tagResolverList.add(Placeholder.component(key, value))
+    }
+
+    fun styling(key: String, vararg value: StyleBuilderApplicable) {
+        tagResolverList.add(Placeholder.styling(key, *value))
+    }
+
+    fun build(): TagResolver = TagResolver.resolver(tagResolverList)
 }
 
 fun lineConfig(init: LineConfigBuilder.() -> Unit): MenuLore.LineConfig {
