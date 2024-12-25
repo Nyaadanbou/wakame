@@ -69,7 +69,7 @@ object ItemConstants {
     const val LORE = "lore"
     const val MENU_ICON_LORE = "menu_icon_lore"
     const val MENU_ICON_NAME = "menu_icon_name"
-    const val MENU_ICON_PLACEHOLDERS = "menu_icon_placeholders"
+    const val MENU_ICON_DICT = "menu_icon_dict"
     const val PORTABLE_CORE = "portable_core"
     const val RARITY = "rarity"
     const val REFORGE_HISTORY = "reforge_history"

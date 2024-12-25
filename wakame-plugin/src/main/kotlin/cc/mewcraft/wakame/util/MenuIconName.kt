@@ -4,9 +4,11 @@ import cc.mewcraft.wakame.Injector
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 data class MenuIconName(
+    @Setting(nodeFromParent = true)
     val name: String,
 ) {
     companion object {

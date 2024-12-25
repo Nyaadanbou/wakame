@@ -47,7 +47,8 @@ data class MenuIconLore(
                     val rawText = line.rawText
                     val tagResolver = config.getTagResolver()
                     val component = MM.deserialize(rawText, tagResolver)
-                    listOf(component)
+                    val result = listOf(component)
+                    result
                 }
 
                 is Line.Folded -> {
@@ -55,10 +56,8 @@ data class MenuIconLore(
                     val rawText = line.rawText
                     val folded = config.getFoldedText(key) ?: return@flatMap emptyList()
                     val tagResolver = config.getTagResolver()
-                    folded.map { line ->
-                        val tagResolver = TagResolver.resolver(tagResolver, Placeholder.component(key, line))
-                        MM.deserialize(rawText, tagResolver)
-                    }
+                    val result = folded.map { line -> MM.deserialize(rawText, TagResolver.resolver(tagResolver, Placeholder.component(key, line))) }
+                    result
                 }
             }
         }
@@ -118,8 +117,8 @@ data class MenuIconLore(
      * 代表 [MenuIconLore] 中的配置文件, 将作为参数传入 [MenuIconLore.resolve].
      */
     class LineConfig(
-        private val tagResolverList: TagResolver,
-        private val foldedLineMap: Map<String, List<Component>>,
+        private val globalTagResolver: TagResolver,
+        private val foldedLineCreatorMap: Map<String, List<Component>>,
     ) {
 
         companion object {
@@ -129,11 +128,11 @@ data class MenuIconLore(
         }
 
         fun getTagResolver(): TagResolver {
-            return tagResolverList
+            return globalTagResolver
         }
 
         fun getFoldedText(tag: String): List<Component>? {
-            return foldedLineMap[tag]
+            return foldedLineCreatorMap[tag]
         }
     }
 
@@ -142,7 +141,7 @@ data class MenuIconLore(
 
     @MenuIconLoreDsl
     class MainBuilder {
-        private val lines = mutableListOf<Line>()
+        private val lines: MutableList<Line> = mutableListOf()
 
         fun standard(rawText: String) {
             lines.add(Line.Standard(rawText))
@@ -157,13 +156,17 @@ data class MenuIconLore(
         }
     }
 
+    /**
+     * 使用上必须让 [standard] 先于 [folded] 调用,
+     * 否则 [folded] 不会使用全部的 [TagResolver].
+     */
     @MenuIconLoreDsl
     class LineConfigBuilder(
         private val dictionary: MenuIconDictionary,
     ) {
-        // 这些 TagResolver 都是
-        private val tagResolverBuilder = TagResolver.builder()
-        private val foldedLineMap = mutableMapOf<String, List<Component>>()
+        private var tagResolver: TagResolver? = null
+        private val tagResolverBuilder: TagResolver.Builder = TagResolver.builder()
+        private val foldedLineMap: MutableMap<String, List<Component>> = mutableMapOf()
 
         fun dict(key: String): String {
             // 开发日记 2024/12/25: 返回空字符串?
@@ -176,7 +179,7 @@ data class MenuIconLore(
         }
 
         // 使用该函数以 DSL 的形式添加 TagResolver.
-        // 使用该函数的好处: DSL 会自动处理 MenuIconDict 中的映射.
+        // DSL 可方便使用 MenuIconDict 中的映射.
         fun standard(dsl: PlaceholderTagResolverBuilder.() -> Unit) {
             tagResolverBuilder.resolver(PlaceholderTagResolverBuilder(dictionary).apply(dsl).build())
         }
@@ -192,22 +195,32 @@ data class MenuIconLore(
         }
 
         // 使用该函数以 DSL 的形式添加折叠的占位符.
-        // 使用该函数的好处: DSL 会自动处理 MenuIconDict 中的映射.
+        // DSL 可方便使用 MenuIconDict 中的映射.
+        // TODO: 如果在 build 之前就调用了这个函数, 那么最终的 Global TagResolver 相当于提前构建了.
+        //  试试通过代码的方式来强制实行以下限制:
+        //  1. 要求 standard 必须先于所有 folded 调用
+        //  2. 如果在 build 之前就调用了 folded, 应该给出一些提示?
         fun folded(key: String, dsl: FoldedLineBuilder.() -> Unit) {
-            foldedLineMap[key] = FoldedLineBuilder(dictionary).apply(dsl).build()
+            if (tagResolver == null) {
+                tagResolver = tagResolverBuilder.build()
+            }
+            foldedLineMap[key] = FoldedLineBuilder(dictionary, tagResolver!!).apply(dsl).build()
         }
 
         fun build(): LineConfig {
-            return LineConfig(tagResolverBuilder.build(), foldedLineMap)
+            if (tagResolver == null) {
+                tagResolver = tagResolverBuilder.build()
+            }
+            return LineConfig(tagResolver!!, foldedLineMap)
         }
     }
 
     @MenuIconLoreDsl
     class FoldedLineBuilder(
         private val dictionary: MenuIconDictionary,
+        private val globalTagResolver: TagResolver,
     ) {
-        private val lines = mutableListOf<Component>()
-        private val tagResolverBuilder = TagResolver.builder()
+        private val foldedLineList: MutableList<Component> = mutableListOf()
 
         fun dict(key: String): String {
             // 开发日记 2024/12/25: 返回空字符串?
@@ -215,19 +228,22 @@ data class MenuIconLore(
         }
 
         fun literal(text: String) {
-            lines.add(MM.deserialize(text))
+            foldedLineList.add(MM.deserialize(text, globalTagResolver))
         }
 
         fun literal(component: Component) {
-            lines.add(component)
+            foldedLineList.add(component)
         }
 
         fun resolve(key: String, dsl: PlaceholderTagResolverBuilder.() -> Unit) {
-            tagResolverBuilder.resolver(PlaceholderTagResolverBuilder(dictionary).apply(dsl).build())
+            val rawText = dict(key)
+            val resolver = PlaceholderTagResolverBuilder(dictionary).apply(dsl).build() // local resolver
+            val parsed = MM.deserialize(rawText, resolver, globalTagResolver)
+            foldedLineList.add(parsed)
         }
 
         fun build(): List<Component> {
-            return lines
+            return foldedLineList
         }
     }
 
@@ -235,7 +251,7 @@ data class MenuIconLore(
     class PlaceholderTagResolverBuilder(
         private val dictionary: MenuIconDictionary,
     ) {
-        private val tagResolverBuilder = TagResolver.builder()
+        private val tagResolverBuilder: TagResolver.Builder = TagResolver.builder()
 
         fun dict(key: String): String {
             // 开发日记 2024/12/25: 返回空字符串?

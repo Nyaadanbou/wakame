@@ -1,6 +1,5 @@
 package util
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.util.MenuIconDictionary
@@ -11,7 +10,6 @@ import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import commonEnv
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.startKoin
@@ -20,6 +18,7 @@ import org.koin.test.KoinTest
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 /**
  * 使用以下代码:
@@ -48,15 +47,13 @@ class MenuIconMixTest : KoinTest {
 
     @Test
     fun `mix case 1`() {
-        val mm = Injector.get<MiniMessage>()
-
         val options = ConfigurationOptions.defaults().serializers {
             it.registerAnnotatedObjects(ObjectMappers.DEFAULT)
             it.kregister(MenuIconLoreSerializer)
         }
         val dictNode = BasicConfigurationNode.root<RuntimeException>(options) { node ->
             node.node("choice_item").set("<mark> <item>×<amount>")
-            node.node("choice_exp").set("<mark> <exp>×<amount>")
+            node.node("choice_exp").set("<mark> exp×<amount>")
             node.node("mark_success").set("✔")
             node.node("mark_failure").set("✘")
         }
@@ -68,7 +65,7 @@ class MenuIconMixTest : KoinTest {
                 listOf(
                     "the rarity is <rarity_name>!",
                     "there are <choice_amount> choices:",
-                    "*prefix* {choice_list} <choice_mark>",
+                    "*fixed prefix* {choice_list} <some_global_tag>",
                     "a literal bottom line",
                 )
             )
@@ -86,6 +83,7 @@ class MenuIconMixTest : KoinTest {
             standard {
                 unparsed("rarity_name", "rare")
                 component("choice_amount", text(3))
+                component("some_global_tag", text("*some global tag*"))
             }
             folded("choice_list") {
                 // 添加固定内容
@@ -97,14 +95,14 @@ class MenuIconMixTest : KoinTest {
                 resolve("choice_item") {
                     unparsed("mark", dict("mark_success"))
                     component("item", text("diamond"))
-                    component("amount", text(3))
+                    component("amount", text(1))
                 }
 
                 // 添加第二行 (因为是第二次调用 line)
                 resolve("choice_item") {
                     unparsed("mark", dict("mark_success"))
                     component("item", text("diamond"))
-                    component("amount", text(3))
+                    component("amount", text(2))
                 }
 
                 // 添加第三行 (因为是第三次调用 line)
@@ -113,15 +111,34 @@ class MenuIconMixTest : KoinTest {
                     component("amount", text(123))
                 }
             }
-            folded("choice_list", text("choice 1"), text("choice 2"), text("choice 3"))
         }
 
         val expectedDict = MenuIconDictionary(
             mapOf(
-                "mark_success" to "<green>✔",
-                "mark_failure" to "<red>✘",
-                "choice_item" to "<!i> <choice_name>",
+                "mark_success" to "✔",
+                "mark_failure" to "✘",
+                "choice_item" to "<mark> <item>×<amount>",
+                "choice_exp" to "<mark> exp×<amount>",
             )
         )
+        val expectedName = text("*anything* Nailm")
+        val expectedLore = listOf(
+            text("the rarity is rare!"),
+            text("there are 3 choices:"),
+            text("*fixed prefix* literal 1 *some global tag*"),
+            text("*fixed prefix* literal 2 *some global tag*"),
+            text("*fixed prefix* ✔ diamond×1 *some global tag*"),
+            text("*fixed prefix* ✔ diamond×2 *some global tag*"),
+            text("*fixed prefix* ✘ exp×123 *some global tag*"),
+            text("a literal bottom line"),
+        )
+
+        // 验证结果
+        assertEquals(expectedDict, actualDict)
+        assertEquals(expectedName, actualName)
+        assertEquals(expectedLore.size, actualLore.size)
+        actualLore.forEachIndexed { index, component ->
+            assertEquals(expectedLore[index], component)
+        }
     }
 }
