@@ -1,5 +1,5 @@
-menu_name: "<item_name>"
-menu_lore:
-  - "$<item_lore>"
+menu_icon_name: "<item_name>"
+menu_icon_lore:
+  - "{item_lore}"
   - ""
   - "<!i>点击取出物品"

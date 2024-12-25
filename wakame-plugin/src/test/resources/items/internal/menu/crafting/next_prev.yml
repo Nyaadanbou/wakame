@@ -1,4 +1,4 @@
 base: arrow
-menu_name: 上一页
-menu_lore:
+menu_icon_name: 上一页
+menu_icon_lore:
   - "<!i><dark_gray>点击查看上一页"

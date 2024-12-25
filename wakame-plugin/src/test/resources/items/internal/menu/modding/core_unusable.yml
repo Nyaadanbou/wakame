@@ -1,5 +1,5 @@
-menu_name: "<white>结果: <red>无效"
-menu_lore:
-  - "$<item_lore>"
+menu_icon_name: "<white>结果: <red>无效"
+menu_icon_lore:
+  - "{item_lore}"
   - ""
   - "<!i>点击取出物品"

@@ -1,4 +1,4 @@
 base: gray_stained_glass_pane
-menu_name: "<core_name>"
-menu_lore:
-  - "$<!i>* <core_description>"
+menu_icon_name: "<core_name>"
+menu_icon_lore:
+  - "<!i>* {core_description}"
