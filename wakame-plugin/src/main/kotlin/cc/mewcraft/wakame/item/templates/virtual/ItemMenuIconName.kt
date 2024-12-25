@@ -25,8 +25,8 @@ data class ItemMenuIconName(
         return ItemGenerationResult.empty()
     }
 
-    fun resolve(placeholderMap: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIconLore.PlaceholderTagResolverBuilder.() -> Unit): Component {
-        return delegate.resolve(placeholderMap, dsl)
+    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIconLore.PlaceholderTagResolverBuilder.() -> Unit): Component {
+        return delegate.resolve(dict, dsl)
     }
 
     companion object : ItemTemplateBridge<ItemMenuIconName> {

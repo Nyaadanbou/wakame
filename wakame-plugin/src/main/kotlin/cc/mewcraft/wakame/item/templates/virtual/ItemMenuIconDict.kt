@@ -22,6 +22,10 @@ data class ItemMenuIconDict(
         return ItemGenerationResult.empty()
     }
 
+    operator fun get(key: String): String {
+        return delegate[key] ?: error("dict key not found: $key")
+    }
+
     companion object : ItemTemplateBridge<ItemMenuIconDict> {
         override fun codec(id: String): ItemTemplateType<ItemMenuIconDict> {
             return Codec(id)

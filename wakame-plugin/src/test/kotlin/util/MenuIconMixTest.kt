@@ -86,26 +86,30 @@ class MenuIconMixTest : KoinTest {
                 component("some_global_tag", text("*some global tag*"))
             }
             folded("choice_list") {
-                // 添加固定内容
+                // 添加第1行: 固定内容
                 literal("literal 1")
+                // 添加第2行: 固定内容
                 literal(text("literal 2"))
 
-                // 添加第一行
-                // 传入 resolve 的字符串是最终内容的 MiniMessage String
+                // 添加第3行: 动态内容
+                // 以 choice_item 映射到的字符串为原始的 MiniMessage String,
+                // 使用全局占位符 + 传入额外的占位符, 将其解析为一个 Component.
                 resolve("choice_item") {
                     unparsed("mark", dict("mark_success"))
                     component("item", text("diamond"))
                     component("amount", text(1))
                 }
 
-                // 添加第二行 (因为是第二次调用 line)
+                // 添加第4行: 动态内容
+                // 同上
                 resolve("choice_item") {
                     unparsed("mark", dict("mark_success"))
                     component("item", text("diamond"))
                     component("amount", text(2))
                 }
 
-                // 添加第三行 (因为是第三次调用 line)
+                // 添加第5行: 动态内容
+                // 同上
                 resolve("choice_exp") {
                     unparsed("mark", dict("mark_failure"))
                     component("amount", text(123))
