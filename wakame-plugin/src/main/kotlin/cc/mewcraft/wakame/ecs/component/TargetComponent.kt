@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs.component
 
-import cc.mewcraft.wakame.skill2.character.Target
+import cc.mewcraft.wakame.ability.character.Target
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 

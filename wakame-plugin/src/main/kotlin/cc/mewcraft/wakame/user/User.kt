@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.skill2.state.SkillState
+import cc.mewcraft.wakame.ability.state.AbilityState
 import java.util.UUID
 
 /**
@@ -49,9 +49,9 @@ interface User<P> {
     val resourceMap: ResourceMap
 
     /**
-     * The Skill State Manager of the player.
+     * The Ability State Manager of the player.
      */
-    val skillState: SkillState<P>
+    val abilityState: AbilityState<P>
 
     /**
      * The Attack Speed of the player.

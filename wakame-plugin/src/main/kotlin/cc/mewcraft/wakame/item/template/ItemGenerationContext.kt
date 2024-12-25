@@ -62,7 +62,7 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
     /**
      * 已经生成的物品技能.
      */
-    val skills: MutableCollection<SkillContextData>
+    val abilities: MutableCollection<AbilityContextData>
 }
 
 /**
@@ -98,7 +98,7 @@ private class SimpleItemGenerationContext(
     override var rarity: Rarity? by ObservableDelegates.reference(null)
     override val elements: MutableCollection<Element> by ObservableDelegates.set(HashSet())
     override val kizamiz: MutableCollection<Kizami> by ObservableDelegates.set(HashSet())
-    override val skills: MutableCollection<SkillContextData> by ObservableDelegates.set(HashSet())
+    override val abilities: MutableCollection<AbilityContextData> by ObservableDelegates.set(HashSet())
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -109,7 +109,7 @@ private class SimpleItemGenerationContext(
         ExaminableProperty.of("rarity", rarity),
         ExaminableProperty.of("elements", elements),
         ExaminableProperty.of("kizamiz", kizamiz),
-        ExaminableProperty.of("skills", skills),
+        ExaminableProperty.of("ability", abilities),
         ExaminableProperty.of("attributes", attributes),
     )
 

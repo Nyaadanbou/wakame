@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -21,7 +21,7 @@ internal object CoreIcons {
         val coreId = core.id.value() // 核心 id, 但去掉 namespace
         val holder = when (core) {
             is AttributeCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/attribute/$coreId", DEFAULT_ITEM_ID)
-            is SkillCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/skill/$coreId", DEFAULT_ITEM_ID)
+            is AbilityCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/ability/$coreId", DEFAULT_ITEM_ID)
             is EmptyCore -> NekoItemHolder.getOrDefault("$ITEM_ID_PREFIX/empty", DEFAULT_ITEM_ID)
             else -> NekoItemHolder.get(DEFAULT_ITEM_ID)
         }

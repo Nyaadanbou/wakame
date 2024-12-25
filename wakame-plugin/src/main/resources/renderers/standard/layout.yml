@@ -15,7 +15,7 @@ primary:
   - attribute:entity_interaction_range
   - attribute:max_health
   - attribute:movement_speed
-  - skill:buff/potion_drop
+  - ability:buff/potion_drop
   - stash:cells/empty
 
   - (fixed:general)

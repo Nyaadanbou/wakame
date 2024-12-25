@@ -20,8 +20,8 @@ primary:
   - attribute:max_health
   - attribute:movement_speed
 
-  - skill:blink
-  - skill:frost
+  - ability:blink
+  - ability:frost
 
   - stash:cells/empty
 

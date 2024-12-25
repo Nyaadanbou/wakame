@@ -25,6 +25,6 @@ internal object ItemSlotChangeRegistry : Initializable {
         listeners += AttributeItemSlotChangeListener
         listeners += EnchantmentItemSlotChangeListener
         listeners += KizamiItemSlotChangeListener
-        listeners += SkillItemSlotChangeListener
+        listeners += AbilityItemSlotChangeListener
     }
 }

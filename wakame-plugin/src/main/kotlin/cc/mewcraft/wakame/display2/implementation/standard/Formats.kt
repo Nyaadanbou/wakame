@@ -15,10 +15,10 @@ import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.AbilityRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -48,20 +48,20 @@ internal data class CellularAttributeRendererFormat(
 }
 
 @ConfigSerializable
-internal data class CellularSkillRendererFormat(
+internal data class CellularAbilityRendererFormat(
     override val namespace: String,
-) : RendererFormat.Dynamic<SkillCore> {
-    override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, SkillRegistry.INSTANCES::has)
+) : RendererFormat.Dynamic<AbilityCore> {
+    override val textMetaFactory: TextMetaFactory = AbilityCoreTextMetaFactory(namespace)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AbilityRegistry.INSTANCES::has)
 
-    fun render(data: SkillCore): IndexedText {
-        val instance = data.skill.instance
+    fun render(data: AbilityCore): IndexedText {
+        val instance = data.ability.instance
         val tooltip = instance.displays.tooltips.map(MM::deserialize)
         return SimpleIndexedText(computeIndex(data), tooltip)
     }
 
-    override fun computeIndex(data: SkillCore): Key {
-        val dataId = data.skill.id
+    override fun computeIndex(data: AbilityCore): Key {
+        val dataId = data.ability.id
         val indexId = dataId.namespace() + "/" + dataId.value()
         return Key.key(namespace, indexId)
     }

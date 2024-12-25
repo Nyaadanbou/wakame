@@ -23,8 +23,8 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
 
-@PreWorldDependency(runBefore = [SkillRegistry::class, AttributeRegistry::class])
-@ReloadDependency(runBefore = [SkillRegistry::class, AttributeRegistry::class])
+@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
+@ReloadDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
 object KizamiRegistry : KoinComponent, Initializable {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).

@@ -24,7 +24,7 @@ import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
@@ -100,7 +100,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
             RerollingTableContext.Slot.INPUT -> {
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_IN.process(collector, id, core, context)
-                    is SkillCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_SKILL_IN.process(collector, id, core, context)
+                    is AbilityCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ABILITY_IN.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, core, context)
                 }
             }
@@ -108,7 +108,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
             RerollingTableContext.Slot.OUTPUT -> {
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_OUT.process(collector, id, core, context)
-                    is SkillCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_SKILL_OUT.process(collector, id, core, context)
+                    is AbilityCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ABILITY_OUT.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, core, context)
                 }
             }
@@ -132,14 +132,14 @@ internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistr
         }
 
     @JvmField
-    val CELLULAR_SKILL_IN: RenderingHandler3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
-        configure3("cells/skills/in") { id, core, context, format ->
+    val CELLULAR_ABILITY_IN: RenderingHandler3<String, AbilityCore, RerollingTableContext, CellularAbilityRendererFormat> =
+        configure3("cells/abilities/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingHandler3<String, SkillCore, RerollingTableContext, CellularSkillRendererFormat> =
-        configure3("cells/skills/out") { id, core, context, format ->
+    val CELLULAR_ABILITY_OUT: RenderingHandler3<String, AbilityCore, RerollingTableContext, CellularAbilityRendererFormat> =
+        configure3("cells/abilities/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 

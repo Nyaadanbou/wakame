@@ -26,7 +26,7 @@ import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
@@ -103,7 +103,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                    is SkillCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_SKILL_IN.process(collector, cell.getId(), core, context)
+                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_IN.process(collector, cell.getId(), core, context)
                     is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
                 }
             }
@@ -113,7 +113,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                    is SkillCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_SKILL_OUT.process(collector, cell.getId(), core, context)
+                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_OUT.process(collector, cell.getId(), core, context)
                     is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
                 }
             }
@@ -163,13 +163,13 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     }
 
     @JvmField
-    val CELLULAR_SKILL_IN: RenderingHandler3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/in") { id, skill, context, format ->
-        format.render(id, skill, context)
+    val CELLULAR_ABILITY_IN: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/in") { id, ability, context, format ->
+        format.render(id, ability, context)
     }
 
     @JvmField
-    val CELLULAR_SKILL_OUT: RenderingHandler3<String, SkillCore, ModdingTableContext, CellularSkillRendererFormat> = configure3("cells/skills/out") { id, skill, context, format ->
-        format.render(id, skill, context)
+    val CELLULAR_ABILITY_OUT: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/out") { id, ability, context, format ->
+        format.render(id, ability, context)
     }
 
     @JvmField

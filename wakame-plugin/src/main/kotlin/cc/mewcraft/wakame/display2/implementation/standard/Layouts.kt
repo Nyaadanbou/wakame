@@ -59,7 +59,7 @@ internal data class AttributeCoreTextMetaFactory(
     }
 }
 
-internal data class SkillCoreTextMeta(
+internal data class AbilityCoreTextMeta(
     override val sourceIndex: SourceIndex,
     override val sourceOrdinal: SourceOrdinal,
     override val defaultText: List<Component>?,
@@ -71,10 +71,10 @@ internal data class SkillCoreTextMeta(
     }
 }
 
-internal data class SkillCoreTextMetaFactory(
+internal data class AbilityCoreTextMetaFactory(
     private val namespace: String,
 ) : TextMetaFactory {
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return SkillCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
+        return AbilityCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }

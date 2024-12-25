@@ -6,10 +6,10 @@ import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.isEmpty
-import cc.mewcraft.wakame.skill2.trigger.Trigger
-import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
+import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -68,8 +68,8 @@ interface CoreMatchRule : Examinable {
  * [CoreMatchRule] 的序列化器.
  *
  * 依赖的序列化器:
- * - [cc.mewcraft.wakame.skill.trigger.SkillTriggerSerializer]
- * - [cc.mewcraft.wakame.skill.TriggerVariantSerializer]
+ * - [cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer]
+ * - [cc.mewcraft.wakame.ability.TriggerVariantSerializer]
  */
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
@@ -104,10 +104,10 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 
-            Namespaces.SKILL -> {
+            Namespaces.ABILITY -> {
                 val trigger = node.node("trigger").krequire<Trigger>()
                 val variant = node.node("variant").get<TriggerVariant>(TriggerVariant.any())
-                return CoreMatchRuleSkill(pattern, trigger, variant)
+                return CoreMatchRuleAbility(pattern, trigger, variant)
             }
 
             else -> {
@@ -211,7 +211,7 @@ private class CoreMatchRuleAttribute(
 /**
  * 用于测试技能核心.
  */
-private class CoreMatchRuleSkill(
+private class CoreMatchRuleAbility(
     override val path: Pattern,
     val trigger: Trigger,
     val variant: TriggerVariant,
@@ -219,7 +219,7 @@ private class CoreMatchRuleSkill(
     override val priority: Int = 2
 
     override fun test(core: Core): Boolean {
-        if (core !is SkillCore) {
+        if (core !is AbilityCore) {
             return false
         }
 
@@ -228,9 +228,9 @@ private class CoreMatchRuleSkill(
             return false
         }
 
-        val skill = core.skill
+        val ability = core.ability
 
-        return trigger == skill.trigger && variant == skill.variant
+        return trigger == ability.trigger && variant == ability.variant
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

@@ -15,11 +15,11 @@ import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.standard.SkillCoreTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.standard.AbilityCoreTextMetaFactory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.SkillCore
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.AbilityRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -88,22 +88,22 @@ internal data class CellularAttributeRendererFormat(
 }
 
 @ConfigSerializable
-internal data class CellularSkillRendererFormat(
+internal data class CellularAbilityRendererFormat(
     override val namespace: String,
     private val diffFormats: ModdingDifferenceFormats,
-) : RendererFormat.Dynamic<SkillCore> {
-    override val textMetaFactory: TextMetaFactory = SkillCoreTextMetaFactory(namespace)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, SkillRegistry.INSTANCES::has)
+) : RendererFormat.Dynamic<AbilityCore> {
+    override val textMetaFactory: TextMetaFactory = AbilityCoreTextMetaFactory(namespace)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AbilityRegistry.INSTANCES::has)
 
-    fun render(id: String, core: SkillCore, context: ModdingTableContext): IndexedText {
+    fun render(id: String, core: AbilityCore, context: ModdingTableContext): IndexedText {
         val original = core.description
         val processed = diffFormats.render(id, original, context)
         return SimpleIndexedText(computeIndex(core), processed)
     }
 
-    override fun computeIndex(data: SkillCore): Key {
-        val skill = data.skill
-        val dataId = skill.id
+    override fun computeIndex(data: AbilityCore): Key {
+        val ability = data.ability
+        val dataId = ability.id
         val indexId = dataId.namespace() + "/" + dataId.value()
         return Key.key(namespace, indexId)
     }

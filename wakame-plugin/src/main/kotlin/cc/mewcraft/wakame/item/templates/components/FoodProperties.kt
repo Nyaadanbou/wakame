@@ -24,7 +24,7 @@ data class FoodProperties(
     val canAlwaysEat: Boolean,
     val eatSeconds: Float,
     val effects: List<FoodEffect>,
-    val skills: List<Key>,
+    val abilities: List<Key>,
 ) : ItemTemplate<FoodPropertiesData> {
     override val componentType: ItemComponentType<FoodPropertiesData> = ItemComponentTypes.FOOD
 
@@ -35,7 +35,7 @@ data class FoodProperties(
             canAlwaysEat,
             eatSeconds,
             effects,
-            skills
+            abilities
         )
         return ItemGenerationResult.of(foodProperties)
     }
@@ -74,8 +74,8 @@ data class FoodProperties(
                 val potionEffect = child.get<PotionEffect>() ?: throw SerializationException(child, javaTypeOf<PotionEffect>(), "The potion effect of a single food effect must be specifically set")
                 FoodEffect(potionEffect, probability)
             }
-            val skills = node.node("skills").getList<Key>(emptyList())
-            return FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects, skills)
+            val abilities = node.node("ability").getList<Key>(emptyList())
+            return FoodProperties(nutrition, saturation, canAlwaysEat, eatSeconds, effects, abilities)
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {

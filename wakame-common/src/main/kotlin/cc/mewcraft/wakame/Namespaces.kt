@@ -49,7 +49,7 @@ object Namespaces {
     /**
      * The namespace of all types of Ability.
      */
-    const val SKILL = "skill"
+    const val ABILITY = "ability"
 
     /**
      * The namespace of all types of Trigger.

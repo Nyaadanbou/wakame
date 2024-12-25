@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill2.Skill
+import cc.mewcraft.wakame.ability.Ability
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -69,7 +69,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
-    fun handleSkillPrepareCast(player: Player, itemStack: ItemStack, skill: Skill, event: PlayerSkillPrepareCastEvent) = Unit
+    fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) = Unit
 }
 
 interface ItemBehaviorType<T : ItemBehavior> : ItemBehaviorHolder {

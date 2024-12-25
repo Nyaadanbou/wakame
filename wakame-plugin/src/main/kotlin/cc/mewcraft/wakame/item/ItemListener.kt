@@ -5,12 +5,12 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.event.PlayerSkillPrepareCastEvent
+import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.skill2.SkillEventHandler
+import cc.mewcraft.wakame.ability.AbilityEventHandler
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -275,7 +275,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: PlayerSkillPrepareCastEvent) {
+    fun on(event: PlayerAbilityPrepareCastEvent) {
         val player = event.caster
 
         if (!isHandleable(player)) {
@@ -284,7 +284,7 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
 
         val itemStack = event.item ?: return
         val nekoStack = itemStack.shadowNeko() ?: return
-        nekoStack.handleSkillPrepareCast(player, itemStack, event.skill, event)
+        nekoStack.handleAbilityPrepareCast(player, itemStack, event.ability, event)
     }
 }
 
@@ -294,9 +294,9 @@ internal class ItemBehaviorListener : KoinComponent, Listener {
  */
 // FIXME 合并到 [ItemChangeListener] 或 [ItemBehaviorListener] 中去
 internal class ItemMiscellaneousListener : KoinComponent, Listener {
-    private val skillEventHandler: SkillEventHandler by inject()
+    private val abilityEventHandler: AbilityEventHandler by inject()
 
-    //<editor-fold desc="Skills">
+    //<editor-fold desc="Abilities">
     @EventHandler
     fun on(event: PlayerInteractEvent) {
         val slot = event.hand ?: return
@@ -313,19 +313,19 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         when (event.action) {
             Action.LEFT_CLICK_BLOCK -> {
-                skillEventHandler.onLeftClickBlock(player, event)
+                abilityEventHandler.onLeftClickBlock(player, event)
             }
 
             Action.LEFT_CLICK_AIR -> {
-                skillEventHandler.onLeftClickAir(player, event)
+                abilityEventHandler.onLeftClickAir(player, event)
             }
 
             Action.RIGHT_CLICK_BLOCK -> {
-                skillEventHandler.onRightClickBlock(player, event)
+                abilityEventHandler.onRightClickBlock(player, event)
             }
 
             Action.RIGHT_CLICK_AIR -> {
-                skillEventHandler.onRightClickAir(player, event)
+                abilityEventHandler.onRightClickAir(player, event)
             }
 
             else -> return
@@ -342,12 +342,12 @@ internal class ItemMiscellaneousListener : KoinComponent, Listener {
 
         val entity = event.entity as? LivingEntity ?: return
         val itemStack = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        skillEventHandler.onAttack(damager, itemStack, event)
+        abilityEventHandler.onAttack(damager, itemStack, event)
     }
 
     @EventHandler
     fun on(event: ProjectileHitEvent) {
-        skillEventHandler.onProjectileHit(event.entity, event.hitEntity)
+        abilityEventHandler.onProjectileHit(event.entity, event.hitEntity)
     }
     //</editor-fold>
 }

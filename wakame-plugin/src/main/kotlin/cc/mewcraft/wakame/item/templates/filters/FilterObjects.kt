@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.SkillContextData
+import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
@@ -221,31 +221,31 @@ data class RarityFilter(
 }
 
 /**
- * Checks the population of *skill*.
+ * Checks the population of *ability*.
  *
- * This could be, for example, used to check whether a skill
- * with key `skill:blink` has been populated.
+ * This could be, for example, used to check whether a ability
+ * with key `ability:blink` has been populated.
  *
  * @property invert whether to invert the original result
- * @property id the identifier of the skill to check with
+ * @property id the identifier of the ability to check with
  *
  * @see cc.mewcraft.wakame.item.components.ItemCells
  */
-data class SkillFilter(
+data class AbilityFilter(
     override val invert: Boolean,
     private val id: Key,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
-        val TYPE = Key.key(NAMESPACE_FILTER, "skill")
+        val TYPE = Key.key(NAMESPACE_FILTER, "ability")
     }
 
     override val kind: Key = TYPE
 
     /**
-     * Returns `true` if the [context] already has the skill with [id] populated.
+     * Returns `true` if the [context] already has the ability with [id] populated.
      */
     override fun testOriginal(context: ItemGenerationContext): Boolean {
-        return SkillContextData(id) in context.skills
+        return AbilityContextData(id) in context.abilities
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

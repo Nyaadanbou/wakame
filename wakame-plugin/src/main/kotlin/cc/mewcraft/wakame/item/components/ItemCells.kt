@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.*
 import cc.mewcraft.wakame.item.components.cells.*
-import cc.mewcraft.wakame.skill2.PlayerSkill
-import cc.mewcraft.wakame.skill2.trigger.TriggerVariant
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.value
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
@@ -107,9 +107,9 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
 
     /**
-     * 获取所有核孔上的 [PlayerSkill].
+     * 获取所有核孔上的 [PlayerAbility].
      */
-    fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill>
+    fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -220,21 +220,21 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return ret.build()
         }
 
-        override fun collectSkillModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerSkill> {
-            val ret = ArrayList<PlayerSkill>()
+        override fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility> {
+            val ret = ArrayList<PlayerAbility>()
             for ((_, cell) in this) {
-                val core = cell.getCore() as? SkillCore ?: continue
-                val skill = core.skill
+                val core = cell.getCore() as? AbilityCore ?: continue
+                val ability = core.ability
 
-                val skillVariant = skill.variant
-                if (skillVariant == TriggerVariant.any()) {
-                    ret.add(skill)
+                val abilityVariant = ability.variant
+                if (abilityVariant == TriggerVariant.any()) {
+                    ret.add(ability)
                     continue
                 }
-                if (skillVariant.id != context.variant) {
+                if (abilityVariant.id != context.variant) {
                     continue
                 }
-                ret.add(skill)
+                ret.add(ability)
             }
             return ret
         }

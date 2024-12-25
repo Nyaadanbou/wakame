@@ -1,7 +1,0 @@
-# 技能模板的 type
-type: potion_drop
-
-# 药水类型. 可选值: [https://jd.papermc.io/paper/1.21/org/bukkit/potion/PotionType.html]
-effect_types:
-  - LUCK
-  - LONG_LEAPING

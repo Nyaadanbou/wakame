@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
-import cc.mewcraft.wakame.item.components.cells.cores.SkillCore
-import cc.mewcraft.wakame.skill2.PlayerSkill
+import cc.mewcraft.wakame.item.components.cells.cores.AbilityCore
+import cc.mewcraft.wakame.ability.PlayerAbility
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
@@ -94,13 +94,13 @@ interface AttributeCore : Core {
 }
 
 /**
- * [SkillCore] 是一个技能核心, 用于表示一个 [PlayerSkill].
+ * [AbilityCore] 是一个技能核心, 用于表示一个 [PlayerAbility].
  */
-interface SkillCore : Core {
+interface AbilityCore : Core {
     /**
      * 该技能核心的技能种类及其变体.
      */
-    val skill: PlayerSkill
+    val ability: PlayerAbility
 }
 
 /**
@@ -147,8 +147,8 @@ object CoreFactory {
                 AttributeCore(coreId, tag)
             }
 
-            coreId.namespace() == Namespaces.SKILL -> {
-                SkillCore(coreId, tag)
+            coreId.namespace() == Namespaces.ABILITY -> {
+                AbilityCore(coreId, tag)
             }
 
             // 无法识别 NBT

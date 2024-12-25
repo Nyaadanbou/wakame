@@ -46,7 +46,7 @@ object MythicMobsDamageApplier : DamageApplier {
             /* ignoreEnchantments = */ false,
             /* damageCause = */ EntityDamageEvent.DamageCause.CUSTOM
         ).apply {
-            putBoolean("trigger_skills", false)
+            putBoolean("trigger_abilities", false)
         }
 
         // 该函数会触发一个 MythicDamageEvent, 其中包含了发起攻击的实体和受到攻击的实体.

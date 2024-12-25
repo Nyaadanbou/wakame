@@ -29,9 +29,9 @@ import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.registry.SkillRegistry
+import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.skill2.skill2Module
+import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -73,7 +73,7 @@ object CommonNekoStackTest {
                 molangModule(),
                 rarityModule(),
                 registryModule(),
-                skill2Module(),
+                abilityModule(),
                 worldModule(),
             )
         }
@@ -83,7 +83,7 @@ object CommonNekoStackTest {
         // 按依赖顺序, 初始化注册表
         AttributeRegistry.onPreWorld()
         ElementRegistry.onPreWorld()
-        SkillRegistry.onPreWorld()
+        AbilityRegistry.onPreWorld()
         KizamiRegistry.onPreWorld()
         RarityRegistry.onPreWorld()
         LevelMappingRegistry.onPreWorld()
