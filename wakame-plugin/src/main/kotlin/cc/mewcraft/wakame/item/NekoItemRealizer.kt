@@ -179,7 +179,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ATTACK)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
-        generate(ItemTemplateTypes.FIRE_RESISTANT)
+        generate(ItemTemplateTypes.DAMAGE_RESISTANT)
         generate(ItemTemplateTypes.UNBREAKABLE)
         generate(ItemTemplateTypes.TRIM)
         generate(ItemTemplateTypes.HIDE_TOOLTIP)

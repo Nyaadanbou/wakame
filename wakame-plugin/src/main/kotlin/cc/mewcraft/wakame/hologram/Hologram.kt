@@ -13,6 +13,7 @@ import net.minecraft.network.syncher.SynchedEntityData.*
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.PositionMoveRotation
 import org.bukkit.Color
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.entity.CraftPlayer
@@ -128,7 +129,7 @@ class Hologram(
             // item
             display.itemStack = MojangStack.fromBukkitCopy(data.itemStack)
         } else if (display is MojangDisplay.BlockDisplay && data is BlockHologramData) {
-            val block = BuiltInRegistries.BLOCK.get(ResourceLocation.bySeparator("minecraft:" + data.block.name.lowercase(), ':'))
+            val block = BuiltInRegistries.BLOCK.get(ResourceLocation.bySeparator("minecraft:" + data.block.name.lowercase(), ':')).get().value()
             display.blockState = block.defaultBlockState()
         }
 
@@ -221,7 +222,7 @@ class Hologram(
 
         // we use bundle packet to send it all at once
         val packets = ArrayList<Packet<ClientGamePacketListener>>()
-        packets += ClientboundTeleportEntityPacket(display)
+        packets += ClientboundTeleportEntityPacket(display.id, PositionMoveRotation.of(display), setOf(), display.onGround)
 
         if (display is MojangDisplay.TextDisplay && data is TextHologramData) {
             display.text = PaperAdventure.asVanilla(data.text)

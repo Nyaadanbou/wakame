@@ -11,7 +11,7 @@
     "MixinPlayerInventory",
     "MixinRepairItemRecipe",
     "MixinServerPlayer",
-    "MixinStackedContentsExtraMap",
+    "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe"
   ]
 }

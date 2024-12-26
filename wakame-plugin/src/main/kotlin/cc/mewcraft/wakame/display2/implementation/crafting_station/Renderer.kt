@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.FireResistant
+import cc.mewcraft.wakame.item.templates.components.DamageResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.templates.components.ItemCells
 import cc.mewcraft.wakame.item.templates.components.ItemCrate
@@ -81,7 +81,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         templates.process(ItemTemplateTypes.CRATE) { data -> CraftingStationRenderingHandlerRegistry.CRATE.process(collector, data) }
         templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> CraftingStationRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.ELEMENTS) { data -> CraftingStationRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
-        templates.process(ItemTemplateTypes.FIRE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.FIRE_RESISTANT.process(collector, data) }
+        templates.process(ItemTemplateTypes.DAMAGE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, data) }
         templates.process(ItemTemplateTypes.ITEM_NAME) { data -> CraftingStationRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.KIZAMIZ) { data -> CraftingStationRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> CraftingStationRenderingHandlerRegistry.LORE.process(collector, data) }
@@ -149,7 +149,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingHandler<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val DAMAGE_RESISTANT: RenderingHandler<DamageResistant, SingleValueRendererFormat> = configure("damage_resistant") { _, format ->
         format.render()
     }
 
@@ -158,7 +158,6 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         format.render(
             Placeholder.component("nutrition", Component.text(data.nutrition)),
             Placeholder.component("saturation", Component.text(data.saturation)),
-            Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
         )
     }
 

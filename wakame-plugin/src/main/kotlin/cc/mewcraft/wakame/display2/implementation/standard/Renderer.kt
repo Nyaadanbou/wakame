@@ -85,7 +85,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.FIRE_RESISTANT) { data -> StandardRenderingHandlerRegistry.FIRE_RESISTANT.process(collector, Unit) }
+        components.process(ItemComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
         components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
         components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
         components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
@@ -184,7 +184,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingHandler<Unit, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val DAMAGE_RESISTANT: RenderingHandler<Unit, SingleValueRendererFormat> = configure("damage_resistant") { _, format ->
         format.render()
     }
 
@@ -193,7 +193,6 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
         format.render(
             Placeholder.component("nutrition", Component.text(data.nutrition)),
             Placeholder.component("saturation", Component.text(data.saturation)),
-            Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
         )
     }
 

@@ -53,7 +53,7 @@ internal object ResourceSynchronizer {
         if (health != null) { // 只有当 PDC 存在才恢复玩家的生命值
             try {
                 player.health = health
-                LOGGER.info("[${player.name}] Loaded player health: $health / ${player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.value}")
+                LOGGER.info("[${player.name}] Loaded player health: $health / ${player.getAttribute(Attribute.MAX_HEALTH)?.value}")
             } catch (e: Exception) {
                 LOGGER.error("[${player.name}] ${e.message}")
             }

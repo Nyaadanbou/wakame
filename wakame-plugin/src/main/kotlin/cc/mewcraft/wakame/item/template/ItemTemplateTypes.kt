@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.templates.components.ArmorTrim
 import cc.mewcraft.wakame.item.templates.components.Castable
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.FireResistant
+import cc.mewcraft.wakame.item.templates.components.DamageResistant
 import cc.mewcraft.wakame.item.templates.components.FoodProperties
 import cc.mewcraft.wakame.item.templates.components.HideAdditionalTooltip
 import cc.mewcraft.wakame.item.templates.components.HideTooltip
@@ -123,10 +123,10 @@ object ItemTemplateTypes {
     val ENCHANTMENTS: ItemTemplateType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.ENCHANTMENTS).register()
 
     /**
-     * 组件: [cc.mewcraft.wakame.item.components.FireResistant]
+     * 组件: [cc.mewcraft.wakame.item.components.DamageResistant]
      */
     @JvmField
-    val FIRE_RESISTANT: ItemTemplateType<FireResistant> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
+    val DAMAGE_RESISTANT: ItemTemplateType<DamageResistant> = DamageResistant.codec(ItemConstants.DAMAGE_RESISTANT).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.FoodProperties]

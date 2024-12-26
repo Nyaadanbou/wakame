@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package item
 
 import assertAny
@@ -23,6 +25,8 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.world.TimeControl
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
@@ -538,8 +542,8 @@ class CustomNekoStackTest : KoinTest {
     }
 
     @Test
-    fun `component - fire_resistant`() = componentLifecycleTest(
-        "fire_resistant", ItemTemplateTypes.FIRE_RESISTANT, ItemComponentTypes.FIRE_RESISTANT
+    fun `component - damage_resistant`() = componentLifecycleTest(
+        "damage_resistant", ItemTemplateTypes.DAMAGE_RESISTANT, ItemComponentTypes.DAMAGE_RESISTANT
     ) {
         serialization {
             assertNotNull(it)
@@ -549,8 +553,10 @@ class CustomNekoStackTest : KoinTest {
             assertFalse(it.isEmpty())
         }
 
+        val tagKey = TagKey.create(RegistryKey.DAMAGE_TYPE, Key.key("is_fire"))
+
         unboxed {
-            assertEquals(Unit, it)
+            assertEquals(tagKey, it.types)
         }
     }
 
@@ -570,7 +576,6 @@ class CustomNekoStackTest : KoinTest {
             assertEquals(5, it.nutrition)
             assertEquals(4.0f, it.saturation, 1e-5f)
             assertEquals(false, it.canAlwaysEat)
-            assertEquals(3.2f, it.eatSeconds)
 
             // 测试环境没法初始化io.papermc.paper.registry.RegistryAccess, 因此这一块只能放到游戏里手动测试.
             /*

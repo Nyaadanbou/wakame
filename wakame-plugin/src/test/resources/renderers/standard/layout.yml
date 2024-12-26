@@ -27,7 +27,7 @@ primary:
 
   - (fixed:vanilla)222
   - vanilla:enchantments
-  - vanilla:fire_resistant
+  - vanilla:damage_resistant
   - vanilla:food
 
   - (fixed:special)333

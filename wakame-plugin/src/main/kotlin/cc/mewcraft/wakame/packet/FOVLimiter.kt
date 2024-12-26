@@ -24,7 +24,7 @@ internal class FOVLimiter : PacketListenerAbstract() {
             return
 
         val player = event.getPlayer<Player>() ?: return
-        val currentMovementSpeed = player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)?.value?.toFloat() ?: return
+        val currentMovementSpeed = player.getAttribute(Attribute.MOVEMENT_SPEED)?.value?.toFloat() ?: return
 
         val flying = player.isFlying
         val sprinting = player.isSprinting

@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.components.ArmorTrim
 import cc.mewcraft.wakame.item.components.CustomModelData
 import cc.mewcraft.wakame.item.components.CustomName
-import cc.mewcraft.wakame.item.components.FireResistant
+import cc.mewcraft.wakame.item.components.DamageResistant
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
 import cc.mewcraft.wakame.item.components.HideTooltip
@@ -135,12 +135,12 @@ internal object ItemComponentTypes {
     val ENCHANTMENTS: ItemComponentType<ItemEnchantments> = ItemEnchantments.codec(ItemConstants.ENCHANTMENTS).register()
 
     /**
-     * 拥有此组件将使物品免疫火焰伤害.
+     * 拥有此组件将使物品免疫一些类型的伤害.
      *
-     * 对应原版组件: [`minecraft:fire_resistant`](https://minecraft.wiki/w/Data_component_format#fire_resistant)
+     * 对应原版组件: [`minecraft:damage_resistant`](https://minecraft.wiki/w/Data_component_format#damage_resistant)
      */
     @JvmField
-    val FIRE_RESISTANT: ItemComponentType<Unit> = FireResistant.codec(ItemConstants.FIRE_RESISTANT).register()
+    val DAMAGE_RESISTANT: ItemComponentType<DamageResistant> = DamageResistant.codec(ItemConstants.DAMAGE_RESISTANT).register()
 
     /**
      * 将物品作为食物.

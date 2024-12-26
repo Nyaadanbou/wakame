@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.CustomModelData
+import cc.mewcraft.wakame.item.components.DamageResistant
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
@@ -202,7 +203,7 @@ var NekoStack.lore: List<Component>
     }
 
 @Deprecated("将在高版本移除")
-var NekoStack.fireResistant: Unit? by direct(ItemComponentTypes.FIRE_RESISTANT)
+var NekoStack.damageResistant: DamageResistant? by direct(ItemComponentTypes.DAMAGE_RESISTANT)
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
 
