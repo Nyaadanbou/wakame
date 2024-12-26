@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.lookup.*
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
-import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
@@ -94,8 +93,6 @@ internal class ResourcePackCustomModelGeneration(
     context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context), KoinComponent {
     private val logger: Logger by inject()
-    private val config: ItemModelDataLookup by inject()
-    private val vanillaResourcePack: VanillaResourcePack by inject()
 
     override fun process() {
         val assets = context.assets
@@ -104,13 +101,11 @@ internal class ResourcePackCustomModelGeneration(
         for (asset in assets) {
             val modelFiles = asset.files.takeIf { it.isNotEmpty() } ?: continue
             for ((index, modelFile) in modelFiles.withIndex()) {
-                logger.info("Generating $index model for ${asset.key}, variant ${asset.variant}, path: $modelFile")
-                val customModelData = config.saveCustomModelData(asset.key, asset.variant)
+                logger.info("Generating $index model for ${asset.itemId}, variant ${asset.variant}, path: $modelFile")
 
                 //<editor-fold desc="Custom Model generation">
                 // Original asset from config
-                val order = index + asset.variant // Order of the model
-                val modelKey = asset.modelKey(order) // Key of the model that will be generated
+                val modelKey = asset.modelKey()
                 val configModelTemplate = ModelSerializer.INSTANCE.deserialize(Readable.file(modelFile), modelKey)
 
                 // Get all textures from the model
@@ -122,54 +117,10 @@ internal class ResourcePackCustomModelGeneration(
                 particle?.let { setTexture(it.key()) }
                 variables.forEach { (_, value) -> setTexture(value.key()) }
 
-                // Get the item type key for generating the CustomModelData vanilla model
-                val itemTypeKey = asset.itemTypeKey()
-
-                // Override for custom asset data
-                val overrideGenerator = SimpleItemOverrideGenerator(
-                    ItemModelData(
-                        key = modelKey,
-                        material = asset.itemType,
-                        index = index,
-                        customModelData = customModelData
-                    )
-                )
-
-                // Override for vanilla asset
-                val vanillaModelInCustomResourcePack = resourcePack.model(itemTypeKey)
-
-                val vanillaCmdOverrideBuilder = vanillaModelInCustomResourcePack?.toBuilder()
-                    ?: vanillaResourcePack.model(itemTypeKey).toBuilder() // Generate the vanilla model if it doesn't exist
-
-                val vanillaCmdOverride = vanillaCmdOverrideBuilder
-                    .addOverride(overrideGenerator.generate())
-                    .build()
-
                 resourcePack.model(configModelTemplate.toMinecraftFormat())
-                resourcePack.model(vanillaCmdOverride)
-                logger.info("Model for ${asset.key}, variant ${asset.variant} generated. CustomModelData: $customModelData")
+                logger.info("Model for ${asset.itemId}, variant ${asset.variant} generated.")
             }
-
-            //<editor-fold desc="Remove unused custom model data">
-            // All custom model data that was used by items but the items' model path is removed
-            val unusedModelCustomModelData = assets
-                .filter { it.files.isEmpty() }
-                .mapNotNull { config[it.key, it.variant] }
-            val removeResult = config.removeCustomModelData(*unusedModelCustomModelData.toIntArray())
-
-            if (removeResult) {
-                logger.warn("Removed unused custom model data from items with no model path: $unusedModelCustomModelData")
-            }
-            //</editor-fold>
         }
-    }
-
-    private fun Assets.modelKey(order: Int): Key {
-        return Key(RESOURCE_NAMESPACE, "item/${key.namespace()}/${key.value()}_$order")
-    }
-
-    private fun Assets.itemTypeKey(): Key {
-        return Key("item/${itemType.name.lowercase()}")
     }
 
     /**

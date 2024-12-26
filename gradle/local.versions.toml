@@ -5,7 +5,7 @@ kotlinx-coroutines-core = "1.9.0"
 koin = "4.0.0"
 commons = "1.17"
 fleks = "2.10"
-shadow-nbt = "1.21.1-SNAPSHOT"
+shadow-nbt = "1.21.3-SNAPSHOT"
 
 ignite = "1.1.0"
 mixin = "0.8.6"

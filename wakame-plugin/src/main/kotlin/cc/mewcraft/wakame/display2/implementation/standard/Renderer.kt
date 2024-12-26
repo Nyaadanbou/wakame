@@ -36,8 +36,8 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
@@ -98,7 +98,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
@@ -117,7 +116,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
                 }
             }
         }
-        item.customModelData = itemCustomModelData
+        item.itemModel = item.modelKey
         item.showAttributeModifiers(false)
         item.showEnchantments(false)
         item.showStoredEnchantments(false)

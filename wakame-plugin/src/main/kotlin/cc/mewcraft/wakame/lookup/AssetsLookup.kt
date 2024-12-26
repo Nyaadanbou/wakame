@@ -27,9 +27,9 @@ import org.koin.core.component.inject
 object AssetsLookup : Initializable, KoinComponent {
     // K - NekoItem key
     // V - Assets
-    private val assets: Multimap<Key, Assets> = MultimapBuilder
+    private val assets: Multimap<Key, ItemAssets> = MultimapBuilder
         .hashKeys()
-        .treeSetValues<Assets> { o1, o2 -> o1.variant.compareTo(o2.variant) }
+        .treeSetValues<ItemAssets> { o1, o2 -> o1.variant.compareTo(o2.variant) }
         .build()
 
     private val plugin: WakamePlugin by inject()
@@ -55,17 +55,7 @@ object AssetsLookup : Initializable, KoinComponent {
         }
     }
 
-    fun getAssets(key: Key): List<Assets> {
-        require(ItemRegistry.CUSTOM.getOrNull(key) != null) { "No such NekoItem: $key" }
-        return assets[key].toList()
-    }
-
-    fun getAssets(key: Key, sid: Int): Assets {
-        require(ItemRegistry.CUSTOM.getOrNull(key) != null) { "No such NekoItem: $key" }
-        return assets[key].firstOrNull { it.variant == sid } ?: throw NoSuchElementException("No such variant: $sid")
-    }
-
-    val allAssets: Collection<Assets>
+    val allAssets: Collection<ItemAssets>
         get() = assets.values()
 
     override fun onPreWorld() {

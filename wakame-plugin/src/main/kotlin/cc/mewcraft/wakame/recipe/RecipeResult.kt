@@ -2,8 +2,7 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.util.customModelData
+import cc.mewcraft.wakame.util.itemModel
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -44,7 +43,7 @@ data class SingleRecipeResult(
     override fun toBukkitItemStack(): ItemStack {
         val itemStack = result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
         val nekoItemId = Key.key(result.identifier.replaceFirst('/', ':'))
-        itemStack.customModelData = ItemModelDataLookup[nekoItemId, 0]
+        itemStack.itemModel = nekoItemId
         itemStack.amount = amount
         return itemStack
     }

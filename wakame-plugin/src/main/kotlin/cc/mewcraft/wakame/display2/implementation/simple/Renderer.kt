@@ -15,8 +15,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -51,11 +51,10 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         templates.process(ItemTemplateTypes.LORE) { data -> SimpleRenderingHandlerRegistry.LORE.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCmd = ItemModelDataLookup[item.id, item.variant]
 
         item.unsafeEdit {
             lore = itemLore
-            customModelData = itemCmd
+            itemModel = item.modelKey
             showNothing()
         }
     }

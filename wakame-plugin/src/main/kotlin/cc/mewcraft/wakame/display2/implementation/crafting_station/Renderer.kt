@@ -29,9 +29,9 @@ import cc.mewcraft.wakame.item.templates.components.ItemCrate
 import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -93,7 +93,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         if (context.erase) {
             item.erase()
@@ -101,7 +100,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
         item.unsafeEdit {
             lore = itemLore
-            customModelData = itemCustomModelData
+            itemModel = item.modelKey
             showAttributeModifiers(false)
             showEnchantments(false)
             showStoredEnchantments(false)

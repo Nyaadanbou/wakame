@@ -3,14 +3,14 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.SharedConstants
-import io.papermc.paper.adventure.PaperAdventure
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.CustomModelData
+import io.papermc.paper.datacomponent.item.ItemLore
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.component.CustomModelData
-import net.minecraft.world.item.component.ItemLore
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
@@ -51,12 +51,12 @@ var BukkitStack.isClientSide: Boolean
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.customName: Component?
-    get() = this.unwrap?.get(DataComponents.CUSTOM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.getData(DataComponentTypes.CUSTOM_NAME)
     set(value) {
         if (value != null) {
-            this.unwrap?.set(DataComponents.CUSTOM_NAME, PaperAdventure.asVanilla(value))
+            this.setData(DataComponentTypes.CUSTOM_NAME, value)
         } else {
-            this.unwrap?.remove(DataComponents.CUSTOM_NAME)
+            this.unsetData(DataComponentTypes.CUSTOM_NAME)
         }
     }
 
@@ -64,12 +64,25 @@ var BukkitStack.customName: Component?
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.itemName: Component?
-    get() = this.unwrap?.get(DataComponents.ITEM_NAME)?.let(PaperAdventure::asAdventure)
+    get() = this.getData(DataComponentTypes.ITEM_NAME)
     set(value) {
         if (value != null) {
-            this.unwrap?.set(DataComponents.ITEM_NAME, PaperAdventure.asVanilla(value))
+            this.setData(DataComponentTypes.ITEM_NAME, value)
         } else {
-            this.unwrap?.remove(DataComponents.ITEM_NAME)
+            this.unsetData(DataComponentTypes.ITEM_NAME)
+        }
+    }
+
+/**
+ * 设置物品的模型. 你可以传入 `null` 来移除它.
+ */
+var BukkitStack.itemModel: Key?
+    get() = this.getData(DataComponentTypes.ITEM_MODEL)
+    set(value) {
+        if (value != null) {
+            this.setData(DataComponentTypes.ITEM_MODEL, value)
+        } else {
+            this.unsetData(DataComponentTypes.ITEM_MODEL)
         }
     }
 
@@ -77,12 +90,12 @@ var BukkitStack.itemName: Component?
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.lore0: List<Component>?
-    get() = this.unwrap?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
+    get() = this.getData(DataComponentTypes.LORE)?.lines()
     set(value) {
         if (value.isNotNullOrEmpty()) {
-            this.unwrap?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
+            this.setData(DataComponentTypes.LORE, ItemLore.lore(value))
         } else {
-            this.unwrap?.remove(DataComponents.LORE)
+            this.unsetData(DataComponentTypes.LORE)
         }
     }
 
@@ -90,12 +103,12 @@ var BukkitStack.lore0: List<Component>?
  * 设置自定义模型数据. 你可以传入 `null` 来移除它.
  */
 var BukkitStack.customModelData: Int?
-    get() = this.unwrap?.get(DataComponents.CUSTOM_MODEL_DATA)?.value
+    get() = this.getData(DataComponentTypes.CUSTOM_MODEL_DATA)?.id()
     set(value) {
         if (value != null) {
-            this.unwrap?.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData(value))
+            this.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData(value))
         } else {
-            this.unwrap?.remove(DataComponents.CUSTOM_MODEL_DATA)
+            this.unsetData(DataComponentTypes.CUSTOM_MODEL_DATA)
         }
     }
 
@@ -103,18 +116,26 @@ var BukkitStack.customModelData: Int?
  * 设置是否隐藏附加提示.
  */
 var BukkitStack.hideAdditionalTooltip: Boolean
-    get() = this.unwrap?.has(DataComponents.HIDE_ADDITIONAL_TOOLTIP) == true
+    get() = this.hasData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
     set(value) {
-        this.unwrap?.set(DataComponents.HIDE_ADDITIONAL_TOOLTIP, if (value) MojangUnit.INSTANCE else null)
+        if (value) {
+            this.setData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+        } else {
+            this.unsetData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+        }
     }
 
 /**
  * 设置是否隐藏提示.
  */
 var BukkitStack.hideTooltip: Boolean
-    get() = this.unwrap?.has(DataComponents.HIDE_TOOLTIP) == true
+    get() = this.hasData(DataComponentTypes.HIDE_TOOLTIP)
     set(value) {
-        this.unwrap?.set(DataComponents.HIDE_TOOLTIP, if (value) MojangUnit.INSTANCE else null)
+        if (value) {
+            this.setData(DataComponentTypes.HIDE_TOOLTIP)
+        } else {
+            this.unsetData(DataComponentTypes.HIDE_TOOLTIP)
+        }
     }
 
 /**

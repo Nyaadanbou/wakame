@@ -28,8 +28,8 @@ import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -122,13 +122,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
         item.unsafeEdit {
             lore = itemLore
-            customModelData = itemCustomModelData
+            itemModel = item.modelKey
             showNothing()
         }
     }

@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.unsafeNekooTag
 import com.github.retrooper.packetevents.protocol.attribute.AttributeOperation
 import com.github.retrooper.packetevents.protocol.attribute.Attributes
@@ -19,6 +20,7 @@ import com.github.retrooper.packetevents.protocol.component.ComponentType
 import com.github.retrooper.packetevents.protocol.component.ComponentTypes
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemAttributeModifiers
 import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemLore
+import com.github.retrooper.packetevents.protocol.component.builtin.item.ItemModel
 import com.github.retrooper.packetevents.protocol.item.ItemStack
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
 import com.github.retrooper.packetevents.resources.ResourceLocation
@@ -146,6 +148,18 @@ internal interface PacketNekoStack : NekoStack {
                 packetItem.set(ComponentTypes.LORE, ItemLore(value))
             } else {
                 packetItem.unset(ComponentTypes.LORE)
+            }
+        }
+
+    var itemModel: Key?
+        get() {
+            return packetItem.get(ComponentTypes.ITEM_MODEL)?.modelLocation?.let { Key(it.namespace, it.key) }
+        }
+        set(value) {
+            if (value != null) {
+                packetItem.set(ComponentTypes.ITEM_MODEL, ItemModel(ResourceLocation(value.namespace(), value.value())))
+            } else {
+                packetItem.unset(ComponentTypes.ITEM_MODEL)
             }
         }
 
