@@ -12,25 +12,37 @@ import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.MenuIconDictionary
+import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.maxDamage
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import kotlin.reflect.KProperty
 
+/**
+ * 获取物品堆叠的数量.
+ */
 var NekoStack.amount: Int
     get() = wrapped.amount
     set(value) {
         wrapped.amount = value
     }
 
+/**
+ * 使物品的攻击进入冷却.
+ */
+// TODO 让视觉冷却仅应用于萌芽物品类型, 而非 Minecraft 物品类型.
+//  升级 1.21.2 后使用 use_cooldown 组件即可解决这个问题.
 fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
     val attackSpeedLevel = itemAttackSpeed.level
@@ -41,15 +53,24 @@ fun NekoStack.applyAttackCooldown(player: Player) {
     player.setCooldown(this.itemType, attackSpeedLevel.cooldown)
 }
 
+/**
+ * 获取物品堆叠的损耗值.
+ */
 var NekoStack.damage: Int
     get() = wrapped.damage
     set(value) {
         wrapped.damage = value
     }
 
+/**
+ * 获取物品堆叠的最大损耗值.
+ */
 val NekoStack.maxDamage: Int
     get() = wrapped.maxDamage
 
+/**
+ * 获取物品堆叠是否具有损耗值.
+ */
 val NekoStack.isDamageable: Boolean
     get() = wrapped.isDamageable
 
@@ -81,12 +102,63 @@ fun Player.damageItemStack2(slot: EquipmentSlot, amount: Int) {
     ItemDamageEventMarker.markAlreadyDamaged(this)
 }
 
+/**
+ * 解析物品堆叠的:
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore]
+ *
+ * 并把这些内容应用到物品堆叠上.
+ */
+fun NekoStack.resolveMenuIconEverything(dsl: MenuIconLore.LineConfigBuilder.() -> Unit) {
+    // TODO 还需要解析 item_model 和带有 show_in_tooltip 字段的物品组件; 等资源包重构玩后再写
+    val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
+    val name = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.delegate
+    val lore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.delegate
+    val config = MenuIconLore.LineConfigBuilder(dict).apply(dsl).build()
+    name?.resolve(config.getTagResolver())?.let { this.itemName = it }
+    lore?.resolve(config)?.let { this.lore = it }
+}
+
+/**
+ * 解析物品堆叠的:
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName]
+ *
+ * 并把这些内容应用到物品堆叠上.
+ */
+fun NekoStack.resolveMenuIconName(dsl: MenuIconLore.PlaceholderTagResolverBuilder.() -> Unit) {
+    val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
+    val name = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.delegate
+    name?.resolve(MenuIconLore.PlaceholderTagResolverBuilder(dict).apply(dsl).build())?.let { this.itemName = it }
+}
+
+/**
+ * 解析物品堆叠的:
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore]
+ *
+ * 并把这些内容应用到物品堆叠上.
+ */
+fun NekoStack.resolveMenuIconLore(dsl: MenuIconLore.LineConfigBuilder.() -> Unit) {
+    val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
+    val lore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.delegate
+    lore?.resolve(dict, dsl)?.let { this.lore = it }
+}
+
 var NekoStack.customModelData: Int? by mapped(ItemComponentTypes.CUSTOM_MODEL_DATA, ::CustomModelData, CustomModelData::data)
 
 var NekoStack.customName: Component? by direct(ItemComponentTypes.CUSTOM_NAME)
 
 var NekoStack.itemName: Component? by direct(ItemComponentTypes.ITEM_NAME)
 
+var NekoStack.lore: List<Component>
+    get() = wrapped.lore0.orEmpty()
+    set(value) {
+        wrapped.lore0 = value
+    }
+
+@Deprecated("将在高版本移除")
 var NekoStack.fireResistant: Unit? by direct(ItemComponentTypes.FIRE_RESISTANT)
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
