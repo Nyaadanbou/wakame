@@ -19,8 +19,8 @@ internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
 
 internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
-        val input = obj.toString().replace("§", "")
-        return Injector.get<MiniMessage>().deserialize(input)
+        val message = obj.toString().replace("§", "")
+        return Injector.get<MiniMessage>().deserialize(message)
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any = Injector.get<MiniMessage>().serialize(item)

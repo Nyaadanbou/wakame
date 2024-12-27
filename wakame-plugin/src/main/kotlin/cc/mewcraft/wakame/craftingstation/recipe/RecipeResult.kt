@@ -24,12 +24,14 @@ import java.util.stream.Stream
  */
 internal sealed interface RecipeResult : Examinable {
     /**
-     * 尝试此 [RecipeResult] 应用到玩家身上. 所产生的效果包括但不仅限于: 扣除材料, 给予物品, 给予经验.
+     * 将此 [RecipeResult] 的效果应用到玩家身上.
+     * 所产生的效果包括但不仅限于: 扣除材料, 给予物品, 给予经验.
      */
     fun apply(player: Player)
 
     /**
-     * 检查此 [RecipeResult] 是否有效. 用于延迟验证配方是否能够注册.
+     * 检查此 [RecipeResult] 是否有效.
+     * 用于延迟验证配方是否能够注册.
      */
     fun valid(): Boolean
 
