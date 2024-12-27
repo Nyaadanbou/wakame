@@ -35,8 +35,8 @@ internal class SimpleCraftingStation(
 ) : CraftingStation {
     companion object {
         const val TYPE = "simple"
-        val STATION_STRUCTURE_LEGAL_CHARS = charArrayOf('X', '.', '<', '>')
-        val PREVIEW_STRUCTURE_LEGAL_CHARS = charArrayOf('X', 'I', 'O', 'C', 'B', '<', '>')
+        val STATION_STRUCTURE_LEGAL_CHARS = charArrayOf('x', '.', '<', '>')
+        val PREVIEW_STRUCTURE_LEGAL_CHARS = charArrayOf('x', 'i', 'o', 'c', 'b', '<', '>')
     }
 
     private val recipes: MutableMap<Key, Recipe> = mutableMapOf()

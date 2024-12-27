@@ -61,19 +61,22 @@ internal class RecipeMatcherResult(
         // 使用配方的 [输出物品堆叠] 作为 [展示物品堆叠]
         val itemStack = recipe.output.displayItemStack(settings)
 
-        // 解析展示用的物品堆叠信息
+        // 解析展示用的所有占位符
         val resolution = settings.getSlotDisplay("listing").resolveEverything {
 
+            // 适用于整个物品堆叠的占位符
             standard {
                 component("item_name", itemStack.itemNameOrType)
                 parsed("ok", dict("ok"))
                 parsed("bad", dict("bad"))
             }
 
+            // 解析折叠占位符 (choice_list)
             folded("choice_list") {
                 for ((choice, flag) in fastMatchResultMap) {
                     when (choice) {
                         is ExpChoice -> {
+                            // 以字典里的 "choice_exp" 为模板生成最终的解析结果, 并添加到折叠占位符中
                             resolve("choice_exp") {
                                 preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
                                 component("amount", Component.text(choice.amount))
@@ -81,9 +84,10 @@ internal class RecipeMatcherResult(
                         }
 
                         is ItemChoice -> {
+                            // 类似上面的 "choice_exp", 只不过这里是 "choice_item"
                             resolve("choice_item") {
                                 preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
-                                unparsed("item", choice.item.displayName())
+                                parsed("item", choice.item.displayName())
                                 component("amount", Component.text(choice.amount))
                             }
                         }
@@ -92,6 +96,7 @@ internal class RecipeMatcherResult(
             }
         }
 
+        // 应用解析结果到物品堆叠上
         resolution.applyTo(itemStack)
 
         return itemStack

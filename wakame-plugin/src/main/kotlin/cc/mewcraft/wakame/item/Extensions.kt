@@ -110,6 +110,7 @@ fun Player.damageItemStack2(slot: EquipmentSlot, amount: Int) {
 private fun NekoStack.reduceForMenuIcon(): NekoStack {
     erase()
     unsafeEdit { showNothing() }
+    isClientSide = false // 防止客户端显示物品信息
     return this
 }
 

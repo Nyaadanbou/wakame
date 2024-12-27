@@ -9,8 +9,6 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.giveItemStack
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import cc.mewcraft.wakame.util.itemNameOrType
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
@@ -62,23 +60,15 @@ internal data class ItemResult(
 
     override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
         // 开发日记 2024/12/27 小米:
-        // 合成配方的结果其实也可以套一层 BasicMenuSettings 的展示逻辑,
-        // 但目前好像没有这个的实际需求. 等之后有需要再加上这个功能就行.
+        // 合成配方的[结果]不需要再套一层 SlotDisplay 的逻辑,
+        // 只需要用合成站的 ItemRenderer 把物品渲染一下就行.
+        // 但如果实在有这个需求的话, 也可以写.
 
         // 生成原始的物品堆叠
         val itemStack = item.createItemStack(amount) ?: ItemRegistry.ERROR_ITEM_STACK
 
-        // 然后基于合成站渲染物品, 这将填充 name & lore
+        // 然后基于合成站来渲染物品, 主要填充 name & lore
         itemStack.render()
-
-        // 解析展示用的物品堆叠信息
-        val resolution = settings.getSlotDisplay("listing").resolveEverything {
-            standard { component("item_name", itemStack.itemNameOrType) }
-            folded("item_lore", itemStack.itemLoreOrEmpty)
-        }
-
-        // 应用解析的结果
-        resolution.applyTo(itemStack)
 
         // 然后基于合成站渲染并返回
         return itemStack

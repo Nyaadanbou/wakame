@@ -37,7 +37,8 @@ internal data class BasicMenuSettings(
      * - k = 配置文件的路径节点
      * - v = 萌芽物品的唯一标识
      */
-    private val icons: Map<String, Key> = emptyMap(),
+    // FIXME 用 kotlin.collections.Map 会导致 configurate 无法序列化
+    private val icons: HashMap<String, Key> = hashMapOf(),
 ) : KoinComponent {
 
     /**
@@ -56,7 +57,7 @@ internal data class BasicMenuSettings(
     //  应该不会发生任何变化.
     fun getSlotDisplay(id: String): SlotDisplay {
         val key = icons[id] ?: run {
-            LOGGER.warn("Menu icon '$id' not found in layout '${title.plain}', using default icon")
+            LOGGER.warn("Menu icon '$id' not found in the settings of '${title.plain}', using default icon")
             return SlotDisplay(ItemRegistry.ERROR_NEKO_ITEM_HOLDER)
         }
         return SlotDisplay(NekoItemHolder.get(key))

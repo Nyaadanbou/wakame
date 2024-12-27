@@ -10,11 +10,14 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.MenuIconLore.LineConfig
+import cc.mewcraft.wakame.util.MenuIconLoreSerializer
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 data class ItemMenuIconLore(
     val delegate: MenuIconLore,
@@ -63,6 +66,12 @@ data class ItemMenuIconLore(
          */
         override fun decode(node: ConfigurationNode): ItemMenuIconLore {
             return ItemMenuIconLore(node.krequire<MenuIconLore>())
+        }
+
+        override fun childrenCodecs(): TypeSerializerCollection {
+            return TypeSerializerCollection.builder()
+                .kregister(MenuIconLoreSerializer)
+                .build()
         }
     }
 }
