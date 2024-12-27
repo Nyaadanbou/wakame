@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
+import cc.mewcraft.wakame.util.MenuIconLore.LineConfig
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -24,7 +25,17 @@ data class ItemMenuIconLore(
         return ItemGenerationResult.empty()
     }
 
-    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIconLore.LineConfigBuilder.() -> Unit): List<Component> {
+    /**
+     * @see MenuIconLore.resolve
+     */
+    fun resolve(config: LineConfig): List<Component> {
+        return delegate.resolve(config)
+    }
+
+    /**
+     * @see MenuIconLore.resolve
+     */
+    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: LineConfig.Builder.() -> Unit): List<Component> {
         return delegate.resolve(dict, dsl)
     }
 

@@ -18,15 +18,18 @@ import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.MenuIcon
 import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.itemName
 import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.maxDamage
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KProperty
 
 /**
@@ -90,7 +93,7 @@ fun NekoStack.hurtAndBreak(player: Player, amount: Int) {
  *
  * 该函数会特殊处理自定义攻击特效与原版损耗机制之间的交互,
  * 以便修复“重复”损耗物品的问题. 因此, 几乎在所有情况下,
- * 实现应该使用这个函数来增加物品的损耗.
+ * 程序员应该使用这个函数来增加物品的损耗.
  *
  * @param slot the slot of the stack to damage
  * @param amount the amount of damage to do
@@ -102,49 +105,89 @@ fun Player.damageItemStack2(slot: EquipmentSlot, amount: Int) {
     ItemDamageEventMarker.markAlreadyDamaged(this)
 }
 
+//<editor-fold desc="Menu Icon Extensions">
+// 移除对于虚拟箱子菜单图标无用的物品组件数据
+private fun NekoStack.reduceForMenuIcon(): NekoStack {
+    erase()
+    unsafeEdit { showNothing() }
+    return this
+}
+
 /**
- * 解析物品堆叠的:
+ * 解析物品的:
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName]
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore]
  *
- * 并把这些内容应用到物品堆叠上.
+ * 并把这些内容应用到此物品堆叠上.
  */
-fun NekoStack.resolveMenuIconEverything(dsl: MenuIconLore.LineConfigBuilder.() -> Unit) {
-    // TODO 还需要解析 item_model 和带有 show_in_tooltip 字段的物品组件; 等资源包重构玩后再写
-    val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
-    val name = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.delegate
-    val lore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.delegate
-    val config = MenuIconLore.LineConfigBuilder(dict).apply(dsl).build()
-    name?.resolve(config.getTagResolver())?.let { this.itemName = it }
-    lore?.resolve(config)?.let { this.lore = it }
+fun NekoStack.applyMenuIconEverything(dsl: MenuIconLore.LineConfig.Builder.() -> Unit = {}): NekoStack {
+    val resolution = prototype.resolveMenuIcon(dsl)
+    this.itemName = resolution.name
+    this.lore = resolution.lore
+    return reduceForMenuIcon()
 }
 
 /**
- * 解析物品堆叠的:
+ * 解析物品的:
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName]
  *
- * 并把这些内容应用到物品堆叠上.
+ * 并把这些内容应用到此物品堆叠上.
  */
-fun NekoStack.resolveMenuIconName(dsl: MenuIconLore.PlaceholderTagResolverBuilder.() -> Unit) {
+fun NekoStack.applyMenuIconName(dsl: MenuIcon.PlaceholderTagResolverBuilder.() -> Unit = {}): NekoStack {
     val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
-    val name = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.delegate
-    name?.resolve(MenuIconLore.PlaceholderTagResolverBuilder(dict).apply(dsl).build())?.let { this.itemName = it }
+    this.itemName = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.resolve(MenuIcon.PlaceholderTagResolverBuilder(dict).apply(dsl).build())
+    return reduceForMenuIcon()
 }
 
 /**
- * 解析物品堆叠的:
+ * 解析物品的:
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
  * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore]
  *
- * 并把这些内容应用到物品堆叠上.
+ * 并把这些内容应用到此物品堆叠上.
  */
-fun NekoStack.resolveMenuIconLore(dsl: MenuIconLore.LineConfigBuilder.() -> Unit) {
+fun NekoStack.applyMenuIconLore(dsl: MenuIconLore.LineConfig.Builder.() -> Unit = {}): NekoStack {
     val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
-    val lore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.delegate
-    lore?.resolve(dict, dsl)?.let { this.lore = it }
+    this.lore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.resolve(dict, dsl).orEmpty()
+    return reduceForMenuIcon()
 }
+
+/**
+ * [MenuIcon] 的解析结果.
+ */
+@ConsistentCopyVisibility
+data class MenuIconResolution internal constructor(val name: Component?, val lore: List<Component>) {
+    /**
+     * 将此 [MenuIconResolution] 应用到 [item].
+     *
+     * @return
+     */
+    fun applyTo(item: ItemStack): ItemStack {
+        item.itemName = name
+        item.lore0 = lore
+        return item
+    }
+}
+
+/**
+ * 解析物品的:
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconDict]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconName]
+ * - [cc.mewcraft.wakame.item.templates.virtual.ItemMenuIconLore]
+ *
+ * 并把这些内容应用到此物品堆叠上.
+ */
+fun NekoItem.resolveMenuIcon(dsl: MenuIconLore.LineConfig.Builder.() -> Unit = {}): MenuIconResolution {
+    val dict = templates.get(ItemTemplateTypes.MENU_ICON_DICT)?.delegate ?: MenuIconDictionary()
+    val config = MenuIconLore.LineConfig.Builder(dict).apply(dsl).build()
+    val resolvedName = templates.get(ItemTemplateTypes.MENU_ICON_NAME)?.resolve(config.getTagResolver())
+    val resolvedLore = templates.get(ItemTemplateTypes.MENU_ICON_LORE)?.resolve(config).orEmpty()
+    // TODO 还需要解析 item_model, tooltip_style. 等资源包重构完后再写
+    return MenuIconResolution(resolvedName, resolvedLore)
+}
+//</editor-fold>
 
 var NekoStack.customModelData: Int? by mapped(ItemComponentTypes.CUSTOM_MODEL_DATA, ::CustomModelData, CustomModelData::data)
 

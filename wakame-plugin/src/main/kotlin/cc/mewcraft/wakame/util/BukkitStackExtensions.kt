@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.util
 
 import cc.mewcraft.nbt.CompoundTag
+import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.component.ItemAttributeModifiers
@@ -102,6 +103,12 @@ class ItemStackDSL(
     }
     //</editor-fold>
 }
+
+val ItemStack.itemNameOrType: Component
+    get() = itemName ?: Component.translatable(type)
+
+val ItemStack.itemLoreOrEmpty: List<Component>
+    get() = lore0 ?: emptyList()
 
 /**
  * 检查物品是否允许被损耗.

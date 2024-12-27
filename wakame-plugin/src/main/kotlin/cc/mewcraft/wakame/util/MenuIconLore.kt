@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -22,15 +21,15 @@ import java.lang.reflect.Type
  */
 data class MenuIconLore(
     private val lines: List<Line>,
-) {
+) : MenuIcon {
 
-    constructor(builder: MainBuilder) : this(builder.build().lines)
+    constructor(builder: Builder) : this(builder.build().lines)
 
     companion object {
         private val MM = Injector.get<MiniMessage>()
 
-        fun build(init: MainBuilder.() -> Unit): MenuIconLore {
-            return MenuIconLore(MainBuilder().apply(init))
+        fun build(init: Builder.() -> Unit): MenuIconLore {
+            return MenuIconLore(Builder().apply(init))
         }
     }
 
@@ -70,8 +69,8 @@ data class MenuIconLore(
      * @param dsl 解析的配置, 通过 DSL 构建
      * @return 解析后的 [Component] 列表
      */
-    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: LineConfigBuilder.() -> Unit): List<Component> {
-        return resolve(LineConfigBuilder(dict).apply(dsl).build())
+    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: LineConfig.Builder.() -> Unit): List<Component> {
+        return resolve(LineConfig.Builder(dict).apply(dsl).build())
     }
 
     /**
@@ -110,7 +109,105 @@ data class MenuIconLore(
          * @param key 折叠的占位符的标识符, 用于在 [LineConfig] 中查找对应的 [Component] 列表
          * @param rawText 用于解析的文本, 必须包含一个占位符 [key], 可以包含若干普通的 [Tag]
          */
-        class Folded(val key: String, rawText: String) : Line(rawText)
+        class Folded(val key: String, rawText: String) : Line(rawText) {
+
+            @MenuIconDsl
+            class Builder(
+                private val dictionary: MenuIconDictionary,
+                private val globalTagResolver: TagResolver,
+            ) {
+                private val foldedLineList: MutableList<Component> = mutableListOf()
+
+                fun dict(key: String): String {
+                    // 开发日记 2024/12/25: 返回空字符串?
+                    return dictionary[key] ?: error("no such key in dict: $key")
+                }
+
+                fun literal(text: String) {
+                    foldedLineList.add(MM.deserialize(text, globalTagResolver))
+                }
+
+                @JvmName("literalStringLambda")
+                fun literal(text: () -> String) {
+                    foldedLineList.add(MM.deserialize(text(), globalTagResolver))
+                }
+
+                fun literal(component: Component) {
+                    foldedLineList.add(component)
+                }
+
+                @JvmName("literalComponentLambda")
+                fun literal(component: () -> Component) {
+                    foldedLineList.add(component())
+                }
+
+                fun resolve(key: String, dsl: DedicatedPlaceholderTagResolverBuilder.() -> Unit) {
+                    val rawText = dict(key)
+                    // local tag resolver & preprocess logic
+                    val (resolver, preprocess) = DedicatedPlaceholderTagResolverBuilder(dictionary).apply(dsl).build2()
+                    val parsed = MM.deserialize(preprocess.applyTo(rawText), resolver, globalTagResolver)
+                    foldedLineList.add(parsed)
+                }
+
+                fun build(): List<Component> {
+                    return foldedLineList
+                }
+
+                @MenuIconDsl
+                class DedicatedPlaceholderTagResolverBuilder(
+                    dictionary: MenuIconDictionary,
+                ) : MenuIcon.PlaceholderTagResolverBuilder(dictionary) {
+                    private var preprocess: Preprocess? = null
+
+                    // 用于在原始字符串被序列化成 Component 之前,
+                    // 对原始字符串进行预处理, 例如替换某些标签.
+                    //
+                    // 只能调用一次! 调用多次将覆盖之前的数据.
+                    fun preprocess(dsl: Preprocess.Builder.() -> Unit) {
+                        if (preprocess == null) {
+                            preprocess = Preprocess.build(dsl)
+                        }
+                    }
+
+                    fun build2(): Result {
+                        return Result(build(), preprocess ?: Preprocess.NO_OPERATION)
+                    }
+
+                    data class Result(val resolver: TagResolver, val preprocess: Preprocess)
+
+                    class Preprocess private constructor(
+                        private val replacement: Map<String, String> = mutableMapOf(),
+                    ) {
+                        companion object {
+                            val NO_OPERATION = Preprocess(emptyMap())
+
+                            fun build(dsl: Builder.() -> Unit): Preprocess {
+                                return Builder().apply(dsl).build()
+                            }
+                        }
+
+                        fun applyTo(source: String): String {
+                            return replacement.entries.fold(source) { acc, (oldTag, newTag) ->
+                                acc.replace("<$oldTag>", "<$newTag>")
+                            }
+                        }
+
+                        @MenuIconDsl
+                        class Builder {
+                            private val replacement: MutableMap<String, String> = mutableMapOf()
+
+                            fun replace(oldTag: String, newTag: String) {
+                                replacement[oldTag] = newTag
+                            }
+
+                            fun build(): Preprocess {
+                                return Preprocess(replacement)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -122,8 +219,8 @@ data class MenuIconLore(
     ) {
 
         companion object {
-            fun build(dict: MenuIconDictionary = MenuIconDictionary(), dsl: LineConfigBuilder.() -> Unit): LineConfig {
-                return LineConfigBuilder(dict).apply(dsl).build()
+            fun build(dict: MenuIconDictionary = MenuIconDictionary(), dsl: Builder.() -> Unit): LineConfig {
+                return Builder(dict).apply(dsl).build()
             }
         }
 
@@ -134,13 +231,67 @@ data class MenuIconLore(
         fun getFoldedText(tag: String): List<Component>? {
             return foldedLineCreatorMap[tag]
         }
+
+        /**
+         * ### 注意事项!
+         * 使用上必须让 [standard] 先于 [folded] 调用,
+         * 否则 [folded] 不会使用全部的 [TagResolver].
+         */
+        @MenuIconDsl
+        class Builder(
+            private val dictionary: MenuIconDictionary,
+        ) {
+            private var tagResolver: TagResolver? = null
+            private val tagResolverBuilder: TagResolver.Builder = TagResolver.builder()
+            private val foldedLineMap: MutableMap<String, List<Component>> = mutableMapOf()
+
+            private fun freezeTagResolver() {
+                if (tagResolver == null) {
+                    tagResolver = tagResolverBuilder.build()
+                }
+            }
+
+            fun dict(key: String): String {
+                // 开发日记 2024/12/25: 返回空字符串?
+                return dictionary[key] ?: error("no such key in dict: $key")
+            }
+
+            // 使用该函数以 DSL 的形式添加 TagResolver.
+            // DSL 可快速使用 MenuIconDict 中的映射.
+            fun standard(dsl: MenuIcon.PlaceholderTagResolverBuilder.() -> Unit) {
+                tagResolverBuilder.resolver(MenuIcon.PlaceholderTagResolverBuilder(dictionary).apply(dsl).build())
+            }
+
+            // 使用该函数来直接添加折叠的占位符.
+            fun folded(key: String, lines: List<Component>) {
+                foldedLineMap[key] = lines
+            }
+
+            // 使用该函数来直接添加折叠的占位符.
+            fun folded(key: String, vararg lines: Component) {
+                foldedLineMap[key] = lines.toList()
+            }
+
+            // 使用该函数以 DSL 的形式添加折叠的占位符.
+            // DSL 可快速使用 MenuIconDict 中的映射.
+            // TODO: 如果在 build 之前就调用了这个函数, 那么最终的 Global TagResolver 相当于提前构建了.
+            //  试试通过代码的方式来强制实行以下限制:
+            //  1. 要求 standard 函数必须先于所有 folded 函数调用
+            //  2. 如果在 build 之前就调用了 folded, 应该给出提示?
+            fun folded(key: String, dsl: Line.Folded.Builder.() -> Unit) {
+                freezeTagResolver()
+                foldedLineMap[key] = Line.Folded.Builder(dictionary, tagResolver!!).apply(dsl).build()
+            }
+
+            fun build(): LineConfig {
+                freezeTagResolver()
+                return LineConfig(tagResolver!!, foldedLineMap)
+            }
+        }
     }
 
-    @DslMarker
-    annotation class MenuIconLoreDsl
-
-    @MenuIconLoreDsl
-    class MainBuilder {
+    @MenuIconDsl
+    class Builder {
         private val lines: MutableList<Line> = mutableListOf()
 
         fun standard(rawText: String) {
@@ -153,141 +304,6 @@ data class MenuIconLore(
 
         fun build(): MenuIconLore {
             return MenuIconLore(lines)
-        }
-    }
-
-    /**
-     * 使用上必须让 [standard] 先于 [folded] 调用,
-     * 否则 [folded] 不会使用全部的 [TagResolver].
-     */
-    @MenuIconLoreDsl
-    class LineConfigBuilder(
-        private val dictionary: MenuIconDictionary,
-    ) {
-        private var tagResolver: TagResolver? = null
-        private val tagResolverBuilder: TagResolver.Builder = TagResolver.builder()
-        private val foldedLineMap: MutableMap<String, List<Component>> = mutableMapOf()
-
-        fun dict(key: String): String {
-            // 开发日记 2024/12/25: 返回空字符串?
-            return dictionary[key] ?: error("no such key in dict: $key")
-        }
-
-        // 使用该函数来直接添加 TagResolver.
-        fun standard(resolver: TagResolver) {
-            tagResolverBuilder.resolver(resolver)
-        }
-
-        // 使用该函数以 DSL 的形式添加 TagResolver.
-        // DSL 可方便使用 MenuIconDict 中的映射.
-        fun standard(dsl: PlaceholderTagResolverBuilder.() -> Unit) {
-            tagResolverBuilder.resolver(PlaceholderTagResolverBuilder(dictionary).apply(dsl).build())
-        }
-
-        // 使用该函数来直接添加折叠的占位符.
-        fun folded(key: String, lines: List<Component>) {
-            foldedLineMap[key] = lines
-        }
-
-        // 使用该函数来直接添加折叠的占位符.
-        fun folded(key: String, vararg lines: Component) {
-            foldedLineMap[key] = lines.toList()
-        }
-
-        // 使用该函数以 DSL 的形式添加折叠的占位符.
-        // DSL 可方便使用 MenuIconDict 中的映射.
-        // TODO: 如果在 build 之前就调用了这个函数, 那么最终的 Global TagResolver 相当于提前构建了.
-        //  试试通过代码的方式来强制实行以下限制:
-        //  1. 要求 standard 必须先于所有 folded 调用
-        //  2. 如果在 build 之前就调用了 folded, 应该给出一些提示?
-        fun folded(key: String, dsl: FoldedLineBuilder.() -> Unit) {
-            if (tagResolver == null) {
-                tagResolver = tagResolverBuilder.build()
-            }
-            foldedLineMap[key] = FoldedLineBuilder(dictionary, tagResolver!!).apply(dsl).build()
-        }
-
-        fun build(): LineConfig {
-            if (tagResolver == null) {
-                tagResolver = tagResolverBuilder.build()
-            }
-            return LineConfig(tagResolver!!, foldedLineMap)
-        }
-    }
-
-    @MenuIconLoreDsl
-    class FoldedLineBuilder(
-        private val dictionary: MenuIconDictionary,
-        private val globalTagResolver: TagResolver,
-    ) {
-        private val foldedLineList: MutableList<Component> = mutableListOf()
-
-        fun dict(key: String): String {
-            // 开发日记 2024/12/25: 返回空字符串?
-            return dictionary[key] ?: error("no such key in dict: $key")
-        }
-
-        fun literal(text: String) {
-            foldedLineList.add(MM.deserialize(text, globalTagResolver))
-        }
-
-        fun literal(component: Component) {
-            foldedLineList.add(component)
-        }
-
-        fun resolve(key: String, dsl: PlaceholderTagResolverBuilder.() -> Unit) {
-            val rawText = dict(key)
-            val resolver = PlaceholderTagResolverBuilder(dictionary).apply(dsl).build() // local resolver
-            val parsed = MM.deserialize(rawText, resolver, globalTagResolver)
-            foldedLineList.add(parsed)
-        }
-
-        fun build(): List<Component> {
-            return foldedLineList
-        }
-    }
-
-    @MenuIconLoreDsl
-    class PlaceholderTagResolverBuilder(
-        private val dictionary: MenuIconDictionary,
-    ) {
-        private val tagResolverBuilder: TagResolver.Builder = TagResolver.builder()
-
-        fun dict(key: String): String {
-            // 开发日记 2024/12/25: 返回空字符串?
-            return dictionary[key] ?: error("no such key in dict: $key")
-        }
-
-        /**
-         * @see Placeholder.parsed
-         */
-        fun parsed(key: String, value: String) {
-            tagResolverBuilder.resolver(Placeholder.parsed(key, value))
-        }
-
-        /**
-         * @see Placeholder.unparsed
-         */
-        fun unparsed(key: String, value: String) {
-            tagResolverBuilder.resolver(Placeholder.unparsed(key, value))
-        }
-
-        /**
-         * @see Placeholder.component
-         */
-        fun component(key: String, value: Component) {
-            tagResolverBuilder.resolver(Placeholder.component(key, value))
-        }
-
-        /**
-         * @see Placeholder.styling
-         */
-        fun styling(key: String, vararg value: StyleBuilderApplicable) {
-            tagResolverBuilder.resolver(Placeholder.styling(key, *value))
-        }
-
-        fun build(): TagResolver {
-            return tagResolverBuilder.build()
         }
     }
 }

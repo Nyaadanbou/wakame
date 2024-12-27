@@ -20,26 +20,24 @@ class ItemXNeko(
     }
 
     override fun valid(): Boolean {
-        return getItem0() != null
+        return getArchetype() != null
     }
 
-    override fun createItemStack(): ItemStack? {
-        val nekoItem = getItem0() ?: return null
-        val context = ItemGenerationContexts.create(
-            // 始终以等级 0 生成
-            trigger = ItemGenerationTriggers.direct(0),
-            // 设置为物品的 key
-            target = nekoItem.id,
-            // 随机种子始终为 0
-            seed = 0
-        )
-        val nekoStack = nekoItem.realize(context)
-        val itemStack = nekoStack.wrapped
-        return itemStack
-    }
-
-    override fun createItemStack(player: Player): ItemStack? {
-        return getItem0()?.realize(player.toUser())?.wrapped
+    override fun createItemStack(amount: Int, player: Player?): ItemStack? {
+        val archetype = getArchetype() ?: return null
+        if (player == null) {
+            val context = ItemGenerationContexts.create(
+                // 始终以等级 0 生成
+                trigger = ItemGenerationTriggers.direct(0),
+                // 设置为物品的 key
+                target = archetype.id,
+                // 随机种子始终为 0
+                seed = 0
+            )
+            return archetype.realize(context).wrapped
+        } else {
+            return archetype.realize(player.toUser()).wrapped
+        }
     }
 
     override fun matches(itemStack: ItemStack): Boolean {
@@ -49,10 +47,10 @@ class ItemXNeko(
     }
 
     override fun displayName(): String {
-        return getItem0()?.plainName ?: return DEFAULT_DISPLAY_NAME
+        return getArchetype()?.plainName ?: return DEFAULT_DISPLAY_NAME
     }
 
-    private fun getItem0(): NekoItem? {
+    private fun getArchetype(): NekoItem? {
         val transformed = identifier.replaceFirst('/', ':')
         val nekoItemId = Key.key(transformed)
         return ItemRegistry.CUSTOM.getOrNull(nekoItemId)
@@ -71,8 +69,8 @@ object ItemXFactoryNeko : ItemXFactory {
     }
 
     override fun create(plugin: String, identifier: String): ItemXNeko? {
-        if (plugin != this.plugin)
-            return null
-        return ItemXNeko(identifier)
+        return if (plugin == this.plugin)
+            ItemXNeko(identifier)
+        else null
     }
 }

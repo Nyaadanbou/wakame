@@ -29,7 +29,7 @@ internal class CraftingStationSession(
      * 获取 [station] 中所有合成配方的匹配结果, 可以合成的会排在前面.
      */
     fun getRecipeMatcherResults(): List<RecipeMatcherResult> {
-        return recipe2MatcherResult.values.sortedByDescending(RecipeMatcherResult::canCraft)
+        return recipe2MatcherResult.values.sortedByDescending(RecipeMatcherResult::isAllowed)
     }
 
     /**

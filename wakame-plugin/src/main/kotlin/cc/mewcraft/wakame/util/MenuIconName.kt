@@ -11,7 +11,7 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 data class MenuIconName(
     @Setting(nodeFromParent = true)
     val name: String,
-) {
+) : MenuIcon {
     companion object {
         private val MM = Injector.get<MiniMessage>()
     }
@@ -20,7 +20,7 @@ data class MenuIconName(
         return MM.deserialize(name, tagResolver)
     }
 
-    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIconLore.PlaceholderTagResolverBuilder.() -> Unit): Component {
-        return MM.deserialize(name, MenuIconLore.PlaceholderTagResolverBuilder(dict).apply(dsl).build())
+    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIcon.PlaceholderTagResolverBuilder.() -> Unit): Component {
+        return MM.deserialize(name, MenuIcon.PlaceholderTagResolverBuilder(dict).apply(dsl).build())
     }
 }

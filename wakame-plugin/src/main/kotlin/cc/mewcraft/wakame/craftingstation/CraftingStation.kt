@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.craftingstation
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
-import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -19,8 +19,8 @@ import java.lang.reflect.Type
  */
 internal sealed interface CraftingStation : Iterable<Recipe> {
     val id: String
-    val primaryLayout: MenuLayout
-    val previewLayout: MenuLayout
+    val primaryLayout: BasicMenuSettings
+    val previewLayout: BasicMenuSettings
     fun addRecipe(recipe: Recipe): Boolean
     fun removeRecipe(key: Key): Recipe?
 }
@@ -30,8 +30,8 @@ internal sealed interface CraftingStation : Iterable<Recipe> {
  */
 internal class SimpleCraftingStation(
     override val id: String,
-    override val primaryLayout: MenuLayout,
-    override val previewLayout: MenuLayout,
+    override val primaryLayout: BasicMenuSettings,
+    override val previewLayout: BasicMenuSettings,
 ) : CraftingStation {
     companion object {
         const val TYPE = "simple"
@@ -70,7 +70,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
         when (stationType) {
             SimpleCraftingStation.TYPE -> {
                 // 获取合成站菜单布局
-                val stationLayout = node.node("layout").krequire<MenuLayout>().apply {
+                val stationLayout = node.node("layout").krequire<BasicMenuSettings>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()
@@ -81,7 +81,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
                 }
 
                 // 获取合成站预览菜单布局
-                val previewLayout = node.node("preview_layout").krequire<MenuLayout>().apply {
+                val previewLayout = node.node("preview_layout").krequire<BasicMenuSettings>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()

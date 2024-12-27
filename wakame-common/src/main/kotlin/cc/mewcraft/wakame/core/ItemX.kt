@@ -44,19 +44,13 @@ sealed interface ItemX : Keyed, Examinable {
 
     /**
      * 该物品是否有效.
-     * 即该物品是否保证可以正常创建出 [ItemStack]
+     *
+     * 当该函数返回 `true` 时, 以下函数都可以正常工作:
+     * - [matches]
+     * - [createItemStack]
+     * - [displayName]
      */
     fun valid(): Boolean
-
-    /**
-     * 创建一个 [ItemStack].
-     */
-    fun createItemStack(): ItemStack?
-
-    /**
-     * 根据玩家创建一个 [ItemStack].
-     */
-    fun createItemStack(player: Player): ItemStack?
 
     // 开发日记: 2024/8/19 芙兰
     // 相比于先将 ItemStack 转成 ItemX 再 equals 进行判等,
@@ -68,7 +62,12 @@ sealed interface ItemX : Keyed, Examinable {
     fun matches(itemStack: ItemStack): Boolean
 
     /**
-     * 该物品的渲染时的名字.
+     * 创建一个 [ItemStack], 默认数量为 1, 可以基于特定玩家生成.
+     */
+    fun createItemStack(amount: Int = 1, player: Player? = null): ItemStack?
+
+    /**
+     * 该物品的展示名字. 字符串为 MiniMessage string, 用作展示给玩家.
      */
     fun displayName(): String
 }
@@ -92,15 +91,15 @@ abstract class ItemXAbstract(
     )
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
+        if (this === other)
+            return true
         return other is ItemX &&
                 plugin == other.plugin &&
                 identifier == other.identifier
     }
 
     override fun hashCode(): Int {
-        return plugin.hashCode() +
-                31 * identifier.hashCode()
+        return plugin.hashCode() + 31 * identifier.hashCode()
     }
 
     override fun toString(): String {

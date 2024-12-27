@@ -4,13 +4,8 @@ import cc.mewcraft.wakame.craftingstation.CraftingStation
 import cc.mewcraft.wakame.craftingstation.CraftingStationSession
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeMatcherResult
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
-import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.gui.toItemProvider
-import cc.mewcraft.wakame.item.NekoStack
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
@@ -42,7 +37,7 @@ internal class CraftingStationMenu(
     /**
      * 该菜单的布局
      */
-    private val layout: MenuLayout
+    private val settings: BasicMenuSettings
         get() = station.primaryLayout
 
     /**
@@ -55,14 +50,14 @@ internal class CraftingStationMenu(
     /**
      * 合成站菜单的 [Gui].
      *
-     * - `X`: background
+     * - `x`: background
      * - `.`: recipe
      * - `<`: prev_page
      * - `>`: next_page
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*layout.structure)
-        builder.addIngredient('X', BackgroundItem())
+        builder.setStructure(*settings.structure)
+        builder.addIngredient('x', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -86,7 +81,7 @@ internal class CraftingStationMenu(
     fun update() {
         // 排序已在 StationSession 的迭代器中实现
         primaryGui.setContent(stationSession.getRecipeMatcherResults().map(::RecipeItem))
-        primaryWindow.setTitle(layout.title) // TODO slot 背景颜色红绿显示
+        primaryWindow.setTitle(settings.title) // TODO slot 背景颜色红绿显示
     }
 
     /**
@@ -116,7 +111,7 @@ internal class CraftingStationMenu(
      */
     inner class BackgroundItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getIcon("background").render0().toItemProvider()
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -129,7 +124,7 @@ internal class CraftingStationMenu(
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            return layout.getIcon("prev_page").render0().toItemProvider()
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
@@ -138,7 +133,7 @@ internal class CraftingStationMenu(
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            return layout.getIcon("next_page").render0().toItemProvider()
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 
@@ -149,7 +144,7 @@ internal class CraftingStationMenu(
         private val recipeMatcherResult: RecipeMatcherResult,
     ) : AbstractCraftItem() {
         override fun getItemProvider(): ItemProvider {
-            return ItemWrapper(recipeMatcherResult.displayItemStack(layout))
+            return ItemWrapper(recipeMatcherResult.getListingDisplay(settings))
         }
 
         private fun updateMenu() {
@@ -163,13 +158,13 @@ internal class CraftingStationMenu(
             when (clickType) {
                 // 左键预览
                 ClickType.LEFT -> {
-                    CraftingPreviewMenu(recipeMatcherResult.recipe, player, this@CraftingStationMenu).open()
+                    CraftingPreviewMenu(this@CraftingStationMenu, recipeMatcherResult.recipe, player).open()
                 }
 
                 // 右键合成
                 ClickType.RIGHT -> {
                     val stationRecipe = recipeMatcherResult.recipe
-                    if (stationRecipe.match(player).canCraft) {
+                    if (stationRecipe.match(player).isAllowed) {
                         tryCraft(stationRecipe, player)
                     } else {
                         notifyFail(player)
@@ -182,11 +177,11 @@ internal class CraftingStationMenu(
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
                     val stationRecipe = recipeMatcherResult.recipe
                     var count = 0
-                    if (stationRecipe.match(player).canCraft) {
+                    if (stationRecipe.match(player).isAllowed) {
                         do {
                             tryCraft(stationRecipe, player)
                             count++
-                        } while (stationRecipe.match(player).canCraft && count < 8)
+                        } while (stationRecipe.match(player).isAllowed && count < 8)
                     } else {
                         notifyFail(player)
                     }
@@ -197,10 +192,10 @@ internal class CraftingStationMenu(
                 // 丢弃一键合成全部
                 ClickType.DROP, ClickType.CONTROL_DROP -> {
                     val stationRecipe = recipeMatcherResult.recipe
-                    if (stationRecipe.match(player).canCraft) {
+                    if (stationRecipe.match(player).isAllowed) {
                         do {
                             tryCraft(stationRecipe, player)
-                        } while (stationRecipe.match(player).canCraft)
+                        } while (stationRecipe.match(player).isAllowed)
                     } else {
                         notifyFail(player)
                     }
@@ -221,8 +216,7 @@ internal class CraftingStationMenu(
  */
 internal abstract class AbstractCraftItem : AbstractItem() {
     fun tryCraft(recipe: Recipe, player: Player) {
-        // 无法正常执行消耗就抛出异常中断代码执行
-        // 不给玩家执行合成的结果
+        // 无法正常执行消耗就抛出异常中断代码执行, 不给予玩家任何东西.
         try {
             recipe.consume(player)
             recipe.output.apply(player)
@@ -241,13 +235,4 @@ internal abstract class AbstractCraftItem : AbstractItem() {
             color(NamedTextColor.RED)
         })
     }
-}
-
-/**
- * 方便函数.
- */
-private fun NekoStack.render0(): NekoStack {
-    val context = CraftingStationContext(Pos.OVERVIEW, erase = true)
-    ItemRenderers.CRAFTING_STATION.render(this, context)
-    return this
 }

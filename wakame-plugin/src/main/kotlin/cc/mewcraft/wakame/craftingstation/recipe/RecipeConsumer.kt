@@ -16,7 +16,7 @@ internal object RecipeConsumer {
         val consumers: List<ChoiceConsumer<*>> = choices.map(RecipeChoice::consumer).distinct()
 
         // 同类的 ChoiceConsumer 使用同一个上下文.
-        // 这里初始化每一类 ChoiceConsumer 的上下文.
+        // 这里初始化每类 ChoiceConsumer 的上下文.
         consumers.forEach { consumer: ChoiceConsumer<*> ->
             contextMap[consumer] = consumer.initCtx(player)
         }

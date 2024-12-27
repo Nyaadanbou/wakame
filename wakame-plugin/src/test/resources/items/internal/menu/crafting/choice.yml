@@ -8,5 +8,4 @@
 
 menu_icon_name: "<item_name>"
 menu_icon_lore:
-  - "<!i>-----------" # 这一行始终会显示, 无论原始物品的信息是什么
   - "{item_lore}" # 这一行会替换成原始物品的 `minecraft:lore`

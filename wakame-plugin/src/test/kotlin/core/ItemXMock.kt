@@ -16,11 +16,7 @@ class ItemXMock(
         throw NotImplementedError()
     }
 
-    override fun createItemStack(): ItemStack? {
-        throw NotImplementedError()
-    }
-
-    override fun createItemStack(player: Player): ItemStack? {
+    override fun createItemStack(amount: Int, player: Player?): ItemStack? {
         throw NotImplementedError()
     }
 

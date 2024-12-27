@@ -3,11 +3,14 @@ package cc.mewcraft.wakame.util
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
+/**
+ * 菜单图标的字符串字典.
+ */
 @ConfigSerializable
 data class MenuIconDictionary(
     @Setting(nodeFromParent = true)
     private val dictionary: Map<String, String> = emptyMap(),
-) {
+) : MenuIcon {
     operator fun get(key: String): String? {
         return dictionary[key]
     }

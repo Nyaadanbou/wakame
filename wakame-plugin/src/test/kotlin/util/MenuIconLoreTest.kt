@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import commonEnv
 import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.startKoin
@@ -45,7 +44,7 @@ class MenuIconLoreTest : KoinTest {
 
         // Resolve the MenuLore
         val actual = lore.resolve {
-            standard(Placeholder.component("world_name", text("overworld")))
+            standard { component("world_name", text("overworld")) }
             folded("choice_list", listOf(text("choice 1"), text("choice 2"), text("choice 3")))
         }
 

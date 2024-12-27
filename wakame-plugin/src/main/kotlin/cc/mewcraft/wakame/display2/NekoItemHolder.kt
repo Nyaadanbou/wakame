@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @param itemId 萌芽物品的唯一标识
  */
 @ConsistentCopyVisibility
-internal data class NekoItemHolder
+data class NekoItemHolder
 private constructor(
     private val itemId: Key,
     private val fallback: Key = ItemRegistry.ERROR_NEKO_ITEM_ID,
@@ -50,14 +50,21 @@ private constructor(
     }
 
     /**
-     * 返回一个新的 [NekoStack] 实例.
+     * 返回此容器持有的 [NekoItem] 实例.
+     */
+    fun get(): NekoItem {
+        return prototype.get()
+    }
+
+    /**
+     * 创建一个新的 [NekoStack] 实例.
      */
     fun createNekoStack(): NekoStack {
         return realized.clone()
     }
 
     /**
-     * 返回一个新的 [ItemStack] 实例.
+     * 创建一个新的 [ItemStack] 实例.
      */
     fun createItemStack(): ItemStack {
         return realized.itemStack

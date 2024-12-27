@@ -1,10 +1,8 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.lore0
+import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.util.itemNameOrType
 import it.unimi.dsi.fastutil.objects.Reference2BooleanArrayMap
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -23,7 +21,7 @@ internal object RecipeMatcher {
         val checkers: List<ChoiceChecker<*>> = choices.map(RecipeChoice::checker).distinct()
 
         // 同类的 ChoiceChecker 使用同一个上下文.
-        // 这里初始化每一类 ChoiceChecker 的上下文.
+        // 这里初始化每类 ChoiceChecker 的上下文.
         checkers.forEach { checker: ChoiceChecker<*> ->
             contextMap[checker] = checker.initCtx(player)
         }
@@ -39,27 +37,63 @@ internal object RecipeMatcher {
 }
 
 /**
- * 合成站配方匹配器的匹配结果的封装.
+ * 代表一个合成站的配方匹配器的匹配结果.
  *
- * @param recipe 与该结果所关联的 [Recipe]
- * @param result 匹配的结果映射, 映射关系为: 配方中的材料 ([Recipe]) -> 是否匹配 ([Boolean])
+ * @param recipe 与该结果所关联的合成配方
+ * @param matchResultMap 匹配的结果映射: [合成配方的输入材料][RecipeChoice] -> [输入材料是否满足][Boolean]
  */
 internal class RecipeMatcherResult(
-    recipe: Recipe,
-    result: Map<RecipeChoice, Boolean>,
+    val recipe: Recipe,
+    matchResultMap: Map<RecipeChoice, Boolean>,
 ) {
-    private val result: Reference2BooleanArrayMap<RecipeChoice> = Reference2BooleanArrayMap(result) // explicit copy
-
-    val recipe: Recipe = recipe
-    val canCraft: Boolean = !this.result.values.contains(false)
+    // explicit copy
+    private val fastMatchResultMap: Reference2BooleanArrayMap<RecipeChoice> = Reference2BooleanArrayMap(matchResultMap)
 
     /**
-     * 获取展示该配方的 Gui 物品.
+     * 检查该匹配结果是否全部通过? 如果返回 `true` 则允许玩家使用该配方.
      */
-    fun displayItemStack(layout: MenuLayout): ItemStack {
-        val itemStack = recipe.output.displayItemStack()
-        itemStack.itemName = getRecipeIconName(layout)
-        itemStack.lore0 = getRecipeIconLore(layout)
+    val isAllowed: Boolean = !this.fastMatchResultMap.containsValue(false)
+
+    /**
+     * 获取展示该配方的 Gui 物品堆叠.
+     */
+    fun getListingDisplay(settings: BasicMenuSettings): ItemStack {
+        // 使用配方的 [输出物品堆叠] 作为 [展示物品堆叠]
+        val itemStack = recipe.output.displayItemStack(settings)
+
+        // 解析展示用的物品堆叠信息
+        val resolution = settings.getSlotDisplay("listing").resolveEverything {
+
+            standard {
+                component("item_name", itemStack.itemNameOrType)
+                parsed("ok", dict("ok"))
+                parsed("bad", dict("bad"))
+            }
+
+            folded("choice_list") {
+                for ((choice, flag) in fastMatchResultMap) {
+                    when (choice) {
+                        is ExpChoice -> {
+                            resolve("choice_exp") {
+                                preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
+                                component("amount", Component.text(choice.amount))
+                            }
+                        }
+
+                        is ItemChoice -> {
+                            resolve("choice_item") {
+                                preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
+                                unparsed("item", choice.item.displayName())
+                                component("amount", Component.text(choice.amount))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        resolution.applyTo(itemStack)
+
         return itemStack
     }
 
@@ -69,41 +103,14 @@ internal class RecipeMatcherResult(
     fun isSameResult(other: RecipeMatcherResult?): Boolean {
         if (other == null)
             return false
-        if (this.result.size != other.result.size)
+        if (this.fastMatchResultMap.size != other.fastMatchResultMap.size)
             return false
-        other.result.forEach { (choice, flag) ->
-            if (!this.result.containsKey(choice))
+        other.fastMatchResultMap.forEach { (choice, flag) ->
+            if (!this.fastMatchResultMap.containsKey(choice))
                 return false
-            if (this.result.getBoolean(choice) != flag)
+            if (this.fastMatchResultMap.getBoolean(choice) != flag)
                 return false
         }
         return true
-    }
-
-    /**
-     * 获取展示该配方的 Gui 物品的 `minecraft:item_name`.
-     */
-    private fun getRecipeIconName(layout: MenuLayout): Component {
-        // 缺省构建格式: "合成: <result>"
-        return (layout.getLang("recipe.name") ?: "合成: <result>")
-            .replace("<result>", recipe.output.description(layout))
-            .mini
-    }
-
-    /**
-     * 获取展示该配方的 Gui 物品的 `minecraft:lore`.
-     */
-    private fun getRecipeIconLore(layout: MenuLayout): List<Component> {
-        val sufficientPrefix = layout.getLang("prefix.sufficient") ?: "✔"
-        val insufficientPrefix = layout.getLang("prefix.insufficient") ?: "✖"
-        val choices = result.map { (choice, flag) ->
-            val prefix = if (flag) sufficientPrefix else insufficientPrefix
-            choice.description(layout).replace("<prefix>", prefix)
-        }
-        val loreStrings = (layout.getLang("recipe.lore") ?: "合成所需材料:\n<choices>")
-            .split('\n')
-        return loreStrings
-            .flatMap { if (it == "<choices>") choices else listOf(it) }
-            .map(String::mini)
     }
 }

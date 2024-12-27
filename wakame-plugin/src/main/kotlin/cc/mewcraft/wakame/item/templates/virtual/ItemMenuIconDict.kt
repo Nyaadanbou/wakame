@@ -22,6 +22,9 @@ data class ItemMenuIconDict(
         return ItemGenerationResult.empty()
     }
 
+    /**
+     * @see MenuIconDictionary.get
+     */
     operator fun get(key: String): String {
         return delegate[key] ?: error("dict key not found: $key")
     }
