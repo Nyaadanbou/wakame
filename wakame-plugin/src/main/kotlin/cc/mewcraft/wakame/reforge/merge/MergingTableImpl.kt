@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component.text
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -19,9 +20,22 @@ import java.util.stream.Stream
  * 一个无限制的 [MergingTable] 实现.
  */
 internal object WtfMergingTable : MergingTable {
-    override val identifier: String = "wtf"
-    override val enabled: Boolean = true
-    override val title: Component = text("Merging Table (Cheat ON)")
+    override val id: String = "wtf"
+    override val settings: BasicMenuSettings = BasicMenuSettings(
+        title = text("Merging Table (Cheat Mode)"),
+        structure = arrayOf(
+            ". . . . . . . . .",
+            ". . . . . . . . .",
+            ". a . b . . . c .",
+            ". . . . . . . . .",
+            ". . . . . . . . .",
+        ),
+        icons = hashMapOf(
+            "background" to Key.key("internal:menu/common/background"),
+            "merge_output_empty" to Key.key("internal:menu/merging/merge_output_empty"),
+            "merge_output_ready" to Key.key("internal:menu/merging/merge_output_ready"),
+        )
+    )
 
     override val inputLevelLimit: Int
         // 无最大输出等级限制
@@ -75,9 +89,8 @@ internal object WtfMergingTable : MergingTable {
  * 一个标准的 [MergingTable] 实现, 需要从配置文件构建.
  */
 internal class SimpleMergingTable(
-    override val identifier: String,
-    override val enabled: Boolean,
-    override val title: Component,
+    override val id: String,
+    override val settings: BasicMenuSettings,
     override val inputLevelLimit: Int,
     override val outputLevelLimit: Int,
     override val outputPenaltyLimit: Int,
@@ -90,8 +103,8 @@ internal class SimpleMergingTable(
 ) : MergingTable {
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("enabled", enabled),
-        ExaminableProperty.of("title", title),
+        ExaminableProperty.of("id", id),
+        ExaminableProperty.of("settings", settings),
         ExaminableProperty.of("inputLevelLimit", inputLevelLimit),
         ExaminableProperty.of("outputLevelLimit", outputLevelLimit),
         ExaminableProperty.of("outputPenaltyLimit", outputPenaltyLimit),

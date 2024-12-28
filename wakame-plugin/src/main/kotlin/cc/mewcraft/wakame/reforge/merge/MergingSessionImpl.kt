@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.integration.economy.EconomyManager
@@ -14,8 +15,9 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -103,7 +105,7 @@ internal class SimpleMergingSession(
             MergeOperation(this)
         } catch (e: Exception) {
             logger.error("An unknown error occurred while merging. This is a bug!", e)
-            ReforgeResult.failure("<red>内部错误".mini)
+            ReforgeResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -174,33 +176,33 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(): MergingSession.ReforgeResult {
-        return Simple(false, "<gray>没有要合并的核心.".mini, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
+        return Simple(false, MessageConstants.MSG_MERGING_RESULT_EMPTY, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并失败*的 [MergingSession.ReforgeResult].
      */
-    fun failure(description: Component): MergingSession.ReforgeResult {
-        return Simple(false, description, ReforgeType.failure(), ReforgeCost.failure(), NekoStack.empty())
+    fun failure(description: ComponentLike): MergingSession.ReforgeResult {
+        return Simple(false, description.asComponent(), ReforgeType.failure(), ReforgeCost.failure(), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
     fun success(item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
-        return Simple(true, "<gray>准备就绪!".mini, type, cost, item)
+        return Simple(true, MessageConstants.MSG_MERGING_RESULT_SUCCESS, type, cost, item)
     }
 
     private class Simple(
         isSuccess: Boolean,
-        description: Component,
+        description: ComponentLike,
         type: MergingSession.ReforgeType,
         cost: MergingSession.ReforgeCost,
         output: NekoStack,
     ) : MergingSession.ReforgeResult {
 
         override val isSuccess = isSuccess
-        override val description: Component = description
+        override val description: Component = description.asComponent()
         override val reforgeType: MergingSession.ReforgeType = type
         override val reforgeCost = cost
         override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
@@ -262,7 +264,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("This type is not supposed to be used.")
         override val description: List<Component> = listOf(
-            "<gray>类型: <white>n/a".mini
+            MessageConstants.MSG_MERGING_TYPE_EMPTY.build()
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -275,7 +277,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("This type is not supposed to be used.")
         override val description: List<Component> = listOf(
-            "<gray>类型: <white>n/a".mini
+            MessageConstants.MSG_MERGING_TYPE_FAILED.build()
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -288,7 +290,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.ADD
         override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 0".mini
+            MessageConstants.MSG_MERGING_TYPE_SUCCESS_0.build()
         )
     }
 
@@ -296,7 +298,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.MULTIPLY_BASE
         override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 1".mini
+            MessageConstants.MSG_MERGING_TYPE_SUCCESS_1.build()
         )
     }
 
@@ -304,7 +306,7 @@ internal object ReforgeType {
         override val operation: AttributeModifier.Operation =
             AttributeModifier.Operation.MULTIPLY_TOTAL
         override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 2".mini
+            MessageConstants.MSG_MERGING_TYPE_SUCCESS_2.build()
         )
     }
 }
@@ -346,7 +348,7 @@ internal object ReforgeCost {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
         override val description: List<Component> = listOf(
-            "<gray>花费: <white>n/a".mini
+            MessageConstants.MSG_MERGING_COST_ZERO.build()
         )
     }
 
@@ -358,7 +360,7 @@ internal object ReforgeCost {
             throw IllegalStateException("This cost is not supposed to be tested.")
 
         override val description: List<Component> = listOf(
-            "<gray>花费: <white>n/a".mini
+            MessageConstants.MSG_MERGING_COST_EMPTY.build()
         )
     }
 
@@ -377,7 +379,9 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
+            MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(
+                TranslationArgument.numeric(currencyAmount)
+            ).build()
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(

@@ -6,20 +6,11 @@ import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableCont
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.removeItalic
-import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component.empty
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -28,8 +19,6 @@ import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
-import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 import kotlin.properties.Delegates
@@ -73,22 +62,16 @@ internal class MergingMenu(
     }
 
     private val primaryGui: Gui = Gui.normal { builder ->
-        builder.setStructure(
-            ". . . . . . . . .",
-            ". . . . . . . . .",
-            ". a . b . . . c .",
-            ". . . . . . . . .",
-            ". . . . . . . . .",
-        )
-        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).edit { hideTooltip = true }))
+        builder.setStructure(*table.settings.structure)
+        builder.addIngredient('.', table.settings.getSlotDisplay("background").resolveToItemWrapper())
         builder.addIngredient('a', inputSlot1)
         builder.addIngredient('b', inputSlot2)
-        builder.addIngredient('c', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).edit { hideTooltip = true }))
+        builder.addIngredient('c', outputSlot, table.settings.getSlotDisplay("merge_output_empty").resolveToItemWrapper())
     }
 
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
-        builder.setTitle(table.title)
+        builder.setTitle(table.settings.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -196,12 +179,7 @@ internal class MergingMenu(
 
                     // 玩家必须有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(ItemStack.of(Material.BARRIER).edit {
-                            itemName = text {
-                                content("结果: ").color(NamedTextColor.WHITE)
-                                append(text("资源不足").color(NamedTextColor.RED))
-                            }
-                        })
+                        setOutputSlot(table.settings.getSlotDisplay("merge_output_not_enough_resource").resolveToItemStack())
                         return
                     }
 
@@ -258,34 +236,18 @@ internal class MergingMenu(
      * 负责渲染合并后的物品在 [MergingMenu.outputSlot] 里面的样子.
      */
     private fun renderOutputSlot(result: MergingSession.ReforgeResult): ItemStack {
-        val clickToMerge = "<gray>[<aqua>点击确认合并</aqua>]".mini
-
         if (result.isSuccess) {
-            // 渲染成功的结果
-
-            // 渲染输出的物品
-            val output = result.output
-            ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
-            return output.unsafeEdit {
-                itemName = "<white>结果: <green>就绪".mini
-                lore = lore.orEmpty() + buildList {
-                    add(empty())
-                    addAll(result.reforgeType.description)
-                    addAll(result.reforgeCost.description)
-
-                    if (confirmed) {
-                        add(empty())
-                        add(clickToMerge)
-                    }
-                }.removeItalic
+            // 获取合并成功后的核心, 用作基础物品堆叠
+            val output = result.output.wrapped
+            val resolution = table.settings.getSlotDisplay("merge_output_ready").resolveEverything {
+                folded("type_description", result.reforgeType.description)
+                folded("cost_description", result.reforgeCost.description)
+                folded("result_description", result.description)
             }
-
+            return resolution.applyTo(output)
         } else {
-            // 渲染失败的结果
-
-            return ItemStack.of(Material.BARRIER).edit {
-                itemName = "<white>结果: <red>失败".mini
-                lore = listOf(result.description).removeItalic
+            return table.settings.getSlotDisplay("merge_output_failure").resolveToItemStack {
+                folded("result_description", result.description)
             }
         }
     }

@@ -1,5 +1,0 @@
-# 该图标对应合并台里[输出]的核心.
-
-menu_icon_name: "<item_name>"
-menu_icon_lore:
-  - "{item_lore}"

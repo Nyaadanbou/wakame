@@ -2,6 +2,7 @@
 repair: example_a
 # 回收站的 id
 recycle: example_a
+
 # 基本菜单设置
 primary_menu_settings:
   title: "DO_NOT_USE"

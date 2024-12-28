@@ -1,5 +1,6 @@
 repair: example_b
 recycle: example_b
+
 primary_menu_settings:
   title: "DO_NOT_USE"
   structure:
