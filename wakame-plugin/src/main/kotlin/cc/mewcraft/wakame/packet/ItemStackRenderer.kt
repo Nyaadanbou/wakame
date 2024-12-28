@@ -10,6 +10,7 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetCursorItem
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
 import org.bukkit.GameMode
@@ -33,6 +34,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         // 修改发给非创造模式玩家的物品包
         val changed = when (event.packetType) {
             PacketType.Play.Server.SET_SLOT -> handleSetSlot(event)
+            PacketType.Play.Server.SET_CURSOR_ITEM -> handleSetCursorItem(event)
             PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(event)
             PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(event)
             PacketType.Play.Server.ENTITY_EQUIPMENT -> handleSetEquipment(event)
@@ -47,6 +49,19 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
     private fun handleSetSlot(event: PacketSendEvent): Boolean {
         val wrapper = WrapperPlayServerSetSlot(event)
         var changed = wrapper.item.modify()
+        return changed
+    }
+
+    private fun handleSetCursorItem(event: PacketSendEvent): Boolean {
+        val wrapper = WrapperPlayServerSetCursorItem(event)
+        var changed = wrapper.stack.modify()
+        // 此包会在玩家拿起物品, 服务端内部进行物品纠错时发送,
+        // 纠错指的是服务端会检查客户端物品是否与服务端一致, 如果不一致则会将物品设置为服务端的物品.
+        // 由于客户端收到的 Wakame 物品与服务端不一致,
+        // 因此会导致客户端物品栏内的 Wakame 有时会被错误地设置到鼠标上.
+        if (changed) {
+            event.isCancelled = true
+        }
         return changed
     }
 
