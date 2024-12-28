@@ -2,12 +2,13 @@ package cc.mewcraft.wakame.reforge.blacksmith
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.Reforge
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -21,7 +22,12 @@ internal object BlacksmithStationSerializer {
             .resolve(Reforge.ROOT_DIR_NAME)
             .resolve(ROOT_DIR_NAME)
 
-        val yamlLoader = yamlConfig { }
+        val yamlLoader = yamlConfig {
+            withDefaults()
+            serializers {
+                registerAnnotatedObjects(ObjectMappers.DEFAULT)
+            }
+        }
 
         val result = blacksmithDirectory.walk()
             .maxDepth(1)
@@ -33,6 +39,9 @@ internal object BlacksmithStationSerializer {
                 val rootNode = yamlLoader.buildAndLoadString(f.readText())
                 val repairId = rootNode.node("repair").krequire<String>()
                 val recycleId = rootNode.node("recycle").krequire<String>()
+                val primarySettings = rootNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
+                val recyclingSettings = rootNode.node("recycling_menu_settings").krequire<BasicMenuSettings>()
+                val repairingSettings = rootNode.node("repairing_menu_settings").krequire<BasicMenuSettings>()
 
                 val repairingTable = RepairingTableRegistry.getTable(repairId) ?: run {
                     LOGGER.warn("Unknown repairing table: $repairId")
@@ -45,7 +54,10 @@ internal object BlacksmithStationSerializer {
 
                 LOGGER.info("Loaded blacksmith station: $id")
 
-                id to SimpleBlacksmithStation(recyclingStation, repairingTable)
+                id to SimpleBlacksmithStation(
+                    primarySettings, recyclingSettings, repairingSettings,
+                    recyclingStation, repairingTable
+                )
             }.toMap()
 
         return result

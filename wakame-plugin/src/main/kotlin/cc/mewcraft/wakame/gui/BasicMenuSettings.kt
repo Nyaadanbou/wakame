@@ -21,7 +21,7 @@ import xyz.xenondevs.invui.item.ItemWrapper
  * 虚拟容器菜单的通用设置.
  */
 @ConfigSerializable
-internal data class BasicMenuSettings(
+data class BasicMenuSettings(
     /**
      * 虚拟容器菜单的标题.
      */

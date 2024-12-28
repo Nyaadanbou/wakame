@@ -129,10 +129,6 @@ internal class SimpleRecyclingSession(
         claims.clear()
     }
 
-    override fun hasAnyClaims(): Boolean {
-        return claims.isNotEmpty()
-    }
-
     override fun getAllClaims(): Collection<RecyclingSession.Claim> {
         return claims
     }

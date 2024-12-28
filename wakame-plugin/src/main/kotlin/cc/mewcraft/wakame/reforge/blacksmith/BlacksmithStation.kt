@@ -1,9 +1,24 @@
 package cc.mewcraft.wakame.reforge.blacksmith
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 
 interface BlacksmithStation {
+    val primarySettings: BasicMenuSettings
+    val recyclingSettings: BasicMenuSettings
+    val repairingSettings: BasicMenuSettings
+
     val recyclingStation: RecyclingStation
     val repairingTable: RepairingTable
+
+    /**
+     * 获取回收站用于存放物品容器的大小 (物品堆叠的数量).
+     */
+    val recyclingInventorySize: Int
+
+    companion object Shared {
+        fun calculateRecyclingInventorySize(settings: BasicMenuSettings): Int =
+            settings.structure.joinToString().count { it == 'i' }
+    }
 }
