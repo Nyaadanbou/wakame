@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -89,7 +88,6 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
             customName = null
 
             lore = itemLore
-            itemModel = item.modelKey
             showNothing()
         }
     }

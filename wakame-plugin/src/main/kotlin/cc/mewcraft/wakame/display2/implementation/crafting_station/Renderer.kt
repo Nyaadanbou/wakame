@@ -29,7 +29,6 @@ import cc.mewcraft.wakame.item.templates.components.ItemCrate
 import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -100,7 +99,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
         item.unsafeEdit {
             lore = itemLore
-            itemModel = item.modelKey
             showAttributeModifiers(false)
             showEnchantments(false)
             showStoredEnchantments(false)

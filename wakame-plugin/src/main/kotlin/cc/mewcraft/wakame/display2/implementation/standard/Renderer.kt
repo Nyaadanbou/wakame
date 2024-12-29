@@ -36,7 +36,6 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -116,7 +115,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
                 }
             }
         }
-        item.itemModel = item.modelKey
         item.showAttributeModifiers(false)
         item.showEnchantments(false)
         item.showStoredEnchantments(false)

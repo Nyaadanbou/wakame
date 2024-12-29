@@ -28,7 +28,6 @@ import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.util.removeItalic
@@ -127,7 +126,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
         item.unsafeEdit {
             lore = itemLore
-            itemModel = item.modelKey
             showNothing()
         }
     }

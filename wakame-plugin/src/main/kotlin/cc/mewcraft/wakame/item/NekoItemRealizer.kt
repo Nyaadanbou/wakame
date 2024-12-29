@@ -145,6 +145,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 设置物品的 id 和 variant
         NekoStackImplementations.setId(itemStack, prototype.id)
         NekoStackImplementations.setVariant(itemStack, 0)
+        NekoStackImplementations.setItemModel(itemStack, prototype.id)
 
         // 获取 物品组件 的容器
         val components = nekoStack.components

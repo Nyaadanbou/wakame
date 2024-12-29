@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.modelKey
 import cc.mewcraft.wakame.item.unsafeEdit
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
@@ -54,7 +53,6 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
 
         item.unsafeEdit {
             lore = itemLore
-            itemModel = item.modelKey
             showNothing()
         }
     }
