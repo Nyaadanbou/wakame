@@ -31,9 +31,9 @@ internal object WtfMergingTable : MergingTable {
             ". . . . . . . . .",
         ),
         icons = hashMapOf(
-            "background" to Key.key("internal:menu/common/background"),
-            "merge_output_empty" to Key.key("internal:menu/merging/merge_output_empty"),
-            "merge_output_ready" to Key.key("internal:menu/merging/merge_output_ready"),
+            "background" to Key.key("internal:menu/common/default/background"),
+            "merge_output_empty" to Key.key("internal:menu/merging/default/merge_output_empty"),
+            "merge_output_ready" to Key.key("internal:menu/merging/default/merge_output_ready"),
         )
     )
 

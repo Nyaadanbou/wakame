@@ -1,0 +1,5 @@
+menu_icon_name: "<item_name>"
+menu_icon_lore:
+  - "{item_lore}"
+  - ""
+  - "<!i><aqua>点击确认取出"

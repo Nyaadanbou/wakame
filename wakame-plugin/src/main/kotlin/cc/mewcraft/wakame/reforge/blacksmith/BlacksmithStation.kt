@@ -13,7 +13,7 @@ interface BlacksmithStation {
     val repairingTable: RepairingTable
 
     /**
-     * 获取回收站用于存放物品容器的大小 (物品堆叠的数量).
+     * 获取回收站用于存放物品的容器的大小 (i.e. 容器的格子数量).
      */
     val recyclingInventorySize: Int
 

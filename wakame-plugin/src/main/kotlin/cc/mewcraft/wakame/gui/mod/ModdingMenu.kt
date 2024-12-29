@@ -4,19 +4,13 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.lang.translateBy
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.removeItalic
-import me.lucko.helper.text3.mini
-import net.kyori.adventure.text.Component.empty
-import net.kyori.adventure.text.Component.text
-import org.bukkit.Material
+import cc.mewcraft.wakame.util.itemLoreOrEmpty
+import cc.mewcraft.wakame.util.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -29,8 +23,6 @@ import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
-import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.ScrollItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
@@ -97,18 +89,11 @@ internal class ModdingMenu(
     }
 
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
-        builder.setStructure(
-            ". . . x x x . . .",
-            ". . . x x x . . .",
-            ". i . x x x . o .",
-            ". . . x x x . . .",
-            ". . . x x x . . .",
-            "# # # < # > # # #"
-        )
-        builder.addIngredient('.', SimpleItem(ItemStack(Material.BLACK_STAINED_GLASS_PANE).edit { hideTooltip = true }))
-        builder.addIngredient('#', SimpleItem(ItemStack(Material.GREEN_STAINED_GLASS_PANE).edit { hideTooltip = true }))
+        builder.setStructure(*table.primaryMenuSettings.structure)
+        builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
+        builder.addIngredient('#', table.primaryMenuSettings.getSlotDisplay("background2").resolveToItemWrapper())
         builder.addIngredient('i', inputSlot)
-        builder.addIngredient('o', outputSlot, ItemWrapper(ItemStack(Material.BARRIER).edit { hideTooltip = true }))
+        builder.addIngredient('o', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_slot_empty").resolveToItemWrapper())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -118,7 +103,7 @@ internal class ModdingMenu(
 
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
-        builder.setTitle(table.title.translateBy(viewer))
+        builder.setTitle(table.primaryMenuSettings.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -229,9 +214,7 @@ internal class ModdingMenu(
 
                     // 检查玩家是否有足够的资源完成定制
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(ItemStack.of(Material.BARRIER).edit {
-                            itemName = "<white>结果: <red>资源不足".mini
-                        })
+                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_slot_insufficient_resource").resolveToItemStack())
                         return
                     }
 
@@ -292,24 +275,23 @@ internal class ModdingMenu(
         val newItemStack = if (reforgeResult.isSuccess) {
             // 定制成功了:
 
-            val output = reforgeResult.output ?: error("Output item is null, but the result is successful. This is a bug!")
-            val context = ModdingTableContext.Output(session)
-            ItemRenderers.MODDING_TABLE.render(output, context)
-            output.unsafeEdit {
-                if (confirmed) {
-                    lore = lore.orEmpty() + listOf(
-                        empty(),
-                        "<gray>[<aqua>点击确认取出</aqua>]".mini
-                    ).removeItalic
-                }
-            }
+            // 用定制台的渲染器重新渲染物品
+            val outputNekoStack = reforgeResult.output ?: error("output item is null, but the result is successful. This is a bug!")
+            val renderingContext = ModdingTableContext.Output(session)
+            ItemRenderers.MODDING_TABLE.render(outputNekoStack, renderingContext)
+            val outputItemStack = outputNekoStack.wrapped
 
+            // 再用 SlotDisplay 处理一下
+            table.primaryMenuSettings.getSlotDisplay("output_slot_ready").resolveToItemStack {
+                standard { component("item_name", outputItemStack.itemNameOrType) }
+                folded("item_lore", outputItemStack.itemLoreOrEmpty)
+            }
         } else {
             // 定制失败了:
 
-            ItemStack.of(Material.BARRIER).edit {
-                itemName = "<white>结果: <red>失败".mini
-                lore = reforgeResult.description.removeItalic
+            table.primaryMenuSettings.getSlotDisplay("output_slot_failed").resolveToItemStack {
+                folded("cost_description", reforgeResult.reforgeCost.description)
+                folded("result_description", reforgeResult.description)
             }
         }
 
@@ -351,9 +333,16 @@ internal class ModdingMenu(
         val sourceItem = session.usableInput
             ?: return session.originalInput // sourceItem 为 null 时, 说明这个物品没法定制, 直接返回玩家放入的原物品
 
-        val context = ModdingTableContext.Input(session)
-        ItemRenderers.MODDING_TABLE.render(sourceItem, context)
+        // 用定制台的渲染器重新渲染物品
+        val renderingCtx = ModdingTableContext.Input(session)
+        ItemRenderers.MODDING_TABLE.render(sourceItem, renderingCtx)
         val newItemStack = sourceItem.itemStack
+
+        // 再用 SlotDisplay 处理一下
+        table.primaryMenuSettings.getSlotDisplay("input_slot").resolveEverything {
+            standard { component("item_name", newItemStack.itemNameOrType) }
+            folded("item_lore", newItemStack.itemLoreOrEmpty)
+        }.applyTo(newItemStack)
 
         return newItemStack
     }
@@ -373,22 +362,18 @@ internal class ModdingMenu(
     /**
      * 向前翻页的 [Item].
      */
-    private class PrevItem : ScrollItem(-1) {
+    private inner class PrevItem : ScrollItem(-1) {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            val stack = ItemStack(Material.PAPER)
-            stack.editMeta { it.itemName(text("上一页")) }
-            return ItemWrapper(stack)
+            return table.primaryMenuSettings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
     /**
      * 向后翻页的 [Item].
      */
-    private class NextItem : ScrollItem(1) {
+    private inner class NextItem : ScrollItem(1) {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
-            val stack = ItemStack(Material.PAPER)
-            stack.editMeta { it.itemName(text("下一页")) }
-            return ItemWrapper(stack)
+            return table.primaryMenuSettings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 }

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import team.unnamed.mocha.runtime.MochaFunction
 
@@ -15,17 +15,17 @@ interface ModdingTable : Examinable {
     /**
      * 本定制台的唯一标识.
      */
-    val identifier: String
+    val id: String
 
     /**
-     * 是否启用本定制台.
+     * 主要的基础菜单设置.
      */
-    val enabled: Boolean // 未定义, 只是留个接口
+    val primaryMenuSettings: BasicMenuSettings
 
     /**
-     * 本定制台的GUI容器标题.
+     * 核孔的基础菜单设置.
      */
-    val title: Component
+    val replaceMenuSettings: BasicMenuSettings
 
     /**
      * @see ReforgeCountAddMethod

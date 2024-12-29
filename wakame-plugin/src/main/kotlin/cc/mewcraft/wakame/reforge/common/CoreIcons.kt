@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.NekoItemHolder
 import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRendererContext
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -31,6 +31,6 @@ internal object CoreIcons {
     }
 
     fun getItemStack(core: Core): ItemStack {
-        return getNekoStack(core).itemStack
+        return getNekoStack(core).wrapped
     }
 }

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
@@ -23,8 +24,9 @@ import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.isEmpty
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -84,7 +86,7 @@ internal class SimpleModdingSession(
             ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("An error occurred while executing reforge operation", e)
-            ReforgeResult.failure("<red>内部错误.".mini)
+            ReforgeResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -274,14 +276,14 @@ internal object ReforgeResult {
     /**
      * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
      */
-    fun failure(description: List<Component>): ModdingSession.ReforgeResult {
-        return Failure(description)
+    fun failure(description: List<ComponentLike>): ModdingSession.ReforgeResult {
+        return Failure(description.map(ComponentLike::asComponent))
     }
 
     /**
      * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
      */
-    fun failure(description: Component): ModdingSession.ReforgeResult {
+    fun failure(description: ComponentLike): ModdingSession.ReforgeResult {
         return failure(listOf(description))
     }
 
@@ -292,7 +294,7 @@ internal object ReforgeResult {
         outputItem: NekoStack,
         cost: ModdingSession.ReforgeCost,
     ): ModdingSession.ReforgeResult {
-        return Success(outputItem, listOf("<gray>准备就绪!".mini), cost)
+        return Success(outputItem, listOf(MessageConstants.MSG_MODDING_RESULT_SUCCESS.build()), cost)
     }
 
     private abstract class Base : ModdingSession.ReforgeResult {
@@ -308,9 +310,7 @@ internal object ReforgeResult {
 
     private class Empty : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(
-            "<gray>没有要定制的物品.".mini
-        )
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_RESULT_EMPTY.build())
         override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
         override val output: NekoStack? = null
     }
@@ -359,9 +359,7 @@ internal object ReforgeCost {
             return true
         }
 
-        override val description: List<Component> = listOf(
-            "<gray>没有资源花费.".mini
-        )
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_COST_EMPTY.build())
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
@@ -382,7 +380,9 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            "<gray>花费: <yellow>${currencyAmount.toInt() + 1 /* +1 使边界情况看起来合理 */} 金币".mini
+            MessageConstants.MSG_MODDING_COST_SIMPLE.arguments(
+                TranslationArgument.numeric(currencyAmount.toInt() + 1 /* +1 使边界情况看起来合理 */)
+            ).build()
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -450,7 +450,7 @@ private object ReforgeReplace {
         override val augment: PortableCore? = null
 
         // 永远返回同样的结果: 核孔无法修改
-        override var latestResult = ReforgeReplaceResult.failure("<gray>核孔无法修改.".mini)
+        override var latestResult = ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_UNCHANGEABLE)
 
         override fun getIngredientLevel(): Int = 0
         override fun getIngredientRarityNumber(): Double = .0
@@ -531,12 +531,12 @@ private object ReforgeReplace {
             // 如果源物品为空, 则返回内部错误
             val usableInput = session.usableInput ?: run {
                 session.logger.error("Usable input is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure("<red>内部错误.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             val itemRule = session.itemRule ?: run {
                 session.logger.error("Item rule is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure("<red>内部错误.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             // TODO 检查权限
@@ -544,19 +544,19 @@ private object ReforgeReplace {
             // 获取耗材中的便携核心
             val customNekoStack = originalInput.shadowNeko(true)
             val portableCore = customNekoStack?.portableCore ?: run {
-                return ReforgeReplaceResult.failure("<gray>非便携核心.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
             }
 
             // 获取源物品上的核孔
             val inputCells = usableInput.cells ?: run {
                 session.logger.error("Usable input has no cells, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure("<red>内部错误.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             // 源物品的核孔上 必须没有与便携核心相似的核心
             val inputCellsExcludingThis = inputCells.filter2 { it.getId() != cell.getId() }
             if (inputCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure("<gray>物品存在相似核心.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
             }
 
             if (
@@ -564,12 +564,12 @@ private object ReforgeReplace {
                     .filter { it.key != cell.getId() } // 排除掉当前的核孔
                     .any { it.value.usableInput?.portableCore?.wrapped?.similarTo(portableCore.wrapped) == true }
             ) {
-                return ReforgeReplaceResult.failure("<gray>输入存在相似核心.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
             }
 
             // 便携式核心的类型 必须符合定制规则
             if (!cellRule.acceptableCores.test(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure("<gray>核孔不兼容此核心.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
@@ -578,18 +578,18 @@ private object ReforgeReplace {
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnInput) {
-                    return ReforgeReplaceResult.failure("<gray>元素跟物品不相融.".mini)
+                    return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = usableInput.reforgeHistory.modCount
             if (modCount >= itemRule.modLimit) {
-                return ReforgeReplaceResult.failure("<gray>物品已消磨殆尽.".mini)
+                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT)
             }
 
             // 全部检查通过!
-            return ReforgeReplaceResult.success("<green>准备就绪!".mini)
+            return ReforgeReplaceResult.success(MessageConstants.MSG_MODDING_REPLACE_RESULT_SUCCESS.build())
         }
 
         override fun getIngredientLevel(): Int {
@@ -616,11 +616,11 @@ private object ReforgeReplaceResult {
         return Empty()
     }
 
-    fun failure(description: List<Component>): ModdingSession.Replace.Result {
-        return Simple(false, description)
+    fun failure(description: List<ComponentLike>): ModdingSession.Replace.Result {
+        return Simple(false, description.map(ComponentLike::asComponent))
     }
 
-    fun failure(description: Component): ModdingSession.Replace.Result {
+    fun failure(description: ComponentLike): ModdingSession.Replace.Result {
         return failure(listOf(description))
     }
 
@@ -643,7 +643,7 @@ private object ReforgeReplaceResult {
 
     private class Empty : Base() {
         override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
-        override val description: List<Component> = listOf("<gray>没有耗材输入.".mini)
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_REPLACE_RESULT_EMPTY.build())
     }
 
     private class Simple(
