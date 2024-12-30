@@ -10,9 +10,8 @@ import java.io.File
  */
 class ItemAssets(
     val itemId: Key,
-    fileStrings: List<String>,
+    val file: File,
 ) {
-    val files: List<File> = fileStrings.map { AssetUtils.getFileOrThrow(it, "json") }
 
     /**
      * 获取模型路径 key.

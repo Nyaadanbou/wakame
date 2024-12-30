@@ -13,6 +13,7 @@ import com.google.common.collect.MultimapBuilder
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.slf4j.Logger
 
 @PreWorldDependency(
     runBefore = [
@@ -25,14 +26,15 @@ import org.koin.core.component.inject
     ]
 )
 object AssetsLookup : Initializable, KoinComponent {
+    private val plugin: WakamePlugin by inject()
+    private val logger: Logger by inject()
+
     // K - NekoItem key
     // V - Assets
     private val assets: Multimap<Key, ItemAssets> = MultimapBuilder
         .hashKeys()
         .arrayListValues()
         .build()
-
-    private val plugin: WakamePlugin by inject()
 
     private fun loadConfiguration() {
         assets.clear()
@@ -41,15 +43,13 @@ object AssetsLookup : Initializable, KoinComponent {
         NekoItemNodeIterator.forEach { (key, _, root) ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
-                val path = with(assetsNode.node("path")) {
-                    if (rawScalar() != null) {
-                        listOf(krequire<String>())
-                    } else {
-                        krequire<List<String>>()
-                    }
+                try {
+                    val path = assetsNode.node("path").krequire<String>()
+                    val modelFile = AssetUtils.getFileOrThrow(path, "json")
+                    assets.put(key, ItemAssets(key, modelFile))
+                } catch (_: Exception) {
+                    logger.warn("在读取物品 $key 的材质时出现错误")
                 }
-
-                assets.put(key, ItemAssets(key, path))
             }
         }
     }
