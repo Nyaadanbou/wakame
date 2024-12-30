@@ -1,0 +1,5 @@
+base: barrier
+menu_icon_name: "<white>结果: <red>合并失败"
+menu_icon_lore:
+  - ""
+  - "{result_description}"

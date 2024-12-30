@@ -70,7 +70,7 @@ internal object MergingTableSerializer : KoinComponent {
 
         val tableMainConfigData = object {
             val id = tableDir.name
-            val menuSettings = tableMainConfigNode.node("menu_settings").krequire<BasicMenuSettings>()
+            val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
             val inputLevelLimit = tableMainConfigNode.node("input_level_limit").getInt(0)
             val outputLevelLimit = tableMainConfigNode.node("output_level_limit").getInt(0)
             val outputPenaltyLimit = tableMainConfigNode.node("output_penalty_limit").getInt(0)
@@ -84,7 +84,7 @@ internal object MergingTableSerializer : KoinComponent {
 
         return SimpleMergingTable(
             id = tableMainConfigData.id,
-            settings = tableMainConfigData.menuSettings,
+            primaryMenuSettings = tableMainConfigData.primaryMenuSettings,
             inputLevelLimit = tableMainConfigData.inputLevelLimit,
             outputLevelLimit = tableMainConfigData.outputLevelLimit,
             outputPenaltyLimit = tableMainConfigData.outputPenaltyLimit,

@@ -25,7 +25,7 @@ interface MergingTable : Examinable {
     /**
      * 合并台的基础菜单设置.
      */
-    val settings: BasicMenuSettings
+    val primaryMenuSettings: BasicMenuSettings
 
     /**
      * 工作台接收的物品可以拥有的最高等级.

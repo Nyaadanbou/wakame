@@ -2,10 +2,11 @@
 
 menu_icon_name: "<white>结果: <green>合并就绪"
 menu_icon_lore:
+  - "{item_lore}"
   - ""
   - "<!i>{type_description}"
   - "<!i>{cost_description}"
   - ""
-  - "<!i>{result_description}"
+  - "{result_description}"
   - ""
-  - "<!i><gray>[<aqua>点击确认合并</aqua>]"
+  - "<aqua>再次点击确认合并"

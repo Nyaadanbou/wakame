@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
 import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.itemLoreOrEmpty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.koin.core.component.KoinComponent
@@ -62,16 +63,16 @@ internal class MergingMenu(
     }
 
     private val primaryGui: Gui = Gui.normal { builder ->
-        builder.setStructure(*table.settings.structure)
-        builder.addIngredient('.', table.settings.getSlotDisplay("background").resolveToItemWrapper())
+        builder.setStructure(*table.primaryMenuSettings.structure)
+        builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
         builder.addIngredient('a', inputSlot1)
         builder.addIngredient('b', inputSlot2)
-        builder.addIngredient('c', outputSlot, table.settings.getSlotDisplay("merge_output_empty").resolveToItemWrapper())
+        builder.addIngredient('c', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_empty").resolveToItemWrapper())
     }
 
     private val primaryWindow: Window = Window.single { builder ->
         builder.setGui(primaryGui)
-        builder.setTitle(table.settings.title)
+        builder.setTitle(table.primaryMenuSettings.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -179,7 +180,7 @@ internal class MergingMenu(
 
                     // 玩家必须有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(table.settings.getSlotDisplay("merge_output_not_enough_resource").resolveToItemStack())
+                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_not_enough_resource").resolveToItemStack())
                         return
                     }
 
@@ -238,15 +239,24 @@ internal class MergingMenu(
     private fun renderOutputSlot(result: MergingSession.ReforgeResult): ItemStack {
         if (result.isSuccess) {
             // 获取合并成功后的核心, 用作基础物品堆叠
-            val output = result.output.wrapped
-            val resolution = table.settings.getSlotDisplay("merge_output_ready").resolveEverything {
+            val output = result.output
+
+            // 使用合并工作台的渲染器渲染合并后的物品
+            ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
+
+            val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
+            val resolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+                folded("item_lore", output.wrapped.itemLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
                 folded("result_description", result.description)
             }
-            return resolution.applyTo(output)
+
+            return resolution.applyTo(output.wrapped)
         } else {
-            return table.settings.getSlotDisplay("merge_output_failure").resolveToItemStack {
+            return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
+                // 这里仅仅解析 result_description 告诉玩家为什么合并失败.
+                // 其他的信息, 比如[合并类型]没有必要在合并失败的时候显示出来.
                 folded("result_description", result.description)
             }
         }

@@ -21,7 +21,7 @@ import java.util.stream.Stream
  */
 internal object WtfMergingTable : MergingTable {
     override val id: String = "wtf"
-    override val settings: BasicMenuSettings = BasicMenuSettings(
+    override val primaryMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = text("Merging Table (Cheat Mode)"),
         structure = arrayOf(
             ". . . . . . . . .",
@@ -32,8 +32,11 @@ internal object WtfMergingTable : MergingTable {
         ),
         icons = hashMapOf(
             "background" to Key.key("internal:menu/common/default/background"),
-            "merge_output_empty" to Key.key("internal:menu/merging/default/merge_output_empty"),
-            "merge_output_ready" to Key.key("internal:menu/merging/default/merge_output_ready"),
+            "output_ok_confirmed" to Key.key("internal:menu/merging/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/merging/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/merging/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/merging/default/output_failure"),
+            "output_insufficient_resource" to Key.key("internal:menu/merging/default/output_insufficient_resource"),
         )
     )
 
@@ -90,7 +93,7 @@ internal object WtfMergingTable : MergingTable {
  */
 internal class SimpleMergingTable(
     override val id: String,
-    override val settings: BasicMenuSettings,
+    override val primaryMenuSettings: BasicMenuSettings,
     override val inputLevelLimit: Int,
     override val outputLevelLimit: Int,
     override val outputPenaltyLimit: Int,
@@ -104,7 +107,7 @@ internal class SimpleMergingTable(
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
-        ExaminableProperty.of("settings", settings),
+        ExaminableProperty.of("primaryMenuSettings", primaryMenuSettings),
         ExaminableProperty.of("inputLevelLimit", inputLevelLimit),
         ExaminableProperty.of("outputLevelLimit", outputLevelLimit),
         ExaminableProperty.of("outputPenaltyLimit", outputPenaltyLimit),

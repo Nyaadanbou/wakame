@@ -7,29 +7,54 @@ import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
+import net.kyori.adventure.audience.Audience
+import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
-import org.bukkit.entity.Player
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import java.text.MessageFormat
 import java.util.Locale
 
-fun Component.translateBy(locale: Locale): Component {
-    if (this !is TranslatableComponent)
-        return this
-    return GlobalTranslation.translate(this, locale) ?: this
+fun ComponentLike.translate(locale: Locale): Component {
+    val component = asComponent()
+    if (component is TranslatableComponent) {
+        return GlobalTranslations.translate(component, locale)
+    } else if (component is TranslatableComponent.Builder) {
+        return GlobalTranslations.translate(component.build(), locale)
+    } else {
+        return component
+    }
 }
 
-fun Component.translateBy(viewer: Player): Component {
-    return translateBy(viewer.locale())
+fun TranslatableComponent.translate(locale: Locale): Component {
+    return GlobalTranslations.translate(this, locale)
 }
 
-object GlobalTranslation : Initializable, KoinComponent {
+fun TranslatableComponent.Builder.translate(locale: Locale): Component {
+    return GlobalTranslations.translate(this.build(), locale)
+}
+
+fun ComponentLike.translate(viewer: Audience): Component {
+    return translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
+}
+
+fun TranslatableComponent.translate(viewer: Audience): Component {
+    return translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
+}
+
+fun TranslatableComponent.Builder.translate(viewer: Audience): Component {
+    return build().translate(viewer)
+}
+
+object GlobalTranslations : Initializable, KoinComponent {
     private val TRANSLATION_KEY = Key("wakame", "global.translation")
 
     private val miniMessage: MiniMessage by inject()
@@ -39,8 +64,8 @@ object GlobalTranslation : Initializable, KoinComponent {
         return translations.translate(key, locale)
     }
 
-    fun translate(component: TranslatableComponent, locale: Locale): Component? {
-        return translations.translate(component, locale)
+    fun translate(component: TranslatableComponent, locale: Locale): Component {
+        return translations.translate(component, locale) ?: component
     }
 
     private fun loadTranslation() {

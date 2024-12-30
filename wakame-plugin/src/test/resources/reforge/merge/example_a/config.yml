@@ -1,5 +1,5 @@
 # 基本菜单设置
-menu_settings:
+primary_menu_settings:
   title: "合并工作台: example_a"
   # a: 输入1
   # b: 输入2
@@ -10,10 +10,15 @@ menu_settings:
     - ". a . b . . . c ."
     - ". . . . . . . . ."
     - ". . . . . . . . ."
+  # background: 背景
+  # output_ok: 输出
+  # output_empty: 输出
   icons:
     background: "internal:menu/common/background"
-    merge_output_empty: "internal:menu/merging/merge_output_empty"
-    merge_output_ready: "internal:menu/merging/merge_output_ready"
+    output_ok: "internal:menu/merging/output_ok"
+    output_empty: "internal:menu/merging/output_empty"
+    output_failure: "internal:menu/merging/output_failure"
+    output_insufficient_resource: "internal:menu/merging/output_insufficient_resource"
 
 # 合并工作台可以接受的最大物品等级.
 # 如果玩家放入的物品等级超过了这个值, 合并将算作失败.

@@ -215,7 +215,7 @@ data class MenuIconLore(
      */
     class LineConfig(
         private val globalTagResolver: TagResolver,
-        private val foldedLineCreatorMap: Map<String, List<Component>>,
+        private val foldedLineMap: Map<String, List<Component>>,
     ) {
 
         companion object {
@@ -229,7 +229,7 @@ data class MenuIconLore(
         }
 
         fun getFoldedText(tag: String): List<Component>? {
-            return foldedLineCreatorMap[tag]
+            return foldedLineMap[tag]
         }
 
         /**

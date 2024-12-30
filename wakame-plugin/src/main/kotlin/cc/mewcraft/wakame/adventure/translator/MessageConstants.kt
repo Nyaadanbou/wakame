@@ -29,7 +29,7 @@ object MessageConstants {
     val MSG_MERGING_TYPE_SUCCESS_1 = create("msg_merging_type_success_1")
     val MSG_MERGING_TYPE_SUCCESS_2 = create("msg_merging_type_success_2")
     val MSG_MERGING_TYPE_EMPTY = create("msg_merging_type_empty")
-    val MSG_MERGING_TYPE_FAILED = create("msg_merging_type_failed")
+    val MSG_MERGING_TYPE_FAILURE = create("msg_merging_type_failure")
     val MSG_MERGING_RESULT_EMPTY = create("msg_merging_result_empty")
     val MSG_MERGING_RESULT_SUCCESS = create("msg_merging_result_success")
     val MSG_MERGING_RESULT_FROZEN_SESSION = create("msg_merging_result_frozen_session")
