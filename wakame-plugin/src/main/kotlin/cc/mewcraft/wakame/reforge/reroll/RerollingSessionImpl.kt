@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
@@ -13,10 +14,8 @@ import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.ComponentLike
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -146,7 +145,7 @@ internal object ReforgeResult {
      * 失败结果; 用于表示因已知的某些条件不满足而无法进行重造.
      */
     fun failure(
-        description: List<Component>,
+        description: List<ComponentLike>,
     ): RerollingSession.ReforgeResult {
         return Simple(false, description, NekoStack.empty(), ReforgeCost.empty())
     }
@@ -155,7 +154,7 @@ internal object ReforgeResult {
      * 参考 [ReforgeResult.failure].
      */
     fun failure(
-        description: Component,
+        description: ComponentLike,
     ): RerollingSession.ReforgeResult {
         return failure(listOf(description))
     }
@@ -167,7 +166,7 @@ internal object ReforgeResult {
         item: NekoStack,
         cost: RerollingSession.ReforgeCost,
     ): RerollingSession.ReforgeResult {
-        return Simple(true, "<gray>准备就绪!".mini, item, cost)
+        return Simple(true, MessageConstants.MSG_REROLLING_RESULT_SUCCESS.build(), item, cost)
     }
 
     private abstract class Base : RerollingSession.ReforgeResult {
@@ -181,36 +180,36 @@ internal object ReforgeResult {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Empty : Base() {
+    private class Error : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(text("没有要重造的物品.").color(NamedTextColor.GRAY))
-        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
+        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.build())
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
         override val output: NekoStack = NekoStack.empty()
     }
 
-    private class Error : Base() {
+    private class Empty : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(text("内部错误.").color(NamedTextColor.GRAY))
-        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_RESULT_EMPTY.build())
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
         override val output: NekoStack = NekoStack.empty()
     }
 
     private class Simple(
         successful: Boolean,
-        description: List<Component>,
+        description: List<ComponentLike>,
         item: NekoStack,
         cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
-            description: Component,
+            description: ComponentLike,
             item: NekoStack,
             cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
         override val isSuccess: Boolean = successful
-        override val description: List<Component> = description
+        override val description: List<Component> = description.map(ComponentLike::asComponent)
         override val reforgeCost: RerollingSession.ReforgeCost = cost
         override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
 
@@ -257,16 +256,16 @@ internal object ReforgeCost {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Empty : Base() {
-        override fun take(viewer: Player) = Unit
-        override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf("<gray>花费: <yellow>无".mini)
-    }
-
     private class Error : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf("<gray>花费: <yellow>内部错误".mini)
+        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.build())
+    }
+
+    private class Empty : Base() {
+        override fun take(viewer: Player) = Unit
+        override fun test(viewer: Player): Boolean = true
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.build())
     }
 
     private class Simple(
@@ -280,9 +279,7 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(
-            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
-        )
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.build())
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
@@ -339,10 +336,9 @@ internal object Selection {
         override val rule: RerollingTable.CellRule,
         override val template: Group<CoreArchetype, ItemGenerationContext>,
     ) : RerollingSession.Selection, KoinComponent {
-        private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
+        // private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
-        override val changeable: Boolean
-            get() = true
+        override val changeable: Boolean = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
             // logger.info("Selection status updated (cell: '$id'): $old -> $new")
         }
@@ -422,7 +418,7 @@ internal object SelectionMap : KoinComponent {
         return Simple(session, LinkedHashMap(selectionData))
     }
 
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
+    // private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
     private class Empty(
         override val session: RerollingSession,

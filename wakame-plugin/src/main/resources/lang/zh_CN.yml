@@ -53,6 +53,17 @@ msg_modding_replace_result_similar_core_present_on_input: "<gray>输入存在相
 msg_modding_replace_result_core_incompatible_with_cell: "<gray>核孔不兼容此核心."
 msg_modding_replace_result_core_element_incompatible_with_target: "<gray>元素跟物品不相融."
 msg_modding_replace_result_target_reach_mod_count_limit: "<gray>物品已达到最大重铸次数."
+msg_rerolling_result_empty: "<gray>没有要重造的物品."
+msg_rerolling_result_success: "<gray>准备就绪!"
+msg_rerolling_result_failure_input_not_usable: "<gray>物品无法重造."
+msg_rerolling_result_failure_item_rule_not_found: "<gray>物品不可重造."
+msg_rerolling_result_failure_nothing_changeable: "<gray>物品不可重造."
+msg_rerolling_result_failure_nothing_selected: "<gray>没有要重造的核孔."
+msg_rerolling_result_failure_input_without_level: "<gray>物品不可重造."
+msg_rerolling_result_failure_input_without_cells: "<gray>物品不可重造."
+msg_rerolling_result_failure_input_reach_mod_count_limit: "<gray>物品已达到最大重铸次数."
+msg_rerolling_cost_empty: "<gray>花费: <white>n/a"
+msg_rerolling_cost_simple: "<gray>花费: <white><arg:0:'zh-CN':'#'> 硬币"
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -20,11 +20,41 @@ import java.util.stream.Stream
 internal object WtfRerollingTable : RerollingTable {
     private val ZERO_MOCHA_FUNCTION = MochaFunction { .0 }
 
-    override val identifier: String = "wtf"
+    override val id: String = "wtf"
 
-    override val enabled: Boolean = true
+    override val primaryMenuSettings: BasicMenuSettings = BasicMenuSettings(
+        title = Component.text("Rerolling Table (Cheat Mode)"),
+        structure = arrayOf(
+            ". . . . . . . . .",
+            ". . x x x x x . .",
+            ". < x x x x x > .",
+            ". . . . . . . . .",
+            ". . i . . . o . .",
+            ". . . . . . . . .",
+        ),
+        icons = hashMapOf(
+            "error" to Key.key("internal:menu/common/error"),
+            "background" to Key.key("internal:menu/common/background"),
+            "prev_page" to Key.key("internal:menu/common/prev_page"),
+            "next_page" to Key.key("internal:menu/common/next_page"),
+            "compatibility_view" to Key.key("internal:menu/rerolling/compatibility_view"),
+            "output_ok_confirmed" to Key.key("internal:menu/rerolling/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/rerolling/output_empty"),
+            "output_failure" to Key.key("internal:menu/rerolling/output_failure"),
+        )
+    )
 
-    override val title: Component = Component.text("Rerolling Table (Cheat ON)")
+    override val selectionMenuSettings: BasicMenuSettings = BasicMenuSettings(
+        title = Component.text("DO_NOT_USE"),
+        structure = arrayOf("a", "b"),
+        icons = hashMapOf(
+            "error" to Key.key("internal:menu/common/error"),
+            "core_view" to Key.key("internal:menu/rerolling/core_view"),
+            "selected" to Key.key("internal:menu/rerolling/selected"),
+            "unselected" to Key.key("internal:menu/rerolling/unselected"),
+        )
+    )
 
     override val rarityNumberMapping: RarityNumberMapping = RarityNumberMapping.constant(1.0)
 
@@ -57,18 +87,18 @@ internal object WtfRerollingTable : RerollingTable {
  * 一个标准的 [RerollingTable] 实现, 设计上需要从配置文件构建.
  */
 internal class SimpleRerollingTable(
-    override val identifier: String,
-    override val enabled: Boolean,
-    override val title: Component,
+    override val id: String,
+    override val primaryMenuSettings: BasicMenuSettings,
+    override val selectionMenuSettings: BasicMenuSettings,
     override val rarityNumberMapping: RarityNumberMapping,
     override val currencyCost: RerollingTable.TableCurrencyCost,
     override val itemRuleMap: RerollingTable.ItemRuleMap,
 ) : RerollingTable {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", identifier),
-        ExaminableProperty.of("enabled", enabled),
-        ExaminableProperty.of("title", title.plain),
+        ExaminableProperty.of("id", id),
+        ExaminableProperty.of("primaryMenuSettings", primaryMenuSettings),
+        ExaminableProperty.of("selectionMenuSettings", selectionMenuSettings),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("currencyCost", currencyCost),
         ExaminableProperty.of("itemRuleMap", itemRuleMap),

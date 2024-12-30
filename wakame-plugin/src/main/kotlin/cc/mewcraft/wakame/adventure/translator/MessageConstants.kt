@@ -59,6 +59,17 @@ object MessageConstants {
     val MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL = create("msg_modding_replace_result_core_incompatible_with_cell")
     val MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET = create("msg_modding_replace_result_core_element_incompatible_with_target")
     val MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT = create("msg_modding_replace_result_target_reach_mod_count_limit")
+    val MSG_REROLLING_RESULT_EMPTY = create("msg_rerolling_result_empty")
+    val MSG_REROLLING_RESULT_SUCCESS = create("msg_rerolling_result_success")
+    val MSG_REROLLING_RESULT_FAILURE_INPUT_NOT_USABLE = create("msg_rerolling_result_failure_input_not_usable")
+    val MSG_REROLLING_RESULT_FAILURE_ITEM_RULE_NOT_FOUND = create("msg_rerolling_result_failure_item_rule_not_found")
+    val MSG_REROLLING_RESULT_FAILURE_NOTHING_CHANGEABLE = create("msg_rerolling_result_failure_nothing_changeable")
+    val MSG_REROLLING_RESULT_FAILURE_NOTHING_SELECTED = create("msg_rerolling_result_failure_nothing_selected")
+    val MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_LEVEL = create("msg_rerolling_result_failure_input_without_level")
+    val MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS = create("msg_rerolling_result_failure_input_without_cells")
+    val MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT = create("msg_rerolling_result_failure_input_reach_mod_count_limit")
+    val MSG_REROLLING_COST_EMPTY = create("msg_rerolling_cost_empty")
+    val MSG_REROLLING_COST_SIMPLE = create("msg_rerolling_cost_simple")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

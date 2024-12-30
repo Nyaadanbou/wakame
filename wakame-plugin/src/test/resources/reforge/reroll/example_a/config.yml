@@ -1,8 +1,51 @@
-# 重造工作台是否启用?
-enabled: true
+primary_menu_settings:
+  title: "定制台: example_a"
+  # .: 背景
+  # <: 上一页
+  # >: 下一页
+  # i: 输入
+  # o: 输出
+  # x: 子菜单
+  structure:
+    - ". . . . . . . . ."
+    - ". . x x x x x . ."
+    - ". < x x x x x > ."
+    - ". . . . . . . . ."
+    - ". . i . . . o . ."
+    - ". . . . . . . . ."
+  # error: 错误
+  # background: 背景
+  # prev_page: 上一页
+  # next_page: 下一页
+  # compatibility_view: 兼容性视图 (查看可以重造出什么样的核心)
+  # output_ok_confirmed: 输出
+  # output_ok_unconfirmed: 输出
+  # output_empty: 输出
+  # output_failure: 输出
+  icons:
+    error: "internal:menu/common/error"
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    compatibility_view: "internal:menu/rerolling/compatibility_view"
+    output_ok_confirmed: "internal:menu/rerolling/output_ok_confirmed"
+    output_ok_unconfirmed: "internal:menu/rerolling/output_ok_unconfirmed"
+    output_empty: "internal:menu/rerolling/output_empty"
+    output_failure: "internal:menu/rerolling/output_failure"
 
-# 重造工作台的菜单标题
-title: "重造工作台: Example A"
+selection_menu_settings:
+  title: "DO_NOT_USE"
+  # a: 核心预览
+  # b: 重造操作
+  structure: ["a", "b"]
+  # error: 错误
+  # core_view: 核心预览
+  # selection: 重造操作
+  icons:
+    error: "internal:menu/common/error"
+    core_view: "internal:menu/rerolling/core_view"
+    selected: "internal:menu/rerolling/selected"
+    unselected: "internal:menu/rerolling/unselected"
 
 # 稀有度->数值的映射表.
 # 可用于所有的自定义函数.

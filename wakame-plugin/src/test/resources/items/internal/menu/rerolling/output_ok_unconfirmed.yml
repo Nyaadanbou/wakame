@@ -2,4 +2,6 @@ menu_icon_name: "<item_name>"
 menu_icon_lore:
   - "{item_lore}"
   - ""
-  - "<!i>点击取出物品"
+  - "<!i>{cost_description}"
+  - ""
+  - "<!i>点击确认重造物品"
