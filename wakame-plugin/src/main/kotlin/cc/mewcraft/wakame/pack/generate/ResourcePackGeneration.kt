@@ -4,13 +4,10 @@ package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.lookup.AssetUtils
+import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
-import cc.mewcraft.wakame.util.namespace
-import cc.mewcraft.wakame.util.readFromDirectory
-import cc.mewcraft.wakame.util.readFromZipFile
-import cc.mewcraft.wakame.util.value
+import cc.mewcraft.wakame.util.*
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -91,27 +88,35 @@ internal class ResourcePackCustomModelGeneration(
     private val logger: Logger by inject()
 
     override fun process() {
-        val assets = context.assets
+        val itemIds = context.itemIds
         val resourcePack = context.resourcePack
 
-        for (asset in assets) {
-            logger.info("Generating model for ${asset.itemId}")
-            val models = generateModel(asset.modelKey())
-            for (model in models) {
-                resourcePack.model(model)
+        for (itemId in itemIds) {
+            logger.info("Generating model for $itemId")
+            try {
+                val models = generateModel(itemId.modelKey())
+                for (model in models) {
+                    resourcePack.model(model)
 
-                // Set all textures from the model
-                val textureLayers = model.textures().layers()
-                val particle = model.textures().particle()
-                val variables = model.textures().variables()
+                    // Set all textures from the model
+                    val textureLayers = model.textures().layers()
+                    val particle = model.textures().particle()
+                    val variables = model.textures().variables()
 
-                textureLayers.forEach { layer -> resourcePack.setTexture(layer.key()) }
-                particle?.let { resourcePack.setTexture(it.key()) }
-                variables.forEach { (_, value) -> resourcePack.setTexture(value.key()) }
+                    textureLayers.forEach { layer -> resourcePack.setTexture(layer.key()) }
+                    particle?.let { resourcePack.setTexture(it.key()) }
+                    variables.forEach { (_, value) -> resourcePack.setTexture(value.key()) }
+
+                    logger.info("Model for $itemId generated.")
+                }
+            } catch (e: Exception) {
+                logger.warn("Failed to generate model for $itemId. Reason: ${e.message}")
             }
-
-            logger.info("Model for ${asset.itemId} generated.")
         }
+    }
+
+    private fun Key.modelKey(): Key {
+        return Key(RESOURCE_NAMESPACE, "item/${namespace()}/${value()}")
     }
 
     private fun generateModel(modelKey: Key): List<CreativeModel> {
