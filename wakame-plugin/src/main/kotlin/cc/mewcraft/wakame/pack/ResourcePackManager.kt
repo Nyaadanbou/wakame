@@ -59,7 +59,6 @@ internal class ResourcePackManager(
                 ResourcePackIconGeneration(context),
                 ResourcePackRegistryModelGeneration(context),
                 ResourcePackCustomModelGeneration(context),
-                ResourcePackExternalGeneration(context),
                 ResourcePackMergePackGeneration(context, packReader),
                 ResourcePackModelSortGeneration(context)
             )

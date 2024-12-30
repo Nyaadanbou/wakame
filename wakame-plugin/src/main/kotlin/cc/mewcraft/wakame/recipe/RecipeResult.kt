@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.itemModel
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
@@ -42,8 +41,7 @@ data class SingleRecipeResult(
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
         val itemStack = result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
-        val nekoItemId = Key.key(result.identifier.replaceFirst('/', ':'))
-        itemStack.itemModel = nekoItemId
+        itemStack.itemModel = result.key
         itemStack.amount = amount
         return itemStack
     }

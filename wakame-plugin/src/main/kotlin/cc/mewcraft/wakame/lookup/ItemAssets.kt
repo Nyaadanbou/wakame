@@ -10,7 +10,6 @@ import java.io.File
  */
 class ItemAssets(
     val itemId: Key,
-    val variant: Int,
     fileStrings: List<String>,
 ) {
     val files: List<File> = fileStrings.map { AssetUtils.getFileOrThrow(it, "json") }
@@ -19,6 +18,6 @@ class ItemAssets(
      * 获取模型路径 key.
      */
     fun modelKey(): Key {
-        return Key(RESOURCE_NAMESPACE, "item/${itemId.namespace()}/${itemId.value()}_$variant")
+        return Key(RESOURCE_NAMESPACE, "item/${itemId.namespace()}/${itemId.value()}")
     }
 }

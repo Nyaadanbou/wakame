@@ -29,7 +29,7 @@ object AssetsLookup : Initializable, KoinComponent {
     // V - Assets
     private val assets: Multimap<Key, ItemAssets> = MultimapBuilder
         .hashKeys()
-        .treeSetValues<ItemAssets> { o1, o2 -> o1.variant.compareTo(o2.variant) }
+        .arrayListValues()
         .build()
 
     private val plugin: WakamePlugin by inject()
@@ -41,7 +41,6 @@ object AssetsLookup : Initializable, KoinComponent {
         NekoItemNodeIterator.forEach { (key, _, root) ->
             val assetsNodes = root.node("assets").childrenList()
             for (assetsNode in assetsNodes) {
-                val variant = assetsNode.node("variant").krequire<Int>()
                 val path = with(assetsNode.node("path")) {
                     if (rawScalar() != null) {
                         listOf(krequire<String>())
@@ -50,7 +49,7 @@ object AssetsLookup : Initializable, KoinComponent {
                     }
                 }
 
-                assets.put(key, ItemAssets(key, variant, path))
+                assets.put(key, ItemAssets(key, path))
             }
         }
     }

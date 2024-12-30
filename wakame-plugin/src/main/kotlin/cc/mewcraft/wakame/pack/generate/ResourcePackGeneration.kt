@@ -71,16 +71,6 @@ internal class ResourcePackIconGeneration(
     }
 }
 
-internal class ResourcePackExternalGeneration(
-    context: ResourcePackGenerationContext,
-) : ResourcePackGeneration(context) {
-    class GenerationCancelledException : Throwable() {
-        override val message: String = "Resource pack generation is cancelled"
-    }
-
-    override fun process() {} // TODO: External generation
-}
-
 internal class ResourcePackRegistryModelGeneration(
     context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
@@ -101,7 +91,7 @@ internal class ResourcePackCustomModelGeneration(
         for (asset in assets) {
             val modelFiles = asset.files.takeIf { it.isNotEmpty() } ?: continue
             for ((index, modelFile) in modelFiles.withIndex()) {
-                logger.info("Generating $index model for ${asset.itemId}, variant ${asset.variant}, path: $modelFile")
+                logger.info("Generating $index model for ${asset.itemId}, path: $modelFile")
 
                 //<editor-fold desc="Custom Model generation">
                 // Original asset from config
@@ -118,7 +108,7 @@ internal class ResourcePackCustomModelGeneration(
                 variables.forEach { (_, value) -> setTexture(value.key()) }
 
                 resourcePack.model(configModelTemplate.toMinecraftFormat())
-                logger.info("Model for ${asset.itemId}, variant ${asset.variant} generated.")
+                logger.info("Model for ${asset.itemId} generated.")
             }
         }
     }
@@ -216,7 +206,6 @@ internal class ResourcePackCustomModelGeneration(
             .key(originModelKey.namespace { RESOURCE_NAMESPACE })
             .build()
 
-        logger.info("Model for $originModelKey generated.")
         context.resourcePack.model(newModel)
         return true
     }
