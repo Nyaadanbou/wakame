@@ -13,7 +13,6 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
-import xyz.xenondevs.commons.collections.enumMap
 import java.util.stream.Stream
 
 /**
@@ -41,48 +40,41 @@ internal object WtfMergingTable : MergingTable {
     )
 
     override val inputLevelLimit: Int
-        // 无最大输出等级限制
-        get() = Int.MAX_VALUE
+        get() = Int.MAX_VALUE // 无最大输出等级限制
 
     override val outputLevelLimit: Int
-        // 无最大输出等级限制
-        get() = Int.MAX_VALUE
+        get() = Int.MAX_VALUE // 无最大输出等级限制
 
     override val outputPenaltyLimit: Int
-        // 无最大输出惩罚限制
-        get() = Int.MAX_VALUE
+        get() = Int.MAX_VALUE // 无最大输出惩罚限制
 
     override val acceptableCoreMatcher: CoreMatchRuleContainer
-        // 匹配任意核心
-        get() = CoreMatchRuleContainer.any()
+        get() = CoreMatchRuleContainer.any() // 匹配任意核心
 
     override val rarityNumberMapping: RarityNumberMapping
-        // 固定映射值
-        get() = RarityNumberMapping.constant(10.0)
+        get() = RarityNumberMapping.constant(10.0) // 固定映射值
 
-    override val valueMergeMethod: MergingTable.ValueMergeMethod = SimpleMergingTable.ValueMergeMethod(
-        enumMap<MergingTable.ValueMergeMethod.Type, MergingTable.ValueMergeMethod.AlgorithmData>().withDefault { key ->
-            MergingTable.ValueMergeMethod.AlgorithmData(
-                // 返回两个值的和
-                "query.value_1() + query.value_2()",
-                spread = 0.2, min = -0.7, max = +0.7
-            )
+    override val valueMergeMethod: MergingTable.ValueMergeMethod = object : MergingTable.ValueMergeMethod {
+        override fun compile(type: MergingTable.ValueMergeMethod.Type, session: MergingSession): MergingTable.ValueMergeMethod.Algorithm {
+            // 返回两个值的和
+            val data = MergingTable.ValueMergeMethod.AlgorithmData("query.value_1() + query.value_2()", spread = 0.2, min = -0.7, max = +0.7)
+            // 其他按照一般流程
+            val mocha = MochaEngine.createStandard().apply { bindInstance(NumberMergeBinding(session), "query") }
+            val meanFunction = mocha.prepareEval(data.base)
+            return MergingTable.ValueMergeMethod.Algorithm(data, meanFunction)
         }
-    )
+    }
 
     override val levelMergeMethod: MergingTable.LevelMergeMethod = SimpleMergingTable.LevelMergeMethod(
-        // 返回两个等级中的较大值
-        "math.max ( query.level_1(), query.level_2() )"
+        "math.max ( query.level_1(), query.level_2() )" // 返回两个等级中的较大值
     )
 
     override val penaltyMergeMethod: MergingTable.PenaltyMergeMethod = SimpleMergingTable.PenaltyMergeMethod(
-        // 返回两个惩罚值之和再加一
-        "query.penalty_1() + query.penalty_2() + 1"
+        "query.penalty_1() + query.penalty_2() + 1" // 返回两个惩罚值之和再加一
     )
 
     override val totalCost: MergingTable.CurrencyCost = SimpleMergingTable.CurrencyCost(
-        // 返回基础花费加上稀有度映射值之和
-        "query.base() + query.rarity_1() + query.rarity_2()"
+        "query.base() + query.rarity_1() + query.rarity_2()" // 返回基础花费加上稀有度映射值之和
     )
 
     override fun toString(): String = toSimpleString()
