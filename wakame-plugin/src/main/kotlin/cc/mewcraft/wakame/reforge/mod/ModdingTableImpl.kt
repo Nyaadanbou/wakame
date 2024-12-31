@@ -28,18 +28,18 @@ internal object WtfModdingTable : ModdingTable {
             ". i . x x x . o .",
             ". . . x x x . . .",
             ". . . x x x . . .",
-            "# # # < # > # # #",
+            ". . . < . > . . .",
         ),
         icons = hashMapOf(
             "background" to Key.key("internal:menu/common/default/background"),
             "prev_page" to Key.key("internal:menu/common/default/prev_page"),
             "next_page" to Key.key("internal:menu/common/default/next_page"),
-            "background2" to Key.key("internal:menu/modding/default/background2"),
             "input_ok" to Key.key("internal:menu/modding/default/input_ok"),
             "input_empty" to Key.key("internal:menu/modding/default/input_empty"),
             "output_ok_confirmed" to Key.key("internal:menu/modding/default/output_ok_confirmed"),
             "output_ok_unconfirmed" to Key.key("internal:menu/modding/default/output_ok_unconfirmed"),
             "output_empty" to Key.key("internal:menu/modding/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/modding/default/output_failure"),
             "output_insufficient_resource" to Key.key("internal:menu/modding/default/output_insufficient_resource"),
         )
     )
