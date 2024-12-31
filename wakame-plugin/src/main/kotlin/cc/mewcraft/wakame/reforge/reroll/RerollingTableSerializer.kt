@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -82,8 +82,8 @@ internal object RerollingTableSerializer : KoinComponent {
 
         // 反序列化好的 config.yml
         val identifier = tableDir.name
-        val enabled = tableMainConfigNode.node("enabled").getBoolean(false)
-        val title = tableMainConfigNode.node("title").krequire<Component>()
+        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
+        val selectionMenuSettings = tableMainConfigNode.node("selection_menu_settings").krequire<BasicMenuSettings>()
         val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
         val currencyCost = tableMainConfigNode.node("currency_cost").krequire<RerollingTable.TableCurrencyCost>()
 
@@ -121,9 +121,9 @@ internal object RerollingTableSerializer : KoinComponent {
             .let(SimpleRerollingTable::ItemRuleMap)
 
         return SimpleRerollingTable(
-            identifier = identifier,
-            enabled = enabled,
-            title = title,
+            id = identifier,
+            primaryMenuSettings = primaryMenuSettings,
+            selectionMenuSettings = selectionMenuSettings,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,
             itemRuleMap = itemRules

@@ -6,5 +6,5 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 fun langModule(): Module = module {
-    single { GlobalTranslation } bind Initializable::class
+    single { GlobalTranslations } bind Initializable::class
 }

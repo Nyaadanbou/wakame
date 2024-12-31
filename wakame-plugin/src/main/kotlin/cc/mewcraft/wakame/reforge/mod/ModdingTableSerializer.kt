@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
@@ -13,7 +15,6 @@ import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -85,13 +86,14 @@ internal object ModdingTableSerializer : KoinComponent {
             serializers {
                 kregister(TableCurrencyCost)
                 kregister(RarityNumberMappingSerializer)
+                registerAnnotatedObjects(ObjectMappers.DEFAULT)
             }
         }.buildAndLoadString(tableMainConfigFile.readText())
 
         // 解析主要配置
-        val identifier = tableDir.name
-        val enabled = tableMainConfigNode.node("enabled").getBoolean(true)
-        val title = tableMainConfigNode.node("title").krequire<Component>()
+        val id = tableDir.name
+        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
+        val replaceMenuSettings = tableMainConfigNode.node("replace_menu_settings").krequire<BasicMenuSettings>()
         val reforgeCountAddMethod = tableMainConfigNode.node("reforge_count_add_method").krequire<ModdingTable.ReforgeCountAddMethod>()
         val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
         val currencyCost = tableMainConfigNode.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>>()
@@ -129,9 +131,9 @@ internal object ModdingTableSerializer : KoinComponent {
             .let(SimpleModdingTable::ItemRuleMap)
 
         return SimpleModdingTable(
-            identifier = identifier,
-            enabled = enabled,
-            title = title,
+            id = id,
+            primaryMenuSettings = primaryMenuSettings,
+            replaceMenuSettings = replaceMenuSettings,
             reforgeCountAddMethod = reforgeCountAddMethod,
             rarityNumberMapping = rarityNumberMapping,
             currencyCost = currencyCost,

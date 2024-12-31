@@ -1,0 +1,8 @@
+menu_icon_name: "LISTING: <item_name>"
+menu_icon_lore:
+  - "{choice_list}"
+menu_icon_dict:
+  ok: "<green>✔</green>"
+  bad: "<red>✘</red>"
+  choice_item: "<!i><requirement_mark> <item>×<amount>"
+  choice_exp: "<!i><requirement_mark> EXP×<amount>"

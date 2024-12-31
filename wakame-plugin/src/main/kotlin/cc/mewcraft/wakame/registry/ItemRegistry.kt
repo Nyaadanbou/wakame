@@ -118,6 +118,13 @@ object ItemRegistry : KoinComponent, Initializable {
         get() = ItemRegistryInternals.ERROR_NEKO_ITEM_PROVIDER
 
     /**
+     * 默认的 [Error NekoItemHolder][NekoItemHolder].
+     */
+    @get:JvmName("getErrorNekoItemHolder")
+    val ERROR_NEKO_ITEM_HOLDER: NekoItemHolder
+        get() = NekoItemHolder.get(ERROR_NEKO_ITEM_ID)
+
+    /**
      * 默认的 [Error NekoStack][NekoStack].
      */
     @get:Contract(" -> new")

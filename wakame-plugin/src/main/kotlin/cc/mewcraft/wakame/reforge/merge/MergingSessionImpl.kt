@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
 import cc.mewcraft.wakame.integration.economy.EconomyManager
@@ -10,12 +11,15 @@ import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.TranslationArgument
+import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -79,7 +83,7 @@ internal class SimpleMergingSession(
         }
     }
 
-    override var latestResult: MergingSession.ReforgeResult by Delegates.vetoable(ReforgeResult.empty()) { _, old, new ->
+    override var latestResult: MergingSession.ReforgeResult by Delegates.vetoable(ReforgeResult.empty(viewer)) { _, old, new ->
         if (frozen) {
             logger.error("Trying to set result of a frozen merging session. This is a bug!")
             return@vetoable false
@@ -103,7 +107,7 @@ internal class SimpleMergingSession(
             MergeOperation(this)
         } catch (e: Exception) {
             logger.error("An unknown error occurred while merging. This is a bug!", e)
-            ReforgeResult.failure("<red>内部错误".mini)
+            ReforgeResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -114,7 +118,7 @@ internal class SimpleMergingSession(
     override fun reset() {
         inputItem1 = null
         inputItem2 = null
-        latestResult = ReforgeResult.empty()
+        latestResult = ReforgeResult.empty(viewer)
     }
 
     override var frozen: Boolean by Delegates.vetoable(false) { _, old, new ->
@@ -173,36 +177,31 @@ internal object ReforgeResult {
     /**
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
-    fun empty(): MergingSession.ReforgeResult {
-        return Simple(false, "<gray>没有要合并的核心.".mini, ReforgeType.empty(), ReforgeCost.zero(), NekoStack.empty())
+    fun empty(player: Player): MergingSession.ReforgeResult {
+        return Simple(false, MessageConstants.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并失败*的 [MergingSession.ReforgeResult].
      */
-    fun failure(description: Component): MergingSession.ReforgeResult {
-        return Simple(false, description, ReforgeType.failure(), ReforgeCost.failure(), NekoStack.empty())
+    fun failure(player: Player, description: ComponentLike): MergingSession.ReforgeResult {
+        return Simple(false, description.translate(player), ReforgeType.failure(player), ReforgeCost.failure(player), NekoStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
-    fun success(item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
-        return Simple(true, "<gray>准备就绪!".mini, type, cost, item)
+    fun success(player: Player, item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
+        return Simple(true, MessageConstants.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
     }
 
     private class Simple(
-        isSuccess: Boolean,
-        description: Component,
-        type: MergingSession.ReforgeType,
-        cost: MergingSession.ReforgeCost,
+        override val isSuccess: Boolean,
+        override val description: Component,
+        override val reforgeType: MergingSession.ReforgeType,
+        override val reforgeCost: MergingSession.ReforgeCost,
         output: NekoStack,
-    ) : MergingSession.ReforgeResult {
-
-        override val isSuccess = isSuccess
-        override val description: Component = description
-        override val reforgeType: MergingSession.ReforgeType = type
-        override val reforgeCost = cost
+    ) : MergingSession.ReforgeResult, Examinable {
         override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -225,87 +224,55 @@ internal object ReforgeType {
     /**
      * 构建一个用于表示没有合并的 [MergingSession.ReforgeType].
      */
-    fun empty(): MergingSession.ReforgeType {
-        return Empty()
+    fun empty(viewer: Player): MergingSession.ReforgeType {
+        return Empty(viewer)
     }
 
     /**
      * 构建一个用于表示合并失败的 [MergingSession.ReforgeType].
      */
-    fun failure(): MergingSession.ReforgeType {
-        return Failure()
+    fun failure(viewer: Player): MergingSession.ReforgeType {
+        return Failure(viewer)
     }
 
     /**
      * 通过 [AttributeModifier.Operation] 构建 [MergingSession.ReforgeType].
      */
-    fun success(operation: AttributeModifier.Operation): MergingSession.ReforgeType {
+    fun success(viewer: Player, operation: AttributeModifier.Operation): MergingSession.ReforgeType {
         return when (operation) {
-            AttributeModifier.Operation.ADD -> Success0()
-            AttributeModifier.Operation.MULTIPLY_BASE -> Success1()
-            AttributeModifier.Operation.MULTIPLY_TOTAL -> Success2()
+            AttributeModifier.Operation.ADD -> Success0(viewer)
+            AttributeModifier.Operation.MULTIPLY_BASE -> Success1(viewer)
+            AttributeModifier.Operation.MULTIPLY_TOTAL -> Success2(viewer)
         }
     }
 
-    private abstract class Base : MergingSession.ReforgeType {
-        override fun examinableProperties(): Stream<out ExaminableProperty?> {
-            return Stream.of(
-                ExaminableProperty.of("operation", operation),
-                ExaminableProperty.of("description", description.plain),
-            )
-        }
+    private abstract class Base : MergingSession.ReforgeType
 
-        override fun toString(): String = toSimpleString()
-    }
-
-    private class Empty : Base() {
+    private data class Empty(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
-            get() = throw IllegalStateException("This type is not supposed to be used.")
-        override val description: List<Component> = listOf(
-            "<gray>类型: <white>n/a".mini
-        )
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("operation", "n/a"),
-            ExaminableProperty.of("description", description.plain),
-        )
+            get() = throw IllegalStateException("this type is not supposed to be used.")
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_EMPTY.translate(viewer))
     }
 
-    private class Failure : Base() {
+    private data class Failure(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
-            get() = throw IllegalStateException("This type is not supposed to be used.")
-        override val description: List<Component> = listOf(
-            "<gray>类型: <white>n/a".mini
-        )
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("operation", "n/a"),
-            ExaminableProperty.of("description", description.plain),
-        )
+            get() = throw IllegalStateException("this type is not supposed to be used.")
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_FAILURE.translate(viewer))
     }
 
-    private class Success0 : Base() {
-        override val operation: AttributeModifier.Operation =
-            AttributeModifier.Operation.ADD
-        override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 0".mini
-        )
+    private class Success0(viewer: Player) : Base() {
+        override val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_0.translate(viewer))
     }
 
-    private class Success1 : Base() {
-        override val operation: AttributeModifier.Operation =
-            AttributeModifier.Operation.MULTIPLY_BASE
-        override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 1".mini
-        )
+    private class Success1(viewer: Player) : Base() {
+        override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_BASE
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_1.translate(viewer))
     }
 
-    private class Success2 : Base() {
-        override val operation: AttributeModifier.Operation =
-            AttributeModifier.Operation.MULTIPLY_TOTAL
-        override val description: List<Component> = listOf(
-            "<gray>类型: <white>type 2".mini
-        )
+    private class Success2(viewer: Player) : Base() {
+        override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_TOTAL
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_2.translate(viewer))
     }
 }
 
@@ -316,77 +283,50 @@ internal object ReforgeCost {
     /**
      * 表示没有资源消耗.
      */
-    fun zero(): MergingSession.ReforgeCost {
-        return Zero
+    fun zero(viewer: Player): MergingSession.ReforgeCost {
+        return Zero(viewer)
     }
 
     /**
      * 表示由于合并失败而产生的资源消耗.
      */
-    fun failure(): MergingSession.ReforgeCost {
-        return Failure
+    fun failure(viewer: Player): MergingSession.ReforgeCost {
+        return Failure(viewer)
     }
 
     /**
      * 表示由于合并成功而产生的资源消耗.
      */
-    fun success(defaultCurrencyAmount: Double): MergingSession.ReforgeCost {
-        return Success(defaultCurrencyAmount)
+    fun success(viewer: Player, defaultCurrencyAmount: Double): MergingSession.ReforgeCost {
+        return Success(viewer, defaultCurrencyAmount)
     }
 
-    private abstract class Base : MergingSession.ReforgeCost {
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("description", description.plain),
-        )
+    private abstract class Base : MergingSession.ReforgeCost
 
-        override fun toString(): String = toSimpleString()
-    }
-
-    private object Zero : Base() {
+    private class Zero(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(
-            "<gray>花费: <white>n/a".mini
-        )
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_ZERO.translate(viewer))
     }
 
-    private object Failure : Base() {
-        override fun take(viewer: Player): Unit =
-            throw IllegalStateException("This cost is not supposed to be taken.")
-
-        override fun test(viewer: Player): Boolean =
-            throw IllegalStateException("This cost is not supposed to be tested.")
-
-        override val description: List<Component> = listOf(
-            "<gray>花费: <white>n/a".mini
-        )
+    private class Failure(viewer: Player) : Base() {
+        override fun take(viewer: Player): Unit = throw IllegalStateException("this cost is not supposed to be taken.")
+        override fun test(viewer: Player): Boolean = throw IllegalStateException("this cost is not supposed to be tested.")
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_EMPTY.translate(viewer))
     }
 
-    // 2024/8/12 TBD
-    // 支持多货币
-    // 支持自定义物品
-    private class Success(
-        val currencyAmount: Double,
+    private data class Success(
+        val viewer: Player,
+        val amount: Double,
     ) : Base() {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, currencyAmount)
+            EconomyManager.take(viewer.uniqueId, amount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(
-            "<gray>花费: <yellow>${currencyAmount.toInt()} 金币".mini
-        )
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(
-            super.examinableProperties(),
-            Stream.of(
-                ExaminableProperty.of("currencyAmount", currencyAmount),
-            )
-        )
-
-        override fun toString(): String = toSimpleString()
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
     }
 }

@@ -1,0 +1,11 @@
+base: writable_book
+menu_icon_name: "你正在出售"
+menu_icon_lore:
+  - "* {item_list}"
+  - ""
+  - "<total_worth>"
+  - ""
+  - "<aqua>点击确认"
+menu_icon_dict:
+  with_level: "<item_name> [lv. <item_level>]"
+  without_level: "<item_name>"

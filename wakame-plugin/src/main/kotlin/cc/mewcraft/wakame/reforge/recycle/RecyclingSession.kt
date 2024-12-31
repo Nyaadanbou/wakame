@@ -26,8 +26,14 @@ interface RecyclingSession {
      */
     fun purchase(dryRun: Boolean): PurchaseResult
 
+    /**
+     * 获取指定 [displaySlot] 的 [Claim].
+     */
     fun getClaim(displaySlot: Int): Claim?
 
+    /**
+     * 移除指定 [displaySlot] 的 [Claim].
+     */
     fun removeClaim(displaySlot: Int): Claim?
 
     /**
@@ -35,11 +41,15 @@ interface RecyclingSession {
      */
     fun reset()
 
-    fun hasAnyClaims(): Boolean
-
+    /**
+     * 返回所有玩家提出的 [Claim].
+     */
     fun getAllClaims(): Collection<Claim>
 
-    fun getAllInputs(): Array<ItemStack> // partially overlapped with getAllOffers
+    /**
+     * 返回所有玩家放入回收站的物品堆叠.
+     */
+    fun getAllInputs(): Array<ItemStack> // partially overlapped with getAllClaims
 
     /**
      * 封装了一个物品堆叠的回收信息.

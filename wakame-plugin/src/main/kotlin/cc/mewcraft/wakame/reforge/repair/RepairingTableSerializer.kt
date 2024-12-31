@@ -3,11 +3,14 @@ package cc.mewcraft.wakame.reforge.repair
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.ObjectMappers
-import cc.mewcraft.wakame.reforge.common.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.reforge.common.PriceInstance
+import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
+import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
+import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -89,14 +92,10 @@ internal object RepairingTableSerializer {
             .associate { f ->
                 val tableId = f.nameWithoutExtension.lowercase()
                 val rootNode = yamlLoader.buildAndLoadString(f.readText())
-                val enabled = rootNode.node("enabled").getBoolean(true)
-                val title = rootNode.node("title").get<Component>(Component.empty())
                 val items = rootNode.node("items").getList<Key>(emptyList()).toHashSet()
 
                 val table = SimpleRepairingTable(
                     id = tableId,
-                    enabled = enabled,
-                    title = title,
                     items = items
                 )
 

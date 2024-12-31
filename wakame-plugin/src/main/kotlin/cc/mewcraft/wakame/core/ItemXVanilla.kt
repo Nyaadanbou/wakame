@@ -9,20 +9,15 @@ class ItemXVanilla(
     identifier: String,
 ) : ItemXAbstract(ItemXFactoryVanilla.plugin, identifier) {
     companion object {
-        const val DEFAULT_DISPLAY_NAME = "<white>UNKNOWN</white>"
+        const val DEFAULT_DISPLAY_NAME = "<red>Unknown Vanilla Item Type"
     }
 
     override fun valid(): Boolean {
         return true
     }
 
-    override fun createItemStack(): ItemStack? {
-        val material = Material.matchMaterial(identifier, false) ?: return null
-        return ItemStack(material)
-    }
-
-    override fun createItemStack(player: Player): ItemStack? {
-        return createItemStack()
+    override fun createItemStack(amount: Int, player: Player?): ItemStack? {
+        return Material.matchMaterial(identifier, false)?.let(::ItemStack)
     }
 
     override fun matches(itemStack: ItemStack): Boolean {
@@ -34,14 +29,14 @@ class ItemXVanilla(
     }
 
     override fun displayName(): String {
-        val material = Material.matchMaterial(identifier, false) ?: return DEFAULT_DISPLAY_NAME
-        return "<tr:${material.translationKey()}>"
+        return Material.matchMaterial(identifier, false)
+            ?.let { material -> "<tr:${material.translationKey()}>" }
+            ?: DEFAULT_DISPLAY_NAME
     }
 }
 
 object ItemXFactoryVanilla : ItemXFactory {
     override val plugin: String = "minecraft"
-
     override val loaded: Boolean = true
 
     override fun create(itemStack: ItemStack): ItemXVanilla {
@@ -49,8 +44,8 @@ object ItemXFactoryVanilla : ItemXFactory {
     }
 
     override fun create(plugin: String, identifier: String): ItemXVanilla? {
-        if (plugin != this.plugin)
-            return null
-        return ItemXVanilla(identifier)
+        return if (plugin == this.plugin)
+            ItemXVanilla(identifier)
+        else null
     }
 }

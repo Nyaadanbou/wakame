@@ -2,12 +2,9 @@ package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 
 interface RepairingTable {
     val id: String
-    val enabled: Boolean
-    val title: Component
 
     /**
      * 获取指定 [key] 对应的 [PriceInstance].

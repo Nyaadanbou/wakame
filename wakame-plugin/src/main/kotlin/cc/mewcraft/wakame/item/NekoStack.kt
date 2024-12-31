@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.ability.Ability
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -149,6 +149,7 @@ interface NekoStack : Examinable {
      */
     fun erase()
 
+    //<editor-fold desc="Fast access to call ItemBehavior functions">
     fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         behaviors.forEach { it.handleInteract(player, itemStack, action, wrappedEvent) }
     }
@@ -208,6 +209,7 @@ interface NekoStack : Examinable {
     fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
         behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, ability, event) }
     }
+    //</editor-fold>
 
     /**
      * 封装了一些“不安全”的操作.

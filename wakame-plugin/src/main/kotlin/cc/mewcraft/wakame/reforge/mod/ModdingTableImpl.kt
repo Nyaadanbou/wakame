@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
@@ -17,11 +18,41 @@ import java.util.stream.Stream
  * 一个没有任何限制的定制台.
  */
 internal object WtfModdingTable : ModdingTable {
-    override val identifier: String = "wtf"
+    override val id: String = "wtf"
 
-    override val enabled: Boolean = true
-
-    override val title: Component = Component.text("Modding Table (Cheat ON)")
+    override val primaryMenuSettings: BasicMenuSettings = BasicMenuSettings(
+        title = Component.text("Modding Table (Cheat Mode)"),
+        structure = arrayOf(
+            ". . . x x x . . .",
+            ". . . x x x . . .",
+            ". i . x x x . o .",
+            ". . . x x x . . .",
+            ". . . x x x . . .",
+            ". . . < . > . . .",
+        ),
+        icons = hashMapOf(
+            "background" to Key.key("internal:menu/common/default/background"),
+            "prev_page" to Key.key("internal:menu/common/default/prev_page"),
+            "next_page" to Key.key("internal:menu/common/default/next_page"),
+            "input_ok" to Key.key("internal:menu/modding/default/input_ok"),
+            "input_empty" to Key.key("internal:menu/modding/default/input_empty"),
+            "output_ok_confirmed" to Key.key("internal:menu/modding/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/modding/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/modding/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/modding/default/output_failure"),
+            "output_insufficient_resource" to Key.key("internal:menu/modding/default/output_insufficient_resource"),
+        )
+    )
+    override val replaceMenuSettings: BasicMenuSettings = BasicMenuSettings(
+        title = Component.text("DO_NOT_USE"),
+        structure = arrayOf("a * b"),
+        icons = hashMapOf(
+            "compatibility_view" to Key.key("internal:menu/modding/default/compatibility_view"),
+            "core_view" to Key.key("internal:menu/modding/default/core_view"),
+            "core_unusable" to Key.key("internal:menu/modding/default/core_unusable"),
+            "core_usable" to Key.key("internal:menu/modding/default/core_usable"),
+        )
+    )
 
     override val reforgeCountAddMethod: ModdingTable.ReforgeCountAddMethod = ModdingTable.ReforgeCountAddMethod.PLUS_ONE
 
@@ -72,9 +103,9 @@ internal object WtfModdingTable : ModdingTable {
  * 一个标准的定制台, 需要从配置文件中构建.
  */
 internal class SimpleModdingTable(
-    override val identifier: String,
-    override val enabled: Boolean,
-    override val title: Component,
+    override val id: String,
+    override val primaryMenuSettings: BasicMenuSettings,
+    override val replaceMenuSettings: BasicMenuSettings,
     override val reforgeCountAddMethod: ModdingTable.ReforgeCountAddMethod,
     override val rarityNumberMapping: RarityNumberMapping,
     override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>,
@@ -82,9 +113,9 @@ internal class SimpleModdingTable(
 ) : ModdingTable {
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("identifier", identifier),
-        ExaminableProperty.of("enabled", enabled),
-        ExaminableProperty.of("title", title),
+        ExaminableProperty.of("id", id),
+        ExaminableProperty.of("primaryMenuSettings", primaryMenuSettings),
+        ExaminableProperty.of("replaceMenuSettings", replaceMenuSettings),
         ExaminableProperty.of("rarityNumberMapping", rarityNumberMapping),
         ExaminableProperty.of("currencyCost", currencyCost),
         ExaminableProperty.of("itemRules", itemRuleMap),

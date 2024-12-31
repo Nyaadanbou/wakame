@@ -1,86 +1,59 @@
 type: simple
+
+# 出现在该合成站里的配方列表
+# 确保这些配方都已在 stations/crafting/recipes/{命名空间} 目录下注册
 recipes:
   - test:raw_bronze
   - test:amethyst_dust
 
-layout:
-  title: "<bold>无分类合成站</bold>"
+listing_layout:
+  title: "<b>无分类合成站"
 
-  # X: background
+  # x: background
   # .: recipe
   # <: prev_page
   # >: next_page
   structure:
-    - "X X X X X X X X X"
-    - "X X . . . . . X X"
-    - "X X . . . . . X X"
-    - "X X . . . . . X X"
-    - "X X . . . . . X X"
-    - "X X < X X X > X X"
+    - "x x x x x x x x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x < x x x > x x"
 
-  # 直接写Wakame物品的命名空间路径
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    background: "menu:background"
-    prev_page: "menu:prev_page"
-    next_page: "menu:next_page"
-
-  lang:
-    prefix:
-      sufficient: "<green>✔</green>"
-      insufficient: "<red>✖</red>"
-    choices:
-      # 可用占位符:
-      # <prefix>
-      # <name>
-      # <amount>
-      item: "<!i><prefix> <name> <gray>*<amount></gray>"
-      # 可用占位符:
-      # <amount>
-      exp: "<!i><prefix> <white>EXP</white> <gray>*<amount></gray>"
-    results:
-      # 可用占位符:
-      # <name>
-      # <amount>
-      item: "<name> <gray>*<amount></gray>"
-    recipe:
-      # 可用占位符:
-      # - <result>
-      name: "<!i><gold>合成:</gold> <result>"
-      # 可用占位符:
-      # - <choices>
-      lore: |-
-        <!i><yellow>===================</yellow>
-        <!i><gold>合成所需材料:</gold>
-        <choices>
-        <!i><yellow>===================</yellow>
-        <!i><gold>左键单击</gold> <dark_gray>>></dark_gray> <gold>预览配方</gold>
-        <!i><gold>右键单击</gold> <dark_gray>>></dark_gray> <gold>合成一次</gold>
-        <!i><gold>潜行单击</gold> <dark_gray>>></dark_gray> <gold>合成八次</gold>
-        <!i><gold><key:key.drop>键丢出</gold> <dark_gray>>></dark_gray> <gold>合成全部</gold>
-        <!i><yellow>===================</yellow>
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    listing: "internal:menu/crafting/listing"
 
 preview_layout:
-  title: "<bold>合成预览</bold>"
+  title: "<b>合成预览"
 
-  # X: background
-  # I: input/choices
-  # O: output/result
+  # x: background
+  # i: input/choice
+  # o: output/result
   # <: prev_page
   # >: next_page
-  # C: craft
-  # B: back
+  # c: craft
+  # b: back
   structure:
-    - "X X X X X X X X X"
-    - "X I I I I X X X X"
-    - "X I I I I X X O X"
-    - "X I I I I X X X X"
-    - "X < X X > X X C X"
-    - "X X X X B X X X X"
+    - "x x x x x x x x x"
+    - "x i i i i x x x x"
+    - "x i i i i x x o x"
+    - "x i i i i x x x x"
+    - "x < x x > x x c x"
+    - "x x x x b x x x x"
 
-  # 直接写Wakame物品的命名空间路径
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    background: "menu:background"
-    prev_page: "menu:prev_page"
-    next_page: "menu:next_page"
-    craft: "menu:craft"
-    back: "menu:back"
+    back: "internal:menu/common/back"
+    background: "internal:menu/common/background"
+    next_page: "internal:menu/common/next_page"
+    prev_page: "internal:menu/common/prev_page"
+    choice: "internal:menu/crafting/choice"
+    craft: "internal:menu/crafting/craft"
+    result: "internal:menu/crafting/result"

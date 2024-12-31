@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRule
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRuleMap
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import team.unnamed.mocha.runtime.MochaFunction
 
@@ -16,17 +16,17 @@ interface RerollingTable : Examinable {
     /**
      * 重造台的唯一标识.
      */
-    val identifier: String
+    val id: String
 
     /**
-     * 重造台是否启用.
+     * 主要的基础菜单设置.
      */
-    val enabled: Boolean
+    val primaryMenuSettings: BasicMenuSettings
 
     /**
-     * GUI 的标题.
+     * 选择核孔的基础菜单设置.
      */
-    val title: Component
+    val selectionMenuSettings: BasicMenuSettings
 
     /**
      * 稀有度到数值的映射.

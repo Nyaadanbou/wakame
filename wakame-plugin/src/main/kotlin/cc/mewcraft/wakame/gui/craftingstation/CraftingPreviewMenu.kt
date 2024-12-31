@@ -1,12 +1,7 @@
 package cc.mewcraft.wakame.gui.craftingstation
 
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
-import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
-import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.gui.toItemProvider
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -29,47 +24,45 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  */
 internal class CraftingPreviewMenu(
     /**
+     * 该菜单的上级菜单.
+     */
+    val parent: CraftingStationMenu,
+    /**
      * 该菜单所预览的配方.
      */
     val recipe: Recipe,
-
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-
-    /**
-     * 该菜单的上级菜单.
-     */
-    val parent: CraftingStationMenu,
 ) : KoinComponent {
     /**
-     * 该菜单的布局
+     * 该菜单的基本设置.
      */
-    private val layout: MenuLayout
+    private val settings: BasicMenuSettings
         get() = parent.station.previewLayout
 
     /**
      * 合成站配方预览菜单的 [Gui].
      *
-     * - 'X': background
-     * - 'I': input/choices
-     * - 'O': output/result
+     * - 'x': background
+     * - 'i': input/choices
+     * - 'o': output/result
      * - '<': prev_page
      * - '>': next_page
-     * - 'C': craft
-     * - 'B': back
+     * - 'c': craft
+     * - 'b': back
      */
     private val previewGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*layout.structure)
-        builder.addIngredient('X', BackgroundItem())
+        builder.setStructure(*settings.structure)
+        builder.addIngredient('x', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('C', CraftItem(recipe))
-        builder.addIngredient('B', BackItem())
-        builder.addIngredient('I', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        builder.addIngredient('O', SimpleItem(recipe.output.displayItemStack()))
-        builder.setContent(recipe.input.map { SimpleItem(it.displayItemStack()) })
+        builder.addIngredient('c', CraftItem(recipe))
+        builder.addIngredient('b', BackItem())
+        builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        builder.addIngredient('o', SimpleItem(recipe.output.displayItemStack(settings)))
+        builder.setContent(recipe.input.map { input -> SimpleItem(input.displayItemStack(settings)) })
     }
 
     /**
@@ -77,7 +70,7 @@ internal class CraftingPreviewMenu(
      */
     private val previewWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(previewGui)
-        setTitle(layout.title)
+        setTitle(settings.title)
     }
 
     /**
@@ -92,7 +85,7 @@ internal class CraftingPreviewMenu(
      */
     inner class BackgroundItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getIcon("background").render0().toItemProvider()
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -106,9 +99,9 @@ internal class CraftingPreviewMenu(
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasPreviousPage()) {
-                return layout.getIcon("background").render0().toItemProvider()
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
             }
-            return layout.getIcon("prev_page").render0().toItemProvider()
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
@@ -118,9 +111,9 @@ internal class CraftingPreviewMenu(
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
             if (!getGui().hasPreviousPage()) {
-                return layout.getIcon("background").render0().toItemProvider()
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
             }
-            return layout.getIcon("next_page").render0().toItemProvider()
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 
@@ -129,7 +122,7 @@ internal class CraftingPreviewMenu(
      */
     inner class BackItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getIcon("back").render0().toItemProvider()
+            return settings.getSlotDisplay("back").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -147,14 +140,14 @@ internal class CraftingPreviewMenu(
         private val recipe: Recipe,
     ) : AbstractCraftItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getIcon("craft").render0().toItemProvider()
+            return settings.getSlotDisplay("craft").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             when (clickType) {
                 // 单击合成
                 ClickType.LEFT, ClickType.RIGHT -> {
-                    if (recipe.match(player).canCraft) {
+                    if (recipe.match(player).isAllowed) {
                         tryCraft(recipe, player)
                     } else {
                         notifyFail(player)
@@ -164,11 +157,11 @@ internal class CraftingPreviewMenu(
                 // 潜行合成8次
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> {
                     var count = 0
-                    if (recipe.match(player).canCraft) {
+                    if (recipe.match(player).isAllowed) {
                         do {
                             tryCraft(recipe, player)
                             count++
-                        } while (recipe.match(player).canCraft && count < 8)
+                        } while (recipe.match(player).isAllowed && count < 8)
                     } else {
                         notifyFail(player)
                     }
@@ -176,10 +169,10 @@ internal class CraftingPreviewMenu(
 
                 // 丢弃一键合成全部
                 ClickType.DROP, ClickType.CONTROL_DROP -> {
-                    if (recipe.match(player).canCraft) {
+                    if (recipe.match(player).isAllowed) {
                         do {
                             tryCraft(recipe, player)
-                        } while (recipe.match(player).canCraft)
+                        } while (recipe.match(player).isAllowed)
                     } else {
                         notifyFail(player)
                     }
@@ -190,15 +183,5 @@ internal class CraftingPreviewMenu(
                 }
             }
         }
-
     }
-}
-
-/**
- * 方便函数.
- */
-private fun NekoStack.render0(): NekoStack {
-    val context = CraftingStationContext(Pos.PREVIEW, erase = true)
-    ItemRenderers.CRAFTING_STATION.render(this, context)
-    return this
 }

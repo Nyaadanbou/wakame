@@ -1,8 +1,57 @@
-# 定制工作台是否启用?
-enabled: true
+# 主要的基础菜单设置
+primary_menu_settings:
+  title: "定制工作台: example_a"
+  # .: 背景
+  # i: 装备输入
+  # o: 装备输出
+  # x: 子菜单
+  # <: 上一页
+  # >: 下一页
+  structure:
+    - ". . . x x x . . ."
+    - ". . . x x x . . ."
+    - ". i . x x x . o ."
+    - ". . . x x x . . ."
+    - ". . . x x x . . ."
+    - ". . . < # > . . ."
+  # background: 背景
+  # prev_page: 上一页
+  # next_page: 下一页
+  # input_ok: 输入
+  # input_empty: 输入
+  # output_empty: 输出
+  # output_failure: 输出
+  # output_ok_confirmed: 输出
+  # output_ok_unconfirmed: 输出
+  # output_insufficient_resource: 输出
+  icons:
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    input_ok: "internal:menu/modding/input_ok"
+    input_empty: "internal:menu/modding/input_empty"
+    output_empty: "internal:menu/modding/output_empty"
+    output_failure: "internal:menu/modding/output_failure"
+    output_ok_confirmed: "internal:menu/modding/output_ok_confirmed"
+    output_ok_unconfirmed: "internal:menu/modding/output_ok_unconfirmed"
+    output_insufficient_resource: "internal:menu/modding/output_insufficient_resource"
 
-# 定制工作台的容器GUI的标题
-title: "定制工作台: Example A"
+# 核孔的基础菜单设置
+replace_menu_settings:
+  title: "DO_NOT_USE"
+  # a: 核心
+  # b: 输入
+  # *: 兼容性检查
+  structure: [ "a * b" ]
+  # compatibility_view: 兼容性检查
+  # core_view: 目标核心
+  # core_unusable: 不可用核心
+  # core_usable: 可用核心
+  icons:
+    compatibility_view: "internal:menu/modding/compatibility_view"
+    core_view: "internal:menu/modding/core_view"
+    core_unusable: "internal:menu/modding/core_unusable"
+    core_usable: "internal:menu/modding/core_usable"
 
 # 物品的重铸次数的计算方式
 # 可用的计算方式:
@@ -38,5 +87,5 @@ rarity_number_mapping:
 # query.source_item_changed_cell_cost()
 #   被定制物品上参与了定制的核孔的总花费
 currency_cost: 200.0 * query.source_item_rarity()
-  + 100.0 * query.source_item_changed_cell_count() 
+  + 100.0 * query.source_item_changed_cell_count()
   + query.source_item_changed_cell_cost()

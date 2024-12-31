@@ -5,8 +5,10 @@ import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
-import cc.mewcraft.wakame.gui.MenuLayout
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.util.itemLoreOrEmpty
+import cc.mewcraft.wakame.util.itemNameOrType
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
@@ -51,15 +53,13 @@ internal sealed interface RecipeChoice : Examinable {
     fun valid(): Boolean
 
     /**
-     * 获取此 [RecipeChoice] 的描述.
-     * 使用 MiniMessage 格式的字符串.
+     * 获取此 [RecipeChoice] 展示用的物品堆叠.
+     *
+     * 由于合成输入不一定是固定的, 其展示用的物品堆叠与最终给予玩家的物品堆叠必须要有区别.
+     * 原因是当一个物品基于某种规则随机生成时, 其展示用的物品堆叠应该向玩家表达清楚随机的规则,
+     * 而不是直接展示众多随机结果中的一种. 这样可以使玩家对合成的随机结果有更清晰的认识.
      */
-    fun description(layout: MenuLayout): String
-
-    /**
-     * 获取此 [RecipeChoice] 的展示物品.
-     */
-    fun displayItemStack(): ItemStack
+    fun displayItemStack(settings: BasicMenuSettings): ItemStack
 }
 
 
@@ -105,19 +105,21 @@ internal data class ItemChoice(
         return item.valid()
     }
 
-    override fun description(layout: MenuLayout): String {
-        // 缺省构建格式: "<prefix> 材料 ×1"
-        return layout.getLang("choices.item")
-            ?.replace("<name>", item.displayName())
-            ?.replace("<amount>", amount.toString())
-            ?: "<prefix> ${item.displayName()} ×$amount"
-    }
+    override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
+        // 生成原始的物品堆叠 (最终给予玩家的物品堆叠)
+        val itemStack = item.createItemStack(amount) ?: ItemStack(Material.BARRIER)
 
-    override fun displayItemStack(): ItemStack {
-        val displayItemStack = item.createItemStack() ?: ItemStack(Material.BARRIER)
-        displayItemStack.render()
-        displayItemStack.amount = amount
-        return displayItemStack
+        // 基于合成站渲染物品, 这将填充 name & lore
+        itemStack.render()
+
+        // 解析展示用的物品堆叠信息
+        val resolution = settings.getSlotDisplay("choice").resolveEverything {
+            standard { component("item_name", itemStack.itemNameOrType) }
+            folded("item_lore", itemStack.itemLoreOrEmpty)
+        }
+
+        // 应用解析结果
+        return resolution.applyNameAndLoreTo(itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -158,14 +160,8 @@ internal data class ExpChoice(
         return true
     }
 
-    override fun description(layout: MenuLayout): String {
-        // 缺省构建格式: "<prefix> EXP ×1"
-        return layout.getLang("choices.exp")
-            ?.replace("<amount>", amount.toString())
-            ?: "<prefix> EXP ×$amount"
-    }
-
-    override fun displayItemStack(): ItemStack {
+    override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
+        // 经验瓶无需解析, 可以直接返回一个原始的物品堆叠
         return ItemStack(Material.EXPERIENCE_BOTTLE)
     }
 

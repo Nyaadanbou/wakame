@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.reforge.merge
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
@@ -12,7 +13,6 @@ import cc.mewcraft.wakame.reforge.common.Reforge
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
-import net.kyori.adventure.text.Component
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -69,9 +69,8 @@ internal object MergingTableSerializer : KoinComponent {
         }.buildAndLoadString(tableMainConfigFile.readText())
 
         val tableMainConfigData = object {
-            val identifier = tableDir.name
-            val enabled = tableMainConfigNode.node("enabled").getBoolean(false)
-            val title = tableMainConfigNode.node("title").krequire<Component>()
+            val id = tableDir.name
+            val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
             val inputLevelLimit = tableMainConfigNode.node("input_level_limit").getInt(0)
             val outputLevelLimit = tableMainConfigNode.node("output_level_limit").getInt(0)
             val outputPenaltyLimit = tableMainConfigNode.node("output_penalty_limit").getInt(0)
@@ -84,9 +83,8 @@ internal object MergingTableSerializer : KoinComponent {
         }
 
         return SimpleMergingTable(
-            identifier = tableMainConfigData.identifier,
-            enabled = tableMainConfigData.enabled,
-            title = tableMainConfigData.title,
+            id = tableMainConfigData.id,
+            primaryMenuSettings = tableMainConfigData.primaryMenuSettings,
             inputLevelLimit = tableMainConfigData.inputLevelLimit,
             outputLevelLimit = tableMainConfigData.outputLevelLimit,
             outputPenaltyLimit = tableMainConfigData.outputPenaltyLimit,

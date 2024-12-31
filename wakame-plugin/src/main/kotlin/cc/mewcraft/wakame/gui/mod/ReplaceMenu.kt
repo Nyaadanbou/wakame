@@ -3,20 +3,10 @@ package cc.mewcraft.wakame.gui.mod
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
-import cc.mewcraft.wakame.item.components.StandaloneCell
-import cc.mewcraft.wakame.item.standaloneCell
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.colorRecursively
 import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.removeItalic
-import me.lucko.helper.text3.mini
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component.empty
-import net.kyori.adventure.text.Component.text
-import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.Material
+import cc.mewcraft.wakame.util.itemLoreOrEmpty
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -28,7 +18,6 @@ import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
-import xyz.xenondevs.invui.item.impl.SimpleItem
 
 /**
  * 用于定制*单个*核孔核心的菜单, 需要被嵌入到 [ModdingMenu] 中.
@@ -53,7 +42,7 @@ internal class ReplaceMenu(
         builder.setStructure("a * b")
         builder.addIngredient('a', ViewItem(replace))
         builder.addIngredient('b', inputSlot)
-        builder.addIngredient('*', SimpleItem(ItemStack(Material.WHITE_STAINED_GLASS_PANE).edit { hideTooltip = true }))
+        builder.addIngredient('*', parent.table.replaceMenuSettings.getSlotDisplay("compatibility_view").resolveToItemWrapper())
     }
 
     /**
@@ -134,30 +123,19 @@ internal class ReplaceMenu(
             return ItemStack.empty()
         }
 
-        val clickToWithdraw = text {
-            color(NamedTextColor.GRAY)
-            content("[")
-            append(text { content("点击以取回").color(NamedTextColor.AQUA) })
-            append(text("]"))
-        }
-
         val replaceResult = replace.latestResult
         val usableInput = replace.usableInput
         if (usableInput == null) {
             // 耗材不可用于定制:
 
-            originalInput.edit {
+            parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
+                folded("result_description", replaceResult.description)
+            }.applyNameAndLoreTo(
+                originalInput
+            ).edit {
                 // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
                 // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉.
                 customData = null
-
-                itemName = "<white>结果: <red>无效".mini
-                lore = buildList {
-                    add(empty())
-                    addAll(replaceResult.description)
-                    add(empty())
-                    add(clickToWithdraw)
-                }.removeItalic
             }
 
             return originalInput
@@ -170,19 +148,13 @@ internal class ReplaceMenu(
             val context = ModdingTableContext.Replace(session, replace)
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
-            // 加上交互提示
-            usableInput.unsafeEdit {
-                customName = null // 玩家可能改了名, 所以清除一下
-                itemName = "<white>结果: <green>就绪".mini
-                lore = lore.orEmpty().map {
-                    it.colorRecursively(NamedTextColor.DARK_GRAY)
-                } + buildList {
-                    add(empty())
-                    add(clickToWithdraw)
-                }.removeItalic
-            }
-
-            return usableInput.itemStack
+            // 使用 SlotDisplay 再处理一遍
+            return parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
+                folded("item_lore", usableInput.wrapped.itemLoreOrEmpty)
+                folded("result_description", replaceResult.description)
+            }.applyNameAndLoreTo(
+                usableInput.wrapped
+            )
         }
     }
 
@@ -194,17 +166,15 @@ internal class ReplaceMenu(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val session = parent.session
+            val core = replace.cell.getCore()
+            val icon = CoreIcons.getItemStack(core)
 
-            val cell = replace.cell
-            val core = cell.getCore()
-            val icon = CoreIcons.getNekoStack(core)
+            parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
+                standard { component("core_name", core.displayName) }
+                folded("core_description", core.description)
+            }.applyNameAndLoreTo(icon)
 
-            icon.standaloneCell = StandaloneCell(cell)
-            icon.unsafeEdit { itemName = core.displayName }
-            ItemRenderers.MODDING_TABLE.render(icon, ModdingTableContext.Preview(session))
-
-            return ItemWrapper(icon.wrapped)
+            return ItemWrapper(icon)
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

@@ -1,24 +1,12 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.item.cells
-import cc.mewcraft.wakame.item.components.StandaloneCell
-import cc.mewcraft.wakame.item.standaloneCell
-import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
-import cc.mewcraft.wakame.util.edit
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 
 /**
@@ -37,19 +25,9 @@ private constructor(
     }
 
     private val primaryGui: Gui = Gui.normal { builder ->
-        builder.setStructure(
-            "a",
-            "b"
-        )
+        builder.setStructure(*parent.table.selectionMenuSettings.structure)
         builder.addIngredient('a', IndicatorItem())
         builder.addIngredient('b', SelectionItem())
-    }
-
-    /**
-     * @param message 错误信息
-     */
-    private fun makeErrorItem(message: Component): ItemProvider {
-        return ItemWrapper(ItemStack.of(Material.BARRIER).edit { itemName = message })
     }
 
     /**
@@ -57,19 +35,13 @@ private constructor(
      */
     private inner class IndicatorItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val session = parent.session
-            val sourceItem = session.usableInput ?: return makeErrorItem(text("内部错误 (source item is null)"))
-
-            val cellId = selection.id
-            val cell = sourceItem.cells?.get(cellId) ?: return makeErrorItem(text("内部错误 (cell '$cellId' is null)"))
-
-            val core = cell.getCore()
-            val icon = CoreIcons.getNekoStack(core)
-            icon.unsafeEdit { itemName = core.displayName }
-            icon.standaloneCell = StandaloneCell(cell)
-            ItemRenderers.REROLLING_TABLE.render(icon, RerollingTableContext(session))
-
-            return ItemWrapper(icon.wrapped)
+            val sourceItem = parent.session.usableInput ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
+            val sourceCell = sourceItem.cells?.get(selection.id) ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
+            val sourceCore = sourceCell.getCore()
+            return parent.table.selectionMenuSettings.getSlotDisplay("core_view").resolveToItemWrapper {
+                standard { component("core_name", sourceCore.displayName) }
+                folded("core_description", sourceCore.description)
+            }
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -82,22 +54,8 @@ private constructor(
      */
     private inner class SelectionItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val type: Material
-            val name: Component
-
-            if (selection.selected) {
-                type = Material.PINK_DYE
-                name = text("该核孔将被重造")
-            } else {
-                type = Material.GRAY_DYE
-                name = text("该核孔保持不变")
-            }
-
-            val stack = ItemStack.of(type).edit {
-                itemName = name
-            }
-
-            return ItemWrapper(stack)
+            val slotDisplayId = if (selection.selected) "core_selected" else "core_unselected"
+            return parent.table.selectionMenuSettings.getSlotDisplay(slotDisplayId).resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

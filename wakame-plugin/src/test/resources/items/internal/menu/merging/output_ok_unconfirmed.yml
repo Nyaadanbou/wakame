@@ -1,0 +1,11 @@
+# 这里不需要 base, 因为物品数据将基于合并后的核心生成.
+
+menu_icon_name: "<white>结果: <green>合并就绪"
+menu_icon_lore:
+  - "{item_lore}"
+  - ""
+  - "{type_description}"
+  - "{cost_description}"
+  - "{result_description}"
+  - ""
+  - "<aqua>再次点击确认合并"

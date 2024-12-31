@@ -1,19 +1,19 @@
 package cc.mewcraft.wakame.config.configurate
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.*
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.StyleBuilderApplicable
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
 internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): Key = Key(obj.toString())
+    override fun deserialize(type: Type, obj: Any): Key = Key.key(obj.toString())
     override fun serialize(item: Key, typeSupported: Predicate<Class<*>>?): Any = item.toString()
 }
 
@@ -23,18 +23,11 @@ internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf())
         return Injector.get<MiniMessage>().deserialize(message)
     }
 
-    override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
-        return Injector.get<MiniMessage>().serialize(item)
-    }
+    override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any = Injector.get<MiniMessage>().serialize(item)
 }
 
 internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): Style {
-        val component = ComponentSerializer.deserialize(type, obj)
-        val style = component.style()
-        return style
-    }
-
+    override fun deserialize(type: Type, obj: Any): Style = ComponentSerializer.deserialize(type, obj).style()
     override fun serialize(item: Style, typeSupported: Predicate<Class<*>>?): Any {
         val component = Component.text().style(item).build()
         return Injector.get<MiniMessage>().serialize(component)

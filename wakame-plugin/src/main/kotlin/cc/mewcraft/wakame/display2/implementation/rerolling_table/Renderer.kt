@@ -13,19 +13,16 @@ import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererF
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
-import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -73,7 +70,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
         val components = item.components
         components.process(ItemComponentTypes.CELLS) { data -> for ((id, cell) in data) renderCore(collector, id, cell, context) }
-        components.process(ItemComponentTypes.STANDALONE_CELL) { data -> RerollingTableRenderingHandlerRegistry.STANDALONE_CELL.process(collector, item, data, context) }
         components.process(ItemComponentTypes.LEVEL) { data -> RerollingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1: ItemRarity = data1 ?: return@process
@@ -169,15 +165,4 @@ internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistr
 
     @JvmField
     val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
-
-    @JvmField
-    val STANDALONE_CELL: RenderingHandler3<NekoStack, StandaloneCell, RerollingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
-        val coreText = cell.core.description
-        val modCount = item.reforgeHistory.modCount
-        val modLimit = context.session.itemRule?.modLimit ?: 0
-        format.render(coreText, modCount, modLimit)
-    }
-
-    // TODO 让渲染器负责渲染重造的花费
-    // val REFORGE_COST
 }

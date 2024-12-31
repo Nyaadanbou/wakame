@@ -1,0 +1,5 @@
+menu_icon_name: "<white>结果: <green>就绪"
+menu_icon_lore:
+  - "{item_lore}"
+  - ""
+  - "<aqua>点击取出物品"

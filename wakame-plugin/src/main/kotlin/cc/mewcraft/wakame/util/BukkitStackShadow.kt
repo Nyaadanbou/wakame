@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.CustomModelData
 import net.minecraft.world.item.component.ItemLore
 import org.bukkit.craftbukkit.inventory.CraftItemStack
+import xyz.xenondevs.commons.collections.isNotNullOrEmpty
 import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
@@ -78,7 +79,7 @@ var BukkitStack.itemName: Component?
 var BukkitStack.lore0: List<Component>?
     get() = this.unwrap?.get(DataComponents.LORE)?.lines?.map(PaperAdventure::asAdventure)
     set(value) {
-        if (value != null) {
+        if (value.isNotNullOrEmpty()) {
             this.unwrap?.set(DataComponents.LORE, ItemLore(value.map(PaperAdventure::asVanilla)))
         } else {
             this.unwrap?.remove(DataComponents.LORE)

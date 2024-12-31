@@ -2,21 +2,36 @@ package cc.mewcraft.wakame.gui.blacksmith
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.implementation.recycling_station.RecyclingStationContext
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
+import cc.mewcraft.wakame.item.level
+import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.reforge.recycle.*
-import cc.mewcraft.wakame.reforge.repair.*
-import cc.mewcraft.wakame.util.*
-import net.kyori.adventure.text.Component.*
+import cc.mewcraft.wakame.reforge.recycle.RecyclingSession
+import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
+import cc.mewcraft.wakame.reforge.recycle.SimpleRecyclingSession
+import cc.mewcraft.wakame.reforge.repair.RepairingSession
+import cc.mewcraft.wakame.reforge.repair.RepairingTable
+import cc.mewcraft.wakame.reforge.repair.SimpleRepairingSession
+import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.itemName
+import cc.mewcraft.wakame.util.itemNameOrType
+import cc.mewcraft.wakame.util.maxDamage
+import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.unregisterEvents
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.TranslationArgument
-import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.*
-import org.bukkit.event.inventory.*
+import org.bukkit.event.Event
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryAction
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent
-import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -39,11 +54,6 @@ internal class BlacksmithMenu(
     val viewer: Player,
 ) : KoinComponent, Listener {
 
-    companion object Shared {
-        private const val RECYCLING_INVENTORY_SIZE = 10
-        private val BACKGROUND_ITEM = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).edit { hideTooltip = true }
-    }
-
     fun open() {
         window2.open()
         viewer.sendMessage(MessageConstants.MSG_OPENED_BLACKSMITH_MENU)
@@ -54,7 +64,7 @@ internal class BlacksmithMenu(
     val repairingTable: RepairingTable
         get() = station.repairingTable
 
-    val recyclingSession: RecyclingSession = SimpleRecyclingSession(recyclingStation, viewer, RECYCLING_INVENTORY_SIZE)
+    val recyclingSession: RecyclingSession = SimpleRecyclingSession(recyclingStation, viewer, station.recyclingInventorySize)
     val repairingSession: RepairingSession = SimpleRepairingSession(repairingTable, viewer)
 
     val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
@@ -66,8 +76,7 @@ internal class BlacksmithMenu(
 
     // 监听玩家与自己背包发生的交互
     @EventHandler(
-        // 被取消基本意味着 InvUI 已经处理过了.
-        ignoreCancelled = true
+        ignoreCancelled = true // 被取消基本意味着 InvUI 已经处理过了
     )
     private fun on(event: InventoryClickEvent) {
         // 当玩家点击自己背包里的物品时,
@@ -132,7 +141,7 @@ internal class BlacksmithMenu(
 
     // 用于展示玩家当前要回收的物品.
     // 将出现在整个菜单的上半部分.
-    private val recyclingInventory: VirtualInventory = VirtualInventory(RECYCLING_INVENTORY_SIZE).apply {
+    private val recyclingInventory: VirtualInventory = VirtualInventory(station.recyclingInventorySize).apply {
         setPreUpdateHandler(::onRecyclingInventoryPreUpdate)
     }
 
@@ -166,7 +175,7 @@ internal class BlacksmithMenu(
                 event.isCancelled = true
 
                 val slot = event.slot
-                val unclaimed = recyclingSession.removeClaim(slot) ?: error("Claim not found for display slot $slot. This is a bug!")
+                val unclaimed = recyclingSession.removeClaim(slot) ?: error("claim not found for display slot $slot. This is a bug!")
 
                 syncRecyclingInventory()
 
@@ -183,11 +192,8 @@ internal class BlacksmithMenu(
     private val sellButton = SellButton()
 
     private val recyclingGui = Gui.normal { builder ->
-        builder.setStructure(
-            "i i i i i . .",
-            "i i i i i . x",
-        )
-        builder.addIngredient('.', BACKGROUND_ITEM)
+        builder.setStructure(*station.recyclingMenuSettings.structure)
+        builder.addIngredient('.', station.recyclingMenuSettings.getSlotDisplay("background").resolveToItemStack())
         builder.addIngredient('i', recyclingInventory)
         builder.addIngredient('x', sellButton)
     }
@@ -242,7 +248,7 @@ internal class BlacksmithMenu(
                 e.isCancelled = true
 
                 val slot = e.slot
-                val claim = repairingSession.getClaim(slot) ?: error("Claim not found for slot $slot. This is a bug!")
+                val claim = repairingSession.getClaim(slot) ?: error("claim not found for slot $slot. This is a bug!")
                 if (claim.repairCost.test(viewer)) {
                     claim.repairCost.take(viewer)
                     claim.repair(viewer)
@@ -269,24 +275,16 @@ internal class BlacksmithMenu(
     }
 
     private val repairingGui = Gui.normal { builder ->
-        builder.setStructure(
-            "i i i i i . .",
-            "* * * * * . .",
-        )
-        builder.addIngredient('.', BACKGROUND_ITEM)
-        builder.addIngredient('*', ItemStack.of(Material.GRAY_STAINED_GLASS_PANE))
+        builder.setStructure(*station.repairingMenuSettings.structure)
+        builder.addIngredient('.', station.repairingMenuSettings.getSlotDisplay("background").resolveToItemStack())
+        builder.addIngredient('*', station.repairingMenuSettings.getSlotDisplay("background2").resolveToItemStack())
         builder.addIngredient('i', repairingInventory)
     }
 
     // 用于承载回收和修复两个 TabGui
     private val primaryUpperGui = TabGui.normal { builder ->
-        builder.setStructure(
-            ". . . . . . . . .",
-            ". . * * * * * * *",
-            "s . * * * * * * *",
-            ". . . . . . . . .",
-        )
-        builder.addIngredient('.', BACKGROUND_ITEM)
+        builder.setStructure(*station.primaryMenuSettings.structure)
+        builder.addIngredient('.', station.primaryMenuSettings.getSlotDisplay("background").resolveToItemStack())
         builder.addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('s', SwitchItem())
         builder.setTabs(
@@ -300,7 +298,7 @@ internal class BlacksmithMenu(
 
     private val window2 = Window.single { builder ->
         builder.setGui(primaryUpperGui)
-        builder.setTitle(recyclingStation.title)
+        builder.setTitle(station.recyclingMenuSettings.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -327,11 +325,11 @@ internal class BlacksmithMenu(
         override fun getItemProvider(gui: TabGui): ItemProvider {
             val currentTab = getCurrentTab()
             val itemStack = if (currentTab == TabType.RECYCLING) {
-                window2.changeTitle(recyclingStation.title)
-                ItemStack.of(Material.ANVIL).edit { itemName = text("切换到物品修复") }
+                window2.changeTitle(station.recyclingMenuSettings.title)
+                station.primaryMenuSettings.getSlotDisplay("select_repairing").resolveToItemStack()
             } else {
-                window2.changeTitle(repairingTable.title)
-                ItemStack.of(Material.EMERALD).edit { itemName = text("切换到物品回收") }
+                window2.changeTitle(station.repairingMenuSettings.title)
+                station.primaryMenuSettings.getSlotDisplay("select_recycling").resolveToItemStack()
             }
             return ItemWrapper(itemStack)
         }
@@ -359,28 +357,50 @@ internal class BlacksmithMenu(
 
     private inner class SellButton : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            if (!recyclingSession.hasAnyClaims()) {
-                val icon = ItemStack.of(Material.WRITABLE_BOOK)
-                val context = RecyclingStationContext.Empty
-                ItemRenderers.RECYCLING_STATION.render(icon, context)
-                return ItemWrapper(icon)
+            if (recyclingSession.getAllClaims().isEmpty()) {
+                return station.recyclingMenuSettings.getSlotDisplay("recycle_when_empty").resolveToItemWrapper()
             }
 
-            if (confirmed) {
-                val icon = ItemStack.of(Material.WRITABLE_BOOK)
-                val result = recyclingSession.purchase(true)
-                val items = recyclingSession.getAllClaims().map { it.originalItem }
-                val context = RecyclingStationContext.Confirmed(items, result)
-                ItemRenderers.RECYCLING_STATION.render(icon, context)
-                return ItemWrapper(icon)
-            } else {
-                val icon = ItemStack.of(Material.WRITABLE_BOOK)
-                val result = recyclingSession.purchase(true)
-                val items = recyclingSession.getAllClaims().map { it.originalItem }
-                val context = RecyclingStationContext.Unconfirmed(items, result)
-                ItemRenderers.RECYCLING_STATION.render(icon, context)
-                return ItemWrapper(icon)
+            val purchaseResult = recyclingSession.purchase(true)
+            val itemWrapper = when (purchaseResult) {
+                is RecyclingSession.PurchaseResult.Failure -> {
+                    station.recyclingMenuSettings.getSlotDisplay("recycle_when_error").resolveToItemWrapper()
+                }
+
+                is RecyclingSession.PurchaseResult.Success -> {
+                    val slotDisplayId = if (confirmed) "recycle_when_confirmed" else "recycle_when_unconfirmed"
+                    station.recyclingMenuSettings.getSlotDisplay(slotDisplayId).resolveToItemWrapper {
+                        standard {
+                            component(
+                                "total_worth", MessageConstants.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
+                                    TranslationArgument.numeric(purchaseResult.minPrice),
+                                    TranslationArgument.numeric(purchaseResult.maxPrice)
+                                ).translate(viewer)
+                            )
+                        }
+                        folded("item_list") {
+                            for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
+                                val itemName = item.itemNameOrType
+                                val itemLevel = item.shadowNeko()?.level?.let(::text)
+                                if (itemLevel != null) {
+                                    resolve("with_level") {
+                                        component("item_name", itemName)
+                                        component("item_level", itemLevel)
+                                    }
+                                } else {
+                                    resolve("without_level") {
+                                        component("item_name", itemName)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                else -> error("unexpected purchase result: $purchaseResult")
             }
+
+            return itemWrapper
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

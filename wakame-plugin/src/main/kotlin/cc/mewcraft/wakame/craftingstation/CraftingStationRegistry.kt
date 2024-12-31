@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.gui.MenuLayoutSerializer
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
@@ -51,8 +51,8 @@ internal object CraftingStationRegistry : Initializable, KoinComponent {
                     val stationNode = yamlConfig {
                         withDefaults()
                         serializers {
+                            registerAnnotatedObjects(ObjectMappers.DEFAULT)
                             kregister(StationSerializer)
-                            kregister(MenuLayoutSerializer)
                         }
                     }.buildAndLoadString(fileText)
                     stationNode.hint(StationSerializer.HINT_NODE, stationId)

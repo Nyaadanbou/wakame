@@ -27,7 +27,6 @@ import cc.mewcraft.wakame.item.components.ItemSkinOwner
 import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.components.Tool
 import cc.mewcraft.wakame.item.components.Unbreakable
 import net.kyori.adventure.text.Component
@@ -224,12 +223,6 @@ internal object ItemComponentTypes {
      */
     @JvmField
     val SKIN_OWNER: ItemComponentType<ItemSkinOwner> = dummy<ItemSkinOwner>(ItemConstants.SKIN_OWNER).register()
-
-    /**
-     * 独立存在的核孔.
-     */
-    @JvmField
-    val STANDALONE_CELL: ItemComponentType<StandaloneCell> = StandaloneCell.codec(ItemConstants.STANDALONE_CELL).register()
 
     /**
      * 附魔书内存储的魔咒.

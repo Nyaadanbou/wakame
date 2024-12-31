@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.RandomizedValue
-import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import team.unnamed.mocha.runtime.MochaFunction
@@ -16,11 +16,16 @@ import team.unnamed.mocha.runtime.MochaFunction
  */
 interface MergingTable : Examinable {
 
-    val identifier: String
+    /**
+     * 合并台的唯一标识符.
+     * 用于指令和配置文件引用.
+     */
+    val id: String
 
-    val enabled: Boolean
-
-    val title: Component
+    /**
+     * 合并台的基础菜单设置.
+     */
+    val primaryMenuSettings: BasicMenuSettings
 
     /**
      * 工作台接收的物品可以拥有的最高等级.
