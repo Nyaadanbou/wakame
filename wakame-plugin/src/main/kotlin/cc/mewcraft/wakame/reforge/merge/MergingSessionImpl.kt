@@ -19,6 +19,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
+import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -195,17 +196,12 @@ internal object ReforgeResult {
     }
 
     private class Simple(
-        isSuccess: Boolean,
-        description: Component,
-        type: MergingSession.ReforgeType,
-        cost: MergingSession.ReforgeCost,
+        override val isSuccess: Boolean,
+        override val description: Component,
+        override val reforgeType: MergingSession.ReforgeType,
+        override val reforgeCost: MergingSession.ReforgeCost,
         output: NekoStack,
-    ) : MergingSession.ReforgeResult {
-
-        override val isSuccess = isSuccess
-        override val description: Component = description
-        override val reforgeType: MergingSession.ReforgeType = type
-        override val reforgeCost = cost
+    ) : MergingSession.ReforgeResult, Examinable {
         override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -250,35 +246,18 @@ internal object ReforgeType {
         }
     }
 
-    private abstract class Base : MergingSession.ReforgeType {
-        override fun examinableProperties(): Stream<out ExaminableProperty?> {
-            return Stream.of(
-                ExaminableProperty.of("operation", operation),
-                ExaminableProperty.of("description", description.plain),
-            )
-        }
+    private abstract class Base : MergingSession.ReforgeType
 
-        override fun toString(): String = toSimpleString()
-    }
-
-    private class Empty(viewer: Player) : Base() {
+    private data class Empty(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
         override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_EMPTY.translate(viewer))
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("operation", "n/a"),
-            ExaminableProperty.of("description", description.plain),
-        )
     }
 
-    private class Failure(viewer: Player) : Base() {
+    private data class Failure(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
         override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_FAILURE.translate(viewer))
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("operation", "n/a"),
-            ExaminableProperty.of("description", description.plain),
-        )
     }
 
     private class Success0(viewer: Player) : Base() {
@@ -322,13 +301,7 @@ internal object ReforgeCost {
         return Success(viewer, defaultCurrencyAmount)
     }
 
-    private abstract class Base : MergingSession.ReforgeCost {
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("description", description.plain),
-        )
-
-        override fun toString(): String = toSimpleString()
-    }
+    private abstract class Base : MergingSession.ReforgeCost
 
     private class Zero(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
@@ -342,34 +315,18 @@ internal object ReforgeCost {
         override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_EMPTY.translate(viewer))
     }
 
-    // 2024/8/12 TBD
-    // 支持多货币
-    // 支持自定义物品
-    private class Success(
-        viewer: Player,
-        val currencyAmount: Double,
+    private data class Success(
+        val viewer: Player,
+        val amount: Double,
     ) : Base() {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, currencyAmount)
+            EconomyManager.take(viewer.uniqueId, amount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(
-            MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(
-                TranslationArgument.numeric(currencyAmount)
-            ).translate(viewer)
-        )
-
-        override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.concat(
-            super.examinableProperties(),
-            Stream.of(
-                ExaminableProperty.of("currencyAmount", currencyAmount),
-            )
-        )
-
-        override fun toString(): String = toSimpleString()
+        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
     }
 }

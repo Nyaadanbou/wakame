@@ -158,7 +158,7 @@ interface MergingSession : Examinable {
     /**
      * 封装了一次合并操作的结果.
      */
-    sealed interface ReforgeResult : Examinable {
+    sealed interface ReforgeResult {
         /**
          * 本次合并是否成功.
          *
@@ -201,7 +201,7 @@ interface MergingSession : Examinable {
     /**
      * 封装了合并操作所属的*类型*.
      */
-    sealed interface ReforgeType : Examinable {
+    sealed interface ReforgeType {
         /**
          * 本类型所对应的属性运算模式.
          */
@@ -218,7 +218,7 @@ interface MergingSession : Examinable {
      *
      * *资源*可以是任何东西, 例如货币、经验等.
      */
-    sealed interface ReforgeCost : Examinable {
+    sealed interface ReforgeCost {
         /**
          * 从玩家那里拿走本次合并所需要的资源.
          */
