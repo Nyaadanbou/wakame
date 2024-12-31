@@ -2,6 +2,6 @@ menu_icon_name: "<item_name>"
 menu_icon_lore:
   - "{item_lore}"
   - ""
-  - "<!i>{cost_description}"
+  - "{cost_description}"
   - ""
-  - "<!i><aqua>再次点击取出物品"
+  - "<aqua>再次点击取出物品"

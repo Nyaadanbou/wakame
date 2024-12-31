@@ -2,7 +2,6 @@
 primary_menu_settings:
   title: "定制工作台: example_a"
   # .: 背景
-  # #: 背景2
   # i: 装备输入
   # o: 装备输出
   # x: 子菜单
@@ -14,9 +13,8 @@ primary_menu_settings:
     - ". i . x x x . o ."
     - ". . . x x x . . ."
     - ". . . x x x . . ."
-    - "# # # < # > # # #"
+    - ". . . < # > . . ."
   # background: 背景
-  # background2: 背景2
   # prev_page: 上一页
   # next_page: 下一页
   # input_ok: 输入
@@ -26,7 +24,6 @@ primary_menu_settings:
   # output_insufficient_resource: 输出
   icons:
     background: "internal:menu/common/background"
-    background2: "internal:menu/modding/background2"
     prev_page: "internal:menu/common/prev_page"
     next_page: "internal:menu/common/next_page"
     input_ok: "internal:menu/modding/input_ok"

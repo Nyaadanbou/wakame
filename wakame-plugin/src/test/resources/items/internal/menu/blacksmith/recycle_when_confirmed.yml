@@ -1,9 +1,9 @@
 base: writable_book
 menu_icon_name: "即将要出售"
 menu_icon_lore:
-  - "<!i>* {item_list}"
+  - "* {item_list}"
   - ""
-  - "<!i><aqua>再次点击确认"
+  - "<aqua>再次点击确认"
 menu_icon_dict:
   with_level: "<item_name> [lv. <item_level>]"
   without_level: "<item_name>"

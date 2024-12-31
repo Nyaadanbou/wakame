@@ -1,5 +1,5 @@
 menu_icon_name: "<white>结果: <red>无效"
 menu_icon_lore:
-  - "<!i>{result_description}"
+  - "{result_description}"
   - ""
-  - "<!i><aqua>点击取出物品"
+  - "<aqua>点击取出物品"

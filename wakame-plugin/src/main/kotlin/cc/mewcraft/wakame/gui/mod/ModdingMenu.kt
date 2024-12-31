@@ -91,7 +91,6 @@ internal class ModdingMenu(
     private val primaryGui: ScrollGui<Gui> = ScrollGui.guis { builder ->
         builder.setStructure(*table.primaryMenuSettings.structure)
         builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
-        builder.addIngredient('#', table.primaryMenuSettings.getSlotDisplay("background2").resolveToItemWrapper())
         builder.addIngredient('i', inputSlot)
         builder.addIngredient('o', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_empty").resolveToItemWrapper())
         builder.addIngredient('<', PrevItem())
@@ -374,6 +373,7 @@ internal class ModdingMenu(
     private inner class NextItem : ScrollItem(1) {
         override fun getItemProvider(gui: ScrollGui<*>): ItemProvider {
             return table.primaryMenuSettings.getSlotDisplay("next_page").resolveToItemWrapper()
+
         }
     }
 }
