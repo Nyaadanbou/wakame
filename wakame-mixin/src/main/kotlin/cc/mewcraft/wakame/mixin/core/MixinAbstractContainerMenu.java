@@ -34,7 +34,7 @@ public abstract class MixinAbstractContainerMenu {
         if (!this.suppressRemoteUpdates) {
             if (!ItemStack.matches(this.getCarried(), this.remoteCarried)) {
                 CustomData customData = this.remoteCarried.get(DataComponents.CUSTOM_DATA);
-                if (customData != null && customData.contains("client_side")) {
+                if (customData != null && customData.contains("processed")) {
                     return;
                 }
                 this.remoteCarried = this.getCarried().copy();

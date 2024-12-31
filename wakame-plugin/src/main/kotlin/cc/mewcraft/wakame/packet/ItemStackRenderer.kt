@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.packet
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.standard.StandardContext
 import cc.mewcraft.wakame.initializer.Initializer
-import cc.mewcraft.wakame.item.NekoStack
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
@@ -22,6 +21,8 @@ import kotlin.jvm.optionals.getOrNull
  */
 internal class ItemStackRenderer : PacketListenerAbstract() {
     companion object : KoinComponent {
+        private const val PROCESSED_KEY = "processed"
+
         private val logger: Logger by inject()
     }
 
@@ -130,7 +131,7 @@ internal class ItemStackRenderer : PacketListenerAbstract() {
         if (nekoStack != null) {
             try {
                 ItemRenderers.STANDARD.render(nekoStack, StandardContext)
-                clientSide = true
+                processed = true
                 changed = true
             } catch (e: Throwable) {
                 if (Initializer.isDebug) {
@@ -144,13 +145,13 @@ internal class ItemStackRenderer : PacketListenerAbstract() {
         return changed
     }
 
-    private var ItemStack.clientSide: Boolean
-        get() = customData?.getTagOrNull(NekoStack.CLIENT_SIDE_KEY) == null
+    private var ItemStack.processed: Boolean
+        get() = customData?.getTagOrNull(PROCESSED_KEY) == null
         set(value) {
             if (value) {
-                customData?.setTag(NekoStack.CLIENT_SIDE_KEY, NBTByte(0))
+                customData?.setTag(PROCESSED_KEY, NBTByte(0))
             } else {
-                customData?.removeTag(NekoStack.CLIENT_SIDE_KEY)
+                customData?.removeTag(PROCESSED_KEY)
             }
         }
 }
