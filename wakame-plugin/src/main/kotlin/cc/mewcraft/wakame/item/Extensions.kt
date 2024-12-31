@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
@@ -216,8 +215,6 @@ var NekoStack.kizamiz: Set<Kizami> by mapped(ItemComponentTypes.KIZAMIZ, ::empty
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 
 var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)
-
-var NekoStack.standaloneCell: StandaloneCell? by direct(ItemComponentTypes.STANDALONE_CELL)
 
 var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_CORE)
 
