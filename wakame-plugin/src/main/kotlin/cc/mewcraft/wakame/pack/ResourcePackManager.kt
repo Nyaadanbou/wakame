@@ -52,7 +52,7 @@ internal class ResourcePackManager(
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
                 resourcePack = resourcePack,
-                itemIds = ItemRegistry.CUSTOM.values.map { it.id }
+                itemModelInfos = ItemRegistry.CUSTOM.values.map { ItemModelInfo(it.id, it.base.type.key()) }
             )
 
             // Generate the resource pack

@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.pack.AssetUtils
+import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.*
@@ -88,35 +89,33 @@ internal class ResourcePackCustomModelGeneration(
     private val logger: Logger by inject()
 
     override fun process() {
-        val itemIds = context.itemIds
         val resourcePack = context.resourcePack
 
-        for (itemId in itemIds) {
-            logger.info("Generating model for $itemId")
+        for (itemModelInfo in context.itemModelInfos) {
+            logger.info("Generating model for $itemModelInfo")
             try {
-                val models = generateModel(itemId.modelKey())
+                val models = generateModel(itemModelInfo.modelKey())
+
+                if (models.isEmpty()) {
+                    resourcePack.setDefaultModel(itemModelInfo)
+                    logger.warn("Failed to generate model for $itemModelInfo, using default model.")
+                    continue
+                }
+
                 for (model in models) {
+                    if (!resourcePack.setTexture(model)) {
+                        resourcePack.setDefaultModel(itemModelInfo)
+                        logger.warn("Failed to generate texture for model $itemModelInfo, using default model.")
+                        continue
+                    }
                     resourcePack.model(model)
 
-                    // Set all textures from the model
-                    val textureLayers = model.textures().layers()
-                    val particle = model.textures().particle()
-                    val variables = model.textures().variables()
-
-                    textureLayers.forEach { layer -> resourcePack.setTexture(layer.key()) }
-                    particle?.let { resourcePack.setTexture(it.key()) }
-                    variables.forEach { (_, value) -> resourcePack.setTexture(value.key()) }
-
-                    logger.info("Model for $itemId generated.")
+                    logger.info("Model for $itemModelInfo generated.")
                 }
             } catch (e: Exception) {
-                logger.warn("Failed to generate model for $itemId. Reason: ${e.message}")
+                logger.warn("Failed to generate model for $itemModelInfo. Reason: ${e.message}")
             }
         }
-    }
-
-    private fun Key.modelKey(): Key {
-        return Key(RESOURCE_NAMESPACE, "item/${namespace()}/${value()}")
     }
 
     private fun generateModel(modelKey: Key): List<CreativeModel> {
@@ -159,25 +158,59 @@ internal class ResourcePackCustomModelGeneration(
     /**
      * 生成一个纹理并添加到资源包中.
      *
-     * @param originTextureKey 原始配置文件中纹理的 Key. 如果为 null, 则不会生成纹理.
+     * @param model 模型实例.
+     * @return 是否成功生成纹理.
      */
-    private fun ResourcePack.setTexture(originTextureKey: Key?) {
-        requireNotNull(originTextureKey) { "Origin key must not be null" }
-        val textureFile = AssetUtils.getFileOrThrow("textures/${originTextureKey.value()}", "png")
-        val textureWritable = Writable.file(textureFile)
+    private fun ResourcePack.setTexture(model: CreativeModel): Boolean {
+        val texturesToGenerate = arrayListOf<ModelTexture>()
 
-        val texture = Texture.texture()
-            .key(originTextureKey.namespace { RESOURCE_NAMESPACE }.value { "$it.png" })
-            .data(textureWritable)
+        // Set all textures from the model
+        val textureLayers = model.textures().layers()
+        val particle = model.textures().particle()
+        val variables = model.textures().variables()
 
-        val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
-        val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(AssetUtils.toJsonElement(it)) }
-        if (meta != null) {
-            texture.meta(meta)
+        textureLayers.forEach { layer -> texturesToGenerate.add(layer) }
+        particle?.let { texturesToGenerate.add(it) }
+        variables.forEach { (_, value) -> texturesToGenerate.add(value) }
+
+        if (texturesToGenerate.isEmpty()) {
+            return false
         }
 
-        logger.info("Texture for $originTextureKey generated.")
-        texture(texture.build())
+        for (texture in texturesToGenerate) {
+            val originTextureKey = texture.key() ?: continue
+            val textureFile = AssetUtils.getFile("textures/${originTextureKey.value()}", "png")
+            if (textureFile == null) {
+                return false
+            }
+            val textureWritable = Writable.file(textureFile)
+
+            val texture = Texture.texture()
+                .key(originTextureKey.value { "$it.png" })
+                .data(textureWritable)
+
+            val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
+            val meta = metaFile?.let { MetadataSerializer.INSTANCE.readFromTree(AssetUtils.toJsonElement(it)) }
+            if (meta != null) {
+                texture.meta(meta)
+            }
+
+            logger.info("Texture for $originTextureKey generated.")
+            texture(texture.build())
+        }
+
+        return true
+    }
+
+    private fun ResourcePack.setDefaultModel(itemModelInfo: ItemModelInfo) {
+        val layers = ModelTexture.ofKey(itemModelInfo.baseModelKey())
+        // FIXME: 有些物品的材质跟物品 id 并不是完全一样, 比如染色玻璃板, 它的物品 id 是 `stained_glass_pane`, 但是材质是 `stained_glass`.
+        val model = CreativeModel.model()
+            .key(itemModelInfo.modelKey())
+            .parent(Key("item/generated"))
+            .textures(ModelTextures.builder().layers(layers).build())
+            .build()
+        model(model)
     }
 
     /**
