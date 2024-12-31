@@ -196,14 +196,14 @@ internal object ReforgeResult {
 
     private class Simple(
         isSuccess: Boolean,
-        description: ComponentLike,
+        description: Component,
         type: MergingSession.ReforgeType,
         cost: MergingSession.ReforgeCost,
         output: NekoStack,
     ) : MergingSession.ReforgeResult {
 
         override val isSuccess = isSuccess
-        override val description: Component = description.asComponent()
+        override val description: Component = description
         override val reforgeType: MergingSession.ReforgeType = type
         override val reforgeCost = cost
         override val output: NekoStack by NekoStackDelegates.copyOnRead(output)

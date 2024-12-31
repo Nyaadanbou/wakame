@@ -15,16 +15,26 @@ primary_menu_settings:
     - ". . . x x x . . ."
     - ". . . x x x . . ."
     - "# # # < # > # # #"
+  # background: 背景
+  # background2: 背景2
+  # prev_page: 上一页
+  # next_page: 下一页
+  # input_ok: 输入
+  # input_empty: 输入
+  # output_ok: 输出
+  # output_empty: 输出
+  # output_insufficient_resource: 输出
   icons:
     background: "internal:menu/common/background"
+    background2: "internal:menu/modding/background2"
     prev_page: "internal:menu/common/prev_page"
     next_page: "internal:menu/common/next_page"
-    background2: "internal:menu/modding/background2"
-    input_slot: "internal:menu/modding/input_slot"
-    input_slot_empty: "internal:menu/modding/input_slot_empty"
-    output_slot: "internal:menu/modding/output_slot"
-    output_slot_empty: "internal:menu/modding/output_slot_empty"
-    output_slot_insufficient_resource: "internal:menu/modding/output_slot_insufficient_resource"
+    input_ok: "internal:menu/modding/input_ok"
+    input_empty: "internal:menu/modding/input_empty"
+    output_ok: "internal:menu/modding/output_ok"
+    output_empty: "internal:menu/modding/output_empty"
+    output_failure: "internal:menu/modding/output_failure"
+    output_insufficient_resource: "internal:menu/modding/output_insufficient_resource"
 
 # 核孔的基础菜单设置
 replace_menu_settings:
@@ -33,6 +43,10 @@ replace_menu_settings:
   # b: 输入
   # *: 兼容性检查
   structure: ["a * b"]
+  # compatibility_view: 兼容性检查
+  # core_view: 目标核心
+  # core_unusable: 不可用核心
+  # core_usable: 可用核心
   icons:
     compatibility_view: "internal:menu/modding/compatibility_view"
     core_view: "internal:menu/modding/core_view"

@@ -7,7 +7,7 @@ base: bedrock
 # 为了让该组件支持*任意*占位符, 程序员需要*解析*该组件里的占位符.
 # 首先, 程序员应该将该物品蓝图给实例化, 获得一个对应的物品堆叠.
 # 此时, 物品堆叠里的 `minecraft:lore` 还是空的 (因为还未解析).
-# 程序员需要调用 `MenuLore` 组件上相应的函数 (e.g. MenuLore#resolve) 来解析出一个 `List<Component>` 对象,
+# 程序员需要调用 `MenuIconLore` 组件上相应的函数 (e.g. MenuLore#resolve) 来解析出一个 `List<Component>` 对象,
 # 该对象是解析生成出来的文本列表, 可直接应用到 `minecraft:lore`.
 # 为了更方便的完成上述操作, 可以添加一个 NekoStack#resolveMenuLore 的扩展函数, 将解析后的文本列表直接应用到物品堆叠上.
 #

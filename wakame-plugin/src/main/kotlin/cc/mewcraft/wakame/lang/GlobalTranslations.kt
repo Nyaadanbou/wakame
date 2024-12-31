@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_LOADER
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslatableComponent
@@ -24,38 +24,22 @@ import java.text.MessageFormat
 import java.util.Locale
 
 fun ComponentLike.translate(locale: Locale): Component {
-    val component = asComponent()
+    val component = asComponent() // 如果是 TranslatableComponent.Builder 会隐式调用 #build()
     if (component is TranslatableComponent) {
         return GlobalTranslations.translate(component, locale)
-    } else if (component is TranslatableComponent.Builder) {
-        return GlobalTranslations.translate(component.build(), locale)
     } else {
         return component
     }
 }
 
-fun TranslatableComponent.translate(locale: Locale): Component {
-    return GlobalTranslations.translate(this, locale)
-}
+fun ComponentLike.translate(viewer: Audience): Component = translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
 
-fun TranslatableComponent.Builder.translate(locale: Locale): Component {
-    return GlobalTranslations.translate(this.build(), locale)
-}
-
-fun ComponentLike.translate(viewer: Audience): Component {
-    return translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
-}
-
-fun TranslatableComponent.translate(viewer: Audience): Component {
-    return translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
-}
-
-fun TranslatableComponent.Builder.translate(viewer: Audience): Component {
-    return build().translate(viewer)
-}
+// 如果 ComponentLike 在一个容器里, 那这个容器一般都是 List (或至少是有序的)
+fun List<ComponentLike>.translate(locale: Locale): List<Component> = map { it.translate(locale) }
+fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.translate(viewer) }
 
 object GlobalTranslations : Initializable, KoinComponent {
-    private val TRANSLATION_KEY = Key("wakame", "global.translation")
+    private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
     private val miniMessage: MiniMessage by inject()
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, miniMessage)

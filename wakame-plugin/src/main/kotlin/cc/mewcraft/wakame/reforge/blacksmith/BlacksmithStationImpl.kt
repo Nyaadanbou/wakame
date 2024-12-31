@@ -13,7 +13,7 @@ import net.kyori.examination.string.StringExaminer
 import java.util.stream.Stream
 
 internal data object WtfBlacksmithStation : BlacksmithStation {
-    override val primarySettings: BasicMenuSettings = BasicMenuSettings(
+    override val primaryMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = Component.text("DO NOT USE"),
         structure = arrayOf(
             ". . . . . . . . .",
@@ -27,7 +27,7 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
             "select_recycling" to Key.key("internal:menu/blacksmith/default/select_recycling"),
         )
     )
-    override val recyclingSettings: BasicMenuSettings = BasicMenuSettings(
+    override val recyclingMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = Component.text("Recycling Station (Cheat Mode)"),
         structure = arrayOf(
             "i i i i i . .",
@@ -35,12 +35,12 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
         ),
         icons = hashMapOf(
             "background" to Key.key("internal:menu/common/default/background"),
-            "recycle_when_confirmed" to Key.key("internal:menu/blacksmith/default/recycle_when_confirmed"),
             "recycle_when_empty" to Key.key("internal:menu/blacksmith/default/recycle_when_empty"),
+            "recycle_when_confirmed" to Key.key("internal:menu/blacksmith/default/recycle_when_confirmed"),
             "recycle_when_unconfirmed" to Key.key("internal:menu/blacksmith/default/recycle_when_unconfirmed"),
         )
     )
-    override val repairingSettings: BasicMenuSettings = BasicMenuSettings(
+    override val repairingMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = Component.text("Repairing Table (Cheat Mode)"),
         structure = arrayOf(
             "i i i i i . .",
@@ -54,26 +54,26 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
 
     override val recyclingStation: RecyclingStation = WtfRecyclingStation
     override val repairingTable: RepairingTable = WtfRepairingTable
-    override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingSettings)
+    override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingMenuSettings)
 }
 
 internal class SimpleBlacksmithStation(
     /* settings */
-    override val primarySettings: BasicMenuSettings,
-    override val recyclingSettings: BasicMenuSettings,
-    override val repairingSettings: BasicMenuSettings,
+    override val primaryMenuSettings: BasicMenuSettings,
+    override val recyclingMenuSettings: BasicMenuSettings,
+    override val repairingMenuSettings: BasicMenuSettings,
     /* stations */
     override val recyclingStation: RecyclingStation,
     override val repairingTable: RepairingTable,
 ) : BlacksmithStation, Examinable {
-    override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingSettings)
+    override val recyclingInventorySize: Int = BlacksmithStation.calculateRecyclingInventorySize(recyclingMenuSettings)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             /* settings */
-            ExaminableProperty.of("primarySettings", primarySettings),
-            ExaminableProperty.of("recyclingSettings", recyclingSettings),
-            ExaminableProperty.of("repairingSettings", repairingSettings),
+            ExaminableProperty.of("primaryMenuSettings", primaryMenuSettings),
+            ExaminableProperty.of("recyclingMenuSettings", recyclingMenuSettings),
+            ExaminableProperty.of("repairingMenuSettings", repairingMenuSettings),
             /* stations */
             ExaminableProperty.of("recyclingStation", recyclingStation),
             ExaminableProperty.of("repairingTable", repairingTable),

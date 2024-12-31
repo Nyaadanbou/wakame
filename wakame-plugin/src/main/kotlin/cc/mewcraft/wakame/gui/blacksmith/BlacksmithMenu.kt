@@ -190,8 +190,8 @@ internal class BlacksmithMenu(
     private val sellButton = SellButton()
 
     private val recyclingGui = Gui.normal { builder ->
-        builder.setStructure(*station.recyclingSettings.structure)
-        builder.addIngredient('.', station.recyclingSettings.getSlotDisplay("background").resolveToItemStack())
+        builder.setStructure(*station.recyclingMenuSettings.structure)
+        builder.addIngredient('.', station.recyclingMenuSettings.getSlotDisplay("background").resolveToItemStack())
         builder.addIngredient('i', recyclingInventory)
         builder.addIngredient('x', sellButton)
     }
@@ -273,16 +273,16 @@ internal class BlacksmithMenu(
     }
 
     private val repairingGui = Gui.normal { builder ->
-        builder.setStructure(*station.repairingSettings.structure)
-        builder.addIngredient('.', station.repairingSettings.getSlotDisplay("background").resolveToItemStack())
-        builder.addIngredient('*', station.repairingSettings.getSlotDisplay("background2").resolveToItemStack())
+        builder.setStructure(*station.repairingMenuSettings.structure)
+        builder.addIngredient('.', station.repairingMenuSettings.getSlotDisplay("background").resolveToItemStack())
+        builder.addIngredient('*', station.repairingMenuSettings.getSlotDisplay("background2").resolveToItemStack())
         builder.addIngredient('i', repairingInventory)
     }
 
     // 用于承载回收和修复两个 TabGui
     private val primaryUpperGui = TabGui.normal { builder ->
-        builder.setStructure(*station.primarySettings.structure)
-        builder.addIngredient('.', station.primarySettings.getSlotDisplay("background").resolveToItemStack())
+        builder.setStructure(*station.primaryMenuSettings.structure)
+        builder.addIngredient('.', station.primaryMenuSettings.getSlotDisplay("background").resolveToItemStack())
         builder.addIngredient('*', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('s', SwitchItem())
         builder.setTabs(
@@ -296,7 +296,7 @@ internal class BlacksmithMenu(
 
     private val window2 = Window.single { builder ->
         builder.setGui(primaryUpperGui)
-        builder.setTitle(station.recyclingSettings.title)
+        builder.setTitle(station.recyclingMenuSettings.title)
         builder.setViewer(viewer)
         builder.addOpenHandler(::onWindowOpen)
         builder.addCloseHandler(::onWindowClose)
@@ -323,11 +323,11 @@ internal class BlacksmithMenu(
         override fun getItemProvider(gui: TabGui): ItemProvider {
             val currentTab = getCurrentTab()
             val itemStack = if (currentTab == TabType.RECYCLING) {
-                window2.changeTitle(station.recyclingSettings.title)
-                station.primarySettings.getSlotDisplay("select_repairing").resolveToItemStack()
+                window2.changeTitle(station.recyclingMenuSettings.title)
+                station.primaryMenuSettings.getSlotDisplay("select_repairing").resolveToItemStack()
             } else {
-                window2.changeTitle(station.repairingSettings.title)
-                station.primarySettings.getSlotDisplay("select_recycling").resolveToItemStack()
+                window2.changeTitle(station.repairingMenuSettings.title)
+                station.primaryMenuSettings.getSlotDisplay("select_recycling").resolveToItemStack()
             }
             return ItemWrapper(itemStack)
         }
@@ -356,13 +356,13 @@ internal class BlacksmithMenu(
     private inner class SellButton : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             if (recyclingSession.getAllClaims().isEmpty()) {
-                return station.recyclingSettings.getSlotDisplay("recycling_empty").resolveToItemWrapper()
+                return station.recyclingMenuSettings.getSlotDisplay("recycle_when_empty").resolveToItemWrapper()
             }
 
             val slotDisplay = if (confirmed) {
-                station.recyclingSettings.getSlotDisplay("recycling_confirmed")
+                station.recyclingMenuSettings.getSlotDisplay("recycle_when_confirmed")
             } else {
-                station.recyclingSettings.getSlotDisplay("recycling_unconfirmed")
+                station.recyclingMenuSettings.getSlotDisplay("recycle_when_unconfirmed")
             }
 
             return slotDisplay.resolveToItemWrapper {

@@ -93,7 +93,7 @@ internal class ModdingMenu(
         builder.addIngredient('.', table.primaryMenuSettings.getSlotDisplay("background").resolveToItemWrapper())
         builder.addIngredient('#', table.primaryMenuSettings.getSlotDisplay("background2").resolveToItemWrapper())
         builder.addIngredient('i', inputSlot)
-        builder.addIngredient('o', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_slot_empty").resolveToItemWrapper())
+        builder.addIngredient('o', outputSlot, table.primaryMenuSettings.getSlotDisplay("output_empty").resolveToItemWrapper())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
@@ -214,7 +214,7 @@ internal class ModdingMenu(
 
                     // 检查玩家是否有足够的资源完成定制
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_slot_insufficient_resource").resolveToItemStack())
+                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_insufficient_resource").resolveToItemStack())
                         return
                     }
 
@@ -282,14 +282,14 @@ internal class ModdingMenu(
             val outputItemStack = outputNekoStack.wrapped
 
             // 再用 SlotDisplay 处理一下
-            table.primaryMenuSettings.getSlotDisplay("output_slot_ready").resolveToItemStack {
+            table.primaryMenuSettings.getSlotDisplay("output_ok").resolveToItemStack {
                 standard { component("item_name", outputItemStack.itemNameOrType) }
                 folded("item_lore", outputItemStack.itemLoreOrEmpty)
             }
         } else {
             // 定制失败了:
 
-            table.primaryMenuSettings.getSlotDisplay("output_slot_failed").resolveToItemStack {
+            table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 folded("cost_description", reforgeResult.reforgeCost.description)
                 folded("result_description", reforgeResult.description)
             }
@@ -339,7 +339,7 @@ internal class ModdingMenu(
         val newItemStack = sourceItem.itemStack
 
         // 再用 SlotDisplay 处理一下
-        table.primaryMenuSettings.getSlotDisplay("input_slot").resolveEverything {
+        table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
             standard { component("item_name", newItemStack.itemNameOrType) }
             folded("item_lore", newItemStack.itemLoreOrEmpty)
         }.applyTo(newItemStack)

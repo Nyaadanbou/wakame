@@ -11,6 +11,7 @@ primary_menu_settings:
   icons:
     select_repairing: "internal:menu/blacksmith/select_repairing"
     select_recycling: "internal:menu/blacksmith/select_recycling"
+
 repairing_menu_settings:
   title: "修复台: example_b"
   structure:
@@ -22,6 +23,6 @@ recycling_menu_settings:
     - "i i i i i . ."
     - "i i i i i . x"
   icons:
-    recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
     recycle_when_empty: "internal:menu/blacksmith/recycle_when_empty"
+    recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
     recycle_when_unconfirmed: "internal:menu/blacksmith/recycle_when_unconfirmed"

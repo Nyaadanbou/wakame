@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 
 interface BlacksmithStation {
-    val primarySettings: BasicMenuSettings
-    val recyclingSettings: BasicMenuSettings
-    val repairingSettings: BasicMenuSettings
+    val primaryMenuSettings: BasicMenuSettings
+    val recyclingMenuSettings: BasicMenuSettings
+    val repairingMenuSettings: BasicMenuSettings
 
     val recyclingStation: RecyclingStation
     val repairingTable: RepairingTable

@@ -4,4 +4,4 @@ menu_icon_lore:
   - ""
   - "<!i>{cost_description}"
   - ""
-  - "<!i>再次点击取出物品"
+  - "<!i><aqua>再次点击取出物品"

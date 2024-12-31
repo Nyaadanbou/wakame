@@ -7,5 +7,5 @@ base: bedrock
 # 参考 MenuLore.
 #
 # 对于用户:
-# 参考 MenuLore.
+# 参考 MenuIconLore.
 menu_icon_name: "你正在出售 <item_count> 组物品"

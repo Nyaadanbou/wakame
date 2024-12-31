@@ -39,9 +39,9 @@ internal object BlacksmithStationSerializer {
                 val rootNode = yamlLoader.buildAndLoadString(f.readText())
                 val repairId = rootNode.node("repair").krequire<String>()
                 val recycleId = rootNode.node("recycle").krequire<String>()
-                val primarySettings = rootNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
-                val recyclingSettings = rootNode.node("recycling_menu_settings").krequire<BasicMenuSettings>()
-                val repairingSettings = rootNode.node("repairing_menu_settings").krequire<BasicMenuSettings>()
+                val primaryMenuSettings = rootNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
+                val recyclingMenuSettings = rootNode.node("recycling_menu_settings").krequire<BasicMenuSettings>()
+                val repairingMenuSettings = rootNode.node("repairing_menu_settings").krequire<BasicMenuSettings>()
 
                 val repairingTable = RepairingTableRegistry.getTable(repairId) ?: run {
                     LOGGER.warn("Unknown repairing table: $repairId")
@@ -55,7 +55,7 @@ internal object BlacksmithStationSerializer {
                 LOGGER.info("Loaded blacksmith station: $id")
 
                 id to SimpleBlacksmithStation(
-                    primarySettings, recyclingSettings, repairingSettings,
+                    primaryMenuSettings, recyclingMenuSettings, repairingMenuSettings,
                     recyclingStation, repairingTable
                 )
             }.toMap()

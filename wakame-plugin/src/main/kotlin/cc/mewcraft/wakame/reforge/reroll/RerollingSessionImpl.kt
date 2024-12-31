@@ -4,11 +4,12 @@ import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
+import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
@@ -46,7 +47,7 @@ internal class SimpleRerollingSession(
         // logger.info("Selection map updated: $old -> $new")
     }
 
-    override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
+    override var latestResult: RerollingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty(viewer)) { _, old, new ->
         // logger.info("Result status updated: $old -> $new")
     }
 
@@ -65,7 +66,7 @@ internal class SimpleRerollingSession(
             ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("An unknown error occurred while rerolling an item", e)
-            ReforgeResult.error()
+            ReforgeResult.error(viewer)
         }
     }
 
@@ -76,7 +77,7 @@ internal class SimpleRerollingSession(
     override fun reset() {
         originalInput = null
         selectionMap = SelectionMap.empty(this)
-        latestResult = ReforgeResult.empty()
+        latestResult = ReforgeResult.empty(viewer)
     }
 
     override fun getAllInputs(): Array<ItemStack> {
@@ -130,43 +131,36 @@ internal object ReforgeResult {
     /**
      * 空结果; 用于表示没有要重造的物品.
      */
-    fun empty(): RerollingSession.ReforgeResult {
-        return Empty()
+    fun empty(viewer: Player): RerollingSession.ReforgeResult {
+        return Empty(viewer)
     }
 
     /**
      * 错误结果; 用于表示重造过程中出现了内部错误.
      */
-    fun error(): RerollingSession.ReforgeResult {
-        return Error()
+    fun error(viewer: Player): RerollingSession.ReforgeResult {
+        return Error(viewer)
     }
 
     /**
      * 失败结果; 用于表示因已知的某些条件不满足而无法进行重造.
      */
-    fun failure(
-        description: List<ComponentLike>,
-    ): RerollingSession.ReforgeResult {
-        return Simple(false, description, NekoStack.empty(), ReforgeCost.empty())
+    fun failure(viewer: Player, description: List<ComponentLike>): RerollingSession.ReforgeResult {
+        return Simple(false, description.translate(viewer), NekoStack.empty(), ReforgeCost.empty(viewer))
     }
 
     /**
      * 参考 [ReforgeResult.failure].
      */
-    fun failure(
-        description: ComponentLike,
-    ): RerollingSession.ReforgeResult {
-        return failure(listOf(description))
+    fun failure(viewer: Player, description: ComponentLike): RerollingSession.ReforgeResult {
+        return failure(viewer, listOf(description))
     }
 
     /**
      * 成功结果; 用于表示重造已准备就绪.
      */
-    fun success(
-        item: NekoStack,
-        cost: RerollingSession.ReforgeCost,
-    ): RerollingSession.ReforgeResult {
-        return Simple(true, MessageConstants.MSG_REROLLING_RESULT_SUCCESS.build(), item, cost)
+    fun success(viewer: Player, item: NekoStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
+        return Simple(true, MessageConstants.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
     }
 
     private abstract class Base : RerollingSession.ReforgeResult {
@@ -180,36 +174,37 @@ internal object ReforgeResult {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Error : Base() {
+    // FIXME data class
+    private class Error(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.build())
-        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error()
+        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
 
-    private class Empty : Base() {
+    private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_RESULT_EMPTY.build())
-        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty()
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
+        override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
 
     private class Simple(
         successful: Boolean,
-        description: List<ComponentLike>,
+        description: List<Component>,
         item: NekoStack,
         cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
-            description: ComponentLike,
+            description: Component,
             item: NekoStack,
             cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
         override val isSuccess: Boolean = successful
-        override val description: List<Component> = description.map(ComponentLike::asComponent)
+        override val description: List<Component> = description
         override val reforgeCost: RerollingSession.ReforgeCost = cost
         override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
 
@@ -228,26 +223,25 @@ internal object ReforgeCost {
     /**
      * 空的花费; 当没有需要重造的物品时, 使用这个.
      */
-    fun empty(): RerollingSession.ReforgeCost {
-        return Empty()
+    fun empty(viewer: Player): RerollingSession.ReforgeCost {
+        return Empty(viewer)
     }
 
     /**
      * 错误的花费; 当重造过程中出现了内部错误, 使用这个.
      */
-    fun error(): RerollingSession.ReforgeCost {
-        return Error()
+    fun error(viewer: Player): RerollingSession.ReforgeCost {
+        return Error(viewer)
     }
 
     /**
      * 正常的花费; 当重造已经准备就绪时, 使用这个.
      */
-    fun simple(
-        currencyAmount: Double,
-    ): RerollingSession.ReforgeCost {
-        return Simple(currencyAmount)
+    fun simple(viewer: Player, currencyAmount: Double): RerollingSession.ReforgeCost {
+        return Simple(viewer, currencyAmount)
     }
 
+    // FIXME data class
     private abstract class Base : RerollingSession.ReforgeCost {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
@@ -256,21 +250,19 @@ internal object ReforgeCost {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Error : Base() {
+    private class Error(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.build())
+        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
     }
 
-    private class Empty : Base() {
+    private class Empty(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.build())
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.translate(viewer))
     }
 
-    private class Simple(
-        val currencyAmount: Double,
-    ) : RerollingSession.ReforgeCost {
+    private class Simple(viewer: Player, val currencyAmount: Double) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
             EconomyManager.take(viewer.uniqueId, currencyAmount)
         }
@@ -279,7 +271,7 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.build())
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.translate(viewer))
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
@@ -301,15 +293,11 @@ internal object Selection {
     /**
      * 创建一个可被修改的 [Selection].
      */
-    fun changeable(
-        session: RerollingSession,
-        id: String,
-        rule: RerollingTable.CellRule,
-        template: Group<CoreArchetype, ItemGenerationContext>,
-    ): RerollingSession.Selection {
+    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CellRule, template: Group<CoreArchetype, ItemGenerationContext>): RerollingSession.Selection {
         return Simple(session, id, rule, template)
     }
 
+    // FIXME data class
     private class Empty(
         override val session: RerollingSession,
         override val id: String,
@@ -385,7 +373,7 @@ internal object SelectionMap : KoinComponent {
 
         // 获取源物品的核孔
         // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
-        val cells = usableInput.components.get(ItemComponentTypes.CELLS) ?: return empty(session)
+        val cells = usableInput.cells ?: return empty(session)
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
@@ -420,6 +408,7 @@ internal object SelectionMap : KoinComponent {
 
     // private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
 
+    // FIXME data class
     private class Empty(
         override val session: RerollingSession,
     ) : RerollingSession.SelectionMap {

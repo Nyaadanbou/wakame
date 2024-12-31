@@ -1,5 +1,2 @@
 base: writable_book
-menu_icon_name: "没有要出售的物品"
-menu_icon_lore:
-  - "<!i>点击自己背包中的物品"
-  - "<!i>以选择出售给铁匠"
+menu_icon_name: "RECYCLE_WHEN_EMPTY"

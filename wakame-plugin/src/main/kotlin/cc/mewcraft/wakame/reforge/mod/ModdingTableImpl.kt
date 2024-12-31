@@ -35,11 +35,12 @@ internal object WtfModdingTable : ModdingTable {
             "prev_page" to Key.key("internal:menu/common/default/prev_page"),
             "next_page" to Key.key("internal:menu/common/default/next_page"),
             "background2" to Key.key("internal:menu/modding/default/background2"),
-            "input_slot" to Key.key("internal:menu/modding/default/input_slot"),
-            "input_slot_empty" to Key.key("internal:menu/modding/default/input_slot_empty"),
-            "output_slot" to Key.key("internal:menu/modding/default/output_slot"),
-            "output_slot_empty" to Key.key("internal:menu/modding/default/output_slot_empty"),
-            "output_slot_insufficient_resource" to Key.key("internal:menu/modding/default/output_slot_insufficient_resource"),
+            "input_ok" to Key.key("internal:menu/modding/default/input_ok"),
+            "input_empty" to Key.key("internal:menu/modding/default/input_empty"),
+            "output_ok_confirmed" to Key.key("internal:menu/modding/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/modding/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/modding/default/output_empty"),
+            "output_insufficient_resource" to Key.key("internal:menu/modding/default/output_insufficient_resource"),
         )
     )
     override val replaceMenuSettings: BasicMenuSettings = BasicMenuSettings(

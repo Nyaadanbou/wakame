@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
@@ -66,7 +67,7 @@ internal class SimpleModdingSession(
     override val totalFunction: MochaFunction = table.currencyCost.total.compile(this)
 
     // 初始为 ReforgeResult.empty() 表示还没有输入
-    override var latestResult: ModdingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty()) { _, old, new ->
+    override var latestResult: ModdingSession.ReforgeResult by Delegates.observable(ReforgeResult.empty(viewer)) { _, old, new ->
         // logger.info("Session's result updated: $old -> $new")
     }
 
@@ -86,7 +87,7 @@ internal class SimpleModdingSession(
             ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("An error occurred while executing reforge operation", e)
-            ReforgeResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+            ReforgeResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -267,34 +268,38 @@ internal class SimpleModdingSession(
 
 internal object ReforgeResult {
     /**
-     * 空的结果. 当要定制的物品不存在时, 用这个.
+     * 内部错误: 发生了无法预料的错误.
      */
-    fun empty(): ModdingSession.ReforgeResult {
-        return Empty()
+    fun error(viewer: Player): ModdingSession.ReforgeResult {
+        return Error(viewer)
     }
 
     /**
-     * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
+     * 空的结果: 要定制的物品不存在.
      */
-    fun failure(description: List<ComponentLike>): ModdingSession.ReforgeResult {
-        return Failure(description.map(ComponentLike::asComponent))
+    fun empty(viewer: Player): ModdingSession.ReforgeResult {
+        return Empty(viewer)
     }
 
     /**
-     * 失败的结果. 当存在要定制的物品, 但由于某种原因无法定制时, 用这个.
+     * 失败的结果: 存在要定制的物品, 但由于某种原因无法定制.
      */
-    fun failure(description: ComponentLike): ModdingSession.ReforgeResult {
-        return failure(listOf(description))
+    fun failure(viewer: Player, description: List<ComponentLike>): ModdingSession.ReforgeResult {
+        return Failure(viewer, description.translate(viewer))
     }
 
     /**
-     * 成功的结果. 当成功定制物品时, 用这个.
+     * 失败的结果: 存在要定制的物品, 但由于某种原因无法定制.
      */
-    fun success(
-        outputItem: NekoStack,
-        cost: ModdingSession.ReforgeCost,
-    ): ModdingSession.ReforgeResult {
-        return Success(outputItem, listOf(MessageConstants.MSG_MODDING_RESULT_SUCCESS.build()), cost)
+    fun failure(viewer: Player, description: ComponentLike): ModdingSession.ReforgeResult {
+        return failure(viewer, listOf(description))
+    }
+
+    /**
+     * 成功的结果: 成功定制物品.
+     */
+    fun success(viewer: Player, outputItem: NekoStack, cost: ModdingSession.ReforgeCost): ModdingSession.ReforgeResult {
+        return Success(viewer, outputItem, listOf(MessageConstants.MSG_MODDING_RESULT_SUCCESS.translate(viewer)), cost)
     }
 
     private abstract class Base : ModdingSession.ReforgeResult {
@@ -308,27 +313,28 @@ internal object ReforgeResult {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Empty : Base() {
+    private class Error(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_RESULT_EMPTY.build())
-        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack? = null
     }
 
-    private class Failure(
-        description: List<Component>,
-    ) : Base() {
+    private class Empty(viewer: Player) : Base() {
+        override val isSuccess: Boolean = false
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_RESULT_EMPTY.translate(viewer))
+        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty(viewer)
+        override val output: NekoStack? = null
+    }
+
+    private class Failure(viewer: Player, description: List<Component>) : Base() {
         override val isSuccess: Boolean = false
         override val description: List<Component> = description
-        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty()
+        override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack? = null
     }
 
-    private class Success(
-        outputItem: NekoStack,
-        description: List<Component>,
-        cost: ModdingSession.ReforgeCost,
-    ) : Base() {
+    private class Success(viewer: Player, outputItem: NekoStack, description: List<Component>, cost: ModdingSession.ReforgeCost) : Base() {
         override val isSuccess: Boolean = true
         override val description: List<Component> = description
         override val reforgeCost: ModdingSession.ReforgeCost = cost
@@ -337,30 +343,21 @@ internal object ReforgeResult {
 }
 
 internal object ReforgeCost {
-    fun empty(): ModdingSession.ReforgeCost {
-        return Empty()
+    fun empty(viewer: Player): ModdingSession.ReforgeCost {
+        return Empty(viewer)
     }
 
     /**
      * @param currencyAmount 要消耗的默认货币数量
      */
-    fun simple(
-        currencyAmount: Double,
-    ): ModdingSession.ReforgeCost {
-        return Simple(currencyAmount)
+    fun simple(viewer: Player, currencyAmount: Double): ModdingSession.ReforgeCost {
+        return Simple(viewer, currencyAmount)
     }
 
-    private class Empty : ModdingSession.ReforgeCost {
-        override fun take(viewer: Player) {
-            // do nothing
-        }
-
-        override fun test(viewer: Player): Boolean {
-            return true
-        }
-
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_COST_EMPTY.build())
-
+    private class Empty(viewer: Player) : ModdingSession.ReforgeCost {
+        override fun take(viewer: Player) = Unit
+        override fun test(viewer: Player): Boolean = true
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_COST_EMPTY.translate(viewer))
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
         )
@@ -368,9 +365,7 @@ internal object ReforgeCost {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Simple(
-        val currencyAmount: Double,
-    ) : ModdingSession.ReforgeCost {
+    private class Simple(viewer: Player, val currencyAmount: Double) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) {
             EconomyManager.take(viewer.uniqueId, currencyAmount)
         }
@@ -381,8 +376,8 @@ internal object ReforgeCost {
 
         override val description: List<Component> = listOf(
             MessageConstants.MSG_MODDING_COST_SIMPLE.arguments(
-                TranslationArgument.numeric(currencyAmount.toInt() + 1 /* +1 使边界情况看起来合理 */)
-            ).build()
+                TranslationArgument.numeric(currencyAmount.toInt() + 1) // +1 使边界情况看起来合理
+            ).translate(viewer)
         )
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -398,21 +393,14 @@ private object ReforgeReplace {
     /**
      * 封装一个不可修改的核孔.
      */
-    fun unchangeable(
-        session: SimpleModdingSession,
-        cell: Cell,
-    ): ModdingSession.Replace {
+    fun unchangeable(session: SimpleModdingSession, cell: Cell): ModdingSession.Replace {
         return Unchangeable(session, cell)
     }
 
     /**
      * 封装一个可以修改的核孔.
      */
-    fun changeable(
-        session: SimpleModdingSession,
-        cell: Cell,
-        rule: CellRule,
-    ): ModdingSession.Replace {
+    fun changeable(session: SimpleModdingSession, cell: Cell, rule: CellRule): ModdingSession.Replace {
         return Changeable(session, cell, rule)
     }
 
@@ -450,7 +438,7 @@ private object ReforgeReplace {
         override val augment: PortableCore? = null
 
         // 永远返回同样的结果: 核孔无法修改
-        override var latestResult = ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_UNCHANGEABLE)
+        override var latestResult = ReforgeReplaceResult.failure(session.viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_UNCHANGEABLE)
 
         override fun getIngredientLevel(): Int = 0
         override fun getIngredientRarityNumber(): Double = .0
@@ -518,25 +506,28 @@ private object ReforgeReplace {
         override val changeable: Boolean
             get() = true
 
-        override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReforgeReplaceResult.empty()) { _, old, new ->
+        override var latestResult: ModdingSession.Replace.Result by Delegates.observable(ReforgeReplaceResult.empty(viewer)) { _, old, new ->
             // session.logger.info("Replace (changeable) result updated: $old -> $new")
         }
+
+        private val viewer: Player
+            get() = session.viewer
 
         private fun executeReplace0(originalInput: ItemStack?): ModdingSession.Replace.Result {
             // 如果耗材为空, 则返回空结果
             if (originalInput.isEmpty()) {
-                return ReforgeReplaceResult.empty()
+                return ReforgeReplaceResult.empty(viewer)
             }
 
             // 如果源物品为空, 则返回内部错误
             val usableInput = session.usableInput ?: run {
                 session.logger.error("Usable input is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             val itemRule = session.itemRule ?: run {
                 session.logger.error("Item rule is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             // TODO 检查权限
@@ -544,19 +535,19 @@ private object ReforgeReplace {
             // 获取耗材中的便携核心
             val customNekoStack = originalInput.shadowNeko(true)
             val portableCore = customNekoStack?.portableCore ?: run {
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
             }
 
             // 获取源物品上的核孔
             val inputCells = usableInput.cells ?: run {
                 session.logger.error("Usable input has no cells, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
             }
 
             // 源物品的核孔上 必须没有与便携核心相似的核心
             val inputCellsExcludingThis = inputCells.filter2 { it.getId() != cell.getId() }
             if (inputCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
             }
 
             if (
@@ -564,12 +555,12 @@ private object ReforgeReplace {
                     .filter { it.key != cell.getId() } // 排除掉当前的核孔
                     .any { it.value.usableInput?.portableCore?.wrapped?.similarTo(portableCore.wrapped) == true }
             ) {
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
             }
 
             // 便携式核心的类型 必须符合定制规则
             if (!cellRule.acceptableCores.test(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
@@ -578,18 +569,18 @@ private object ReforgeReplace {
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnInput) {
-                    return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
+                    return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = usableInput.reforgeHistory.modCount
             if (modCount >= itemRule.modLimit) {
-                return ReforgeReplaceResult.failure(MessageConstants.MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT)
+                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT)
             }
 
             // 全部检查通过!
-            return ReforgeReplaceResult.success(MessageConstants.MSG_MODDING_REPLACE_RESULT_SUCCESS.build())
+            return ReforgeReplaceResult.success(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SUCCESS)
         }
 
         override fun getIngredientLevel(): Int {
@@ -612,24 +603,24 @@ private object ReforgeReplaceResult {
     /**
      * 空的结果. 当没有耗材输入时, 用这个.
      */
-    fun empty(): ModdingSession.Replace.Result {
-        return Empty()
+    fun empty(viewer: Player): ModdingSession.Replace.Result {
+        return Empty(viewer)
     }
 
-    fun failure(description: List<ComponentLike>): ModdingSession.Replace.Result {
-        return Simple(false, description.map(ComponentLike::asComponent))
+    fun failure(viewer: Player, description: List<ComponentLike>): ModdingSession.Replace.Result {
+        return Simple(false, description.translate(viewer))
     }
 
-    fun failure(description: ComponentLike): ModdingSession.Replace.Result {
-        return failure(listOf(description))
+    fun failure(viewer: Player, description: ComponentLike): ModdingSession.Replace.Result {
+        return failure(viewer, listOf(description))
     }
 
-    fun success(description: List<Component>): ModdingSession.Replace.Result {
-        return Simple(true, description)
+    fun success(viewer: Player, description: List<ComponentLike>): ModdingSession.Replace.Result {
+        return Simple(true, description.translate(viewer))
     }
 
-    fun success(description: Component): ModdingSession.Replace.Result {
-        return success(listOf(description))
+    fun success(viewer: Player, description: ComponentLike): ModdingSession.Replace.Result {
+        return success(viewer, listOf(description))
     }
 
     private abstract class Base : ModdingSession.Replace.Result {
@@ -641,9 +632,9 @@ private object ReforgeReplaceResult {
         override fun toString(): String = toSimpleString()
     }
 
-    private class Empty : Base() {
+    private class Empty(viewer: Player) : Base() {
         override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_REPLACE_RESULT_EMPTY.build())
+        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_REPLACE_RESULT_EMPTY.translate(viewer))
     }
 
     private class Simple(

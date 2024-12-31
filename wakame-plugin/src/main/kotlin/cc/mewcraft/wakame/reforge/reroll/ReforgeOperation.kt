@@ -3,10 +3,14 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.elements
+import cc.mewcraft.wakame.item.kizamiz
+import cc.mewcraft.wakame.item.level
+import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.template.AttributeContextData
@@ -16,8 +20,8 @@ import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.RarityRegistry
 import net.kyori.adventure.key.Key
+import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.slf4j.Logger
 
@@ -34,6 +38,8 @@ private constructor(
         }
     }
 
+    private val viewer: Player
+        get() = session.viewer
     private val logger: Logger
         get() = session.logger
 
@@ -43,52 +49,45 @@ private constructor(
     private fun execute(): RerollingSession.ReforgeResult {
         if (session.frozen) {
             logger.error("Trying to refresh output in a frozen session. This is a bug!")
-            return ReforgeResult.error()
+            return ReforgeResult.error(viewer)
         }
 
-        // 获取 originalInput
-        // 如果 originalInput 不存在, 则代表没有输入
-        val originalInput = session.originalInput
-            ?: return ReforgeResult.empty()
+        // 获取 originalInput. 如果不存在, 则代表没有输入
+        val originalInput = session.originalInput ?: return ReforgeResult.empty(viewer)
 
-        // 获取 usableInput
-        // 如果 usableInput 不存在, 则代表物品无法重造
-        val usableInput = session.usableInput
-            ?: return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_NOT_USABLE)
+        // 获取 usableInput. 如果不存在, 则代表物品无法重造
+        val usableInput = session.usableInput ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_NOT_USABLE)
 
-        val itemRule = session.itemRule
-            ?: return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_ITEM_RULE_NOT_FOUND)
+        // 获取 itemRule. 如果不存在, 则代表物品无法重造
+        val itemRule = session.itemRule ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_ITEM_RULE_NOT_FOUND)
 
-        // 获取核孔的选择状态
-        // 如果没有可重造的核孔, 返回一个失败结果
+        // 获取核孔的选择状态. 如果没有可重造的核孔, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (!selectionMap.values.any { it.changeable }) {
-            return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_CHANGEABLE)
+            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_CHANGEABLE)
         }
 
         // 如果没有选择任何核孔, 返回一个失败结果
         if (!selectionMap.values.any { it.selected }) {
-            return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_SELECTED)
+            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_SELECTED)
         }
 
         // 获取必要的物品组件
         val itemId = usableInput.id
-        val itemLevel = usableInput.components.get(ItemComponentTypes.LEVEL)?.level
-            ?: return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_LEVEL)
-        val itemCells = usableInput.components.get(ItemComponentTypes.CELLS)
-            ?: return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
+        val itemLevel = usableInput.level
+        val itemCells = usableInput.cells ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
 
         // 检查重铸次数是否超过了重铸次数上限
         val modCount = usableInput.reforgeHistory.modCount
         val modLimit = itemRule.modLimit
         if (modCount >= modLimit) {
-            return ReforgeResult.failure(MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT)
+            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT)
         }
 
         // 获取可有可无的物品组件
-        val itemRarity = usableInput.components.get(ItemComponentTypes.RARITY)?.rarity ?: RarityRegistry.DEFAULT
-        val itemElements = usableInput.components.get(ItemComponentTypes.ELEMENTS)?.elements ?: emptySet()
-        val itemKizamiz = usableInput.components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz ?: emptySet()
+        val itemRarity = usableInput.rarity
+        val itemElements = usableInput.elements
+        val itemKizamiz = usableInput.kizamiz
 
         // 准备生成核心用的上下文
         val context = try {
@@ -102,7 +101,7 @@ private constructor(
             )
         } catch (e: Exception) { // 有必要 try-catch?
             logger.error("Unexpected error while preparing generation context", e)
-            return ReforgeResult.error()
+            return ReforgeResult.error(viewer)
         }
 
         val updatedItemCells = itemCells.builder().apply {
@@ -129,12 +128,12 @@ private constructor(
         val output = usableInput.clone()
 
         // 将新的核孔组件写入物品
-        output.components.set(ItemComponentTypes.CELLS, updatedItemCells)
+        output.cells = updatedItemCells
 
         // 计算重造物品的总花费
-        val total = ReforgeCost.simple(session.total.evaluate())
+        val total = ReforgeCost.simple(viewer, session.total.evaluate())
 
-        return ReforgeResult.success(output, total)
+        return ReforgeResult.success(viewer, output, total)
     }
 
     /**

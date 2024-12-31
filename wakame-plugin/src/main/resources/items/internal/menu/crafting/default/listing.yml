@@ -1,16 +1,8 @@
 menu_icon_name: "合成: <item_name>"
 menu_icon_lore:
-  - "<!i><color:#afded6><st>                    </color>"
-  - "<!i><color:#ffba4a>所需材料</color><gray>:</gray>"
   - "{choice_list}"
-  - "<!i><color:#afded6><st>                    </color>"
-  - "<!i><color:#fdff87>预览配方</color><dark_gray>:</dark_gray> <color:#7dffb5>左键单击</color>"
-  - "<!i><color:#fdff87>合成一次</color><dark_gray>:</dark_gray> <color:#7dffb5>右键单击</color>"
-  - "<!i><color:#fdff87>合成八次</color><dark_gray>:</dark_gray> <color:#7dffb5>潜行单击</color>"
-  - "<!i><color:#fdff87>合成全部</color><dark_gray>:</dark_gray> <color:#7dffb5><key:key.drop>键丢出</color>"
-  - "<!i><color:#afded6><st>                    </color>"
 menu_icon_dict:
   ok: "<green>✔</green>"
   bad: "<red>✘</red>"
-  choice_item: "<!i><requirement_mark> <white><item></white> <gray>×</gray> <white><amount></white>"
-  choice_exp: "<!i><requirement_mark> <white>经验值</white> <gray>×</gray> <white><amount></white>"
+  choice_item: "<!i><requirement_mark> <item>×<amount>"
+  choice_exp: "<!i><requirement_mark> 经验值×<amount>"
