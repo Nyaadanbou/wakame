@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
 import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.reforge.recycle.RecyclingSession
@@ -16,6 +17,7 @@ import cc.mewcraft.wakame.reforge.repair.SimpleRepairingSession
 import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.itemName
+import cc.mewcraft.wakame.util.itemNameOrType
 import cc.mewcraft.wakame.util.maxDamage
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -359,30 +361,46 @@ internal class BlacksmithMenu(
                 return station.recyclingMenuSettings.getSlotDisplay("recycle_when_empty").resolveToItemWrapper()
             }
 
-            val slotDisplay = if (confirmed) {
-                station.recyclingMenuSettings.getSlotDisplay("recycle_when_confirmed")
-            } else {
-                station.recyclingMenuSettings.getSlotDisplay("recycle_when_unconfirmed")
-            }
+            val purchaseResult = recyclingSession.purchase(true)
+            val itemWrapper = when (purchaseResult) {
+                is RecyclingSession.PurchaseResult.Failure -> {
+                    station.recyclingMenuSettings.getSlotDisplay("recycle_when_error").resolveToItemWrapper()
+                }
 
-            return slotDisplay.resolveToItemWrapper {
-                folded("item_list") {
-                    for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
-                        val itemName = item.itemName ?: translatable(item)
-                        val itemLevel = item.shadowNeko()?.level?.let(::text)
-                        if (itemLevel != null) {
-                            resolve("with_level") {
-                                component("item_name", itemName)
-                                component("item_level", itemLevel)
-                            }
-                        } else {
-                            resolve("without_level") {
-                                component("item_name", itemName)
+                is RecyclingSession.PurchaseResult.Success -> {
+                    val slotDisplayId = if (confirmed) "recycle_when_confirmed" else "recycle_when_unconfirmed"
+                    station.recyclingMenuSettings.getSlotDisplay(slotDisplayId).resolveToItemWrapper {
+                        standard {
+                            component(
+                                "total_worth", MessageConstants.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
+                                    TranslationArgument.numeric(purchaseResult.minPrice),
+                                    TranslationArgument.numeric(purchaseResult.maxPrice)
+                                ).translate(viewer)
+                            )
+                        }
+                        folded("item_list") {
+                            for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
+                                val itemName = item.itemNameOrType
+                                val itemLevel = item.shadowNeko()?.level?.let(::text)
+                                if (itemLevel != null) {
+                                    resolve("with_level") {
+                                        component("item_name", itemName)
+                                        component("item_level", itemLevel)
+                                    }
+                                } else {
+                                    resolve("without_level") {
+                                        component("item_name", itemName)
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+                else -> error("unexpected purchase result: $purchaseResult")
             }
+
+            return itemWrapper
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

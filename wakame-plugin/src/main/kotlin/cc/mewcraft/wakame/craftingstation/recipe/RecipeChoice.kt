@@ -119,7 +119,7 @@ internal data class ItemChoice(
         }
 
         // 应用解析结果
-        return resolution.applyTo(itemStack)
+        return resolution.applyNameAndLoreTo(itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

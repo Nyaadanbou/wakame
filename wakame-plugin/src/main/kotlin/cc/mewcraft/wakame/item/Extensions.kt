@@ -165,7 +165,7 @@ data class MenuIconResolution internal constructor(val name: Component?, val lor
      *
      * @return
      */
-    fun applyTo(item: ItemStack): ItemStack {
+    fun applyNameAndLoreTo(item: ItemStack): ItemStack {
         item.itemName = name
         item.lore0 = lore
         return item

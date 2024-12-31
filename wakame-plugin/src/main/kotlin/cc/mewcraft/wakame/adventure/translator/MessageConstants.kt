@@ -70,6 +70,7 @@ object MessageConstants {
     val MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT = create("msg_rerolling_result_failure_input_reach_mod_count_limit")
     val MSG_REROLLING_COST_EMPTY = create("msg_rerolling_cost_empty")
     val MSG_REROLLING_COST_SIMPLE = create("msg_rerolling_cost_simple")
+    val MSG_BLACKSMITH_TOTAL_WORTH = create("msg_blacksmith_total_worth")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

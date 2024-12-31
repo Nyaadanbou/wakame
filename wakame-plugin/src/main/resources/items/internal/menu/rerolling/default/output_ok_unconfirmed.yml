@@ -1,4 +1,4 @@
-menu_icon_name: "OUTPUT_OK_CONFIRMED: <item_name>"
+menu_icon_name: "OUTPUT_OK_UNCONFIRMED: <item_name>"
 menu_icon_lore:
   - "{item_lore}"
   - ""

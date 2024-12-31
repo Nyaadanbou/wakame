@@ -51,8 +51,6 @@ internal data class CraftingStationContext(
     val erase: Boolean = false,
 ) {
     enum class Pos {
-        OVERVIEW, // 合成站的主要菜单
-        PREVIEW, // 合成站的预览菜单
         CHOICE, // station choice
         RESULT, // station result
     }

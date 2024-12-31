@@ -50,10 +50,12 @@ recycling_menu_settings:
     - "i i i i i . x"
   # background: 背景
   # recycle_when_empty: 回收(无输入)
+  # recycle_when_error: 回收(错误)
   # recycle_when_confirmed: 回收(已确认)
   # recycle_when_unconfirmed: 回收(未确认)
   icons:
     background: "internal:menu/common/background"
     recycle_when_empty: "internal:menu/blacksmith/recycle_when_empty"
+    recycle_when_error: "internal:menu/blacksmith/recycle_when_error"
     recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
     recycle_when_unconfirmed: "internal:menu/blacksmith/recycle_when_unconfirmed"

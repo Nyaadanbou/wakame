@@ -3,6 +3,8 @@ menu_icon_name: "即将要出售"
 menu_icon_lore:
   - "* {item_list}"
   - ""
+  - "<total_worth>"
+  - ""
   - "<aqua>再次点击确认"
 menu_icon_dict:
   with_level: "<item_name> [lv. <item_level>]"

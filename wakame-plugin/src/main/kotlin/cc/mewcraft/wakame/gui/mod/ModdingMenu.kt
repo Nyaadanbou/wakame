@@ -281,10 +281,15 @@ internal class ModdingMenu(
             val outputItemStack = outputNekoStack.wrapped
 
             // 再用 SlotDisplay 处理一下
-            table.primaryMenuSettings.getSlotDisplay("output_ok").resolveToItemStack {
+            val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
+            val iconResolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 standard { component("item_name", outputItemStack.itemNameOrType) }
                 folded("item_lore", outputItemStack.itemLoreOrEmpty)
+                folded("cost_description", reforgeResult.reforgeCost.description)
+                folded("result_description", reforgeResult.description)
             }
+
+            iconResolution.applyNameAndLoreTo(outputItemStack)
         } else {
             // 定制失败了:
 
@@ -341,7 +346,7 @@ internal class ModdingMenu(
         table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
             standard { component("item_name", newItemStack.itemNameOrType) }
             folded("item_lore", newItemStack.itemLoreOrEmpty)
-        }.applyTo(newItemStack)
+        }.applyNameAndLoreTo(newItemStack)
 
         return newItemStack
     }

@@ -5,10 +5,8 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.colorRecursively
 import cc.mewcraft.wakame.util.edit
 import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -132,7 +130,7 @@ internal class ReplaceMenu(
 
             parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
                 folded("result_description", replaceResult.description)
-            }.applyTo(
+            }.applyNameAndLoreTo(
                 originalInput
             ).edit {
                 // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
@@ -151,11 +149,12 @@ internal class ReplaceMenu(
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
             // 使用 SlotDisplay 再处理一遍
-            parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
-                folded("item_lore", usableInput.wrapped.itemLoreOrEmpty.map { it.colorRecursively(NamedTextColor.DARK_GRAY) })
-            }
-
-            return usableInput.itemStack
+            return parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
+                folded("item_lore", usableInput.wrapped.itemLoreOrEmpty)
+                folded("result_description", replaceResult.description)
+            }.applyNameAndLoreTo(
+                usableInput.wrapped
+            )
         }
     }
 
@@ -173,7 +172,7 @@ internal class ReplaceMenu(
             parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
                 standard { component("core_name", core.displayName) }
                 folded("core_description", core.description)
-            }.applyTo(icon)
+            }.applyNameAndLoreTo(icon)
 
             return ItemWrapper(icon)
         }

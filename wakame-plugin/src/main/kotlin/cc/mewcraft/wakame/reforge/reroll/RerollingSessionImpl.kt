@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
+import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -262,20 +263,20 @@ internal object ReforgeCost {
         override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.translate(viewer))
     }
 
-    private class Simple(viewer: Player, val currencyAmount: Double) : RerollingSession.ReforgeCost {
+    private class Simple(viewer: Player, val amount: Double) : RerollingSession.ReforgeCost {
         override fun take(viewer: Player) {
-            EconomyManager.take(viewer.uniqueId, currencyAmount)
+            EconomyManager.take(viewer.uniqueId, amount)
         }
 
         override fun test(viewer: Player): Boolean {
-            return EconomyManager.has(viewer.uniqueId, currencyAmount).getOrDefault(false)
+            return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.translate(viewer))
+        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
-            ExaminableProperty.of("currencyAmount", currencyAmount)
+            ExaminableProperty.of("amount", amount)
         )
 
         override fun toString(): String = toSimpleString()

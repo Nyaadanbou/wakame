@@ -33,15 +33,15 @@ internal object WtfRerollingTable : RerollingTable {
             ". . . . . . . . .",
         ),
         icons = hashMapOf(
-            "error" to Key.key("internal:menu/common/error"),
-            "background" to Key.key("internal:menu/common/background"),
-            "prev_page" to Key.key("internal:menu/common/prev_page"),
-            "next_page" to Key.key("internal:menu/common/next_page"),
-            "compatibility_view" to Key.key("internal:menu/rerolling/compatibility_view"),
-            "output_ok_confirmed" to Key.key("internal:menu/rerolling/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/rerolling/output_empty"),
-            "output_failure" to Key.key("internal:menu/rerolling/output_failure"),
+            "error" to Key.key("internal:menu/common/default/error"),
+            "background" to Key.key("internal:menu/common/default/background"),
+            "prev_page" to Key.key("internal:menu/common/default/prev_page"),
+            "next_page" to Key.key("internal:menu/common/default/next_page"),
+            "compatibility_view" to Key.key("internal:menu/rerolling/default/compatibility_view"),
+            "output_ok_confirmed" to Key.key("internal:menu/rerolling/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/rerolling/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/rerolling/default/output_failure"),
         )
     )
 
@@ -49,10 +49,10 @@ internal object WtfRerollingTable : RerollingTable {
         title = Component.text("DO_NOT_USE"),
         structure = arrayOf("a", "b"),
         icons = hashMapOf(
-            "error" to Key.key("internal:menu/common/error"),
-            "core_view" to Key.key("internal:menu/rerolling/core_view"),
-            "selected" to Key.key("internal:menu/rerolling/selected"),
-            "unselected" to Key.key("internal:menu/rerolling/unselected"),
+            "error" to Key.key("internal:menu/common/default/error"),
+            "core_view" to Key.key("internal:menu/rerolling/default/core_view"),
+            "core_selected" to Key.key("internal:menu/rerolling/default/core_selected"),
+            "core_unselected" to Key.key("internal:menu/rerolling/default/core_unselected"),
         )
     )
 

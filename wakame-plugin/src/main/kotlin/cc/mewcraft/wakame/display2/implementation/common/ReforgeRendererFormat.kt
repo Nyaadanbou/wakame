@@ -3,78 +3,12 @@
 
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
-import cc.mewcraft.wakame.item.components.StandaloneCell
 import cc.mewcraft.wakame.util.styleRecursively
 import net.kyori.adventure.extra.kotlin.plus
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.empty
 import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.minimessage.MiniMessage
-import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
-import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-
-/**
- * 一个用来渲染 [StandaloneCell] 的 [RendererFormat].
- */
-@ConfigSerializable
-internal data class StandaloneCellRendererFormat(
-    override val namespace: String,
-    private val historyFormat: List<String>,
-    private val overallOrdinal: List<OrdinalIndex>,
-) : RendererFormat.Simple {
-    override val id: String = "standalone_cell"
-    override val index: DerivedIndex = createIndex()
-    override val textMetaFactory: TextMetaFactory = TextMetaFactory()
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
-
-    /**
-     * @param coreText 核心的文本描述
-     * @param modCount 重铸次数
-     * @param modLimit 重铸次数上限
-     */
-    fun render(
-        coreText: List<Component>,
-        modCount: Int,
-        modLimit: Int,
-    ): IndexedText {
-        // 生成重铸历史的文本描述
-        val historyText = this.historyFormat.map { line ->
-            MM.deserialize(
-                line,
-                Formatter.number("mod_count", modCount),
-                Formatter.number("mod_limit", modLimit),
-            )
-        }
-
-        // 合并成最终的文本描述
-        val resultText = buildList {
-            overallOrdinal.forEach {
-                when (it) {
-                    OrdinalIndex.CORE -> addAll(coreText)
-                    OrdinalIndex.HISTORY -> addAll(historyText)
-                }
-            }
-        }
-
-        return SimpleIndexedText(index, resultText)
-    }
-
-    enum class OrdinalIndex {
-        CORE, HISTORY
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
-}
 
 /**
  * 本 class 封装了共同逻辑, 用于渲染将要被重铸的核孔.

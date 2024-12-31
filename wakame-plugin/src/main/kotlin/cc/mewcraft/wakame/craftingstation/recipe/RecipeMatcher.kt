@@ -97,7 +97,7 @@ internal class RecipeMatcherResult(
         }
 
         // 应用解析结果到物品堆叠上
-        resolution.applyTo(itemStack)
+        resolution.applyNameAndLoreTo(itemStack)
 
         return itemStack
     }

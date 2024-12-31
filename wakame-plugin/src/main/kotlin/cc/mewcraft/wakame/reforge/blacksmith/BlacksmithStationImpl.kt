@@ -36,6 +36,7 @@ internal data object WtfBlacksmithStation : BlacksmithStation {
         icons = hashMapOf(
             "background" to Key.key("internal:menu/common/default/background"),
             "recycle_when_empty" to Key.key("internal:menu/blacksmith/default/recycle_when_empty"),
+            "recycle_when_error" to Key.key("internal:menu/blacksmith/default/recycle_when_error"),
             "recycle_when_confirmed" to Key.key("internal:menu/blacksmith/default/recycle_when_confirmed"),
             "recycle_when_unconfirmed" to Key.key("internal:menu/blacksmith/default/recycle_when_unconfirmed"),
         )

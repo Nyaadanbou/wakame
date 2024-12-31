@@ -180,7 +180,7 @@ internal class MergingMenu(
 
                     // 玩家必须有足够的资源
                     if (!reforgeResult.reforgeCost.test(viewer)) {
-                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_not_enough_resource").resolveToItemStack())
+                        setOutputSlot(table.primaryMenuSettings.getSlotDisplay("output_insufficient_resource").resolveToItemStack())
                         return
                     }
 
@@ -252,7 +252,7 @@ internal class MergingMenu(
                 folded("result_description", result.description)
             }
 
-            return resolution.applyTo(output.wrapped)
+            return resolution.applyNameAndLoreTo(output.wrapped)
         } else {
             return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.

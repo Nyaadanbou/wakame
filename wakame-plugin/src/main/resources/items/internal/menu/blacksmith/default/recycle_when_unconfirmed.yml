@@ -2,6 +2,7 @@ base: writable_book
 menu_icon_name: "RECYCLE_WHEN_CONFIRMED"
 menu_icon_lore:
   - "{item_list}"
+  - "<total_worth>"
 menu_icon_dict:
   with_level: "<item_name> <item_level>"
   without_level: "<item_name>"

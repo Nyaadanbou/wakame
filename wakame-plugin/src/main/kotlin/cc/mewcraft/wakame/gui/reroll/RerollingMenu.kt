@@ -245,7 +245,7 @@ internal class RerollingMenu(
                 standard { component("item_name", previewItem.wrapped.itemNameOrType) }
                 folded("item_lore", previewItem.wrapped.itemLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
-            }.applyTo(
+            }.applyNameAndLoreTo(
                 previewItem.wrapped
             )
         } else {

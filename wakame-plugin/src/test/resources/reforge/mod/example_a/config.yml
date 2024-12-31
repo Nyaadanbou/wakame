@@ -19,8 +19,10 @@ primary_menu_settings:
   # next_page: 下一页
   # input_ok: 输入
   # input_empty: 输入
-  # output_ok: 输出
   # output_empty: 输出
+  # output_failure: 输出
+  # output_ok_confirmed: 输出
+  # output_ok_unconfirmed: 输出
   # output_insufficient_resource: 输出
   icons:
     background: "internal:menu/common/background"
@@ -28,9 +30,10 @@ primary_menu_settings:
     next_page: "internal:menu/common/next_page"
     input_ok: "internal:menu/modding/input_ok"
     input_empty: "internal:menu/modding/input_empty"
-    output_ok: "internal:menu/modding/output_ok"
     output_empty: "internal:menu/modding/output_empty"
     output_failure: "internal:menu/modding/output_failure"
+    output_ok_confirmed: "internal:menu/modding/output_ok_confirmed"
+    output_ok_unconfirmed: "internal:menu/modding/output_ok_unconfirmed"
     output_insufficient_resource: "internal:menu/modding/output_insufficient_resource"
 
 # 核孔的基础菜单设置
@@ -39,7 +42,7 @@ replace_menu_settings:
   # a: 核心
   # b: 输入
   # *: 兼容性检查
-  structure: ["a * b"]
+  structure: [ "a * b" ]
   # compatibility_view: 兼容性检查
   # core_view: 目标核心
   # core_unusable: 不可用核心
@@ -84,5 +87,5 @@ rarity_number_mapping:
 # query.source_item_changed_cell_cost()
 #   被定制物品上参与了定制的核孔的总花费
 currency_cost: 200.0 * query.source_item_rarity()
-  + 100.0 * query.source_item_changed_cell_count() 
+  + 100.0 * query.source_item_changed_cell_count()
   + query.source_item_changed_cell_cost()

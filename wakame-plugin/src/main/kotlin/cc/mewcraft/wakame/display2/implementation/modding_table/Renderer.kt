@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.HardcodedRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.StandaloneCellRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
@@ -23,11 +22,9 @@ import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.StandaloneCell
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
-import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -55,11 +52,6 @@ internal sealed interface ModdingTableContext {
      * 用于输出的主要物品, 也就是经过定制后的物品.
      */
     data class Output(override val session: ModdingSession) : ModdingTableContext
-
-    /**
-     * 用于核孔的预览, 例如渲染核孔的名字, 重铸的历史数据等.
-     */
-    data class Preview(override val session: ModdingSession) : ModdingTableContext
 
     /**
      * 用于便携式核心.
@@ -122,10 +114,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             ModdingTableRenderingHandlerRegistry.REFORGE_COST.process(collector, context)
         }
 
-        if (context is ModdingTableContext.Preview) {
-            components.process(ItemComponentTypes.STANDALONE_CELL) { data -> ModdingTableRenderingHandlerRegistry.STANDALONE_CELL.process(collector, item, data, context) }
-        }
-
         if (context is ModdingTableContext.Replace) {
             val augment = context.replace.augment
             if (augment != null) {
@@ -185,14 +173,6 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     @JvmField
     val REPLACE_IN: RenderingHandler2<PortableCore, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
         SimpleIndexedText(format.index, core.description)
-    }
-
-    @JvmField
-    val STANDALONE_CELL: RenderingHandler3<NekoStack, StandaloneCell, ModdingTableContext, StandaloneCellRendererFormat> = configure3("standalone_cell") { item, cell, context, format ->
-        val coreText = cell.core.description
-        val modCount = item.reforgeHistory.modCount
-        val modLimit = context.session.itemRule?.modLimit ?: 0
-        format.render(coreText, modCount, modLimit)
     }
 
     @JvmField

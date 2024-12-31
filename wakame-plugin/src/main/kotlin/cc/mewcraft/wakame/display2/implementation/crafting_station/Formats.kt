@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.enchantments.Enchantment
-import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable

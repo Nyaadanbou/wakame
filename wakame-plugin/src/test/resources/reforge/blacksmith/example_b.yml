@@ -24,5 +24,6 @@ recycling_menu_settings:
     - "i i i i i . x"
   icons:
     recycle_when_empty: "internal:menu/blacksmith/recycle_when_empty"
+    recycle_when_error: "internal:menu/blacksmith/recycle_when_error"
     recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
     recycle_when_unconfirmed: "internal:menu/blacksmith/recycle_when_unconfirmed"
