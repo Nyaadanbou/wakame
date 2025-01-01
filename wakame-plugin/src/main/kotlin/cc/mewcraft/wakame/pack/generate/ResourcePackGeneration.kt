@@ -7,8 +7,12 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
+import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.namespace
+import cc.mewcraft.wakame.util.readFromDirectory
+import cc.mewcraft.wakame.util.readFromZipFile
+import cc.mewcraft.wakame.util.value
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -203,14 +207,15 @@ internal class ResourcePackCustomModelGeneration(
     }
 
     private fun ResourcePack.setDefaultModel(itemModelInfo: ItemModelInfo) {
-        val layers = ModelTexture.ofKey(itemModelInfo.baseModelKey())
-        // FIXME: 有些物品的材质跟物品 id 并不是完全一样, 比如染色玻璃板, 它的物品 id 是 `stained_glass_pane`, 但是材质是 `stained_glass`.
-        val model = CreativeModel.model()
-            .key(itemModelInfo.modelKey())
-            .parent(Key("item/generated"))
-            .textures(ModelTextures.builder().layers(layers).build())
-            .build()
-        model(model)
+        val defaultModel = VanillaResourcePack.model(itemModelInfo.base)
+            .map { it.toBuilder().key(itemModelInfo.modelKey()).build() }
+            .onFailure {
+                logger.warn("Failed to get default model for $itemModelInfo. Reason: ${it.message}")
+                return
+            }
+            .getOrThrow()
+
+        model(defaultModel)
     }
 
     /**

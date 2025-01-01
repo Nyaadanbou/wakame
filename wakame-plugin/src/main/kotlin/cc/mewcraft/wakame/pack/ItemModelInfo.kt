@@ -10,8 +10,4 @@ data class ItemModelInfo(
     fun modelKey(): Key {
         return Key(RESOURCE_NAMESPACE, "item/${itemId.namespace()}/${itemId.value()}")
     }
-
-    fun baseModelKey(): Key {
-        return Key(base.namespace(), "item/${base.value()}")
-    }
 }
