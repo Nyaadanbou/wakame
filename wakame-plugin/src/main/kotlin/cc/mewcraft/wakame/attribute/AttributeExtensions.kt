@@ -23,19 +23,19 @@ fun NekoAttributeModifier.toBukkit() = BukkitAttributeModifier(id.toNamespacedKe
 fun BukkitAttributeModifier.toNeko() = NekoAttributeModifier(key, amount, operation.toNeko())
 
 private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = ImmutableBiMap.builder<NekoAttribute, BukkitAttribute>()
-    .put(Attributes.ATTACK_KNOCKBACK, BukkitAttribute.GENERIC_ATTACK_KNOCKBACK)
-    .put(Attributes.BLOCK_INTERACTION_RANGE, BukkitAttribute.PLAYER_BLOCK_INTERACTION_RANGE)
-    .put(Attributes.ENTITY_INTERACTION_RANGE, BukkitAttribute.PLAYER_ENTITY_INTERACTION_RANGE)
-    .put(Attributes.KNOCKBACK_RESISTANCE, BukkitAttribute.GENERIC_KNOCKBACK_RESISTANCE)
-    .put(Attributes.MAX_HEALTH, BukkitAttribute.GENERIC_MAX_HEALTH)
-    .put(Attributes.MAX_ABSORPTION, BukkitAttribute.GENERIC_MAX_ABSORPTION)
-    .put(Attributes.MINING_EFFICIENCY, BukkitAttribute.PLAYER_MINING_EFFICIENCY)
-    .put(Attributes.MOVEMENT_SPEED, BukkitAttribute.GENERIC_MOVEMENT_SPEED)
-    .put(Attributes.SAFE_FALL_DISTANCE, BukkitAttribute.GENERIC_SAFE_FALL_DISTANCE)
-    .put(Attributes.SCALE, BukkitAttribute.GENERIC_SCALE)
-    .put(Attributes.STEP_HEIGHT, BukkitAttribute.GENERIC_STEP_HEIGHT)
-    .put(Attributes.SWEEPING_DAMAGE_RATIO, BukkitAttribute.PLAYER_SWEEPING_DAMAGE_RATIO)
-    .put(Attributes.WATER_MOVEMENT_EFFICIENCY, BukkitAttribute.GENERIC_WATER_MOVEMENT_EFFICIENCY)
+    .put(Attributes.ATTACK_KNOCKBACK, BukkitAttribute.ATTACK_KNOCKBACK)
+    .put(Attributes.BLOCK_INTERACTION_RANGE, BukkitAttribute.BLOCK_INTERACTION_RANGE)
+    .put(Attributes.ENTITY_INTERACTION_RANGE, BukkitAttribute.ENTITY_INTERACTION_RANGE)
+    .put(Attributes.KNOCKBACK_RESISTANCE, BukkitAttribute.KNOCKBACK_RESISTANCE)
+    .put(Attributes.MAX_HEALTH, BukkitAttribute.MAX_HEALTH)
+    .put(Attributes.MAX_ABSORPTION, BukkitAttribute.MAX_ABSORPTION)
+    .put(Attributes.MINING_EFFICIENCY, BukkitAttribute.MINING_EFFICIENCY)
+    .put(Attributes.MOVEMENT_SPEED, BukkitAttribute.MOVEMENT_SPEED)
+    .put(Attributes.SAFE_FALL_DISTANCE, BukkitAttribute.SAFE_FALL_DISTANCE)
+    .put(Attributes.SCALE, BukkitAttribute.SCALE)
+    .put(Attributes.STEP_HEIGHT, BukkitAttribute.STEP_HEIGHT)
+    .put(Attributes.SWEEPING_DAMAGE_RATIO, BukkitAttribute.SWEEPING_DAMAGE_RATIO)
+    .put(Attributes.WATER_MOVEMENT_EFFICIENCY, BukkitAttribute.WATER_MOVEMENT_EFFICIENCY)
     .build()
 
 fun NekoAttribute.toBukkit(): BukkitAttribute {
@@ -44,5 +44,5 @@ fun NekoAttribute.toBukkit(): BukkitAttribute {
 }
 
 fun BukkitAttribute.toNeko(): NekoAttribute {
-    return MAPPINGS.inverse()[this] ?: throw IllegalArgumentException("Can't convert ${this.name} to Neko attribute")
+    return MAPPINGS.inverse()[this] ?: throw IllegalArgumentException("Can't convert ${this.key} to Neko attribute")
 }

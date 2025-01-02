@@ -4,6 +4,7 @@
 
 package cc.mewcraft.wakame
 
+import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.api.ApiNekooProvider
 import cc.mewcraft.wakame.api.NekooProvider
@@ -25,7 +26,6 @@ import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.lang.langModule
-import cc.mewcraft.wakame.lookup.lookupModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
@@ -36,7 +36,6 @@ import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.resource.resourceModule
-import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.user.userModule
@@ -98,7 +97,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 itemModule(),
                 kizamiModule(),
                 langModule(),
-                lookupModule(),
                 molangModule(),
                 packetModule(),
                 packModule(),

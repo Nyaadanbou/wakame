@@ -24,7 +24,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
@@ -78,7 +77,6 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
         }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase()
 
@@ -90,7 +88,6 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
             customName = null
 
             lore = itemLore
-            customModelData = itemCustomModelData
             showNothing()
         }
     }

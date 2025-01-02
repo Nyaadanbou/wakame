@@ -13,7 +13,7 @@ primary:
   - (fixed:vanilla)
   - vanilla:item_name
   - vanilla:enchantments
-  - vanilla:fire_resistant
+  - vanilla:damage_resistant
   - vanilla:food
 
   - (fixed:general)

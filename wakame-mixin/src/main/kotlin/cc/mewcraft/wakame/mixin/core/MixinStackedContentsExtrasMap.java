@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.mixin.core;
 
 import cc.mewcraft.wakame.mixin.support.ItemStackStrategy;
-import io.papermc.paper.inventory.recipe.StackedContentsExtraMap;
+import io.papermc.paper.inventory.recipe.StackedContentsExtrasMap;
 import it.unimi.dsi.fastutil.Hash;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.world.item.ItemStack;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(value = StackedContentsExtraMap.class)
-public abstract class MixinStackedContentsExtraMap {
+@Mixin(value = StackedContentsExtrasMap.class)
+public abstract class MixinStackedContentsExtrasMap {
 
     /**
      * @author Nailm, Flandre, g2213swo
@@ -21,11 +21,11 @@ public abstract class MixinStackedContentsExtraMap {
             method = "<init>",
             at = @At(
                     value = "NEW",
-                    target = "Lit/unimi/dsi/fastutil/objects/Object2IntOpenCustomHashMap;",
+                    target = "Lit/unimi/dsi/fastutil/objects/ObjectOpenCustomHashSet;",
                     opcode = Opcodes.NEW
             )
     )
-    public Object2IntOpenCustomHashMap<ItemStack> redirect(final Hash.Strategy<ItemStack> strategy) {
-        return new Object2IntOpenCustomHashMap<>(ItemStackStrategy.CUSTOM_STRATEGY);
+    public ObjectOpenCustomHashSet<ItemStack> redirect(final Hash.Strategy<ItemStack> strategy) {
+        return new ObjectOpenCustomHashSet<>(ItemStackStrategy.CUSTOM_STRATEGY);
     }
 }

@@ -8,6 +8,6 @@ attribute_modifiers:
   show_in_tooltip: false
 crate:
   key: "foo:bar"
-fire_resistant: { }
+damage_resistant: "is_fire"
 unbreakable:
   show_in_tooltip: false

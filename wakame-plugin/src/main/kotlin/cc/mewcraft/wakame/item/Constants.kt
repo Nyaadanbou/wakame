@@ -58,7 +58,7 @@ object ItemConstants {
     const val ENCHANTMENTS = "enchantments"
     const val MAX_DAMAGE = "max_damage"
     const val ELEMENTS = "elements"
-    const val FIRE_RESISTANT = "fire_resistant"
+    const val DAMAGE_RESISTANT = "damage_resistant"
     const val FOOD = "food"
     const val GLOWABLE = "glowable"
     const val HIDE_TOOLTIP = "hide_tooltip"

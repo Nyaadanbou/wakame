@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.lookup.AssetsLookup
 import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.util.formatSize
+import cc.mewcraft.wakame.util.writeToDirectory
+import cc.mewcraft.wakame.util.writeToZipFile
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -50,7 +52,7 @@ internal class ResourcePackManager(
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
                 resourcePack = resourcePack,
-                assets = AssetsLookup.allAssets
+                itemModelInfos = ItemRegistry.CUSTOM.values.map { ItemModelInfo(it.id, it.base.type.key()) }
             )
 
             // Generate the resource pack
@@ -59,7 +61,6 @@ internal class ResourcePackManager(
                 ResourcePackIconGeneration(context),
                 ResourcePackRegistryModelGeneration(context),
                 ResourcePackCustomModelGeneration(context),
-                ResourcePackExternalGeneration(context),
                 ResourcePackMergePackGeneration(context, packReader),
                 ResourcePackModelSortGeneration(context)
             )

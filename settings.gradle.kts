@@ -34,7 +34,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:1.0-SNAPSHOT")
+            from("cc.mewcraft.gradle:catalog:0.3")
         }
     }
 }

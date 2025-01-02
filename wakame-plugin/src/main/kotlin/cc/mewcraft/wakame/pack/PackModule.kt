@@ -31,7 +31,6 @@ internal val RESOURCE_PACK_CONFIG by lazy { Configs.YAML["resourcepack.yml"] }
 internal fun packModule(): Module = module {
     // 生成(核心)
     singleOf(::ResourcePackManager)
-    singleOf(::VanillaResourcePack)
     single<ResourcePackReader<FileTreeReader>> { MinecraftResourcePackReader.minecraft() }
     single<ResourcePackWriter<FileTreeWriter>> { MinecraftResourcePackWriter.minecraft() }
 

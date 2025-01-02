@@ -72,17 +72,17 @@ public class LootNekoItem extends LootPoolSingletonContainer {
      * @return 应该得到战利品的玩家
      */
     private @Nullable CraftPlayer getLootingPlayer(LootContext context) {
-        var thisEntity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
+        var thisEntity = context.getParameter(LootContextParams.THIS_ENTITY);
         if (thisEntity instanceof ServerPlayer serverPlayer) {
             return serverPlayer.getBukkitEntity();
         }
 
-        var lastDamagePlayer = context.getParamOrNull(LootContextParams.LAST_DAMAGE_PLAYER);
+        var lastDamagePlayer = context.getParameter(LootContextParams.LAST_DAMAGE_PLAYER);
         if (lastDamagePlayer instanceof ServerPlayer serverPlayer) {
             return serverPlayer.getBukkitEntity();
         }
 
-        var attackingEntity = context.getParamOrNull(LootContextParams.ATTACKING_ENTITY);
+        var attackingEntity = context.getParameter(LootContextParams.ATTACKING_ENTITY);
         if (attackingEntity instanceof ServerPlayer serverPlayer) {
             return serverPlayer.getBukkitEntity();
         }

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.lookup
+package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
@@ -55,7 +55,7 @@ internal object AssetUtils {
      * 从文件中读取 JSON.
      *
      * @param file 文件对象
-     * @return [JsonElement]
+     * @return [com.google.gson.JsonElement]
      */
     fun toJsonElement(file: File): JsonElement {
         val readText = file.readText()

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.pack.generate
 
-import cc.mewcraft.wakame.lookup.Assets
+import cc.mewcraft.wakame.pack.ItemModelInfo
 import team.unnamed.creative.ResourcePack
 
 data class ResourcePackGenerationContext(
@@ -31,9 +31,9 @@ data class ResourcePackGenerationContext(
     //
 
     /**
-     * 资源包里包含的所有“资源文件”.
+     * 资源包里包含的所有“物品材质”.
      */
-    val assets: Collection<Assets>,
+    val itemModelInfos: Collection<ItemModelInfo>,
 
     //
 

@@ -6,12 +6,9 @@ import cc.mewcraft.wakame.initializer.Initializer
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEquipment
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerMerchantOffers
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetSlot
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerWindowItems
+import com.github.retrooper.packetevents.wrapper.play.server.*
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -22,8 +19,12 @@ import kotlin.jvm.optionals.getOrNull
 /**
  * 修改 [org.bukkit.inventory.ItemStack].
  */
-internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
-    private val logger: Logger by inject()
+internal class ItemStackRenderer : PacketListenerAbstract() {
+    companion object : KoinComponent {
+        private const val PROCESSED_KEY = "processed"
+
+        private val logger: Logger by inject()
+    }
 
     override fun onPacketSend(event: PacketSendEvent) {
         // 不修改发给创造模式玩家的物品包
@@ -130,6 +131,7 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
         if (nekoStack != null) {
             try {
                 ItemRenderers.STANDARD.render(nekoStack, StandardContext)
+                processed = true
                 changed = true
             } catch (e: Throwable) {
                 if (Initializer.isDebug) {
@@ -142,4 +144,14 @@ internal class ItemStackRenderer : PacketListenerAbstract(), KoinComponent {
 
         return changed
     }
+
+    private var ItemStack.processed: Boolean
+        get() = customData?.getTagOrNull(PROCESSED_KEY) == null
+        set(value) {
+            if (value) {
+                customData?.setTag(PROCESSED_KEY, NBTByte(0))
+            } else {
+                customData?.removeTag(PROCESSED_KEY)
+            }
+        }
 }

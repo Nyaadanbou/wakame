@@ -8,9 +8,6 @@ import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
 import cc.mewcraft.wakame.display2.implementation.RenderingHandler
 import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
-import cc.mewcraft.wakame.util.customModelData
 import cc.mewcraft.wakame.util.isClientSide
 import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.showNothing
@@ -54,12 +51,6 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
         RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
         item.lore0 = textAssembler.assemble(collector)
-
-        // 渲染 `minecraft:custom_model_data`
-        val nekoStack = item.shadowNeko()
-        if (nekoStack != null) {
-            item.customModelData = ItemModelDataLookup[nekoStack.id, nekoStack.variant]
-        }
 
         // 渲染其他可见部分
         item.showNothing()

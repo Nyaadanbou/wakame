@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.FireResistant
+import cc.mewcraft.wakame.item.templates.components.DamageResistant
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.templates.components.ItemCells
 import cc.mewcraft.wakame.item.templates.components.ItemCrate
@@ -31,7 +31,6 @@ import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -81,7 +80,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         templates.process(ItemTemplateTypes.CRATE) { data -> CraftingStationRenderingHandlerRegistry.CRATE.process(collector, data) }
         templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> CraftingStationRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.ELEMENTS) { data -> CraftingStationRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
-        templates.process(ItemTemplateTypes.FIRE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.FIRE_RESISTANT.process(collector, data) }
+        templates.process(ItemTemplateTypes.DAMAGE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, data) }
         templates.process(ItemTemplateTypes.ITEM_NAME) { data -> CraftingStationRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.KIZAMIZ) { data -> CraftingStationRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> CraftingStationRenderingHandlerRegistry.LORE.process(collector, data) }
@@ -93,7 +92,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         if (context.erase) {
             item.erase()
@@ -101,7 +99,6 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
         item.unsafeEdit {
             lore = itemLore
-            customModelData = itemCustomModelData
             showAttributeModifiers(false)
             showEnchantments(false)
             showStoredEnchantments(false)
@@ -149,7 +146,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     }
 
     @JvmField
-    val FIRE_RESISTANT: RenderingHandler<FireResistant, SingleValueRendererFormat> = configure("fire_resistant") { _, format ->
+    val DAMAGE_RESISTANT: RenderingHandler<DamageResistant, SingleValueRendererFormat> = configure("damage_resistant") { _, format ->
         format.render()
     }
 
@@ -158,7 +155,6 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         format.render(
             Placeholder.component("nutrition", Component.text(data.nutrition)),
             Placeholder.component("saturation", Component.text(data.saturation)),
-            Placeholder.component("eat_seconds", Component.text(data.eatSeconds)),
         )
     }
 

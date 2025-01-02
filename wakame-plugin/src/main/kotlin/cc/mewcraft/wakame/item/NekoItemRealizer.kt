@@ -145,6 +145,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         // 设置物品的 id 和 variant
         NekoStackImplementations.setId(itemStack, prototype.id)
         NekoStackImplementations.setVariant(itemStack, 0)
+        NekoStackImplementations.setItemModel(itemStack, prototype.modelKey)
 
         // 获取 物品组件 的容器
         val components = nekoStack.components
@@ -179,7 +180,7 @@ internal object CustomNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ATTACK)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
-        generate(ItemTemplateTypes.FIRE_RESISTANT)
+        generate(ItemTemplateTypes.DAMAGE_RESISTANT)
         generate(ItemTemplateTypes.UNBREAKABLE)
         generate(ItemTemplateTypes.TRIM)
         generate(ItemTemplateTypes.HIDE_TOOLTIP)

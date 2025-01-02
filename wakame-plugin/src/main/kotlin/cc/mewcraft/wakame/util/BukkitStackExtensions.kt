@@ -25,6 +25,12 @@ class ItemStackDSL(
             target.itemName = value
         }
 
+    var itemModel
+        get() = target.itemModel
+        set(value) {
+            target.itemModel = value
+        }
+
     var customName
         get() = target.customName
         set(value) {

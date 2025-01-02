@@ -61,8 +61,8 @@ enchantments:
   # <level> 魔咒的等级
   tooltip: "<name> <level>"
 
-# id: `fire_resistant`
-fire_resistant:
+# id: `damage_resistant`
+damage_resistant:
   namespace: vanilla
   tooltip: "免疫火焰"
 

@@ -91,8 +91,8 @@ elements:
 enchantments:
   namespace: vanilla
 
-# id: `fire_resistant`
-fire_resistant:
+# id: `damage_resistant`
+damage_resistant:
   namespace: vanilla
   tooltip: "免疫火焰伤害"
 

@@ -16,6 +16,7 @@ import java.util.Objects;
  * 当物品是萌芽物品时, 产生的哈希值将完全基于 {@link net.minecraft.world.item.Item} 和萌芽物品的标识, 而忽略所有其他的信息.
  * 当物品不是萌芽物品时, 产生的哈希值将基于游戏原本的哈希算法, 也就是基于物品类型和完整的物品组件.
  */
+@SuppressWarnings("deprecation")
 public class ItemStackStrategy {
     public static final Hash.Strategy<? super ItemStack> CUSTOM_STRATEGY = new Hash.Strategy<>() {
         @Override

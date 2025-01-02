@@ -27,7 +27,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.lookup.ItemModelDataLookup
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
@@ -78,13 +77,11 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
         }
 
         val itemLore = textAssembler.assemble(collector)
-        val itemCustomModelData = ItemModelDataLookup[item.id, item.variant]
 
         item.erase() // 这是呈现给玩家的最后一环, 可以 erase
 
         item.unsafeEdit {
             lore = itemLore
-            customModelData = itemCustomModelData
             showNothing()
         }
     }

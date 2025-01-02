@@ -56,7 +56,7 @@ components:
     enabled: true
     display_name: "<!i><white>附魔"
 
-  fire_resistant:
+  damage_resistant:
     enabled: true
     display_name: "<!i><white>免疫火焰伤害"
 

@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.CustomModelData
+import cc.mewcraft.wakame.item.components.DamageResistant
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemKizamiz
@@ -25,11 +27,30 @@ import cc.mewcraft.wakame.util.isDamageable
 import cc.mewcraft.wakame.util.itemName
 import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.maxDamage
+import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KProperty
+
+val NekoItem.universalId: String
+    get() {
+        val nekoItemId = this.id
+        return "${nekoItemId.namespace()}/${nekoItemId.value()}"
+    }
+
+val NekoItem.modelKey: Key
+    get() = Key.key(SharedConstants.PLUGIN_NAME, universalId)
+
+val NekoStack.universalId: String
+    get() {
+        val nekoItemId = this.id
+        return "${nekoItemId.namespace()}/${nekoItemId.value()}"
+    }
+
+val NekoStack.modelKey: Key
+    get() = Key.key(SharedConstants.PLUGIN_NAME, universalId)
 
 /**
  * 获取物品堆叠的数量.
@@ -202,7 +223,7 @@ var NekoStack.lore: List<Component>
     }
 
 @Deprecated("将在高版本移除")
-var NekoStack.fireResistant: Unit? by direct(ItemComponentTypes.FIRE_RESISTANT)
+var NekoStack.damageResistant: DamageResistant? by direct(ItemComponentTypes.DAMAGE_RESISTANT)
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
 

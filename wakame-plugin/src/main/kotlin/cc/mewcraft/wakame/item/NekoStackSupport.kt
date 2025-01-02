@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
@@ -18,6 +20,7 @@ import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.unsafeNekooTag
 import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import cc.mewcraft.wakame.util.unsafeRootTagOrNull
+import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -499,6 +502,10 @@ internal object NekoStackImplementations {
             return
         }
         nekoo.putInt(BaseBinaryKeys.VARIANT, variant)
+    }
+
+    fun setItemModel(stack: ItemStack, key: Key) {
+        stack.setData(DataComponentTypes.ITEM_MODEL, key)
     }
 
     fun getSlotGroup(nekoo: CompoundTag): ItemSlotGroup {
