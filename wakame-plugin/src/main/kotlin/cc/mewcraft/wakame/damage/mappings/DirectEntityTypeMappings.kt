@@ -5,8 +5,9 @@ import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
 import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
@@ -28,13 +29,16 @@ import java.io.File
 /**
  * 依据直接伤害实体的类型来获取萌芽伤害的映射.
  */
-@PostWorldDependency(
-    runBefore = [ElementRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
-object DirectEntityTypeMappings : Initializable, KoinComponent {
+//@PostWorldDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+object DirectEntityTypeMappings : KoinComponent {
     private const val DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_FILE = "damage/direct_entity_type_mappings.yml"
 
     private val logger: Logger = get()
@@ -61,13 +65,14 @@ object DirectEntityTypeMappings : Initializable, KoinComponent {
         return null
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         loadConfig()
     }
 
-    override fun onReload() {
-        loadConfig()
-    }
+//    override fun onReload() {
+//        loadConfig()
+//    }
 
     private fun loadConfig() {
         noCauseMappings.clear()

@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.craftingstation
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.ObjectMappers
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -16,13 +16,17 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
-@PostWorldDependency(
+@Init(
+    stage = InitStage.POST_WORLD,
     runBefore = [CraftingStationRecipeRegistry::class]
 )
-@ReloadDependency(
-    runBefore = [CraftingStationRecipeRegistry::class]
-)
-internal object CraftingStationRegistry : Initializable, KoinComponent {
+//@PostWorldDependency(
+//    runBefore = [CraftingStationRecipeRegistry::class]
+//)
+//@ReloadDependency(
+//    runBefore = [CraftingStationRecipeRegistry::class]
+//)
+internal object CraftingStationRegistry : KoinComponent {
     private const val STATION_DIR_NAME = "station/stations"
     private val stations: MutableMap<String, CraftingStation> = mutableMapOf()
 
@@ -71,11 +75,12 @@ internal object CraftingStationRegistry : Initializable, KoinComponent {
         LOGGER.info("Registered stations: {}", stations.keys.joinToString())
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         loadStations()
     }
 
-    override fun onReload() {
-        loadStations()
-    }
+//    override fun onReload() {
+//        loadStations()
+//    }
 }

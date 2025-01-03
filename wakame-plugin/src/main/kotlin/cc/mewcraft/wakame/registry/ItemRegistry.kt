@@ -1,18 +1,12 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.display2.NekoItemHolder
-import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.Initializer
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.item.ItemBaseImpl
-import cc.mewcraft.wakame.item.ItemSlotGroup
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoItemFactory
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.SimpleNekoItem
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
-import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
@@ -30,7 +24,8 @@ import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
 
-@PreWorldDependency(
+@Init(
+    stage = InitStage.PRE_WORLD,
     runBefore = [
         AttributeRegistry::class,
         ElementRegistry::class,
@@ -42,19 +37,31 @@ import xyz.xenondevs.commons.provider.immutable.provider
         AbilityRegistry::class,
     ]
 )
-@ReloadDependency(
-    runBefore = [
-        AttributeRegistry::class,
-        ElementRegistry::class,
-        EntityRegistry::class,
-        ItemSkinRegistry::class,
-        KizamiRegistry::class,
-        LevelMappingRegistry::class,
-        RarityRegistry::class,
-        AbilityRegistry::class,
-    ]
-)
-object ItemRegistry : KoinComponent, Initializable {
+//@PreWorldDependency(
+//    runBefore = [
+//        AttributeRegistry::class,
+//        ElementRegistry::class,
+//        EntityRegistry::class,
+//        ItemSkinRegistry::class,
+//        KizamiRegistry::class,
+//        LevelMappingRegistry::class,
+//        RarityRegistry::class,
+//        AbilityRegistry::class,
+//    ]
+//)
+//@ReloadDependency(
+//    runBefore = [
+//        AttributeRegistry::class,
+//        ElementRegistry::class,
+//        EntityRegistry::class,
+//        ItemSkinRegistry::class,
+//        KizamiRegistry::class,
+//        LevelMappingRegistry::class,
+//        RarityRegistry::class,
+//        AbilityRegistry::class,
+//    ]
+//)
+object ItemRegistry : KoinComponent {
     /**
      * 用于一般用途的 [NekoItem].
      * 这些物品类型可以用来生成 [ItemStack].
@@ -94,11 +101,13 @@ object ItemRegistry : KoinComponent, Initializable {
 
     private val namespace2Paths: Object2ObjectOpenHashMap<String, ObjectArrayList<String>> = Object2ObjectOpenHashMap()
 
-    override fun onPreWorld() {
+    @InitFun
+    private fun onPreWorld() {
         loadConfiguration()
     }
 
-    override fun onReload() {
+    @InitFun
+    private fun onReload() {
         loadConfiguration()
     }
 

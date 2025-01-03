@@ -2,16 +2,10 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.kizami.KizamiEffect
-import cc.mewcraft.wakame.kizami.KizamiEffectSerializer
-import cc.mewcraft.wakame.kizami.KizamiInstance
-import cc.mewcraft.wakame.kizami.KizamiInstanceSerializer
-import cc.mewcraft.wakame.kizami.KizamiProvider
-import cc.mewcraft.wakame.kizami.KizamiSerializer
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.kizami.*
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
@@ -23,9 +17,13 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
 
-@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
-@ReloadDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
-object KizamiRegistry : KoinComponent, Initializable {
+@Init(
+    stage = InitStage.PRE_WORLD,
+    runBefore = [AbilityRegistry::class, AttributeRegistry::class]
+)
+//@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
+//@ReloadDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
+object KizamiRegistry : KoinComponent {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
      */
@@ -63,7 +61,8 @@ object KizamiRegistry : KoinComponent, Initializable {
         return INSTANCES[BI_LOOKUP.getUniqueIdBy(binary)]
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         // 注册 KizamiProvider
         KizamiProvider.register(DefaultKizamiProvider)
 
@@ -71,9 +70,9 @@ object KizamiRegistry : KoinComponent, Initializable {
         loadRegistries()
     }
 
-    override fun onReload() {
-        loadRegistries()
-    }
+//    override fun onReload() {
+//        loadRegistries()
+//    }
 
     private val logger: Logger by inject()
 

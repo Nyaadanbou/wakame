@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.registry.Registry
 import cc.mewcraft.wakame.registry.SimpleRegistry
 import org.koin.core.component.KoinComponent
@@ -9,7 +8,7 @@ import org.koin.core.component.KoinComponent
 /**
  * 物品组件相关的注册表.
  */
-internal object ItemComponentRegistry : KoinComponent, Initializable {
+internal object ItemComponentRegistry : KoinComponent {
 
     const val CONFIG_FILE_NAME = "items.yml"
     const val NODE_COMPONENTS = "components"

@@ -10,24 +10,14 @@ import cc.mewcraft.wakame.attribute.AttributeGetter
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.*
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute.Quality
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeR
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeRE
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeSE
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
@@ -43,7 +33,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
@@ -61,13 +50,14 @@ import kotlin.reflect.KClass
  *
  * Check the [CompositeAttributeFacade] for more details.
  */
-@PreWorldDependency(
+@Init(
+    stage = InitStage.PRE_WORLD,
     runBefore = [ElementRegistry::class]
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
-object AttributeRegistry : Initializable {
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+object AttributeRegistry {
 
     /**
      * The facades of all composite attributes.
@@ -137,7 +127,8 @@ object AttributeRegistry : Initializable {
         +buildComposite("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         // 初始化 Attributes
         // 这一步主要是初始化 [元素属性]
         Attributes.bootstrap()

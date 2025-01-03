@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
@@ -11,13 +13,17 @@ import org.slf4j.Logger
 /**
  * Provides default [AttributeInstance]s for various subject types.
  */
-@PreWorldDependency(
+@Init(
+    stage = InitStage.PRE_WORLD,
     runBefore = [AttributeRegistry::class],
 )
-@ReloadDependency(
-    runBefore = [AttributeRegistry::class],
-)
-object DefaultAttributes : KoinComponent, Initializable {
+//@PreWorldDependency(
+//    runBefore = [AttributeRegistry::class],
+//)
+//@ReloadDependency(
+//    runBefore = [AttributeRegistry::class],
+//)
+object DefaultAttributes : KoinComponent {
 
     private val LOGGER: Logger by inject()
 
@@ -69,13 +75,14 @@ object DefaultAttributes : KoinComponent, Initializable {
 
     /* Internals */
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         loadConfiguration()
     }
 
-    override fun onReload() {
-        loadConfiguration()
-    }
+//    override fun onReload() {
+//        loadConfiguration()
+//    }
 
     private fun loadConfiguration() {
         SUPPLIERS.clear()

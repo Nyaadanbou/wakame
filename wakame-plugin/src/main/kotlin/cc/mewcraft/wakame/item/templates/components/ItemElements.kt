@@ -3,27 +3,15 @@ package cc.mewcraft.wakame.item.templates.components
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.Node
-import cc.mewcraft.wakame.random3.NodeContainer
-import cc.mewcraft.wakame.random3.NodeFacadeSupport
-import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.random3.Pool
-import cc.mewcraft.wakame.random3.PoolSerializer
-import cc.mewcraft.wakame.random3.Sample
-import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.random3.*
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.kregister
@@ -39,6 +27,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
 import java.nio.file.Path
+import kotlin.io.path.Path
 import cc.mewcraft.wakame.item.components.ItemElements as ItemElementsData
 
 
@@ -87,17 +76,21 @@ data class ItemElements(
 /**
  * 封装了类型 [Element] 所需要的所有 [Node] 相关的实现.
  */
-@PreWorldDependency(
+@Init(
+    stage = InitStage.PRE_WORLD,
     runBefore = [ElementRegistry::class],
     runAfter = [ItemRegistry::class]
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-internal class ElementSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<Element, ItemGenerationContext>(), Initializable {
+//@PreWorldDependency(
+//    runBefore = [ElementRegistry::class],
+//    runAfter = [ItemRegistry::class]
+//)
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class],
+//    runAfter = [ItemRegistry::class]
+//)
+internal object ElementSampleNodeFacade : SampleNodeFacade<Element, ItemGenerationContext>() {
+    override val dataDir: Path = Path("random/items/elements")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         kregister(ElementSerializer)
         kregister(FilterSerializer)
@@ -114,13 +107,14 @@ internal class ElementSampleNodeFacade(
         return emptyList()
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         NodeFacadeSupport.reload(this)
     }
 
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
+//    override fun onReload() {
+//        NodeFacadeSupport.reload(this)
+//    }
 }
 
 /**

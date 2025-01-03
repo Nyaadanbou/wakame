@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.config.Configs.YAML
 import cc.mewcraft.wakame.config.Configs.getKoin
+import cc.mewcraft.wakame.initializer2.InternalInit
+import cc.mewcraft.wakame.initializer2.InternalInitStage
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
@@ -18,6 +20,7 @@ val MAIN_CONFIG: ConfigProvider by lazy { YAML["config.yml"] }
 /**
  * The object that manages the configuration providers.
  */
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 object Configs : KoinComponent {
     val YAML: YamlConfigs = YamlConfigs()
     val GSON: GsonConfigs = GsonConfigs()

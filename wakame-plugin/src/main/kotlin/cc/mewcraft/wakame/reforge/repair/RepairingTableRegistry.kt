@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.reforge.repair
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
@@ -8,7 +10,10 @@ import org.jetbrains.annotations.VisibleForTesting
 /**
  * 修复台的注册表.
  */
-object RepairingTableRegistry : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+object RepairingTableRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val tables: MutableMap<String, RepairingTable> = mutableMapOf()
 
@@ -33,11 +38,12 @@ object RepairingTableRegistry : Initializable {
         tables.put("wtf", WtfRepairingTable) // 总是覆盖同名映射
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         load()
     }
 
-    override fun onReload() {
-        load()
-    }
+//    override fun onReload() {
+//        load()
+//    }
 }

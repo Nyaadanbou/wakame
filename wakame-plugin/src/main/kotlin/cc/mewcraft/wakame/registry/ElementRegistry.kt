@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementProvider
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -13,7 +15,10 @@ import org.koin.core.qualifier.named
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 
-object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, Byte> {
+@Init(
+    stage = InitStage.PRE_WORLD
+)
+object ElementRegistry : KoinComponent, BiKnot<String, Element, Byte> {
     /**
      * The default element. By design, it should be the most common element.
      */
@@ -33,7 +38,8 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
         return providers[id]
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         // 注册 ElementProvider
         ElementProvider.register(DefaultElementProvider)
 
@@ -41,10 +47,10 @@ object ElementRegistry : KoinComponent, Initializable, BiKnot<String, Element, B
         loadConfiguration()
     }
 
-    override fun onReload() {
-        loadConfiguration()
-        updateProviders()
-    }
+//    override fun onReload() {
+//        loadConfiguration()
+//        updateProviders()
+//    }
 
     private fun updateProviders() {
         providers.asMap().forEach { (_, provider) ->

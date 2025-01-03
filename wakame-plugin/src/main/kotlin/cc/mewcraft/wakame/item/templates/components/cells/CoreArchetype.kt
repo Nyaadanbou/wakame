@@ -2,43 +2,30 @@ package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreArchetype
+import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.GroupSerializer
-import cc.mewcraft.wakame.random3.Node
-import cc.mewcraft.wakame.random3.NodeContainer
-import cc.mewcraft.wakame.random3.NodeFacadeSupport
-import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.random3.Pool
-import cc.mewcraft.wakame.random3.PoolSerializer
-import cc.mewcraft.wakame.random3.Sample
-import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.random3.*
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.namespace
-import cc.mewcraft.wakame.util.typeTokenOf
-import cc.mewcraft.wakame.util.value
+import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -51,6 +38,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * 代表一个 [核心][Core] 的模板.
@@ -187,17 +175,21 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
 /**
  * 封装了类型 [CoreArchetype] 所需要的所有 [Node] 相关的实现.
  */
-@PreWorldDependency(
+@Init(
+    stage = InitStage.PRE_WORLD,
     runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
     runAfter = [ItemRegistry::class],
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-    runAfter = [ItemRegistry::class]
-)
-internal class CoreArchetypeSampleNodeFacade(
-    override val dataDir: Path,
-) : SampleNodeFacade<CoreArchetype, ItemGenerationContext>(), Initializable {
+//@PreWorldDependency(
+//    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+//    runAfter = [ItemRegistry::class],
+//)
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+//    runAfter = [ItemRegistry::class]
+//)
+internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
+    override val dataDir: Path = Path("random/items/cores")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(ABILITY_EXTERNALS)))
@@ -250,11 +242,12 @@ internal class CoreArchetypeSampleNodeFacade(
         return listOf(filter)
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         NodeFacadeSupport.reload(this)
     }
 
-    override fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
+//    override fun onReload() {
+//        NodeFacadeSupport.reload(this)
+//    }
 }

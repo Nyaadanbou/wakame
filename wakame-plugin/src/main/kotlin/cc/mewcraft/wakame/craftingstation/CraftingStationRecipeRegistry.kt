@@ -7,14 +7,10 @@ import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.RunningEnvironment
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
@@ -22,10 +18,13 @@ import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
-@ReloadDependency(
-    runBefore = [ItemRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD,
 )
-internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
+//@ReloadDependency(
+//    runBefore = [ItemRegistry::class]
+//)
+internal object CraftingStationRecipeRegistry : KoinComponent {
     private const val RECIPE_DIR_NAME = "station/recipes"
 
     @VisibleForTesting
@@ -89,13 +88,14 @@ internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
         LOGGER.info("Registered ${recipes.size} station recipes")
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         loadConfig()
         registerRecipes()
     }
 
-    override fun onReload() {
-        loadConfig()
-        registerRecipes()
-    }
+//    override fun onReload() {
+//        loadConfig()
+//        registerRecipes()
+//    }
 }

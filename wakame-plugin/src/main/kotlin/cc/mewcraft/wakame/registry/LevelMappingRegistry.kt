@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
@@ -13,16 +13,21 @@ import org.koin.core.qualifier.named
 /**
  * The registry of `level -> rarity` mappings.
  */
-@PreWorldDependency(runBefore = [RarityRegistry::class])
-@ReloadDependency(runBefore = [RarityRegistry::class])
-object LevelMappingRegistry : KoinComponent, Initializable {
+@Init(
+    stage = InitStage.PRE_WORLD,
+    runBefore = [RarityRegistry::class]
+)
+//@PreWorldDependency(runBefore = [RarityRegistry::class])
+//@ReloadDependency(runBefore = [RarityRegistry::class])
+object LevelMappingRegistry : KoinComponent {
     const val GLOBAL_NAME = "global"
     const val CUSTOM_NAME = "custom"
 
     val INSTANCES: Registry<String, LevelMappings> = SimpleRegistry()
 
-    override fun onPreWorld() = loadConfiguration()
-    override fun onReload() = loadConfiguration()
+    @InitFun
+    fun onPreWorld() = loadConfiguration()
+//    override fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
         INSTANCES.clear()

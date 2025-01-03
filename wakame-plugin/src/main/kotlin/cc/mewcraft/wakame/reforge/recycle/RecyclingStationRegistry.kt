@@ -1,11 +1,16 @@
 package cc.mewcraft.wakame.reforge.recycle
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
-object RecyclingStationRegistry : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+object RecyclingStationRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val stations: MutableMap<String, RecyclingStation> = mutableMapOf()
 
@@ -30,11 +35,12 @@ object RecyclingStationRegistry : Initializable {
         stations.put("wtf", WtfRecyclingStation)
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         load()
     }
 
-    override fun onReload() {
-        load()
-    }
+//    override fun onReload() {
+//        load()
+//    }
 }

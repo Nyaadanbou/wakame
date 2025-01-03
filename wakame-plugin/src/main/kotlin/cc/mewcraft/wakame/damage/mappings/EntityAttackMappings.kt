@@ -7,8 +7,9 @@ import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
 import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
@@ -25,20 +26,25 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 
 /**
  * 依据原版生物的攻击特征来获取萌芽伤害的映射.
  */
-@PostWorldDependency(
-    runBefore = [ElementRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD,
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
-object EntityAttackMappings : Initializable, KoinComponent {
+//@PostWorldDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+object EntityAttackMappings : KoinComponent {
     private const val ENTITY_ATTACK_MAPPINGS_CONFIG_FILE = "damage/entity_attack_mappings.yml"
 
     private val logger: Logger = get()
@@ -58,13 +64,14 @@ object EntityAttackMappings : Initializable, KoinComponent {
         return null
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         loadConfig()
     }
 
-    override fun onReload() {
-        loadConfig()
-    }
+//    override fun onReload() {
+//        loadConfig()
+//    }
 
     private fun loadConfig() {
         mappings.clear()

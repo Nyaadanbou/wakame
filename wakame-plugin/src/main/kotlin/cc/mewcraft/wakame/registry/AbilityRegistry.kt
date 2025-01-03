@@ -2,14 +2,14 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -22,9 +22,12 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 
-@PreWorldDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
-@ReloadDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
-object AbilityRegistry : Initializable, KoinComponent {
+@Init(
+    stage = InitStage.PRE_WORLD,
+    runBefore = [AttributeRegistry::class, ElementRegistry::class]
+)
+//@ReloadDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
+object AbilityRegistry : KoinComponent {
     /* Trigger Constants */
 
     /**
@@ -95,13 +98,14 @@ object AbilityRegistry : Initializable, KoinComponent {
         }
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         AbilityFactories.load()
         loadConfiguration()
         loadTriggers()
     }
 
-    override fun onReload() {
-        loadConfiguration()
-    }
+//    override fun onReload() {
+//        loadConfiguration()
+//    }
 }

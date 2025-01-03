@@ -7,23 +7,32 @@ import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toNamespacedKey
+import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.damage.DamageType
-import org.koin.core.component.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.*
+import org.spongepowered.configurate.objectmapping.meta.Constraint
+import org.spongepowered.configurate.objectmapping.meta.NodeResolver
+import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 import java.lang.reflect.Type
@@ -31,13 +40,16 @@ import java.lang.reflect.Type
 /**
  * 依据原版伤害类型来获取萌芽伤害的映射.
  */
-@PostWorldDependency(
-    runBefore = [ElementRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
-object DamageTypeMappings : Initializable, KoinComponent {
+//@PostWorldDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+//@ReloadDependency(
+//    runBefore = [ElementRegistry::class]
+//)
+object DamageTypeMappings : KoinComponent {
     private const val DAMAGE_TYPE_MAPPINGS_CONFIG_FILE = "damage/damage_type_mappings.yml"
 
     private val default: DamageTypeMapping by ReloadableProperty {
@@ -56,8 +68,9 @@ object DamageTypeMappings : Initializable, KoinComponent {
         return mappings[damageType] ?: default
     }
 
-    override fun onPostWorld(): Unit = loadConfig()
-    override fun onReload(): Unit = loadConfig()
+    @InitFun
+    private fun onPostWorld(): Unit = loadConfig()
+//    override fun onReload(): Unit = loadConfig()
 
     private fun loadConfig() {
         mappings.clear()

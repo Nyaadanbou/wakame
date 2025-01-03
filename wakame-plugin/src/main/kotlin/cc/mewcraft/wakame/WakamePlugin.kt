@@ -20,8 +20,8 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
-import cc.mewcraft.wakame.initializer.Initializer
-import cc.mewcraft.wakame.initializer.initializerModule
+import cc.mewcraft.wakame.initializer2.Initializer
+import cc.mewcraft.wakame.initializer2.initializer2Module
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -92,7 +92,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 enchantmentModule(),
                 entityModule(),
                 guiModule(),
-                initializerModule(),
+                initializer2Module(),
                 integrationModule(),
                 itemModule(),
                 kizamiModule(),

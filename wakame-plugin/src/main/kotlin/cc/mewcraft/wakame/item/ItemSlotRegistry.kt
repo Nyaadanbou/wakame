@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.initializer.Initializable
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
@@ -15,7 +14,7 @@ import org.slf4j.Logger
 /**
  * [ItemSlotRegistry] 的默认实现.
  */
-object DefaultItemSlotRegistry : ItemSlotRegistry, Initializable, KoinComponent {
+object DefaultItemSlotRegistry : ItemSlotRegistry, KoinComponent {
     private val logger: Logger by inject()
 
     // 所有的 ItemSlot 实例

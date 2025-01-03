@@ -2,12 +2,11 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.core.ItemXSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
-import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -16,10 +15,11 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
 
-@ReloadDependency(
-    runBefore = [ItemRegistry::class]
-)
-object VanillaRecipeRegistry : Initializable, KoinComponent {
+@Init(stage = InitStage.POST_WORLD)
+//@ReloadDependency(
+//    runBefore = [ItemRegistry::class]
+//)
+object VanillaRecipeRegistry : KoinComponent {
     private const val RECIPE_DIR_NAME = "recipes"
 
     @VisibleForTesting
@@ -150,19 +150,20 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
         }
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         //TODO 待优化写法
         loadRecipes()
         runTask { registerRecipes() }
     }
 
-    override fun onReload() {
-        //TODO 待优化写法
-        loadRecipes()
-        runTask {
-            registerRecipes()
-            //向所有玩家的客户端发送配方刷新数据包
-            Bukkit.updateRecipes()
-        }
-    }
+//    override fun onReload() {
+//        //TODO 待优化写法
+//        loadRecipes()
+//        runTask {
+//            registerRecipes()
+//            //向所有玩家的客户端发送配方刷新数据包
+//            Bukkit.updateRecipes()
+//        }
+//    }
 }

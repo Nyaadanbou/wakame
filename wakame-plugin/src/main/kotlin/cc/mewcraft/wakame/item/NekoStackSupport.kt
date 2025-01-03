@@ -3,23 +3,15 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.ItemStackDSL
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.editNekooTag
-import cc.mewcraft.wakame.util.editRootTag
-import cc.mewcraft.wakame.util.nekooTagOrNull
-import cc.mewcraft.wakame.util.rootTagOrNull
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNekooTag
-import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
-import cc.mewcraft.wakame.util.unsafeRootTagOrNull
+import cc.mewcraft.wakame.util.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -28,7 +20,6 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.stream.Stream
 
 /**
@@ -402,11 +393,13 @@ internal class ImaginaryNekoStack(
     }
 }
 
-@ReloadDependency(
-    runBefore = [ItemRegistry::class],
+@Init(
+    stage = InitStage.POST_WORLD,
 )
-internal object ImaginaryNekoStackRegistry : Initializable, KoinComponent {
-    private val realizer: ImaginaryNekoItemRealizer by inject()
+//@ReloadDependency(
+//    runBefore = [ItemRegistry::class],
+//)
+internal object ImaginaryNekoStackRegistry : KoinComponent {
     private val registry: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)
 
     fun has(material: Material): Boolean {
@@ -429,18 +422,19 @@ internal object ImaginaryNekoStackRegistry : Initializable, KoinComponent {
         registry[id] = stack
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    private fun onPostWorld() {
         realizeAndRegister()
     }
 
-    override fun onReload() {
-        realizeAndRegister()
-    }
+//    override fun onReload() {
+//        realizeAndRegister()
+//    }
 
     private fun realizeAndRegister() {
         registry.clear()
         for ((id, prototype) in ItemRegistry.IMAGINARY) {
-            val stack = realizer.realize(prototype)
+            val stack = ImaginaryNekoItemRealizer.realize(prototype)
             register(id, stack)
         }
     }
