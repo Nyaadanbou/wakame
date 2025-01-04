@@ -1,5 +1,10 @@
 package cc.mewcraft.wakame.core
 
+/**
+ * 提供访问注册表的方式.
+ *
+ * 如果程序员只是想访问注册表里的数据, 应该直接使用已经创建好的单例.
+ */
 interface RegistryAccess {
     companion object {
         @JvmField
@@ -24,21 +29,5 @@ data class RegistryEntry<T>(val key: ResourceKey<out Registry<T>>, val value: Re
             @Suppress("UNCHECKED_CAST")
             return RegistryEntry(key as ResourceKey<out Registry<T>>, value as Registry<T>)
         }
-    }
-}
-
-class ImmutableRegistryAccess(registries: Map<out ResourceKey<out Registry<*>>, Registry<*>>) : RegistryAccess {
-    private val registries: Map<ResourceKey<out Registry<*>>, Registry<*>> = HashMap(registries)
-
-    constructor(registries: List<Registry<*>>) : this(registries.associateBy(Registry<*>::key))
-    constructor(registries: Sequence<RegistryEntry<*>>) : this(registries.associateBy(RegistryEntry<*>::key, RegistryEntry<*>::value))
-
-    override fun <T> registry(key: ResourceKey<out Registry<T>>): Registry<T>? {
-        @Suppress("UNCHECKED_CAST")
-        return registries[key] as Registry<T>?
-    }
-
-    override fun registries(): Sequence<RegistryEntry<*>> {
-        return registries.entries.asSequence().map { RegistryEntry.fromMapEntry(it) }
     }
 }

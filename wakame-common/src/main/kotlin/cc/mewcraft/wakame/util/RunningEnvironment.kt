@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+@Deprecated("Use new alternative instead.", ReplaceWith("SharedConstants.IS_RUNNING_IN_IDE"))
 enum class RunningEnvironment {
     TEST {
         override fun isRunning(): Boolean {
