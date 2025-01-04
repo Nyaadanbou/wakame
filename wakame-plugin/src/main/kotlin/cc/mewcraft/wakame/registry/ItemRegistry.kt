@@ -26,7 +26,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [
+    runAfter = [
         AttributeRegistry::class,
         ElementRegistry::class,
         EntityRegistry::class,

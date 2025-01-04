@@ -23,7 +23,6 @@ import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -106,8 +105,8 @@ private class KizamiPool(
  * ```
  */
 private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, ItemGenerationContext>() {
-    override val sampleNodeFacade: KizamiSampleNodeFacade by inject()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val sampleNodeFacade: KizamiSampleNodeFacade = KizamiSampleNodeFacade
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(
         amount: Long,
@@ -125,7 +124,7 @@ private object KizamiPoolSerializer : KoinComponent, PoolSerializer<Kizami, Item
 }
 
 private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, ItemGenerationContext>() {
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(node: ConfigurationNode): Pool<Kizami, ItemGenerationContext> {
         return node.krequire<Pool<Kizami, ItemGenerationContext>>()
@@ -137,8 +136,8 @@ private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, It
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [KizamiRegistry::class],
-    runAfter = [ItemRegistry::class]
+    runBefore = [ItemRegistry::class],
+    runAfter = [KizamiRegistry::class]
 )
 //@PreWorldDependency(
 //    runBefore = [KizamiRegistry::class],
@@ -157,7 +156,7 @@ internal object KizamiSampleNodeFacade : SampleNodeFacade<Kizami, ItemGeneration
     }.build()
     override val repository: NodeRepository<Sample<Kizami, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<Kizami> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun decodeSampleData(node: ConfigurationNode): Kizami {
         return node.node("type").krequire<Kizami>()

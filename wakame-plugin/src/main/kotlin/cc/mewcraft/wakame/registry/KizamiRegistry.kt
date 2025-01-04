@@ -19,7 +19,7 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [AbilityRegistry::class, AttributeRegistry::class]
+    runAfter = [AbilityRegistry::class, AttributeRegistry::class]
 )
 //@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
 //@ReloadDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])

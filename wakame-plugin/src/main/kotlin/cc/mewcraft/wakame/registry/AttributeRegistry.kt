@@ -52,8 +52,11 @@ import kotlin.reflect.KClass
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ElementRegistry::class]
+    runAfter = [ElementRegistry::class]
 )
+//@PreWorldDependency(
+//    runBefore = [ElementRegistry::class]
+//)
 //@ReloadDependency(
 //    runBefore = [ElementRegistry::class]
 //)

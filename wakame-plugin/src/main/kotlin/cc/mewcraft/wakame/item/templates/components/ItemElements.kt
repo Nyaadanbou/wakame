@@ -21,7 +21,6 @@ import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -78,8 +77,8 @@ data class ItemElements(
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ElementRegistry::class],
-    runAfter = [ItemRegistry::class]
+    runBefore = [ItemRegistry::class],
+    runAfter = [ElementRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class],
@@ -97,7 +96,7 @@ internal object ElementSampleNodeFacade : SampleNodeFacade<Element, ItemGenerati
     }.build()
     override val repository: NodeRepository<Sample<Element, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<Element> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun decodeSampleData(node: ConfigurationNode): Element {
         return node.node("type").krequire<Element>()
@@ -149,8 +148,8 @@ private data class ElementPool(
  * ```
  */
 private data object ElementPoolSerializer : KoinComponent, PoolSerializer<Element, ItemGenerationContext>() {
-    override val sampleNodeFacade: ElementSampleNodeFacade by inject()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val sampleNodeFacade: ElementSampleNodeFacade = ElementSampleNodeFacade
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(
         amount: Long,

@@ -24,7 +24,7 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [AttributeRegistry::class, ElementRegistry::class]
+    runAfter = [AttributeRegistry::class, ElementRegistry::class]
 )
 //@ReloadDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
 object AbilityRegistry : KoinComponent {

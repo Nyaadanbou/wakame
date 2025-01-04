@@ -15,7 +15,7 @@ import org.koin.core.qualifier.named
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [RarityRegistry::class]
+    runAfter = [RarityRegistry::class]
 )
 //@PreWorldDependency(runBefore = [RarityRegistry::class])
 //@ReloadDependency(runBefore = [RarityRegistry::class])

@@ -18,7 +18,7 @@ import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runBefore = [CraftingStationRecipeRegistry::class]
+    runAfter = [CraftingStationRecipeRegistry::class]
 )
 //@PostWorldDependency(
 //    runBefore = [CraftingStationRecipeRegistry::class]

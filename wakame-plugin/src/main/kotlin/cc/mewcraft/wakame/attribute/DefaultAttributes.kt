@@ -15,7 +15,7 @@ import org.slf4j.Logger
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [AttributeRegistry::class],
+    runAfter = [AttributeRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [AttributeRegistry::class],

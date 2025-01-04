@@ -31,7 +31,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -143,8 +142,8 @@ internal class CoreArchetypePool(
  * ```
  */
 internal object CoreArchetypePoolSerializer : KoinComponent, PoolSerializer<CoreArchetype, ItemGenerationContext>() {
-    override val sampleNodeFacade by inject<CoreArchetypeSampleNodeFacade>()
-    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
+    override val sampleNodeFacade = CoreArchetypeSampleNodeFacade
+    override val filterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(
         amount: Long,
@@ -165,7 +164,7 @@ internal object CoreArchetypePoolSerializer : KoinComponent, PoolSerializer<Core
  * [CoreArchetype] 的 [cc.mewcraft.wakame.random3.Group] 的序列化器.
  */
 internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<CoreArchetype, ItemGenerationContext>() {
-    override val filterNodeFacade by inject<ItemFilterNodeFacade>()
+    override val filterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(node: ConfigurationNode): Pool<CoreArchetype, ItemGenerationContext> {
         return node.krequire<Pool<CoreArchetype, ItemGenerationContext>>()
@@ -177,8 +176,8 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-    runAfter = [ItemRegistry::class],
+    runBefore = [ItemRegistry::class],
+    runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
@@ -199,7 +198,7 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
     }.build()
     override val repository: NodeRepository<Sample<CoreArchetype, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<CoreArchetype> = typeTokenOf()
-    override val filterNodeFacade: ItemFilterNodeFacade by inject()
+    override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun decodeSampleData(node: ConfigurationNode): CoreArchetype {
         return node.krequire<CoreArchetype>()

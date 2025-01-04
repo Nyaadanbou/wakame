@@ -2,11 +2,11 @@
 
 package cc.mewcraft.wakame.initializer2
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.initializer2.Initializer.start
 import cc.mewcraft.wakame.util.data.JarUtils
-import cc.mewcraft.wakame.util.registerSuspendingEvents
 import com.google.common.graph.Graph
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
@@ -16,14 +16,10 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 
-internal object Initializer : Listener, KoinComponent {
-    private val logger: Logger by inject()
+internal object Initializer : Listener {
 
     private val initializables: HashSet<Initializable> = HashSet<Initializable>()
     private val disableables: HashSet<DisableableFunction> = HashSet<DisableableFunction>()
@@ -42,6 +38,9 @@ internal object Initializer : Listener, KoinComponent {
      */
     fun start() = tryInit {
         collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
+//        for (addon in AddonBootstrapper.addons) {
+//            collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
+//        }
 
         initPreWorld()
     }
@@ -141,14 +140,35 @@ internal object Initializer : Listener, KoinComponent {
                 launch(preWorldScope, initializable, initPreWorld)
             }
         }
+
+//        if (IS_DEV_SERVER)
+//            dumpGraphs()
     }
+
+//    @Suppress("UNCHECKED_CAST")
+//    private fun dumpGraphs() {
+//        val dir = File("debug/nova/")
+//        val preWorldFile = File(dir, "pre_world.dot")
+//        val postWorldFile = File(dir, "post_world.dot")
+//        val disableFile = File(dir, "disable.dot")
+//        dir.mkdirs()
+//
+//        val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
+//        exporter.setVertexAttributeProvider { vertex ->
+//            mapOf(
+//                "label" to DefaultAttribute.createAttribute(vertex.toString()),
+//                "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
+//            )
+//        }
+//        exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
+//        exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
+//        exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
+//    }
 
     /**
      * Stats the pre-world initialization process.
      */
     private fun initPreWorld() = runBlocking {
-        registerSuspendingEvents() // register `this` listener
-
         tryInit {
             coroutineScope {
                 preWorldScope = this
@@ -172,7 +192,11 @@ internal object Initializer : Listener, KoinComponent {
         isDone = true
         NekoLoadDataEvent().callEvent()
 
-        logger.info("Done loading")
+//        @Suppress("UnstableApiUsage")
+//        PermanentStorage.store("last_version", Nova.pluginMeta.version)
+//        setGlobalIngredients()
+//        setupMetrics()
+        LOGGER.info("Done loading")
     }
 
     /**
@@ -190,7 +214,7 @@ internal object Initializer : Listener, KoinComponent {
     private fun <T : InitializerRunnable<T>> launch(
         scope: CoroutineScope,
         runnable: T,
-        graph: Graph<T>,
+        graph: Graph<T>
     ) {
         scope.launch {
             // await dependencies, which may increase during wait
@@ -210,7 +234,8 @@ internal object Initializer : Listener, KoinComponent {
 
             // run in preferred context
             withContext(runnable.dispatcher ?: scope.coroutineContext) {
-                logger.info(runnable.toString())
+//                if (LOGGING)
+                    LOGGER.info(runnable.toString())
 
                 runnable.run()
             }
@@ -227,12 +252,12 @@ internal object Initializer : Listener, KoinComponent {
         } catch (t: Throwable) {
             val cause = if (t is InvocationTargetException) t.targetException else t
             if (cause is InitializationException) {
-                logger.error(cause.message)
+                LOGGER.error(cause.message)
             } else {
-                logger.error("An exception occurred during initialization", cause)
+                LOGGER.error("An exception occurred during initialization", cause)
             }
 
-            logger.error("Initialization failure")
+            LOGGER.error("Initialization failure")
             (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
             Runtime.getRuntime().halt(-1) // force-quit process to prevent further errors
         }
@@ -245,7 +270,7 @@ internal object Initializer : Listener, KoinComponent {
         if (isDone) {
             coroutineScope { launchAll(this, disable) }
         } else {
-            logger.warn("Skipping disable phase due to incomplete initialization")
+            LOGGER.warn("Skipping disable phase due to incomplete initialization")
         }
     }
 
@@ -253,7 +278,20 @@ internal object Initializer : Listener, KoinComponent {
     private fun handleServerStarted(event: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
-        } else logger.warn("Skipping post world initialization")
+        } else LOGGER.warn("Skipping post world initialization")
     }
+
+//    private fun setupMetrics() {
+//        val metrics = Metrics(Nova, 11927)
+//        metrics.addCustomChart(DrilldownPie("addons") {
+//            val map = HashMap<String, Map<String, Int>>()
+//
+//            for (addon in AddonBootstrapper.addons) {
+//                map[addon.name] = mapOf(addon.version to 1)
+//            }
+//
+//            return@DrilldownPie map
+//        })
+//    }
 
 }

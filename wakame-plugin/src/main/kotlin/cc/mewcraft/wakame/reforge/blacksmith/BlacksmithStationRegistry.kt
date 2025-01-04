@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
+    runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
 )
 //@PostWorldDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])
 //@ReloadDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])

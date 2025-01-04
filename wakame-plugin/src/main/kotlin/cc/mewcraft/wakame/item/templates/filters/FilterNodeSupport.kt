@@ -26,8 +26,8 @@ import kotlin.io.path.Path
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
-    runAfter = [ItemRegistry::class]
+    runBefore = [ItemRegistry::class],
+    runAfter = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
