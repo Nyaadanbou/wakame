@@ -1,15 +1,16 @@
 package cc.mewcraft.wakame.integration.permission
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PostWorldDependency
+import cc.mewcraft.wakame.initializer2.Dispatcher
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.integration.HooksLoader
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
-import org.koin.core.component.get
 import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 // private data class PermissionArgs(val world: World, val player: OfflinePlayer, val permission: String)
@@ -22,16 +23,22 @@ import java.util.concurrent.CompletableFuture
  * 但如果服务器用的是其他权限插件, 请确保它们缓存了离线玩家的权限查询结果.
  * 否则每当查询离线玩家的权限时, 可能会导致性能问题.
  */
-@PostWorldDependency(
-    runBefore = [HooksLoader::class]
+@Init(
+    stage = InitStage.POST_WORLD,
+    dispatcher = Dispatcher.ASYNC,
+    runAfter = [HooksLoader::class]
 )
-object PermissionManager : Initializable {
+//@PostWorldDependency(
+//    runBefore = [HooksLoader::class]
+//)
+object PermissionManager {
 
     internal val integrations = ArrayList<PermissionIntegration>()
 
     private val logger: Logger = Injector.get()
 
-    override suspend fun onPostWorldAsync() {
+    @InitFun
+    fun onPostWorldAsync() {
         if (integrations.size > 1) {
             logger.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nekoo will use the first one")
         }

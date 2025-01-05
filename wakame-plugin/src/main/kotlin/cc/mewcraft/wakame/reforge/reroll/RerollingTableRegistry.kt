@@ -1,11 +1,16 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 
 /**
  * 重造台的注册表.
  */
-object RerollingTableRegistry : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+object RerollingTableRegistry  {
     private val tables = HashMap<String, RerollingTable>()
 
     /**
@@ -28,11 +33,12 @@ object RerollingTableRegistry : Initializable {
         this.tables.put("wtf", WtfRerollingTable)
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    fun onPostWorld() {
         load()
     }
 
-    override fun onReload() {
-        load()
-    }
+//    override fun onReload() {
+//        load()
+//    }
 }

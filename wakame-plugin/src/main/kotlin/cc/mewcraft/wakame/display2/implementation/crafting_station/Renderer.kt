@@ -2,33 +2,20 @@ package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.DamageResistant
-import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
-import cc.mewcraft.wakame.item.templates.components.ItemCells
-import cc.mewcraft.wakame.item.templates.components.ItemCrate
-import cc.mewcraft.wakame.item.templates.components.ItemElements
-import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
-import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -55,6 +42,9 @@ internal data class CraftingStationContext(
     }
 }
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
 internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, CraftingStationContext>() {
     override val name: String = "crafting_station"
     override val formats = CraftingStationRendererFormatRegistry(this)
@@ -103,6 +93,11 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
             showEnchantments(false)
             showStoredEnchantments(false)
         }
+    }
+
+    @InitFun
+    fun onPostWorld() {
+        initialize0()
     }
 }
 

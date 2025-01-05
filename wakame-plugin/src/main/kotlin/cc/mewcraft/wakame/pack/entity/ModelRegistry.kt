@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.pack.entity
 
 import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -13,7 +15,10 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
-object ModelRegistry : Initializable, KoinComponent {
+@Init(
+    stage = InitStage.PRE_WORLD,
+)
+object ModelRegistry : KoinComponent {
     private const val BBMODELS_DIR = "bbmodels"
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
@@ -65,11 +70,12 @@ object ModelRegistry : Initializable, KoinComponent {
         return models.values
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         loadModels().onFailure { it.printStackTrace() }
     }
 
-    override fun onReload() {
-        loadModels().onFailure { it.printStackTrace() }
-    }
+//    fun onReload() {
+//        loadModels().onFailure { it.printStackTrace() }
+//    }
 }

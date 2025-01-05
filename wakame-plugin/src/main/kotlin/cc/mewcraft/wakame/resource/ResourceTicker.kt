@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.resource
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.DisableFun
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskTimer
@@ -11,11 +14,16 @@ import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import java.util.WeakHashMap
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.util.*
 
-class ResourceTicker(
-    private val server: Server,
-) : Initializable {
+@Init(
+    stage = InitStage.PRE_WORLD,
+)
+object ResourceTicker : KoinComponent {
+    private val server: Server by inject()
+
     private val bossBarMap: WeakHashMap<Player, BossBar> = WeakHashMap()
     private var resourceTickTask: BukkitTask? = null
 
@@ -65,16 +73,18 @@ class ResourceTicker(
         }
     }
 
-    override fun close() {
+    @DisableFun
+    fun close() {
         resourceTickTask?.cancel()
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    private fun onPreWorld() {
         start()
     }
 
-    override fun onReload() {
-        close()
-        start()
-    }
+//    override fun onReload() {
+//        close()
+//        start()
+//    }
 }

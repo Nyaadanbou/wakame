@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.lang
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.util.krequire
@@ -21,7 +23,7 @@ import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import java.text.MessageFormat
-import java.util.Locale
+import java.util.*
 
 fun ComponentLike.translate(locale: Locale): Component {
     val component = asComponent() // 如果是 TranslatableComponent.Builder 会隐式调用 #build()
@@ -38,7 +40,10 @@ fun ComponentLike.translate(viewer: Audience): Component = translate(viewer.get(
 fun List<ComponentLike>.translate(locale: Locale): List<Component> = map { it.translate(locale) }
 fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.translate(viewer) }
 
-object GlobalTranslations : Initializable, KoinComponent {
+@Init(
+    stage = InitStage.PRE_WORLD,
+)
+object GlobalTranslations : KoinComponent {
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
     private val miniMessage: MiniMessage by inject()
@@ -70,13 +75,14 @@ object GlobalTranslations : Initializable, KoinComponent {
         }
     }
 
-    override fun onPreWorld() {
+    @InitFun
+    fun onPreWorld() {
         GlobalTranslator.translator().addSource(translations)
         loadTranslation()
     }
 
-    override fun onReload() {
-        translations.unregisterAll()
-        loadTranslation()
-    }
+//    override fun onReload() {
+//        translations.unregisterAll()
+//        loadTranslation()
+//    }
 }

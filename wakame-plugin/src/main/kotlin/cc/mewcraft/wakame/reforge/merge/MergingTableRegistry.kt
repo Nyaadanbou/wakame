@@ -1,11 +1,16 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 
 /**
  * 合并台的注册表.
  */
-object MergingTableRegistry : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+object MergingTableRegistry {
     private val tables = HashMap<String, MergingTable>()
 
     /**
@@ -28,11 +33,12 @@ object MergingTableRegistry : Initializable {
         this.tables.put("wtf", WtfMergingTable)
     }
 
-    override fun onPostWorld() {
+    @InitFun
+    fun onPostWorld() {
         load()
     }
 
-    override fun onReload() {
-        load()
-    }
+//    override fun onReload() {
+//        load()
+//    }
 }

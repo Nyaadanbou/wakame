@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.MaterialSerializer
-import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.item.component.componentModule
 import cc.mewcraft.wakame.item.components.componentsModule
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
@@ -13,7 +12,7 @@ import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
-import org.koin.dsl.binds
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -28,9 +27,7 @@ internal fun itemModule(): Module = module {
         templatesModule(),
     )
 
-    single { DefaultItemSlotRegistry } binds arrayOf(
-        Initializable::class, ItemSlotRegistry::class
-    )
+    single { DefaultItemSlotRegistry } bind ItemSlotRegistry::class
 //    single { ImaginaryNekoStackRegistry } bind Initializable::class
 //    single { ImaginaryNekoItemRealizer }
 //    single { CustomNekoItemRealizer }

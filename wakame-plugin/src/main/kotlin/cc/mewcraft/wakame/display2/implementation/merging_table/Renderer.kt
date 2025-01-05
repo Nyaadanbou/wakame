@@ -2,24 +2,14 @@ package cc.mewcraft.wakame.display2.implementation.merging_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -38,6 +28,9 @@ internal sealed interface MergingTableContext {
     data class MergeOutputSlot(val session: MergingSession) : MergingTableContext
 }
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
     override val formats = MergingTableRendererFormatRegistry(this)
@@ -90,6 +83,11 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
             lore = itemLore
             showNothing()
         }
+    }
+
+    @InitFun
+    fun onPostWorld() {
+        initialize0()
     }
 }
 

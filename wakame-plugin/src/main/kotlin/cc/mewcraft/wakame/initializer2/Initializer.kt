@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.initializer2.Initializer.start
 import cc.mewcraft.wakame.util.data.JarUtils
+import cc.mewcraft.wakame.util.registerSuspendingEvents
 import com.google.common.graph.Graph
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
@@ -37,6 +38,8 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryInit {
+        registerSuspendingEvents()
+
         collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
 //        for (addon in AddonBootstrapper.addons) {
 //            collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)

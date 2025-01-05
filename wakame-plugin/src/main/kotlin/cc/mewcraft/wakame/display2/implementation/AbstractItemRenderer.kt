@@ -5,16 +5,7 @@ package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.IndexedDataRenderer
-import cc.mewcraft.wakame.display2.IndexedDataRenderer2
-import cc.mewcraft.wakame.display2.IndexedDataRenderer3
-import cc.mewcraft.wakame.display2.IndexedDataRenderer4
-import cc.mewcraft.wakame.display2.IndexedDataRenderer5
-import cc.mewcraft.wakame.display2.IndexedDataRenderer6
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.ItemRenderer
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -31,7 +22,7 @@ import java.nio.file.Path
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
-internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, Initializable, KoinComponent {
+internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, KoinComponent {
     protected val logger = get<Logger>()
 
     /**
@@ -85,13 +76,9 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, I
         initialize(formatPath, layoutPath)
     }
 
-    override fun onPostWorld() {
-        initialize0()
-    }
-
-    override fun onReload() {
-        initialize0()
-    }
+//    override fun onReload() {
+//        initialize0()
+//    }
 
     companion object {
         const val LAYOUT_FILE_NAME = "layout.yml"

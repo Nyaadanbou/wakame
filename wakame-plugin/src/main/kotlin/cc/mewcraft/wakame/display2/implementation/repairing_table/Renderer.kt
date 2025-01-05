@@ -2,12 +2,11 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.util.isClientSide
 import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.showNothing
@@ -25,6 +24,9 @@ internal class RepairingTableItemRendererLayout : AbstractRendererLayout(Repairi
 
 internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
 internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
@@ -54,6 +56,11 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
         // 渲染其他可见部分
         item.showNothing()
+    }
+
+    @InitFun
+    fun onPostWorld() {
+        initialize0()
     }
 }
 

@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.initializer2
 
 import com.google.common.graph.MutableGraph

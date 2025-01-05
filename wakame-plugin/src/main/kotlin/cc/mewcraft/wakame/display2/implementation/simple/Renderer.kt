@@ -2,14 +2,13 @@ package cc.mewcraft.wakame.display2.implementation.simple
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
@@ -25,6 +24,9 @@ internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRende
 
 internal data object SimpleItemRendererContext
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
 internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
@@ -55,6 +57,11 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
             lore = itemLore
             showNothing()
         }
+    }
+
+    @InitFun
+    fun onPostWorld() {
+        initialize0()
     }
 }
 
