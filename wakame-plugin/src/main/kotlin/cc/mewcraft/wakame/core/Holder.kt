@@ -14,33 +14,57 @@ interface Holder<T> {
         fun <T> direct(value: T): Holder<T> = Direct(value)
     }
 
-    // 用于直接获取数据 T
-    // 通常在所有注册表已完全加载后的场景里使用
+    /**
+     * 是否已经绑定了数据.
+     */
+    val isBound: Boolean
+
+    /**
+     * 获取容器里的数据. 如果数据未绑定, 则抛出异常.
+     *
+     * 通常在所有注册表已完全加载后的场景里使用.
+     *
+     * @throws IllegalStateException 如果数据未绑定.
+     */
     val value: T
 
-    // 将数据 T 转换成响应式对象
-    // 通常在 注册表还未完全加载但需要将数据进行转换并储存在成员变量 的场景里使用
+    /**
+     * 获取该容器的类型.
+     */
+    val kind: Kind
+
+    /**
+     * 将数据转换成响应式对象.
+     *
+     * 通常在 *注册表还未完全加载但需要将数据进行转换并储存在成员变量* 的场景里使用.
+     */
     fun reactive(): ReactiveHolder<T>
 
     fun equals(id: ResourceLocation): Boolean
     fun equals(id: ResourceKey<T>): Boolean
     fun equals(entry: Holder<T>): Boolean
+
     fun unwrap(): Either<ResourceKey<T>, T>
     fun unwrapKey(): ResourceKey<T>?
-    val kind: Kind
-    fun canSerializeIn(owner: HolderOwner<T>): Boolean
     val registeredName: String
         get() = this.unwrapKey()?.location?.toString() ?: "[UNREGISTERED]"
+
+    fun canSerializeIn(owner: HolderOwner<T>): Boolean
 
     enum class Kind {
         DIRECT, REFERENCE
     }
 
     // Holder.Direct 封装的是没有与 Registry 相关联的数据
-    class Direct<T>(override val value: T) : Holder<T> {
+    class Direct<T>
+    @ApiStatus.Internal
+    constructor(override val value: T) : Holder<T> {
+        override val isBound: Boolean
+            get() = true
+
         private var reactive: ReactiveHolder<T>? = null
 
-        // FIXME 需要 thread-safe?
+        @Synchronized
         override fun reactive(): ReactiveHolder<T> {
             return reactive ?: provider(value).also { reactive = it }
         }
@@ -67,7 +91,7 @@ interface Holder<T> {
     class Reference<T>
     private constructor(
         private val owner: HolderOwner<T>,
-        private val type: Type, // 目前仅仅是标记, 无实际用途
+        val type: Type, // 目前仅仅是标记, 无实际用途
         val key: ResourceKey<T>,
         private var _value: T? = null,
     ) : Holder<T> {
@@ -83,16 +107,22 @@ interface Holder<T> {
 
         private var reactive: ReactiveHolder<T>? = null
 
-        // FIXME 需要 thread-safe?
+        @Synchronized
         override fun reactive(): ReactiveHolder<T> {
             return reactive ?: provider(this::value).also { reactive = it }
         }
 
+        override val isBound: Boolean
+            get() = _value != null
+
         override val value: T
             get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry ${this.owner}")
 
+        override val kind: Kind = Kind.REFERENCE
+
         // 使用场景:
-        // 1) Registry#register 为 intrusive holder 绑定数据
+        // 1) WritableRegistry#register 注册一个新的数据
+        // 1) WritableRegistry#register 为 intrusive holder 绑定数据
         // 2) 配置文件发生重载
         @ApiStatus.Internal
         fun bindValue(value: T): Reference<T> {
@@ -111,7 +141,6 @@ interface Holder<T> {
         override fun equals(entry: Holder<T>): Boolean = entry is Reference<*> && entry.key == this.key
         override fun unwrap(): Either<ResourceKey<T>, T> = Either.left(this.key)
         override fun unwrapKey(): ResourceKey<T>? = this.key
-        override val kind: Kind = Kind.REFERENCE
         override fun canSerializeIn(owner: HolderOwner<T>) = this.owner.canSerializeIn(owner)
         override fun toString(): String = "Reference[${this.key}=${this.value}]"
 

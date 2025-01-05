@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.core
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.DataResult
 import net.kyori.adventure.key.Key
 
 const val DEFAULT_NAMESPACE = "koish"
@@ -12,21 +14,17 @@ const val DEFAULT_NAMESPACE = "koish"
 typealias ResourceLocation = Key
 
 /**
- * 包含 [ResourceLocation] 的静态函数, 用于统一创建实例的过程.
+ * 包含 [ResourceLocation] 的静态函数, 用于统一创建实例的方式.
  */
 object ResourceLocations {
-    fun defaultNamespace(path: String): ResourceLocation = ResourceLocation.key(DEFAULT_NAMESPACE, path)
-}
+    @JvmField
+    val CODEC: Codec<ResourceLocation> = Codec.STRING.comapFlatMap(ResourceLocations::read, ResourceLocation::toString)
 
-// data class ResourceLocation(
-//     val namespace: String,
-//     val path: String,
-// ) {
-//     companion object {
-//         fun defaultNamespace(path: String): ResourceLocation = ResourceLocation("koish", path)
-//     }
-//
-//     override fun toString(): String {
-//         return "$namespace:$path"
-//     }
-// }
+    fun withDefaultNamespace(path: String): ResourceLocation = ResourceLocation.key(DEFAULT_NAMESPACE, path)
+
+    fun read(id: String): DataResult<ResourceLocation> = try {
+        DataResult.success(ResourceLocation.key(id))
+    } catch (e: Exception) {
+        DataResult.error { "Not a valid resource location: $id ${e.message}" }
+    }
+}
