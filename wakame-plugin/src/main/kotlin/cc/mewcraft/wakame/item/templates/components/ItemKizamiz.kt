@@ -16,6 +16,9 @@ import cc.mewcraft.wakame.random3.*
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -139,6 +142,11 @@ private object KizamiGroupSerializer : KoinComponent, GroupSerializer<Kizami, It
     runBefore = [ItemRegistry::class],
     runAfter = [KizamiRegistry::class]
 )
+@Reload(
+    order = ReloadableOrder.NORMAL,
+    runBefore = [ItemRegistry::class],
+    runAfter = [KizamiRegistry::class]
+)
 //@PreWorldDependency(
 //    runBefore = [KizamiRegistry::class],
 //    runAfter = [ItemRegistry::class]
@@ -171,7 +179,8 @@ internal object KizamiSampleNodeFacade : SampleNodeFacade<Kizami, ItemGeneration
         NodeFacadeSupport.reload(this)
     }
 
-//    override fun onReload() {
-//        NodeFacadeSupport.reload(this)
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        NodeFacadeSupport.reload(this)
+    }
 }

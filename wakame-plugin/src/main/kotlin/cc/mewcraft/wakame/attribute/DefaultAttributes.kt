@@ -4,6 +4,9 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.Key
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -15,6 +18,10 @@ import org.slf4j.Logger
  */
 @Init(
     stage = InitStage.PRE_WORLD,
+    runAfter = [AttributeRegistry::class],
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
     runAfter = [AttributeRegistry::class],
 )
 //@PreWorldDependency(
@@ -80,9 +87,10 @@ object DefaultAttributes : KoinComponent {
         loadConfiguration()
     }
 
-//    override fun onReload() {
-//        loadConfiguration()
-//    }
+    @ReloadableFun
+    fun onReload() {
+        loadConfiguration()
+    }
 
     private fun loadConfiguration() {
         SUPPLIERS.clear()

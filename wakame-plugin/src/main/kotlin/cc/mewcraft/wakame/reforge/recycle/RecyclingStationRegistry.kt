@@ -4,11 +4,17 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.common.PriceInstance
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 object RecyclingStationRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
@@ -40,7 +46,8 @@ object RecyclingStationRegistry {
         load()
     }
 
-//    override fun onReload() {
-//        load()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        load()
+    }
 }

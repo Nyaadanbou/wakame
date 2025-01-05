@@ -19,6 +19,8 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -52,6 +54,10 @@ import kotlin.reflect.KClass
  */
 @Init(
     stage = InitStage.PRE_WORLD,
+    runAfter = [ElementRegistry::class]
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
     runAfter = [ElementRegistry::class]
 )
 //@PreWorldDependency(

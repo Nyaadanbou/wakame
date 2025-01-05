@@ -25,6 +25,9 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -43,6 +46,9 @@ internal data class RerollingTableContext(
 
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
@@ -112,6 +118,11 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
     @InitFun
     fun onPostWorld() {
+        initialize0()
+    }
+
+    @ReloadableFun
+    fun onReload() {
         initialize0()
     }
 }

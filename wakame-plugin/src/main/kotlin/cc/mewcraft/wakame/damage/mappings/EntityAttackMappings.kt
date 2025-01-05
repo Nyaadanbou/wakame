@@ -10,6 +10,9 @@ import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
@@ -37,6 +40,9 @@ import java.io.File
  */
 @Init(
     stage = InitStage.POST_WORLD,
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 //@PostWorldDependency(
 //    runBefore = [ElementRegistry::class]
@@ -69,9 +75,10 @@ object EntityAttackMappings : KoinComponent {
         loadConfig()
     }
 
-//    override fun onReload() {
-//        loadConfig()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        loadConfig()
+    }
 
     private fun loadConfig() {
         mappings.clear()

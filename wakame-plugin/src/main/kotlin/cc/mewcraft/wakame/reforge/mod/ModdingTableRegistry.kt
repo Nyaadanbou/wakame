@@ -3,6 +3,10 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 
 /**
  * 定制台的注册表.
@@ -16,6 +20,13 @@ import cc.mewcraft.wakame.initializer2.InitStage
 //)
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
+    runAfter = [
+        // 我们仍然直接依赖 Ability 相关的实例, 而不是实例的引用, 因此 Ability 必须在我们之前加载完毕
+        AbilityRegistry::class
+    ]
 )
 object ModdingTableRegistry {
     private val tables = HashMap<String, ModdingTable>()
@@ -45,7 +56,8 @@ object ModdingTableRegistry {
         load()
     }
 
-//    override fun onReload() {
-//        load()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        load()
+    }
 }

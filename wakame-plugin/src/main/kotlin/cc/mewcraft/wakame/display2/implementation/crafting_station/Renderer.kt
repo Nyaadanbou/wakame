@@ -18,6 +18,9 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -44,6 +47,9 @@ internal data class CraftingStationContext(
 
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, CraftingStationContext>() {
     override val name: String = "crafting_station"
@@ -97,6 +103,11 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
     @InitFun
     fun onPostWorld() {
+        initialize0()
+    }
+
+    @ReloadableFun
+    fun onReload() {
         initialize0()
     }
 }

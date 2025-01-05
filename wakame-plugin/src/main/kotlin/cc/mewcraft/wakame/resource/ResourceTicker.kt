@@ -4,6 +4,9 @@ import cc.mewcraft.wakame.initializer2.DisableFun
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskTimer
@@ -20,6 +23,9 @@ import java.util.*
 
 @Init(
     stage = InitStage.PRE_WORLD,
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 object ResourceTicker : KoinComponent {
     private val server: Server by inject()
@@ -83,8 +89,9 @@ object ResourceTicker : KoinComponent {
         start()
     }
 
-//    override fun onReload() {
-//        close()
-//        start()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        close()
+        start()
+    }
 }

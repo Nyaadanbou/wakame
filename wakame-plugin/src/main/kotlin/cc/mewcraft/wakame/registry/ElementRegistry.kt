@@ -5,6 +5,9 @@ import cc.mewcraft.wakame.element.ElementProvider
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -17,6 +20,9 @@ import xyz.xenondevs.commons.provider.immutable.provider
 
 @Init(
     stage = InitStage.PRE_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 object ElementRegistry : KoinComponent, BiKnot<String, Element, Byte> {
     /**
@@ -47,10 +53,11 @@ object ElementRegistry : KoinComponent, BiKnot<String, Element, Byte> {
         loadConfiguration()
     }
 
-//    override fun onReload() {
-//        loadConfiguration()
-//        updateProviders()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        loadConfiguration()
+        updateProviders()
+    }
 
     private fun updateProviders() {
         providers.asMap().forEach { (_, provider) ->

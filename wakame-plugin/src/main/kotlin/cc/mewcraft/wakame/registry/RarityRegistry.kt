@@ -4,6 +4,9 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
@@ -13,13 +16,17 @@ import org.koin.core.qualifier.named
 @Init(
     stage = InitStage.PRE_WORLD,
 )
+@Reload(
+    order = ReloadableOrder.NORMAL
+)
 object RarityRegistry : KoinComponent, BiKnot<String, Rarity, Byte> {
     override val INSTANCES: Registry<String, Rarity> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Byte> = SimpleBiRegistry()
 
     @InitFun
     fun onPreWorld() = loadConfiguration()
-//    override fun onReload() = loadConfiguration()
+    @ReloadableFun
+    fun onReload() = loadConfiguration()
 
     /**
      * The default rarity. By design, it should be the most common rarity.

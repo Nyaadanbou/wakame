@@ -3,12 +3,18 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 
 /**
  * 重造台的注册表.
  */
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 object RerollingTableRegistry  {
     private val tables = HashMap<String, RerollingTable>()
@@ -38,7 +44,8 @@ object RerollingTableRegistry  {
         load()
     }
 
-//    override fun onReload() {
-//        load()
-//    }
+    @ReloadableFun
+    fun onReload() {
+        load()
+    }
 }

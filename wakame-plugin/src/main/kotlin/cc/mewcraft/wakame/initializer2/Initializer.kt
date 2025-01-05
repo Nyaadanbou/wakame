@@ -6,19 +6,17 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
 import cc.mewcraft.wakame.initializer2.Initializer.start
+import cc.mewcraft.wakame.initializer2.InitializerSupport.tryInit
 import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.registerSuspendingEvents
 import com.google.common.graph.Graph
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.*
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
 import java.io.File
-import java.lang.reflect.InvocationTargetException
 
 internal object Initializer : Listener {
 
@@ -238,31 +236,10 @@ internal object Initializer : Listener {
             // run in preferred context
             withContext(runnable.dispatcher ?: scope.coroutineContext) {
 //                if (LOGGING)
-                    LOGGER.info(runnable.toString())
+                LOGGER.info(runnable.toString())
 
                 runnable.run()
             }
-        }
-    }
-
-    /**
-     * Wraps [run] in a try-catch block with error logging specific to initialization.
-     * Returns whether the initialization was successful, and also shuts down the server if it wasn't.
-     */
-    private inline fun tryInit(run: () -> Unit) {
-        try {
-            run()
-        } catch (t: Throwable) {
-            val cause = if (t is InvocationTargetException) t.targetException else t
-            if (cause is InitializationException) {
-                LOGGER.error(cause.message)
-            } else {
-                LOGGER.error("An exception occurred during initialization", cause)
-            }
-
-            LOGGER.error("Initialization failure")
-            (LogManager.getContext(false) as LoggerContext).stop() // flush log messages
-            Runtime.getRuntime().halt(-1) // force-quit process to prevent further errors
         }
     }
 

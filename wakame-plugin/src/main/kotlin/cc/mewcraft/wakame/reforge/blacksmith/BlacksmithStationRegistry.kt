@@ -5,10 +5,17 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 
 @Init(
     stage = InitStage.POST_WORLD,
     runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
+    runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
 )
 //@PostWorldDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])
 //@ReloadDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])
@@ -33,7 +40,8 @@ object BlacksmithStationRegistry {
         load()
     }
 
-//    override fun onReload() {
-//        load()
-//    }
+    @ReloadableFun
+    private fun onReload() {
+        load()
+    }
 }

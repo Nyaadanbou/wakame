@@ -44,7 +44,7 @@ enum class InitStage(
     /**
      * Before the world is loaded.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class)),
+    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, FacadeInitializer::class)),
 
     /**
      * After the world has been loaded.

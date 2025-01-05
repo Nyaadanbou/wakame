@@ -6,6 +6,9 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.kizami.*
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.yamlConfig
@@ -19,6 +22,10 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
+    runAfter = [AbilityRegistry::class, AttributeRegistry::class]
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
     runAfter = [AbilityRegistry::class, AttributeRegistry::class]
 )
 //@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
@@ -70,9 +77,10 @@ object KizamiRegistry : KoinComponent {
         loadRegistries()
     }
 
-//    override fun onReload() {
-//        loadRegistries()
-//    }
+    @ReloadableFun
+    fun onReload() {
+        loadRegistries()
+    }
 
     private val logger: Logger by inject()
 

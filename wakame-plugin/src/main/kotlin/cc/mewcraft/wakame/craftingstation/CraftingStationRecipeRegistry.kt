@@ -10,6 +10,10 @@ import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
@@ -20,6 +24,10 @@ import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
+    runAfter = [ItemRegistry::class],
 )
 //@ReloadDependency(
 //    runBefore = [ItemRegistry::class]
@@ -94,8 +102,9 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
         registerRecipes()
     }
 
-//    override fun onReload() {
-//        loadConfig()
-//        registerRecipes()
-//    }
+    @ReloadableFun
+    fun onReload() {
+        loadConfig()
+        registerRecipes()
+    }
 }

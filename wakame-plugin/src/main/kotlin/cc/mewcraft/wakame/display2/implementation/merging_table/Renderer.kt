@@ -15,6 +15,9 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.merge.MergingSession
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -30,6 +33,9 @@ internal sealed interface MergingTableContext {
 
 @Init(
     stage = InitStage.POST_WORLD
+)
+@Reload(
+    order = ReloadableOrder.NORMAL
 )
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
@@ -87,6 +93,11 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
 
     @InitFun
     fun onPostWorld() {
+        initialize0()
+    }
+
+    @ReloadableFun
+    fun onReload() {
         initialize0()
     }
 }

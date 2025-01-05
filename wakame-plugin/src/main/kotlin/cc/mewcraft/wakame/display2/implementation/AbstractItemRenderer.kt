@@ -76,10 +76,6 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, K
         initialize(formatPath, layoutPath)
     }
 
-//    override fun onReload() {
-//        initialize0()
-//    }
-
     companion object {
         const val LAYOUT_FILE_NAME = "layout.yml"
         const val FORMAT_FILE_NAME = "formats.yml"

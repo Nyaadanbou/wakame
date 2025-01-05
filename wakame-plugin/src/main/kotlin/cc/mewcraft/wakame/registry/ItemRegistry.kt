@@ -10,6 +10,9 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
@@ -26,6 +29,19 @@ import xyz.xenondevs.commons.provider.immutable.provider
 
 @Init(
     stage = InitStage.PRE_WORLD,
+    runAfter = [
+        AttributeRegistry::class,
+        ElementRegistry::class,
+        EntityRegistry::class,
+        ItemSkinRegistry::class,
+        KizamiRegistry::class,
+        LevelMappingRegistry::class,
+        RarityRegistry::class,
+        AbilityRegistry::class,
+    ]
+)
+@Reload(
+    order = ReloadableOrder.NORMAL,
     runAfter = [
         AttributeRegistry::class,
         ElementRegistry::class,
@@ -106,7 +122,7 @@ object ItemRegistry : KoinComponent {
         loadConfiguration()
     }
 
-    @InitFun
+    @ReloadableFun
     private fun onReload() {
         loadConfiguration()
     }

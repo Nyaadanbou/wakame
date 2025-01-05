@@ -11,6 +11,9 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toNamespacedKey
@@ -43,6 +46,9 @@ import java.lang.reflect.Type
 @Init(
     stage = InitStage.POST_WORLD
 )
+@Reload(
+    order = ReloadableOrder.NORMAL
+)
 //@PostWorldDependency(
 //    runBefore = [ElementRegistry::class]
 //)
@@ -70,7 +76,8 @@ object DamageTypeMappings : KoinComponent {
 
     @InitFun
     private fun onPostWorld(): Unit = loadConfig()
-//    override fun onReload(): Unit = loadConfig()
+    @ReloadableFun
+    private fun onReload(): Unit = loadConfig()
 
     private fun loadConfig() {
         mappings.clear()
