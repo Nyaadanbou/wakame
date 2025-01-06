@@ -48,6 +48,7 @@ dependencies {
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.kotlin))
+    implementation(platform(libs.bom.configurate.dfu4))
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
     implementation(platform(libs.bom.cloud.kotlin))

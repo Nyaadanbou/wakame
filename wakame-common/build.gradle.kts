@@ -4,6 +4,7 @@
 plugins {
     id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.kotlin")
+    id("io.papermc.paperweight.userdev")
     `maven-publish`
 }
 
@@ -11,7 +12,7 @@ group = "cc.mewcraft.wakame"
 version = "0.0.1-SNAPSHOT"
 
 dependencies {
-    compileOnly(local.paper)
+    paperweight.paperDevBundle(local.versions.paper)
     compileOnly(local.shadow.nbt)
 }
 
