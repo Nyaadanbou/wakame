@@ -15,8 +15,7 @@ import cc.mewcraft.wakame.random3.*
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -84,9 +83,8 @@ data class ItemElements(
     runAfter = [ElementRegistry::class],
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
-    runBefore = [ItemRegistry::class],
     runAfter = [ElementRegistry::class],
+    runBefore = [ItemRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class],
@@ -119,7 +117,7 @@ internal object ElementSampleNodeFacade : SampleNodeFacade<Element, ItemGenerati
         NodeFacadeSupport.reload(this)
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         NodeFacadeSupport.reload(this)
     }

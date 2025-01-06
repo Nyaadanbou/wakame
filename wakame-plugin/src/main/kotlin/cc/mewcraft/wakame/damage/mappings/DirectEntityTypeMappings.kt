@@ -10,8 +10,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
@@ -37,7 +36,6 @@ import java.io.File
     stage = InitStage.POST_WORLD
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [ElementRegistry::class]
 )
 //@PostWorldDependency(
@@ -78,7 +76,7 @@ object DirectEntityTypeMappings : KoinComponent {
         loadConfig()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         loadConfig()
     }

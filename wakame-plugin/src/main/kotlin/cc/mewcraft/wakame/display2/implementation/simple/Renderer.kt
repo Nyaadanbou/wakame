@@ -16,8 +16,7 @@ import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -30,9 +29,7 @@ internal data object SimpleItemRendererContext
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
@@ -70,7 +67,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         initialize0()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         initialize0()
     }

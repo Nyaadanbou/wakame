@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.initializer2.FacadeInitializer
 import cc.mewcraft.wakame.initializer2.InternalInit
 import cc.mewcraft.wakame.initializer2.InternalInitStage
 import cc.mewcraft.wakame.reloader.InternalReload
-import cc.mewcraft.wakame.reloader.ReloadableFun
+import cc.mewcraft.wakame.reloader.ReloadFun
 import org.jetbrains.annotations.TestOnly
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
@@ -32,7 +32,7 @@ object Configs : KoinComponent {
     val YAML: YamlConfigs = YamlConfigs()
     val GSON: GsonConfigs = GsonConfigs()
 
-    @ReloadableFun
+    @ReloadFun
     fun reload() {
         YAML.reload()
         GSON.reload()

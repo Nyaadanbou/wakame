@@ -12,8 +12,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -400,7 +399,6 @@ internal class ImaginaryNekoStack(
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [ItemRegistry::class],
 )
 //@ReloadDependency(
@@ -434,7 +432,7 @@ internal object ImaginaryNekoStackRegistry : KoinComponent {
         realizeAndRegister()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         realizeAndRegister()
     }

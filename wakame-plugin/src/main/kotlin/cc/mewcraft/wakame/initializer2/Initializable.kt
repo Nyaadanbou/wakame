@@ -2,29 +2,23 @@
 
 package cc.mewcraft.wakame.initializer2
 
+import cc.mewcraft.wakame.dependency.dependencySupport
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaMethod
 
 internal abstract class Initializable(
     val stage: InternalInitStage,
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
-    private val runAfterNames: Set<String>
+    private val runAfterNames: Set<String>,
 ) : InitializerRunnable<Initializable>() {
 
     abstract val initClass: InitializableClass
 
-    override fun loadDependencies(all: Set<Initializable>, graph: MutableGraph<Initializable>) {
+    override fun loadDependencies(all: Set<Initializable>, graph: MutableGraph<Initializable>) = dependencySupport {
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
-            val runBefore = all
-                .filterIsInstance<InitializableClass>()
-                .firstOrNull { candidate -> candidate.initClass.className == runBeforeName }
+            val runBefore = findInitializableClass(all, runBeforeName)
                 ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '$this'")
             if (!stage.isPreWorld && runBefore.stage.isPreWorld)
                 throw IllegalArgumentException("Incompatible stages: '$this' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
@@ -36,19 +30,13 @@ internal abstract class Initializable(
             if (stage != runBefore.stage)
                 continue
 
-            try {
-                graph.putEdge(this, runBefore)
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Failed to add edge from '$this' to '$runBeforeName'", e)
-            }
+            graph.tryPutEdge(this@Initializable, runBefore)
         }
 
         // this runAfter that
         for (runAfterName in runAfterNames) {
             val runAfters = HashSet<Initializable>()
-            val runAfterClass = all
-                .filterIsInstance<InitializableClass>()
-                .firstOrNull { candidate -> candidate.initClass.className == runAfterName }
+            val runAfterClass = findInitializableClass(all, runAfterName)
                 ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '$this'")
             runAfters += runAfterClass
             if (runAfterClass != initClass)
@@ -62,15 +50,18 @@ internal abstract class Initializable(
                 if (stage != runAfter.stage)
                     continue
 
-                try {
-                    graph.putEdge(runAfter, this)
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Failed to add edge from '$runAfter' to '$this'", e)
-                }
+                graph.tryPutEdge(runAfter, this@Initializable)
             }
         }
     }
 
+    companion object {
+        fun findInitializableClass(all: Set<Initializable>, className: String): InitializableClass? {
+            return all
+                .filterIsInstance<InitializableClass>()
+                .firstOrNull { candidate -> candidate.initClass.className == className }
+        }
+    }
 }
 
 internal class InitializableClass(
@@ -79,7 +70,7 @@ internal class InitializableClass(
     stage: InternalInitStage,
     dispatcher: CoroutineDispatcher?,
     runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
+    runAfterNames: Set<String>,
 ) : Initializable(stage, dispatcher, runBeforeNames, runAfterNames) {
 
     override val initClass = this
@@ -101,9 +92,8 @@ internal class InitializableClass(
     companion object {
 
         @Suppress("UNCHECKED_CAST")
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
-            val stage = (annotation["stage"] as Array<String>?)?.get(1)
-                ?.let { enumValueOf<InitStage>(it) }
+        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass = dependencySupport {
+            val stage = readEnum<InitStage>("stage", annotation)
                 ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
             val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
             runBefore += stage.runBefore
@@ -117,9 +107,8 @@ internal class InitializableClass(
         }
 
         @Suppress("UNCHECKED_CAST")
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
-            val stage = (annotation["stage"] as Array<String>?)?.get(1)
-                ?.let { enumValueOf<InternalInitStage>(it) }
+        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass = dependencySupport {
+            val stage = readEnum<InternalInitStage>("stage", annotation)
                 ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
             val dispatcher = readDispatcher(annotation)
             val dependsOn = readStrings("dependsOn", annotation)
@@ -140,7 +129,7 @@ internal class InitializableFunction(
     private val methodName: String,
     dispatcher: CoroutineDispatcher?,
     runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
+    runAfterNames: Set<String>,
 ) : Initializable(
     initClass.stage,
     dispatcher,
@@ -148,17 +137,9 @@ internal class InitializableFunction(
     runAfterNames + initClass.className
 ) {
 
-    override suspend fun run() {
+    override suspend fun run() = dependencySupport {
         val clazz = initClass.clazz.kotlin
-        val function = clazz.functions.first {
-            it.javaMethod!!.name == methodName &&
-                    it.parameters.size == 1 &&
-                    it.parameters[0].kind == KParameter.Kind.INSTANCE
-        }
-        function.isAccessible = true
-        function.callSuspend(clazz.objectInstance)
-
-        completion.complete(Unit)
+        clazz.executeSuspendFunction(methodName, completion)
     }
 
     override fun toString(): String {
@@ -167,7 +148,7 @@ internal class InitializableFunction(
 
     companion object {
 
-        fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction {
+        fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction = dependencySupport {
             val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
             val func = InitializableFunction(
                 clazz, methodName,

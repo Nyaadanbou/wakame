@@ -7,8 +7,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
@@ -22,7 +21,6 @@ import java.io.File
 
 @Init(stage = InitStage.POST_WORLD)
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [ItemRegistry::class],
 )
 //@ReloadDependency(
@@ -166,7 +164,7 @@ object VanillaRecipeRegistry : KoinComponent {
         runTask { registerRecipes() }
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         //TODO 待优化写法
         loadRecipes()

@@ -12,8 +12,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
@@ -26,7 +25,6 @@ import java.io.File
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [ItemRegistry::class],
 )
 //@ReloadDependency(
@@ -102,7 +100,7 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
         registerRecipes()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         loadConfig()
         registerRecipes()

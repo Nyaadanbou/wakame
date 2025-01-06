@@ -5,14 +5,16 @@ package cc.mewcraft.wakame.initializer2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
+import cc.mewcraft.wakame.dependency.dependencyLoaderSupport
 import cc.mewcraft.wakame.initializer2.Initializer.start
 import cc.mewcraft.wakame.initializer2.InitializerSupport.tryInit
 import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.registerSuspendingEvents
-import com.google.common.graph.Graph
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
@@ -68,8 +70,8 @@ internal object Initializer : Listener {
 
         val internalInits = result.classes[InternalInit::class] ?: emptyMap()
         val inits = result.classes[Init::class] ?: emptyMap()
-        val initFuncs = result.functions[InitFun::class] ?: emptyMap()
-        val disableFuncs = result.functions[DisableFun::class] ?: emptyMap()
+        val initFunctions = result.functions[InitFun::class] ?: emptyMap()
+        val disableFunctions = result.functions[DisableFun::class] ?: emptyMap()
 
         for ((className, annotations) in internalInits) {
             val clazz = InitializableClass.fromInternalAnnotation(classLoader, className, annotations.first())
@@ -82,7 +84,7 @@ internal object Initializer : Listener {
             initializableClasses[className] = clazz
         }
 
-        for ((className, annotatedFuncs) in initFuncs) {
+        for ((className, annotatedFuncs) in initFunctions) {
             val clazz = initializableClasses[className]
                 ?: throw IllegalStateException("Class $className is missing an init annotation!")
 
@@ -91,7 +93,7 @@ internal object Initializer : Listener {
             }
         }
 
-        for ((className, annotatedFuncs) in disableFuncs) {
+        for ((className, annotatedFuncs) in disableFunctions) {
             for ((methodName, annotations) in annotatedFuncs) {
                 disableables += DisableableFunction.fromInitAnnotation(classLoader, className, methodName, annotations.first())
             }
@@ -105,31 +107,31 @@ internal object Initializer : Listener {
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) {
+    private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) = dependencyLoaderSupport {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
         for (initializable in initializables) {
-            this.initializables += initializable
+            this@Initializer.initializables += initializable
             when (initializable.stage) {
                 InternalInitStage.PRE_WORLD -> initPreWorld.addNode(initializable)
                 else -> initPostWorld.addNode(initializable)
             }
         }
         for (disableable in disableables) {
-            this.disableables += disableable
+            this@Initializer.disableables += disableable
             disable.addNode(disableable)
         }
 
         // add edges
         for (initializable in initializables) {
             initializable.loadDependencies(
-                this.initializables,
+                this@Initializer.initializables,
                 if (initializable.stage == InternalInitStage.PRE_WORLD) initPreWorld else initPostWorld
             )
         }
         for (disableable in disableables) {
-            disableable.loadDependencies(this.disableables, disable)
+            disableable.loadDependencies(this@Initializer.disableables, disable)
         }
 
         // launch initialization it if already started
@@ -169,88 +171,51 @@ internal object Initializer : Listener {
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld() = runBlocking {
-        tryInit {
-            coroutineScope {
-                preWorldScope = this
-                launchAll(this, initPreWorld)
+    private fun initPreWorld() = dependencyLoaderSupport {
+        runBlocking {
+            tryInit {
+                coroutineScope {
+                    preWorldScope = this
+                    launchAll(this, initPreWorld)
+                }
             }
-        }
 
-        preWorldInitialized = true
+            preWorldInitialized = true
+        }
     }
 
     /**
      * Starts the post-world initialization process.
      */
-    private fun initPostWorld() = runBlocking {
-        tryInit {
-            coroutineScope {
-                launchAll(this, initPostWorld)
+    private fun initPostWorld() = dependencyLoaderSupport {
+        runBlocking {
+            tryInit {
+                coroutineScope {
+                    launchAll(this, initPostWorld)
+                }
             }
-        }
 
-        isDone = true
-        NekoLoadDataEvent().callEvent()
+            isDone = true
+            NekoLoadDataEvent().callEvent()
 
 //        @Suppress("UnstableApiUsage")
 //        PermanentStorage.store("last_version", Nova.pluginMeta.version)
 //        setGlobalIngredients()
 //        setupMetrics()
-        LOGGER.info("Done loading")
-    }
-
-    /**
-     * Launches all vertices of [graph] in the given [scope].
-     */
-    private fun <T : InitializerRunnable<T>> launchAll(scope: CoroutineScope, graph: Graph<T>) {
-        for (initializable in graph.nodes()) {
-            launch(scope, initializable, graph)
-        }
-    }
-
-    /**
-     * Launches [runnable] of [graph] in the given [scope].
-     */
-    private fun <T : InitializerRunnable<T>> launch(
-        scope: CoroutineScope,
-        runnable: T,
-        graph: Graph<T>
-    ) {
-        scope.launch {
-            // await dependencies, which may increase during wait
-            var prevDepsSize = 0
-            var deps: List<Deferred<*>> = emptyList()
-
-            fun findDependencies(): List<Deferred<*>> {
-                deps = graph.predecessors(runnable)
-                    .map { it.completion }
-                return deps
-            }
-
-            while (prevDepsSize != findDependencies().size) {
-                prevDepsSize = deps.size
-                deps.awaitAll()
-            }
-
-            // run in preferred context
-            withContext(runnable.dispatcher ?: scope.coroutineContext) {
-//                if (LOGGING)
-                LOGGER.info(runnable.toString())
-
-                runnable.run()
-            }
+            LOGGER.info("Done loading")
         }
     }
 
     /**
      * Disables all [Initializables][Initializable] in the reverse order that they were initialized in.
      */
-    fun disable() = runBlocking {
-        if (isDone) {
-            coroutineScope { launchAll(this, disable) }
-        } else {
-            LOGGER.warn("Skipping disable phase due to incomplete initialization")
+    fun disable() = dependencyLoaderSupport {
+        runBlocking {
+            if (isDone) {
+                coroutineScope { launchAll(this, disable) }
+            } else {
+                LOGGER.warn("Skipping disable phase due to incomplete initialization")
+            }
         }
     }
 

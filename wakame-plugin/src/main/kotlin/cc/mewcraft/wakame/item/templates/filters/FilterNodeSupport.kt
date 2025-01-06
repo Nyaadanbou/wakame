@@ -16,8 +16,7 @@ import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.get
@@ -33,9 +32,8 @@ import kotlin.io.path.Path
     runAfter = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
-    runBefore = [ItemRegistry::class],
     runAfter = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
+    runBefore = [ItemRegistry::class],
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class, KizamiRegistry::class, RarityRegistry::class],
@@ -68,7 +66,7 @@ internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>()
         NodeFacadeSupport.reload(this)
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         NodeFacadeSupport.reload(this)
     }

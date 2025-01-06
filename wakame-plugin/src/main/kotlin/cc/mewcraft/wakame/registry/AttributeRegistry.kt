@@ -20,7 +20,6 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableOrder
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -57,7 +56,6 @@ import kotlin.reflect.KClass
     runAfter = [ElementRegistry::class]
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [ElementRegistry::class]
 )
 //@PreWorldDependency(
@@ -65,7 +63,7 @@ import kotlin.reflect.KClass
 //)
 //@ReloadDependency(
 //    runBefore = [ElementRegistry::class]
-//)
+//)wwdwdwww
 object AttributeRegistry {
 
     /**

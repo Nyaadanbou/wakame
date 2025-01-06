@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
@@ -16,9 +15,7 @@ import org.jetbrains.annotations.VisibleForTesting
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 object RepairingTableRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val tables: MutableMap<String, RepairingTable> = mutableMapOf()
@@ -49,7 +46,7 @@ object RepairingTableRegistry {
         load()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         load()
     }

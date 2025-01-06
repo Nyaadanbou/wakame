@@ -13,7 +13,6 @@ annotation class InternalReload(
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class Reload(
-    val order: ReloadableOrder,
     val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = [],
@@ -21,7 +20,7 @@ annotation class Reload(
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
-annotation class ReloadableFun(
+annotation class ReloadFun(
     val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
     val runBefore: Array<KClass<*>> = []

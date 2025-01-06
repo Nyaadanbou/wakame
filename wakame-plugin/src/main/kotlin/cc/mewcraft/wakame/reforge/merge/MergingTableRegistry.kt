@@ -4,8 +4,7 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 
 /**
  * 合并台的注册表.
@@ -13,9 +12,7 @@ import cc.mewcraft.wakame.reloader.ReloadableOrder
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 object MergingTableRegistry {
     private val tables = HashMap<String, MergingTable>()
 
@@ -44,7 +41,7 @@ object MergingTableRegistry {
         load()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         load()
     }

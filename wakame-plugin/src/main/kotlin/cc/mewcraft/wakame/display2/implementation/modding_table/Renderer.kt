@@ -20,8 +20,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
@@ -53,9 +52,7 @@ internal sealed interface ModdingTableContext {
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
     override val name: String = "modding_table"
     override val formats = ModdingTableRendererFormatRegistry(this)
@@ -133,7 +130,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         initialize0()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         initialize0()
     }

@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
@@ -21,7 +20,6 @@ import org.koin.core.qualifier.named
     runAfter = [RarityRegistry::class]
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [RarityRegistry::class]
 )
 //@PreWorldDependency(runBefore = [RarityRegistry::class])
@@ -34,7 +32,7 @@ object LevelMappingRegistry : KoinComponent {
 
     @InitFun
     fun onPreWorld() = loadConfiguration()
-    @ReloadableFun
+    @ReloadFun
     fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {

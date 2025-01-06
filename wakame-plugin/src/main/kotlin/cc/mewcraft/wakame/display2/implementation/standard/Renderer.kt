@@ -21,8 +21,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -38,9 +37,7 @@ internal data object StandardContext // 等之后需要的时候, 改成 class �
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
@@ -124,7 +121,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         initialize0()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         initialize0()
     }

@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -21,9 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 object ModelRegistry : KoinComponent {
     private const val BBMODELS_DIR = "bbmodels"
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
@@ -81,7 +78,7 @@ object ModelRegistry : KoinComponent {
         loadModels().onFailure { it.printStackTrace() }
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         loadModels().onFailure { it.printStackTrace() }
     }

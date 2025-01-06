@@ -6,8 +6,7 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -21,9 +20,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
 @Init(
     stage = InitStage.PRE_WORLD
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 object ElementRegistry : KoinComponent, BiKnot<String, Element, Byte> {
     /**
      * The default element. By design, it should be the most common element.
@@ -53,7 +50,7 @@ object ElementRegistry : KoinComponent, BiKnot<String, Element, Byte> {
         loadConfiguration()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         loadConfiguration()
         updateProviders()

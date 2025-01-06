@@ -7,8 +7,7 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -24,7 +23,6 @@ import java.io.File
     runAfter = [CraftingStationRecipeRegistry::class]
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [CraftingStationRecipeRegistry::class]
 )
 //@PostWorldDependency(
@@ -87,7 +85,7 @@ internal object CraftingStationRegistry : KoinComponent {
         loadStations()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         loadStations()
     }

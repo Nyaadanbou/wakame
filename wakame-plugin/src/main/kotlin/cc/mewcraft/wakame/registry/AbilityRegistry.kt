@@ -11,8 +11,7 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.krequire
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -30,7 +29,6 @@ import java.io.File
     runAfter = [AttributeRegistry::class, ElementRegistry::class]
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [AttributeRegistry::class, ElementRegistry::class]
 )
 //@ReloadDependency(runBefore = [AttributeRegistry::class, ElementRegistry::class])
@@ -112,7 +110,7 @@ object AbilityRegistry : KoinComponent {
         loadTriggers()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         loadConfiguration()
     }

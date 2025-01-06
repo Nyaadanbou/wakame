@@ -2,63 +2,55 @@
 
 package cc.mewcraft.wakame.reloader
 
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.dependency.dependencySupport
 import cc.mewcraft.wakame.initializer2.Dispatcher
-import cc.mewcraft.wakame.initializer2.InitializerRunnable
+import cc.mewcraft.wakame.util.internalName
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaMethod
 
 internal abstract class Reloadable(
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
-    private val runAfterNames: Set<String>
+    private val runAfterNames: Set<String>,
 ) : ReloaderRunnable<Reloadable>() {
 
     abstract val reloadClass: ReloadableClass
 
-    override fun loadDependencies(all: Set<Reloadable>, graph: MutableGraph<Reloadable>) {
+    override fun loadDependencies(all: Set<Reloadable>, graph: MutableGraph<Reloadable>) = dependencySupport {
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
-            val runBefore = all
-                .filterIsInstance<ReloadableClass>()
-                .firstOrNull { candidate -> candidate.reloadClass.className == runBeforeName }
+            val runBefore = findReloadClass(all, runBeforeName)
                 ?: throw IllegalArgumentException("Could not find reloadable class '$runBeforeName', which is a runBefore of '$this'")
 
             if (runBefore.completion.isCompleted)
                 throw IllegalArgumentException("'$this' is configured to be reloaded before '$runBeforeName', but '$runBeforeName' is already reloaded")
 
-            try {
-                graph.putEdge(this, runBefore)
-            } catch (e: IllegalArgumentException) {
-                throw IllegalArgumentException("Failed to add edge from '$this' to '$runBeforeName'", e)
-            }
+            graph.tryPutEdge(this@Reloadable, runBefore)
         }
 
         // this runAfter that
         for (runAfterName in runAfterNames) {
             val runAfters = HashSet<Reloadable>()
-            val runAfterClass = all
-                .filterIsInstance<ReloadableClass>()
-                .firstOrNull { candidate -> candidate.reloadClass.className == runAfterName }
+            val runAfterClass = findReloadClass(all, runAfterName)
                 ?: throw IllegalArgumentException("Could not find reloadable class '$runAfterName', which is a runAfter of '$this'")
             runAfters += runAfterClass
+
             if (runAfterClass != reloadClass)
                 runAfters += runAfterClass.reloadFunctions
 
             for (runAfter in runAfters) {
-                try {
-                    graph.putEdge(runAfter, this)
-                } catch (e: IllegalArgumentException) {
-                    throw IllegalArgumentException("Failed to add edge from '$runAfter' to '$this'", e)
-                }
+                graph.tryPutEdge(runAfter, this@Reloadable)
             }
         }
     }
 
+    companion object {
+        fun findReloadClass(all: Set<Reloadable>, className: String): ReloadableClass? {
+            return all.filterIsInstance<ReloadableClass>()
+                .firstOrNull { candidate -> candidate.reloadClass.className == className }
+        }
+    }
 }
 
 internal class ReloadableClass(
@@ -66,7 +58,7 @@ internal class ReloadableClass(
     val className: String,
     dispatcher: CoroutineDispatcher?,
     runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
+    runAfterNames: Set<String>,
 ) : Reloadable(dispatcher, runBeforeNames, runAfterNames) {
 
     override val reloadClass = this
@@ -88,13 +80,10 @@ internal class ReloadableClass(
     companion object {
 
         @Suppress("UNCHECKED_CAST")
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass {
-            val order = (annotation["order"] as Array<String>?)?.get(1)
-                ?.let { enumValueOf<ReloadableOrder>(it) }
-                ?: throw IllegalStateException("Reloadable annotation on $clazz does not contain a order!")
+        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = dependencySupport{
             val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
-            runBefore += order.runBefore
-            runAfter += order.runAfter
+            // Configs 需要在所有类之前重载之前被重载.
+            runBefore += Configs::class.internalName
 
             return ReloadableClass(
                 classLoader, clazz,
@@ -104,9 +93,9 @@ internal class ReloadableClass(
         }
 
         @Suppress("UNCHECKED_CAST")
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass {
-            val dispatcher = InitializerRunnable.Companion.readDispatcher(annotation)
-            val dependsOn = InitializerRunnable.Companion.readStrings("dependsOn", annotation)
+        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = dependencySupport{
+            val dispatcher = readDispatcher(annotation)
+            val dependsOn = readStrings("dependsOn", annotation)
 
             return ReloadableClass(
                 classLoader, clazz,
@@ -124,24 +113,16 @@ internal class ReloadableFunction(
     private val methodName: String,
     dispatcher: CoroutineDispatcher?,
     runBeforeNames: Set<String>,
-    runAfterNames: Set<String>
+    runAfterNames: Set<String>,
 ) : Reloadable(
     dispatcher,
     runBeforeNames,
     runAfterNames + reloadClass.className
 ) {
 
-    override suspend fun run() {
+    override suspend fun run() = dependencySupport {
         val clazz = reloadClass.clazz.kotlin
-        val function = clazz.functions.first {
-            it.javaMethod!!.name == methodName &&
-                    it.parameters.size == 1 &&
-                    it.parameters[0].kind == KParameter.Kind.INSTANCE
-        }
-        function.isAccessible = true
-        function.callSuspend(clazz.objectInstance)
-
-        completion.complete(Unit)
+        clazz.executeSuspendFunction(methodName, completion)
     }
 
     override fun toString(): String {
@@ -150,7 +131,7 @@ internal class ReloadableFunction(
 
     companion object {
 
-        fun fromInitAnnotation(clazz: ReloadableClass, methodName: String, annotation: Map<String, Any?>): ReloadableFunction {
+        fun fromInitAnnotation(clazz: ReloadableClass, methodName: String, annotation: Map<String, Any?>): ReloadableFunction = dependencySupport {
             val (dispatcher, runBefore, runAfter) = readAnnotationCommons(annotation)
             val func = ReloadableFunction(
                 clazz, methodName,

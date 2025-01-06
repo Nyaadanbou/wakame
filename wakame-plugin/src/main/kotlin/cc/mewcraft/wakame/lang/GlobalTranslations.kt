@@ -8,8 +8,7 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
@@ -46,9 +45,7 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload(
-    order = ReloadableOrder.NORMAL
-)
+@Reload()
 object GlobalTranslations : KoinComponent {
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
@@ -87,7 +84,7 @@ object GlobalTranslations : KoinComponent {
         loadTranslation()
     }
 
-    @ReloadableFun
+    @ReloadFun
     fun onReload() {
         translations.unregisterAll()
         loadTranslation()

@@ -26,8 +26,7 @@ import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
@@ -183,9 +182,8 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
     runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
-    runBefore = [ItemRegistry::class],
-    runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class]
+    runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+    runBefore = [ItemRegistry::class]
 )
 //@PreWorldDependency(
 //    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
@@ -254,7 +252,7 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
         NodeFacadeSupport.reload(this)
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         NodeFacadeSupport.reload(this)
     }

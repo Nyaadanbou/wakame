@@ -11,8 +11,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
 import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadableFun
-import cc.mewcraft.wakame.reloader.ReloadableOrder
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
@@ -41,7 +40,6 @@ import xyz.xenondevs.commons.provider.immutable.provider
     ]
 )
 @Reload(
-    order = ReloadableOrder.NORMAL,
     runAfter = [
         AttributeRegistry::class,
         ElementRegistry::class,
@@ -122,7 +120,7 @@ object ItemRegistry : KoinComponent {
         loadConfiguration()
     }
 
-    @ReloadableFun
+    @ReloadFun
     private fun onReload() {
         loadConfiguration()
     }
