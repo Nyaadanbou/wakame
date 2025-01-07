@@ -11,7 +11,7 @@ data class ItemSkin @InternalApi internal constructor(
     override val uniqueId: String,
     override val binaryId: Short,
     override val displayName: Component,
-    override val styles: Array<StyleBuilderApplicable>,
+    override val displayStyles: Array<StyleBuilderApplicable>,
     /**
      * K - predicate name
      * V - variant

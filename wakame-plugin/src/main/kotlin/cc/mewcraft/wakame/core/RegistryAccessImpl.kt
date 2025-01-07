@@ -10,6 +10,17 @@ class MutableRegistryAccess : RegistryAccess {
         return registry
     }
 
+    /**
+     * 重置注册表的所有状态.
+     */
+    fun resetRegistries() {
+        registries.forEach { (_, registry) ->
+            if (registry is WritableRegistry<*>) {
+                registry.resetRegistry()
+            }
+        }
+    }
+
     override fun <E> registry(key: ResourceKey<out Registry<E>>): Registry<E>? {
         @Suppress("UNCHECKED_CAST")
         return registries[key] as Registry<E>?

@@ -1,9 +1,13 @@
 package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.DefaultAttributes
+import cc.mewcraft.wakame.attribute.attributeModule
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.registries.KoishRegistries
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.registryModule
 import io.mockk.mockk
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
@@ -13,7 +17,10 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import testEnv
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class DefaultAttributeSerializationTest : KoinTest {
     companion object {
@@ -34,14 +41,13 @@ class DefaultAttributeSerializationTest : KoinTest {
                 modules(
                     adventureModule(),
                     attributeModule(),
-                    elementModule(),
                     registryModule(),
                 )
             }
 
-            ElementRegistry.onPreWorld()
-            AttributeRegistry.onPreWorld()
-            DefaultAttributes.onPreWorld()
+            ElementRegistryConfigStorage.init()
+            AttributeRegistry.init()
+            DefaultAttributes.init()
         }
 
         @JvmStatic
@@ -52,9 +58,9 @@ class DefaultAttributeSerializationTest : KoinTest {
     }
 
     // 测试用的元素
-    private val defaultElement = ElementRegistry.DEFAULT
-    private val fireElement = ElementRegistry.INSTANCES["fire"]
-    private val windElement = ElementRegistry.INSTANCES["wind"]
+    private val defaultElement = KoishRegistries.ELEMENT.defaultValue
+    private val fireElement = KoishRegistries.ELEMENT.getOrThrow("fire")
+    private val windElement = KoishRegistries.ELEMENT.getOrThrow("wind")
 
     // 测试用的属性
     private val lifesteal = Attributes.LIFESTEAL

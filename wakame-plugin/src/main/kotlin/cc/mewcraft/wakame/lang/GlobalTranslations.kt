@@ -25,7 +25,7 @@ import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import java.text.MessageFormat
-import java.util.*
+import java.util.Locale
 
 fun ComponentLike.translate(locale: Locale): Component {
     val component = asComponent() // 如果是 TranslatableComponent.Builder 会隐式调用 #build()
@@ -45,12 +45,24 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload()
+@Reload
 object GlobalTranslations : KoinComponent {
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
     private val miniMessage: MiniMessage by inject()
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, miniMessage)
+
+    @InitFun
+    private fun init() {
+        GlobalTranslator.translator().addSource(translations)
+        loadDataIntoRegistry()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        translations.unregisterAll()
+        loadDataIntoRegistry()
+    }
 
     fun translate(key: String, locale: Locale): MessageFormat? {
         return translations.translate(key, locale)
@@ -60,7 +72,7 @@ object GlobalTranslations : KoinComponent {
         return translations.translate(component, locale) ?: component
     }
 
-    private fun loadTranslation() {
+    private fun loadDataIntoRegistry() {
         // Load translation
         val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(LANG_PROTO_CONFIG_DIR)
         val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(LANG_PROTO_CONFIG_LOADER)) // will be reused
@@ -76,17 +88,5 @@ object GlobalTranslations : KoinComponent {
                 translations.register(key.toString(), locale, value.krequire())
             }
         }
-    }
-
-    @InitFun
-    fun onPreWorld() {
-        GlobalTranslator.translator().addSource(translations)
-        loadTranslation()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        translations.unregisterAll()
-        loadTranslation()
     }
 }

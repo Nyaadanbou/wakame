@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.pack.entity
 
-import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -9,13 +9,14 @@ import me.lucko.helper.scheduler.Task
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import team.unnamed.hephaestus.animation.Animation
 import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.util.Quaternion
 import team.unnamed.hephaestus.view.modifier.BoneModifier
-import java.util.*
+import java.util.Collections
+import java.util.UUID
+import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
 
 @Init(
@@ -28,10 +29,9 @@ object ModelAnimateTask : Runnable, KoinComponent {
     private lateinit var task: Task
 
     @InitFun
-    fun onPostWorld() {
-        val plugin: WakamePlugin by inject()
+    private fun init() {
         task = Schedulers.async().runRepeating(this, 0, 1)
-        task.bindWith(plugin)
+        task.bindWith(NEKO)
     }
 
     override fun run() {

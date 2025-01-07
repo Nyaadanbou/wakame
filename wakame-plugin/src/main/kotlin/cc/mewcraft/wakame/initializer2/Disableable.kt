@@ -6,16 +6,16 @@ import cc.mewcraft.wakame.dependency.dependencySupport
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
 
-internal class DisableableFunction(
+internal class Disableable(
     private val classLoader: ClassLoader,
     private val className: String,
     private val methodName: String,
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
     private val runAfterNames: Set<String>
-) : InitializerRunnable<DisableableFunction>() {
+) : InitializerRunnable<Disableable>() {
 
-    override fun loadDependencies(all: Set<DisableableFunction>, graph: MutableGraph<DisableableFunction>) {
+    override fun loadDependencies(all: Set<Disableable>, graph: MutableGraph<Disableable>) {
         // this runBefore that
         runBeforeNames
             .flatMap { runBeforeName -> all.filter { it.className == runBeforeName } }
@@ -43,7 +43,7 @@ internal class DisableableFunction(
             className: String, methodName: String,
             annotation: Map<String, Any?>
         ) = dependencySupport {
-            DisableableFunction(
+            Disableable(
                 classLoader,
                 className, methodName,
                 (readDispatcher(annotation) ?: Dispatcher.SYNC).dispatcher,

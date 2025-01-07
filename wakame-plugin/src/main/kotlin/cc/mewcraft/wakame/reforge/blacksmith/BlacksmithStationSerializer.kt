@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.reforge.blacksmith
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.Reforge
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import java.io.File
@@ -22,7 +22,7 @@ internal object BlacksmithStationSerializer {
             .resolve(Reforge.ROOT_DIR_NAME)
             .resolve(ROOT_DIR_NAME)
 
-        val yamlLoader = yamlConfig {
+        val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 registerAnnotatedObjects(ObjectMappers.DEFAULT)

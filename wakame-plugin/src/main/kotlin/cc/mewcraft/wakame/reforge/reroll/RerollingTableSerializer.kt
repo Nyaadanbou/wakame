@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
 import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -72,7 +72,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val tableMainConfigFile = tableDir.resolve("config.yml")
         val tableItemsDirectory = tableDir.resolve("items")
 
-        val tableMainConfigNode = yamlConfig {
+        val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 kregister(TableCurrencyCostSerializer)
@@ -94,7 +94,7 @@ internal object RerollingTableSerializer : KoinComponent {
                 val itemId = Key.key(it.namespace, it.path)
                 val itemRule = run {
                     val text = it.file.readText()
-                    val itemRuleNode = yamlConfig {
+                    val itemRuleNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
                             kregister(CellRuleSerializer)

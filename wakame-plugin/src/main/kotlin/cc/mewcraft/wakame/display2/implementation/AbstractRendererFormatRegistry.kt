@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.RendererFormatRegistry
 import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -60,7 +60,7 @@ internal abstract class AbstractRendererFormatRegistry(
     fun initialize(formatPath: Path) {
         cleanup()
 
-        val loader = yamlConfig {
+        val loader = buildYamlConfigLoader {
             withDefaults()
             serializers { registerAnnotatedObjects(ObjectMappers.DEFAULT) }
         }

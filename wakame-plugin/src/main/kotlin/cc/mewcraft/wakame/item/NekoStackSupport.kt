@@ -13,7 +13,16 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.ItemStackDSL
+import cc.mewcraft.wakame.util.edit
+import cc.mewcraft.wakame.util.editNekooTag
+import cc.mewcraft.wakame.util.editRootTag
+import cc.mewcraft.wakame.util.nekooTagOrNull
+import cc.mewcraft.wakame.util.rootTagOrNull
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.unsafeNekooTag
+import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
+import cc.mewcraft.wakame.util.unsafeRootTagOrNull
 import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -401,11 +410,18 @@ internal class ImaginaryNekoStack(
 @Reload(
     runAfter = [ItemRegistry::class],
 )
-//@ReloadDependency(
-//    runBefore = [ItemRegistry::class],
-//)
 internal object ImaginaryNekoStackRegistry : KoinComponent {
     private val registry: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)
+
+    @InitFun
+    private fun init() {
+        realizeAndRegister()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        realizeAndRegister()
+    }
 
     fun has(material: Material): Boolean {
         return has(material.key())
@@ -425,16 +441,6 @@ internal object ImaginaryNekoStackRegistry : KoinComponent {
 
     fun register(id: Key, stack: ImaginaryNekoStack) {
         registry[id] = stack
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        realizeAndRegister()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        realizeAndRegister()
     }
 
     private fun realizeAndRegister() {

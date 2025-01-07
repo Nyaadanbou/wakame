@@ -35,6 +35,7 @@ enum class InitStage(
     runBefore: Set<KClass<*>> = emptySet(),
 ) {
 
+    // TODO !!! make it actually work
     /**
      * Before configs are initialized.
      * Can be used to register custom config serializers via [Configs.registerSerializers].
@@ -44,7 +45,7 @@ enum class InitStage(
     /**
      * Before the world is loaded.
      */
-    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, FacadeInitializer::class)),
+    PRE_WORLD(InternalInitStage.PRE_WORLD, runAfter = setOf(Configs::class, KoishBootstrap::class)),
 
     /**
      * After the world has been loaded.

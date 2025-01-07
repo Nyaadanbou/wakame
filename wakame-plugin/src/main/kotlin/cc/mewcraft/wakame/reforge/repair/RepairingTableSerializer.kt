@@ -2,14 +2,14 @@ package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
@@ -41,7 +41,7 @@ internal object RepairingTableSerializer {
         val collector = NamespacedPathCollector(itemsDirectory, true)
         val itemFiles = collector.collect("yml")
 
-        val yamlLoader = yamlConfig {
+        val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 registerAnnotatedObjects(ObjectMappers.DEFAULT)
@@ -78,7 +78,7 @@ internal object RepairingTableSerializer {
             .resolve(ROOT_DIR_NAME)
             .resolve(TABLES_DIR_NAME)
 
-        val yamlLoader = yamlConfig {
+        val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 registerAnnotatedObjects(objectMapperFactory())

@@ -14,28 +14,37 @@ import team.unnamed.hephaestus.ModelDataCursor
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader
 import java.io.File
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload()
+@Reload
 object ModelRegistry : KoinComponent {
-    private const val BBMODELS_DIR = "bbmodels"
+    private const val BBMODELS_DIR_PATH = "bbmodels"
     private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
 
     private val models: MutableMap<String, Model> = ConcurrentHashMap()
     private val views: MutableMap<UUID, ModelView> = ConcurrentHashMap()
 
+    @InitFun
+    fun init() {
+        loadModels().onFailure { it.printStackTrace() }
+    }
+
+    @ReloadFun
+    fun reload() {
+        loadModels().onFailure { it.printStackTrace() }
+    }
+
     private fun loadModels(): Result<Unit> {
         models.clear()
-
         return runCatching { register(loadModel("test.bbmodel")) }
     }
 
     private fun loadModel(fileName: String): Model {
-        val modelFile = assetsDir.resolve(BBMODELS_DIR).resolve(fileName)
+        val modelFile = assetsDir.resolve(BBMODELS_DIR_PATH).resolve(fileName)
         if (!modelFile.exists()) {
             throw IllegalArgumentException("BBModel file $fileName not found")
         }
@@ -71,15 +80,5 @@ object ModelRegistry : KoinComponent {
 
     fun models(): Collection<Model> {
         return models.values
-    }
-
-    @InitFun
-    fun onPreWorld() {
-        loadModels().onFailure { it.printStackTrace() }
-    }
-
-    @ReloadFun
-    fun onReload() {
-        loadModels().onFailure { it.printStackTrace() }
     }
 }

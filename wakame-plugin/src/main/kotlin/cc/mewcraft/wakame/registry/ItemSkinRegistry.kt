@@ -11,17 +11,18 @@ import org.koin.core.component.KoinComponent
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload()
+@Reload
 object ItemSkinRegistry : KoinComponent, BiKnot<String, ItemSkin, Short> {
     override val INSTANCES: Registry<String, ItemSkin> = SimpleRegistry()
     override val BI_LOOKUP: BiRegistry<String, Short> = SimpleBiRegistry()
 
     @InitFun
-    private fun onPreWorld() = loadConfiguration()
-    @ReloadFun
-    private fun onReload() = loadConfiguration()
+    private fun init() = loadDataIntoRegistry()
 
-    private fun loadConfiguration() {
+    @ReloadFun
+    private fun reload() = loadDataIntoRegistry()
+
+    private fun loadDataIntoRegistry() {
         INSTANCES.clear()
         BI_LOOKUP.clear()
 

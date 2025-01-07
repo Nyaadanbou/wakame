@@ -115,7 +115,7 @@ fun DamagePacket(
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
     return DamagePacket(
-        element = ElementProvider.instance().get(elementId) ?: throw IllegalArgumentException("Invalid element: $elementId"),
+        element = ElementProvider.instance().get(elementId) ?: throw IllegalArgumentException("No such element: '$elementId'"),
         min = min,
         max = max,
         rate = rate,

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.config.configurate.MaterialSerializer
 import cc.mewcraft.wakame.item.component.componentModule
 import cc.mewcraft.wakame.item.components.componentsModule
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
@@ -8,6 +7,7 @@ import cc.mewcraft.wakame.item.logic.logicModule
 import cc.mewcraft.wakame.item.template.ITEM_COMPONENT_TEMPLATE_SERIALIZERS
 import cc.mewcraft.wakame.item.template.templateModule
 import cc.mewcraft.wakame.item.templates.templatesModule
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.MaterialSerializer
 import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf

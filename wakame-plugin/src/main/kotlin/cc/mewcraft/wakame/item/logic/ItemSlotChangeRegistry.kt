@@ -26,7 +26,7 @@ internal object ItemSlotChangeRegistry {
     val listeners: MutableList<ItemSlotChangeListener> = mutableListOf()
 
     @InitFun
-    fun onPreWorld() {
+    private fun init() {
         listeners += AttackSpeedItemSlotChangeListener
         listeners += AttributeItemSlotChangeListener
         listeners += EnchantmentItemSlotChangeListener

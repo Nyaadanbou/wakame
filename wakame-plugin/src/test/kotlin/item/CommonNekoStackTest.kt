@@ -4,14 +4,18 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.element.elementModule
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
@@ -19,7 +23,14 @@ import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.*
+import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry.EntityRegistry
+import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
+import cc.mewcraft.wakame.registry.KizamiRegistry
+import cc.mewcraft.wakame.registry.LevelMappingRegistry
+import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -40,22 +51,17 @@ import kotlin.test.fail
 object CommonNekoStackTest {
     fun beforeAll() {
         // 配置依赖注入
-        val app = startKoin {
-            // environment
+        startKoin {
             modules(
-                testEnv()
-            )
+                // environment
+                testEnv(),
 
-            // this module
-            modules(
-                itemModule()
-            )
+                // this module
+                itemModule(),
 
-            // dependencies
-            modules(
+                // dependencies
                 adventureModule(),
                 damageModule(),
-                elementModule(),
                 entityModule(),
                 kizamiModule(),
                 molangModule(),
@@ -69,21 +75,19 @@ object CommonNekoStackTest {
         CommonNBT.mockStatic()
 
         // 按依赖顺序, 初始化注册表
-        AttributeRegistry.onPreWorld()
-        ElementRegistry.onPreWorld()
-        AbilityRegistry.onPreWorld()
+        ElementRegistryConfigStorage.init()
+        AttributeRegistry.init()
+        AbilityRegistry.init()
         KizamiRegistry.onPreWorld()
-        RarityRegistry.onPreWorld()
+        RarityRegistry.init()
         LevelMappingRegistry.onPreWorld()
-        EntityRegistry.onPreWorld()
+        EntityRegistry.init()
 
         // 初始化所有 random3.Node 相关的实现
-        with(app.koin) {
-            ElementSampleNodeFacade.onPreWorld()
-            KizamiSampleNodeFacade.onPreWorld()
-            CoreArchetypeSampleNodeFacade.onPreWorld()
-            ItemFilterNodeFacade.onPreWorld()
-        }
+        ElementSampleNodeFacade.init()
+        KizamiSampleNodeFacade.init()
+        CoreArchetypeSampleNodeFacade.init()
+        ItemFilterNodeFacade.init()
     }
 
     fun afterAll() {

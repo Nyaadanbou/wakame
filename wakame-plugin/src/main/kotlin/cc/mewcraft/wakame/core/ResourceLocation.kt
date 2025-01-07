@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import net.kyori.adventure.key.Key
 
-const val DEFAULT_NAMESPACE = "koish"
+const val KOISH_NAMESPACE = "koish"
 
 // adventure 已经提供比较完备的实现,
 // 直接用 typealias 也许更具有维护性
@@ -20,11 +20,27 @@ object ResourceLocations {
     @JvmField
     val CODEC: Codec<ResourceLocation> = Codec.STRING.comapFlatMap(ResourceLocations::read, ResourceLocation::toString)
 
-    fun withDefaultNamespace(path: String): ResourceLocation = ResourceLocation.key(DEFAULT_NAMESPACE, path)
+    /**
+     * 从形如 `player`, `koish:player` 的字符串创建一个 [ResourceLocation].
+     *
+     * 如果该字符串不包含命名空间, 则使用默认的命名空间 [KOISH_NAMESPACE].
+     *
+     * @param string 用于创建实例的字符串
+     * @return 创建的实例
+     */
+    fun withKoishNamespace(string: String): ResourceLocation {
+        val index = string.indexOf(Key.DEFAULT_SEPARATOR);
+        val namespace = if (index >= 1) string.substring(0, index) else KOISH_NAMESPACE
+        val value = if (index >= 0) string.substring(index + 1) else string
+        return ResourceLocation.key(namespace, value)
+    }
 
-    fun read(id: String): DataResult<ResourceLocation> = try {
-        DataResult.success(ResourceLocation.key(id))
+    /**
+     * 用于方便创建 [Codec].
+     */
+    fun read(string: String): DataResult<ResourceLocation> = try {
+        DataResult.success(withKoishNamespace(string))
     } catch (e: Exception) {
-        DataResult.error { "Not a valid resource location: $id ${e.message}" }
+        DataResult.error { "Not a valid resource location: '$string' ${e.message}" }
     }
 }

@@ -1,20 +1,19 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
@@ -25,14 +24,9 @@ import java.io.File
 @Reload(
     runAfter = [CraftingStationRecipeRegistry::class]
 )
-//@PostWorldDependency(
-//    runBefore = [CraftingStationRecipeRegistry::class]
-//)
-//@ReloadDependency(
-//    runBefore = [CraftingStationRecipeRegistry::class]
-//)
-internal object CraftingStationRegistry : KoinComponent {
-    private const val STATION_DIR_NAME = "station/stations"
+internal object CraftingStationRegistry {
+    private const val STATION_DIR_PATH = "station/stations"
+
     private val stations: MutableMap<String, CraftingStation> = mutableMapOf()
 
     /**
@@ -41,15 +35,21 @@ internal object CraftingStationRegistry : KoinComponent {
     val NAMES: Set<String>
         get() = stations.keys
 
+    @InitFun
+    private fun init() = loadDataIntoRegistry()
+
+    @ReloadFun
+    private fun reload() = loadDataIntoRegistry()
+
     operator fun get(id: String): CraftingStation? {
         return stations[id]
     }
 
     @VisibleForTesting
-    fun loadStations() {
+    fun loadDataIntoRegistry() {
         stations.clear()
 
-        val stationDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_NAME)
+        val stationDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_PATH)
         stationDir.walk()
             .drop(1)
             .filter { it.extension == "yml" }
@@ -57,7 +57,7 @@ internal object CraftingStationRegistry : KoinComponent {
                 try {
                     val fileText = file.readText()
                     val stationId = file.nameWithoutExtension
-                    val stationNode = yamlConfig {
+                    val stationNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
                             registerAnnotatedObjects(ObjectMappers.DEFAULT)
@@ -69,24 +69,10 @@ internal object CraftingStationRegistry : KoinComponent {
                     stations[stationId] = station
 
                 } catch (e: Throwable) {
-                    val message = "Can't register station: '${file.relativeTo(stationDir)}'"
-                    if (RunningEnvironment.TEST.isRunning()) {
-                        throw IllegalArgumentException(message, e)
-                    }
-                    LOGGER.warn(message, e)
+                    Util.pauseInIde(IllegalStateException("Can't register station: '${file.relativeTo(stationDir)}'", e))
                 }
             }
 
         LOGGER.info("Registered stations: {}", stations.keys.joinToString())
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        loadStations()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        loadStations()
     }
 }

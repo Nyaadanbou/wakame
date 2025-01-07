@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.display2.implementation.simple
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
@@ -29,12 +33,22 @@ internal data object SimpleItemRendererContext
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         SimpleRenderingHandlerRegistry.bootstrap()
@@ -60,16 +74,6 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
             lore = itemLore
             showNothing()
         }
-    }
-
-    @InitFun
-    fun onPostWorld() {
-        initialize0()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        initialize0()
     }
 }
 

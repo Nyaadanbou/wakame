@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.reloader.ReloadFun
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 object MergingTableRegistry {
     private val tables = HashMap<String, MergingTable>()
 
@@ -21,6 +21,16 @@ object MergingTableRegistry {
      */
     val NAMES: Set<String>
         get() = tables.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     /**
      * 获取指定的定制台.
@@ -34,15 +44,5 @@ object MergingTableRegistry {
         val tables = MergingTableSerializer.loadAll()
         this.tables.putAll(tables)
         this.tables.put("wtf", WtfMergingTable)
-    }
-
-    @InitFun
-    fun onPostWorld() {
-        load()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        load()
     }
 }

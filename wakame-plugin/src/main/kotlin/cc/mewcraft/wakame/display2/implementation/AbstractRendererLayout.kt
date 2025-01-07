@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.StaticIndexedText
 import cc.mewcraft.wakame.display2.StaticTextMeta
 import cc.mewcraft.wakame.display2.TextMeta
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
@@ -73,7 +73,7 @@ internal abstract class AbstractRendererLayout(
     fun initialize(layoutPath: Path) {
         reset()
 
-        val root = yamlConfig { withDefaults() }.buildAndLoadString(layoutPath.readText())
+        val root = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
 
         val unprocessedPrimary = root.node("primary").getList<String>(listOf())
 

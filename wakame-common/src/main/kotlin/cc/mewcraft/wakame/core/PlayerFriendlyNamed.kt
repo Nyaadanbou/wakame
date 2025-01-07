@@ -1,11 +1,14 @@
-package cc.mewcraft.wakame
+package cc.mewcraft.wakame.core
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 
-interface FriendlyNamed {
+/**
+ * Represents an object with a player-friendly name.
+ */
+interface PlayerFriendlyNamed {
     /**
-     * The display name that end-users can understand.
+     * The display name that players can understand.
      */
     val displayName: Component
 
@@ -14,7 +17,7 @@ interface FriendlyNamed {
      *
      * Note that the style has nothing to do with [displayName].
      * It solely serves the purpose of applying special styles
-     * to other components.
+     * to other text [components][Component].
      */
-    val styles: Array<StyleBuilderApplicable>
+    val displayStyles: Array<StyleBuilderApplicable>
 }

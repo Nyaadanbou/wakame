@@ -10,16 +10,27 @@ import cc.mewcraft.wakame.attribute.AttributeGetter
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.*
+import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute.Quality
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeR
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeRE
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeS
+import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeSE
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.AttributeRegistry.FACADES
-import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.util.RandomizedValue
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -42,9 +53,11 @@ import java.text.NumberFormat
 import java.util.stream.Stream
 import kotlin.reflect.KClass
 
+
 //
 // Caution! This is a big file. Navigate the file by the Structure view of your IDE.
 //
+
 
 /**
  * This singleton holds various implementations for **each** attribute.
@@ -53,17 +66,8 @@ import kotlin.reflect.KClass
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [ElementRegistry::class]
+    runAfter = [ElementRegistryConfigStorage::class]
 )
-@Reload(
-    runAfter = [ElementRegistry::class]
-)
-//@PreWorldDependency(
-//    runBefore = [ElementRegistry::class]
-//)
-//@ReloadDependency(
-//    runBefore = [ElementRegistry::class]
-//)wwdwdwww
 object AttributeRegistry {
 
     /**
@@ -75,6 +79,15 @@ object AttributeRegistry {
      * The config of all attributes.
      */
     val CONFIG: ConfigProvider by lazy { Configs.YAML[ATTRIBUTE_GLOBAL_CONFIG_FILE] }
+
+    @InitFun
+    fun init() {
+        // 初始化 Attributes, 以初始化 [元素属性]
+        Attributes.bootstrap()
+
+        // 注册所有 Composite Attributes
+        registerComposites()
+    }
 
     /**
      * Builds an composite attribute facade.
@@ -132,16 +145,6 @@ object AttributeRegistry {
         +buildComposite("universal_defense_penetration").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION)
         +buildComposite("universal_defense_penetration_rate").single().bind(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)
         +buildComposite("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
-    }
-
-    @InitFun
-    fun onPreWorld() {
-        // 初始化 Attributes
-        // 这一步主要是初始化 [元素属性]
-        Attributes.bootstrap()
-
-        // 注册所有 Compositions
-        registerComposites()
     }
 }
 
@@ -223,9 +226,11 @@ inline fun <reified T : CompositeAttributeComponent> CompositeAttributeMetadata.
     return hasComponent(T::class)
 }
 
+
 //
 // Mini DSL for building an composite attribute facade
 //
+
 
 private operator fun AttributeFacadeOverride<*, *>.unaryPlus() {
     @Suppress("UNCHECKED_CAST")
@@ -300,9 +305,11 @@ private class AttributeFacadeOverride<S : ConstantCompositeAttribute, V : Variab
     }
 }
 
+
 //
 // Implementations start from here
 //
+
 
 //<editor-fold desc="Implementations">
 private val MM = Injector.get<MiniMessage>()
@@ -625,13 +632,13 @@ private class SingleElementAttributeBinderImpl(
                 ConstantCompositeAttributeSE(id, tag)
             },
             createTooltipName = {
-                val resolver = Placeholder.component("element", it.element.displayName)
+                val resolver = Placeholder.component("element", it.element.value.displayName)
                 MM.deserialize(displayName, resolver)
             },
             createTooltipLore = { data ->
                 val input = tooltips.line(data.operation)
                 val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
-                val resolver2 = tooltips.component("element", data.element.displayName)
+                val resolver2 = tooltips.component("element", data.element.value.displayName)
                 val resolver3 = tooltips.component("quality", quality.translate(data.quality))
                 listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
             },
@@ -687,14 +694,14 @@ private class RangedElementAttributeBinderImpl(
                 ConstantCompositeAttributeRE(id, tag)
             },
             createTooltipName = {
-                val resolver = Placeholder.component("element", it.element.displayName)
+                val resolver = Placeholder.component("element", it.element.value.displayName)
                 MM.deserialize(displayName, resolver)
             },
             createTooltipLore = { data ->
                 val input = tooltips.line(data.operation)
                 val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
                 val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
-                val resolver3 = tooltips.component("element", data.element.displayName)
+                val resolver3 = tooltips.component("element", data.element.value.displayName)
                 val resolver4 = tooltips.component("quality", quality.translate(data.quality))
                 listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
             },
@@ -704,6 +711,7 @@ private class RangedElementAttributeBinderImpl(
     }
 }
 
+
 /* Specialized Configuration Operations */
 
 
@@ -711,8 +719,8 @@ private fun ConfigurationNode.getOperation(): Operation {
     return node("operation").string?.let { Operation.byName(it) } ?: Operation.ADD
 }
 
-private fun ConfigurationNode.getElement(): Element {
-    return node("element").krequire<Element>()
+private fun ConfigurationNode.getElement(): Holder<Element> {
+    return node("element").krequire<Holder<Element>>()
 }
 
 private fun ConfigurationNode.getSimpleScalar(): Double {

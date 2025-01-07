@@ -1,5 +1,5 @@
 nodes:
-  - type: element:water
+  - type: water
     weight: 1
-  - type: element:earth
+  - type: earth
     weight: 1

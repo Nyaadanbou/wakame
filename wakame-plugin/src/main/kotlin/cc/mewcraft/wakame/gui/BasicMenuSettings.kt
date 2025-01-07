@@ -38,7 +38,7 @@ data class BasicMenuSettings(
      * - v = 萌芽物品的唯一标识
      */
     // FIXME 用 kotlin.collections.Map 会导致 configurate 无法序列化
-    private val icons: HashMap<String, Key> = hashMapOf(),
+    val icons: HashMap<String, Key> = hashMapOf(),
 ) : KoinComponent {
 
     /**

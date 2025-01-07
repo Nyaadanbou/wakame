@@ -12,8 +12,9 @@ import cc.mewcraft.wakame.item.VanillaItemSlot
     stage = InitStage.POST_WORLD
 )
 internal object EnchantmentInitializer {
+
     @InitFun
-    fun onPostWorld() {
+    fun init() {
         // 魔咒唯一直接依赖的实例就是 Element 实例,
         // 并且 Element 是在 pre-world 就初始化了,
         // 所以这里在 post-world 遍历所有魔咒就很安全.

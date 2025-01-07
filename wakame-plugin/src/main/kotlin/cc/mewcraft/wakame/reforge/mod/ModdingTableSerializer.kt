@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
@@ -10,10 +9,11 @@ import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -81,7 +81,7 @@ internal object ModdingTableSerializer : KoinComponent {
         val tableItemsDirectory = tableDir.resolve("items")
 
         // config.yml 的配置节点
-        val tableMainConfigNode = yamlConfig {
+        val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 kregister(TableCurrencyCost)
@@ -105,7 +105,7 @@ internal object ModdingTableSerializer : KoinComponent {
                 try {
                     val itemId = Key.key(it.namespace, it.path)
                     val fileText = it.file.readText()
-                    val itemNode = yamlConfig {
+                    val itemNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
                             kregister(CellRule)

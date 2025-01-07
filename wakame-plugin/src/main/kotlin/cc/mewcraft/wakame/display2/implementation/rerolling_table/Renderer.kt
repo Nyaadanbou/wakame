@@ -2,7 +2,13 @@ package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
@@ -46,12 +52,22 @@ internal data class RerollingTableContext(
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
     override val formats = RerollingTableRendererFormatRegistry(this)
     override val layout = RerollingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         RerollingTableRenderingHandlerRegistry.bootstrap()
@@ -111,16 +127,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
             RerollingTableContext.Slot.UNDEFINED -> {}
         }
-    }
-
-    @InitFun
-    fun onPostWorld() {
-        initialize0()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        initialize0()
     }
 }
 

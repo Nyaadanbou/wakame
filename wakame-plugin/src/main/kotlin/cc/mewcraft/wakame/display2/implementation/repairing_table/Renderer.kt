@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -29,12 +33,22 @@ internal data class RepairingTableItemRendererContext(val damage: Int, val maxDa
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()
     private val textAssembler: TextAssembler = TextAssembler(layout)
+
+    @InitFun
+    private fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         RepairingTableRenderingHandlerRegistry.bootstrap()

@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -21,7 +22,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.world.TimeControl
@@ -248,7 +249,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
+                fun assert(element: Holder<Element>, expectedMin: Double, expectedMax: Double) {
                     val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
@@ -258,8 +259,8 @@ class CustomNekoStackTest : KoinTest {
                     assertEquals(expectedMax, modMax.amount)
                 }
 
-                val fire = ElementRegistry.INSTANCES["fire"]
-                val water = ElementRegistry.INSTANCES["water"]
+                val fire = KoishRegistries.ELEMENT.getOrThrow("fire")
+                val water = KoishRegistries.ELEMENT.getOrThrow("water")
                 when (val actual = core.attribute.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
@@ -450,7 +451,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("Foo", it.content())
 
-            val expectedStyle = Style.style(*common.styles)
+            val expectedStyle = Style.style(*common.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -519,10 +520,10 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val elements = it.elements
             val possibleElements = setOf(
-                ElementRegistry.INSTANCES["neutral"],
-                ElementRegistry.INSTANCES["water"],
-                ElementRegistry.INSTANCES["fire"],
-                ElementRegistry.INSTANCES["wind"],
+                KoishRegistries.ELEMENT.getOrThrow("neutral"),
+                KoishRegistries.ELEMENT.getOrThrow("water"),
+                KoishRegistries.ELEMENT.getOrThrow("fire"),
+                KoishRegistries.ELEMENT.getOrThrow("water"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })
@@ -683,7 +684,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("普通", it.content())
 
-            val expectedStyle = Style.style(*common.styles)
+            val expectedStyle = Style.style(*common.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)

@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.WakamePlugin
 import cc.mewcraft.wakame.config.Configs.YAML
 import cc.mewcraft.wakame.config.Configs.getKoin
-import cc.mewcraft.wakame.initializer2.FacadeInitializer
 import cc.mewcraft.wakame.initializer2.InternalInit
 import cc.mewcraft.wakame.initializer2.InternalInitStage
+import cc.mewcraft.wakame.initializer2.KoishBootstrap
 import cc.mewcraft.wakame.reloader.InternalReload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import org.jetbrains.annotations.TestOnly
@@ -25,7 +25,9 @@ val MAIN_CONFIG: ConfigProvider by lazy { YAML["config.yml"] }
  */
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
-    dependsOn = [FacadeInitializer::class]
+    dependsOn = [
+        KoishBootstrap::class
+    ]
 )
 @InternalReload
 object Configs : KoinComponent {

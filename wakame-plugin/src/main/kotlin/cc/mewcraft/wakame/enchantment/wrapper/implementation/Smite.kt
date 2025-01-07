@@ -6,19 +6,13 @@ import cc.mewcraft.wakame.enchantment.Enchantments
 import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.enchantment.wrapper.AbstractEnchantment
 import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent
-import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.*
+import cc.mewcraft.wakame.enchantment.wrapper.EnchantmentAttributeComponent.Part
 import cc.mewcraft.wakame.item.ItemSlot
 
 internal class Smite : AbstractEnchantment(Enchantments.SMITE) {
-    private val hammerDamageRatioAdd: EnchantmentAttributeComponent = EnchantmentAttributeComponent(
-        this, setOf(
-            Part(
-                Attributes.HAMMER_DAMAGE_RATIO, 0.15, 0.10, AttributeModifier.Operation.ADD
-            )
-        )
-    )
+    private val component1: EnchantmentAttributeComponent = EnchantmentAttributeComponent(this, setOf(Part(Attributes.HAMMER_DAMAGE_RATIO, 0.15, 0.10, AttributeModifier.Operation.ADD)))
 
     override fun getEffects(level: Int, slot: ItemSlot): Collection<EnchantmentEffect> {
-        return hammerDamageRatioAdd.getEffects(level, slot)
+        return component1.getEffects(level, slot)
     }
 }

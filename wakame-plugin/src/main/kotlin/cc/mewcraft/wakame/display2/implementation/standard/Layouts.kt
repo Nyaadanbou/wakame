@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.display2.SimpleTextMeta
 import cc.mewcraft.wakame.display2.SourceIndex
 import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.hasComponent
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.key.Key
@@ -42,8 +42,8 @@ internal data class AttributeCoreTextMeta(
         val elementIndex: List<String>,
     ) {
         init { // validate values
-            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid operation, check your renderer config") }
-            this.elementIndex.forEach { ElementRegistry.INSTANCES.getOrNull(it) ?: error("'$it' is not a valid element, check your renderer config") }
+            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid attribute modifier operation, check your renderer config") }
+            this.elementIndex.forEach { if (!KoishRegistries.ELEMENT.containsKey(it)) error("'$it' is not a valid element type, check your renderer config") }
         }
     }
 }

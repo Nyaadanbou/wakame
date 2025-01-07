@@ -11,8 +11,9 @@ import cc.mewcraft.wakame.initializer2.InitStage
     stage = InitStage.PRE_WORLD
 )
 internal object AttributeBootstrap {
+
     @InitFun
-    private fun onPreWorld() {
+    private fun init() {
 
         // 注册 AttributeMapAccess
         AttributeMapAccess.register(DefaultAttributeMapAccess)

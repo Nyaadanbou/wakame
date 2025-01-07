@@ -20,11 +20,18 @@ interface Holder<T> {
     val isBound: Boolean
 
     /**
-     * 获取容器里的数据. 如果数据未绑定, 则抛出异常.
+     * 获取容器的键名.
+     *
+     * @throws IllegalStateException 如果容器没有键名.
+     */
+    val key: ResourceKey<T>
+
+    /**
+     * 获取容器里的数据.
      *
      * 通常在所有注册表已完全加载后的场景里使用.
      *
-     * @throws IllegalStateException 如果数据未绑定.
+     * @throws IllegalStateException 如果数据还未绑定.
      */
     val value: T
 
@@ -41,13 +48,13 @@ interface Holder<T> {
     fun reactive(): ReactiveHolder<T>
 
     fun equals(id: ResourceLocation): Boolean
-    fun equals(id: ResourceKey<T>): Boolean
+    fun equals(key: ResourceKey<T>): Boolean
     fun equals(entry: Holder<T>): Boolean
 
     fun unwrap(): Either<ResourceKey<T>, T>
     fun unwrapKey(): ResourceKey<T>?
     val registeredName: String
-        get() = this.unwrapKey()?.location?.toString() ?: "[UNREGISTERED]"
+        get() = this.unwrapKey()?.location?.toString() ?: "unregistered"
 
     fun canSerializeIn(owner: HolderOwner<T>): Boolean
 
@@ -62,6 +69,9 @@ interface Holder<T> {
         override val isBound: Boolean
             get() = true
 
+        override val key: ResourceKey<T>
+            get() = throw IllegalStateException("Trying to access key of direct holder with value: '$this.value'")
+
         private var reactive: ReactiveHolder<T>? = null
 
         @Synchronized
@@ -70,7 +80,7 @@ interface Holder<T> {
         }
 
         override fun equals(id: ResourceLocation): Boolean = false
-        override fun equals(id: ResourceKey<T>): Boolean = false
+        override fun equals(key: ResourceKey<T>): Boolean = false
         override fun equals(entry: Holder<T>): Boolean = this.value == entry.value
         override fun unwrap(): Either<ResourceKey<T>, T> = Either.right(this.value)
         override fun unwrapKey(): ResourceKey<T>? = null
@@ -92,7 +102,7 @@ interface Holder<T> {
     private constructor(
         private val owner: HolderOwner<T>,
         val type: Type, // 目前仅仅是标记, 无实际用途
-        val key: ResourceKey<T>,
+        override val key: ResourceKey<T>,
         private var _value: T? = null,
     ) : Holder<T> {
         companion object {
@@ -137,10 +147,21 @@ interface Holder<T> {
         }
 
         override fun equals(id: ResourceLocation): Boolean = this.key.location == id
-        override fun equals(id: ResourceKey<T>): Boolean = this.key == id
-        override fun equals(entry: Holder<T>): Boolean = entry is Reference<*> && entry.key == this.key
+        override fun equals(key: ResourceKey<T>): Boolean = this.key == key
+        override fun equals(entry: Holder<T>): Boolean = entry is Reference<*> && this.key == entry.key
+
+        override fun hashCode(): Int {
+            return this.key.hashCode()
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is Reference<*>) return false
+            return this.key == other.key
+        }
+
         override fun unwrap(): Either<ResourceKey<T>, T> = Either.left(this.key)
-        override fun unwrapKey(): ResourceKey<T>? = this.key
+        override fun unwrapKey(): ResourceKey<T> = this.key
         override fun canSerializeIn(owner: HolderOwner<T>) = this.owner.canSerializeIn(owner)
         override fun toString(): String = "Reference[${this.key}=${this.value}]"
 

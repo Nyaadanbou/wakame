@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
 internal annotation class InternalInit(
     val stage: InternalInitStage,
     val dispatcher: Dispatcher = Dispatcher.SYNC,
-    val dependsOn: Array<KClass<*>> = []
+    val dependsOn: Array<KClass<*>> = [],
 )
 
 /**
@@ -67,7 +67,7 @@ annotation class Init(
 annotation class InitFun(
     val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
-    val runBefore: Array<KClass<*>> = []
+    val runBefore: Array<KClass<*>> = [],
 )
 
 /**
@@ -84,5 +84,5 @@ annotation class InitFun(
 annotation class DisableFun(
     val dispatcher: Dispatcher = Dispatcher.SYNC,
     val runAfter: Array<KClass<*>> = [],
-    val runBefore: Array<KClass<*>> = []
+    val runBefore: Array<KClass<*>> = [],
 )

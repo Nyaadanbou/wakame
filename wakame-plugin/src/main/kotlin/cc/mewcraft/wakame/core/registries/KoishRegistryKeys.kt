@@ -18,7 +18,7 @@ import cc.mewcraft.wakame.registry.CompositeAttributeFacade
 
 object KoishRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = ResourceLocations.withDefaultNamespace("root")
+    val ROOT_REGISTRY_NAME = ResourceLocations.withKoishNamespace("root")
 
     ///
 
@@ -58,6 +58,6 @@ object KoishRegistryKeys {
     ///
 
     private fun <T> createRegistryKey(name: String): ResourceKey<out Registry<T>> {
-        return ResourceKey.create(ROOT_REGISTRY_NAME, ResourceLocations.withDefaultNamespace(name))
+        return ResourceKey.create(ROOT_REGISTRY_NAME, ResourceLocations.withKoishNamespace(name))
     }
 }

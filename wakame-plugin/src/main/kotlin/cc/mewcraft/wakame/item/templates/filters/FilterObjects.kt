@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.item.templates.filters
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
@@ -32,7 +33,7 @@ data class AttributeFilter(
     override val invert: Boolean,
     private val id: String,
     private val operation: Operation?,
-    private val element: Element?,
+    private val element: Holder<Element>?,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "attribute")
@@ -79,7 +80,7 @@ data class AttributeFilter(
  */
 data class ElementFilter(
     override val invert: Boolean,
-    private val element: Element,
+    private val element: Holder<Element>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "element")

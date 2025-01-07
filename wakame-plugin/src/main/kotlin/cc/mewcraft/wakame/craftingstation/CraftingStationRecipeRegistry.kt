@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
@@ -13,7 +14,10 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 import org.koin.core.component.KoinComponent
@@ -27,11 +31,8 @@ import java.io.File
 @Reload(
     runAfter = [ItemRegistry::class],
 )
-//@ReloadDependency(
-//    runBefore = [ItemRegistry::class]
-//)
 internal object CraftingStationRecipeRegistry : KoinComponent {
-    private const val RECIPE_DIR_NAME = "station/recipes"
+    private const val RECIPE_DIR_PATH = "station/recipes"
 
     @VisibleForTesting
     val raw: MutableMap<Key, Recipe> = mutableMapOf()
@@ -42,11 +43,23 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
         return recipes[key]
     }
 
+    @InitFun
+    fun load() {
+        loadDataIntoRegistry()
+        registerStationRecipes()
+    }
+
+    @ReloadFun
+    fun reload() {
+        loadDataIntoRegistry()
+        registerStationRecipes()
+    }
+
     @VisibleForTesting
-    fun loadConfig() {
+    fun loadDataIntoRegistry() {
         raw.clear()
 
-        val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_NAME)
+        val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
         val namespacedPaths = NamespacedPathCollector(recipeDir, true).collect("yml")
         namespacedPaths.forEach {
             val file = it.file
@@ -54,7 +67,7 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
                 val fileText = file.readText()
                 val key = Key.key(it.namespace, it.path)
 
-                val recipeNode = yamlConfig {
+                val recipeNode = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
                         kregister(StationRecipeSerializer)
@@ -73,15 +86,13 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
 
             } catch (e: Throwable) {
                 val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
-                if (RunningEnvironment.TEST.isRunning()) {
-                    throw IllegalArgumentException(message, e)
-                }
+                Util.pauseInIde(IllegalArgumentException(message, e))
                 LOGGER.warn(message, e)
             }
         }
     }
 
-    private fun registerRecipes() {
+    private fun registerStationRecipes() {
         raw.forEach { (key, recipe) ->
             if (recipe.valid()) {
                 recipes[key] = recipe
@@ -92,17 +103,5 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
 
         LOGGER.info("Registered station recipes: {}", recipes.keys.joinToString())
         LOGGER.info("Registered ${recipes.size} station recipes")
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        loadConfig()
-        registerRecipes()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        loadConfig()
-        registerRecipes()
     }
 }

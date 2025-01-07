@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.util.Key
 import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key
@@ -323,7 +323,7 @@ internal class AttributeSupplierDeserializer(
                 requireNotNull(
                     builders[parentKey]?.copy()
                 ) {
-                    "invalid parent '$parentKey'\n\nmake sure you have defined the parent before \"this\" in the configuration!"
+                    "Invalid parent '$parentKey'!\n\nMake sure you have defined the parent before 'this' in the configuration!"
                 }
             } else {
                 AttributeSupplierBuilder()
@@ -339,16 +339,16 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val element = ElementRegistry.INSTANCES.getOrNull(elementId) ?: error("invalid element id: '$elementId'")
-                            val attributes = Attributes.getComposition("$compositionId/${element.uniqueId}")
+                            val elementType = KoishRegistries.ELEMENT.getValue(elementId) ?: error("Invalid element id: '$elementId'")
+                            val attributes = Attributes.getComposition("$compositionId/${elementType.key.value()}") // FIXME 这里对于不同命名空间但路径一样的 ElementType 来说会存在重复的问题
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
                         // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
-                        for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val attributes = Attributes.getComposition("$compositionId/${elementType.uniqueId}")
+                        for (elementType in KoishRegistries.ELEMENT.valueSequence) {
+                            val attributes = Attributes.getComposition("$compositionId/${elementType.key.value()}")
                             builder.add(attributes, valueNode)
                         }
                     }
@@ -378,10 +378,10 @@ internal class AttributeSupplierDeserializer(
         // 2. The config node has correct structure
         for ((compositionId, valueNode) in valuesMap) {
             if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
-                error("the composition id '$compositionId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
+                error("The composition id '$compositionId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
             }
             if (compositionId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
-                error("the attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")
+                error("The attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 
@@ -396,7 +396,7 @@ internal class AttributeSupplierDeserializer(
      */
     fun deserialize(): Map<Key, AttributeSupplier> {
         if (isFrozen) {
-            throw IllegalStateException("the function deserialize() can be invoked at most once for the instance")
+            throw IllegalStateException("The function deserialize() can be invoked at most once for the instance")
         }
 
         val nodeMap = this.node.childrenMap().mapKeys { (key, _) -> Key(key.toString()) }

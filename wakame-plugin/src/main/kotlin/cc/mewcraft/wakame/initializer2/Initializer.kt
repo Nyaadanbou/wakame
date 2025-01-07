@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.dependency.dependencyLoaderSupport
 import cc.mewcraft.wakame.initializer2.Initializer.start
 import cc.mewcraft.wakame.initializer2.InitializerSupport.tryInit
 import cc.mewcraft.wakame.util.data.JarUtils
-import cc.mewcraft.wakame.util.registerSuspendingEvents
+import cc.mewcraft.wakame.util.registerEvents
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineScope
@@ -23,14 +23,15 @@ import java.io.File
 internal object Initializer : Listener {
 
     private val initializables: HashSet<Initializable> = HashSet<Initializable>()
-    private val disableables: HashSet<DisableableFunction> = HashSet<DisableableFunction>()
+    private val disableables: HashSet<Disableable> = HashSet<Disableable>()
 
     private val initPreWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPostWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
-    private val disable: MutableGraph<DisableableFunction> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val disable: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     private lateinit var preWorldScope: CoroutineScope
     private var preWorldInitialized = false
+
     var isDone = false
         private set
 
@@ -38,12 +39,14 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryInit {
-        registerSuspendingEvents()
+        registerEvents()
 
         collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
-//        for (addon in AddonBootstrapper.addons) {
-//            collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
-//        }
+
+        // TODO introduce Addon System
+        // for (addon in AddonBootstrapper.addons) {
+        //     collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
+        // }
 
         initPreWorld()
     }
@@ -54,12 +57,12 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions
-     * annotated by [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][DisableableFunction].
+     * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions annotated by
+     * [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][Disableable].
      */
-    private fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<DisableableFunction>> {
+    private fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<Disableable>> {
         val initializables = ArrayList<Initializable>()
-        val disableables = ArrayList<DisableableFunction>()
+        val disableables = ArrayList<Disableable>()
         val initializableClasses = HashMap<String, InitializableClass>()
 
         val result = JarUtils.findAnnotatedClasses(
@@ -95,7 +98,7 @@ internal object Initializer : Listener {
 
         for ((className, annotatedFuncs) in disableFunctions) {
             for ((methodName, annotations) in annotatedFuncs) {
-                disableables += DisableableFunction.fromInitAnnotation(classLoader, className, methodName, annotations.first())
+                disableables += Disableable.fromInitAnnotation(classLoader, className, methodName, annotations.first())
             }
         }
 
@@ -103,11 +106,11 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Adds the given [Initializables][Initializable] and [DisableableFunctions][DisableableFunction] to the initialization process.
+     * Adds the given [Initializables][Initializable] and [DisableFunctions][Disableable] to the initialization process.
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    private fun addRunnables(initializables: List<Initializable>, disableables: List<DisableableFunction>) = dependencyLoaderSupport {
+    private fun addRunnables(initializables: List<Initializable>, disableables: List<Disableable>) = dependencyLoaderSupport {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
@@ -144,29 +147,29 @@ internal object Initializer : Listener {
             }
         }
 
-//        if (IS_DEV_SERVER)
-//            dumpGraphs()
+        // if (IS_DEV_SERVER)
+        //     dumpGraphs()
     }
 
-//    @Suppress("UNCHECKED_CAST")
-//    private fun dumpGraphs() {
-//        val dir = File("debug/nova/")
-//        val preWorldFile = File(dir, "pre_world.dot")
-//        val postWorldFile = File(dir, "post_world.dot")
-//        val disableFile = File(dir, "disable.dot")
-//        dir.mkdirs()
-//
-//        val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
-//        exporter.setVertexAttributeProvider { vertex ->
-//            mapOf(
-//                "label" to DefaultAttribute.createAttribute(vertex.toString()),
-//                "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
-//            )
-//        }
-//        exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
-//        exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
-//        exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
-//    }
+    // @Suppress("UNCHECKED_CAST")
+    // private fun dumpGraphs() {
+    //     val dir = File("debug/nova/")
+    //     val preWorldFile = File(dir, "pre_world.dot")
+    //     val postWorldFile = File(dir, "post_world.dot")
+    //     val disableFile = File(dir, "disable.dot")
+    //     dir.mkdirs()
+    //
+    //     val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
+    //     exporter.setVertexAttributeProvider { vertex ->
+    //         mapOf(
+    //             "label" to DefaultAttribute.createAttribute(vertex.toString()),
+    //             "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
+    //         )
+    //     }
+    //     exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
+    //     exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
+    //     exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
+    // }
 
     /**
      * Stats the pre-world initialization process.
@@ -198,10 +201,9 @@ internal object Initializer : Listener {
             isDone = true
             NekoLoadDataEvent().callEvent()
 
-//        @Suppress("UnstableApiUsage")
-//        PermanentStorage.store("last_version", Nova.pluginMeta.version)
-//        setGlobalIngredients()
-//        setupMetrics()
+            // PermanentStorage.store("last_version", Nova.pluginMeta.version)
+            // setGlobalIngredients()
+            // setupMetrics()
             LOGGER.info("Done loading")
         }
     }
@@ -223,20 +225,8 @@ internal object Initializer : Listener {
     private fun handleServerStarted(event: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
-        } else LOGGER.warn("Skipping post world initialization")
+        } else {
+            LOGGER.error("Skipping post world initialization")
+        }
     }
-
-//    private fun setupMetrics() {
-//        val metrics = Metrics(Nova, 11927)
-//        metrics.addCustomChart(DrilldownPie("addons") {
-//            val map = HashMap<String, Map<String, Int>>()
-//
-//            for (addon in AddonBootstrapper.addons) {
-//                map[addon.name] = mapOf(addon.version to 1)
-//            }
-//
-//            return@DrilldownPie map
-//        })
-//    }
-
 }

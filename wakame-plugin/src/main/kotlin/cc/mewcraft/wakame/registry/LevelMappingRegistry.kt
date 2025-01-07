@@ -6,11 +6,11 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.rarity.LevelMappings
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.NekoConfigurationLoader
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 /**
  * The registry of `level -> rarity` mappings.
@@ -22,9 +22,8 @@ import org.koin.core.qualifier.named
 @Reload(
     runAfter = [RarityRegistry::class]
 )
-//@PreWorldDependency(runBefore = [RarityRegistry::class])
-//@ReloadDependency(runBefore = [RarityRegistry::class])
 object LevelMappingRegistry : KoinComponent {
+
     const val GLOBAL_NAME = "global"
     const val CUSTOM_NAME = "custom"
 
@@ -32,13 +31,14 @@ object LevelMappingRegistry : KoinComponent {
 
     @InitFun
     fun onPreWorld() = loadConfiguration()
+
     @ReloadFun
     fun onReload() = loadConfiguration()
 
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        val root = get<NekoConfigurationLoader>(named(LEVEL_GLOBAL_CONFIG_LOADER)).load()
+        val root = get<YamlConfigurationLoader>(named(LEVEL_GLOBAL_CONFIG_LOADER)).load()
 
         // deserialize the `global` mappings
         val globalLevelMappings = root.node(GLOBAL_NAME).krequire<LevelMappings>()

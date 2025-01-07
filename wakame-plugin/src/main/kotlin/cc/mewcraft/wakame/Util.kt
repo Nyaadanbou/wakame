@@ -5,33 +5,28 @@ import java.time.Instant
 import java.util.function.Consumer
 
 object Util {
-    private var thePauser: Consumer<String?> = Consumer { message: String -> doPause(message) }
+    private var thePauser: Consumer<Throwable> = Consumer { throw it }
 
-    init {
-        setPause(LOGGER::error) // 简单记录一下
-    }
-
-    @JvmStatic
     fun <T : Throwable> pauseInIde(t: T): T {
         if (SharedConstants.IS_RUNNING_IN_IDE) {
             LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t)
-            doPause(t.message)
+            doPause(t)
+        } else {
+            LOGGER.warn("A fatal exception occurred, but suppressed since not in IDE", t)
         }
         return t
     }
 
-    @JvmStatic
-    private fun doPause(message: String?) {
+    private fun <T : Throwable> doPause(t: T) {
         val instant = Instant.now()
         LOGGER.warn("Did you remember to set a breakpoint here?")
         val bl = Duration.between(instant, Instant.now()).toMillis() > 500L
         if (!bl) {
-            thePauser.accept(message)
+            thePauser.accept(t)
         }
     }
 
-    @JvmStatic
-    fun setPause(missingBreakpointHandler: Consumer<String?>) {
+    fun setPause(missingBreakpointHandler: Consumer<Throwable>) {
         thePauser = missingBreakpointHandler
     }
 }

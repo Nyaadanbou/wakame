@@ -5,34 +5,34 @@ import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 
 /**
- * 代表一个资源的键名, 包含一个 [registryName] 用于确定该资源所在的 [Registry].
+ * 代表一个资源的键名, 包含一个 [registryId] 用于确定该资源所在的 [Registry].
  */
 class ResourceKey<T>
 private constructor(
-    val registryName: ResourceLocation,
-    val location: ResourceLocation,
+    val registryId: ResourceLocation, // e.g. "koish:item", "koish:element"
+    val location: ResourceLocation, // depends on the entries in registry
 ) {
     companion object {
         // 确保值的全局唯一性
         private val VALUES: ConcurrentMap<InternKey, ResourceKey<*>> = MapMaker().weakValues().makeMap()
 
-        fun <T> create(registry: ResourceLocation, value: ResourceLocation): ResourceKey<T> {
+        fun <T> create(registryName: ResourceLocation, value: ResourceLocation): ResourceKey<T> {
             @Suppress("UNCHECKED_CAST")
-            return VALUES.computeIfAbsent(InternKey(registry, value)) { pair -> ResourceKey<T>(pair.registry, pair.location) } as ResourceKey<T>
+            return VALUES.computeIfAbsent(InternKey(registryName, value)) { pair -> ResourceKey<T>(pair.registry, pair.location) } as ResourceKey<T>
         }
 
-        fun <T> create(registry: ResourceKey<out Registry<T>>, value: ResourceLocation): ResourceKey<T> {
-            return create(registry.location, value)
+        fun <T> create(registryKey: ResourceKey<out Registry<T>>, value: ResourceLocation): ResourceKey<T> {
+            return create(registryKey.location, value)
         }
 
         // 创建的 ResourceKey 位于 koish:root
-        fun <T> createRegistryKey(registry: ResourceLocation): ResourceKey<T> {
-            return create(KoishRegistryKeys.ROOT_REGISTRY_NAME, registry)
+        fun <T> createRegistryKey(registryName: ResourceLocation): ResourceKey<T> {
+            return create(KoishRegistryKeys.ROOT_REGISTRY_NAME, registryName)
         }
     }
 
-    fun isFor(registry: ResourceKey<*>): Boolean {
-        return registryName == registry.location
+    fun isFor(registryKey: ResourceKey<*>): Boolean {
+        return registryId == registryKey.location
     }
 
     fun <E> safeCast(registryRef: ResourceKey<in Registry<E>>): ResourceKey<E>? {
@@ -43,12 +43,12 @@ private constructor(
     }
 
     // 返回的 ResourceKey 位于 koish:root
-    fun registryKey(): ResourceKey<Registry<T>> {
-        return createRegistryKey(registryName)
+    fun registryKey(): ResourceKey<T> {
+        return createRegistryKey<T>(registryId)
     }
 
     override fun toString(): String {
-        return "ResourceKey[$registryName / $location]"
+        return "ResourceKey[$registryId / $location]"
     }
 
     private data class InternKey(val registry: ResourceLocation, val location: ResourceLocation)

@@ -3,15 +3,18 @@ package damage
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.registryModule
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
@@ -43,13 +46,12 @@ class DamageBundleDSLTest : KoinTest {
                 // dependencies
                 modules(
                     adventureModule(),
-                    elementModule(),
                     registryModule(),
                 )
             }
 
             // 按依赖顺序, 初始化注册表
-            ElementRegistry.onPreWorld()
+            ElementRegistryConfigStorage.init()
         }
 
         @AfterAll
@@ -62,16 +64,16 @@ class DamageBundleDSLTest : KoinTest {
     private val logger: Logger by inject()
 
     // 用于测试的 Element 实例
-    private lateinit var fireElem: Element
-    private lateinit var windElem: Element
+    private lateinit var fireElem: Holder<Element>
+    private lateinit var windElem: Holder<Element>
 
     // 用于测试的 AttributeMap 实例
     private lateinit var attriMap: AttributeMap
 
     @BeforeEach
     fun beforeEach() {
-        fireElem = ElementRegistry.INSTANCES["fire"]
-        windElem = ElementRegistry.INSTANCES["wind"]
+        fireElem = KoishRegistries.ELEMENT.getOrThrow("fire")
+        windElem = KoishRegistries.ELEMENT.getOrThrow("wind")
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()

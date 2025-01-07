@@ -22,6 +22,16 @@ object RerollingTableRegistry  {
     val NAMES: Set<String>
         get() = tables.keys
 
+    @InitFun
+    fun init() {
+        load()
+    }
+
+    @ReloadFun
+    fun reload() {
+        load()
+    }
+
     /**
      * 获取指定的定制台.
      */
@@ -34,15 +44,5 @@ object RerollingTableRegistry  {
         val tables = RerollingTableSerializer.loadAll()
         this.tables.putAll(tables)
         this.tables.put("wtf", WtfRerollingTable)
-    }
-
-    @InitFun
-    fun onPostWorld() {
-        load()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        load()
     }
 }

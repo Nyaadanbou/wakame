@@ -13,15 +13,23 @@ import cc.mewcraft.wakame.reloader.ReloadFun
     runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
 )
 @Reload(
-    runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
+    runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
 )
-//@PostWorldDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])
-//@ReloadDependency(runBefore = [RepairingTableRegistry::class, RecyclingStationRegistry::class])
 object BlacksmithStationRegistry {
     private val stations: MutableMap<String, BlacksmithStation> = mutableMapOf()
 
-    val names: Set<String>
+    val NAMES: Set<String>
         get() = stations.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     fun getStation(id: String): BlacksmithStation? {
         return stations[id]
@@ -31,15 +39,5 @@ object BlacksmithStationRegistry {
         stations.clear()
         stations.putAll(BlacksmithStationSerializer.loadAllStations())
         stations.put("wtf", WtfBlacksmithStation)
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        load()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        load()
     }
 }

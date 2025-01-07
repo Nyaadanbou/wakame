@@ -7,11 +7,11 @@ import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.getByteOrNull
 import cc.mewcraft.wakame.util.getIntOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -20,7 +20,7 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val ConstantCompositeAttribute.element: Element?
+val ConstantCompositeAttribute.element: Holder<Element>?
     get() = (this as? CompositeAttributeComponent.Element)?.element
 
 /**
@@ -252,7 +252,7 @@ internal data class ConstantCompositeAttributeSE(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
-    override val element: Element,
+    override val element: Holder<Element>,
     override val quality: Quality? = null,
 ) : ConstantCompositeAttribute(), CompositeAttributeSE<Double> {
     constructor(
@@ -285,7 +285,7 @@ internal data class ConstantCompositeAttributeRE(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-    override val element: Element,
+    override val element: Holder<Element>,
     override val quality: Quality? = null,
 ) : ConstantCompositeAttribute(), CompositeAttributeRE<Double> {
     constructor(
@@ -315,8 +315,8 @@ internal data class ConstantCompositeAttributeRE(
     }
 }
 
-private fun CompoundTag.readElement(): Element {
-    return getByteOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { ElementRegistry.getBy(it) } ?: ElementRegistry.DEFAULT
+private fun CompoundTag.readElement(): Holder<Element> {
+    return getIntOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { integerId -> KoishRegistries.ELEMENT[integerId] } ?: KoishRegistries.ELEMENT.defaultValue
 }
 
 private fun CompoundTag.readOperation(): Operation {
@@ -336,8 +336,8 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
     putDouble(key, value)
 }
 
-private fun CompoundTag.writeElement(element: Element) {
-    putByte(AttributeBinaryKeys.ELEMENT_TYPE, element.binaryId)
+private fun CompoundTag.writeElement(element: Holder<Element>) {
+    putByte(AttributeBinaryKeys.ELEMENT_TYPE, element.value.integerId.toByte())
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {

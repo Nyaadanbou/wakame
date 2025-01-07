@@ -1,9 +1,14 @@
 package cc.mewcraft.wakame.rarity
 
-import cc.mewcraft.wakame.*
+import cc.mewcraft.wakame.BiIdentifiable
+import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.core.PlayerFriendlyNamed
 import cc.mewcraft.wakame.registry.RarityRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.toStableByte
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -21,7 +26,7 @@ import java.util.stream.Stream
  *
  * 使用 [RarityRegistry] 来获得该实例.
  */
-interface Rarity : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte>, Comparable<Rarity> {
+interface Rarity : Keyed, Examinable, PlayerFriendlyNamed, BiIdentifiable<String, Byte>, Comparable<Rarity> {
     val weight: Int
     val glowColor: GlowColor
 }
@@ -33,7 +38,7 @@ private data class RarityType(
     override val uniqueId: String,
     override val binaryId: Byte,
     override val displayName: Component,
-    override val styles: Array<StyleBuilderApplicable>,
+    override val displayStyles: Array<StyleBuilderApplicable>,
     override val weight: Int,
     override val glowColor: GlowColor,
 ) : KoinComponent, Rarity {
@@ -43,7 +48,7 @@ private data class RarityType(
         ExaminableProperty.of("uniqueId", uniqueId),
         ExaminableProperty.of("binaryId", binaryId),
         ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
-        ExaminableProperty.of("styles", styles),
+        ExaminableProperty.of("styles", displayStyles),
         ExaminableProperty.of("weight", weight),
         ExaminableProperty.of("glowColor", glowColor)
     )

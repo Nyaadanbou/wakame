@@ -1,16 +1,21 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.element.ElementSerializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.kizami.*
+import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiEffect
+import cc.mewcraft.wakame.kizami.KizamiEffectSerializer
+import cc.mewcraft.wakame.kizami.KizamiInstance
+import cc.mewcraft.wakame.kizami.KizamiInstanceSerializer
+import cc.mewcraft.wakame.kizami.KizamiProvider
+import cc.mewcraft.wakame.kizami.KizamiSerializer
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -26,8 +31,6 @@ import java.io.File
 @Reload(
     runAfter = [AbilityRegistry::class, AttributeRegistry::class]
 )
-//@PreWorldDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
-//@ReloadDependency(runBefore = [AbilityRegistry::class, AttributeRegistry::class])
 object KizamiRegistry : KoinComponent {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
@@ -87,13 +90,12 @@ object KizamiRegistry : KoinComponent {
         BI_LOOKUP.clear()
         EFFECTS.clear()
 
-        val yamlLoaderBuilder = yamlConfig {
+        val yamlLoaderBuilder = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 kregister(KizamiSerializer)
                 kregister(KizamiEffectSerializer)
                 kregister(KizamiInstanceSerializer)
-                kregister(ElementSerializer)
             }
         }
 

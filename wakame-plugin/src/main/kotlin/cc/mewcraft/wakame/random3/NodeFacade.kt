@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.random3
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -103,7 +103,7 @@ abstract class NodeFacade<T> : KoinComponent {
             throw IllegalArgumentException("'dataDir' must be a relative path to the plugin data directory")
         }
 
-        val loadBuilder = yamlConfig {
+        val loadBuilder = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 registerAll(serializers)

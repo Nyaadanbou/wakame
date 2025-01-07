@@ -27,16 +27,14 @@ import java.io.File
 internal object Reloader : Listener {
 
     private val reloadables: HashSet<Reloadable> = HashSet<Reloadable>()
-
-    private val reload: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val dependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     /**
-     * Stats the reloader process.
+     * Stats the reloading process.
      */
     @InitFun
-    fun start() = tryInit {
+    private fun start() = tryInit {
         registerSuspendingEvents()
-
         collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
     }
 
@@ -94,14 +92,14 @@ internal object Reloader : Listener {
         // add vertices
         for (reloadable in reloadables) {
             this.reloadables += reloadable
-            reload.addNode(reloadable)
+            dependencyGraph.addNode(reloadable)
         }
 
         // add edges
         for (reloadable in reloadables) {
             reloadable.loadDependencies(
                 this.reloadables,
-                reload
+                this.dependencyGraph
             )
         }
     }
@@ -113,7 +111,7 @@ internal object Reloader : Listener {
         runBlocking {
             tryInit {
                 coroutineScope {
-                    launchAll(this, reload)
+                    launchAll(this, dependencyGraph)
                 }
             }
 

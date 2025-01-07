@@ -21,7 +21,6 @@ import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer2.Initializer
-import cc.mewcraft.wakame.initializer2.initializer2Module
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.kizami.kizamiModule
@@ -39,7 +38,6 @@ import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.user.userModule
-import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -52,7 +50,7 @@ val NEKO: WakamePlugin
     get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
 
 val LOGGER: ComponentLogger
-    get() = if (RunningEnvironment.PRODUCTION.isRunning()) {
+    get() = if (!SharedConstants.IS_RUNNING_IN_IDE) {
         NEKO.componentLogger
     } else {
         ComponentLogger.logger("Test")
@@ -92,7 +90,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 enchantmentModule(),
                 entityModule(),
                 guiModule(),
-                initializer2Module(),
                 integrationModule(),
                 itemModule(),
                 kizamiModule(),

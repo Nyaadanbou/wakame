@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.registerEvents
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -23,7 +22,9 @@ class ReloadableProperty<T>(
     private var value: T? = null
 
     init {
-        RunningEnvironment.PRODUCTION.run { registerEvents() }
+        if (!SharedConstants.IS_RUNNING_IN_IDE) {
+            registerEvents()
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST) // properties are reloaded the latest because some of them depend on configs

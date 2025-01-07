@@ -10,7 +10,7 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.slf4j.Logger
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
 // private data class PermissionArgs(val world: World, val player: OfflinePlayer, val permission: String)
@@ -28,9 +28,6 @@ import java.util.concurrent.CompletableFuture
     dispatcher = Dispatcher.ASYNC,
     runAfter = [HooksLoader::class]
 )
-//@PostWorldDependency(
-//    runBefore = [HooksLoader::class]
-//)
 object PermissionManager {
 
     internal val integrations = ArrayList<PermissionIntegration>()
@@ -38,7 +35,7 @@ object PermissionManager {
     private val logger: Logger = Injector.get()
 
     @InitFun
-    fun onPostWorldAsync() {
+    private fun init() {
         if (integrations.size > 1) {
             logger.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nekoo will use the first one")
         }

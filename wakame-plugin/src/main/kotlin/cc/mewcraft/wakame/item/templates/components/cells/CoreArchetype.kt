@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.element.ELEMENT_EXTERNALS
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -20,14 +19,26 @@ import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.random3.*
+import cc.mewcraft.wakame.random3.Filter
+import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.random3.Node
+import cc.mewcraft.wakame.random3.NodeContainer
+import cc.mewcraft.wakame.random3.NodeFacadeSupport
+import cc.mewcraft.wakame.random3.NodeRepository
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.random3.PoolSerializer
+import cc.mewcraft.wakame.random3.Sample
+import cc.mewcraft.wakame.random3.SampleNodeFacade
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.namespace
+import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.value
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -179,24 +190,15 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
 @Init(
     stage = InitStage.PRE_WORLD,
     runBefore = [ItemRegistry::class],
-    runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [KizamiRegistry::class, AttributeRegistry::class],
 )
 @Reload(
-    runAfter = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-    runBefore = [ItemRegistry::class]
+    runBefore = [ItemRegistry::class],
+    runAfter = [KizamiRegistry::class, AttributeRegistry::class],
 )
-//@PreWorldDependency(
-//    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-//    runAfter = [ItemRegistry::class],
-//)
-//@ReloadDependency(
-//    runBefore = [ElementRegistry::class, KizamiRegistry::class, AttributeRegistry::class],
-//    runAfter = [ItemRegistry::class]
-//)
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/cores")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(ELEMENT_EXTERNALS)))
         registerAll(get(named(ABILITY_EXTERNALS)))
         registerAll(get(named(EVALUABLE_SERIALIZERS)))
         kregister(CoreArchetypeSerializer)
@@ -206,8 +208,14 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
     override val sampleDataType: TypeToken<CoreArchetype> = typeTokenOf()
     override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
-    override fun decodeSampleData(node: ConfigurationNode): CoreArchetype {
-        return node.krequire<CoreArchetype>()
+    @InitFun
+    fun init() {
+        NodeFacadeSupport.reload(this)
+    }
+
+    @ReloadFun
+    fun reload() {
+        NodeFacadeSupport.reload(this)
     }
 
     override fun intrinsicFilters(value: CoreArchetype): Collection<Filter<ItemGenerationContext>> {
@@ -247,13 +255,8 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
         return listOf(filter)
     }
 
-    @InitFun
-    fun onPreWorld() {
-        NodeFacadeSupport.reload(this)
+    override fun decodeSampleData(node: ConfigurationNode): CoreArchetype {
+        return node.krequire<CoreArchetype>()
     }
 
-    @ReloadFun
-    private fun onReload() {
-        NodeFacadeSupport.reload(this)
-    }
 }

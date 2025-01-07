@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.resource
 
+import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.initializer2.DisableFun
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -13,22 +14,34 @@ import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.Server
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.util.*
+import java.util.WeakHashMap
 
 @Init(
     stage = InitStage.PRE_WORLD,
 )
-@Reload()
-object ResourceTicker : KoinComponent {
-    private val server: Server by inject()
+@Reload
+object ResourceTicker {
 
     private val bossBarMap: WeakHashMap<Player, BossBar> = WeakHashMap()
     private var resourceTickTask: BukkitTask? = null
+
+    @InitFun
+    private fun init() {
+        start()
+    }
+
+    @DisableFun
+    private fun close() {
+        resourceTickTask?.cancel()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        close()
+        start()
+    }
 
     fun start() {
         // 开始一个每 t 执行一次的循环任务,
@@ -37,11 +50,11 @@ object ResourceTicker : KoinComponent {
         // * 显示当前魔法值
 
         // TODO 移除魔法值更新/显示, 等重构技能时再加回来
-         runTaskTimer(
+        runTaskTimer(
             delay = 0,
             period = 1
         ) {
-            server.onlinePlayers.forEach { player ->
+            SERVER.onlinePlayers.forEach { player ->
                 val user = player.toUser()
                 regenMana(user)
                 showMana(user)
@@ -74,21 +87,5 @@ object ResourceTicker : KoinComponent {
             // 展示给该玩家
             bossBar.addViewer(player)
         }
-    }
-
-    @DisableFun
-    fun close() {
-        resourceTickTask?.cancel()
-    }
-
-    @InitFun
-    private fun onPreWorld() {
-        start()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        close()
-        start()
     }
 }

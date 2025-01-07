@@ -21,6 +21,10 @@ import kotlin.random.Random
 interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
     val key: ResourceKey<out Registry<T>>
 
+    fun asWritable(): WritableRegistry<T> = this as WritableRegistry<T>
+    fun asDefaulted(): DefaultedRegistry<T> = this as DefaultedRegistry<T>
+    fun asDefaultedWritable(): DefaultedWritableRegistry<T> = this as DefaultedWritableRegistry<T>
+
     // 用于序列化, 例如注册表数据之间的依赖, NBT读写, Web系统 等只需要储存键名的地方
     val valueByNameCodec: Codec<T>
         get() = referenceHolderCodec.flatComapMap(
@@ -46,9 +50,17 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
         return DataResults.wrap(holder as? Holder.Reference<T>) { "Unregistered holder in registry ${this.key}: $holder" }
     }
 
+    /**
+     * 初始化后必须调用一次.
+     */
+    fun freeze(): Registry<T>
+
     fun getValue(key: ResourceKey<T>): T?
     fun getValue(id: ResourceLocation): T?
+    fun getValue(id: String): T? = getValue(ResourceLocations.withKoishNamespace(id))
     fun getValueOrThrow(key: ResourceKey<T>): T = getValue(key) ?: throw IllegalArgumentException("Missing key in ${this.key}: $key")
+    fun getValueOrThrow(id: ResourceLocation): T = getValue(id) ?: throw IllegalArgumentException("Missing id in ${this.key}: $id")
+    fun getValueOrThrow(id: String): T = getValueOrThrow(ResourceLocations.withKoishNamespace(id))
 
     override fun <U> keys(ops: DynamicOps<U>): Sequence<U> = keySet.asSequence().map { ops.createString(it.toString()) }
 
@@ -64,18 +76,21 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
     val entrySet: Set<Map.Entry<ResourceKey<T>, T>>
     val registryKeySet: Set<ResourceKey<T>>
 
-    val sequence: Sequence<T>
+    val holderSequence: Sequence<Holder.Reference<T>>
+    val valueSequence: Sequence<T>
+        get() = holderSequence.map(Holder.Reference<T>::value)
 
     fun containsKey(key: ResourceKey<T>): Boolean
     fun containsKey(id: ResourceLocation): Boolean
+    fun containsKey(id: String): Boolean = containsKey(ResourceLocations.withKoishNamespace(id))
 
     /**
      * 创建一个侵入式的 [Holder.Reference] 实例并返回.
      *
      * ### 注意事项
      * 实现上并不会始终创建一个侵入式的 [Holder.Reference] 实例.
-     * 如果注册表里已经存在对应的数据, 那么将直接返回已存在的实例.
-     * 多次以相同的 [id] 调用该函数将返回同一个实例.
+     * 如果注册表里已经存在对应的数据, 那么将直接返回已存在的 [Holder].
+     * 多次以相同的 [id] 调用该函数将返回同一个 [Holder.Reference] 实例.
      *
      * ### 设计哲学
      * 该函数是为了解决必须手动指定注册表之间所有依赖的问题, 设计大概是这样的:
@@ -95,6 +110,7 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
      * 没有绑定数据的 [Holder] 会在 [WritableRegistry.register] 执行时(通常是加载配置文件时)将数据绑定好.
      */
     fun createIntrusiveHolder(id: ResourceLocation): Holder.Reference<T>
+    fun createIntrusiveHolder(id: String): Holder.Reference<T> = createIntrusiveHolder(ResourceLocations.withKoishNamespace(id))
 
     /**
      * 验证注册表的数据是否正确.
@@ -107,18 +123,22 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
     operator fun get(rawId: Int): Holder.Reference<T>?
     operator fun get(key: ResourceKey<T>): Holder.Reference<T>?
     operator fun get(id: ResourceLocation): Holder.Reference<T>?
+    operator fun get(id: String): Holder.Reference<T>? = get(ResourceLocations.withKoishNamespace(id))
+    fun getOrThrow(rawId: Int): Holder.Reference<T> = get(rawId) ?: throw IllegalStateException("Missing raw id in registry ${this.key}: $rawId")
     fun getOrThrow(key: ResourceKey<T>): Holder.Reference<T> = get(key) ?: throw IllegalStateException("Missing key in registry ${this.key}: $key")
+    fun getOrThrow(id: ResourceLocation): Holder.Reference<T> = get(id) ?: throw IllegalStateException("Missing id in registry ${this.key}: $id")
+    fun getOrThrow(id: String): Holder.Reference<T> = getOrThrow(ResourceLocations.withKoishNamespace(id))
 
     fun wrapAsHolder(value: T): Holder<T>
 
     fun asHolderIdMap(): IdMap<Holder<T>> {
         return object : IdMap<Holder<T>> {
             override fun getId(value: Holder<T>): Int {
-                return getId(value.value)
+                return this@Registry.getId(value.value)
             }
 
             override fun byId(index: Int): Holder<T>? {
-                return get(index)
+                return this@Registry[index]
             }
 
             override fun size(): Int {
@@ -126,28 +146,47 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
             }
 
             override fun iterator(): Iterator<Holder<T>> {
-                return sequence.map(::wrapAsHolder).iterator()
+                return this@Registry.holderSequence.iterator()
             }
         }
     }
-
 }
 
 interface WritableRegistry<T> : Registry<T> {
     fun update(key: ResourceKey<T>, value: T): Holder.Reference<T>
-    fun register(key: ResourceKey<T>, value: T): Holder.Reference<T>
+    fun update(id: ResourceLocation, value: T): Holder.Reference<T> = update(ResourceKey.create(this.key, id), value)
+    fun update(id: String, value: T): Holder.Reference<T> = update(ResourceLocations.withKoishNamespace(id), value)
 
-    // 疑问: 需要把 update 和 register 合并成一个函数吗?
-    fun registerOrUpdate(key: ResourceKey<T>, value: T): Holder.Reference<T> {
-        return if (containsKey(key)) update(key, value) else register(key, value)
-    }
+    fun register(key: ResourceKey<T>, value: T): Holder.Reference<T>
+    fun register(id: ResourceLocation, value: T): Holder.Reference<T> = register(ResourceKey.create(this.key, id), value)
+    fun register(id: String, value: T): Holder.Reference<T> = register(ResourceLocations.withKoishNamespace(id), value)
+
+    // fun registerOrUpdate(key: ResourceKey<T>, value: T): Holder.Reference<T> {
+    //     return if (containsKey(key)) update(key, value) else register(key, value)
+    // }
+    //
+    // fun registerOrUpdate(id: ResourceLocation, value: T): Holder.Reference<T> = registerOrUpdate(ResourceKey.create(this.key, id), value)
+    // fun registerOrUpdate(id: String, value: T): Holder.Reference<T> = registerOrUpdate(ResourceLocations.withKoishNamespace(id), value)
+
+    /**
+     * 仅在注册表初始化之前调用.
+     */
+    // 因为单元测试会重复执行初始化, 继而出现添加重复数据的情况, 所以暴露了这么一个函数.
+    fun resetRegistry()
 
     val isEmpty: Boolean
 }
 
 interface DefaultedRegistry<T> : Registry<T> {
     val defaultId: ResourceLocation
-    override fun getValue(id: ResourceLocation): T
-    override fun getResourceLocation(value: T): ResourceLocation
-    override fun byId(index: Int): T
+    val defaultValue: Holder.Reference<T>
+
+    fun getValueOrDefault(key: ResourceKey<T>): T
+    fun getValueOrDefault(id: ResourceLocation): T
+    fun getValueOrDefault(id: String): T
+    fun getResourceLocationOrDefault(value: T): ResourceLocation
+    fun getResourceKeyOrDefault(value: T): ResourceKey<T>
+    fun byIdOrDefault(index: Int): T
 }
+
+interface DefaultedWritableRegistry<T> : DefaultedRegistry<T>, WritableRegistry<T>

@@ -13,14 +13,9 @@ import org.koin.core.component.KoinComponent
     stage = InitStage.POST_WORLD,
 )
 internal object ResourcePackLifecycle : KoinComponent {
-    private fun initialize() {
-        val service = ResourcePackServiceProvider.get()
-        service.start()
-    }
-
     @InitFun
-    fun onPostWorld() {
-        runTask { initialize() }
+    private fun init() {
+        runTask { ResourcePackServiceProvider.get().start() }
     }
 }
 

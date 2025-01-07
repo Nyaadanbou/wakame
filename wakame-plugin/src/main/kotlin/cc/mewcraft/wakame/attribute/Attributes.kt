@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registries.KoishRegistries
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
 import java.util.concurrent.ConcurrentHashMap
@@ -63,13 +64,13 @@ object Attributes : AttributeProvider {
     // 跟上面的萌芽属性一样, 只不过不是 Attribute 实例, 而是一个“中间对象”.
     // 客户端需要再指定一次元素才可以获取到最终的 (Element)Attribute 实例.
 
-    val DEFENSE = createGetter { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
-    val DEFENSE_PENETRATION = createGetter { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
-    val DEFENSE_PENETRATION_RATE = createGetter { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
-    val MAX_ATTACK_DAMAGE = createGetter { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
-    val MIN_ATTACK_DAMAGE = createGetter { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
-    val ATTACK_DAMAGE_RATE = createGetter { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
-    val INCOMING_DAMAGE_RATE = createGetter { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val DEFENSE = registerLazy { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION = registerLazy { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
+    val DEFENSE_PENETRATION_RATE = registerLazy { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
+    val MAX_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
+    val MIN_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
+    val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
     //</editor-fold>
 
     /**
@@ -124,7 +125,8 @@ object Attributes : AttributeProvider {
         return AttributeProviderInternals.register(this)
     }
 
-    private fun createGetter(creator: (Element) -> ElementAttribute): AttributeGetter {
+    // "lazy" 意为不立马创建 ElementAttribute, 而仅仅是规定好如何创建 ElementAttribute.
+    private fun registerLazy(creator: (Holder<Element>) -> ElementAttribute): AttributeGetter {
         return SimpleAttributeGetter(creator)
     }
 }
@@ -168,15 +170,23 @@ interface AttributeGetter {
      * @param element 元素类型
      */
     fun of(element: Element): ElementAttribute
+
+    /**
+     * 获取 [ElementAttribute] 实例.
+     * 该函数始终会返回一个 [ElementAttribute] 实例.
+     * 对于同一个 [Element] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
+     *
+     * @param element 元素类型
+     */
+    fun of(element: Holder<Element>): ElementAttribute
 }
 
 
 /* Internals */
 
 
-
 private class SimpleAttributeGetter(
-    private val creator: (Element) -> ElementAttribute,
+    private val creator: (Holder<Element>) -> ElementAttribute,
 ) : AttributeGetter {
 
     init {
@@ -184,10 +194,10 @@ private class SimpleAttributeGetter(
     }
 
     // element -> element attribute
-    private val mappings: ConcurrentHashMap<Element, ElementAttribute> = ConcurrentHashMap()
+    private val mappings: ConcurrentHashMap<Holder<Element>, ElementAttribute> = ConcurrentHashMap()
 
     override fun of(id: String): ElementAttribute? {
-        val elem = ElementRegistry.INSTANCES.getOrNull(id)
+        val elem = KoishRegistries.ELEMENT[id]
         if (elem == null) {
             return null
         }
@@ -195,13 +205,17 @@ private class SimpleAttributeGetter(
     }
 
     override fun of(element: Element): ElementAttribute {
-        return mappings.computeIfAbsent(element) { x: Element ->
-            registerAttribute(creator(x))
+        return of(KoishRegistries.ELEMENT.wrapAsHolder(element))
+    }
+
+    override fun of(element: Holder<Element>): ElementAttribute {
+        return mappings.computeIfAbsent(element) { k ->
+            registerAttribute(creator(k))
         }
     }
 
     /**
-     * 本伴生对象主要充当 [AttributeGetter] 的对象池, 以及存放一些其他需要在所有之中共享的数据.
+     * 本伴生对象主要充当 [AttributeGetter] 的对象池, 以及存放需要在所有对象之间共享的数据.
      */
     companion object Shared {
         private val objectPool: HashSet<AttributeGetter> = HashSet()
@@ -238,8 +252,8 @@ private class SimpleAttributeGetter(
         fun bootstrap() {
             // 初始化每一个 AttributeGetter 的每一种 Element
             for (getter: AttributeGetter in objectPool) {
-                for (element: Map.Entry<String, Element> in ElementRegistry.INSTANCES) {
-                    getter.of(element.value)
+                for (element in KoishRegistries.ELEMENT.holderSequence) {
+                    getter.of(element)
                 }
             }
         }

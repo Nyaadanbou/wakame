@@ -1,11 +1,11 @@
-package cc.mewcraft.wakame.config.configurate
+package cc.mewcraft.wakame.serialization.configurate.mapperfactory
 
 import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.objectmapping.ObjectMapper
 import org.spongepowered.configurate.util.NamingSchemes
 
 /**
- * @see ObjectMapper.Factory
+ * @see org.spongepowered.configurate.objectmapping.ObjectMapper.Factory
  */
 object ObjectMappers {
     @JvmField

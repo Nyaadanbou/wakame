@@ -2,13 +2,34 @@ package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
+import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.components.FoodProperties
+import cc.mewcraft.wakame.item.components.ItemAttackSpeed
+import cc.mewcraft.wakame.item.components.ItemCrate
+import cc.mewcraft.wakame.item.components.ItemElements
+import cc.mewcraft.wakame.item.components.ItemEnchantments
+import cc.mewcraft.wakame.item.components.ItemKizamiz
+import cc.mewcraft.wakame.item.components.ItemLevel
+import cc.mewcraft.wakame.item.components.ItemRarity
+import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
@@ -37,12 +58,22 @@ internal data object StandardContext // 等之后需要的时候, 改成 class �
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    fun reload() {
+        initialize0()
+    }
 
     override fun initialize(
         formatPath: Path,
@@ -114,16 +145,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
             is AbilityCore -> StandardRenderingHandlerRegistry.CELLULAR_ABILITY.process(collector, core)
             is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
         }
-    }
-
-    @InitFun
-    fun onPostWorld() {
-        initialize0()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        initialize0()
     }
 }
 

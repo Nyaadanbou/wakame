@@ -12,13 +12,23 @@ import org.jetbrains.annotations.VisibleForTesting
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 object RecyclingStationRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val stations: MutableMap<String, RecyclingStation> = mutableMapOf()
 
-    val names: Set<String>
+    val NAMES: Set<String>
         get() = stations.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     fun getItem(id: Key): PriceInstance? {
         return items[id]
@@ -36,15 +46,5 @@ object RecyclingStationRegistry {
         stations.clear()
         stations.putAll(RecyclingStationSerializer.loadAllStations())
         stations.put("wtf", WtfRecyclingStation)
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        load()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        load()
     }
 }

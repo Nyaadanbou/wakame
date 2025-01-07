@@ -1,8 +1,7 @@
-package cc.mewcraft.wakame.config.configurate
+package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.util.typeTokenOf
-import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -12,25 +11,29 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-internal object KeySerializer : ScalarSerializer<Key>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): Key = Key.key(obj.toString())
-    override fun serialize(item: Key, typeSupported: Predicate<Class<*>>?): Any = item.toString()
-}
 
 internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
+        val miniMessage = Injector.get<MiniMessage>()
         val message = obj.toString().replace("§", "")
-        return Injector.get<MiniMessage>().deserialize(message)
+        return miniMessage.deserialize(message)
     }
 
-    override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any = Injector.get<MiniMessage>().serialize(item)
+    override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
+        val miniMessage = Injector.get<MiniMessage>()
+        return miniMessage.serialize(item)
+    }
 }
 
 internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): Style = ComponentSerializer.deserialize(type, obj).style()
+    override fun deserialize(type: Type, obj: Any): Style {
+        return ComponentSerializer.deserialize(type, obj).style()
+    }
+
     override fun serialize(item: Style, typeSupported: Predicate<Class<*>>?): Any {
+        val miniMessage = Injector.get<MiniMessage>()
         val component = Component.text().style(item).build()
-        return Injector.get<MiniMessage>().serialize(component)
+        return miniMessage.serialize(component)
     }
 }
 
@@ -54,7 +57,8 @@ internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleB
     }
 
     override fun serialize(item: Array<StyleBuilderApplicable>, typeSupported: Predicate<Class<*>>?): Any {
+        val miniMessage = Injector.get<MiniMessage>()
         val component = Component.text().style { builder -> item.forEach(builder::apply) }.build()
-        return Injector.get<MiniMessage>().serialize(component)
+        return miniMessage.serialize(component)
     }
 }

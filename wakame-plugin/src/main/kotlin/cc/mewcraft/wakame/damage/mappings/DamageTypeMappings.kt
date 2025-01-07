@@ -3,20 +3,22 @@
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.damage.*
-import cc.mewcraft.wakame.element.ElementSerializer
+import cc.mewcraft.wakame.damage.DamageMetadataBuilder
+import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
+import cc.mewcraft.wakame.damage.DirectCriticalStrikeMetadataBuilder
+import cc.mewcraft.wakame.damage.DirectDamageTagsBuilder
+import cc.mewcraft.wakame.damage.VanillaDamageMetadataBuilder
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toNamespacedKey
-import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -45,22 +47,16 @@ import java.lang.reflect.Type
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
-//@PostWorldDependency(
-//    runBefore = [ElementRegistry::class]
-//)
-//@ReloadDependency(
-//    runBefore = [ElementRegistry::class]
-//)
+@Reload
 object DamageTypeMappings : KoinComponent {
-    private const val DAMAGE_TYPE_MAPPINGS_CONFIG_FILE = "damage/damage_type_mappings.yml"
+    private const val DAMAGE_TYPE_MAPPINGS_CONFIG_PATH = "damage/damage_type_mappings.yml"
 
-    private val default: DamageTypeMapping by ReloadableProperty {
+    private val default: DamageTypeMapping by lazy {
         DamageTypeMapping(
             VanillaDamageMetadataBuilder(
                 damageTags = DirectDamageTagsBuilder(emptyList()),
                 criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
-                element = ElementRegistry.DEFAULT
+                element = KoishRegistries.ELEMENT.defaultValue
             )
         )
     }
@@ -72,16 +68,17 @@ object DamageTypeMappings : KoinComponent {
     }
 
     @InitFun
-    private fun onPostWorld(): Unit = loadConfig()
-    @ReloadFun
-    private fun onReload(): Unit = loadConfig()
+    private fun init(): Unit = loadDataIntoRegistry()
 
-    private fun loadConfig() {
+    @ReloadFun
+    private fun reload(): Unit = loadDataIntoRegistry()
+
+    private fun loadDataIntoRegistry() {
         mappings.clear()
 
-        val root = yamlConfig {
+        val rootNode = buildYamlConfigLoader {
             withDefaults()
-            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_TYPE_MAPPINGS_CONFIG_FILE).bufferedReader() }
+            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_TYPE_MAPPINGS_CONFIG_PATH).bufferedReader() }
             serializers {
                 registerAnnotatedObjects(
                     ObjectMapper.factoryBuilder()
@@ -91,14 +88,13 @@ object DamageTypeMappings : KoinComponent {
                         .addDiscoverer(dataClassFieldDiscoverer())
                         .build()
                 )
-                kregister(ElementSerializer)
                 kregister(DamageTypeMappingSerializer)
                 kregister(DamageMetadataBuilderSerializer)
             }
         }.build().load()
 
         val damageTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.DAMAGE_TYPE)
-        root.childrenMap()
+        rootNode.childrenMap()
             .mapKeys { (key, _) ->
                 val stringKey = key.toString()
                 val adventKey = try {

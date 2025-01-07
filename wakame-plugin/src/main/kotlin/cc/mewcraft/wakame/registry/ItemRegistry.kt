@@ -1,12 +1,19 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.NekoItemHolder
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemBaseImpl
+import cc.mewcraft.wakame.item.ItemSlotGroup
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoItemFactory
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.SimpleNekoItem
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
+import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
@@ -18,9 +25,6 @@ import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
@@ -30,7 +34,6 @@ import xyz.xenondevs.commons.provider.immutable.provider
     stage = InitStage.PRE_WORLD,
     runAfter = [
         AttributeRegistry::class,
-        ElementRegistry::class,
         EntityRegistry::class,
         ItemSkinRegistry::class,
         KizamiRegistry::class,
@@ -42,7 +45,6 @@ import xyz.xenondevs.commons.provider.immutable.provider
 @Reload(
     runAfter = [
         AttributeRegistry::class,
-        ElementRegistry::class,
         EntityRegistry::class,
         ItemSkinRegistry::class,
         KizamiRegistry::class,
@@ -51,31 +53,7 @@ import xyz.xenondevs.commons.provider.immutable.provider
         AbilityRegistry::class,
     ]
 )
-//@PreWorldDependency(
-//    runBefore = [
-//        AttributeRegistry::class,
-//        ElementRegistry::class,
-//        EntityRegistry::class,
-//        ItemSkinRegistry::class,
-//        KizamiRegistry::class,
-//        LevelMappingRegistry::class,
-//        RarityRegistry::class,
-//        AbilityRegistry::class,
-//    ]
-//)
-//@ReloadDependency(
-//    runBefore = [
-//        AttributeRegistry::class,
-//        ElementRegistry::class,
-//        EntityRegistry::class,
-//        ItemSkinRegistry::class,
-//        KizamiRegistry::class,
-//        LevelMappingRegistry::class,
-//        RarityRegistry::class,
-//        AbilityRegistry::class,
-//    ]
-//)
-object ItemRegistry : KoinComponent {
+object ItemRegistry {
     /**
      * 用于一般用途的 [NekoItem].
      * 这些物品类型可以用来生成 [ItemStack].
@@ -116,16 +94,14 @@ object ItemRegistry : KoinComponent {
     private val namespace2Paths: Object2ObjectOpenHashMap<String, ObjectArrayList<String>> = Object2ObjectOpenHashMap()
 
     @InitFun
-    private fun onPreWorld() {
-        loadConfiguration()
+    private fun init() {
+        loadDataIntoRegistry()
     }
 
     @ReloadFun
-    private fun onReload() {
-        loadConfiguration()
+    private fun reload() {
+        loadDataIntoRegistry()
     }
-
-    private val LOGGER: Logger = get()
 
     /**
      * 默认的 [Error NekoItem][NekoItem] 的唯一标识.
@@ -163,7 +139,7 @@ object ItemRegistry : KoinComponent {
     val ERROR_ITEM_STACK: ItemStack
         get() = ItemRegistryInternals.ERROR_NEKO_STACK_PROVIDER.get().itemStack
 
-    private fun loadConfiguration() {
+    private fun loadDataIntoRegistry() {
         // 清空现有的注册表
         if (!IMAGINARY.isEmpty()) {
             IMAGINARY.clear()

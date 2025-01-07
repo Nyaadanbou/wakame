@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -70,7 +70,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
         when (stationType) {
             SimpleCraftingStation.TYPE -> {
                 // 获取合成站菜单布局
-                val stationLayout = node.node("layout").krequire<BasicMenuSettings>().apply {
+                val stationLayout = node.node("listing_layout").krequire<BasicMenuSettings>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()
@@ -96,7 +96,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
-                    val stationRecipe = if (RunningEnvironment.TEST.isRunning()) {
+                    val stationRecipe = if (SharedConstants.IS_RUNNING_IN_IDE) {
                         CraftingStationRecipeRegistry.raw[key]
                     } else {
                         CraftingStationRecipeRegistry[key]

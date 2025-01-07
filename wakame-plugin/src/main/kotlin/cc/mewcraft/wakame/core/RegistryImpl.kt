@@ -12,10 +12,15 @@ open class MappedRegistry<T>(
     override val key: ResourceKey<out Registry<T>>,
 ) : WritableRegistry<T> {
     private val byId: ObjectList<Holder.Reference<T>> = ObjectArrayList(256)
-    private val toId: Reference2IntMap<T> = Reference2IntOpenHashMap<T>(2048).apply { defaultReturnValue(-1) }
-    private val byLocation: MutableMap<ResourceLocation, Holder.Reference<T>> = HashMap(2048)
-    private val byKey: MutableMap<ResourceKey<T>, Holder.Reference<T>> = HashMap(2048)
-    private val byValue: MutableMap<T, Holder.Reference<T>> = IdentityHashMap(2048)
+    private val toId: Reference2IntMap<T> = Reference2IntOpenHashMap<T>(1024).apply { defaultReturnValue(-1) }
+    private val byLocation: MutableMap<ResourceLocation, Holder.Reference<T>> = HashMap(1024)
+    private val byKey: MutableMap<ResourceKey<T>, Holder.Reference<T>> = HashMap(1024)
+    private val byValue: MutableMap<T, Holder.Reference<T>> = IdentityHashMap(1024)
+
+    private var frozen: Boolean = false
+
+    // 还未正式注册好的 intrusive holders.
+    // 该映射在最终必须为空, 否则视为注册表错误.
     private val unregisteredIntrusiveHolders: MutableMap<ResourceLocation, Holder.Reference<T>> = HashMap()
 
     override fun update(key: ResourceKey<T>, value: T): Holder.Reference<T> {
@@ -28,7 +33,9 @@ open class MappedRegistry<T>(
     }
 
     override fun register(key: ResourceKey<T>, value: T): Holder.Reference<T> {
-        if (this.byLocation.containsKey(key.location)) {
+        if (frozen) {
+            throw Util.pauseInIde(IllegalStateException("Adding new entry to frozen registry '${this.key}'"))
+        } else if (this.byLocation.containsKey(key.location)) {
             throw Util.pauseInIde(IllegalStateException("Adding duplicate key '$key' to registry '${this.key}'"))
         } else if (this.byValue.containsKey(value)) {
             throw Util.pauseInIde(IllegalStateException("Adding duplicate value '$value' to registry '${this.key}'"))
@@ -49,8 +56,28 @@ open class MappedRegistry<T>(
         }
     }
 
+    override fun resetRegistry() {
+        this.byId.clear()
+        this.toId.clear()
+        this.byLocation.clear()
+        this.byKey.clear()
+        this.byValue.clear()
+        this.unregisteredIntrusiveHolders.clear()
+        this.frozen = false
+    }
+
     override val isEmpty: Boolean
         get() = byKey.isEmpty()
+
+    override fun freeze(): Registry<T> {
+        if (frozen) {
+            return this
+        } else {
+            validate().getOrThrow()
+            frozen = true
+            return this
+        }
+    }
 
     override fun getValue(key: ResourceKey<T>): T? = byKey[key]?.value
     override fun getValue(id: ResourceLocation): T? = byLocation[id]?.value
@@ -59,26 +86,30 @@ open class MappedRegistry<T>(
     override fun getResourceKey(value: T): ResourceKey<T>? = byValue[value]?.key
 
     override fun getAny(): Holder.Reference<T>? = byId.first()
-    override fun getRandom(random: Random): Holder.Reference<T>? = byId[random.nextInt(-1, byId.size)]
+    override fun getRandom(random: Random): Holder.Reference<T>? = byId.randomOrNull(random)
 
     override val keySet: Set<ResourceLocation>
         get() = byLocation.keys
     override val entrySet: Set<Map.Entry<ResourceKey<T>, T>>
-        get() = byKey.mapValues { (_, v) -> v.value }.entries
+        get() = byKey.mapValues { (_, ref) -> ref.value }.entries
     override val registryKeySet: Set<ResourceKey<T>>
         get() = byKey.keys
-    override val sequence: Sequence<T>
-        get() = iterator().asSequence()
+    override val holderSequence: Sequence<Holder.Reference<T>>
+        get() = byId.asSequence()
 
     override fun containsKey(key: ResourceKey<T>): Boolean = byKey.containsKey(key)
     override fun containsKey(id: ResourceLocation): Boolean = byLocation.containsKey(id)
 
     override fun createIntrusiveHolder(id: ResourceLocation): Holder.Reference<T> {
         // 如果注册表已经存在 id 对应的数据, 那么直接返回已存在的实例.
-        // 这种情况一般发生在 reload 时 - 键名已经加载, 只需要更新数据.
+        // 这种情况一般发生在 reload - Holder 已创建, 只需要更新数据.
         val existing = byLocation[id]
         if (existing != null) {
             return existing
+        }
+
+        if (frozen) {
+            throw Util.pauseInIde(IllegalStateException("Trying to create intrusive holder for '$id' in frozen registry '${this.key}'"))
         }
 
         // 序列化可能会在该注册表未加载数据时, 多次使用同一个 id 创建 intrusive holder.
@@ -86,18 +117,18 @@ open class MappedRegistry<T>(
         return unregisteredIntrusiveHolders.getOrPut(id) { Holder.Reference.createIntrusive(this, ResourceKey.create(this.key, id)) }
     }
 
-    override fun validate(): Result<Registry<T>> {
-        if (unregisteredIntrusiveHolders.isNotEmpty()) {
+    override fun validate(): Result<Registry<T>> = runCatching {
+        if (!unregisteredIntrusiveHolders.isEmpty()) {
             // 检查是否有未注册的 intrusive reference holders.
             // 发生该错误的原因: 通常是引用该注册表的配置文件写错了 id,
             // 例如属性里写了 "fire" 元素但元素注册表里不存在 "fire"
-            return Result.failure(IllegalStateException("Found unregistered intrusive holders in registry '${this.key}': ${unregisteredIntrusiveHolders.keys.joinToString()}"))
+            throw IllegalStateException("Found unregistered intrusive holders in registry '${this.key}': ${unregisteredIntrusiveHolders.keys.joinToString()}")
         } else if (!byId.all(Holder.Reference<T>::isBound)) {
             // 检查所有的 reference holders 都已经绑定了数据.
             // 发生该错误的原因: 暂时不太清楚, 等代码跑起来再看.
-            return Result.failure(IllegalStateException("Found unbound reference holders in registry '${this.key}': ${byId.filterNot(Holder.Reference<T>::isBound).map(Holder.Reference<T>::key).joinToString()}"))
+            throw IllegalStateException("Found unbound reference holders in registry '${this.key}': ${byId.filterNot(Holder.Reference<T>::isBound).map(Holder.Reference<T>::key).joinToString()}")
         } else {
-            return Result.success(this)
+            this
         }
     }
 
@@ -106,7 +137,7 @@ open class MappedRegistry<T>(
     override fun get(id: ResourceLocation): Holder.Reference<T>? = byLocation[id]
 
     override fun wrapAsHolder(value: T): Holder<T> {
-        return byValue[value] ?: Holder.direct(value)
+        return byValue[value] ?: throw IllegalStateException("Trying to wrap unregistered value '$value' in registry '${this.key}'")
     }
 
     override fun getId(value: T): Int {
@@ -129,12 +160,12 @@ open class MappedRegistry<T>(
 open class DefaultedMappedRegistry<T>(
     defaultId: String,
     override val key: ResourceKey<out Registry<T>>,
-) : MappedRegistry<T>(key), DefaultedRegistry<T> {
-    override val defaultId: ResourceLocation = ResourceLocation.key(defaultId)
-    private lateinit var defaultValue: Holder.Reference<T>
+) : MappedRegistry<T>(key), DefaultedWritableRegistry<T> {
+    override val defaultId: ResourceLocation = ResourceLocations.withKoishNamespace(defaultId)
+    override lateinit var defaultValue: Holder.Reference<T>
 
     override fun register(key: ResourceKey<T>, value: T): Holder.Reference<T> {
-        val reference = super.register(key, value)
+        val reference = super<MappedRegistry>.register(key, value)
         assignToDefaultValue(key, reference)
         return reference
     }
@@ -150,23 +181,43 @@ open class DefaultedMappedRegistry<T>(
         return if (i == -1) super.getId(this.defaultValue.value) else i
     }
 
-    override fun getResourceLocation(value: T): ResourceLocation {
+    override fun getValueOrDefault(id: ResourceLocation): T {
+        return super<MappedRegistry>.getValue(id) ?: this.defaultValue.value
+    }
+
+    override fun getValueOrDefault(key: ResourceKey<T>): T {
+        return super<MappedRegistry>.getValue(key) ?: this.defaultValue.value
+    }
+
+    override fun getValueOrDefault(id: String): T {
+        return super<MappedRegistry>.getValue(id) ?: this.defaultValue.value
+    }
+
+    override fun getResourceLocationOrDefault(value: T): ResourceLocation {
         return super<MappedRegistry>.getResourceLocation(value) ?: this.defaultId
     }
 
-    override fun getValue(id: ResourceLocation): T {
-        return super<MappedRegistry>.getValue(id) ?: this.defaultValue.value
+    override fun getResourceKeyOrDefault(value: T): ResourceKey<T> {
+        return super<MappedRegistry>.getResourceKey(value) ?: ResourceKey.create(this.key, this.defaultId)
+    }
+
+    override fun byIdOrDefault(index: Int): T {
+        return super<MappedRegistry>.byId(index) ?: this.defaultValue.value
     }
 
     override fun getAny(): Holder.Reference<T>? {
         return this.defaultValue
     }
 
-    override fun byId(index: Int): T {
-        return super<MappedRegistry>.byId(index) ?: this.defaultValue.value
+    override fun getRandom(random: Random): Holder.Reference<T> {
+        return super.getRandom(random) ?: this.defaultValue
     }
 
-    override fun getRandom(random: Random): Holder.Reference<T>? {
-        return super.getRandom(random) ?: this.defaultValue
+    override fun validate(): Result<Registry<T>> = super.validate().mapCatching { registry ->
+        if (!this::defaultValue.isInitialized) {
+            throw IllegalStateException("Default value not initialized in registry '${this.key}'")
+        } else {
+            this
+        }
     }
 }

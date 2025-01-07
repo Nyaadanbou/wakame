@@ -2,16 +2,15 @@
 
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeGetter
 import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
+import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry.ElementRegistry
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import cc.mewcraft.wakame.registries.KoishRegistries
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -32,14 +31,14 @@ fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
 /**
  * 开始构建一个 [DamagePacket].
  */
-fun damagePacket(element: Element, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
+fun damagePacket(element: Holder<Element>, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element, attrMap).apply(block).build()
 }
 
 /**
  * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMapLike].
  */
-fun damagePacket(element: Element, block: DamagePacketDSL.() -> Unit): DamagePacket {
+fun damagePacket(element: Holder<Element>, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element).apply(block).build()
 }
 
@@ -47,7 +46,7 @@ fun damagePacket(element: Element, block: DamagePacketDSL.() -> Unit): DamagePac
  * 开始构建一个 [DamagePacket], 使用默认的元素, 不依赖任何 [AttributeMapLike].
  */
 fun damagePacket(block: DamagePacketDSL.() -> Unit): DamagePacket {
-    return DamagePacketDSL(ElementRegistry.DEFAULT).apply(block).build()
+    return DamagePacketDSL(KoishRegistries.ELEMENT.defaultValue).apply(block).build()
 }
 
 /**
@@ -65,15 +64,15 @@ class DamageBundleDSL(
 ) {
     private val bundle: DamageBundle = DamageBundle()
 
-    private fun getElementById(id: String): Element? {
-        return ElementRegistry.INSTANCES.getOrNull(id)
+    private fun getElementById(id: String): Holder<Element>? {
+        return KoishRegistries.ELEMENT[id]
     }
 
     /**
      * 为每种已知的元素构建 [DamagePacket].
      */
     fun every(block: DamagePacketDSL.() -> Unit) {
-        for ((_, element) in ElementRegistry.INSTANCES) {
+        for (element in KoishRegistries.ELEMENT.holderSequence) {
             // every() 只添加先前不存在的元素伤害包, 使其永远成为一个 "fallback".
             // 这样无论 DSL 的调用顺序是怎样的, 都可以让 single() 拥有更高优先级.
             bundle.addIfAbsent(DamagePacketDSL(element, attrMap).apply(block).build())
@@ -84,7 +83,7 @@ class DamageBundleDSL(
      * 为默认的元素构建 [DamagePacket].
      */
     fun default(block: DamagePacketDSL.() -> Unit) {
-        val element = ElementRegistry.DEFAULT
+        val element = KoishRegistries.ELEMENT.defaultValue
         bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
     }
 
@@ -92,8 +91,9 @@ class DamageBundleDSL(
      * 为指定的元素构建 [DamagePacket].
      */
     fun single(elementId: String, block: DamagePacketDSL.() -> Unit) {
-        val element = getElementById(elementId) ?: run {
-            DamageBundleDSLSupport.logger.warn("Element '$elementId' not found while building damage packet bundle. The damage packet will not be added.")
+        val element = getElementById(elementId)
+        if (element == null) {
+            LOGGER.warn("Element '$elementId' not found while building damage packet bundle. The damage packet will not be added.")
             return
         }
         bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
@@ -102,7 +102,7 @@ class DamageBundleDSL(
     /**
      * 为指定的元素构建 [DamagePacket].
      */
-    fun single(elementType: Element, block: DamagePacketDSL.() -> Unit) {
+    fun single(elementType: Holder<Element>, block: DamagePacketDSL.() -> Unit) {
         bundle.add(DamagePacketDSL(elementType, attrMap).apply(block).build())
     }
 
@@ -126,7 +126,7 @@ class DamageBundleDSL(
  */
 @DamagePacketBundleDsl
 class DamagePacketDSL(
-    private val element: Element,
+    private val element: Holder<Element>,
     private val attrMap: AttributeMapLike? = null,
 ) {
     private var min: Double? = null
@@ -207,7 +207,7 @@ class DamagePacketDSL(
 
     fun build(): DamagePacket {
         return DamagePacket(
-            element,
+            element.value,
             validateValue(min),
             validateValue(max),
             validateValue(rate),
@@ -228,7 +228,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MinDamageDSL(
-        override val element: Element, override val attrMap: AttributeMapLike,
+        override val element: Holder<Element>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)).coerceAtLeast(0.0)
@@ -237,7 +237,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MaxDamageDSL(
-        override val element: Element, override val attrMap: AttributeMapLike,
+        override val element: Holder<Element>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)).coerceAtLeast(0.0)
@@ -246,7 +246,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DamageRateDSL(
-        override val element: Element, override val attrMap: AttributeMapLike,
+        override val element: Holder<Element>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value(Attributes.ATTACK_DAMAGE_RATE)
@@ -255,7 +255,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationDSL(
-        override val element: Element, override val attrMap: AttributeMapLike,
+        override val element: Holder<Element>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)).coerceAtLeast(0.0)
@@ -264,7 +264,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationRateDSL(
-        override val element: Element, override val attrMap: AttributeMapLike,
+        override val element: Holder<Element>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION_RATE) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)).coerceAtLeast(0.0)
@@ -272,7 +272,7 @@ class DamagePacketDSL(
     }
 
     abstract class ValueDSL {
-        abstract val element: Element
+        abstract val element: Holder<Element>
         abstract val attrMap: AttributeMapLike
 
         /**
@@ -299,11 +299,4 @@ class DamagePacketDSL(
             return attrMap.getValue(attributeGetter.of(element))
         }
     }
-}
-
-/**
- * 储存依赖注入进来的实例. 存到一个单例中, 以避免运行时的哈希开销.
- */
-private object DamageBundleDSLSupport : KoinComponent {
-    val logger: Logger by inject()
 }

@@ -3,8 +3,10 @@ package cc.mewcraft.wakame.kizami
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.toStableByte
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -23,7 +25,7 @@ private data class KizamiType(
     override val uniqueId: String,
     override val binaryId: Byte,
     override val displayName: Component,
-    override val styles: Array<StyleBuilderApplicable>,
+    override val displayStyles: Array<StyleBuilderApplicable>,
 ) : KoinComponent, Kizami {
     override val key: Key = Key.key(Namespaces.KIZAMI, uniqueId)
 
@@ -31,7 +33,7 @@ private data class KizamiType(
         ExaminableProperty.of("uniqueId", uniqueId),
         ExaminableProperty.of("binaryId", binaryId),
         ExaminableProperty.of("displayName", PlainTextComponentSerializer.plainText().serialize(displayName)),
-        ExaminableProperty.of("styles", styles)
+        ExaminableProperty.of("styles", displayStyles)
     )
 
     override fun hashCode(): Int = uniqueId.hashCode()

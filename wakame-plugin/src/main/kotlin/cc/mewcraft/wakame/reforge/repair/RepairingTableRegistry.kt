@@ -15,13 +15,23 @@ import org.jetbrains.annotations.VisibleForTesting
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 object RepairingTableRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val tables: MutableMap<String, RepairingTable> = mutableMapOf()
 
-    val names: Set<String>
+    val NAMES: Set<String>
         get() = tables.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     fun getItem(id: Key): PriceInstance? {
         return items[id]
@@ -39,15 +49,5 @@ object RepairingTableRegistry {
         tables.clear()
         tables.putAll(RepairingTableSerializer.loadAllTables())
         tables.put("wtf", WtfRepairingTable) // 总是覆盖同名映射
-    }
-
-    @InitFun
-    private fun onPostWorld() {
-        load()
-    }
-
-    @ReloadFun
-    private fun onReload() {
-        load()
     }
 }

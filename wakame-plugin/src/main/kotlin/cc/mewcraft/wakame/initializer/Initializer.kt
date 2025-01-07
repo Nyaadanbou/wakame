@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.ecs.EcsListener
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.gui.GuiManager
@@ -26,16 +27,15 @@ import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
+import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ELEMENT_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
@@ -134,7 +134,7 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
-        saveResource(ELEMENT_GLOBAL_CONFIG_FILE)
+        saveResource(ElementRegistryConfigStorage.FILE_PATH)
         saveResource(ENTITY_GLOBAL_CONFIG_FILE)
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
