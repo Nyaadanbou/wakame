@@ -47,8 +47,8 @@ dependencies {
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
-    implementation(platform(libs.bom.configurate.kotlin))
-    implementation(platform(libs.bom.configurate.dfu4))
+    implementation(platform(libs.bom.configurate.extra.kotlin))
+    implementation(platform(libs.bom.configurate.extra.dfu4))
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
     implementation(platform(libs.bom.cloud.kotlin))
@@ -78,6 +78,9 @@ dependencies {
 }
 
 tasks {
+    // test {
+    //     forkEvery = 1 // 给每个 Test 开一个新的 JVM 进程
+    // }
     shadowJar {
         // invui 的 nms 模块只能在 spigot-mapping 下运行,
         // 因此必须告知服务端我们用的是 spigot-mapping,
@@ -114,9 +117,11 @@ tasks {
     assemble {
         dependsOn(reobfJar)
     }
+
     paperweight {
         reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
     }
+
     copyJar {
         environment = "paper"
         jarTaskName = "reobfJar"
