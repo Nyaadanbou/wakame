@@ -91,12 +91,12 @@ private class DashAbilityMechanic(
         return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
         if (tickCount >= ability.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = componentMap[CastBy]?.entity ?: return TickResult.INTERRUPT // 无效生物
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = ability.stepDistance
         // 计算每一步的移动向量
@@ -112,7 +112,7 @@ private class DashAbilityMechanic(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -129,11 +129,11 @@ private class DashAbilityMechanic(
 
         if (affectEntityNearby(entity)) {
             if (!ability.canContinueAfterHit) {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
             }
         }
 
-        return TickResult.CONTINUE_TICK
+        return@abilitySupport TickResult.CONTINUE_TICK
     }
 
     private fun affectEntityNearby(casterEntity: Entity): Boolean {

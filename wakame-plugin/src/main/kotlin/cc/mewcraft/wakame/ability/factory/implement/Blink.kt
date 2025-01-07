@@ -7,10 +7,9 @@ import cc.mewcraft.wakame.ability.AbilityMechanic
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.factory.AbilityFactory
+import cc.mewcraft.wakame.ability.factory.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
-import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -22,7 +21,6 @@ import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.math.Position
 import net.kyori.adventure.key.Key
 import org.bukkit.Particle
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -66,24 +64,19 @@ private class BlinkAbilityMechanic(
 
     private var isTeleported: Boolean = false
 
-    override fun tickIdle(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        componentMap += Tags.READY_TO_REMOVE
-        return TickResult.CONTINUE_TICK
-    }
-
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val entity = componentMap[CastBy]?.entity as? LivingEntity ?: return TickResult.INTERRUPT // 无效生物
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
 
         // 如果玩家面前方块过近, 无法传送
         if (entity.getTargetBlockExact(3) != null) {
             entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return@abilitySupport TickResult.RESET_STATE
         }
-        return TickResult.NEXT_STATE
+        return@abilitySupport TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val entity = componentMap[CastBy]?.entity as? LivingEntity ?: return TickResult.INTERRUPT // 无效生物
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
         val location = entity.location.clone()
 
         // 计算目标位置
@@ -108,10 +101,10 @@ private class BlinkAbilityMechanic(
         // 如果没有找到可传送的方块，那么就不传送
         if (!isTeleported) {
             entity.sendMessage("无法传送至目标位置".mini)
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return@abilitySupport TickResult.RESET_STATE
         }
 
-        entity.teleport(target, TeleportFlag.Relative.X, TeleportFlag.Relative.Y, TeleportFlag.Relative.Z, TeleportFlag.Relative.YAW, TeleportFlag.Relative.PITCH)
+        entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
 
         componentMap += ParticleEffectComponent(
             builderProvider = { loc ->
@@ -128,20 +121,20 @@ private class BlinkAbilityMechanic(
         )
         componentMap += TargetComponent(TargetAdapter.adapt(target))
 
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
-        val entity = componentMap[CastBy]?.entity ?: return TickResult.INTERRUPT
+    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT
         if (!isTeleported) {
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
 
         // 再给予一个向前的固定惯性
         entity.velocity = entity.location.direction.normalize()
 
         teleportedMessages.send(entity)
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
 
     override fun tickReset(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
