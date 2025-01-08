@@ -233,8 +233,8 @@ protected constructor(
     val element: Holder<Element>,
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    compositionId + ELEMENT_SEPARATOR + element.key.location.value(),
-    descriptionId + ELEMENT_SEPARATOR + element.key.location.value(),
+    compositionId + ELEMENT_SEPARATOR + element.registeredName,
+    descriptionId + ELEMENT_SEPARATOR + element.registeredName,
     defaultValue,
     minValue,
     maxValue,
@@ -271,9 +271,9 @@ protected constructor(
     ) : this(
         compositionId = compositionId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.key.location.value(), "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.key.location.value(), "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.key.location.value(), "max").orElse(maxValue),
+        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "default").orElse(defaultValue),
+        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "min").orElse(minValue),
+        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )
@@ -299,7 +299,7 @@ protected constructor(
         return Stream.concat(
             super.examinableProperties(),
             Stream.of(
-                ExaminableProperty.of("element", element.key)
+                ExaminableProperty.of("element", element)
             )
         )
     }

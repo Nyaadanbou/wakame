@@ -47,7 +47,7 @@ internal class RegistryHolderEntrySerializer<T : Any>(
     }
 
     override fun serialize(item: Holder<T>, typeSupported: Predicate<Class<*>>): Any {
-        return item.key.location.toString()
+        return item.unwrapKeyOrThrow().location.toString()
     }
 }
 //</editor-fold>

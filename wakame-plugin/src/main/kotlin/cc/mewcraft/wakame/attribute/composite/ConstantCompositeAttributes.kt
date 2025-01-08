@@ -337,7 +337,7 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
 }
 
 private fun CompoundTag.writeElement(element: Holder<Element>) {
-    putByte(AttributeBinaryKeys.ELEMENT_TYPE, element.value.integerId.toByte())
+    putByte(AttributeBinaryKeys.ELEMENT_TYPE, KoishRegistries.ELEMENT.getId(element.value).toByte())
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {

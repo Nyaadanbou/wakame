@@ -339,16 +339,18 @@ internal class AttributeSupplierDeserializer(
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val elementType = KoishRegistries.ELEMENT.getValue(elementId) ?: error("Invalid element id: '$elementId'")
-                            val attributes = Attributes.getComposition("$compositionId/${elementType.key.value()}") // FIXME 这里对于不同命名空间但路径一样的 ElementType 来说会存在重复的问题
+                            if (!KoishRegistries.ELEMENT.containsKey(elementId)) error("Invalid element id: '$elementId'")
+                            val compositionIdWithElement = "$compositionId/${elementId.replace(':', '.')}"
+                            val attributes = Attributes.getComposition(compositionIdWithElement)
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
                         // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
-                        for (elementType in KoishRegistries.ELEMENT.valueSequence) {
-                            val attributes = Attributes.getComposition("$compositionId/${elementType.key.value()}")
+                        for (elementType in KoishRegistries.ELEMENT.holderSequence) {
+                            val compositionIdWithElement = "$compositionId/${elementType.registeredName.replace(':', '.')}"
+                            val attributes = Attributes.getComposition(compositionIdWithElement)
                             builder.add(attributes, valueNode)
                         }
                     }

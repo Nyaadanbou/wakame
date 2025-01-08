@@ -1,19 +1,20 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.isEmpty
-import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -74,7 +75,7 @@ interface CoreMatchRule : Examinable {
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
         val typeNode = node.node("type")
-        val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "missing key: 'type'")
+        val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "Missing key: 'type'")
         if (rawType == "*") {
             // 值为 “*” - 直接解析为 CoreMatchRuleAny
             return CoreMatchRuleAny
@@ -83,7 +84,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
         val (namespace, pattern) = run {
             val index = rawType.indexOf(':')
             if (index == -1) {
-                throw SerializationException(typeNode, javaTypeOf<String>(), "invalid type: '$rawType'")
+                throw SerializationException(typeNode, javaTypeOf<String>(), "Invalid type: '$rawType'")
             }
             val namespace = rawType.substring(0, index)
             val patternString = rawType.substring(index + 1)
@@ -92,7 +93,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
             } catch (e: PatternSyntaxException) {
                 throw SerializationException(typeNode, javaTypeOf<Pattern>(), e)
             } catch (e: Throwable) {
-                throw IOException("unknown error", e)
+                throw IOException("Unknown error", e)
             }
             namespace to pattern
         }
@@ -100,7 +101,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
         when (namespace) {
             Namespaces.ATTRIBUTE -> {
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<String>()?.let { Key.key("element", it) }
+                val element = node.node("element").get<Holder<Element>>()
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 
@@ -162,7 +163,7 @@ private data object CoreMatchRuleAny : CoreMatchRule {
 private class CoreMatchRuleAttribute(
     override val path: Pattern,
     val operation: AttributeModifier.Operation?,
-    val element: Key?,
+    val element: Holder<Element>?,
 ) : CoreMatchRule {
     override val priority: Int = 1
 
@@ -191,7 +192,7 @@ private class CoreMatchRuleAttribute(
             return false
         }
 
-        if (element != null && element != attribute.element?.key) {
+        if (element != null && element != attribute.element) {
             return false
         }
 

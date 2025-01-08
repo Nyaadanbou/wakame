@@ -5,7 +5,16 @@ import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 
 /**
- * 代表一个资源的键名, 包含一个 [registryId] 用于确定该资源所在的 [Registry].
+ * 代表一个资源的键名, 包含两种信息:
+ * - [registryId] 描述了该资源所在的注册表 [Registry]
+ * - [location] 描述了该资源在 [Registry] 中的位置
+ *
+ * 因此, 该键名可用于从任意注册表中确定一个数据.
+ *
+ * ### 对象池
+ * [ResourceKey] 采用了对象池的设计. 相同的 [registryId]
+ * 和 [location] 会共享一个 [ResourceKey] 实例.
+ * 因此可以安全使用 `===` 比较不同的实例.
  */
 class ResourceKey<T>
 private constructor(

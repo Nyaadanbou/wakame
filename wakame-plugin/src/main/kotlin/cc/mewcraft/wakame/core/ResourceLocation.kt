@@ -21,9 +21,9 @@ object ResourceLocations {
     val CODEC: Codec<ResourceLocation> = Codec.STRING.comapFlatMap(ResourceLocations::read, ResourceLocation::toString)
 
     /**
-     * 从形如 `player`, `koish:player` 的字符串创建一个 [ResourceLocation].
-     *
-     * 如果该字符串不包含命名空间, 则使用默认的命名空间 [KOISH_NAMESPACE].
+     * 从形如 `player`, `foo:player` 的字符串创建一个 [ResourceLocation].
+     * 如果字符串不包含命名空间与路径的分隔符 [Key.DEFAULT_SEPARATOR],
+     * 则自动将其命名空间设置为 [KOISH_NAMESPACE].
      *
      * @param string 用于创建实例的字符串
      * @return 创建的实例

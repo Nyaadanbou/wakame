@@ -72,7 +72,7 @@ data class ItemElements(
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
             holder.editTag { tag ->
-                val integerIdByteArray = value.elements.mapToByteArray { it.value.integerId.toByte() }
+                val integerIdByteArray = value.elements.mapToByteArray { KoishRegistries.ELEMENT.getIdOrThrow(it.value).toByte() }
                 tag.putByteArray(TAG_VALUE, integerIdByteArray)
             }
         }

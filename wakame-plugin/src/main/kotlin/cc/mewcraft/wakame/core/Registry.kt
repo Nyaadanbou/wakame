@@ -43,7 +43,7 @@ interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
         get() = ResourceLocations.CODEC.comapFlatMap(
             // 如果该 id 已经存在一个 holder, 那么直接返回已存在的, 否则就尝试创建一个 intrusive holder
             { id -> this[id]?.let(DataResult<Holder.Reference<T>>::success) ?: DataResult.success(this.createIntrusiveHolder(id)) },
-            { holder -> holder.key.location }
+            { holder -> holder.unwrapKey().location }
         )
 
     private fun safeCastToReference(holder: Holder<T>): DataResult<Holder.Reference<T>> {

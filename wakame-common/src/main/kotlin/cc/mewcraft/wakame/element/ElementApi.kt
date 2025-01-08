@@ -17,11 +17,11 @@ interface Element : Keyed, Examinable, PlayerFriendlyNamed, StringRepresentable,
     // 用于配置文件
     override val key: Key
 
-    // 形如 "3", "5", 目前由配置文件手动指定
+    // 形如 "3" 的非零整数, 目前由配置文件手动指定, 之后由注册表自动分配
     // 用于压缩数据
     override val integerId: Int
 
-    // 形如 "ice", "koish:ice"(带命名空间)
+    // 形如 "ice"(命名空间为 "koish" 可省略命名空间), "foo:ice"(命名空间不是 "koish")
     // 用于持久化
     override val stringId: String
 }
