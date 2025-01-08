@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player

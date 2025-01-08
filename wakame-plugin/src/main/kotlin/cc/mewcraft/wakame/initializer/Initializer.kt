@@ -40,7 +40,7 @@ import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
 import cc.mewcraft.wakame.util.registerSuspendingEvents
-import cc.mewcraft.wakame.world.entity.BetterArmorStandListener
+import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
@@ -173,7 +173,7 @@ object Initializer : KoinComponent, Listener {
         registerListener<ResourcePackPlayerListener>()
 
         // game world
-        registerListener<BetterArmorStandListener>()
+        registerListener<UnbreakableArmorStandListener>()
         registerListener<PlayerDeathProtect>()
 
         // compatibility

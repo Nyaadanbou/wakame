@@ -1,20 +1,21 @@
-package cc.mewcraft.wakame.registries
+package cc.mewcraft.wakame.core.registries
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.ResourceKey
 import cc.mewcraft.wakame.core.ResourceLocations
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.EntityTypeHolder
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.CompositeAttributeFacade
+import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
     @JvmField
@@ -27,6 +28,9 @@ object KoishRegistryKeys {
 
     @JvmField
     val ATTRIBUTE = createRegistryKey<Attribute>("attribute")
+
+    @JvmField
+    val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField
     val COMPOSITE_ATTRIBUTE = createRegistryKey<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>("attribute_composition")

@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.util.CompoundTag
 import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.registries.KoishRegistries
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.util.Key
 import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key

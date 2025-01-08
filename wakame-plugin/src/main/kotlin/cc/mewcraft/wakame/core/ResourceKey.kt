@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.core
 
-import cc.mewcraft.wakame.registries.KoishRegistryKeys
+import cc.mewcraft.wakame.core.registries.KoishRegistryKeys
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
 

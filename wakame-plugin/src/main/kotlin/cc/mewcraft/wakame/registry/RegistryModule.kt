@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.ability.ABILITY_GROUP_SERIALIZERS
 import cc.mewcraft.wakame.ability.AbilitySerializer
 import cc.mewcraft.wakame.ability.trigger.ABILITY_TRIGGER_SERIALIZERS
 import cc.mewcraft.wakame.adventure.ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS
-import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_SERIALIZER
 import cc.mewcraft.wakame.item.ITEM_PROTO_SERIALIZERS
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.rarity.RARITY_SERIALIZERS
@@ -54,12 +53,6 @@ const val ENTITY_GLOBAL_CONFIG_FILE = "entities.yml"
 const val ENTITY_GLOBAL_CONFIG_LOADER = "entity_global_config_loader"
 
 internal fun registryModule(): Module = module {
-    single<YamlConfigurationLoader>(named(ENTITY_GLOBAL_CONFIG_LOADER)) {
-        createYamlLoader(ENTITY_GLOBAL_CONFIG_FILE) {
-            registerAll(get(named(ENTITY_TYPE_HOLDER_SERIALIZER)))
-        }
-    }
-
     single<YamlConfigurationLoader>(named(SKIN_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(SKIN_GLOBAL_CONFIG_FILE) {
             registerAll(get(named(SKIN_SERIALIZERS)))

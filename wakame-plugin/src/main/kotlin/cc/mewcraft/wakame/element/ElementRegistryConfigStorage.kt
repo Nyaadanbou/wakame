@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.element
 import cc.mewcraft.wakame.core.RegistryConfigStorage
 import cc.mewcraft.wakame.core.ResourceLocation
 import cc.mewcraft.wakame.core.ResourceLocations
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -39,15 +39,16 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
         applyDataToRegistry(KoishRegistries.ELEMENT::update)
     }
 
-    internal fun applyDataToRegistry(registryAction: (ResourceLocation, ElementType) -> Unit) {
-        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
+    private fun applyDataToRegistry(registryAction: (ResourceLocation, ElementType) -> Unit) {
+        val loader = buildYamlConfigLoader { withDefaults() }
+        val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
             val (id, element) = parseEntry(nodeKey, node)
             registryAction.invoke(id, element)
         }
     }
 
-    internal fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<ResourceLocation, ElementType> {
+    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<ResourceLocation, ElementType> {
         val stringId = nodeKey.toString()
         val resourceLocation = ResourceLocations.withKoishNamespace(stringId)
         val integerId = node.node("binary_index").krequire<Int>()

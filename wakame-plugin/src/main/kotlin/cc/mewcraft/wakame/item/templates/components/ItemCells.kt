@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.entity.ENTITY_TYPE_HOLDER_EXTERNALS
+import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Cell
@@ -16,7 +16,6 @@ import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSeria
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -123,9 +122,6 @@ data class ItemCells(
 
                 // 可计算值, 部分核心会用到
                 .registerAll(get(named(EVALUABLE_SERIALIZERS)))
-
-                // 实体类型, 部分诅咒会用到
-                .registerAll(get(named(ENTITY_TYPE_HOLDER_EXTERNALS)))
 
                 .build()
         }

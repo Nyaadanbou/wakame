@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs
 
-import cc.mewcraft.wakame.entity.EntityKeyLookupPart
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import io.lumine.mythic.bukkit.MythicBukkit
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
@@ -10,7 +10,7 @@ import org.koin.core.component.get
 import org.slf4j.Logger
 import kotlin.jvm.optionals.getOrElse
 
-class MythicMobsEntityKeyLookup : KoinComponent, EntityKeyLookupPart {
+class MythicMobsEntityKeyLookup : KoinComponent, EntityKeyLookup.Dictionary {
 
     private val logger: Logger = get()
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }

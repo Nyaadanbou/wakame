@@ -1,24 +1,13 @@
-package cc.mewcraft.wakame.entity
+package cc.mewcraft.wakame.world.entity
 
-import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookup.get
-import cc.mewcraft.wakame.util.toNamespacedKey
+import cc.mewcraft.wakame.world.entity.MinecraftEntityKeyLookup.get
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.entity.Entity
-import org.koin.core.component.KoinScopeComponent
-import org.koin.core.component.createScope
-import org.koin.core.scope.Scope
 
 internal class EntityKeyLookupImpl(
-    private val lookupList: List<EntityKeyLookupPart>,
-) : KoinScopeComponent, EntityKeyLookup {
-
-    override val scope: Scope by lazy { createScope(this) }
-
-    init {
-        scope.close()
-    }
-
+    private val lookupList: List<EntityKeyLookup.Dictionary>,
+) : EntityKeyLookup {
     override fun get(entity: Entity): Key {
         for (lookup in lookupList) {
             val key = lookup.get(entity)
@@ -34,7 +23,6 @@ internal class EntityKeyLookupImpl(
     override fun validate(key: Key): Boolean {
         return lookupList.any { it.validate(key) }
     }
-
 }
 
 /**
@@ -45,14 +33,10 @@ internal class EntityKeyLookupImpl(
  * So, you should call other implementation first, and this implementation
  * should always be the last to be called.
  */
-private object MinecraftEntityKeyLookup : EntityKeyLookupPart {
+private object MinecraftEntityKeyLookup : EntityKeyLookup.Dictionary {
+    override fun get(entity: Entity): Key =
+        entity.type.key
 
-    override fun get(entity: Entity): Key {
-        return entity.type.key
-    }
-
-    override fun validate(key: Key): Boolean {
-        return Registry.ENTITY_TYPE.get(key.toNamespacedKey()) != null
-    }
-
+    override fun validate(key: Key): Boolean =
+        Registry.ENTITY_TYPE.get(key) != null
 }

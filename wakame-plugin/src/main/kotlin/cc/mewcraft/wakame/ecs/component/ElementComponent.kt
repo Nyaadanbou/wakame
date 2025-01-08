@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.ecs.component
 
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registries.KoishRegistries
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 

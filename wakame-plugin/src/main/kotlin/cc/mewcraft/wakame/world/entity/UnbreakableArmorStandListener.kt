@@ -19,14 +19,13 @@ import org.bukkit.inventory.ItemStack
 import java.util.concurrent.TimeUnit
 
 /**
- * 更好的盔甲架机制.
+ * 阻止玩家在非潜行状态下破坏盔甲架.
  */
-class BetterArmorStandListener : Listener {
+class UnbreakableArmorStandListener : Listener {
     companion object {
         private val MESSAGE_COOLDOWN = MetadataKey.createCooldownKey("sneak_to_break_armor_stand_tip")
     }
 
-    //<editor-fold desc="阻止玩家在非潜行状态下破坏盔甲架.">
     // config
     private val requireSneakingToBreakArmorStand: Boolean by MAIN_CONFIG.entry("require_sneaking_to_break_armor_stand")
 
@@ -73,5 +72,4 @@ class BetterArmorStandListener : Listener {
             whisper(player, 10, MESSAGE_COOLDOWN) { sendMessage(MessageConstants.MSG_SNEAK_TO_BREAK_ARMOR_STAND) }
         }
     }
-    //</editor-fold>
 }

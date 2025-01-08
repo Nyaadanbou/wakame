@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getIntOrNull

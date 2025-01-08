@@ -32,7 +32,7 @@ import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
-import cc.mewcraft.wakame.world.entity.BetterArmorStandListener
+import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.bukkit.event.Listener
 import org.koin.core.component.KoinComponent
@@ -120,7 +120,7 @@ object KoishBootstrap : KoinComponent {
         registerListener<ResourcePackPlayerListener>()
 
         // game world
-        registerListener<BetterArmorStandListener>()
+        registerListener<UnbreakableArmorStandListener>()
         registerListener<PlayerDeathProtect>()
 
         // compatibility

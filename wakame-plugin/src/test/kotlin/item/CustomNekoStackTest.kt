@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -22,7 +23,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.world.TimeControl

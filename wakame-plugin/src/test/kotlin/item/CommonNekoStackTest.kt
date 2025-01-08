@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -25,12 +24,12 @@ import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.EntityRegistry
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.world.entity.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -62,7 +61,6 @@ object CommonNekoStackTest {
                 // dependencies
                 adventureModule(),
                 damageModule(),
-                entityModule(),
                 kizamiModule(),
                 molangModule(),
                 rarityModule(),
@@ -81,7 +79,7 @@ object CommonNekoStackTest {
         KizamiRegistry.init()
         RarityRegistry.init()
         LevelMappingRegistry.init()
-        EntityRegistry.init()
+        EntityTypeHolderRegistryConfigStorage.init()
 
         // 初始化所有 random3.Node 相关的实现
         ElementSampleNodeFacade.init()

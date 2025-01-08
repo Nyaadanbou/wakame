@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.util.CompoundBinaryTag
 import cc.mewcraft.wakame.util.ListBinaryTag
 import cc.mewcraft.wakame.util.getByteOrNull
 import cc.mewcraft.wakame.util.getDoubleOrNull
 import cc.mewcraft.wakame.util.getListOrNull
 import cc.mewcraft.wakame.util.getStringOrNull
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction

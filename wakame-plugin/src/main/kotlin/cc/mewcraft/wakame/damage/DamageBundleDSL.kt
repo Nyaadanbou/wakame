@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registries.KoishRegistries
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registries.KoishRegistries
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable

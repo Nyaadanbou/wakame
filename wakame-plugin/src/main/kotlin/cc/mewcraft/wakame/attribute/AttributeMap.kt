@@ -3,20 +3,24 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.*
-import org.koin.core.component.*
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
+import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 

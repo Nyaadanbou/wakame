@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.registries.KoishRegistries
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.util.NumericValueSerializer
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey

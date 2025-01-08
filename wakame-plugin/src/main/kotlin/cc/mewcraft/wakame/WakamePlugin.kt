@@ -18,7 +18,6 @@ import cc.mewcraft.wakame.display2.display2Module
 import cc.mewcraft.wakame.ecs.ecsModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
-import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.integrationModule
@@ -88,7 +87,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 ecsModule(),
                 elementModule(),
                 enchantmentModule(),
-                entityModule(),
                 guiModule(),
                 integrationModule(),
                 itemModule(),

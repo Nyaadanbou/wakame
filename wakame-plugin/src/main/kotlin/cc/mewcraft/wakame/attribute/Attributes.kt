@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registries.KoishRegistries
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
 import java.util.concurrent.ConcurrentHashMap

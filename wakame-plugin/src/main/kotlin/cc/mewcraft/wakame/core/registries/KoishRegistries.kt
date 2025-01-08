@@ -1,7 +1,8 @@
-package cc.mewcraft.wakame.registries
+package cc.mewcraft.wakame.core.registries
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
 import cc.mewcraft.wakame.core.DefaultedMappedRegistry
@@ -12,16 +13,16 @@ import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.ResourceKey
 import cc.mewcraft.wakame.core.WritableRegistry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.EntityTypeHolder
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.CompositeAttributeFacade
+import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistries {
-    private val access = MutableRegistryAccess()
+    private val ACCESS = MutableRegistryAccess()
 
     ///
 
@@ -36,6 +37,12 @@ object KoishRegistries {
      */
     @JvmField
     val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys.ATTRIBUTE)
+
+    /**
+     * 实体的默认属性.
+     */
+    @JvmField
+    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
      * 复合属性.
@@ -112,14 +119,14 @@ object KoishRegistries {
     ///
 
     fun resetRegistries() {
-        access.resetRegistries()
+        ACCESS.resetRegistries()
     }
 
     private fun <T> registerSimple(key: ResourceKey<out Registry<T>>, initializer: (Registry<T>) -> Unit = {}): WritableRegistry<T> {
-        return access.register(key, MappedRegistry(key).apply(initializer))
+        return ACCESS.register(key, MappedRegistry(key).apply(initializer))
     }
 
     private fun <T> registerDefaulted(key: ResourceKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): DefaultedWritableRegistry<T> {
-        return access.register(key, DefaultedMappedRegistry(defaultId, key).apply(initializer)).asDefaultedWritable()
+        return ACCESS.register(key, DefaultedMappedRegistry(defaultId, key).apply(initializer)).asDefaultedWritable()
     }
 }
