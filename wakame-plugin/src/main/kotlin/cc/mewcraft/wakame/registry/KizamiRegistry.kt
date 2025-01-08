@@ -29,7 +29,7 @@ import java.io.File
     runAfter = [AbilityRegistry::class, AttributeRegistry::class]
 )
 @Reload(
-    runAfter = [AbilityRegistry::class, AttributeRegistry::class]
+    runAfter = [AbilityRegistry::class]
 )
 object KizamiRegistry : KoinComponent {
     /**
@@ -70,7 +70,7 @@ object KizamiRegistry : KoinComponent {
     }
 
     @InitFun
-    fun onPreWorld() {
+    fun init() {
         // 注册 KizamiProvider
         KizamiProvider.register(DefaultKizamiProvider)
 
@@ -79,7 +79,7 @@ object KizamiRegistry : KoinComponent {
     }
 
     @ReloadFun
-    fun onReload() {
+    fun reload() {
         loadRegistries()
     }
 

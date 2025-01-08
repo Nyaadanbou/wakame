@@ -44,7 +44,6 @@ import xyz.xenondevs.commons.provider.immutable.provider
 )
 @Reload(
     runAfter = [
-        AttributeRegistry::class,
         EntityRegistry::class,
         ItemSkinRegistry::class,
         KizamiRegistry::class,

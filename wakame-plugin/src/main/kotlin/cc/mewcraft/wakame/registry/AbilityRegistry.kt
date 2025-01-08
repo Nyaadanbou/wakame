@@ -26,9 +26,7 @@ import java.io.File
     stage = InitStage.PRE_WORLD,
     runAfter = [AttributeRegistry::class]
 )
-@Reload(
-    runAfter = [AttributeRegistry::class]
-)
+@Reload
 object AbilityRegistry {
     /**
      * 技能类型. 包含了技能的唯一标识, 条件, 描述信息等.

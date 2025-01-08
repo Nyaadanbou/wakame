@@ -78,9 +78,9 @@ object CommonNekoStackTest {
         ElementRegistryConfigStorage.init()
         AttributeRegistry.init()
         AbilityRegistry.init()
-        KizamiRegistry.onPreWorld()
+        KizamiRegistry.init()
         RarityRegistry.init()
-        LevelMappingRegistry.onPreWorld()
+        LevelMappingRegistry.init()
         EntityRegistry.init()
 
         // 初始化所有 random3.Node 相关的实现

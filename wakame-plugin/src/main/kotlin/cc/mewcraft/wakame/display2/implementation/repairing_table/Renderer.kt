@@ -74,16 +74,6 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
         // 渲染其他可见部分
         item.showNothing()
     }
-
-    @InitFun
-    fun onPostWorld() {
-        initialize0()
-    }
-
-    @ReloadFun
-    fun onReload() {
-        initialize0()
-    }
 }
 
 internal object RepairingTableRenderingHandlerRegistry : RenderingHandlerRegistry(RepairingTableItemRenderer) {

@@ -17,9 +17,7 @@ import net.kyori.adventure.key.Key
     stage = InitStage.PRE_WORLD,
     runAfter = [AttributeRegistry::class],
 )
-@Reload(
-    runAfter = [AttributeRegistry::class],
-)
+@Reload
 object DefaultAttributes {
 
     /**

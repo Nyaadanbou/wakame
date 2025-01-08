@@ -30,10 +30,10 @@ object LevelMappingRegistry : KoinComponent {
     val INSTANCES: Registry<String, LevelMappings> = SimpleRegistry()
 
     @InitFun
-    fun onPreWorld() = loadConfiguration()
+    fun init() = loadConfiguration()
 
     @ReloadFun
-    fun onReload() = loadConfiguration()
+    fun reload() = loadConfiguration()
 
     private fun loadConfiguration() {
         INSTANCES.clear()

@@ -194,7 +194,7 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
 )
 @Reload(
     runBefore = [ItemRegistry::class],
-    runAfter = [KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [KizamiRegistry::class],
 )
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/cores")
