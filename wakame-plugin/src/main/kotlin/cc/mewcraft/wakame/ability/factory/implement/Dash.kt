@@ -96,7 +96,7 @@ private class DashAbilityMechanic(
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
+        val entity = componentMap.castByEntity()
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = ability.stepDistance
         // 计算每一步的移动向量

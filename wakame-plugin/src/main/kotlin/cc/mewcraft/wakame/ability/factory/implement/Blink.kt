@@ -65,7 +65,7 @@ private class BlinkAbilityMechanic(
     private var isTeleported: Boolean = false
 
     override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
+        val entity = componentMap.castByEntity()
 
         // 如果玩家面前方块过近, 无法传送
         if (entity.getTargetBlockExact(3) != null) {
@@ -76,7 +76,7 @@ private class BlinkAbilityMechanic(
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT // 无效生物
+        val entity = componentMap.castByEntity()
         val location = entity.location.clone()
 
         // 计算目标位置
@@ -110,7 +110,7 @@ private class BlinkAbilityMechanic(
             builderProvider = { loc ->
                 ParticleBuilder(Particle.END_ROD)
                     .location(loc)
-                    .receivers(32)
+                    .receivers(64)
                     .extra(.0)
                     .source(entity as? Player)
             },
@@ -125,7 +125,7 @@ private class BlinkAbilityMechanic(
     }
 
     override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.INTERRUPT
+        val entity = componentMap.castByEntity()
         if (!isTeleported) {
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }

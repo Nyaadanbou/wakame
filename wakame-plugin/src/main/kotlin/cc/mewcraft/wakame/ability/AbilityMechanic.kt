@@ -47,7 +47,7 @@ abstract class AbilityMechanic : Mechanic {
      */
     fun isEmpty(): Boolean = true
 
-    override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    final override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
             val state = componentMap[StatePhaseComponent]
             if (state == null) {

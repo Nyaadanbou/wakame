@@ -37,8 +37,24 @@ data class CirclePath(
     val endAngle: Double = Math.PI * 2 // 默认一个完整的圆
 ) : ParticlePath {
 
+    init {
+        // 检查 radius 是否为有效值
+        require(radius > 0) { "Radius must be greater than 0." }
+
+        // 检查 axis 是否是一个有效的单位向量
+        require(axis.lengthSquared() == 1.0) { "Axis must be a unit vector." }
+
+        // 检查角度是否有效
+        require(!startAngle.isNaN() && !endAngle.isNaN()) { "Angles must be valid numbers." }
+    }
+
     // 用 Rodrigues' Rotation Formula 计算旋转后的点
     private fun rotatePoint(p: Vector, axis: Vector, theta: Double): Vector {
+        // 如果输入无效（NaN 或无穷大），直接返回原始点
+        if (axis.isZero || p.isZero || theta.isNaN() || theta.isInfinite()) {
+            return p
+        }
+
         val cosTheta = cos(theta)
         val sinTheta = sin(theta)
 
@@ -74,9 +90,11 @@ data class CirclePath(
         val finalY = center.y() + rotatedPoint.y
         val finalZ = center.z() + rotatedPoint.z
 
+        // 返回最终的 Position
         return Position.fine(finalX, finalY, finalZ)
     }
 }
+
 
 /**
  * 螺旋路径：粒子沿着螺旋路径运动

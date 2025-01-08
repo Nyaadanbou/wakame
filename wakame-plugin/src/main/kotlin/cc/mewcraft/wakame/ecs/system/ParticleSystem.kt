@@ -16,9 +16,17 @@ class ParticleSystem : IteratingSystem(
     private val numberOfParticles = 100  // 设置每个路径上生成粒子的数量
 
     override fun onTickEntity(entity: Entity) {
-        val builderProvider = entity[ParticleEffectComponent].builderProvider
-        val particlePath = entity[ParticleEffectComponent].particlePath
+        val particleEffectComponent = entity[ParticleEffectComponent]
+        val builderProvider = particleEffectComponent.builderProvider
+        val particlePath = particleEffectComponent.particlePath
         val target = entity[TargetComponent].target
+
+        // 检查是否已经结束
+        if (particleEffectComponent.times == 0) {
+            // 粒子已经结束，删除粒子效果组件
+            entity.configure { it -= ParticleEffectComponent }
+            return
+        }
 
         // 遍历每个粒子，计算其在路径上的位置
         for (i in 0 until numberOfParticles) {
@@ -31,5 +39,8 @@ class ParticleSystem : IteratingSystem(
             // 使用 ParticleBuilder 生成粒子效果
             builderProvider.invoke(position.toLocation(target.bukkitLocation.world)).spawn()
         }
+
+        // 触发成功生成粒子效果后，减少剩余次数
+        particleEffectComponent.times--
     }
 }

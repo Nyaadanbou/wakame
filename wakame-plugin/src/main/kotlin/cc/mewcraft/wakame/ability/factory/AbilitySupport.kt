@@ -15,15 +15,13 @@ internal fun <T> abilitySupport(dsl: AbilitySupport.() -> T): T = AbilitySupport
  */
 @AbilitySupportDsl
 internal object AbilitySupport {
-    fun ComponentMap.castByEntity(): LivingEntity? {
-        return this[CastBy]?.entity as? LivingEntity
+    fun ComponentMap.castByEntity(): LivingEntity {
+        return this[CastBy]?.entity as? LivingEntity ?: error("No entity found in CastBy component")
     }
 
-    var ComponentMap.tickCount: Double?
-        get() = this[TickCountComponent]?.tick
+    var ComponentMap.tickCount: Double
+        get() = this[TickCountComponent]?.tick ?: error("No TickCountComponent found")
         set(value) {
-            if (value != null) {
-                this[TickCountComponent]?.tick = value
-            }
+            this[TickCountComponent]?.tick = value
         }
 }
