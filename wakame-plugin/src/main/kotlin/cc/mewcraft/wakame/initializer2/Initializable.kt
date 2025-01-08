@@ -19,12 +19,12 @@ internal abstract class Initializable(
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
             val runBefore = findInitializableClass(all, runBeforeName)
-                ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '$this'")
+                ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '${this@Initializable}'")
             if (!stage.isPreWorld && runBefore.stage.isPreWorld)
-                throw IllegalArgumentException("Incompatible stages: '$this' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
+                throw IllegalArgumentException("Incompatible stages: '${this@Initializable}' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
 
             if (runBefore.completion.isCompleted)
-                throw IllegalArgumentException("'$this' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
+                throw IllegalArgumentException("'${this@Initializable}' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
 
             // stages are compatible, and execution order is already specified through those
             if (stage != runBefore.stage)
@@ -37,14 +37,14 @@ internal abstract class Initializable(
         for (runAfterName in runAfterNames) {
             val runAfters = HashSet<Initializable>()
             val runAfterClass = findInitializableClass(all, runAfterName)
-                ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '$this'")
+                ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '${this@Initializable}'")
             runAfters += runAfterClass
             if (runAfterClass != initClass)
                 runAfters += runAfterClass.initFunctions
 
             for (runAfter in runAfters) {
                 if (stage.isPreWorld && !runAfter.stage.isPreWorld)
-                    throw IllegalArgumentException("Incompatible stages: '$this' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
+                    throw IllegalArgumentException("Incompatible stages: '${this@Initializable}' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
 
                 // stages are compatible, and execution order is already specified through those
                 if (stage != runAfter.stage)

@@ -21,10 +21,10 @@ internal abstract class Reloadable(
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
             val runBefore = findReloadClass(all, runBeforeName)
-                ?: throw IllegalArgumentException("Could not find reloadable class '$runBeforeName', which is a runBefore of '$this'")
+                ?: throw IllegalArgumentException("Could not find reloadable class '$runBeforeName', which is a runBefore of '${this@Reloadable}'")
 
             if (runBefore.completion.isCompleted)
-                throw IllegalArgumentException("'$this' is configured to be reloaded before '$runBeforeName', but '$runBeforeName' is already reloaded")
+                throw IllegalArgumentException("'${this@Reloadable}' is configured to be reloaded before '$runBeforeName', but '$runBeforeName' is already reloaded")
 
             graph.tryPutEdge(this@Reloadable, runBefore)
         }
@@ -33,7 +33,7 @@ internal abstract class Reloadable(
         for (runAfterName in runAfterNames) {
             val runAfters = HashSet<Reloadable>()
             val runAfterClass = findReloadClass(all, runAfterName)
-                ?: throw IllegalArgumentException("Could not find reloadable class '$runAfterName', which is a runAfter of '$this'")
+                ?: throw IllegalArgumentException("Could not find reloadable class '$runAfterName', which is a runAfter of '${this@Reloadable}'")
             runAfters += runAfterClass
 
             if (runAfterClass != reloadClass)
