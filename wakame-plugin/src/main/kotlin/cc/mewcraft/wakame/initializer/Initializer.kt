@@ -30,7 +30,6 @@ import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
@@ -135,7 +134,7 @@ object Initializer : KoinComponent, Listener {
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ElementRegistryConfigStorage.FILE_PATH)
-        saveResource(ENTITY_GLOBAL_CONFIG_FILE)
+        // saveResource(ENTITY_GLOBAL_CONFIG_FILE) FIXME remove old Initializer
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释

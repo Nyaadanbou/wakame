@@ -379,8 +379,8 @@ internal class AttributeSupplierDeserializer(
         // 1. The format of the composition id is correct
         // 2. The config node has correct structure
         for ((compositionId, valueNode) in valuesMap) {
-            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
-                error("The composition id '$compositionId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
+            if (!ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
+                error("The composition id '$compositionId' is in illegal format (allowed pattern: ${ATTRIBUTE_ID_PATTERN_STRING})")
             }
             if (compositionId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
                 error("The attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")

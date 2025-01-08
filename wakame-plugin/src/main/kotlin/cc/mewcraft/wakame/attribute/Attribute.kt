@@ -3,8 +3,10 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Namespaces
+import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -13,6 +15,10 @@ import org.intellij.lang.annotations.Pattern
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import java.util.stream.Stream
+
+internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
+
+internal val GLOBAL_ATTRIBUTE_CONFIG by lazy { Configs.YAML[ATTRIBUTE_GLOBAL_CONFIG_FILE] }
 
 /**
  * An attribute type with a numerical default value.
@@ -36,9 +42,9 @@ open class SimpleAttribute
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    @Pattern(ATTRIBUTE_ID_PATTERN_STRING)
     final override val compositionId: String,
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
+    @Pattern(ATTRIBUTE_ID_PATTERN_STRING)
     final override val descriptionId: String,
     defaultValue: Provider<Double>,
     final override val vanilla: Boolean = false,
@@ -71,7 +77,7 @@ protected constructor(
     ) : this(
         compositionId = compositionId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
         vanilla = vanilla
     )
 
@@ -156,9 +162,9 @@ protected constructor(
     ) : this(
         compositionId = compositionId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "max").orElse(maxValue),
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
+        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "min").orElse(minValue),
+        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "max").orElse(maxValue),
         vanilla = vanilla
     )
 
@@ -271,9 +277,9 @@ protected constructor(
     ) : this(
         compositionId = compositionId,
         descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "max").orElse(maxValue),
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "default").orElse(defaultValue),
+        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "min").orElse(minValue),
+        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )

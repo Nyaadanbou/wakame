@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ENTITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
@@ -32,6 +31,7 @@ import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
+import cc.mewcraft.wakame.world.attribute.AttributeSupplierRegistryConfigStorage
 import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.bukkit.event.Listener
@@ -53,7 +53,7 @@ object KoishBootstrap : KoinComponent {
      */
     @InitFun
     fun start() {
-        warmupStaticInitializer()
+        warmupStaticBlocks()
         saveDefaultConfigs()
         registerListeners()
         registerCommands()
@@ -82,7 +82,7 @@ object KoishBootstrap : KoinComponent {
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ElementRegistryConfigStorage.FILE_PATH)
-        saveResource(ENTITY_GLOBAL_CONFIG_FILE)
+        saveResource(AttributeSupplierRegistryConfigStorage.FILE_PATH)
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
@@ -145,7 +145,7 @@ object KoishBootstrap : KoinComponent {
         CommandManager(NEKO).init()
     }
 
-    private fun warmupStaticInitializer() {
+    private fun warmupStaticBlocks() {
         InvUI.getInstance()
         WindowManager.getInstance()
     }

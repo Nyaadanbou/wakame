@@ -49,9 +49,6 @@ const val LEVEL_GLOBAL_CONFIG_LOADER = "level_global_config_loader"
 const val SKIN_GLOBAL_CONFIG_FILE = "skins.yml"
 const val SKIN_GLOBAL_CONFIG_LOADER = "skin_global_config_loader"
 
-const val ENTITY_GLOBAL_CONFIG_FILE = "entities.yml"
-const val ENTITY_GLOBAL_CONFIG_LOADER = "entity_global_config_loader"
-
 internal fun registryModule(): Module = module {
     single<YamlConfigurationLoader>(named(SKIN_GLOBAL_CONFIG_LOADER)) {
         createYamlLoader(SKIN_GLOBAL_CONFIG_FILE) {

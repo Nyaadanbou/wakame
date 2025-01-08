@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.ReloadableProperty
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
@@ -44,7 +45,7 @@ fun AttributeMap(player: Player): AttributeMap {
 fun AttributeMap(user: User<Player>): AttributeMap {
     // 创建一个全新的 AttributeMap
     val key = AttributeMapSupport.PLAYER_KEY
-    val default = DefaultAttributes.getSupplier(key)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(key)
     return PlayerAttributeMap(default, user.player)
 }
 
@@ -56,7 +57,7 @@ fun AttributeMap(user: User<Player>): AttributeMap {
  */
 fun AttributeMap(entity: LivingEntity): AttributeMap {
     val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
-    val default = DefaultAttributes.getSupplier(key)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(key)
     return EntityAttributeMap(default, entity)
 }
 
@@ -300,7 +301,7 @@ private object ImaginaryAttributeMapRegistry : KoinComponent {
 
     fun get(key: Key): ImaginaryAttributeMap {
         return pool.computeIfAbsent(key) { k ->
-            val default = DefaultAttributes.getSupplier(k)
+            val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(k)
             val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
             for (attribute in default.attributes) {
                 val instance = default.createImaginaryInstance(attribute) ?: continue

@@ -40,6 +40,14 @@ object KoishRegistries {
 
     /**
      * 实体的默认属性.
+     *
+     * 1. 包含所有原版实体(包括玩家)的默认属性.
+     * 2. MythicMobs 生物的属性不由这里提供.
+     *
+     * ### Notes
+     * Using [ResourceKey] to identify the "type" of living entities because we want the whole
+     * attribute system to be compatible with 3rd party mob system such as MythicMobs,
+     * in which case the enum type is not enough to express all types.
      */
     @JvmField
     val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)

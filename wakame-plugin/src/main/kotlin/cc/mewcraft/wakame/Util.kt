@@ -12,7 +12,7 @@ object Util {
             LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t)
             doPause(t)
         } else {
-            LOGGER.warn("A fatal exception occurred, but suppressed since not in IDE", t)
+            LOGGER.warn("Suppressing a fatal exception since not in IDE", t)
         }
         return t
     }

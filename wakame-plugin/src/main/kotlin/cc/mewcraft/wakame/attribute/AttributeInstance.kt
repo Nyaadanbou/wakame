@@ -1,8 +1,13 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.AttributeModifier.*
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import com.google.common.collect.ImmutableSet
-import it.unimi.dsi.fastutil.objects.*
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import it.unimi.dsi.fastutil.objects.ObjectCollection
+import it.unimi.dsi.fastutil.objects.ObjectSets
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
 import org.bukkit.entity.Player
@@ -150,11 +155,11 @@ private class AttributeInstanceDelegation(
     fun addTransientModifier(modifier: AttributeModifier) {
         ensureDataOwnership()
         if (modifiersById.putIfAbsent(modifier.id, modifier) != null) {
-            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same id)")
+            LOGGER.warn("$modifier is already applied on this attribute (same id)")
             return
         }
         if (getModifiers(modifier.operation).putIfAbsent(modifier.id, modifier) != null) {
-            AttributeSupport.LOGGER.warn("$modifier is already applied on this attribute (same operation)")
+            LOGGER.warn("$modifier is already applied on this attribute (same operation)")
             return
         }
         dirty = true
