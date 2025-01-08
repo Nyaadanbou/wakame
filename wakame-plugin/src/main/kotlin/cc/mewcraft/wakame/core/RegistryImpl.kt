@@ -24,9 +24,26 @@ open class MappedRegistry<T>(
     private val unregisteredIntrusiveHolders: MutableMap<ResourceLocation, Holder.Reference<T>> = HashMap()
 
     override fun update(key: ResourceKey<T>, value: T): Holder.Reference<T> {
-        val holder = this.byKey[key]
+        val holder = byKey[key]
         if (holder != null) {
-            return holder.bindValue(value)
+            // 获取旧数据
+            val oldValue = holder.value
+
+            // 更新映射 toId
+            val id = toId.getInt(oldValue)
+            if (id != -1) {
+                toId.removeInt(oldValue)
+                toId.put(value, id)
+            }
+
+            // 更新映射 byValue
+            byValue.remove(oldValue)
+            byValue.put(value, holder)
+
+            // 重新绑定的数据
+            holder.bindValue(value)
+
+            return holder
         } else {
             throw Util.pauseInIde(IllegalStateException("Trying to update unregistered key '$key' in registry ${this.key}"))
         }
