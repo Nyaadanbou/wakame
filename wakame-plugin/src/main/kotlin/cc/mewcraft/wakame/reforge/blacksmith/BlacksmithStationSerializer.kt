@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.Reforge
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.qualifier.named
@@ -24,9 +23,6 @@ internal object BlacksmithStationSerializer {
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
-            serializers {
-                registerAnnotatedObjects(ObjectMappers.DEFAULT)
-            }
         }
 
         val result = blacksmithDirectory.walk()

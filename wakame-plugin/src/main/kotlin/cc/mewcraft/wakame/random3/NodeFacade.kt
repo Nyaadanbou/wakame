@@ -105,9 +105,7 @@ abstract class NodeFacade<T> : KoinComponent {
 
         val loadBuilder = buildYamlConfigLoader {
             withDefaults()
-            serializers {
-                registerAll(serializers)
-            }
+            serializers { registerAll(serializers) }
         }
 
         // 清空 repository

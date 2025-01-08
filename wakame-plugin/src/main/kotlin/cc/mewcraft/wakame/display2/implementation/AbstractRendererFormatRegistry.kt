@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.RendererFormatRegistry
 import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
 import org.koin.core.component.KoinComponent
@@ -60,15 +59,10 @@ internal abstract class AbstractRendererFormatRegistry(
     fun initialize(formatPath: Path) {
         cleanup()
 
-        val loader = buildYamlConfigLoader {
-            withDefaults()
-            serializers { registerAnnotatedObjects(ObjectMappers.DEFAULT) }
-        }
-        val root = loader.buildAndLoadString(formatPath.readText())
-
+        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(formatPath.readText())
         val relativeTo = formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))
         for ((id, type) in rendererFormatTypeById) {
-            val node = root.node(id)
+            val node = rootNode.node(id)
             if (node.virtual()) {
                 logger.warn("Renderer format '$id' is not found in '$relativeTo'")
             }

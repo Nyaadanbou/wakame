@@ -30,7 +30,7 @@ data class BasicMenuSettings(
      * 虚拟容器菜单的结构.
      */
     @Suppress("ArrayInDataClass")
-    val structure: Array<String> = emptyArray(),
+    val structure: Array<String>,
     /**
      * 虚拟容器菜单中的图标.
      *
@@ -38,7 +38,7 @@ data class BasicMenuSettings(
      * - v = 萌芽物品的唯一标识
      */
     // FIXME 用 kotlin.collections.Map 会导致 configurate 无法序列化
-    val icons: HashMap<String, Key> = hashMapOf(),
+    val icons: HashMap<String, Key>,
 ) : KoinComponent {
 
     /**

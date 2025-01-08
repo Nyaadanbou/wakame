@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -60,7 +59,6 @@ internal object CraftingStationRegistry {
                     val stationNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
-                            registerAnnotatedObjects(ObjectMappers.DEFAULT)
                             kregister(StationSerializer)
                         }
                     }.buildAndLoadString(fileText)

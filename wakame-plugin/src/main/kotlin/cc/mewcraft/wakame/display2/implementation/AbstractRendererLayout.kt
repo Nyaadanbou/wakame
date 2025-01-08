@@ -73,9 +73,9 @@ internal abstract class AbstractRendererLayout(
     fun initialize(layoutPath: Path) {
         reset()
 
-        val root = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
+        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
 
-        val unprocessedPrimary = root.node("primary").getList<String>(listOf())
+        val unprocessedPrimary = rootNode.node("primary").getList<String>(listOf())
 
         // accumulative offset of the [DerivedIndex]
         var accIndexOffset = 0

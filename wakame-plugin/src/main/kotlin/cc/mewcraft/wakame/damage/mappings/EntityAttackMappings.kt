@@ -63,7 +63,7 @@ object EntityAttackMappings {
     private fun loadDataIntoRegistry() {
         mappings.clear()
 
-        val root = buildYamlConfigLoader {
+        val rootNode = buildYamlConfigLoader {
             withDefaults()
             source { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(ENTITY_ATTACK_MAPPINGS_CONFIG_PATH).bufferedReader() }
             serializers {
@@ -74,7 +74,7 @@ object EntityAttackMappings {
         }.build().load()
 
         val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
-        root.childrenMap()
+        rootNode.childrenMap()
             .mapKeys { (key, _) ->
                 NamespacedKey.minecraft(key.toString())
             }

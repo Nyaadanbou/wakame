@@ -31,13 +31,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.Constraint
-import org.spongepowered.configurate.objectmapping.meta.NodeResolver
-import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 import java.lang.reflect.Type
 
@@ -80,14 +74,6 @@ object DamageTypeMappings : KoinComponent {
             withDefaults()
             source { get<File>(named(PLUGIN_DATA_DIR)).resolve(DAMAGE_TYPE_MAPPINGS_CONFIG_PATH).bufferedReader() }
             serializers {
-                registerAnnotatedObjects(
-                    ObjectMapper.factoryBuilder()
-                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addNodeResolver(NodeResolver.nodeKey())
-                        .addConstraint(Required::class.java, Constraint.required())
-                        .addDiscoverer(dataClassFieldDiscoverer())
-                        .build()
-                )
                 kregister(DamageTypeMappingSerializer)
                 kregister(DamageMetadataBuilderSerializer)
             }

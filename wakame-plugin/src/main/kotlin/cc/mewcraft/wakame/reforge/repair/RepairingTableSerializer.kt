@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.NamespacedPathCollector
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
@@ -15,7 +14,6 @@ import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
-import org.spongepowered.configurate.kotlin.objectMapperFactory
 import java.io.File
 
 internal object RepairingTableSerializer {
@@ -44,7 +42,6 @@ internal object RepairingTableSerializer {
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                registerAnnotatedObjects(ObjectMappers.DEFAULT)
                 kregister(PriceInstanceSerializer)
                 kregister(PriceModifierSerializer)
             }
@@ -80,9 +77,6 @@ internal object RepairingTableSerializer {
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
-            serializers {
-                registerAnnotatedObjects(objectMapperFactory())
-            }
         }
 
         val result = tablesDirectory.walk()

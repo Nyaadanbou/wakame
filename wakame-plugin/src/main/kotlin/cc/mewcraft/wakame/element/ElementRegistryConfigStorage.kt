@@ -40,8 +40,7 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
     }
 
     internal fun applyDataToRegistry(registryAction: (ResourceLocation, ElementType) -> Unit) {
-        val loader = buildYamlConfigLoader { withDefaults() }
-        val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
+        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
             val (id, element) = parseEntry(nodeKey, node)
             registryAction.invoke(id, element)

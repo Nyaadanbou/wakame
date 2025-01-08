@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.NamespacedPathCollector
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
@@ -86,7 +85,6 @@ internal object ModdingTableSerializer : KoinComponent {
             serializers {
                 kregister(TableCurrencyCost)
                 kregister(RarityNumberMappingSerializer)
-                registerAnnotatedObjects(ObjectMappers.DEFAULT)
             }
         }.buildAndLoadString(tableMainConfigFile.readText())
 

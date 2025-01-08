@@ -19,10 +19,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntityDamageEvent
 import org.koin.core.qualifier.named
-import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 
 /**
@@ -74,24 +71,18 @@ object DirectEntityTypeMappings {
         noCauseMappings.clear()
         playerMappings.clear()
 
-        val root = buildYamlConfigLoader {
+        val rootNode = buildYamlConfigLoader {
             withDefaults()
-            source { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_PATH).bufferedReader() }
             serializers {
-                registerAnnotatedObjects(
-                    ObjectMapper.factoryBuilder()
-                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addDiscoverer(dataClassFieldDiscoverer())
-                        .build()
-                )
                 kregister(DamageMappingSerializer)
                 kregister(DamagePredicateSerializer)
                 kregister(DamageMetadataBuilderSerializer)
             }
+            source { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_PATH).bufferedReader() }
         }.build().load()
 
         val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
-        root.node("no_causing").childrenMap()
+        rootNode.node("no_causing").childrenMap()
             .mapKeys { (key, _) ->
                 NamespacedKey.minecraft(key.toString())
             }
@@ -111,7 +102,7 @@ object DirectEntityTypeMappings {
                 noCauseMappings[entityType] = mappings
             }
 
-        root.node("player").childrenMap()
+        rootNode.node("player").childrenMap()
             .mapKeys { (key, _) ->
                 NamespacedKey.minecraft(key.toString())
             }
