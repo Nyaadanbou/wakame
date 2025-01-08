@@ -38,7 +38,7 @@ object PluginCommands : KoinComponent, CommandFactory<CommandSender> {
                         event.callEvent()
                         PluginEventBus.get().post(event)
                     }
-                    sender.sendPlainMessage("Wakame has been reloaded successfully! ${reloadTime}ms elapsed.")
+                    sender.sendPlainMessage("Plugin has been reloaded successfully! ${reloadTime}ms elapsed.")
                 }
             }.buildAndAdd(this)
         }

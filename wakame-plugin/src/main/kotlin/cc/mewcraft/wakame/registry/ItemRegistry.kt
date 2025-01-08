@@ -29,6 +29,7 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.map
 import xyz.xenondevs.commons.provider.immutable.orElse
 import xyz.xenondevs.commons.provider.immutable.provider
+import kotlin.system.measureTimeMillis
 
 @Init(
     stage = InitStage.PRE_WORLD,
@@ -153,38 +154,39 @@ object ItemRegistry {
         }
 
         // 加载所有配置文件
-        for ((key, path, node) in NekoItemNodeIterator) {
-            val keyNamespace = key.namespace()
-            val keyValue = key.value()
+        measureTimeMillis {
+            for ((key, path, node) in NekoItemNodeIterator) {
+                val keyNamespace = key.namespace()
+                val keyValue = key.value()
 
-            if (keyNamespace == Key.MINECRAFT_NAMESPACE) {
-                // Process as vanilla item
-                LOGGER.info("Loading vanilla item: '$key'")
-                runCatching { NekoItemFactory.createVanilla(key, path, node) }
-                    .onSuccess { nekoItem -> IMAGINARY.register(key, nekoItem) }
-                    .onFailure { ex -> reportError(key, ex) }
-            } else {
-                // Process as custom item
-                LOGGER.info("Loading custom item: '$key'")
-                runCatching { NekoItemFactory.createCustom(key, path, node) }
-                    .onSuccess { nekoItem ->
-                        CUSTOM.register(key, nekoItem)
-                        CUSTOM_FUZZY.register(keyValue, nekoItem)
-                        namespaces.add(keyNamespace)
-                        namespace2Paths.getOrPut(keyNamespace, ::ObjectArrayList).add(keyValue)
-                    }
-                    .onFailure { ex -> reportError(key, ex) }
+                if (keyNamespace == Key.MINECRAFT_NAMESPACE) {
+                    // Process as vanilla item
+                    runCatching { NekoItemFactory.createVanilla(key, path, node) }
+                        .onSuccess { nekoItem -> IMAGINARY.register(key, nekoItem) }
+                        .onFailure { ex -> reportError(key, ex) }
+                } else {
+                    // Process as custom item
+                    runCatching { NekoItemFactory.createCustom(key, path, node) }
+                        .onSuccess { nekoItem ->
+                            CUSTOM.register(key, nekoItem)
+                            CUSTOM_FUZZY.register(keyValue, nekoItem)
+                            namespaces.add(keyNamespace)
+                            namespace2Paths.getOrPut(keyNamespace, ::ObjectArrayList).add(keyValue)
+                        }
+                        .onFailure { ex -> reportError(key, ex) }
+                }
             }
+        }.also {
+            LOGGER.info("Registered ${CUSTOM.size + IMAGINARY.size} items in ${it}ms.")
         }
-        LOGGER.info("Registered all items.")
 
         // 注册默认的 error item
         if (CUSTOM.has(ERROR_NEKO_ITEM_ID)) {
-            LOGGER.info("Found a custom error neko item!")
+            LOGGER.info("Found a custom error item!")
         } else {
-            LOGGER.warn("Custom error neko item not found, using default one.")
+            LOGGER.warn("Custom error item not found, using default one.")
             CUSTOM.register(ERROR_NEKO_ITEM_ID, ItemRegistryInternals.DEFAULT_ERROR_NEKO_ITEM)
-            LOGGER.info("Registered default error neko item.")
+            LOGGER.info("Registered default error item.")
         }
 
         // 重新加载 Error NekoItem
@@ -196,9 +198,9 @@ object ItemRegistry {
 
     private fun reportError(key: Key, throwable: Throwable) {
         if (Initializer.isDebug) {
-            LOGGER.error("Can't load item '$key'", throwable)
+            LOGGER.error("Can't parse item '$key'", throwable)
         } else {
-            LOGGER.error("Can't load item '$key': ${throwable.message}")
+            LOGGER.error("Can't parse item '$key': ${throwable.message}")
         }
     }
 }

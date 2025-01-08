@@ -13,6 +13,12 @@ import org.jetbrains.annotations.TestOnly
  * An abstract key-value registry.
  */
 sealed interface Registry<K, V> : Iterable<Map.Entry<K, V>> {
+
+    /**
+     * The number of entries in this registry.
+     */
+    val size: Int
+
     /**
      * All the [instances][V] in this registry.
      */
@@ -157,6 +163,9 @@ sealed interface BiKnot<K, V, B> {
 //<editor-fold desc="Internal Implementations">
 internal class SimpleRegistry<K, V> : Registry<K, V> {
     private val uniqueId2ObjectMap: MutableMap<K, V> = LinkedHashMap() // order matters
+
+    override val size: Int
+        get() = uniqueId2ObjectMap.size
 
     override val values: Set<V>
         get() = ImmutableSet.copyOf(uniqueId2ObjectMap.values)
