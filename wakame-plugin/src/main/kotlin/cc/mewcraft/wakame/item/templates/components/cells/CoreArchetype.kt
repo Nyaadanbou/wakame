@@ -36,9 +36,7 @@ import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.namespace
 import cc.mewcraft.wakame.util.typeTokenOf
-import cc.mewcraft.wakame.util.value
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
