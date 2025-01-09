@@ -523,7 +523,7 @@ class CustomNekoStackTest : KoinTest {
                 KoishRegistries.ELEMENT.getOrThrow("neutral"),
                 KoishRegistries.ELEMENT.getOrThrow("water"),
                 KoishRegistries.ELEMENT.getOrThrow("fire"),
-                KoishRegistries.ELEMENT.getOrThrow("water"),
+                KoishRegistries.ELEMENT.getOrThrow("wind"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })
