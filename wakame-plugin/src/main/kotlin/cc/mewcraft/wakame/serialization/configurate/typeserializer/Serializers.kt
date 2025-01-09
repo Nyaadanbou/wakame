@@ -4,7 +4,6 @@ package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.util.NumericValueSerializer
-import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -51,7 +50,3 @@ private inline fun <reified T> TypeSerializerCollection.Builder.register(seriali
     register({ it == type }, serializer)
     return this
 }
-
-@Suppress("UNCHECKED_CAST")
-internal inline fun <reified T> geantyrefTypeTokenOf(): TypeToken<T> =
-    TypeToken.get(javaTypeOf<T>()) as TypeToken<T>

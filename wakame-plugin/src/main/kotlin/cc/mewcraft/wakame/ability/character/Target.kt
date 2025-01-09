@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.ability.character
 
 import cc.mewcraft.wakame.user.User
-import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.Location as BukkitLocation
+import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
 
@@ -29,7 +29,7 @@ inline fun <reified T : Target> Target.valueNonNull(): T = valueNonNull(T::class
 
 object TargetAdapter {
     fun adapt(user: User<Player>): Target.LivingEntity {
-        return BukkitLivingEntityTarget(user.player)
+        return BukkitLivingEntityTarget(user.player())
     }
 
     fun adapt(entity: BukkitLivingEntity): Target.LivingEntity {

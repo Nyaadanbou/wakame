@@ -46,7 +46,7 @@ fun AttributeMap(user: User<Player>): AttributeMap {
     // 创建一个全新的 AttributeMap
     val key = AttributeMapSupport.PLAYER_KEY
     val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(key)
-    return PlayerAttributeMap(default, user.player)
+    return PlayerAttributeMap(default, user.player())
 }
 
 /**

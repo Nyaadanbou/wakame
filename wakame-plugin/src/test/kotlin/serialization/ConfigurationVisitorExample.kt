@@ -1,7 +1,9 @@
+package serialization
+
+import org.junit.jupiter.api.Test
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationVisitor
 import org.spongepowered.configurate.kotlin.extensions.typedSet
-import kotlin.test.Test
 
 class ConfigurationVisitorExample {
     /**

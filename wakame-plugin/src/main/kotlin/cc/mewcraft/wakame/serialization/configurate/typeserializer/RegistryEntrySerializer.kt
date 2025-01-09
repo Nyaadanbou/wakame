@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.util.MojangRegistry
 import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.getValueOrThrow
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -17,11 +18,11 @@ import java.util.function.Predicate
 
 //<editor-fold desc="Koish Registry">
 internal inline fun <reified T : Any> Registry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
-    return RegistryValueEntrySerializer(this, geantyrefTypeTokenOf())
+    return RegistryValueEntrySerializer(this, typeTokenOf())
 }
 
 internal inline fun <reified T : Any> Registry<T>.holderByNameTypeSerializer(): ScalarSerializer<Holder<T>> {
-    return RegistryHolderEntrySerializer(this, geantyrefTypeTokenOf())
+    return RegistryHolderEntrySerializer(this, typeTokenOf())
 }
 
 @PublishedApi
@@ -54,7 +55,7 @@ internal class RegistryHolderEntrySerializer<T : Any>(
 
 //<editor-fold desc="Paper Registry">
 internal inline fun <reified T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
-    return BukkitRegistryEntryValueSerializer(this, geantyrefTypeTokenOf<T>())
+    return BukkitRegistryEntryValueSerializer(this, typeTokenOf<T>())
 }
 
 internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
@@ -77,7 +78,7 @@ internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
 
 //<editor-fold desc="Vanilla Registry">
 internal inline fun <reified T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
-    return MojangRegistryValueEntrySerializer(this, geantyrefTypeTokenOf<T>())
+    return MojangRegistryValueEntrySerializer(this, typeTokenOf<T>())
 }
 
 internal class MojangRegistryValueEntrySerializer<T : Any>(
