@@ -21,7 +21,7 @@ interface TrackPeakDamage : Track, TrackMap<TrackPeakDamage, Element, Double> {
         fun of(nbt: CompoundTag): TrackPeakDamage {
             val map = if (nbt.size() < 8) Reference2DoubleArrayMap<Element>() else Reference2DoubleOpenHashMap()
             for (tagKey: String in nbt.keySet()) {
-                val element = KoishRegistries.ELEMENT.getValue(tagKey) ?: continue // 直接跳过无效的元素
+                val element = KoishRegistries.ELEMENT.get(tagKey) ?: continue // 直接跳过无效的元素
                 val damage = nbt.getDouble(tagKey)
                 map[element] = damage
             }

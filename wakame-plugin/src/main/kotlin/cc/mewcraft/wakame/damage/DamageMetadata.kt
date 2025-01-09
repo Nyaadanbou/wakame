@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.molang.Evaluable
@@ -81,7 +81,7 @@ object VanillaDamageMetadata {
         )
     }
 
-    operator fun invoke(element: Holder<Element>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
+    operator fun invoke(element: RegistryEntry<Element>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
         return invoke(
             damageBundle {
                 single(element) {
@@ -96,7 +96,7 @@ object VanillaDamageMetadata {
     }
 
     operator fun invoke(damageValue: Double): DamageMetadata {
-        return invoke(KoishRegistries.ELEMENT.defaultValue, damageValue, 0.0, 0.0)
+        return invoke(KoishRegistries.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
     }
 }
 
@@ -173,7 +173,7 @@ interface DamageTagsBuilder {
  * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
  */
 interface DamagePacketBuilder<T> {
-    val element: Holder<Element>
+    val element: RegistryEntry<Element>
     val min: T
     val max: T
     val rate: T
@@ -217,7 +217,7 @@ data class DirectDamageMetadataBuilder(
     private fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = KoishRegistries.ELEMENT.getValueOrDefault(element)
+            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -239,7 +239,7 @@ data class VanillaDamageMetadataBuilder(
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
-    val element: Holder<Element>,
+    val element: RegistryEntry<Element>,
     val rate: Double = 1.0,
     val defensePenetration: Double = 0.0,
     val defensePenetrationRate: Double = 0.0,
@@ -301,7 +301,7 @@ data class DirectDamageTagsBuilder(
 data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: Holder<Element>,
+    override val element: RegistryEntry<Element>,
     @Required
     override val min: Double,
     @Required
@@ -348,7 +348,7 @@ data class MolangDamageMetadataBuilder(
     fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = KoishRegistries.ELEMENT.getValueOrDefault(element)
+            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -361,7 +361,7 @@ data class MolangDamageMetadataBuilder(
 data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: Holder<Element>,
+    override val element: RegistryEntry<Element>,
     @Required
     override val min: Evaluable<*>,
     @Required

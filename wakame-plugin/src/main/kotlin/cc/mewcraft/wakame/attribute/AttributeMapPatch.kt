@@ -217,7 +217,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
         if (entity !is LivingEntity) return
 
         val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: return
-        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(entityKeyLookup.get(entity))
+        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityKeyLookup.get(entity))
 
         // 把跟默认属性一样的属性移除
         patch.trimBy(default)

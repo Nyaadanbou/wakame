@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
+import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.KOISH_NAMESPACE
-import cc.mewcraft.wakame.core.ResourceLocations
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
@@ -13,7 +13,7 @@ import java.util.function.Predicate
 internal object KeySerializer : ScalarSerializer<Key>(Key::class.java) {
     override fun deserialize(type: Type, obj: Any): Key {
         return try {
-            ResourceLocations.withKoishNamespace(obj.toString()) // 默认使用 koish 命名空间
+            Identifiers.ofKoish(obj.toString()) // 默认使用 koish 命名空间
         } catch (e: InvalidKeyException) {
             throw SerializationException(type, "Invalid key: '$obj'", e)
         }

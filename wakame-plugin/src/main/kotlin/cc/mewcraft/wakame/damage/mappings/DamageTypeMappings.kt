@@ -50,7 +50,7 @@ object DamageTypeMappings : KoinComponent {
             VanillaDamageMetadataBuilder(
                 damageTags = DirectDamageTagsBuilder(emptyList()),
                 criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
-                element = KoishRegistries.ELEMENT.defaultValue
+                element = KoishRegistries.ELEMENT.getDefaultEntry()
             )
         )
     }

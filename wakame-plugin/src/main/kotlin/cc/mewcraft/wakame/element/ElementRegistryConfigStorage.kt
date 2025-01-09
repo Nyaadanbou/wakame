@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.element
 
+import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.ResourceLocation
-import cc.mewcraft.wakame.core.ResourceLocations
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -26,7 +26,7 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
     @InitFun
     fun init() {
         KoishRegistries.ELEMENT.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ELEMENT::register)
+        applyDataToRegistry(KoishRegistries.ELEMENT::add)
         KoishRegistries.ELEMENT.freeze()
 
         // register the provider
@@ -39,7 +39,7 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
         applyDataToRegistry(KoishRegistries.ELEMENT::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (ResourceLocation, ElementType) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (Identifier, ElementType) -> Unit) {
         val loader = buildYamlConfigLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
@@ -48,9 +48,9 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
         }
     }
 
-    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<ResourceLocation, ElementType> {
+    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, ElementType> {
         val stringId = nodeKey.toString()
-        val resourceLocation = ResourceLocations.withKoishNamespace(stringId)
+        val resourceLocation = Identifiers.ofKoish(stringId)
         val integerId = node.node("binary_index").krequire<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
@@ -61,6 +61,6 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
 
 private object BuiltInElementProvider : ElementProvider {
     override fun get(stringId: String): Element? {
-        return KoishRegistries.ELEMENT.getValue(stringId)
+        return KoishRegistries.ELEMENT.get(stringId)
     }
 }

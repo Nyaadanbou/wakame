@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -249,7 +249,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                fun assert(element: Holder<Element>, expectedMin: Double, expectedMax: Double) {
+                fun assert(element: RegistryEntry<Element>, expectedMin: Double, expectedMax: Double) {
                     val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
@@ -259,8 +259,8 @@ class CustomNekoStackTest : KoinTest {
                     assertEquals(expectedMax, modMax.amount)
                 }
 
-                val fire = KoishRegistries.ELEMENT.getOrThrow("fire")
-                val water = KoishRegistries.ELEMENT.getOrThrow("water")
+                val fire = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
+                val water = KoishRegistries.ELEMENT.getEntryOrThrow("water")
                 when (val actual = core.attribute.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
@@ -520,10 +520,10 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val elements = it.elements
             val possibleElements = setOf(
-                KoishRegistries.ELEMENT.getOrThrow("neutral"),
-                KoishRegistries.ELEMENT.getOrThrow("water"),
-                KoishRegistries.ELEMENT.getOrThrow("fire"),
-                KoishRegistries.ELEMENT.getOrThrow("wind"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("neutral"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("water"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("fire"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("wind"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })

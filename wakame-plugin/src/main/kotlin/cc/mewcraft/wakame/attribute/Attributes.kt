@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import com.google.common.collect.MultimapBuilder
@@ -126,7 +126,7 @@ object Attributes : AttributeProvider {
     }
 
     // "lazy" 意为不立马创建 ElementAttribute, 而仅仅是规定好如何创建 ElementAttribute.
-    private fun registerLazy(creator: (Holder<Element>) -> ElementAttribute): AttributeGetter {
+    private fun registerLazy(creator: (RegistryEntry<Element>) -> ElementAttribute): AttributeGetter {
         return SimpleAttributeGetter(creator)
     }
 }
@@ -178,7 +178,7 @@ interface AttributeGetter {
      *
      * @param element 元素类型
      */
-    fun of(element: Holder<Element>): ElementAttribute
+    fun of(element: RegistryEntry<Element>): ElementAttribute
 }
 
 
@@ -186,7 +186,7 @@ interface AttributeGetter {
 
 
 private class SimpleAttributeGetter(
-    private val creator: (Holder<Element>) -> ElementAttribute,
+    private val creator: (RegistryEntry<Element>) -> ElementAttribute,
 ) : AttributeGetter {
 
     init {
@@ -194,10 +194,10 @@ private class SimpleAttributeGetter(
     }
 
     // element -> element attribute
-    private val mappings: ConcurrentHashMap<Holder<Element>, ElementAttribute> = ConcurrentHashMap()
+    private val mappings: ConcurrentHashMap<RegistryEntry<Element>, ElementAttribute> = ConcurrentHashMap()
 
     override fun of(id: String): ElementAttribute? {
-        val elem = KoishRegistries.ELEMENT[id]
+        val elem = KoishRegistries.ELEMENT.getEntry(id)
         if (elem == null) {
             return null
         }
@@ -208,7 +208,7 @@ private class SimpleAttributeGetter(
         return of(KoishRegistries.ELEMENT.wrapAsHolder(element))
     }
 
-    override fun of(element: Holder<Element>): ElementAttribute {
+    override fun of(element: RegistryEntry<Element>): ElementAttribute {
         return mappings.computeIfAbsent(element) { k ->
             registerAttribute(creator(k))
         }
@@ -252,7 +252,7 @@ private class SimpleAttributeGetter(
         fun bootstrap() {
             // 初始化每一个 AttributeGetter 的每一种 Element
             for (getter: AttributeGetter in objectPool) {
-                for (element in KoishRegistries.ELEMENT.holderSequence) {
+                for (element in KoishRegistries.ELEMENT.entrySequence) {
                     getter.of(element)
                 }
             }

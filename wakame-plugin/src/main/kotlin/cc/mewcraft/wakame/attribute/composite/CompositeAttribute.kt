@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attribute.composite
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.Element as ElementType
 
 /**
@@ -19,7 +19,7 @@ sealed interface CompositeAttributeComponent {
      * 部分: *元素*.
      */
     interface Element : CompositeAttributeComponent {
-        val element: Holder<ElementType>
+        val element: RegistryEntry<ElementType>
     }
 
     /**
@@ -117,7 +117,7 @@ interface CompositeAttributeR<T> : CompositeAttribute, CompositeAttributeCompone
  */
 interface CompositeAttributeSE<T> : CompositeAttribute, CompositeAttributeComponent.Scalar<T>, CompositeAttributeComponent.Element {
     override val value: T
-    override val element: Holder<ElementType>
+    override val element: RegistryEntry<ElementType>
 }
 
 /**
@@ -131,5 +131,5 @@ interface CompositeAttributeSE<T> : CompositeAttribute, CompositeAttributeCompon
 interface CompositeAttributeRE<T> : CompositeAttribute, CompositeAttributeComponent.Ranged<T>, CompositeAttributeComponent.Element {
     override val lower: T
     override val upper: T
-    override val element: Holder<ElementType>
+    override val element: RegistryEntry<ElementType>
 }

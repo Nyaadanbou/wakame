@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.ResourceKey
-import cc.mewcraft.wakame.core.ResourceLocations
+import cc.mewcraft.wakame.core.RegistryKey
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
@@ -19,7 +19,7 @@ import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = ResourceLocations.withKoishNamespace("root")
+    val ROOT_REGISTRY_NAME = Identifiers.ofKoish("root")
 
     ///
 
@@ -61,7 +61,7 @@ object KoishRegistryKeys {
 
     ///
 
-    private fun <T> createRegistryKey(name: String): ResourceKey<out Registry<T>> {
-        return ResourceKey.create(ROOT_REGISTRY_NAME, ResourceLocations.withKoishNamespace(name))
+    private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
+        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.ofKoish(name))
     }
 }

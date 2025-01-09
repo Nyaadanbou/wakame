@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.composite.element
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.ItemCells
@@ -144,7 +144,7 @@ private constructor(
         itemId: Key,
         itemLevel: Int,
         itemRarity: Rarity,
-        itemElements: Set<Holder<Element>>,
+        itemElements: Set<RegistryEntry<Element>>,
         itemKizamiz: Set<Kizami>,
         itemCells: ItemCells,
     ): ItemGenerationContext {

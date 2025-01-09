@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.world.attribute
 
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
+import cc.mewcraft.wakame.core.Identifier
 import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.ResourceLocation
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -28,7 +28,7 @@ object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
     @InitFun
     fun init() {
         KoishRegistries.ATTRIBUTE_SUPPLIER.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::register)
+        applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::add)
         KoishRegistries.ATTRIBUTE_SUPPLIER.freeze()
     }
 
@@ -37,7 +37,7 @@ object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
         applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (ResourceLocation, AttributeSupplier) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (Identifier, AttributeSupplier) -> Unit) {
         val loader = buildYamlConfigLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText()).node("entity_attributes")
         val dataMap = AttributeSupplierSerializer.deserialize(rootNode)

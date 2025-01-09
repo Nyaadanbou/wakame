@@ -57,9 +57,9 @@ class DefaultAttributeSerializationTest : KoinTest {
     }
 
     // 测试用的元素
-    private val defaultElement = KoishRegistries.ELEMENT.defaultValue
-    private val fireElement = KoishRegistries.ELEMENT.getOrThrow("fire")
-    private val windElement = KoishRegistries.ELEMENT.getOrThrow("wind")
+    private val defaultElement = KoishRegistries.ELEMENT.getDefaultEntry()
+    private val fireElement = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
+    private val windElement = KoishRegistries.ELEMENT.getEntryOrThrow("wind")
 
     // 测试用的属性
     private val lifesteal = Attributes.LIFESTEAL
@@ -76,7 +76,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft living`() {
         // 测试 minecraft:living
         val mockAttributable: Attributable = mockk<Attributable>()
-        val livingSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:living")
+        val livingSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:living")
         assertTrue(livingSupplier.hasAttribute(defaultDefense))
         assertTrue(livingSupplier.hasAttribute(fireDefense))
         assertTrue(livingSupplier.hasAttribute(windDefense))
@@ -90,7 +90,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft mob`() {
         // 测试 minecraft:mob
         val mockAttributable: Attributable = mockk<Attributable>()
-        val mobSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:mob")
+        val mobSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:mob")
         assertTrue(mobSupplier.hasAttribute(maxMana))
         assertFalse(mobSupplier.hasAttribute(maxHealth))
     }
@@ -99,7 +99,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft monster`() {
         // 测试 minecraft:monster
         val mockAttributable: Attributable = mockk<Attributable>()
-        val monsterSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:monster")
+        val monsterSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:monster")
         assertEquals(0.0, monsterSupplier.getValue(defaultDefense, mockAttributable))
     }
 
@@ -107,7 +107,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft player`() {
         // 测试 minecraft:player
         val mockAttributable: Attributable = mockk<Attributable>()
-        val playerSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:player")
+        val playerSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:player")
         assertTrue(playerSupplier.hasAttribute(defaultDefense))
         assertTrue(playerSupplier.hasAttribute(lifesteal))
         assertTrue(playerSupplier.hasAttribute(manasteal))
@@ -118,7 +118,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft skeleton`() {
         // 测试 minecraft:skeleton
         val mockAttributable: Attributable = mockk<Attributable>()
-        val skeletonSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:skeleton")
+        val skeletonSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:skeleton")
         assertTrue(skeletonSupplier.hasAttribute(maxMana))
         assertEquals(60.0, skeletonSupplier.getValue(maxHealth, mockAttributable))
         assertEquals(5.0, skeletonSupplier.getValue(defaultMinAttackDamage, mockAttributable))
@@ -129,7 +129,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft spider`() {
         // 测试 minecraft:spider
         val mockAttributable: Attributable = mockk<Attributable>()
-        val spiderSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:spider")
+        val spiderSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:spider")
         assertTrue(spiderSupplier.hasAttribute(maxMana))
         assertEquals(40.0, spiderSupplier.getValue(maxHealth, mockAttributable))
         assertEquals(2.0, spiderSupplier.getValue(defaultDefense, mockAttributable))
@@ -139,7 +139,7 @@ class DefaultAttributeSerializationTest : KoinTest {
     fun `minecraft zombie`() {
         // 测试 minecraft:zombie
         val mockAttributable: Attributable = mockk<Attributable>()
-        val zombieSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow("minecraft:zombie")
+        val zombieSupplier = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow("minecraft:zombie")
         assertTrue(zombieSupplier.hasAttribute(maxMana))
         assertEquals(20.0, zombieSupplier.getValue(maxHealth, mockAttributable))
         assertEquals(80.0, zombieSupplier.getValue(maxMana, mockAttributable))

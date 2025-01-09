@@ -11,23 +11,23 @@ interface RegistryAccess {
         val EMPTY = ImmutableRegistryAccess(emptyMap())
     }
 
-    fun <E> registry(key: ResourceKey<out Registry<E>>): Registry<E>?
-    fun <E> registryOrThrow(key: ResourceKey<out Registry<E>>): Registry<E> {
-        return registry(key) ?: throw IllegalStateException("Missing registry: $key")
+    fun <E> get(key: RegistryKey<out Registry<E>>): Registry<E>?
+    fun <E> getOrThrow(key: RegistryKey<out Registry<E>>): Registry<E> {
+        return get(key) ?: throw IllegalStateException("Missing registry: $key")
     }
 
-    fun registries(): Sequence<RegistryEntry<*>>
-}
+    fun sequenceAllRegistries(): Sequence<Entry<*>>
 
-data class RegistryEntry<T>(val key: ResourceKey<out Registry<T>>, val value: Registry<T>) {
-    companion object {
-        fun <T, R : Registry<out T>> fromMapEntry(entry: Map.Entry<ResourceKey<out Registry<*>>, R>): RegistryEntry<T> {
-            return fromUntyped(entry.key, entry.value)
-        }
+    data class Entry<T>(val key: RegistryKey<out Registry<T>>, val value: Registry<T>) {
+        companion object {
+            fun <T, R : Registry<out T>> of(entry: Map.Entry<RegistryKey<out Registry<*>>, R>): Entry<T> {
+                return of(entry.key, entry.value)
+            }
 
-        fun <T> fromUntyped(key: ResourceKey<out Registry<*>>, value: Registry<*>): RegistryEntry<T> {
-            @Suppress("UNCHECKED_CAST")
-            return RegistryEntry(key as ResourceKey<out Registry<T>>, value as Registry<T>)
+            fun <T> of(key: RegistryKey<out Registry<*>>, value: Registry<*>): Entry<T> {
+                @Suppress("UNCHECKED_CAST")
+                return Entry(key as RegistryKey<out Registry<T>>, value as Registry<T>)
+            }
         }
     }
 }

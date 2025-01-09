@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -101,7 +101,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
         when (namespace) {
             Namespaces.ATTRIBUTE -> {
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<Holder<Element>>()
+                val element = node.node("element").get<RegistryEntry<Element>>()
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 
@@ -163,7 +163,7 @@ private data object CoreMatchRuleAny : CoreMatchRule {
 private class CoreMatchRuleAttribute(
     override val path: Pattern,
     val operation: AttributeModifier.Operation?,
-    val element: Holder<Element>?,
+    val element: RegistryEntry<Element>?,
 ) : CoreMatchRule {
     override val priority: Int = 1
 

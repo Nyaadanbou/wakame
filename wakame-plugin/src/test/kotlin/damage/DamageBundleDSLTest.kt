@@ -3,7 +3,7 @@ package damage
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
@@ -64,16 +64,16 @@ class DamageBundleDSLTest : KoinTest {
     private val logger: Logger by inject()
 
     // 用于测试的 Element 实例
-    private lateinit var fireElem: Holder<Element>
-    private lateinit var windElem: Holder<Element>
+    private lateinit var fireElem: RegistryEntry<Element>
+    private lateinit var windElem: RegistryEntry<Element>
 
     // 用于测试的 AttributeMap 实例
     private lateinit var attriMap: AttributeMap
 
     @BeforeEach
     fun beforeEach() {
-        fireElem = KoishRegistries.ELEMENT.getOrThrow("fire")
-        windElem = KoishRegistries.ELEMENT.getOrThrow("wind")
+        fireElem = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
+        windElem = KoishRegistries.ELEMENT.getEntryOrThrow("wind")
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()

@@ -5,12 +5,12 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
 import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
-import cc.mewcraft.wakame.core.DefaultedMappedRegistry
 import cc.mewcraft.wakame.core.DefaultedWritableRegistry
-import cc.mewcraft.wakame.core.MappedRegistry
 import cc.mewcraft.wakame.core.MutableRegistryAccess
 import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.ResourceKey
+import cc.mewcraft.wakame.core.RegistryKey
+import cc.mewcraft.wakame.core.SimpleDefaultedRegistry
+import cc.mewcraft.wakame.core.SimpleRegistry
 import cc.mewcraft.wakame.core.WritableRegistry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoItem
@@ -45,7 +45,7 @@ object KoishRegistries {
      * 2. MythicMobs 生物的属性不由这里提供.
      *
      * ### Notes
-     * Using [ResourceKey] to identify the "type" of living entities because we want the whole
+     * Using [RegistryKey] to identify the "type" of living entities because we want the whole
      * attribute system to be compatible with 3rd party mob system such as MythicMobs,
      * in which case the enum type is not enough to express all types.
      */
@@ -110,31 +110,17 @@ object KoishRegistries {
     @JvmField
     val RARITY: DefaultedWritableRegistry<Rarity> = registerDefaulted(KoishRegistryKeys.RARITY, "common")
 
-    // /**
-    //  * 验证所有注册表.
-    //  */
-    // fun validate() {
-    //     access.validateAll()
-    // }
-    //
-    // /**
-    //  * 冻结所有注册表.
-    //  */
-    // fun freeze() {
-    //     access.freezeAll()
-    // }
-
     ///
 
     fun resetRegistries() {
         ACCESS.resetRegistries()
     }
 
-    private fun <T> registerSimple(key: ResourceKey<out Registry<T>>, initializer: (Registry<T>) -> Unit = {}): WritableRegistry<T> {
-        return ACCESS.register(key, MappedRegistry(key).apply(initializer))
+    private fun <T> registerSimple(key: RegistryKey<out Registry<T>>, initializer: (Registry<T>) -> Unit = {}): WritableRegistry<T> {
+        return ACCESS.add(key, SimpleRegistry(key).apply(initializer))
     }
 
-    private fun <T> registerDefaulted(key: ResourceKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): DefaultedWritableRegistry<T> {
-        return ACCESS.register(key, DefaultedMappedRegistry(defaultId, key).apply(initializer)).asDefaultedWritable()
+    private fun <T> registerDefaulted(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): DefaultedWritableRegistry<T> {
+        return ACCESS.add(key, SimpleDefaultedRegistry(defaultId, key).apply(initializer)).asDefaultedWritable()
     }
 }

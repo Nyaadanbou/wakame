@@ -10,15 +10,15 @@ import xyz.xenondevs.commons.provider.immutable.provider
  *
  * @see Registry
  */
-interface Holder<T> {
+interface RegistryEntry<T> {
     companion object {
-        fun <T> direct(value: T): Holder<T> = Direct(value)
+        fun <T> direct(value: T): Direct<T> = Direct(value)
     }
 
     /**
      * 返回容器的类型.
      */
-    val kind: Kind
+    val type: Type
 
     /**
      * 返回容器里的数据.
@@ -32,62 +32,63 @@ interface Holder<T> {
     /**
      * 检查该容器是否已经绑定了数据.
      */
-    val isBound: Boolean
+    val hasValue: Boolean
 
     /**
-     * 返回一个与该容器相关联的响应式对象 [ReactiveHolder].
+     * 返回一个与该容器相关联的响应式对象 [ReactiveRegistryEntry].
      *
      * 通常在 *注册表还未完全加载但需要将数据进行转换并放在成员变量* 的场景里使用.
      */
-    fun reactive(): ReactiveHolder<T>
+    fun reactive(): ReactiveRegistryEntry<T>
 
-    fun equals(id: ResourceLocation): Boolean
-    fun equals(key: ResourceKey<T>): Boolean
-    fun equals(entry: Holder<T>): Boolean
+    fun matchesKey(key: RegistryKey<T>): Boolean
+    fun matchesId(id: Identifier): Boolean
+    fun matches(entry: RegistryEntry<T>): Boolean
 
     /**
      * 返回容器的键名或数据.
      */
-    fun unwrap(): Either<ResourceKey<T>, T>
+    fun getKeyOrValue(): Either<RegistryKey<T>, T>
 
     /**
      * 返回容器的键名.
      *
      * 该键名包含两种信息:
-     * 1. 该容器 [Holder] 所在的注册表 [Registry]
-     * 2. 该容器 [Holder] 在 [Registry] 中的位置
+     * 1. 该容器 [RegistryEntry] 所在的注册表 [Registry]
+     * 2. 该容器 [RegistryEntry] 在 [Registry] 中的位置
      *
      * 因此该键名可用于从任意注册表中确定一个数据.
      *
-     * @see ResourceKey
+     * @see RegistryKey
      * @throws IllegalStateException 如果容器没有键名
      */
-    fun unwrapKey(): ResourceKey<T>?
-    fun unwrapKeyOrThrow(): ResourceKey<T> {
-        return unwrapKey() ?: throw IllegalStateException("No resource key associated with this holder")
+    fun getKey(): RegistryKey<T>?
+    fun getKeyOrThrow(): RegistryKey<T> {
+        return getKey() ?: throw IllegalStateException("No resource key associated with this holder")
     }
 
     /**
      * 返回该容器的注册名. (在已知一个注册表时) 该名字可用来唯一确定该数据.
      *
      * 当容器数据的命名空间为 [KOISH_NAMESPACE] 时, 返回值部分不包含命名空间.
-     * 否则返回完整的 `命名空间:路径` 形式. 在已知 [registeredName] 的情况下,
-     * 逆操作 ([ResourceLocations.withKoishNamespace]) 也完全遵循该规则.
+     * 否则返回完整的 `命名空间:路径` 形式. 在已知 [getIdAsString] 的情况下,
+     * 逆操作 ([Identifiers.ofKoish]) 也完全遵循该规则.
      *
-     * 例如从 [ResourceLocation] 转换为 [registeredName]:
+     * 例如从 [Identifier] 转换为 [getIdAsString]:
      * - `"koish:ice"` -> `"ice"` (命名空间为 "koish" 将省略命名空间)
      * - `"kawaii:cute"` -> `"kawaii:cute"` (命名空间不是 "koish" 将保留完整路径)
      *
-     * 例如从 [registeredName] 转换为 [ResourceLocation]:
+     * 例如从 [getIdAsString] 转换为 [Identifier]:
      * - `"ice"` -> `"koish:ice"` (省略命名空间时, 将自动设置为 "koish")
      * - `"kawaii:cute"` -> `"kawaii:cute"` (存在命名空间时, 将保留完整路径)
      */
-    val registeredName: String
-        get() = this.unwrapKey()?.location?.asMinimalString2() ?: "unregistered"
+    fun getIdAsString(): String {
+        return this.getKey()?.value?.asMinimalString2() ?: "unregistered"
+    }
 
-    fun canSerializeIn(owner: HolderOwner<T>): Boolean
+    fun ownerEquals(owner: RegistryEntryOwner<T>): Boolean
 
-    enum class Kind {
+    enum class Type {
         /**
          * 未与注册表相关联的数据.
          */
@@ -102,26 +103,26 @@ interface Holder<T> {
     // Holder.Direct 封装的是没有与 Registry 相关联的数据
     class Direct<T>
     @ApiStatus.Internal
-    constructor(override val value: T) : Holder<T> {
-        override val kind: Kind
-            get() = Kind.DIRECT
+    constructor(override val value: T) : RegistryEntry<T> {
+        override val type: Type
+            get() = Type.DIRECT
 
-        override val isBound: Boolean
+        override val hasValue: Boolean
             get() = true
 
-        private var reactive: ReactiveHolder<T>? = null
+        private var reactive: ReactiveRegistryEntry<T>? = null
 
         @Synchronized
-        override fun reactive(): ReactiveHolder<T> {
+        override fun reactive(): ReactiveRegistryEntry<T> {
             return reactive ?: provider(value).also { reactive = it }
         }
 
-        override fun equals(id: ResourceLocation): Boolean = false
-        override fun equals(key: ResourceKey<T>): Boolean = false
-        override fun equals(entry: Holder<T>): Boolean = this.value == entry.value
-        override fun unwrap(): Either<ResourceKey<T>, T> = Either.right(this.value)
-        override fun unwrapKey(): ResourceKey<T>? = null
-        override fun canSerializeIn(owner: HolderOwner<T>) = true
+        override fun matchesId(id: Identifier): Boolean = false
+        override fun matchesKey(key: RegistryKey<T>): Boolean = false
+        override fun matches(entry: RegistryEntry<T>): Boolean = this.value == entry.value
+        override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.right(this.value)
+        override fun getKey(): RegistryKey<T>? = null
+        override fun ownerEquals(owner: RegistryEntryOwner<T>) = true
         override fun toString(): String = "Direct[${this.value}]"
     }
 
@@ -136,42 +137,42 @@ interface Holder<T> {
     //
     class Reference<T>
     private constructor(
-        private val owner: HolderOwner<T>,
-        val type: Type, // 目前仅仅是标记, 无实际用途
-        val key: ResourceKey<T>,
+        private val owner: RegistryEntryOwner<T>,
+        val referenceType: Type, // 目前仅仅是标记, 无实际用途
+        private val key: RegistryKey<T>,
         private var _value: T? = null,
-    ) : Holder<T> {
+    ) : RegistryEntry<T> {
         companion object {
-            fun <T> createStandalone(owner: HolderOwner<T>, key: ResourceKey<T>, value: T): Reference<T> {
+            fun <T> standalone(owner: RegistryEntryOwner<T>, key: RegistryKey<T>, value: T): Reference<T> {
                 return Reference(owner, Type.STANDALONE, key, value)
             }
 
-            fun <T> createIntrusive(owner: HolderOwner<T>, key: ResourceKey<T>): Reference<T> {
+            fun <T> intrusive(owner: RegistryEntryOwner<T>, key: RegistryKey<T>): Reference<T> {
                 return Reference(owner, Type.INTRUSIVE, key)
             }
         }
 
-        private var reactive: ReactiveHolder<T>? = null
+        private var reactive: ReactiveRegistryEntry<T>? = null
 
         @Synchronized
-        override fun reactive(): ReactiveHolder<T> {
+        override fun reactive(): ReactiveRegistryEntry<T> {
             return reactive ?: provider(this::value).also { reactive = it }
         }
 
-        override val isBound: Boolean
+        override val hasValue: Boolean
             get() = _value != null
 
         override val value: T
             get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry ${this.owner}")
 
-        override val kind: Kind = Kind.REFERENCE
+        override val type: RegistryEntry.Type = RegistryEntry.Type.REFERENCE
 
         // 使用场景:
         // 1) WritableRegistry#register 注册一个新的数据
         // 1) WritableRegistry#register 为 intrusive holder 绑定数据
         // 2) 配置文件发生重载
         @ApiStatus.Internal
-        fun bindValue(value: T): Reference<T> {
+        fun setValue(value: T): Reference<T> {
             _value = value
 
             // 如果存在 reactive, 也要更新 reactive 链上的所有数据
@@ -182,9 +183,9 @@ interface Holder<T> {
             return this // 返回 this, 方便链式调用
         }
 
-        override fun equals(id: ResourceLocation): Boolean = this.key.location == id
-        override fun equals(key: ResourceKey<T>): Boolean = this.key === key
-        override fun equals(entry: Holder<T>): Boolean = this === entry || (entry is Reference<*> && this.key == entry.key)
+        override fun matchesKey(key: RegistryKey<T>): Boolean = this.key === key
+        override fun matchesId(id: Identifier): Boolean = this.key.value == id
+        override fun matches(entry: RegistryEntry<T>): Boolean = this === entry || (entry is Reference<*> && this.key == entry.key)
 
         override fun hashCode(): Int {
             return this.key.hashCode()
@@ -196,19 +197,19 @@ interface Holder<T> {
             return this.key === other.key
         }
 
-        override fun unwrap(): Either<ResourceKey<T>, T> = Either.left(this.key)
-        override fun unwrapKey(): ResourceKey<T> = this.key
-        override fun canSerializeIn(owner: HolderOwner<T>) = this.owner.canSerializeIn(owner)
+        override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.left(this.key)
+        override fun getKey(): RegistryKey<T> = this.key
+        override fun ownerEquals(owner: RegistryEntryOwner<T>) = this.owner.ownerEquals(owner)
         override fun toString(): String = "Reference[${this.key}=${this.value}]"
 
         enum class Type {
             /**
-             * 由注册表自己使用 [WritableRegistry.register] 创建的 [Reference].
+             * 由注册表自己使用 [WritableRegistry.add] 创建的 [Reference].
              */
             STANDALONE,
 
             /**
-             * 由外部调用 [Registry.createIntrusiveHolder] 创建的 [Reference].
+             * 由外部调用 [Registry.createEntry] 创建的 [Reference].
              */
             INTRUSIVE
         }

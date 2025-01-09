@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.core.ResourceLocation
+import cc.mewcraft.wakame.core.Identifier
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import com.google.common.collect.ImmutableMap
@@ -300,12 +300,12 @@ internal object AttributeSupplierSerializer {
      * ```
      * @return the deserialized objects
      */
-    fun deserialize(rootNode: ConfigurationNode): Map<ResourceLocation, AttributeSupplier> {
+    fun deserialize(rootNode: ConfigurationNode): Map<Identifier, AttributeSupplier> {
         // The builders that have been deserialized successfully so far
         val builders = mutableMapOf<Key, AttributeSupplierBuilder>()
 
         // Transform the keys of the children map to ResourceLocation
-        val nodeMap = rootNode.childrenMap().transformKeys<ResourceLocation>()
+        val nodeMap = rootNode.childrenMap().transformKeys<Identifier>()
 
         // An extension to reduce duplicates
         fun AttributeSupplierBuilder.add(
@@ -340,7 +340,7 @@ internal object AttributeSupplierSerializer {
 
         // Creates a builder from the given data
         fun parseBuilder(
-            builders: Map<ResourceLocation, AttributeSupplierBuilder>,
+            builders: Map<Identifier, AttributeSupplierBuilder>,
             parentKey: Key?,
             valuesMap: Map<String, ConfigurationNode>,
         ): AttributeSupplierBuilder {
@@ -361,7 +361,7 @@ internal object AttributeSupplierSerializer {
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            if (!KoishRegistries.ELEMENT.containsKey(elementId)) error("Invalid element id: '$elementId'")
+                            if (!KoishRegistries.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
                             val compositionIdWithElement = "$compositionId/${elementId.replace(':', '.')}"
                             val attributes = Attributes.getComposition(compositionIdWithElement)
                             builder.add(attributes, valueNodeInMap)
@@ -370,8 +370,8 @@ internal object AttributeSupplierSerializer {
                         // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
-                        for (elementType in KoishRegistries.ELEMENT.holderSequence) {
-                            val compositionIdWithElement = "$compositionId/${elementType.registeredName.replace(':', '.')}"
+                        for (elementType in KoishRegistries.ELEMENT.entrySequence) {
+                            val compositionIdWithElement = "$compositionId/${elementType.getIdAsString().replace(':', '.')}"
                             val attributes = Attributes.getComposition(compositionIdWithElement)
                             builder.add(attributes, valueNode)
                         }

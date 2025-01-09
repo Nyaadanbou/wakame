@@ -43,7 +43,7 @@ internal data class AttributeCoreTextMeta(
     ) {
         init { // validate values
             this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid attribute modifier operation, check your renderer config") }
-            this.elementIndex.forEach { if (!KoishRegistries.ELEMENT.containsKey(it)) error("'$it' is not a valid element type, check your renderer config") }
+            this.elementIndex.forEach { if (!KoishRegistries.ELEMENT.containsId(it)) error("'$it' is not a valid element type, check your renderer config") }
         }
     }
 }

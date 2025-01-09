@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.world.entity
 
+import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.ResourceLocation
-import cc.mewcraft.wakame.core.ResourceLocations
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -24,7 +24,7 @@ object EntityTypeHolderRegistryConfigStorage : RegistryConfigStorage {
     @InitFun
     fun init() {
         KoishRegistries.ENTITY_TYPE_HOLDER.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::register)
+        applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::add)
         KoishRegistries.ENTITY_TYPE_HOLDER.freeze()
     }
 
@@ -33,7 +33,7 @@ object EntityTypeHolderRegistryConfigStorage : RegistryConfigStorage {
         applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (ResourceLocation, EntityTypeHolder) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (Identifier, EntityTypeHolder) -> Unit) {
         val loader = buildYamlConfigLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("entity_type_holders").childrenMap()) {
@@ -42,8 +42,8 @@ object EntityTypeHolderRegistryConfigStorage : RegistryConfigStorage {
         }
     }
 
-    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<ResourceLocation, EntityTypeHolder> {
-        val resourceLocation = ResourceLocations.withKoishNamespace(nodeKey.toString())
+    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, EntityTypeHolder> {
+        val resourceLocation = Identifiers.ofKoish(nodeKey.toString())
         val keySet = node.getList<Key>(emptyList()).toSet()
         return Pair(resourceLocation, EntityTypeHolderImpl(keySet))
     }

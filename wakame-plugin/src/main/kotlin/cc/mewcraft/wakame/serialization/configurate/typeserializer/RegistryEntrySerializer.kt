@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.core.Holder
 import cc.mewcraft.wakame.core.Registry
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.util.MojangRegistry
 import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.getValueOrThrow
@@ -21,7 +21,7 @@ internal inline fun <reified T : Any> Registry<T>.valueByNameTypeSerializer(): S
     return RegistryValueEntrySerializer(this, typeTokenOf())
 }
 
-internal inline fun <reified T : Any> Registry<T>.holderByNameTypeSerializer(): ScalarSerializer<Holder<T>> {
+internal inline fun <reified T : Any> Registry<T>.holderByNameTypeSerializer(): ScalarSerializer<RegistryEntry<T>> {
     return RegistryHolderEntrySerializer(this, typeTokenOf())
 }
 
@@ -30,25 +30,25 @@ internal class RegistryValueEntrySerializer<T : Any>(
     private val registry: Registry<T>, type: TypeToken<T>,
 ) : ScalarSerializer<T>(type) {
     override fun deserialize(type: Type, obj: Any): T {
-        return registry.getValueOrThrow(obj.toString())
+        return registry.getOrThrow(obj.toString())
     }
 
     override fun serialize(item: T, typeSupported: Predicate<Class<*>>): Any {
-        return registry.getResourceLocation(item)?.toString()
+        return registry.getId(item)?.toString()
             ?: throw SerializationException("No such value '$item' in registry '${registry.key}'")
     }
 }
 
 @PublishedApi
 internal class RegistryHolderEntrySerializer<T : Any>(
-    private val registry: Registry<T>, type: TypeToken<Holder<T>>,
-) : ScalarSerializer<Holder<T>>(type) {
-    override fun deserialize(type: Type, obj: Any): Holder<T> {
-        return registry.createIntrusiveHolder(obj.toString())
+    private val registry: Registry<T>, type: TypeToken<RegistryEntry<T>>,
+) : ScalarSerializer<RegistryEntry<T>>(type) {
+    override fun deserialize(type: Type, obj: Any): RegistryEntry<T> {
+        return registry.createEntry(obj.toString())
     }
 
-    override fun serialize(item: Holder<T>, typeSupported: Predicate<Class<*>>): Any {
-        return item.unwrapKeyOrThrow().location.toString()
+    override fun serialize(item: RegistryEntry<T>, typeSupported: Predicate<Class<*>>): Any {
+        return item.getKeyOrThrow().value.toString()
     }
 }
 //</editor-fold>

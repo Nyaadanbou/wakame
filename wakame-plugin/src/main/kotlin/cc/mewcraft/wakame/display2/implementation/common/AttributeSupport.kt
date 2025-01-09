@@ -20,7 +20,7 @@ internal fun AttributeCore.computeIndex(namespace: String): DerivedIndex {
         append(attribute.operation.key)
         attribute.element?.let {
             append('.')
-            append(it.registeredName)
+            append(it.getIdAsString())
         }
     }
     return Key.key(namespace, indexId)

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -40,7 +40,7 @@ import cc.mewcraft.wakame.item.components.ItemElements as DataItemElements
 
 
 data class ItemElements(
-    val selector: Pool<Holder<Element>, ItemGenerationContext>,
+    val selector: Pool<RegistryEntry<Element>, ItemGenerationContext>,
 ) : ItemTemplate<DataItemElements> {
     override val componentType: ItemComponentType<DataItemElements> = ItemComponentTypes.ELEMENTS
 
@@ -68,7 +68,7 @@ data class ItemElements(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemElements {
-            return ItemElements(node.krequire<Pool<Holder<Element>, ItemGenerationContext>>())
+            return ItemElements(node.krequire<Pool<RegistryEntry<Element>, ItemGenerationContext>>())
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {
@@ -90,13 +90,13 @@ data class ItemElements(
 @Reload(
     runBefore = [ItemRegistry::class],
 )
-internal object ElementSampleNodeFacade : SampleNodeFacade<Holder<Element>, ItemGenerationContext>() {
+internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<Element>, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/elements")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
         kregister(FilterSerializer)
     }.build()
-    override val repository: NodeRepository<Sample<Holder<Element>, ItemGenerationContext>> = NodeRepository()
-    override val sampleDataType: TypeToken<Holder<Element>> = typeTokenOf()
+    override val repository: NodeRepository<Sample<RegistryEntry<Element>, ItemGenerationContext>> = NodeRepository()
+    override val sampleDataType: TypeToken<RegistryEntry<Element>> = typeTokenOf()
     override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     @InitFun
@@ -109,11 +109,11 @@ internal object ElementSampleNodeFacade : SampleNodeFacade<Holder<Element>, Item
         NodeFacadeSupport.reload(this)
     }
 
-    override fun decodeSampleData(node: ConfigurationNode): Holder<Element> {
-        return node.node("type").krequire<Holder<Element>>()
+    override fun decodeSampleData(node: ConfigurationNode): RegistryEntry<Element> {
+        return node.node("type").krequire<RegistryEntry<Element>>()
     }
 
-    override fun intrinsicFilters(value: Holder<Element>): Collection<Filter<ItemGenerationContext>> {
+    override fun intrinsicFilters(value: RegistryEntry<Element>): Collection<Filter<ItemGenerationContext>> {
         return emptyList()
     }
 }
@@ -123,11 +123,11 @@ internal object ElementSampleNodeFacade : SampleNodeFacade<Holder<Element>, Item
  */
 private data class ElementPool(
     override val amount: Long,
-    override val samples: NodeContainer<Sample<Holder<Element>, ItemGenerationContext>>,
+    override val samples: NodeContainer<Sample<RegistryEntry<Element>, ItemGenerationContext>>,
     override val filters: NodeContainer<Filter<ItemGenerationContext>>,
     override val isReplacement: Boolean,
-) : Pool<Holder<Element>, ItemGenerationContext>() {
-    override fun whenSelect(value: Holder<Element>, context: ItemGenerationContext) {
+) : Pool<RegistryEntry<Element>, ItemGenerationContext>() {
+    override fun whenSelect(value: RegistryEntry<Element>, context: ItemGenerationContext) {
         context.elements += value
     }
 }
@@ -149,16 +149,16 @@ private data class ElementPool(
  *       weight: 1
  * ```
  */
-private data object ElementPoolSerializer : PoolSerializer<Holder<Element>, ItemGenerationContext>() {
+private data object ElementPoolSerializer : PoolSerializer<RegistryEntry<Element>, ItemGenerationContext>() {
     override val sampleNodeFacade: ElementSampleNodeFacade = ElementSampleNodeFacade
     override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(
         amount: Long,
-        samples: NodeContainer<Sample<Holder<Element>, ItemGenerationContext>>,
+        samples: NodeContainer<Sample<RegistryEntry<Element>, ItemGenerationContext>>,
         filters: NodeContainer<Filter<ItemGenerationContext>>,
         isReplacement: Boolean,
-    ): Pool<Holder<Element>, ItemGenerationContext> {
+    ): Pool<RegistryEntry<Element>, ItemGenerationContext> {
         return ElementPool(
             amount = amount,
             samples = samples,

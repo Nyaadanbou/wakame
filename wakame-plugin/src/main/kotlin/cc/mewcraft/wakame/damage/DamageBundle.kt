@@ -36,7 +36,7 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
 }
 
 private fun getElementById(id: String): Element? {
-    return KoishRegistries.ELEMENT.getValue(id) ?: run {
+    return KoishRegistries.ELEMENT.get(id) ?: run {
         LOGGER.warn("No such element: '$id'")
         return null
     }

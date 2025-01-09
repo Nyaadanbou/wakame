@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.util.toSimpleString
@@ -236,11 +236,11 @@ protected constructor(
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    val element: Holder<Element>,
+    val element: RegistryEntry<Element>,
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    compositionId + ELEMENT_SEPARATOR + element.registeredName,
-    descriptionId + ELEMENT_SEPARATOR + element.registeredName,
+    compositionId + ELEMENT_SEPARATOR + element.getIdAsString(),
+    descriptionId + ELEMENT_SEPARATOR + element.getIdAsString(),
     defaultValue,
     minValue,
     maxValue,
@@ -272,14 +272,14 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Holder<Element>,
+        element: RegistryEntry<Element>,
         vanilla: Boolean = false,
     ) : this(
         compositionId = compositionId,
         descriptionId = descriptionId,
-        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "default").orElse(defaultValue),
-        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "min").orElse(minValue),
-        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.registeredName, "max").orElse(maxValue),
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.getIdAsString(), "default").orElse(defaultValue),
+        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.getIdAsString(), "min").orElse(minValue),
+        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.getIdAsString(), "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )
@@ -289,7 +289,7 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Holder<Element>,
+        element: RegistryEntry<Element>,
         vanilla: Boolean = false,
     ) : this(
         compositionId = descriptionId,

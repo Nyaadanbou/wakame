@@ -45,7 +45,7 @@ fun AttributeMap(player: Player): AttributeMap {
 fun AttributeMap(user: User<Player>): AttributeMap {
     // 创建一个全新的 AttributeMap
     val key = AttributeMapSupport.PLAYER_KEY
-    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(key)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
     return PlayerAttributeMap(default, user.player())
 }
 
@@ -57,7 +57,7 @@ fun AttributeMap(user: User<Player>): AttributeMap {
  */
 fun AttributeMap(entity: LivingEntity): AttributeMap {
     val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
-    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(key)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
     return EntityAttributeMap(default, entity)
 }
 
@@ -301,7 +301,7 @@ private object ImaginaryAttributeMapRegistry : KoinComponent {
 
     fun get(key: Key): ImaginaryAttributeMap {
         return pool.computeIfAbsent(key) { k ->
-            val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getValueOrThrow(k)
+            val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(k)
             val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
             for (attribute in default.attributes) {
                 val instance = default.createImaginaryInstance(attribute) ?: continue

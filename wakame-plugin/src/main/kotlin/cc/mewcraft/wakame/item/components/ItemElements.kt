@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.core.Holder
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.ItemConstants
@@ -21,7 +21,7 @@ data class ItemElements(
     /**
      * 所有的元素.
      */
-    val elements: Set<Holder<Element>>,
+    val elements: Set<RegistryEntry<Element>>,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemElements> {
@@ -33,14 +33,14 @@ data class ItemElements(
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(elements: Collection<Holder<Element>>): ItemElements {
+        fun of(elements: Collection<RegistryEntry<Element>>): ItemElements {
             return ItemElements(ObjectArraySet(elements))
         }
 
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(vararg elements: Holder<Element>): ItemElements {
+        fun of(vararg elements: RegistryEntry<Element>): ItemElements {
             return of(elements.toList())
         }
 
@@ -64,7 +64,7 @@ data class ItemElements(
         override fun read(holder: ItemComponentHolder): ItemElements? {
             val elementSet = holder.getTag()
                 ?.getByteArrayOrNull(TAG_VALUE)
-                ?.mapTo(ObjectArraySet(4)) { KoishRegistries.ELEMENT.getOrThrow(it.toInt()) }
+                ?.mapTo(ObjectArraySet(4)) { KoishRegistries.ELEMENT.getEntryOrThrow(it.toInt()) }
                 ?: return null
             return ItemElements(elementSet)
         }
@@ -72,7 +72,7 @@ data class ItemElements(
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
             holder.editTag { tag ->
-                val integerIdByteArray = value.elements.mapToByteArray { KoishRegistries.ELEMENT.getIdOrThrow(it.value).toByte() }
+                val integerIdByteArray = value.elements.mapToByteArray { KoishRegistries.ELEMENT.getRawIdOrThrow(it.value).toByte() }
                 tag.putByteArray(TAG_VALUE, integerIdByteArray)
             }
         }
