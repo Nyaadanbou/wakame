@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
+import cc.mewcraft.wakame.core.KOISH_NAMESPACE
+import cc.mewcraft.wakame.core.ResourceLocations
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
@@ -11,7 +13,7 @@ import java.util.function.Predicate
 internal object KeySerializer : ScalarSerializer<Key>(Key::class.java) {
     override fun deserialize(type: Type, obj: Any): Key {
         return try {
-            Key.key(obj.toString())
+            ResourceLocations.withKoishNamespace(obj.toString()) // 默认使用 koish 命名空间
         } catch (e: InvalidKeyException) {
             throw SerializationException(type, "Invalid key: '$obj'", e)
         }
@@ -24,7 +26,11 @@ internal object KeySerializer : ScalarSerializer<Key>(Key::class.java) {
 
 internal object NamespacedKeySerializer : ScalarSerializer<NamespacedKey>(NamespacedKey::class.java) {
     override fun deserialize(type: Type, obj: Any): NamespacedKey {
-        return NamespacedKey.fromString(obj.toString()) ?: throw IllegalArgumentException("Invalid key: '$obj'")
+        val string = obj.toString()
+        val index = string.indexOf(':');
+        val namespace = if (index >= 1) string.substring(0, index) else KOISH_NAMESPACE // 默认使用 koish 命名空间
+        val value = if (index >= 0) string.substring(index + 1) else string
+        return NamespacedKey(namespace, value)
     }
 
     override fun serialize(item: NamespacedKey, typeSupported: Predicate<Class<*>>): Any {

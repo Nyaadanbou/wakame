@@ -84,7 +84,7 @@ object KoishRegistries {
      * 玩家无法直接获得/使用, 仅用于给纯原版物品套一层皮 (i.e., 给原版物品添加内容)
      */
     @JvmField
-    val VANILLA_PROXY_ITEM: WritableRegistry<NekoItem> = registerSimple(KoishRegistryKeys.VANILLA_PROXY_ITEM)
+    val VANILLA_WRAPPER_ITEM: WritableRegistry<NekoItem> = registerSimple(KoishRegistryKeys.VANILLA_PROXY_ITEM)
 
     /**
      * 物品皮肤.
