@@ -35,7 +35,7 @@ object WakameWorld {
      */
     private val componentMapCache: Object2ObjectOpenHashMap<Entity, ComponentMap> = Object2ObjectOpenHashMap()
 
-    val instance: World = configureWorld {
+    private val instance: World = configureWorld {
 
         systems {
             // 关于顺序: 删除系统优先于一切系统.
@@ -76,16 +76,18 @@ object WakameWorld {
         }
     }
 
-    fun createEntity(identifier: String, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
-        with(instance) {
-            entity {
-                it += IdentifierComponent(identifier)
-                configuration.invoke(this, it)
-            }
+    internal fun world(): World {
+        return instance
+    }
+
+    internal inline fun createEntity(identifier: String, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
+        instance.entity {
+            it += IdentifierComponent(identifier)
+            configuration.invoke(this, it)
         }
     }
 
-    fun createMechanic(identifier: String, replace: Boolean = true, mechanicProvider: () -> Mechanic) {
+    internal fun createMechanic(identifier: String, replace: Boolean = true, mechanicProvider: () -> Mechanic) {
         with(instance) {
             val identifierFamily = family { all(IdentifierComponent, MechanicComponent) }
             val entityToModify = identifierFamily.firstOrNull { it[IdentifierComponent].id == identifier }
@@ -96,6 +98,7 @@ object WakameWorld {
                 return
             }
             createEntity(identifier) {
+                it += EntityType.MECHANIC
                 it += Tags.DISPOSABLE
                 it += MechanicComponent(mechanicProvider())
                 it += TickCountComponent()
@@ -103,47 +106,52 @@ object WakameWorld {
         }
     }
 
-    fun editEntity(identifier: String, configuration: EntityUpdateContext.(Entity) -> Unit) {
+    internal fun removeMechanic(identifier: String) {
         with(instance) {
-            val identifierFamily = family { all(IdentifierComponent) }
-            val entityToModify = identifierFamily.firstOrNull { it[IdentifierComponent].id == identifier } ?: return
-            editEntity(entityToModify, configuration)
-        }
-    }
-
-    fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) {
-        with(instance) {
-            entity.configure(configuration)
-        }
-    }
-
-    fun editEntities(family: World.() -> Family, configuration: EntityUpdateContext.(Entity) -> Unit) {
-        with(instance) {
-            val family = family()
-            family.forEach {
-                it.configure(configuration)
-            }
-        }
-    }
-
-    fun removeEntity(identifier: String) {
-        with(instance) {
-            val identifierFamily = family { all(IdentifierComponent) }
+            val identifierFamily = family { all(IdentifierComponent, EntityType.MECHANIC) }
             val entityToRemove = identifierFamily
-                .firstOrNull { it[IdentifierComponent].id == identifier } ?: return
+                .firstOrNull { it[IdentifierComponent].id == identifier }
+            if (entityToRemove == null) {
+                error("Tried to remove mechanic that does not exist: $identifier")
+            }
             entityToRemove.configure {
                 it += Remove
             }
         }
     }
 
-    fun removeEntity(entity: Entity) {
+    internal inline fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) {
         with(instance) {
+            if (!contains(entity)) {
+                error("Tried to edit entity that does not exist: $entity")
+            }
+            entity.configure(configuration)
+        }
+    }
+
+    internal inline fun editEntities(family: World.() -> Family, noinline configuration: EntityUpdateContext.(Entity) -> Unit) {
+        with(instance) {
+            val family = family()
+            if (family.isEmpty) {
+                error("No entities found for family: $family")
+            }
+
+            family.forEach {
+                it.configure(configuration)
+            }
+        }
+    }
+
+    internal fun removeEntity(entity: Entity) {
+        with(instance) {
+            if (!contains(entity)) {
+                error("Tried to remove entity that does not exist: $entity")
+            }
             entity.configure { it += Remove }
         }
     }
 
     fun componentMap(entity: Entity): ComponentMap {
-        return this.componentMapCache.computeIfAbsent(entity, Object2ObjectFunction { ComponentMap(instance, entity) })
+        return this.componentMapCache.computeIfAbsent(entity, Object2ObjectFunction { ComponentMap(entity) })
     }
 }

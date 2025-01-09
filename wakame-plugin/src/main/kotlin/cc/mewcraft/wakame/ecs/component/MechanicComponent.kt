@@ -13,12 +13,12 @@ data class MechanicComponent(
     override fun type(): ComponentType<MechanicComponent> = MechanicComponent
 
     override fun World.onAdd(entity: Entity) {
-        val componentMap = ComponentMap(this, entity)
+        val componentMap = ComponentMap(entity)
         mechanic.onEnable(componentMap)
     }
 
     override fun World.onRemove(entity: Entity) {
-        val componentMap = ComponentMap(this, entity)
+        val componentMap = ComponentMap(entity)
         mechanic.onDisable(componentMap)
     }
 

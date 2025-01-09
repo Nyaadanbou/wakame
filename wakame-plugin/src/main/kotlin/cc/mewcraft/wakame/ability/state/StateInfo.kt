@@ -1,10 +1,14 @@
 package cc.mewcraft.wakame.ability.state
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityWorldInteraction
+import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.data.TickResult
+import cc.mewcraft.wakame.event.PlayerManaCostEvent
+import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.abilityWorldInteraction
 import cc.mewcraft.wakame.ability.state.display.StateDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
@@ -12,8 +16,8 @@ import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.PlayerManaCostEvent
+import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.event.Events
@@ -100,7 +104,7 @@ class PlayerStateInfo(
             if (sequenceAbility != null) {
                 stateDisplay.displaySuccess(currentSequence.readAll(), player)
                 currentSequence.clear()
-                WakameWorld.removeEntity(mechanicName)
+                WakameWorld.removeMechanic(mechanicName)
                 markNextState(sequenceAbility)
                 return AbilityStateResult.CANCEL_EVENT
             }
@@ -109,7 +113,7 @@ class PlayerStateInfo(
         // Single trigger abilities
         val singleAbility = getAbilityByTrigger(castTrigger)
         if (singleAbility != null) {
-            WakameWorld.removeEntity(mechanicName)
+            WakameWorld.removeMechanic(mechanicName)
             markNextState(singleAbility)
             return AbilityStateResult.CANCEL_EVENT
         }
@@ -117,11 +121,11 @@ class PlayerStateInfo(
         return AbilityStateResult.SILENT_FAILURE
     }
 
-    private fun markNextState(ability: Ability) {
+    private fun markNextState(ability: Ability) = abilityWorldInteraction {
         val abilityName = ability.key.asString()
         val costPenalty = penalizeManaCost(abilityName)
-        abilityWorldInteraction.setCostPenalty(player, abilityName, costPenalty)
-        abilityWorldInteraction.setNextState(player, ability)
+        player.setCostPenalty(abilityName, costPenalty)
+        player.setNextState(ability)
     }
 
     private fun penalizeManaCost(identifier: String): ManaCostPenalty {
@@ -134,8 +138,8 @@ class PlayerStateInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleTrigger): Ability? {
-        val triggerTypes = abilityWorldInteraction.getAllActiveAbilityTriggers(player)
+    private fun trySequenceAbility(trigger: SingleTrigger): Ability? = abilityWorldInteraction {
+        val triggerTypes = player.getAllActiveAbilityTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
         // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | triggerTypes.any { it is SequenceTrigger } -> isFirstRightClickAndHasTrigger
@@ -172,15 +176,16 @@ class PlayerStateInfo(
         return null
     }
 
-    private fun getAbilityByTrigger(trigger: Trigger): Ability? {
-        val abilities = abilityWorldInteraction.getMechanicsBy(player, trigger)
+    private fun getAbilityByTrigger(trigger: Trigger): Ability? = abilityWorldInteraction {
+        val abilities = player.getMechanicsBy(trigger)
         if (abilities.size > 1) {
             LOGGER.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
         }
         return abilities.firstOrNull()
     }
 
-    override fun cleanup() {
+    override fun cleanup() = abilityWorldInteraction {
+        player.cleanupAbility()
         manaNoEnoughSubscription.close()
         manaCostSubscription.close()
     }

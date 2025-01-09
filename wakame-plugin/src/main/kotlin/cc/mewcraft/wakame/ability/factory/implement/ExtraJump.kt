@@ -63,7 +63,7 @@ private class ExtraJumpAbilityMechanic(
             .filter { it.player == componentMap.castByEntity() }
             .filter { jumpCount > 0 }
             .filter { it.input.isJump }
-            .filter { !it.player.isOnGround }
+            .filter { !it.player.isOnGround } // Spigot 弃用此方法的原因是客户端可以通过发包来欺骗服务器, 我们这里不考虑挂端欺骗的情况.
             .handler {
                 // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
                 val player = it.player

@@ -4,5 +4,6 @@ import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.entityTagOf
 
 enum class EntityType : EntityTags by entityTagOf() {
-    ABILITY
+    ABILITY,
+    MECHANIC
 }

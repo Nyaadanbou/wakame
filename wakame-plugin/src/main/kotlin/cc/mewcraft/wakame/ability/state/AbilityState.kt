@@ -66,7 +66,6 @@ class PlayerAbilityState(
     }
 
     override fun cleanup() {
-        cooldown.reset()
         stateInfo.cleanup()
     }
 

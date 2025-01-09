@@ -56,7 +56,7 @@ class PaperUser(
     }
 
     override fun cleanup() {
-        abilityState
+        abilityState.cleanup()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {

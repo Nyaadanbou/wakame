@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.ability.state.display.PlayerStateDisplay
 import cc.mewcraft.wakame.ability.state.display.StateDisplay
 import cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer
 import cc.mewcraft.wakame.ability.trigger.abilityTriggerModule
+import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.util.register
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -24,8 +25,6 @@ fun abilityModule(): Module = module {
     )
 
     singleOf(::PlayerStateDisplay) bind StateDisplay::class
-
-    singleOf(::AbilityWorldInteraction)
 
     // 用于外部代码
     single<TypeSerializerCollection>(named(ABILITY_EXTERNALS)) {

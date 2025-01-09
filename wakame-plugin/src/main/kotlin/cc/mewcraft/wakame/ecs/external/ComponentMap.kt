@@ -10,23 +10,24 @@ import com.github.quillraven.fleks.UniqueId
 import com.github.quillraven.fleks.World
 
 // TODO: 改名成 ComponentBridge
-class ComponentMap internal constructor(
-    world: World,
+@JvmInline
+value class ComponentMap(
     val entity: Entity,
 ) {
-
     /**
      * 存放所有外部组件的键值对.
      *
      * K - [ComponentType], 所有 [ComponentType] 在各个 [Component] 内静态存储.
      * V - [Component] 实例.
      */
-    val componentsMap: Map<ComponentType<out Any>, Component<out Any>> = world.snapshotOf(entity).components.associate { it.type() to it }.toMap()
+    val componentsMap: Map<ComponentType<out Any>, Component<out Any>>
+        get() = WakameWorld.world().snapshotOf(entity).components.associate { it.type() to it }
 
     /**
      * [EntityTag] 列表.
      */
-    val tags: List<UniqueId<out Any>> = world.snapshotOf(entity).tags.toList()
+    val tags: List<UniqueId<out Any>>
+        get() = WakameWorld.world().snapshotOf(entity).tags
 
     operator fun <T : Component<out Any>> get(type: ComponentType<T>): T? {
         @Suppress("UNCHECKED_CAST")
@@ -64,18 +65,4 @@ class ComponentMap internal constructor(
     override fun toString(): String {
         return "ComponentMap(entity=$entity, componentsMap=$componentsMap, tags=$tags)"
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ComponentMap
-
-        return entity == other.entity
-    }
-
-    override fun hashCode(): Int {
-        return entity.hashCode()
-    }
-
 }
