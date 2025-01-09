@@ -8,6 +8,8 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import java.util.IdentityHashMap
 import kotlin.random.Random
 
+// FIXME rename to SimpleRegistry
+// FIXME rename classes/functions according to Yarn mapping
 open class MappedRegistry<T>(
     override val key: ResourceKey<out Registry<T>>,
 ) : WritableRegistry<T> {

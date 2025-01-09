@@ -4,6 +4,8 @@ package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.util.NumericValueSerializer
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -44,6 +46,31 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
     .build()
+
+object Serializers {
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatching(
+        noinline typeInfoLookup: (V) -> K,
+        noinline decodingLookup: (K) -> TypeToken<out V>,
+    ): TypeSerializer<V> {
+        return dispatching("type", typeInfoLookup, decodingLookup)
+    }
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatching(
+        typeKey: String,
+        noinline typeInfoLookup: (V) -> K,
+        noinline decodingLookup: (K) -> TypeToken<out V>,
+    ): TypeSerializer<V> {
+        return DispatchingTypeSerializer(typeKey, typeTokenOf(), typeInfoLookup, decodingLookup)
+    }
+
+}
 
 private inline fun <reified T> TypeSerializerCollection.Builder.register(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
     val type = javaTypeOf<T>()

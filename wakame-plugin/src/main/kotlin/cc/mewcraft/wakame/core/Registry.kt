@@ -12,13 +12,47 @@ import kotlin.random.Random
 // 3) 当一个对象的成员需要来自注册表里的数据时, 必须手动编写懒加载机制, 或严格控制加载的顺序
 
 /**
- * 代表一个注册表.
+ * 创建一个注册表, 位于根命名空间下.
+ */
+fun <T> createRootRegistry(id: String): MappedRegistry<T> {
+    return MappedRegistry(ResourceKey.createRegistryKey(ResourceLocations.withKoishNamespace(id)))
+}
+
+/**
+ * 注册表.
  *
  * @see Holder
  * @see ResourceKey
  * @see ResourceLocation
  */
 interface Registry<T> : HolderOwner<T>, Keyable, IdMap<T> {
+
+    /**
+     * 方便函数. 用于注册一个数据到注册表里, 同时返回注册的数据.
+     */
+    companion object {
+        fun <T> register(registry: Registry<in T>, id: String, entry: T): T {
+            return register(registry, ResourceLocations.withKoishNamespace(id), entry)
+        }
+
+        fun <V, T : V> register(registry: Registry<V>, id: ResourceLocation, entry: T): T {
+            return register(registry, ResourceKey.create(registry.key, id), entry)
+        }
+
+        fun <V, T : V> register(registry: Registry<V>, key: ResourceKey<V>, entry: T): T {
+            registry.asWritable().register(key, entry as V)
+            return entry
+        }
+
+        fun <T> registerForHolder(registry: Registry<T>, key: ResourceKey<T>, entry: T): Holder.Reference<T> {
+            return registry.asWritable().register(key, entry)
+        }
+
+        fun <T> registerForHolder(registry: Registry<T>, id: ResourceLocation, entry: T): Holder.Reference<T> {
+            return registerForHolder(registry, ResourceKey.create(registry.key, id), entry)
+        }
+    }
+
     val key: ResourceKey<out Registry<T>>
 
     fun asWritable(): WritableRegistry<T> = this as WritableRegistry<T>
