@@ -3,7 +3,6 @@ package serialization
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.SimpleRegistry
-import cc.mewcraft.wakame.core.createRootRegistry
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.Serializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.kregister
@@ -75,7 +74,7 @@ interface Animal {
 class AnimalType<E : Animal>(val type: TypeToken<E>) {
     companion object {
         // 创建一个注册表, 用于存放所有 Animal 的 *类型* (AnimalType)
-        val REGISTRY: SimpleRegistry<AnimalType<*>> = createRootRegistry("animal_type")
+        val REGISTRY: SimpleRegistry<AnimalType<*>> = Registry.of("animal_type")
     }
 }
 

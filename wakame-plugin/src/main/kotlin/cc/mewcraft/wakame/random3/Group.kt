@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
@@ -108,7 +108,7 @@ interface Group<S, C : RandomSelectorContext> {
  * @param V the type of content
  * @param C the type of context
  */
-abstract class GroupSerializer<V, C : RandomSelectorContext> : SchemaSerializer<Group<V, C>> {
+abstract class GroupSerializer<V, C : RandomSelectorContext> : TypeSerializer<Group<V, C>> {
     companion object Constants {
         val HINT_NODE_SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_shared_pools", typeTokenOf<ConfigurationNode>())
         private const val PATH_FILTERS = "filters"

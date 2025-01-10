@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-internal object PotionEffectSerializer : SchemaSerializer<PotionEffect?> {
+internal object PotionEffectSerializer : TypeSerializer<PotionEffect?> {
     override fun deserialize(type: Type, node: ConfigurationNode): PotionEffect? {
         if (node.raw() == null)
             return null

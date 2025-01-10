@@ -1,6 +1,4 @@
-@file:Suppress("UnstableApiUsage")
-
-package cc.mewcraft.wakame.world.entity
+package cc.mewcraft.wakame.entity
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.config.MAIN_CONFIG
@@ -21,7 +19,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 阻止玩家在非潜行状态下破坏盔甲架.
  */
-class UnbreakableArmorStandListener : Listener {
+class UnbreakableArmorStand : Listener {
     companion object {
         private val MESSAGE_COOLDOWN = MetadataKey.createCooldownKey("sneak_to_break_armor_stand_tip")
     }

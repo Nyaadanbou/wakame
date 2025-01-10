@@ -32,7 +32,10 @@ class DispatchingTypeSerializer<K : Any, V : Any>(
 
     override fun deserialize(type: Type, node: ConfigurationNode): V {
         val typeKeyNode: ConfigurationNode = node.node(this.typeKey)
-        val typeKeyValue: K = typeKeyNode.get(this.keyType) ?: throw SerializationException(node, type, "Input does not contain a key [${typeKey}]")
+        if (typeKeyNode.virtual()) {
+            throw SerializationException(node, type, "Input does not contain a node key of type: '${typeKey}'")
+        }
+        val typeKeyValue: K = typeKeyNode.get(this.keyType) ?: throw SerializationException(node, type, "Failed to map type name '${typeKeyNode.raw()}' to type ${keyType.type.typeName}")
         val valueType: TypeToken<out V> = this.decodingLookup(typeKeyValue)
         return node.get(valueType) ?: throw SerializationException(node, type, "Input does not have a value entry")
     }

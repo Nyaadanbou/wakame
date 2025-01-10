@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.BiIdentifiable
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.SchemaSerializer
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.PlayerFriendlyNamed
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.util.krequire
@@ -83,7 +83,7 @@ private data class RarityType(
  *   ...
  * ```
  */
-internal object RaritySerializer : SchemaSerializer<Rarity> {
+internal object RaritySerializer : TypeSerializer<Rarity> {
     override fun deserialize(type: Type, node: ConfigurationNode): Rarity {
         val scalar = node.rawScalar() as? String
         if (scalar != null) {

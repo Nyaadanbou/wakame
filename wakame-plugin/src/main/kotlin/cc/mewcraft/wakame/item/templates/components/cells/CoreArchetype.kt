@@ -31,7 +31,6 @@ import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
@@ -188,11 +187,10 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
 @Init(
     stage = InitStage.PRE_WORLD,
     runBefore = [ItemRegistry::class],
-    runAfter = [KizamiRegistry::class, AttributeRegistry::class],
+    runAfter = [AttributeRegistry::class],
 )
 @Reload(
     runBefore = [ItemRegistry::class],
-    runAfter = [KizamiRegistry::class],
 )
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/cores")

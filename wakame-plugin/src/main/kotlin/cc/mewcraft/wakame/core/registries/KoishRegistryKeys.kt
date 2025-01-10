@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.core.RegistryKey
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.CompositeAttributeFacade
@@ -51,7 +51,7 @@ object KoishRegistryKeys {
     val ITEM_SKIN = createRegistryKey<ItemSkin>("item_skin")
 
     @JvmField
-    val KIZAMI = createRegistryKey<Kizami>("kizami")
+    val KIZAMI = createRegistryKey<KizamiType>("kizami")
 
     @JvmField
     val LEVEL_RARITY_MAPPING = createRegistryKey<LevelMapping>("level_rarity_mapping")

@@ -12,13 +12,6 @@ import kotlin.random.Random
 // 3) 当一个对象的成员需要来自注册表里的数据时, 必须手动编写懒加载机制, 或严格控制加载的顺序
 
 /**
- * 创建一个注册表, 位于根命名空间下.
- */
-fun <T> createRootRegistry(id: String): SimpleRegistry<T> {
-    return SimpleRegistry(RegistryKey.ofRegistry(Identifiers.ofKoish(id)))
-}
-
-/**
  * 注册表.
  *
  * @see RegistryEntry
@@ -31,6 +24,8 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
      * 方便函数. 用于注册一个数据到注册表里, 同时返回注册的数据.
      */
     companion object {
+        // 注册数据 //
+
         fun <T> register(registry: Registry<in T>, id: String, entry: T): T {
             return register(registry, Identifiers.ofKoish(id), entry)
         }
@@ -51,6 +46,15 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         fun <T> registerForHolder(registry: Registry<T>, id: Identifier, entry: T): RegistryEntry.Reference<T> {
             return registerForHolder(registry, RegistryKey.of(registry.key, id), entry)
         }
+
+        // 创建注册表 //
+
+        /**
+         * 创建一个注册表, 位于根命名空间下.
+         */
+        fun <T> of(id: String): SimpleRegistry<T> {
+            return SimpleRegistry(RegistryKey.ofRegistry(Identifiers.ofKoish(id)))
+        }
     }
 
     val key: RegistryKey<out Registry<T>>
@@ -63,7 +67,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     val valueByNameCodec: Codec<T>
         get() = referenceEntryCodec.flatComapMap(
             { holder -> holder.value },
-            { value -> this.safeCastToReference(this.wrapAsHolder(value)) }
+            { value -> this.safeCastToReference(this.wrapAsEntry(value)) }
         )
 
     // 同上, 只不过返回的是 Holder<T>
@@ -119,29 +123,29 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun containsId(id: String): Boolean = containsId(Identifiers.ofKoish(id))
 
     /**
-     * 创建一个侵入式的 [Entry.Reference] 实例并返回.
+     * 创建一个侵入式的 [RegistryEntry.Reference] 实例并返回.
      *
      * ### 注意事项
-     * 实现上并不会始终创建一个侵入式的 [Entry.Reference] 实例.
-     * 如果注册表里已经存在对应的数据, 那么将直接返回已存在的 [Entry].
-     * 多次以相同的 [id] 调用该函数将返回同一个 [Entry.Reference] 实例.
+     * 实现上并不会始终创建一个侵入式的 [RegistryEntry.Reference] 实例.
+     * 如果注册表里已经存在对应的数据, 那么将直接返回已存在的 [RegistryEntry].
+     * 多次以相同的 [id] 调用该函数将返回同一个 [RegistryEntry.Reference] 实例.
      *
      * ### 设计哲学
      * 该函数是为了解决必须手动指定注册表之间所有依赖的问题, 设计大概是这样的:
      *
-     * 外部可以使用该函数“声明”*现在或将来*需要一个键名为 [id] 的数据的 [Entry].
-     * 由于是 [Entry] 所以外部可以选择仅仅把引用存起来, 或者如果需要转换数据的话
-     * 那么可以使用 [Entry.reactive] 来进行一系列响应式的数据操作(lazy).
+     * 外部可以使用该函数“声明”*现在或将来*需要一个键名为 [id] 的数据的 [RegistryEntry].
+     * 由于是 [RegistryEntry] 所以外部可以选择仅仅把引用存起来, 或者如果需要转换数据的话
+     * 那么可以使用 [RegistryEntry.reactive] 来进行一系列响应式的数据操作(lazy).
      *
-     * 返回的 [Entry] 在一开始没有绑定的数据, 也就是说直接调用 [Entry.value] 会抛异常.
-     * 当注册表里的数据全部加载完毕后, 此时 [Entry] 中的数据会被填充, 所有数据将正常返回.
+     * 返回的 [RegistryEntry] 在一开始没有绑定的数据, 也就是说直接调用 [RegistryEntry.value] 会抛异常.
+     * 当注册表里的数据全部加载完毕后, 此时 [RegistryEntry] 中的数据会被填充, 所有数据将正常返回.
      *
      * [WritableRegistry.add] 与 [Registry.createEntry] 的关系:
      *
-     * 当整个 Koish 加载完毕后, 所有的注册表里的 [Entry] 也应该全部加载完毕了. 此时:
-     * 有些 [Entry] 是由 [WritableRegistry.add] 创建的, 由这种方式创建的 [Entry] 一开始就绑定了数据.
-     * 而有些 [Entry] 是由 [Registry.createEntry] 创建的, 由这种方式创建的 [Entry] 一开始没有绑定数据.
-     * 没有绑定数据的 [Entry] 会在 [WritableRegistry.add] 执行时(通常是加载配置文件时)将数据绑定好.
+     * 当整个 Koish 加载完毕后, 所有的注册表里的 [RegistryEntry] 也应该全部加载完毕了. 此时:
+     * 有些 [RegistryEntry] 是由 [WritableRegistry.add] 创建的, 由这种方式创建的 [RegistryEntry] 一开始就绑定了数据.
+     * 而有些 [RegistryEntry] 是由 [Registry.createEntry] 创建的, 由这种方式创建的 [RegistryEntry] 一开始没有绑定数据.
+     * 没有绑定数据的 [RegistryEntry] 会在 [WritableRegistry.add] 执行时(通常是加载配置文件时)将数据绑定好.
      */
     fun createEntry(id: Identifier): RegistryEntry.Reference<T>
     fun createEntry(id: String): RegistryEntry.Reference<T> = createEntry(Identifiers.ofKoish(id))
@@ -163,7 +167,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun getEntryOrThrow(id: Identifier): RegistryEntry.Reference<T> = getEntry(id) ?: throw IllegalStateException("Missing id in registry ${this.key}: $id")
     fun getEntryOrThrow(id: String): RegistryEntry.Reference<T> = getEntryOrThrow(Identifiers.ofKoish(id))
 
-    fun wrapAsHolder(value: T): RegistryEntry<T>
+    fun wrapAsEntry(value: T): RegistryEntry<T>
 
     fun getIndexedEntries(): IndexedIterable<RegistryEntry<T>> {
         return object : IndexedIterable<RegistryEntry<T>> {

@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:wind_lace
+  - type: wind_lace
     weight: 3
-  - type: kizami:antigravity
+  - type: antigravity
     weight: 2
-  - type: kizami:berserker
+  - type: berserker
     weight: 1

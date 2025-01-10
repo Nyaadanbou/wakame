@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.attribute.AttributeModifier.Operation.entries
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import net.kyori.adventure.key.Key
 

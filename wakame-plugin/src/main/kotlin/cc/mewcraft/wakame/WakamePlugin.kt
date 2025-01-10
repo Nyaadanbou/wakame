@@ -22,7 +22,6 @@ import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.lang.langModule
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
@@ -90,7 +89,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 guiModule(),
                 integrationModule(),
                 itemModule(),
-                kizamiModule(),
                 langModule(),
                 molangModule(),
                 packetModule(),

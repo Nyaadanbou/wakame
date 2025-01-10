@@ -32,7 +32,6 @@ import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -184,7 +183,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         val allPossibleKizamiz = selector.allPossibleSamples
         val maximumKizamiAmount = selector.maximumSampleAmount
         val resolver = Placeholder.component("count", Component.text(maximumKizamiAmount))
-        format.render(allPossibleKizamiz, Kizami::displayName, resolver)
+        format.render(allPossibleKizamiz, { it.value.displayName }, resolver)
     }
 
     @JvmField

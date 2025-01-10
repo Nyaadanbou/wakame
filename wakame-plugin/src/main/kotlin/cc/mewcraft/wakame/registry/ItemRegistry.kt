@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.NekoItemHolder
+import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -19,7 +20,6 @@ import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.world.entity.EntityTypeHolderRegistryConfigStorage
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.key.Key
@@ -38,7 +38,6 @@ import kotlin.system.measureTimeMillis
         AttributeRegistry::class,
         EntityTypeHolderRegistryConfigStorage::class,
         ItemSkinRegistry::class,
-        KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
         AbilityRegistry::class,
@@ -48,7 +47,6 @@ import kotlin.system.measureTimeMillis
     runAfter = [
         EntityTypeHolderRegistryConfigStorage::class,
         ItemSkinRegistry::class,
-        KizamiRegistry::class,
         LevelMappingRegistry::class,
         RarityRegistry::class,
         AbilityRegistry::class,

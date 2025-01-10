@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -232,7 +232,7 @@ var NekoStack.rarity: Rarity by mapped(ItemComponentTypes.RARITY, RarityRegistry
 
 var NekoStack.elements: Set<RegistryEntry<Element>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
 
-var NekoStack.kizamiz: Set<Kizami> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
+var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 

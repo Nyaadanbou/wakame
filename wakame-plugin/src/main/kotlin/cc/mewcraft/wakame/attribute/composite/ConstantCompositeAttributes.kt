@@ -184,8 +184,8 @@ sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, Compo
      */
     abstract override fun serializeAsTag(): CompoundTag
 
-    override fun provideAttributeModifiers(sourceId: Key): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[id].createAttributeModifiers(sourceId, this)
+    override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
+        return AttributeRegistry.FACADES[id].createAttributeModifiers(modifierId, this)
     }
 }
 

@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:antigravity
+  - type: antigravity
     weight: 3
-  - type: kizami:berserker
+  - type: berserker
     weight: 2
-  - type: kizami:guarding
+  - type: guarding
     weight: 1

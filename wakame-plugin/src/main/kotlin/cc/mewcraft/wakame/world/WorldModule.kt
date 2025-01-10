@@ -4,9 +4,9 @@
 package cc.mewcraft.wakame.world
 
 import cc.mewcraft.wakame.NEKO
+import cc.mewcraft.wakame.entity.EntityKeyLookupImpl
+import cc.mewcraft.wakame.entity.UnbreakableArmorStand
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
-import cc.mewcraft.wakame.world.entity.EntityKeyLookupImpl
-import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -17,7 +17,7 @@ internal fun worldModule(): Module = module {
     //</editor-fold>
 
     //<editor-fold desc="Entity">
-    singleOf(::UnbreakableArmorStandListener)
+    singleOf(::UnbreakableArmorStand)
 
     single<EntityKeyLookup> {
         fun registerImplementation(

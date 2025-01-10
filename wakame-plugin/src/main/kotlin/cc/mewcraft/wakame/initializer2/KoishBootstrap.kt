@@ -10,12 +10,15 @@ import cc.mewcraft.wakame.damage.DamageListener
 import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.ecs.EcsListener
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.entity.UnbreakableArmorStand
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
 import cc.mewcraft.wakame.gui.GuiManager
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
+import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
@@ -24,15 +27,12 @@ import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
-import cc.mewcraft.wakame.world.attribute.AttributeSupplierRegistryConfigStorage
-import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.bukkit.event.Listener
 import org.koin.core.component.KoinComponent
@@ -75,7 +75,7 @@ object KoishBootstrap : KoinComponent {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
-        saveResourceRecursively(KIZAMI_DIR_NAME)
+        saveResourceRecursively(KizamiRegistryConfigStorage.DIR_PATH)
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
@@ -120,7 +120,7 @@ object KoishBootstrap : KoinComponent {
         registerListener<ResourcePackPlayerListener>()
 
         // game world
-        registerListener<UnbreakableArmorStandListener>()
+        registerListener<UnbreakableArmorStand>()
         registerListener<PlayerDeathProtect>()
 
         // compatibility

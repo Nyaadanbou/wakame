@@ -7,7 +7,7 @@ import java.lang.reflect.AnnotatedType
 import java.lang.reflect.Type
 
 // FIXME rename to KoishTypeSerializer
-interface TypeSerializer<T> : TypeSerializer<T> {
+fun interface TypeSerializer<T> : TypeSerializer<T> {
     override fun deserialize(type: Type, node: ConfigurationNode): T
     override fun deserialize(type: AnnotatedType, node: ConfigurationNode): T = super.deserialize(type, node)
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Unit = throw UnsupportedOperationException()

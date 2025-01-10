@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.core.WritableRegistry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
 import cc.mewcraft.wakame.registry.CompositeAttributeFacade
@@ -96,7 +96,7 @@ object KoishRegistries {
      * 铭刻.
      */
     @JvmField
-    val KIZAMI: WritableRegistry<Kizami> = registerSimple(KoishRegistryKeys.KIZAMI)
+    val KIZAMI: WritableRegistry<KizamiType> = registerSimple(KoishRegistryKeys.KIZAMI)
 
     /**
      * 等级>稀有度映射.

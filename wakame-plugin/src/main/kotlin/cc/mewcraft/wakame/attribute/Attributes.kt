@@ -205,7 +205,7 @@ private class SimpleAttributeGetter(
     }
 
     override fun of(element: Element): ElementAttribute {
-        return of(KoishRegistries.ELEMENT.wrapAsHolder(element))
+        return of(KoishRegistries.ELEMENT.wrapAsEntry(element))
     }
 
     override fun of(element: RegistryEntry<Element>): ElementAttribute {

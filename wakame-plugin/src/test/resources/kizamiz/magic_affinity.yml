@@ -3,18 +3,22 @@ display_name: <green>法力亲和
 styles: ""
 effects:
   1:
-    - type: attribute:max_mana
+    - type: "attribute_modifier"
+      id: "max_mana"
       operation: add
       value: 10
   2:
-    - type: attribute:max_mana
+    - type: "attribute_modifier"
+      id: "max_mana"
       operation: add
       value: 20
   3:
-    - type: attribute:max_mana
+    - type: "attribute_modifier"
+      id: "max_mana"
       operation: add
       value: 30
   4:
-    - type: attribute:max_mana
+    - type: "attribute_modifier"
+      id: "max_mana"
       operation: add
       value: 40

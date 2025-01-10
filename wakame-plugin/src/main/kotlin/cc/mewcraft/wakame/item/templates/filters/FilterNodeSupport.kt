@@ -4,14 +4,12 @@ import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.kizami.KIZAMI_EXTERNALS
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.NodeFacadeSupport
 import cc.mewcraft.wakame.random3.NodeRepository
 import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
@@ -27,16 +25,15 @@ import kotlin.io.path.Path
 @Init(
     stage = InitStage.PRE_WORLD,
     runBefore = [ItemRegistry::class],
-    runAfter = [KizamiRegistry::class, RarityRegistry::class],
+    runAfter = [RarityRegistry::class],
 )
 @Reload(
     runBefore = [ItemRegistry::class],
-    runAfter = [KizamiRegistry::class, RarityRegistry::class],
+    runAfter = [RarityRegistry::class],
 )
 internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/filters")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(KIZAMI_EXTERNALS)))
         registerAll(get(named(RARITY_EXTERNALS)))
         kregister(FilterSerializer)
     }.build()

@@ -1,6 +1,7 @@
-package cc.mewcraft.wakame.world.entity
+package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.world.entity.MinecraftEntityKeyLookup.get
+import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookup.get
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.entity.Entity

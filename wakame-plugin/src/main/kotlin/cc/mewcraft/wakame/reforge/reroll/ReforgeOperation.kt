@@ -19,7 +19,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.Rarity
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -145,7 +145,7 @@ private constructor(
         itemLevel: Int,
         itemRarity: Rarity,
         itemElements: Set<RegistryEntry<Element>>,
-        itemKizamiz: Set<Kizami>,
+        itemKizamiz: Set<RegistryEntry<KizamiType>>,
         itemCells: ItemCells,
     ): ItemGenerationContext {
         // 创建一个空的 context

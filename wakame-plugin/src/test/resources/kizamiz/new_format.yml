@@ -1,0 +1,25 @@
+binary_index: 6
+display_name: <green>新格式
+styles: ""
+effects:
+  0:
+    - type: "attribute_modifier" # 属性修饰器 (单个数值: 通过 value 指定)
+      id: "movement_speed"
+      value: 1
+      operation: add
+    - type: "attribute_modifier" # 属性修饰器 (单个数值, 带元素: 通过 value, element 指定)
+      id: "defense"
+      value: 3
+      element: fire
+      operation: add
+    - type: "attribute_modifier2" # 属性修饰器 (范围数值, 带元素: 通过 min, max, element 指定)
+      id: "attack_damage"
+      min: 5
+      max: 7
+      element: fire
+      operation: add
+  1:
+    - type: "player_ability" # 玩家技能
+      id: "melee/blink"
+      trigger: "combo/110"
+      variant: 0

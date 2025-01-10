@@ -20,7 +20,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
     stage = InitStage.PRE_WORLD
 )
 @Reload
-object ElementRegistryConfigStorage : RegistryConfigStorage {
+internal object ElementRegistryConfigStorage : RegistryConfigStorage {
     const val FILE_PATH: String = "elements.yml"
 
     @InitFun
@@ -43,8 +43,8 @@ object ElementRegistryConfigStorage : RegistryConfigStorage {
         val loader = buildYamlConfigLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
-            val (id, element) = parseEntry(nodeKey, node)
-            registryAction.invoke(id, element)
+            val entry = parseEntry(nodeKey, node)
+            registryAction.invoke(entry.first, entry.second)
         }
     }
 

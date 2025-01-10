@@ -8,8 +8,6 @@ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import java.util.IdentityHashMap
 import kotlin.random.Random
 
-// FIXME rename to SimpleRegistry
-// FIXME rename classes/functions according to Yarn mapping
 open class SimpleRegistry<T>(
     override val key: RegistryKey<out Registry<T>>,
 ) : WritableRegistry<T> {
@@ -98,13 +96,15 @@ open class SimpleRegistry<T>(
         }
     }
 
+    override fun get(index: Int): T? = rawIdToEntry.getOrNull(index)?.value
     override fun get(key: RegistryKey<T>): T? = keyToEntry[key]?.value
     override fun get(id: Identifier): T? = idToEntry[id]?.value
 
-    override fun getId(value: T): Identifier? = valueToEntry[value]?.getKey()?.value
+    override fun getRawId(value: T): Int = entryToRawId.getInt(value)
     override fun getKey(value: T): RegistryKey<T>? = valueToEntry[value]?.getKey()
+    override fun getId(value: T): Identifier? = valueToEntry[value]?.getKey()?.value
 
-    override fun getDefaultEntry(): RegistryEntry.Reference<T>? = rawIdToEntry.first()
+    override fun getDefaultEntry(): RegistryEntry.Reference<T>? = rawIdToEntry.firstOrNull()
     override fun getRandomEntry(random: Random): RegistryEntry.Reference<T>? = rawIdToEntry.randomOrNull(random)
 
     override val ids: Set<Identifier>
@@ -128,7 +128,7 @@ open class SimpleRegistry<T>(
         }
 
         if (frozen) {
-            throw Util.pauseInIde(IllegalStateException("Trying to create intrusive holder for '$id' in frozen registry '${this.key}'"))
+            throw Util.pauseInIde(IllegalStateException("Trying to create intrusive entry for '$id' in frozen registry '${this.key}'"))
         }
 
         // 序列化可能会在该注册表未加载数据时, 多次使用同一个 id 创建 intrusive holder.
@@ -141,11 +141,11 @@ open class SimpleRegistry<T>(
             // 检查是否有未注册的 intrusive reference holders.
             // 发生该错误的原因: 通常是引用该注册表的配置文件写错了 id,
             // 例如属性里写了 "fire" 元素但元素注册表里不存在 "fire"
-            throw IllegalStateException("Found unregistered intrusive holders in registry '${this.key}': ${intrusiveIdToEntry.keys.joinToString()}")
+            throw IllegalStateException("Found unregistered intrusive entries in registry '${this.key}': ${intrusiveIdToEntry.keys.joinToString()}")
         } else if (!rawIdToEntry.all(RegistryEntry.Reference<T>::hasValue)) {
             // 检查所有的 reference holders 都已经绑定了数据.
             // 发生该错误的原因: 暂时不太清楚, 等代码跑起来再看.
-            throw IllegalStateException("Found unbound reference holders in registry '${this.key}': ${rawIdToEntry.filterNot(RegistryEntry.Reference<T>::hasValue).map(RegistryEntry.Reference<T>::getKey).joinToString()}")
+            throw IllegalStateException("Found unbound reference entries in registry '${this.key}': ${rawIdToEntry.filterNot(RegistryEntry.Reference<T>::hasValue).map(RegistryEntry.Reference<T>::getKey).joinToString()}")
         } else {
             this
         }
@@ -155,16 +155,8 @@ open class SimpleRegistry<T>(
     override fun getEntry(key: RegistryKey<T>): RegistryEntry.Reference<T>? = keyToEntry[key]
     override fun getEntry(id: Identifier): RegistryEntry.Reference<T>? = idToEntry[id]
 
-    override fun wrapAsHolder(value: T): RegistryEntry<T> {
+    override fun wrapAsEntry(value: T): RegistryEntry<T> {
         return valueToEntry[value] ?: throw IllegalStateException("Trying to wrap unregistered value '$value' in registry '${this.key}'")
-    }
-
-    override fun getRawId(value: T): Int {
-        return entryToRawId.getInt(value)
-    }
-
-    override fun get(index: Int): T? {
-        return rawIdToEntry.getOrNull(index)?.value
     }
 
     override fun size(): Int {

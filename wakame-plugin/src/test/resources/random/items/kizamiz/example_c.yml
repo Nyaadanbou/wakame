@@ -1,7 +1,7 @@
 nodes:
-  - type: kizami:berserker
+  - type: berserker
     weight: 3
-  - type: kizami:guarding
+  - type: guarding
     weight: 2
-  - type: kizami:magic_affinity
+  - type: magic_affinity
     weight: 1

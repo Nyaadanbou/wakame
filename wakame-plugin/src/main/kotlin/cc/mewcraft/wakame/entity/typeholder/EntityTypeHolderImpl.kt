@@ -1,6 +1,8 @@
-package cc.mewcraft.wakame.world.entity
+package cc.mewcraft.wakame.entity.typeholder
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
+import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 

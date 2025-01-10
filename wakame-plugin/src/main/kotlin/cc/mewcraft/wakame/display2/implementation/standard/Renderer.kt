@@ -39,7 +39,6 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.packet.PacketNekoStack
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
@@ -217,7 +216,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val KIZAMIZ: RenderingHandler<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
-        format.render(data.kizamiz, Kizami::displayName)
+        format.render(data.kizamiz) { it.value.displayName }
     }
 
     @JvmField

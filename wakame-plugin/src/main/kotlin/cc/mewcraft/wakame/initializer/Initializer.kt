@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.dependency.CircularDependencyException
 import cc.mewcraft.wakame.dependency.DependencyResolver
 import cc.mewcraft.wakame.ecs.EcsListener
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.entity.UnbreakableArmorStand
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.gui.GuiManager
@@ -31,7 +31,6 @@ import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.KizamiRegistry.KIZAMI_DIR_NAME
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
@@ -39,7 +38,6 @@ import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
 import cc.mewcraft.wakame.util.registerSuspendingEvents
-import cc.mewcraft.wakame.world.entity.UnbreakableArmorStandListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import com.github.shynixn.mccoroutine.bukkit.launch
 import kotlinx.coroutines.CoroutineName
@@ -127,13 +125,13 @@ object Initializer : KoinComponent, Listener {
         saveDefaultConfig() // config.yml
         saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
         saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
-        saveResourceRecursively(KIZAMI_DIR_NAME)
+        // saveResourceRecursively(KIZAMI_DIR_NAME) // FIXME remove old Initializer
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
         saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
-        saveResource(ElementRegistryConfigStorage.FILE_PATH)
+        // saveResource(ElementRegistryConfigStorage.FILE_PATH) // FIXME remove old Initializer
         // saveResource(ENTITY_GLOBAL_CONFIG_FILE) FIXME remove old Initializer
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LEVEL_GLOBAL_CONFIG_FILE)
@@ -172,7 +170,7 @@ object Initializer : KoinComponent, Listener {
         registerListener<ResourcePackPlayerListener>()
 
         // game world
-        registerListener<UnbreakableArmorStandListener>()
+        registerListener<UnbreakableArmorStand>()
         registerListener<PlayerDeathProtect>()
 
         // compatibility

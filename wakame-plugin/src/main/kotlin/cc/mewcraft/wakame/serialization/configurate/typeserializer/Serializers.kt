@@ -11,8 +11,15 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.reflection.javaTypeOf
 
+/**
+ * 本集合包含会在项目多个地方使用的 [TypeSerializer].
+ *
+ * 如果一个 [TypeSerializer] 只会在一个地方使用, 那么它应该直接在使用它的
+ * [org.spongepowered.configurate.loader.ConfigurationLoader] 中注册.
+ */
 val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // Koish Object
+    .register(AttributeModifierSerializer)
     .register(NumericValueSerializer)
     // Adventure Text
     .register(ComponentSerializer)

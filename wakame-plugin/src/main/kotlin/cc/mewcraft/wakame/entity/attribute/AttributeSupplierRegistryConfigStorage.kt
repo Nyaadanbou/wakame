@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
@@ -22,7 +22,7 @@ import cc.mewcraft.wakame.util.buildYamlConfigLoader
     ]
 )
 @Reload
-object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
+internal object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
     const val FILE_PATH = "entities.yml"
 
     @InitFun
@@ -42,7 +42,7 @@ object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText()).node("entity_attributes")
         val dataMap = AttributeSupplierSerializer.deserialize(rootNode)
         dataMap.forEach { (k, v) ->
-            registryAction.invoke(k, v)
+            registryAction(k, v)
         }
     }
 }

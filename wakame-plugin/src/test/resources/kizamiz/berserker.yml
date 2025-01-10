@@ -3,5 +3,7 @@ display_name: <green>狂战士之血
 styles: ""
 effects: { } # 测试环境无法加载 RegistryAccess, 因此不能加载所有需要 RegistryAccess 的对象
 #  1:
-#    - type: ability:buff/potion_remove
-#      trigger: trigger:combo/101
+#    - type: "player_ability"
+#      id: "buff/potion_remove"
+#      trigger: "combo/101"
+#      variant: 0

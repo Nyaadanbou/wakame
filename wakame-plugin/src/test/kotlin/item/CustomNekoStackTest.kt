@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.KizamiRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.world.TimeControl
 import io.papermc.paper.registry.RegistryKey
@@ -250,7 +249,7 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(core)
 
                 fun assert(element: RegistryEntry<Element>, expectedMin: Double, expectedMax: Double) {
-                    val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
+                    val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
                     assertNotNull(modMin)
@@ -276,7 +275,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
+                val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
@@ -710,8 +709,8 @@ class CustomNekoStackTest : KoinTest {
             val kizamiz = it.kizamiz
             assertEquals(2, kizamiz.size)
             val possibleKizamiz = setOf(
-                KizamiRegistry.INSTANCES["wind_lace"],
-                KizamiRegistry.INSTANCES["antigravity"],
+                KoishRegistries.KIZAMI.getEntryOrThrow("wind_lace"),
+                KoishRegistries.KIZAMI.getEntryOrThrow("antigravity"),
             )
             assertTrue(kizamiz.all { it in possibleKizamiz })
         }

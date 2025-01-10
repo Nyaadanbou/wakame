@@ -223,7 +223,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                 val core = cell.getCore() as? AttributeCore ?: continue
                 val attribute = core.attribute
                 val sourceId = context.id.withValue { "$it/${slot.slotIndex}/$id" }
-                val attributeModifiers = attribute.provideAttributeModifiers(sourceId)
+                val attributeModifiers = attribute.createAttributeModifiers(sourceId)
                 ret.putAll(attributeModifiers.entries)
             }
             return ret.build()

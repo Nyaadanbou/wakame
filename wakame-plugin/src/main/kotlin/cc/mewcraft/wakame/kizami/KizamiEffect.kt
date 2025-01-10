@@ -1,53 +1,109 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.ability.character.CasterAdapter
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.core.Registry
+import cc.mewcraft.wakame.core.SimpleRegistry
+import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.typeTokenOf
+import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.key.Key
+import org.spongepowered.configurate.serialize.SerializationException
 
 /**
- * Represents a collection of potential effects provided by a kizami.
- *
- * The same kizami of different amount can provide a different [KizamiEffect].
- *
- * @see KizamiInstance
+ * 铭刻的效果.
  */
-sealed interface KizamiEffect {
-    /**
-     * The collection of effects, such as attributes (modifiers) and abilities.
-     */
-    val effects: List<Single<*>>
+interface KizamiEffect {
+    val type: KizamiEffectType<*>
+    fun apply(user: User<*>)
+    fun remove(user: User<*>)
+}
 
-    /**
-     * Applies the [kizami effects][effects] to the [user].
-     */
-    fun apply(/* kizami: Kizami, */ user: User<*>) {
-        effects.forEach { it.apply(/* kizami, */ user) }
+/**
+ * 铭刻效果的类型.
+ */
+class KizamiEffectType<T : KizamiEffect>(val type: TypeToken<T>) {
+    val id: String
+        get() = REGISTRY.getId(this).toString()
+
+    companion object {
+        val REGISTRY: SimpleRegistry<KizamiEffectType<*>> = Registry.of("kizami_effect_type")
+    }
+}
+
+/**
+ * 铭刻效果类型的注册表.
+ */
+object KizamiEffectTypes {
+    val PLAYER_ABILITY = register<KizamiEffectPlayerAbility>("player_ability")
+    val ATTRIBUTE_MODIFIER = register<KizamiEffectAttributeModifier>("attribute_modifier")
+
+    private inline fun <reified T : KizamiEffect> register(id: String): KizamiEffectType<T> {
+        return Registry.register(KizamiEffectType.REGISTRY, id, KizamiEffectType(typeTokenOf()))
+    }
+}
+
+/**
+ * 铭刻效果：玩家技能.
+ */
+class KizamiEffectPlayerAbility(
+    private val ability: PlayerAbility,
+) : KizamiEffect {
+    override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
+
+    override fun apply(user: User<*>) {
+        ability.recordBy(CasterAdapter.adapt(user), null, null)
     }
 
-    /**
-     * Removes the [kizami effects][effects] from the [user].
-     */
-    fun remove(/* kizami: Kizami, */ user: User<*>) {
-        effects.forEach { it.remove(/* kizami, */ user) }
+    override fun remove(user: User<*>) {
+        // do nothing
     }
 
-    /**
-     * A single effect.
-     *
-     * @param T the effect type
-     */
-    interface Single<T> {
-        /**
-         * A single effect.
-         */
-        val effect: T
+    companion object {
+        val SERIALIZER = TypeSerializer<KizamiEffectPlayerAbility> { type, node ->
+            val id = node.node("id").krequire<Key>()
+            val ability = PlayerAbility(id, node)
 
-        /**
-         * Applies the [single effect][effect] to the [user].
-         */
-        fun apply(/* kizami: Kizami, */ user: User<*>)
+            KizamiEffectPlayerAbility(ability)
+        }
+    }
+}
 
-        /**
-         * Removes the [single effect][effect] from the [user].
-         */
-        fun remove(/* kizami: Kizami, */ user: User<*>)
+/**
+ * 铭刻效果：属性修饰器.
+ */
+class KizamiEffectAttributeModifier(
+    private val modifiers: Map<Attribute, AttributeModifier>,
+) : KizamiEffect {
+    override val type: KizamiEffectType<*> = KizamiEffectTypes.ATTRIBUTE_MODIFIER
+
+    override fun apply(user: User<*>) {
+        modifiers.forEach { (attribute, modifier) ->
+            user.attributeMap.getInstance(attribute)?.addTransientModifier(modifier)
+        }
+    }
+
+    override fun remove(user: User<*>) {
+        modifiers.forEach { (attribute, modifier) ->
+            user.attributeMap.getInstance(attribute)?.removeModifier(modifier)
+        }
+    }
+
+    companion object {
+        val SERIALIZER = TypeSerializer<KizamiEffectAttributeModifier> { type, node ->
+            val id = node.node("id").krequire<String>()
+            val attribute = ConstantCompositeAttribute(id, node)
+            val kizamiId = node.hint(RepresentationHints.KIZAMI_ID)
+                ?: throw SerializationException(node, type, "No such hint '${RepresentationHints.KIZAMI_ID}' in node '$node'")
+            val modifiers = attribute.createAttributeModifiers(kizamiId)
+
+            KizamiEffectAttributeModifier(modifiers)
+        }
     }
 }
