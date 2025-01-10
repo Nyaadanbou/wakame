@@ -9,9 +9,9 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 
 /**
- * 代表了一个技能执行的结果.
+ * 代表了一个主动技能执行的机制.
  */
-abstract class AbilityMechanic : Mechanic {
+abstract class ActiveAbilityMechanic : Mechanic {
 
     /**
      * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.ability.state.PlayerStateInfo].
@@ -68,4 +68,4 @@ abstract class AbilityMechanic : Mechanic {
     }
 }
 
-data object EmptyAbilityMechanic : AbilityMechanic()
+data object EmptyAbilityMechanic : ActiveAbilityMechanic()

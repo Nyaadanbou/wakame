@@ -3,12 +3,13 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityMechanic
+import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.factory.AbilityFactory
 import cc.mewcraft.wakame.ability.factory.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
+import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
@@ -51,7 +52,7 @@ interface Blink : Ability {
         override val distance: Int,
         override val teleportedMessages: AudienceMessageGroup,
     ) : Blink, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): AbilityMechanic {
+        override fun mechanic(input: AbilityInput): Mechanic {
             return BlinkAbilityMechanic(distance, teleportedMessages)
         }
     }
@@ -60,7 +61,7 @@ interface Blink : Ability {
 private class BlinkAbilityMechanic(
     val distance: Int,
     val teleportedMessages: AudienceMessageGroup,
-) : AbilityMechanic() {
+) : ActiveAbilityMechanic() {
 
     private var isTeleported: Boolean = false
 

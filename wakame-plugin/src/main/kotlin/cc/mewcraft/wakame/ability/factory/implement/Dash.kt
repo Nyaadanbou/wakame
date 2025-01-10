@@ -1,13 +1,15 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityMechanic
+import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.AbilityProvider
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.factory.AbilityFactory
+import cc.mewcraft.wakame.ability.factory.abilitySupport
+import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
@@ -70,7 +72,7 @@ interface Dash : Ability {
         override val hitEffects: List<AbilityProvider>,
         override val hitInterval: Long,
     ) : Dash, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): AbilityMechanic {
+        override fun mechanic(input: AbilityInput): Mechanic {
             return DashAbilityMechanic(this)
         }
     }
@@ -78,7 +80,7 @@ interface Dash : Ability {
 
 private class DashAbilityMechanic(
     private val ability: Dash,
-) : AbilityMechanic() {
+) : ActiveAbilityMechanic() {
 
     companion object {
         /**

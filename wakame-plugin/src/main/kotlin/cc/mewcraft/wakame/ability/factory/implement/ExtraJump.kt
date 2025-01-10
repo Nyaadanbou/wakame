@@ -3,11 +3,12 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityMechanic
+import cc.mewcraft.wakame.ability.PassiveAbilityMechanic
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.factory.AbilityFactory
 import cc.mewcraft.wakame.ability.factory.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
+import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.data.SpiralPath
 import cc.mewcraft.wakame.ecs.external.ComponentMap
@@ -41,9 +42,9 @@ interface ExtraJump : Ability {
         key: Key,
         config: ConfigurationNode,
         override val count: Int,
-        override val jumpedMessages: AudienceMessageGroup
+        override val jumpedMessages: AudienceMessageGroup,
     ) : ExtraJump, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): AbilityMechanic {
+        override fun mechanic(input: AbilityInput): Mechanic {
             return ExtraJumpAbilityMechanic(count, jumpedMessages)
         }
     }
@@ -51,8 +52,8 @@ interface ExtraJump : Ability {
 
 private class ExtraJumpAbilityMechanic(
     private val count: Int,
-    private val jumpedMessages: AudienceMessageGroup
-) : AbilityMechanic() {
+    private val jumpedMessages: AudienceMessageGroup,
+) : PassiveAbilityMechanic() {
     private lateinit var jumpSubscription: Subscription
     private lateinit var touchGroundSubscription: Subscription
 
@@ -63,7 +64,7 @@ private class ExtraJumpAbilityMechanic(
             .filter { it.player == componentMap.castByEntity() }
             .filter { jumpCount > 0 }
             .filter { it.input.isJump }
-            .filter { !it.player.isOnGround } // Spigot 弃用此方法的原因是客户端可以通过发包来欺骗服务器, 我们这里不考虑挂端欺骗的情况.
+            .filter { @Suppress("DEPRECATION") !it.player.isOnGround } // Spigot 弃用此方法的原因是客户端可以通过发包来欺骗服务端, 我们这里不考虑挂端欺骗的情况.
             .handler {
                 // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
                 val player = it.player
@@ -80,7 +81,7 @@ private class ExtraJumpAbilityMechanic(
 
         touchGroundSubscription = Events.subscribe(PlayerMoveEvent::class.java)
             .filter { it.player == componentMap.castByEntity() }
-            .filter { it.player.isOnGround }
+            .filter { @Suppress("DEPRECATION") it.player.isOnGround }
             .handler {
                 // 重置跳跃状态.
                 jumpCount = count
