@@ -14,6 +14,7 @@ import kotlin.jvm.optionals.getOrNull
  *
  * @param T 该 [Evaluable] 由类型 [T] 的值组成.
  */
+// FIXME 重命名为 Expression(表达式), 去除泛型
 interface Evaluable<T : Any> {
     companion object {
         /**

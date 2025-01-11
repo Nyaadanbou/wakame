@@ -67,7 +67,7 @@ internal object KizamiRegistryConfigStorage : RegistryConfigStorage {
         for (file in dir.walk().drop(1).filter(File::isFile)) {
             try {
                 val rootNode = loader.buildAndLoadString(file.readText())
-                val kizamiId = Identifiers.ofKoish(file.nameWithoutExtension)
+                val kizamiId = Identifiers.of(file.nameWithoutExtension)
 
                 // 开发日记 2024/8/31 小米
                 // 因为铭刻现在是“一文件, 一铭刻” 所以文件内部无从得知铭刻的 id

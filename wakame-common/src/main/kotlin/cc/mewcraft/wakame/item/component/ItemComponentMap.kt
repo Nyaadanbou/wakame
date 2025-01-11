@@ -41,6 +41,10 @@ interface ItemComponentMap : Iterable<TypedItemComponent<*>>, Examinable {
         return get(type) ?: fallback
     }
 
+    fun <T> getOrDefault(type: ItemComponentType<out T>, fallback: () -> T): T {
+        return get(type) ?: fallback()
+    }
+
     fun <T> getTyped(type: ItemComponentType<T>): TypedItemComponent<T>? {
         val value = get(type) ?: return null
         return TypedItemComponent(type, value)

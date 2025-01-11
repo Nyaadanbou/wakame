@@ -25,7 +25,6 @@ import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
@@ -35,8 +34,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
@@ -73,7 +70,6 @@ data class ItemKizamiz(
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
-                .registerAll(get(named(RARITY_EXTERNALS)))
                 .kregister(KizamiPoolSerializer)
                 .kregister(KizamiGroupSerializer)
                 .kregister(FilterSerializer) // 凡是随机池都要用到筛选器

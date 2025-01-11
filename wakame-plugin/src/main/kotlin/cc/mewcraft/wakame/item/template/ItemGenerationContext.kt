@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -48,7 +48,7 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
     /**
      * 已经生成的物品稀有度.
      */
-    var rarity: Rarity?
+    var rarity: RegistryEntry<RarityType>?
 
     /**
      * 已经生成的物品元素.
@@ -96,7 +96,7 @@ private class SimpleItemGenerationContext(
     override val random: Random = Random(seed)
     override val marks: MutableCollection<Mark> by ObservableDelegates.set(HashSet())
     override var level: Int? by ObservableDelegates.reference(null)
-    override var rarity: Rarity? by ObservableDelegates.reference(null)
+    override var rarity: RegistryEntry<RarityType>? by ObservableDelegates.reference(null)
     override val elements: MutableCollection<RegistryEntry<ElementType>> by ObservableDelegates.set(HashSet())
     override val kizamiz: MutableCollection<RegistryEntry<KizamiType>> by ObservableDelegates.set(HashSet())
     override val abilities: MutableCollection<AbilityContextData> by ObservableDelegates.set(HashSet())

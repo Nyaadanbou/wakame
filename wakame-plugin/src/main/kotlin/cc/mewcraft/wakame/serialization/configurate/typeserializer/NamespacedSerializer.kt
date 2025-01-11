@@ -13,7 +13,7 @@ import java.util.function.Predicate
 internal object KeySerializer : ScalarSerializer<Key>(Key::class.java) {
     override fun deserialize(type: Type, obj: Any): Key {
         return try {
-            Identifiers.ofKoish(obj.toString()) // 默认使用 koish 命名空间
+            Identifiers.of(obj.toString()) // 默认使用 koish 命名空间
         } catch (e: InvalidKeyException) {
             throw SerializationException(type, "Invalid key: '$obj'", e)
         }

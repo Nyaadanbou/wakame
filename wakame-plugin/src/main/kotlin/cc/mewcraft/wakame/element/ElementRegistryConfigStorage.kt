@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.asMinimalString2
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.text.Component
@@ -49,13 +50,13 @@ internal object ElementRegistryConfigStorage : RegistryConfigStorage {
     }
 
     private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, ElementType> {
-        val stringId = nodeKey.toString()
-        val resourceLocation = Identifiers.ofKoish(stringId)
+        val id = Identifiers.of(nodeKey.toString())
+        val stringId = id.asMinimalString2()
         val integerId = node.node("binary_index").krequire<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
 
-        return resourceLocation to ElementType(resourceLocation, stringId, integerId, displayName, displayStyles)
+        return id to ElementType(id, stringId, integerId, displayName, displayStyles)
     }
 }
 

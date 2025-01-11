@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
@@ -9,7 +10,7 @@ import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList
@@ -100,23 +101,23 @@ internal data class RarityRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun renderSimple(rarity: Rarity): IndexedText {
+    fun renderSimple(rarity: RegistryEntry<RarityType>): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     simple,
-                    component("rarity_display_name", rarity.displayName)
+                    component("rarity_display_name", rarity.value.displayName)
                 )
             )
         )
     }
 
-    fun renderComplex(rarity: Rarity, modCount: Int): IndexedText {
+    fun renderComplex(rarity: RegistryEntry<RarityType>, modCount: Int): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     complex,
-                    component("rarity_display_name", rarity.displayName),
+                    component("rarity_display_name", rarity.value.displayName),
                     component("reforge_mod_count", Component.text(modCount.toString()))
                 )
             )

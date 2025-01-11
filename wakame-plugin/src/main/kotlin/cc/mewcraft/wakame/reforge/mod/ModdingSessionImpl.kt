@@ -149,15 +149,15 @@ internal class SimpleModdingSession(
     }
 
     override fun getSourceItemLevel(): Int {
-        return usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level ?: 0
+        return usableInput?.level ?: 0
     }
 
     override fun getSourceItemRarityNumber(): Double {
-        return usableInput?.components?.get(ItemComponentTypes.RARITY)?.rarity?.let { table.rarityNumberMapping.get(it.key) } ?: .0
+        return usableInput?.rarity?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
     }
 
     override fun getSourceItemTotalCellCount(): Int {
-        return usableInput?.components?.get(ItemComponentTypes.CELLS)?.size ?: 0
+        return usableInput?.cells?.size ?: 0
     }
 
     override fun getSourceItemChangeableCellCount(): Int {
@@ -588,7 +588,7 @@ private object ReforgeReplace {
         }
 
         override fun getIngredientRarityNumber(): Double {
-            return usableInput?.rarity?.let { session.table.rarityNumberMapping.get(it.key) } ?: .0
+            return usableInput?.rarity?.getKeyOrThrow()?.value?.let(session.table.rarityNumberMapping::get) ?: .0
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

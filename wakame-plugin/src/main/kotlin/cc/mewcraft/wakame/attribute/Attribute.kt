@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.core.RegistryEntry
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.util.toSimpleString
@@ -49,6 +50,10 @@ protected constructor(
     defaultValue: Provider<Double>,
     final override val vanilla: Boolean = false,
 ) : Examinable, Attribute {
+
+    init {
+        KoishRegistries.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
+    }
 
     // 需要注意 (kotlin 委托基础)
     // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider

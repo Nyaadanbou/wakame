@@ -1,8 +1,6 @@
 # 在这里设置重造台物品的 *渲染布局*.
 
 primary:
-  - reforge:standalone_cell
-
   - (fixed:general)
   - general:level
   - general:rarity

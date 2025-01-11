@@ -13,13 +13,13 @@ import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.rarity.LevelMapping
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.LevelRarityMapping
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.ofKoish("root")
+    val ROOT_REGISTRY_NAME = Identifiers.of("root")
 
     ///
 
@@ -54,14 +54,14 @@ object KoishRegistryKeys {
     val KIZAMI = createRegistryKey<KizamiType>("kizami")
 
     @JvmField
-    val LEVEL_RARITY_MAPPING = createRegistryKey<LevelMapping>("level_rarity_mapping")
+    val LEVEL_RARITY_MAPPING = createRegistryKey<LevelRarityMapping>("level_rarity_mapping")
 
     @JvmField
-    val RARITY = createRegistryKey<Rarity>("rarity")
+    val RARITY = createRegistryKey<RarityType>("rarity")
 
     ///
 
     private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
-        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.ofKoish(name))
+        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
     }
 }

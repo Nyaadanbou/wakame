@@ -82,8 +82,8 @@ object Attributes : AttributeProvider {
     /**
      * Gets all [Attribute.id] of known attributes.
      */
-    val descriptionIds: Set<String>
-        get() = AttributeProviderInternals.primitiveIds + SimpleAttributeGetter.simpleIds
+    val simpleIds: Set<String>
+        get() = AttributeProviderInternals.simpleIds + SimpleAttributeGetter.simpleIds
 
     /**
      * Gets all [Attribute.bundleId] of known vanilla-backed attributes.
@@ -227,7 +227,7 @@ private class SimpleAttributeGetter(
     companion object Shared {
         private val INSTANCES: HashSet<AttributeGetter> = HashSet()
 
-        // description id -> element attribute
+        // simple id -> element attribute
         private val SIMPLE_ID_TO_ATTRIBUTE: HashMap<String, ElementAttribute> = HashMap()
 
         // bundle id -> set <element attribute>
@@ -249,9 +249,14 @@ private class SimpleAttributeGetter(
 
         @Synchronized
         private fun registerAttribute(attribute: ElementAttribute): ElementAttribute {
-            SIMPLE_ID_TO_ATTRIBUTE[attribute.id] = attribute
-            BUNDLE_ID_TO_ATTRIBUTE_SET.computeIfAbsent(attribute.bundleId) { _ -> HashSet() }.add(attribute)
+            val simpleId = attribute.id
+            val bundleId = attribute.bundleId
+
+            SIMPLE_ID_TO_ATTRIBUTE[simpleId] = attribute
+            BUNDLE_ID_TO_ATTRIBUTE_SET.computeIfAbsent(bundleId) { _ -> HashSet() }.add(attribute)
+
             AttributeNamesHolder.register(attribute)
+
             return attribute
         }
 
@@ -277,14 +282,14 @@ private class SimpleAttributeGetter(
 
 // 封装了一些内部状态, 以提供更简洁的接口
 private object AttributeProviderInternals {
-    // description id -> attribute
+    // simple id -> attribute
     private val SIMPLE_ID_TO_ATTRIBUTE: HashMap<String, Attribute> = HashMap()
 
     // bundle id -> attribute set
     private val BUNDLE_ID_TO_ATTRIBUTE_SET: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
 
-    // 所有已知的 attribute 的 description id
-    val primitiveIds: Set<String>
+    // 所有已知的 attribute 的 simple id
+    val simpleIds: Set<String>
         get() = SIMPLE_ID_TO_ATTRIBUTE.keys
 
     @Synchronized
@@ -320,18 +325,20 @@ private object AttributeNamesHolder {
         get() = elementAttributeNameSet
 
     @Synchronized
-    fun register(attribute: Attribute) {
+    fun register(attribute: Attribute): Attribute {
         tryRegisterVanillaAttribute(attribute)
         tryRegisterElementAttribute(attribute)
+        return attribute
     }
 
-    private fun tryRegisterVanillaAttribute(attribute: Attribute) {
+    private fun tryRegisterVanillaAttribute(attribute: Attribute): Attribute {
         if (attribute.vanilla) {
             vanillaAttributeNameSet.add(attribute.bundleId)
         }
+        return attribute
     }
 
-    private fun tryRegisterElementAttribute(attribute: Attribute) {
+    private fun tryRegisterElementAttribute(attribute: Attribute): Attribute {
         if (attribute is ElementAttribute) {
             // 注册两个名字, 一个是不带元素的名字, 一个是带元素的名字.
             // 例如对于 `defense` 这个属性 (元素属性) 会注册两类名字:
@@ -340,5 +347,6 @@ private object AttributeNamesHolder {
             elementAttributeNameSet.add(attribute.bundleId.substringBefore(ElementAttribute.ELEMENT_SEPARATOR))
             elementAttributeNameSet.add(attribute.bundleId)
         }
+        return attribute
     }
 }

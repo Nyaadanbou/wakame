@@ -145,7 +145,7 @@ internal class SimpleMergingSession(
     }
 
     private fun getRarityNumber(inputItem: NekoStack?): Double {
-        return inputItem?.rarity?.key?.let(table.rarityNumberMapping::get) ?: .0
+        return inputItem?.rarity?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
     }
 
     private fun getPenalty(inputItem: NekoStack?): Double {

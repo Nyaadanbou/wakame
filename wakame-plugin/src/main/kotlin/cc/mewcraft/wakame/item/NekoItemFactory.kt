@@ -228,7 +228,7 @@ private sealed interface Validator<T> {
 
     object Unsupported : Validator<Nothing> {
         override fun validate(context: ValidatorContext<Nothing>) {
-            throw UnsupportedItemTemplateException("Adding unsupported config '${context.type.id} to item type '${context.item}''")
+            throw UnsupportedItemTemplateException("Adding unsupported config '${context.type.id}' to item type '${context.item}''")
         }
     }
 

@@ -24,12 +24,12 @@ import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
+import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.LEVEL_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.RARITY_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
@@ -84,9 +84,9 @@ object KoishBootstrap : KoinComponent {
         saveResource(ElementRegistryConfigStorage.FILE_PATH)
         saveResource(AttributeSupplierRegistryConfigStorage.FILE_PATH)
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
-        saveResource(LEVEL_GLOBAL_CONFIG_FILE)
+        saveResource(LevelRarityMappingRegistryConfigStorage.FILE_PATH)
         // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
-        saveResource(RARITY_GLOBAL_CONFIG_FILE)
+        saveResource(RarityRegistryConfigStorage.FILE_PATH)
         saveResourceRecursively("renderers")
         saveResourceRecursively("station")
         saveResourceRecursively("damage")

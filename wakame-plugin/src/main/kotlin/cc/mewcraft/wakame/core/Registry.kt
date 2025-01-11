@@ -27,7 +27,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         // 注册数据 //
 
         fun <T> register(registry: Registry<in T>, id: String, entry: T): T {
-            return register(registry, Identifiers.ofKoish(id), entry)
+            return register(registry, Identifiers.of(id), entry)
         }
 
         fun <V, T : V> register(registry: Registry<V>, id: Identifier, entry: T): T {
@@ -53,7 +53,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
          * 创建一个注册表, 位于根命名空间下.
          */
         fun <T> of(id: String): SimpleRegistry<T> {
-            return SimpleRegistry(RegistryKey.ofRegistry(Identifiers.ofKoish(id)))
+            return SimpleRegistry(RegistryKey.ofRegistry(Identifiers.of(id)))
         }
     }
 
@@ -95,10 +95,10 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
     operator fun get(key: RegistryKey<T>): T?
     operator fun get(id: Identifier): T?
-    operator fun get(id: String): T? = get(Identifiers.ofKoish(id))
+    operator fun get(id: String): T? = get(Identifiers.of(id))
     fun getOrThrow(key: RegistryKey<T>): T = get(key) ?: throw IllegalArgumentException("Missing key in ${this.key}: $key")
     fun getOrThrow(id: Identifier): T = get(id) ?: throw IllegalArgumentException("Missing id in ${this.key}: $id")
-    fun getOrThrow(id: String): T = getOrThrow(Identifiers.ofKoish(id))
+    fun getOrThrow(id: String): T = getOrThrow(Identifiers.of(id))
 
     override fun <U> keys(ops: DynamicOps<U>): Sequence<U> = ids.asSequence().map { ops.createString(it.toString()) }
 
@@ -120,7 +120,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
     fun containsKey(key: RegistryKey<T>): Boolean
     fun containsId(id: Identifier): Boolean
-    fun containsId(id: String): Boolean = containsId(Identifiers.ofKoish(id))
+    fun containsId(id: String): Boolean = containsId(Identifiers.of(id))
 
     /**
      * 创建一个侵入式的 [RegistryEntry.Reference] 实例并返回.
@@ -148,7 +148,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
      * 没有绑定数据的 [RegistryEntry] 会在 [WritableRegistry.add] 执行时(通常是加载配置文件时)将数据绑定好.
      */
     fun createEntry(id: Identifier): RegistryEntry.Reference<T>
-    fun createEntry(id: String): RegistryEntry.Reference<T> = createEntry(Identifiers.ofKoish(id))
+    fun createEntry(id: String): RegistryEntry.Reference<T> = createEntry(Identifiers.of(id))
 
     /**
      * 验证注册表的数据是否正确.
@@ -161,11 +161,11 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun getEntry(rawId: Int): RegistryEntry.Reference<T>?
     fun getEntry(key: RegistryKey<T>): RegistryEntry.Reference<T>?
     fun getEntry(id: Identifier): RegistryEntry.Reference<T>?
-    fun getEntry(id: String): RegistryEntry.Reference<T>? = getEntry(Identifiers.ofKoish(id))
+    fun getEntry(id: String): RegistryEntry.Reference<T>? = getEntry(Identifiers.of(id))
     fun getEntryOrThrow(rawId: Int): RegistryEntry.Reference<T> = getEntry(rawId) ?: throw IllegalStateException("Missing raw id in registry ${this.key}: $rawId")
     fun getEntryOrThrow(key: RegistryKey<T>): RegistryEntry.Reference<T> = getEntry(key) ?: throw IllegalStateException("Missing key in registry ${this.key}: $key")
     fun getEntryOrThrow(id: Identifier): RegistryEntry.Reference<T> = getEntry(id) ?: throw IllegalStateException("Missing id in registry ${this.key}: $id")
-    fun getEntryOrThrow(id: String): RegistryEntry.Reference<T> = getEntryOrThrow(Identifiers.ofKoish(id))
+    fun getEntryOrThrow(id: String): RegistryEntry.Reference<T> = getEntryOrThrow(Identifiers.of(id))
 
     fun wrapAsEntry(value: T): RegistryEntry<T>
 
@@ -193,11 +193,11 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 interface WritableRegistry<T> : Registry<T> {
     fun update(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T>
     fun update(id: Identifier, value: T): RegistryEntry.Reference<T> = update(RegistryKey.of(this.key, id), value)
-    fun update(id: String, value: T): RegistryEntry.Reference<T> = update(Identifiers.ofKoish(id), value)
+    fun update(id: String, value: T): RegistryEntry.Reference<T> = update(Identifiers.of(id), value)
 
     fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T>
     fun add(id: Identifier, value: T): RegistryEntry.Reference<T> = add(RegistryKey.of(this.key, id), value)
-    fun add(id: String, value: T): RegistryEntry.Reference<T> = add(Identifiers.ofKoish(id), value)
+    fun add(id: String, value: T): RegistryEntry.Reference<T> = add(Identifiers.of(id), value)
 
     /**
      * 仅在注册表初始化之前调用.

@@ -2,8 +2,11 @@
 
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
+import cc.mewcraft.wakame.ability.TriggerVariantSerializer
+import cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.util.NumericValueSerializer
+import cc.mewcraft.wakame.molang.EvaluableSerializer
+import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey
@@ -20,7 +23,10 @@ import xyz.xenondevs.commons.reflection.javaTypeOf
 val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     // Koish Object
     .register(AttributeModifierSerializer)
-    .register(NumericValueSerializer)
+    .register(RandomizedValueSerializer)
+    .register(AbilityTriggerSerializer)
+    .register(TriggerVariantSerializer)
+    .register(EvaluableSerializer)
     // Adventure Text
     .register(ComponentSerializer)
     .register(StyleSerializer)

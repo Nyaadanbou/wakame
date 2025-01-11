@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.world.TimeControl
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
@@ -437,7 +436,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = RarityRegistry.INSTANCES["common"]
+        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -450,7 +449,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("Foo", it.content())
 
-            val expectedStyle = Style.style(*common.displayStyles)
+            val expectedStyle = Style.style(*common.value.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -670,7 +669,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = RarityRegistry.INSTANCES["common"]
+        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -683,7 +682,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("普通", it.content())
 
-            val expectedStyle = Style.style(*common.displayStyles)
+            val expectedStyle = Style.style(*common.value.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -700,7 +699,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val rarity = RarityRegistry.INSTANCES["rare"]
+        val rarity = KoishRegistries.RARITY.getEntryOrThrow("rare")
         context {
             it.rarity = rarity // 假设稀有度
         }

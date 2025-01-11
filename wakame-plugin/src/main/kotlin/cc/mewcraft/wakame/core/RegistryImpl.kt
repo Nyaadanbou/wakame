@@ -172,7 +172,7 @@ open class SimpleDefaultedRegistry<T>(
     defaultId: String,
     override val key: RegistryKey<out Registry<T>>,
 ) : SimpleRegistry<T>(key), DefaultedWritableRegistry<T> {
-    override val defaultId: Identifier = Identifiers.ofKoish(defaultId)
+    override val defaultId: Identifier = Identifiers.of(defaultId)
     private lateinit var defaultEntry: RegistryEntry.Reference<T>
 
     override fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {

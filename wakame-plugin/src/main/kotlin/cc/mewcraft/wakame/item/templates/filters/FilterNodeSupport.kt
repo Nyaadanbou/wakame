@@ -8,15 +8,12 @@ import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.NodeFacadeSupport
 import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.rarity.RARITY_EXTERNALS
+import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import org.koin.core.component.get
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.nio.file.Path
@@ -25,18 +22,17 @@ import kotlin.io.path.Path
 @Init(
     stage = InitStage.PRE_WORLD,
     runBefore = [ItemRegistry::class],
-    runAfter = [RarityRegistry::class],
+    runAfter = [RarityRegistryConfigStorage::class],
 )
 @Reload(
     runBefore = [ItemRegistry::class],
-    runAfter = [RarityRegistry::class],
+    runAfter = [RarityRegistryConfigStorage::class],
 )
 internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/filters")
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(RARITY_EXTERNALS)))
-        kregister(FilterSerializer)
-    }.build()
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
+        .kregister(FilterSerializer)
+        .build()
 
     @InitFun
     fun init() {

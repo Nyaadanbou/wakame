@@ -44,7 +44,7 @@ internal object EntityTypeHolderRegistryConfigStorage : RegistryConfigStorage {
     }
 
     private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, EntityTypeHolder> {
-        val resourceLocation = Identifiers.ofKoish(nodeKey.toString())
+        val resourceLocation = Identifiers.of(nodeKey.toString())
         val keySet = node.getList<Key>(emptyList()).toSet()
         return Pair(resourceLocation, EntityTypeHolderImpl(keySet))
     }

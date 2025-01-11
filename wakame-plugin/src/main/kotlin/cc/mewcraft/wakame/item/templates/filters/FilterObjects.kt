@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range
@@ -194,7 +194,7 @@ data class MarkFilter(
  */
 data class RarityFilter(
     override val invert: Boolean,
-    private val rarity: Rarity,
+    private val rarity: RegistryEntry<RarityType>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "rarity")
@@ -224,7 +224,7 @@ data class RarityFilter(
 /**
  * Checks the population of *ability*.
  *
- * This could be, for example, used to check whether a ability
+ * This could be, for example, used to check whether an ability
  * with key `ability:blink` has been populated.
  *
  * @property invert whether to invert the original result

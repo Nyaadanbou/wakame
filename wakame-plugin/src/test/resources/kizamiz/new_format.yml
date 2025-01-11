@@ -12,10 +12,10 @@ effects:
       value: 3
       element: fire
       operation: add
-    - type: "attribute_modifier2" # 属性修饰器 (范围数值, 带元素: 通过 min, max, element 指定)
+    - type: "attribute_modifier" # 属性修饰器 (范围数值, 带元素: 通过 lower, upper, element 指定)
       id: "attack_damage"
-      min: 5
-      max: 7
+      lower: 5
+      upper: 7
       element: fire
       operation: add
   1:

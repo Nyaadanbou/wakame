@@ -19,6 +19,8 @@ import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator
 import cc.mewcraft.wakame.iterator.NekoItemNodeIterator.iterator
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
+import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -38,18 +40,16 @@ import kotlin.system.measureTimeMillis
     runAfter = [
         AttributeBundleFacadeRegistryConfigStorage::class,
         EntityTypeHolderRegistryConfigStorage::class,
-        ItemSkinRegistry::class,
-        LevelMappingRegistry::class,
-        RarityRegistry::class,
+        LevelRarityMappingRegistryConfigStorage::class,
+        RarityRegistryConfigStorage::class,
         AbilityRegistry::class,
     ]
 )
 @Reload(
     runAfter = [
         EntityTypeHolderRegistryConfigStorage::class,
-        ItemSkinRegistry::class,
-        LevelMappingRegistry::class,
-        RarityRegistry::class,
+        LevelRarityMappingRegistryConfigStorage::class,
+        RarityRegistryConfigStorage::class,
         AbilityRegistry::class,
     ]
 )

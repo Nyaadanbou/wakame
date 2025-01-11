@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
+import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -14,6 +15,7 @@ import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
@@ -108,7 +110,7 @@ private constructor(
             // 选取权重较高的稀有度作为结果的稀有度
             val rarity1 = inputItem1.rarity
             val rarity2 = inputItem2.rarity
-            maxOf(rarity1, rarity2)
+            maxOf(rarity1, rarity2, Comparator.comparing(RegistryEntry<RarityType>::value))
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改

@@ -23,11 +23,10 @@ import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNod
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
 import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.rarity.rarityModule
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
+import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
-import cc.mewcraft.wakame.registry.LevelMappingRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
@@ -61,7 +60,6 @@ object CommonNekoStackTest {
                 adventureModule(),
                 damageModule(),
                 molangModule(),
-                rarityModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
@@ -75,8 +73,8 @@ object CommonNekoStackTest {
         AttributeBundleFacadeRegistryConfigStorage.init()
         AbilityRegistry.init()
         KizamiRegistryConfigStorage.init()
-        RarityRegistry.init()
-        LevelMappingRegistry.init()
+        RarityRegistryConfigStorage.init()
+        LevelRarityMappingRegistryConfigStorage.init()
         EntityTypeHolderRegistryConfigStorage.init()
 
         // 初始化所有 random3.Node 相关的实现

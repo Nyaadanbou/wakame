@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.packet
 
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.isNeko
+import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.rarity.GlowColor
@@ -11,7 +11,9 @@ import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.*
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
 import io.github.retrooper.packetevents.util.SpigotConversionUtil
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Item
@@ -105,10 +107,7 @@ internal class ItemEntityRenderer : PacketListenerAbstract() {
     private fun sendGlowColorPacket(event: PacketSendEvent, entity: Item) {
         val nekoStack = entity.itemStack.shadowNeko() ?: return
         val user = event.user
-        val components = nekoStack.components
-        val rarityColor = components.get(ItemComponentTypes.RARITY)?.rarity?.glowColor
-            ?.takeIf { it != GlowColor.empty() }
-            ?: return
+        val rarityColor = nekoStack.rarity.value.glowColor.takeIf { it != GlowColor.empty() } ?: return
         val teamPacket = buildCreateTeamPacket(entity, rarityColor)
         entityId2EntityUniqueId[entity.entityId] = entity.uniqueId
         user.sendPacketSilently(teamPacket)

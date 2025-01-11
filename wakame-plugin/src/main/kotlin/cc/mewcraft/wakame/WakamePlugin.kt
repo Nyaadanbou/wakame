@@ -28,7 +28,6 @@ import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
 import cc.mewcraft.wakame.random3.randomModule
-import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
@@ -95,7 +94,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 packModule(),
                 playerModule(),
                 randomModule(),
-                rarityModule(),
                 recipeModule(),
                 reforgeModule(),
                 registryModule(),

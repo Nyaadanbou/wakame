@@ -72,7 +72,7 @@ interface RegistryEntry<T> {
      *
      * 当容器数据的命名空间为 [KOISH_NAMESPACE] 时, 返回值部分不包含命名空间.
      * 否则返回完整的 `命名空间:路径` 形式. 在已知 [getIdAsString] 的情况下,
-     * 逆操作 ([Identifiers.ofKoish]) 也完全遵循该规则.
+     * 逆操作 ([Identifiers.of]) 也完全遵循该规则.
      *
      * 例如从 [Identifier] 转换为 [getIdAsString]:
      * - `"koish:ice"` -> `"ice"` (命名空间为 "koish" 将省略命名空间)
