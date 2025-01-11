@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
@@ -248,7 +248,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                fun assert(element: RegistryEntry<Element>, expectedMin: Double, expectedMax: Double) {
+                fun assert(element: RegistryEntry<ElementType>, expectedMin: Double, expectedMax: Double) {
                     val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]

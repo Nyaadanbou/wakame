@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -227,7 +227,7 @@ protected constructor(
 }
 
 /**
- * An [Attribute] type with an [Element].
+ * An [Attribute] type with an [ElementType].
  */
 open class ElementAttribute
 protected constructor(
@@ -236,7 +236,7 @@ protected constructor(
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    val element: RegistryEntry<Element>,
+    val element: RegistryEntry<ElementType>,
     vanilla: Boolean = false,
 ) : RangedAttribute(
     compositionId + ELEMENT_SEPARATOR + element.getIdAsString(),
@@ -272,7 +272,7 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: RegistryEntry<Element>,
+        element: RegistryEntry<ElementType>,
         vanilla: Boolean = false,
     ) : this(
         compositionId = compositionId,
@@ -289,7 +289,7 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: RegistryEntry<Element>,
+        element: RegistryEntry<ElementType>,
         vanilla: Boolean = false,
     ) : this(
         compositionId = descriptionId,

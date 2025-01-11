@@ -25,8 +25,8 @@ import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttributeSE
 import cc.mewcraft.wakame.config.ConfigProvider
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -719,8 +719,8 @@ private fun ConfigurationNode.getOperation(): Operation {
     return node("operation").string?.let { Operation.byName(it) } ?: Operation.ADD
 }
 
-private fun ConfigurationNode.getElement(): RegistryEntry<Element> {
-    return node("element").krequire<RegistryEntry<Element>>()
+private fun ConfigurationNode.getElement(): RegistryEntry<ElementType> {
+    return node("element").krequire<RegistryEntry<ElementType>>()
 }
 
 private fun ConfigurationNode.getSimpleScalar(): Double {

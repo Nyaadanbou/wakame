@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.templates.filters
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.rarity.Rarity
@@ -31,12 +31,12 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
             AttributeFilter.TYPE -> {
                 val id = node.node("attribute").krequire<String>()
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<RegistryEntry<Element>>() // optional
+                val element = node.node("element").get<RegistryEntry<ElementType>>() // optional
                 AttributeFilter(inverted, id, operation, element)
             }
 
             ElementFilter.TYPE -> {
-                val element = node.node("element").krequire<RegistryEntry<Element>>()
+                val element = node.node("element").krequire<RegistryEntry<ElementType>>()
                 ElementFilter(inverted, element)
             }
 

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.composite
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element as ElementType
+import cc.mewcraft.wakame.element.ElementType
 
 /**
  * 代表 [CompositeAttribute] 的一部分数据, 故名为 "...Component".

@@ -7,13 +7,12 @@ import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
@@ -81,7 +80,7 @@ object VanillaDamageMetadata {
         )
     }
 
-    operator fun invoke(element: RegistryEntry<Element>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
+    operator fun invoke(element: RegistryEntry<ElementType>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
         return invoke(
             damageBundle {
                 single(element) {
@@ -173,7 +172,7 @@ interface DamageTagsBuilder {
  * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
  */
 interface DamagePacketBuilder<T> {
-    val element: RegistryEntry<Element>
+    val element: RegistryEntry<ElementType>
     val min: T
     val max: T
     val rate: T
@@ -239,7 +238,7 @@ data class VanillaDamageMetadataBuilder(
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
-    val element: RegistryEntry<Element>,
+    val element: RegistryEntry<ElementType>,
     val rate: Double = 1.0,
     val defensePenetration: Double = 0.0,
     val defensePenetrationRate: Double = 0.0,
@@ -269,7 +268,7 @@ data class AttributeDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
-) : DamageMetadataBuilder<Double>, KoinComponent {
+) : DamageMetadataBuilder<Double> {
     override fun build(event: EntityDamageEvent): DamageMetadata {
         val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null"
@@ -301,7 +300,7 @@ data class DirectDamageTagsBuilder(
 data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
     @Required
     override val min: Double,
     @Required
@@ -361,7 +360,7 @@ data class MolangDamageMetadataBuilder(
 data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
     @Required
     override val min: Evaluable<*>,
     @Required

@@ -11,7 +11,7 @@ import java.util.stream.Stream
 /**
  * [Element] 的实现.
  */
-internal class ElementType
+class ElementType
 internal constructor(
     override val key: Key,
     override val stringId: String,

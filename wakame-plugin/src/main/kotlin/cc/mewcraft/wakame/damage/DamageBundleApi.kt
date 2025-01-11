@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.element.ElementProvider
+import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.element.ElementType
 import org.jetbrains.annotations.ApiStatus
 import kotlin.random.Random
 
@@ -28,7 +28,7 @@ interface DamageBundle {
     /**
      * 从伤害捆绑包中移除元素伤害包.
      */
-    fun remove(element: Element): DamagePacket?
+    fun remove(element: ElementType): DamagePacket?
 
     /**
      * 从伤害捆绑包中移除元素伤害包.
@@ -40,7 +40,7 @@ interface DamageBundle {
     /**
      * 从伤害捆绑包中获取元素伤害包.
      */
-    fun get(element: Element): DamagePacket?
+    fun get(element: ElementType): DamagePacket?
 
     /**
      * 从伤害捆绑包中获取元素伤害包.
@@ -63,7 +63,7 @@ interface DamageBundleFactory {
     /**
      * 创建一个 [DamageBundle].
      */
-    fun create(data: Map<Element, DamagePacket>): DamageBundle
+    fun create(data: Map<ElementType, DamagePacket>): DamageBundle
 
     /**
      * 创建一个 [DamageBundle].
@@ -93,7 +93,7 @@ interface DamageBundleFactory {
             instance = null
         }
 
-        override fun create(data: Map<Element, DamagePacket>): DamageBundle {
+        override fun create(data: Map<ElementType, DamagePacket>): DamageBundle {
             return instance().create(data)
         }
 
@@ -115,7 +115,7 @@ fun DamagePacket(
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
     return DamagePacket(
-        element = ElementProvider.instance().get(elementId) ?: throw IllegalArgumentException("No such element: '$elementId'"),
+        element = KoishRegistries.ELEMENT[elementId] ?: throw IllegalArgumentException("No such element: '$elementId'"),
         min = min,
         max = max,
         rate = rate,
@@ -131,7 +131,7 @@ data class DamagePacket(
     /**
      * 伤害的元素类型.
      */
-    val element: Element,
+    val element: ElementType,
 
     /**
      * 伤害的最小值.

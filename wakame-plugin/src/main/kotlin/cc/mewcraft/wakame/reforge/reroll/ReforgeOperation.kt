@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.composite.element
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.Rarity
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
 import org.slf4j.Logger
 
 /**
@@ -33,7 +32,7 @@ internal class ReforgeOperation
 private constructor(
     private val session: SimpleRerollingSession,
 ) {
-    companion object : KoinComponent {
+    companion object {
         operator fun invoke(session: SimpleRerollingSession): RerollingSession.ReforgeResult {
             return ReforgeOperation(session).execute()
         }
@@ -144,7 +143,7 @@ private constructor(
         itemId: Key,
         itemLevel: Int,
         itemRarity: Rarity,
-        itemElements: Set<RegistryEntry<Element>>,
+        itemElements: Set<RegistryEntry<ElementType>>,
         itemKizamiz: Set<RegistryEntry<KizamiType>>,
         itemCells: ItemCells,
     ): ItemGenerationContext {

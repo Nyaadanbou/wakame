@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.CustomModelData
@@ -230,7 +230,7 @@ var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumL
 
 var NekoStack.rarity: Rarity by mapped(ItemComponentTypes.RARITY, RarityRegistry::DEFAULT, ::ItemRarity, ItemRarity::rarity)
 
-var NekoStack.elements: Set<RegistryEntry<Element>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
+var NekoStack.elements: Set<RegistryEntry<ElementType>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
 
 var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -21,7 +21,7 @@ data class ItemElements(
     /**
      * 所有的元素.
      */
-    val elements: Set<RegistryEntry<Element>>,
+    val elements: Set<RegistryEntry<ElementType>>,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemElements> {
@@ -33,14 +33,14 @@ data class ItemElements(
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(elements: Collection<RegistryEntry<Element>>): ItemElements {
+        fun of(elements: Collection<RegistryEntry<ElementType>>): ItemElements {
             return ItemElements(ObjectArraySet(elements))
         }
 
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(vararg elements: RegistryEntry<Element>): ItemElements {
+        fun of(vararg elements: RegistryEntry<ElementType>): ItemElements {
             return of(elements.toList())
         }
 

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.attribute.composite.AttributeGenerationContext
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext
@@ -53,7 +53,7 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
     /**
      * 已经生成的物品元素.
      */
-    val elements: MutableCollection<RegistryEntry<Element>>
+    val elements: MutableCollection<RegistryEntry<ElementType>>
 
     /**
      * 已经生成的物品铭刻.
@@ -97,7 +97,7 @@ private class SimpleItemGenerationContext(
     override val marks: MutableCollection<Mark> by ObservableDelegates.set(HashSet())
     override var level: Int? by ObservableDelegates.reference(null)
     override var rarity: Rarity? by ObservableDelegates.reference(null)
-    override val elements: MutableCollection<RegistryEntry<Element>> by ObservableDelegates.set(HashSet())
+    override val elements: MutableCollection<RegistryEntry<ElementType>> by ObservableDelegates.set(HashSet())
     override val kizamiz: MutableCollection<RegistryEntry<KizamiType>> by ObservableDelegates.set(HashSet())
     override val abilities: MutableCollection<AbilityContextData> by ObservableDelegates.set(HashSet())
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())

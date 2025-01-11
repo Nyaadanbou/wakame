@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.core.RegistryKey
 import cc.mewcraft.wakame.core.SimpleDefaultedRegistry
 import cc.mewcraft.wakame.core.SimpleRegistry
 import cc.mewcraft.wakame.core.WritableRegistry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
@@ -62,7 +62,7 @@ object KoishRegistries {
      * 元素.
      */
     @JvmField
-    val ELEMENT = registerDefaulted<Element>(KoishRegistryKeys.ELEMENT, "neutral")
+    val ELEMENT = registerDefaulted<ElementType>(KoishRegistryKeys.ELEMENT, "neutral")
 
     /**
      * 实体类型集合.

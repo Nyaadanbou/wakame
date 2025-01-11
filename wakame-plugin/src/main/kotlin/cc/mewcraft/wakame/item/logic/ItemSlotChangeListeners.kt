@@ -149,11 +149,11 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamizSet -> kizamiMap.subtractOneEach(kizamizSet.map(RegistryEntry<KizamiType>::value)) }
+        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamizSet -> kizamiMap.subtractOneEach(kizamizSet) }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamiSet -> kizamiMap.addOneEach(kizamiSet.map(RegistryEntry<KizamiType>::value)) }
+        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamiSet -> kizamiMap.addOneEach(kizamiSet) }
     }
 
     // 基于当前铭刻数量, 将新的铭刻效果应用到玩家身上.

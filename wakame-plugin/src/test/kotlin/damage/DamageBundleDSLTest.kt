@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry.registryModule
 import io.mockk.every
 import io.mockk.mockk
@@ -64,8 +64,8 @@ class DamageBundleDSLTest : KoinTest {
     private val logger: Logger by inject()
 
     // 用于测试的 Element 实例
-    private lateinit var fireElem: RegistryEntry<Element>
-    private lateinit var windElem: RegistryEntry<Element>
+    private lateinit var fireElem: RegistryEntry<ElementType>
+    private lateinit var windElem: RegistryEntry<ElementType>
 
     // 用于测试的 AttributeMap 实例
     private lateinit var attriMap: AttributeMap

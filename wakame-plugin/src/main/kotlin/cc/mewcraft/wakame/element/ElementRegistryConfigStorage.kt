@@ -60,7 +60,7 @@ internal object ElementRegistryConfigStorage : RegistryConfigStorage {
 }
 
 private object BuiltInElementProvider : ElementProvider {
-    override fun get(stringId: String): Element? {
+    override fun get(stringId: String): ElementType? {
         return KoishRegistries.ELEMENT[stringId]
     }
 }

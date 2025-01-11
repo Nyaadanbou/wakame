@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -31,14 +31,14 @@ fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
 /**
  * 开始构建一个 [DamagePacket].
  */
-fun damagePacket(element: RegistryEntry<Element>, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
+fun damagePacket(element: RegistryEntry<ElementType>, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element, attrMap).apply(block).build()
 }
 
 /**
  * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMapLike].
  */
-fun damagePacket(element: RegistryEntry<Element>, block: DamagePacketDSL.() -> Unit): DamagePacket {
+fun damagePacket(element: RegistryEntry<ElementType>, block: DamagePacketDSL.() -> Unit): DamagePacket {
     return DamagePacketDSL(element).apply(block).build()
 }
 
@@ -64,7 +64,7 @@ class DamageBundleDSL(
 ) {
     private val bundle: DamageBundle = DamageBundle()
 
-    private fun getElementById(id: String): RegistryEntry<Element>? {
+    private fun getElementById(id: String): RegistryEntry<ElementType>? {
         return KoishRegistries.ELEMENT.getEntry(id)
     }
 
@@ -102,7 +102,7 @@ class DamageBundleDSL(
     /**
      * 为指定的元素构建 [DamagePacket].
      */
-    fun single(elementType: RegistryEntry<Element>, block: DamagePacketDSL.() -> Unit) {
+    fun single(elementType: RegistryEntry<ElementType>, block: DamagePacketDSL.() -> Unit) {
         bundle.add(DamagePacketDSL(elementType, attrMap).apply(block).build())
     }
 
@@ -126,7 +126,7 @@ class DamageBundleDSL(
  */
 @DamagePacketBundleDsl
 class DamagePacketDSL(
-    private val element: RegistryEntry<Element>,
+    private val element: RegistryEntry<ElementType>,
     private val attrMap: AttributeMapLike? = null,
 ) {
     private var min: Double? = null
@@ -228,7 +228,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MinDamageDSL(
-        override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
+        override val element: RegistryEntry<ElementType>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)).coerceAtLeast(0.0)
@@ -237,7 +237,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class MaxDamageDSL(
-        override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
+        override val element: RegistryEntry<ElementType>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)).coerceAtLeast(0.0)
@@ -246,7 +246,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DamageRateDSL(
-        override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
+        override val element: RegistryEntry<ElementType>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return value(Attributes.ATTACK_DAMAGE_RATE)
@@ -255,7 +255,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationDSL(
-        override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
+        override val element: RegistryEntry<ElementType>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)).coerceAtLeast(0.0)
@@ -264,7 +264,7 @@ class DamagePacketDSL(
 
     @DamagePacketBundleDsl
     class DefensePenetrationRateDSL(
-        override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
+        override val element: RegistryEntry<ElementType>, override val attrMap: AttributeMapLike,
     ) : ValueDSL() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION_RATE) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)).coerceAtLeast(0.0)
@@ -272,7 +272,7 @@ class DamagePacketDSL(
     }
 
     abstract class ValueDSL {
-        abstract val element: RegistryEntry<Element>
+        abstract val element: RegistryEntry<ElementType>
         abstract val attrMap: AttributeMapLike
 
         /**

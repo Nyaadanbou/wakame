@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attribute.composite
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.RandomizedValue
@@ -14,7 +14,7 @@ import kotlin.math.min
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val VariableCompositeAttribute.element: RegistryEntry<Element>?
+val VariableCompositeAttribute.element: RegistryEntry<ElementType>?
     get() = (this as? CompositeAttributeComponent.Element)?.element
 
 /**
@@ -76,7 +76,7 @@ internal data class VariableCompositeAttributeRE(
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
 ) : VariableCompositeAttribute, CompositeAttributeRE<RandomizedValue> {
     override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)
@@ -116,7 +116,7 @@ internal data class VariableCompositeAttributeSE(
     override val id: String,
     override val operation: Operation,
     override val value: RandomizedValue,
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
 ) : VariableCompositeAttribute, CompositeAttributeSE<RandomizedValue> {
     override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
         populateContextWithDefault(context)

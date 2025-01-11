@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getIntOrNull
@@ -20,7 +20,7 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val ConstantCompositeAttribute.element: RegistryEntry<Element>?
+val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
     get() = (this as? CompositeAttributeComponent.Element)?.element
 
 /**
@@ -252,7 +252,7 @@ internal data class ConstantCompositeAttributeSE(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
     override val quality: Quality? = null,
 ) : ConstantCompositeAttribute(), CompositeAttributeSE<Double> {
     constructor(
@@ -285,7 +285,7 @@ internal data class ConstantCompositeAttributeRE(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-    override val element: RegistryEntry<Element>,
+    override val element: RegistryEntry<ElementType>,
     override val quality: Quality? = null,
 ) : ConstantCompositeAttribute(), CompositeAttributeRE<Double> {
     constructor(
@@ -315,7 +315,7 @@ internal data class ConstantCompositeAttributeRE(
     }
 }
 
-private fun CompoundTag.readElement(): RegistryEntry<Element> {
+private fun CompoundTag.readElement(): RegistryEntry<ElementType> {
     return getIntOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { integerId -> KoishRegistries.ELEMENT.getEntry(integerId) } ?: KoishRegistries.ELEMENT.getDefaultEntry()
 }
 
@@ -336,7 +336,7 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
     putDouble(key, value)
 }
 
-private fun CompoundTag.writeElement(element: RegistryEntry<Element>) {
+private fun CompoundTag.writeElement(element: RegistryEntry<ElementType>) {
     putByte(AttributeBinaryKeys.ELEMENT_TYPE, KoishRegistries.ELEMENT.getRawId(element.value).toByte())
 }
 

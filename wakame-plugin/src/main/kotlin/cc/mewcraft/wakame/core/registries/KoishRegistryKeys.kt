@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
 import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.RegistryKey
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
@@ -36,7 +36,7 @@ object KoishRegistryKeys {
     val COMPOSITE_ATTRIBUTE_FACADE = createRegistryKey<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>("composite_attribute_facade")
 
     @JvmField
-    val ELEMENT = createRegistryKey<Element>("element")
+    val ELEMENT = createRegistryKey<ElementType>("element")
 
     @JvmField
     val ENTITY_TYPE_HOLDER = createRegistryKey<EntityTypeHolder>("entity_type_holder")

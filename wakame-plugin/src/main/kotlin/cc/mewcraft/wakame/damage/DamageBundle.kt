@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.registries.KoishRegistries
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable
@@ -13,14 +13,14 @@ import java.util.stream.Stream
  * 创建一个 [DamageBundle].
  */
 fun DamageBundle(
-    packets: Map<Element, DamagePacket> = emptyMap(),
+    packets: Map<ElementType, DamagePacket> = emptyMap(),
 ): DamageBundle {
     return DamageBundleImpl(packets)
 }
 
 internal object DefaultDamageBundleFactory : DamageBundleFactory {
     override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
-        val packets = mutableMapOf<Element, DamagePacket>()
+        val packets = mutableMapOf<ElementType, DamagePacket>()
         for ((id, packet) in data) {
             val element = getElementById(id)
             if (element != null) {
@@ -30,20 +30,20 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
         return DamageBundle(packets)
     }
 
-    override fun create(data: Map<Element, DamagePacket>): DamageBundle {
+    override fun create(data: Map<ElementType, DamagePacket>): DamageBundle {
         return DamageBundle(data)
     }
 }
 
-private fun getElementById(id: String): Element? {
-    return KoishRegistries.ELEMENT.get(id) ?: run {
+private fun getElementById(id: String): ElementType? {
+    return KoishRegistries.ELEMENT[id] ?: run {
         LOGGER.warn("No such element: '$id'")
         return null
     }
 }
 
 private class DamageBundleImpl(
-    packets: Map<Element, DamagePacket>,
+    packets: Map<ElementType, DamagePacket>,
 ) : DamageBundle, Examinable {
     private val packets = Reference2ObjectArrayMap(packets)
 
@@ -63,7 +63,7 @@ private class DamageBundleImpl(
         packets.putIfAbsent(packet.element, packet)
     }
 
-    override fun remove(element: Element): DamagePacket? {
+    override fun remove(element: ElementType): DamagePacket? {
         return packets.remove(element)
     }
 
@@ -72,7 +72,7 @@ private class DamageBundleImpl(
         return packets.remove(element)
     }
 
-    override fun get(element: Element): DamagePacket? {
+    override fun get(element: ElementType): DamagePacket? {
         return packets[element]
     }
 
