@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.core.Identifier
 import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.RegistryConfigStorage
 import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
@@ -21,7 +21,7 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [AttributeRegistry::class]
+    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class]
 )
 @Reload(
     runAfter = []

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
@@ -24,7 +25,6 @@ import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
 import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.registry.LevelMappingRegistry
 import cc.mewcraft.wakame.registry.RarityRegistry
@@ -72,7 +72,7 @@ object CommonNekoStackTest {
 
         // 按依赖顺序, 初始化注册表
         ElementRegistryConfigStorage.init()
-        AttributeRegistry.init()
+        AttributeBundleFacadeRegistryConfigStorage.init()
         AbilityRegistry.init()
         KizamiRegistryConfigStorage.init()
         RarityRegistry.init()

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
@@ -13,17 +14,15 @@ import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import org.koin.core.component.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 
@@ -33,7 +32,7 @@ internal data class CellularAttributeRendererFormat(
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AttributeRegistry.FACADES::has)
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.containsId(id) }
 
     fun render(data: AttributeCore): IndexedText {
         return SimpleIndexedText(computeIndex(data), data.description)

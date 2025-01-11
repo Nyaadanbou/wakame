@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.SimpleRegistry
@@ -98,7 +98,7 @@ class KizamiEffectAttributeModifier(
     companion object {
         val SERIALIZER = TypeSerializer<KizamiEffectAttributeModifier> { type, node ->
             val id = node.node("id").krequire<String>()
-            val attribute = ConstantCompositeAttribute(id, node)
+            val attribute = ConstantAttributeBundle(id, node)
             val kizamiId = node.hint(RepresentationHints.KIZAMI_ID)
                 ?: throw SerializationException(node, type, "No such hint '${RepresentationHints.KIZAMI_ID}' in node '$node'")
             val modifiers = attribute.createAttributeModifiers(kizamiId)

@@ -3,18 +3,18 @@ package cc.mewcraft.wakame.core.registries
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.RegistryKey
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.CompositeAttributeFacade
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
@@ -33,7 +33,7 @@ object KoishRegistryKeys {
     val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField
-    val COMPOSITE_ATTRIBUTE_FACADE = createRegistryKey<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>("composite_attribute_facade")
+    val ATTRIBUTE_BUNDLE_FACADE = createRegistryKey<AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_bundle_facade")
 
     @JvmField
     val ELEMENT = createRegistryKey<ElementType>("element")

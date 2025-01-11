@@ -40,7 +40,7 @@ private val MAPPINGS: ImmutableBiMap<NekoAttribute, BukkitAttribute> = Immutable
 
 fun NekoAttribute.toBukkit(): BukkitAttribute {
     require(this.vanilla) { "Can't convert non-vanilla attribute to Bukkit" }
-    return MAPPINGS[this] ?: throw IllegalArgumentException("Can't convert ${this.descriptionId} to Bukkit attribute")
+    return MAPPINGS[this] ?: throw IllegalArgumentException("Can't convert ${this.id} to Bukkit attribute")
 }
 
 fun BukkitAttribute.toNeko(): NekoAttribute {

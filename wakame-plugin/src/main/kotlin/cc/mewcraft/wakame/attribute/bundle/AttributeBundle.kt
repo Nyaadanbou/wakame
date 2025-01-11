@@ -1,49 +1,49 @@
-package cc.mewcraft.wakame.attribute.composite
+package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 
 /**
- * 代表 [CompositeAttribute] 的一部分数据, 故名为 "...Component".
+ * 代表 [AttributeBundle] 的一部分特性, 故命名为 "...Trait".
  */
-sealed interface CompositeAttributeComponent {
+sealed interface AttributeBundleTrait {
     /**
-     * 部分: *运算模式*.
+     * 运算模式.
      */
-    interface Operation : CompositeAttributeComponent {
+    interface Operation : AttributeBundleTrait {
         val operation: AttributeModifier.Operation
     }
 
     /**
-     * 部分: *元素*.
+     * 元素.
      */
-    interface Element : CompositeAttributeComponent {
+    interface Element : AttributeBundleTrait {
         val element: RegistryEntry<ElementType>
     }
 
     /**
-     * 部分: *单一数值*.
+     * 单一数值.
      */
-    interface Scalar<T> : CompositeAttributeComponent {
+    interface Scalar<T> : AttributeBundleTrait {
         val value: T
     }
 
     /**
-     * 部分: *区间数值*.
+     * 区间数值.
      */
-    interface Ranged<T> : CompositeAttributeComponent {
+    interface Ranged<T> : AttributeBundleTrait {
         val lower: T
         val upper: T
     }
 }
 
 /**
- * 这是一个高度抽象的接口, 可以称之为 “复合属性”, 它代表:
+ * 这是一个高度抽象的接口, 可以称之为 “属性块”, 它代表:
  * - 一个玩家视角下的属性 (例如物品上面的攻击力)
  * - 一个由配置文件定义的属性 (例如随机池里的属性)
  *
- * 而本质上, 它是多个 [CompositeAttributeComponent] 的组合.
+ * 而本质上, 它是多个 [AttributeBundleTrait] 的组合.
  *
  * 为什么需要这个接口? 原因有以下几点:
  *
@@ -77,58 +77,58 @@ sealed interface CompositeAttributeComponent {
  *
  * 这些功能都需要一个统一的接口来实现, 以增加代码的可读性.
  */
-sealed interface CompositeAttribute : CompositeAttributeComponent.Operation /* 所有属性都有 Operation */ {
+sealed interface AttributeBundle : AttributeBundleTrait.Operation /* 所有属性都有 Operation */ {
     /**
-     * 该 [CompositeAttribute] 的唯一标识.
+     * 该 [AttributeBundle] 的唯一标识.
      */
     val id: String
 }
 
 /**
  * 拥有组件:
- * - [CompositeAttributeComponent.Operation]
- * - [CompositeAttributeComponent.Scalar]
+ * - [AttributeBundleTrait.Operation]
+ * - [AttributeBundleTrait.Scalar]
  *
  * 这种属性只有一个固定的数值. 典型代表: 移速.
  */
-interface CompositeAttributeS<T> : CompositeAttribute, CompositeAttributeComponent.Scalar<T> {
+interface AttributeBundleS<T> : AttributeBundle, AttributeBundleTrait.Scalar<T> {
     override val value: T
 }
 
 /**
  * 拥有组件:
- * - [CompositeAttributeComponent.Operation]
- * - [CompositeAttributeComponent.Scalar]
+ * - [AttributeBundleTrait.Operation]
+ * - [AttributeBundleTrait.Scalar]
  *
  * 这种属性有一个最小值和最大值. 典型代表: 暂无.
  */
-interface CompositeAttributeR<T> : CompositeAttribute, CompositeAttributeComponent.Ranged<T> {
+interface AttributeBundleR<T> : AttributeBundle, AttributeBundleTrait.Ranged<T> {
     override val lower: T
     override val upper: T
 }
 
 /**
  * 拥有组件:
- * - [CompositeAttributeComponent.Operation]
- * - [CompositeAttributeComponent.Scalar]
- * - [CompositeAttributeComponent.Element]
+ * - [AttributeBundleTrait.Operation]
+ * - [AttributeBundleTrait.Scalar]
+ * - [AttributeBundleTrait.Element]
  *
  * 这种属性只有一个固定的数值, 并且有一个元素类型. 典型代表: 所有元素伤害加成.
  */
-interface CompositeAttributeSE<T> : CompositeAttribute, CompositeAttributeComponent.Scalar<T>, CompositeAttributeComponent.Element {
+interface AttributeBundleSE<T> : AttributeBundle, AttributeBundleTrait.Scalar<T>, AttributeBundleTrait.Element {
     override val value: T
     override val element: RegistryEntry<ElementType>
 }
 
 /**
  * 拥有组件:
- * - [CompositeAttributeComponent.Operation],
- * - [CompositeAttributeComponent.Ranged],
- * - [CompositeAttributeComponent.Element]
+ * - [AttributeBundleTrait.Operation],
+ * - [AttributeBundleTrait.Ranged],
+ * - [AttributeBundleTrait.Element]
  *
  * 这种属性有一个最小值和最大值, 并且有一个元素类型. 典型代表: 基于元素的浮动攻击力.
  */
-interface CompositeAttributeRE<T> : CompositeAttribute, CompositeAttributeComponent.Ranged<T>, CompositeAttributeComponent.Element {
+interface AttributeBundleRE<T> : AttributeBundle, AttributeBundleTrait.Ranged<T>, AttributeBundleTrait.Element {
     override val lower: T
     override val upper: T
     override val element: RegistryEntry<ElementType>

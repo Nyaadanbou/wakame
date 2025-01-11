@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import io.mockk.mockk
 import org.bukkit.attribute.Attributable
@@ -45,7 +45,8 @@ class DefaultAttributeSerializationTest : KoinTest {
             }
 
             ElementRegistryConfigStorage.init()
-            AttributeRegistry.init()
+            Attributes.init()
+            AttributeBundleFacadeRegistryConfigStorage.init()
             AttributeSupplierRegistryConfigStorage.init()
         }
 

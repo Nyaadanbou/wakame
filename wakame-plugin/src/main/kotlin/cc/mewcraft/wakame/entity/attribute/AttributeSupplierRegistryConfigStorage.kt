@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
 import cc.mewcraft.wakame.core.Identifier
 import cc.mewcraft.wakame.core.RegistryConfigStorage
 import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -18,7 +18,8 @@ import cc.mewcraft.wakame.util.buildYamlConfigLoader
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeRegistry::class // 实际上也依赖 Element, 但因为 Attribute 已经依赖 Element 所以这里不需要显式声明
+        ElementRegistryConfigStorage::class, // 反序列化时知道所有已知的元素类型
+        AttributeBundleFacadeRegistryConfigStorage::class
     ]
 )
 @Reload

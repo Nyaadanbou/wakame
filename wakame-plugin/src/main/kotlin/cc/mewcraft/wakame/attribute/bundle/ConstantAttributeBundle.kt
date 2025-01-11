@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.composite
+package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.util.getIntOrNull
 import net.kyori.adventure.key.Key
@@ -20,15 +19,15 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
-    get() = (this as? CompositeAttributeComponent.Element)?.element
+val ConstantAttributeBundle.element: RegistryEntry<ElementType>?
+    get() = (this as? AttributeBundleTrait.Element)?.element
 
 /**
- * 从 NBT 构建一个 [ConstantCompositeAttribute].
+ * 从 NBT 构建一个 [ConstantAttributeBundle].
  *
  * 给定的 [CompoundTag] 必须是以下结构之一:
  *
- * ## 对于 ConstantCompositeAttributeS
+ * ## 对于 ConstantAttributeBundleS
  *
  * ```NBT
  * byte('op'): <operation>
@@ -36,7 +35,7 @@ val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
  * byte('quality'): <quality>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeSE
+ * ## 对于 ConstantAttributeBundleSE
  *
  * ```NBT
  * byte('op'): <operation>
@@ -45,7 +44,7 @@ val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
  * byte('quality'): <quality>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeR
+ * ## 对于 ConstantAttributeBundleR
  *
  * ```NBT
  * byte('op'): <operation>
@@ -54,7 +53,7 @@ val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
  * byte('quality'): <quality>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeRE
+ * ## 对于 ConstantAttributeBundleRE
  *
  * ```NBT
  * byte('op'): <operation>
@@ -64,18 +63,18 @@ val ConstantCompositeAttribute.element: RegistryEntry<ElementType>?
  * byte('quality'): <quality>
  * ```
  */
-fun ConstantCompositeAttribute(
+fun ConstantAttributeBundle(
     id: String, tag: CompoundTag,
-): ConstantCompositeAttribute {
-    return AttributeRegistry.FACADES[id].convertNBT2Constant(tag)
+): ConstantAttributeBundle {
+    return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
 }
 
 /**
- * 从配置文件构建一个 [ConstantCompositeAttribute].
+ * 从配置文件构建一个 [ConstantAttributeBundle].
  *
  * 给定的 [ConfigurationNode] 必须是以下结构之一:
  *
- * ## 对于 ConstantCompositeAttributeS
+ * ## 对于 ConstantAttributeBundleS
  *
  * 给定的 [node] 必须是以下结构:
  *
@@ -84,7 +83,7 @@ fun ConstantCompositeAttribute(
  * value: <double>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeSE
+ * ## 对于 ConstantAttributeBundleSE
  *
  * 给定的 [node] 必须是以下结构:
  *
@@ -94,7 +93,7 @@ fun ConstantCompositeAttribute(
  * element: <element>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeR
+ * ## 对于 ConstantAttributeBundleR
  *
  * 给定的 [node] 必须是以下结构:
  *
@@ -104,7 +103,7 @@ fun ConstantCompositeAttribute(
  * upper: <double>
  * ```
  *
- * ## 对于 ConstantCompositeAttributeRE
+ * ## 对于 ConstantAttributeBundleRE
  *
  * 给定的 [node] 必须是以下结构:
  *
@@ -115,34 +114,34 @@ fun ConstantCompositeAttribute(
  * element: <element>
  * ```
  */
-fun ConstantCompositeAttribute(
+fun ConstantAttributeBundle(
     id: String, node: ConfigurationNode,
-): ConstantCompositeAttribute {
-    return AttributeRegistry.FACADES[id].convertNode2Constant(node)
+): ConstantAttributeBundle {
+    return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).convertNodeToConstant(node)
 }
 
 /**
- * 代表一个数值恒定的 [CompositeAttribute].
+ * 代表一个数值恒定的 [AttributeBundle].
  */
-sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, CompositeAttribute, AttributeModifierSource {
+sealed class ConstantAttributeBundle : BinarySerializable<CompoundTag>, AttributeBundle, AttributeModifierSource {
 
     /**
      * 数值的质量, 通常以正态分布的 Z-score 转换而来.
      *
-     * 并不是每个复合属性都有数值的质量,
-     * 例如用于铭刻的复合属性就没有数值质量,
+     * 并不是每个属性块都有数值的质量,
+     * 例如用于铭刻的属性块就没有数值质量,
      * 因为它们都已经在配置文件中固定好的.
      *
-     * 如果该复合属性有多个数值, 例如 [CompositeAttributeR],
-     * 那么只会储存 [CompositeAttributeR.upper]
+     * 如果该属性块有多个数值, 例如 [AttributeBundleR],
+     * 那么只会储存 [AttributeBundleR.upper]
      * 的数值质量.
      */
     abstract val quality: Quality?
 
     val displayName: Component
-        get() = AttributeRegistry.FACADES[id].createTooltipName(this)
+        get() = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createTooltipName(this)
     val description: List<Component>
-        get() = AttributeRegistry.FACADES[id].createTooltipLore(this)
+        get() = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createTooltipLore(this)
 
     /**
      * 属性核心的“数值质量”.
@@ -170,14 +169,14 @@ sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, Compo
     }
 
     /**
-     * 检查两个 [ConstantCompositeAttribute] 是否拥有一样的:
+     * 检查两个 [ConstantAttributeBundle] 是否拥有一样的:
      * - 运算模式
      * - 数值结构
      * - 元素类型 (如果有)
      *
      * 该函数不会检查任何数值的相等性.
      */
-    abstract fun similarTo(other: ConstantCompositeAttribute): Boolean
+    abstract fun similarTo(other: ConstantAttributeBundle): Boolean
 
     /**
      * 序列化为 NBT 标签. 请注意这并不包含 [id] 的信息.
@@ -185,16 +184,16 @@ sealed class ConstantCompositeAttribute : BinarySerializable<CompoundTag>, Compo
     abstract override fun serializeAsTag(): CompoundTag
 
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
-        return AttributeRegistry.FACADES[id].createAttributeModifiers(modifierId, this)
+        return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
     }
 }
 
-internal data class ConstantCompositeAttributeS(
+internal data class ConstantAttributeBundleS(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
     override val quality: Quality? = null,
-) : ConstantCompositeAttribute(), CompositeAttributeS<Double> {
+) : ConstantAttributeBundle(), AttributeBundleS<Double> {
     constructor(
         id: String, compound: CompoundTag,
     ) : this(
@@ -204,8 +203,8 @@ internal data class ConstantCompositeAttributeS(
         compound.readQuality(),
     )
 
-    override fun similarTo(other: ConstantCompositeAttribute): Boolean {
-        return other is ConstantCompositeAttributeS &&
+    override fun similarTo(other: ConstantAttributeBundle): Boolean {
+        return other is ConstantAttributeBundleS &&
                 other.id == id &&
                 other.operation == operation
     }
@@ -217,13 +216,13 @@ internal data class ConstantCompositeAttributeS(
     }
 }
 
-internal data class ConstantCompositeAttributeR(
+internal data class ConstantAttributeBundleR(
     override val id: String,
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
     override val quality: Quality? = null,
-) : ConstantCompositeAttribute(), CompositeAttributeR<Double> {
+) : ConstantAttributeBundle(), AttributeBundleR<Double> {
     constructor(
         id: String, compound: CompoundTag,
     ) : this(
@@ -234,8 +233,8 @@ internal data class ConstantCompositeAttributeR(
         compound.readQuality(),
     )
 
-    override fun similarTo(other: ConstantCompositeAttribute): Boolean {
-        return other is ConstantCompositeAttributeR &&
+    override fun similarTo(other: ConstantAttributeBundle): Boolean {
+        return other is ConstantAttributeBundleR &&
                 other.id == id &&
                 other.operation == operation
     }
@@ -248,13 +247,13 @@ internal data class ConstantCompositeAttributeR(
     }
 }
 
-internal data class ConstantCompositeAttributeSE(
+internal data class ConstantAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
     override val element: RegistryEntry<ElementType>,
     override val quality: Quality? = null,
-) : ConstantCompositeAttribute(), CompositeAttributeSE<Double> {
+) : ConstantAttributeBundle(), AttributeBundleSE<Double> {
     constructor(
         id: String, compound: CompoundTag,
     ) : this(
@@ -265,8 +264,8 @@ internal data class ConstantCompositeAttributeSE(
         compound.readQuality(),
     )
 
-    override fun similarTo(other: ConstantCompositeAttribute): Boolean {
-        return other is ConstantCompositeAttributeSE &&
+    override fun similarTo(other: ConstantAttributeBundle): Boolean {
+        return other is ConstantAttributeBundleSE &&
                 other.id == id &&
                 other.operation == operation &&
                 other.element == element
@@ -280,14 +279,14 @@ internal data class ConstantCompositeAttributeSE(
     }
 }
 
-internal data class ConstantCompositeAttributeRE(
+internal data class ConstantAttributeBundleRE(
     override val id: String,
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
     override val element: RegistryEntry<ElementType>,
     override val quality: Quality? = null,
-) : ConstantCompositeAttribute(), CompositeAttributeRE<Double> {
+) : ConstantAttributeBundle(), AttributeBundleRE<Double> {
     constructor(
         id: String, compound: CompoundTag,
     ) : this(
@@ -299,8 +298,8 @@ internal data class ConstantCompositeAttributeRE(
         compound.readQuality(),
     )
 
-    override fun similarTo(other: ConstantCompositeAttribute): Boolean {
-        return other is ConstantCompositeAttributeRE
+    override fun similarTo(other: ConstantAttributeBundle): Boolean {
+        return other is ConstantAttributeBundleRE
                 && other.id == id
                 && other.operation == operation
                 && other.element == element
@@ -328,8 +327,8 @@ private fun CompoundTag.readNumber(key: String): Double {
     return getDouble(key)
 }
 
-private fun CompoundTag.readQuality(): ConstantCompositeAttribute.Quality? {
-    return getIntOrNull(AttributeBinaryKeys.QUALITY)?.let(ConstantCompositeAttribute.Quality.entries::get)
+private fun CompoundTag.readQuality(): ConstantAttributeBundle.Quality? {
+    return getIntOrNull(AttributeBinaryKeys.QUALITY)?.let(ConstantAttributeBundle.Quality.entries::get)
 }
 
 private fun CompoundTag.writeNumber(key: String, value: Double) {
@@ -344,6 +343,6 @@ private fun CompoundTag.writeOperation(operation: Operation) {
     putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.binary)
 }
 
-private fun CompoundTag.writeQuality(quality: ConstantCompositeAttribute.Quality?) {
+private fun CompoundTag.writeQuality(quality: ConstantAttributeBundle.Quality?) {
     quality?.run { putByte(AttributeBinaryKeys.QUALITY, ordinal.toByte()) }
 }

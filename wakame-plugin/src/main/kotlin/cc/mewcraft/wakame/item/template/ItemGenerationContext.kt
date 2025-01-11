@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.attribute.composite.AttributeGenerationContext
+import cc.mewcraft.wakame.attribute.bundle.AttributeGenerationContext
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.kizami.KizamiType

@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
 import java.util.concurrent.ConcurrentHashMap
@@ -14,6 +17,9 @@ import java.util.concurrent.ConcurrentHashMap
  * "lookup index" for other code in this project. The numeric values passing to the
  * attribute constructors are just fallback values when the config provides nothing.
  */
+@Init(
+    stage = InitStage.PRE_WORLD
+)
 object Attributes : AttributeProvider {
     //<editor-fold desc="原版属性">
 
@@ -55,8 +61,8 @@ object Attributes : AttributeProvider {
     val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).register()
     val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).register()
     val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, .0, 1.0).register()
-    val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_max_attack_damage", .0, .0, 16384.0).register()
-    val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_attack_damage", "universal_min_attack_damage", .0, .0, 16384.0).register()
+    val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_max_attack_damage", "universal_attack_damage", .0, .0, 16384.0).register()
+    val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_min_attack_damage", "universal_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>
 
     //<editor-fold desc="萌芽属性 (元素)">
@@ -67,26 +73,26 @@ object Attributes : AttributeProvider {
     val DEFENSE = registerLazy { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
     val DEFENSE_PENETRATION = registerLazy { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
     val DEFENSE_PENETRATION_RATE = registerLazy { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
-    val MAX_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("attack_damage", "max_attack_damage", .0, .0, 16384.0, element) }
-    val MIN_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("attack_damage", "min_attack_damage", .0, .0, 16384.0, element) }
+    val MAX_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("max_attack_damage", "attack_damage", .0, .0, 16384.0, element) }
+    val MIN_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("min_attack_damage", "attack_damage", .0, .0, 16384.0, element) }
     val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
     val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
     //</editor-fold>
 
     /**
-     * Gets all [Attribute.descriptionId] of known attributes.
+     * Gets all [Attribute.id] of known attributes.
      */
     val descriptionIds: Set<String>
-        get() = AttributeProviderInternals.descriptionIds + SimpleAttributeGetter.descriptionIds
+        get() = AttributeProviderInternals.primitiveIds + SimpleAttributeGetter.simpleIds
 
     /**
-     * Gets all [Attribute.compositionId] of known vanilla-backed attributes.
+     * Gets all [Attribute.bundleId] of known vanilla-backed attributes.
      */
     val vanillaAttributeNames: Collection<String>
         get() = AttributeNamesHolder.vanillaAttributeNames
 
     /**
-     * Gets all [Attribute.compositionId] of known element attributes.
+     * Gets all [Attribute.bundleId] of known element attributes.
      *
      * 返回的集合中包含两种名字: 一种是不带元素的名字, 一种是带元素的名字.
      * 例如对于 `defense` 这个属性, 会有两种名字包含在返回的集合中:
@@ -96,27 +102,28 @@ object Attributes : AttributeProvider {
     val elementAttributeNames: Collection<String>
         get() = AttributeNamesHolder.elementAttributeNames
 
-    override fun getSingleton(descriptionId: String): Attribute? {
-        return AttributeProviderInternals.getSingleton(descriptionId) ?: SimpleAttributeGetter.getSingleton(descriptionId)
-    }
-
-    override fun getComposition(compositionId: String): Collection<Attribute> {
-        return AttributeProviderInternals.getComposition(compositionId)
-    }
-
-    override fun isElementalByDescriptionId(descriptionId: String): Boolean {
-        return descriptionId in SimpleAttributeGetter.descriptionIds
-    }
-
-    override fun isElementalByCompositionId(compositionId: String): Boolean {
-        return compositionId in SimpleAttributeGetter.compositionIds
-    }
-
     /**
-     * 初始化 [Attributes] 的所有数据.
+     * 初始化 [Attributes].
      */
-    fun bootstrap() {
-        SimpleAttributeGetter.bootstrap()
+    @InitFun
+    fun init() {
+        SimpleAttributeGetter.init()
+    }
+
+    override fun get(id: String): Attribute? {
+        return AttributeProviderInternals.get(id) ?: SimpleAttributeGetter.get(id)
+    }
+
+    override fun getList(id: String): Collection<Attribute> {
+        return AttributeProviderInternals.getList(id)
+    }
+
+    override fun isElementalById(id: String): Boolean {
+        return id in SimpleAttributeGetter.simpleIds
+    }
+
+    override fun isElementalByBundleId(bundleId: String): Boolean {
+        return bundleId in SimpleAttributeGetter.bundleIds
     }
 
     //////
@@ -218,52 +225,52 @@ private class SimpleAttributeGetter(
      * 本伴生对象主要充当 [AttributeGetter] 的对象池, 以及存放需要在所有对象之间共享的数据.
      */
     companion object Shared {
-        private val objectPool: HashSet<AttributeGetter> = HashSet()
+        private val INSTANCES: HashSet<AttributeGetter> = HashSet()
 
         // description id -> element attribute
-        private val descriptionId2Attribute: HashMap<String, ElementAttribute> = HashMap()
+        private val SIMPLE_ID_TO_ATTRIBUTE: HashMap<String, ElementAttribute> = HashMap()
 
-        // composition id -> set <element attribute>
-        private val compositionId2AttributeSet: HashMap<String, HashSet<ElementAttribute>> = HashMap()
+        // bundle id -> set <element attribute>
+        private val BUNDLE_ID_TO_ATTRIBUTE_SET: HashMap<String, HashSet<ElementAttribute>> = HashMap()
 
-        // 所有已知的 ElementAttribute 的 descriptionId
-        val descriptionIds: Set<String>
-            get() = descriptionId2Attribute.keys
+        // 所有已知的 ElementAttribute 的 simleId
+        val simpleIds: Set<String>
+            get() = SIMPLE_ID_TO_ATTRIBUTE.keys
 
-        // 所有已知的 ElementAttribute 的 compositionId
-        val compositionIds: Set<String>
-            get() = compositionId2AttributeSet.keys
+        // 所有已知的 ElementAttribute 的 bundleId
+        val bundleIds: Set<String>
+            get() = BUNDLE_ID_TO_ATTRIBUTE_SET.keys
 
         @Synchronized
         private fun registerGetter(getter: AttributeGetter): AttributeGetter {
-            objectPool.add(getter)
+            INSTANCES.add(getter)
             return getter
         }
 
         @Synchronized
         private fun registerAttribute(attribute: ElementAttribute): ElementAttribute {
-            descriptionId2Attribute[attribute.descriptionId] = attribute
-            compositionId2AttributeSet.computeIfAbsent(attribute.compositionId) { _ -> HashSet() }.add(attribute)
+            SIMPLE_ID_TO_ATTRIBUTE[attribute.id] = attribute
+            BUNDLE_ID_TO_ATTRIBUTE_SET.computeIfAbsent(attribute.bundleId) { _ -> HashSet() }.add(attribute)
             AttributeNamesHolder.register(attribute)
             return attribute
         }
 
         @Synchronized
-        fun bootstrap() {
+        fun init() {
             // 初始化每一个 AttributeGetter 的每一种 Element
-            for (getter: AttributeGetter in objectPool) {
+            for (getter: AttributeGetter in INSTANCES) {
                 for (element in KoishRegistries.ELEMENT.entrySequence) {
                     getter.of(element)
                 }
             }
         }
 
-        fun getSingleton(descriptionId: String): ElementAttribute? {
-            return descriptionId2Attribute[descriptionId]
+        fun get(id: String): ElementAttribute? {
+            return SIMPLE_ID_TO_ATTRIBUTE[id]
         }
 
-        fun getComposition(compositionId: String): Collection<ElementAttribute> {
-            return compositionId2AttributeSet[compositionId] ?: throw IllegalArgumentException("unknown composition id: '$compositionId'")
+        fun getList(id: String): Collection<ElementAttribute> {
+            return BUNDLE_ID_TO_ATTRIBUTE_SET[id] ?: throw IllegalArgumentException("Unknown bundle id: '$id'")
         }
     }
 }
@@ -271,46 +278,46 @@ private class SimpleAttributeGetter(
 // 封装了一些内部状态, 以提供更简洁的接口
 private object AttributeProviderInternals {
     // description id -> attribute
-    private val descriptionId2Attribute: HashMap<String, Attribute> = HashMap()
+    private val SIMPLE_ID_TO_ATTRIBUTE: HashMap<String, Attribute> = HashMap()
 
-    // composition id -> attribute set
-    private val compositionId2AttributeSet: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
+    // bundle id -> attribute set
+    private val BUNDLE_ID_TO_ATTRIBUTE_SET: SetMultimap<String, Attribute> = MultimapBuilder.hashKeys().linkedHashSetValues().build()
 
     // 所有已知的 attribute 的 description id
-    val descriptionIds: Set<String>
-        get() = descriptionId2Attribute.keys
+    val primitiveIds: Set<String>
+        get() = SIMPLE_ID_TO_ATTRIBUTE.keys
 
     @Synchronized
     fun <T : Attribute> register(attribute: T): T {
-        descriptionId2Attribute[attribute.descriptionId] = attribute
-        compositionId2AttributeSet.put(attribute.compositionId, attribute)
+        SIMPLE_ID_TO_ATTRIBUTE[attribute.id] = attribute
+        BUNDLE_ID_TO_ATTRIBUTE_SET.put(attribute.bundleId, attribute)
         AttributeNamesHolder.register(attribute)
         return attribute
     }
 
-    fun getSingleton(descriptionId: String): Attribute? {
-        return descriptionId2Attribute[descriptionId]
+    fun get(id: String): Attribute? {
+        return SIMPLE_ID_TO_ATTRIBUTE[id]
     }
 
-    fun getComposition(compositionId: String): Collection<Attribute> {
-        val compositionIds = compositionId2AttributeSet.get(compositionId)
-        if (compositionIds.isNotEmpty()) {
-            return compositionIds
+    fun getList(id: String): Collection<Attribute> {
+        val bundleIds = BUNDLE_ID_TO_ATTRIBUTE_SET.get(id)
+        if (bundleIds.isNotEmpty()) {
+            return bundleIds
         }
-        return SimpleAttributeGetter.getComposition(compositionId)
+        return SimpleAttributeGetter.getList(id)
     }
 }
 
 // 封装了一些内部状态, 以提供更简洁的接口
 private object AttributeNamesHolder {
-    private val _vanillaAttributeNames: HashSet<String> = HashSet()
-    private val _elementAttributeNames: HashSet<String> = HashSet()
+    private val vanillaAttributeNameSet: HashSet<String> = HashSet()
+    private val elementAttributeNameSet: HashSet<String> = HashSet()
 
     val vanillaAttributeNames: Collection<String>
-        get() = _vanillaAttributeNames
+        get() = vanillaAttributeNameSet
 
     val elementAttributeNames: Collection<String>
-        get() = _elementAttributeNames
+        get() = elementAttributeNameSet
 
     @Synchronized
     fun register(attribute: Attribute) {
@@ -320,7 +327,7 @@ private object AttributeNamesHolder {
 
     private fun tryRegisterVanillaAttribute(attribute: Attribute) {
         if (attribute.vanilla) {
-            _vanillaAttributeNames.add(attribute.compositionId)
+            vanillaAttributeNameSet.add(attribute.bundleId)
         }
     }
 
@@ -330,8 +337,8 @@ private object AttributeNamesHolder {
             // 例如对于 `defense` 这个属性 (元素属性) 会注册两类名字:
             // - defense (不带元素的名字)
             // - defense/fire (带了元素的名字)
-            _elementAttributeNames.add(attribute.compositionId.substringBefore(ElementAttribute.ELEMENT_SEPARATOR))
-            _elementAttributeNames.add(attribute.compositionId)
+            elementAttributeNameSet.add(attribute.bundleId.substringBefore(ElementAttribute.ELEMENT_SEPARATOR))
+            elementAttributeNameSet.add(attribute.bundleId)
         }
     }
 }

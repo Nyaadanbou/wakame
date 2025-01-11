@@ -3,7 +3,7 @@
 
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import net.kyori.adventure.key.Key

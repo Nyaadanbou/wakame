@@ -8,7 +8,9 @@ import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.*
+import org.incendo.cloud.parser.ArgumentParseResult
+import org.incendo.cloud.parser.ArgumentParser
+import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
 class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestionProvider.Strings<C> {
@@ -24,7 +26,7 @@ class AttributeParser<C : Any> : ArgumentParser<C, Attribute>, BlockingSuggestio
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<Attribute> {
         val peekString = commandInput.peekString()
-        val attribute = Attributes.getSingleton(peekString)
+        val attribute = Attributes.get(peekString)
             ?: return ArgumentParseResult.failure(AttributeParseException(commandContext))
 
         commandInput.readString()

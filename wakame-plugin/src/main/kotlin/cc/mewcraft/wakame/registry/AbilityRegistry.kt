@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -24,7 +25,7 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [AttributeRegistry::class]
+    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class]
 )
 @Reload
 object AbilityRegistry {

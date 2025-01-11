@@ -3,8 +3,9 @@ package cc.mewcraft.wakame.item.templates.components.cells
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -29,7 +30,6 @@ import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
@@ -187,7 +187,7 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
 @Init(
     stage = InitStage.PRE_WORLD,
     runBefore = [ItemRegistry::class],
-    runAfter = [AttributeRegistry::class],
+    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class],
 )
 @Reload(
     runBefore = [ItemRegistry::class],

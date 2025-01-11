@@ -6,8 +6,8 @@ import assertAny
 import cc.mewcraft.wakame.attack.HandAttack
 import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
@@ -302,7 +302,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<ConstantCompositeAttributeS>((cell1.getCore() as? AttributeCore)?.attribute)
+            val core1 = assertIs<ConstantAttributeBundleS>((cell1.getCore() as? AttributeCore)?.attribute)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
             val core2 = assertIs<EmptyCore>(cell2.getCore())

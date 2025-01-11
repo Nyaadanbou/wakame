@@ -28,7 +28,6 @@ import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
@@ -129,7 +128,7 @@ object Initializer : KoinComponent, Listener {
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
-        saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
+        // saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE) // FIXME remove old Initializer
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         // saveResource(ElementRegistryConfigStorage.FILE_PATH) // FIXME remove old Initializer
         // saveResource(ENTITY_GLOBAL_CONFIG_FILE) FIXME remove old Initializer

@@ -102,13 +102,13 @@ internal constructor(
      */
     fun getModifierValue(type: Attribute, id: Key, attributable: Attributable): Double {
         return requireNotNull(getDefault(type, attributable).getModifier(id)?.amount) {
-            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.id}'"
         }
     }
 
     fun getModifierValue(type: Attribute, id: Key): Double {
         return requireNotNull(getDefault(type).getModifier(id)?.amount) {
-            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.id}'"
         }
     }
 
@@ -146,7 +146,7 @@ internal constructor(
         return if (isAbsoluteVanilla(type)) {
             AttributeInstanceFactory.createLiveInstance(type, attributable, false)
         } else {
-            requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
+            requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.id}'" }
         }
     }
 
@@ -156,7 +156,7 @@ internal constructor(
      * @throws IllegalArgumentException 如果 [type] 不在此供应者中
      */
     private fun getDefault(type: Attribute): AttributeInstance {
-        return requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
+        return requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.id}'" }
     }
 
     /**
@@ -242,16 +242,16 @@ class AttributeSupplierBuilder(
  *   minecraft:living:
  *     parent: ~
  *     values:
- *       <composite_attribute_id_1>: ~
- *       <composite_attribute_id_2>: ~
- *       <composite_attribute_id_3>:
+ *       <attribute_bundle_id_1>: ~
+ *       <attribute_bundle_id_2>: ~
+ *       <attribute_bundle_id_3>:
  *         <element_id_1>: ~
  *         <element_id_2>: ~
  *   minecraft:mob:
  *     parent: minecraft:living
  *     values:
- *       <composite_attribute_id_4>: ~
- *       <composite_attribute_id_5>: ~
+ *       <attribute_bundle_id_4>: ~
+ *       <attribute_bundle_id_5>: ~
  * ```
  */
 internal object AttributeSupplierSerializer {
@@ -263,14 +263,14 @@ internal object AttributeSupplierSerializer {
      */
     private fun validateValuesMap(valuesMap: Map<String, ConfigurationNode>): Map<String, ConfigurationNode> {
         // This will validate two things:
-        // 1. The format of the composition id is correct
+        // 1. The format of the bundle id is correct
         // 2. The config node has correct structure
-        for ((compositionId, valueNode) in valuesMap) {
-            if (!ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
-                error("The composition id '$compositionId' is in illegal format (allowed pattern: ${ATTRIBUTE_ID_PATTERN_STRING})")
+        for ((bundleId, valueNode) in valuesMap) {
+            if (!ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(bundleId)) {
+                error("The attribute bundle id '$bundleId' is in illegal format (allowed pattern: ${ATTRIBUTE_ID_PATTERN_STRING})")
             }
-            if (compositionId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
-                error("The attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")
+            if (bundleId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
+                error("The config node '$bundleId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 
@@ -287,16 +287,16 @@ internal object AttributeSupplierSerializer {
      *   minecraft:living:
      *     parent: ~
      *     values:
-     *       <composite_attribute_id_1>: ~
-     *       <composite_attribute_id_2>: ~
-     *       <composite_attribute_id_3>:
+     *       <attribute_bundle_id_1>: ~
+     *       <attribute_bundle_id_2>: ~
+     *       <attribute_bundle_id_3>:
      *         <element_id_1>: ~
      *         <element_id_2>: ~
      *   minecraft:mob:
      *     parent: minecraft:living
      *     values:
-     *       <composite_attribute_id_4>: ~
-     *       <composite_attribute_id_5>: ~
+     *       <attribute_bundle_id_4>: ~
+     *       <attribute_bundle_id_5>: ~
      * ```
      * @return the deserialized objects
      */
@@ -322,7 +322,7 @@ internal object AttributeSupplierSerializer {
 
         // An extension to reduce duplicates
         fun AttributeSupplierBuilder.add(
-            attributes: Collection<Attribute>, // all from the composite attribute
+            attributes: Collection<Attribute>, // all from the bundle attribute
             valueNode: ConfigurationNode, // the node holding the value
         ): AttributeSupplierBuilder {
             for (attribute in attributes) {
@@ -352,8 +352,8 @@ internal object AttributeSupplierSerializer {
             }
 
             // Put data into the builder
-            for ((compositionId, valueNode) in valuesMap) {
-                if (compositionId in Attributes.elementAttributeNames) {
+            for ((bundleId, valueNode) in valuesMap) {
+                if (bundleId in Attributes.elementAttributeNames) {
                     // it's a node for elemental attributes
 
                     if (valueNode.isMap) {
@@ -362,8 +362,8 @@ internal object AttributeSupplierSerializer {
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
                             if (!KoishRegistries.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
-                            val compositionIdWithElement = "$compositionId/${elementId.replace(':', '.')}"
-                            val attributes = Attributes.getComposition(compositionIdWithElement)
+                            val bundleIdWithElement = "$bundleId/${elementId.replace(':', '.')}"
+                            val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNodeInMap)
                         }
                     } else {
@@ -371,8 +371,8 @@ internal object AttributeSupplierSerializer {
                         // the value node is used for every single element available in the system
 
                         for (elementType in KoishRegistries.ELEMENT.entrySequence) {
-                            val compositionIdWithElement = "$compositionId/${elementType.getIdAsString().replace(':', '.')}"
-                            val attributes = Attributes.getComposition(compositionIdWithElement)
+                            val bundleIdWithElement = "$bundleId/${elementType.getIdAsString().replace(':', '.')}"
+                            val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNode)
                         }
                     }
@@ -380,7 +380,7 @@ internal object AttributeSupplierSerializer {
                 } else {
                     // it's a node for any other attributes
 
-                    val attributes = Attributes.getComposition(compositionId)
+                    val attributes = Attributes.getList(bundleId)
                     builder.add(attributes, valueNode)
                 }
             }

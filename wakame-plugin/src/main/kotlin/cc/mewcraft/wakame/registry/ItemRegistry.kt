@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.NekoItemHolder
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.initializer.Initializer
 import cc.mewcraft.wakame.initializer2.Init
@@ -35,7 +36,7 @@ import kotlin.system.measureTimeMillis
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeRegistry::class,
+        AttributeBundleFacadeRegistryConfigStorage::class,
         EntityTypeHolderRegistryConfigStorage::class,
         ItemSkinRegistry::class,
         LevelMappingRegistry::class,

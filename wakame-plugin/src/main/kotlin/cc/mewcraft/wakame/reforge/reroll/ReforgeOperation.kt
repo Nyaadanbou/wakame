@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.cells

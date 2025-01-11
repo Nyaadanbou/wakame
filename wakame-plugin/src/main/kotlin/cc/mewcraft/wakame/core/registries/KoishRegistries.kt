@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.core.registries
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.core.DefaultedWritableRegistry
 import cc.mewcraft.wakame.core.MutableRegistryAccess
 import cc.mewcraft.wakame.core.Registry
@@ -13,12 +13,12 @@ import cc.mewcraft.wakame.core.SimpleDefaultedRegistry
 import cc.mewcraft.wakame.core.SimpleRegistry
 import cc.mewcraft.wakame.core.WritableRegistry
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelMapping
 import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.CompositeAttributeFacade
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistries {
@@ -53,10 +53,10 @@ object KoishRegistries {
     val ATTRIBUTE_SUPPLIER = registerSimple<AttributeSupplier>(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
-     * 复合属性.
+     * 属性块的 Facade.
      */
     @JvmField
-    val ATTRIBUTE_FACADE = registerSimple<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>(KoishRegistryKeys.COMPOSITE_ATTRIBUTE_FACADE)
+    val ATTRIBUTE_BUNDLE_FACADE = registerSimple<AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>>(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
 
     /**
      * 元素.

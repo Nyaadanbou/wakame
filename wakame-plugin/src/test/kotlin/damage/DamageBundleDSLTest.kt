@@ -77,11 +77,11 @@ class DamageBundleDSLTest : KoinTest {
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()
-        every { attriMap.getValue(match { it.descriptionId.contains("min_attack_damage") }) } returns 8.0
-        every { attriMap.getValue(match { it.descriptionId.contains("max_attack_damage") }) } returns 8.0
-        every { attriMap.getValue(match { it.descriptionId.contains("attack_damage_rate") }) } returns 0.1
-        every { attriMap.getValue(match { it.descriptionId.contains("defense_penetration") }) } returns 1.0
-        every { attriMap.getValue(match { it.descriptionId.contains("defense_penetration_rate") }) } returns 0.1
+        every { attriMap.getValue(match { it.id.contains("min_attack_damage") }) } returns 8.0
+        every { attriMap.getValue(match { it.id.contains("max_attack_damage") }) } returns 8.0
+        every { attriMap.getValue(match { it.id.contains("attack_damage_rate") }) } returns 0.1
+        every { attriMap.getValue(match { it.id.contains("defense_penetration") }) } returns 1.0
+        every { attriMap.getValue(match { it.id.contains("defense_penetration_rate") }) } returns 0.1
         every { attriMap.getValue(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE) } returns 2.0
         every { attriMap.getValue(Attributes.UNIVERSAL_DEFENSE_PENETRATION) } returns 1.0

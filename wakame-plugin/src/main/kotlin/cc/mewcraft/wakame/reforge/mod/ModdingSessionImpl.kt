@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates

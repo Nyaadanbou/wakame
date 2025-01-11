@@ -252,7 +252,7 @@ private data object AttributeMapPatchType {
             override fun toPrimitive(complex: AttributeMapPatch, context: PersistentDataAdapterContext): ByteArray {
                 val serializableInstanceList = complex.map { (type, instance) ->
                     SerializableAttributeInstance(
-                        id = type.descriptionId,
+                        id = type.id,
                         base = instance.getBaseValue(),
                         modifiers = instance.getModifiers().map { modifier ->
                             SerializableAttributeModifier(
@@ -326,7 +326,7 @@ private data class SerializableAttributeInstance(
     }
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
-        val attribute = Attributes.getSingleton(id) ?: return null
+        val attribute = Attributes.get(id) ?: return null
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }

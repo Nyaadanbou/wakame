@@ -3,9 +3,10 @@ package attribute
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.core.Identifiers
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
-import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.registry.registryModule
 import mainEnv
 import org.junit.jupiter.api.AfterEach
@@ -14,7 +15,6 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
-import org.spongepowered.configurate.kotlin.extensions.contains
 import testEnv
 import kotlin.test.Test
 import kotlin.test.fail
@@ -54,20 +54,17 @@ class CheckMissingAttributeConfigTest : KoinTest {
 
     private fun checkMissingConfigs() {
         ElementRegistryConfigStorage.init()
-        AttributeRegistry.init()
+        AttributeBundleFacadeRegistryConfigStorage.init()
 
-        val config = Configs.YAML[ATTRIBUTE_GLOBAL_CONFIG_FILE]
+        val config = Configs.YAML[AttributeBundleFacadeRegistryConfigStorage.FILE_PATH]
 
-        val missingConfigs = mutableListOf<String>()
+        val rootNode = config.get()
+        val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.ids
+        val idsPresentInConfig = rootNode.childrenMap().keys.map(Any::toString).map(Identifiers::ofKoish)
+        val missingIdsInConfig = idsPresentInRegistry subtract idsPresentInConfig
 
-        for ((key, _) in AttributeRegistry.FACADES) {
-            if (!config.get().contains(key)) {
-                missingConfigs.add(key)
-            }
-        }
-
-        if (missingConfigs.isNotEmpty()) {
-            fail("Missing attribute configs for: ${missingConfigs.joinToString(", ")}")
+        if (missingIdsInConfig.isNotEmpty()) {
+            fail("Missing attribute configs for: ${missingIdsInConfig.joinToString(", ")}")
         }
     }
 }

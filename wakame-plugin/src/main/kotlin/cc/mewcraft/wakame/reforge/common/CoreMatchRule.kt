@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.composite.element
+import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType

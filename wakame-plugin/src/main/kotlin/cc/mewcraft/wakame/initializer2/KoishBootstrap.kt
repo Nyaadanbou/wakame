@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.damage.DamagePostListener
 import cc.mewcraft.wakame.ecs.EcsListener
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.UnbreakableArmorStand
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
 import cc.mewcraft.wakame.gui.GuiManager
 import cc.mewcraft.wakame.item.ItemBehaviorListener
@@ -24,7 +25,6 @@ import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ATTRIBUTE_GLOBAL_CONFIG_FILE
 import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
@@ -79,7 +79,7 @@ object KoishBootstrap : KoinComponent {
         saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
-        saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE)
+        saveResource(AttributeBundleFacadeRegistryConfigStorage.FILE_PATH)
         // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ElementRegistryConfigStorage.FILE_PATH)
         saveResource(AttributeSupplierRegistryConfigStorage.FILE_PATH)

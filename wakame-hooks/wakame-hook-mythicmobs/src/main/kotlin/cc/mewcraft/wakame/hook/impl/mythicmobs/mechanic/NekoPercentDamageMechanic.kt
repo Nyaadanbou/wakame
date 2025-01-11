@@ -81,7 +81,7 @@ class NekoPercentDamageMechanic(
             val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
                 target.health * percent
             } else {
-                val maxHealthAttribute = requireNotNull(AttributeProvider.getSingleton("max_health")) { "Max health attribute is Null!" }
+                val maxHealthAttribute = requireNotNull(AttributeProvider.get("max_health")) { "Max health attribute is Null!" }
                 val maxHealth = AttributeMapAccess.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -91,9 +91,9 @@ private constructor(
         val resultedOperation = attribute1.operation
         val (resultedValue, resultedScore) = session.valueMergeFunction(resultedOperation).evaluate()
         val resultedCore = when (attribute1 /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantCompositeAttributeS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
-            is ConstantCompositeAttributeSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
-            is ConstantCompositeAttributeR, is ConstantCompositeAttributeRE -> {
+            is ConstantAttributeBundleS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleR, is ConstantAttributeBundleRE -> {
                 // 我们不支持拥有两个数值的核心, 原因:
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心
                 // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种

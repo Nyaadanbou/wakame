@@ -34,7 +34,7 @@ class AttributeModifierMechanic(
     }
 
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.getSingleton(parsed) }
+        ?.let { parsed -> AttributeProvider.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")

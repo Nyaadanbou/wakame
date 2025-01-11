@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.templates.components.cells.cores
 
-import cc.mewcraft.wakame.attribute.composite.VariableCompositeAttribute
+import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
@@ -25,7 +25,7 @@ fun AttributeCoreArchetype(
     id: Key,
     node: ConfigurationNode,
 ): AttributeCoreArchetype = SimpleAttributeCoreArchetype(
-    id = id, attribute = AttributeRegistry.FACADES[id.value()].convertNode2Variable(node)
+    id = id, attribute = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNodeToVariable(node)
 )
 
 /**
@@ -35,7 +35,7 @@ interface AttributeCoreArchetype : CoreArchetype {
     /**
      * 属性核心的模板.
      */
-    val attribute: VariableCompositeAttribute
+    val attribute: VariableAttributeBundle
 
     /**
      * 生成一个 [AttributeCore] 实例.
@@ -51,7 +51,7 @@ interface AttributeCoreArchetype : CoreArchetype {
  */
 internal class SimpleAttributeCoreArchetype(
     override val id: Key,
-    override val attribute: VariableCompositeAttribute,
+    override val attribute: VariableAttributeBundle,
 ) : AttributeCoreArchetype {
     override fun generate(context: ItemGenerationContext): AttributeCore = AttributeCore(
         id = id, attribute = attribute.generate(context)

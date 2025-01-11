@@ -1,10 +1,10 @@
-package cc.mewcraft.wakame.attribute.composite
+package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.core.RegistryEntry
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.AttributeContextData
-import cc.mewcraft.wakame.registry.AttributeRegistry
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
 import kotlin.math.max
@@ -14,25 +14,25 @@ import kotlin.math.min
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val VariableCompositeAttribute.element: RegistryEntry<ElementType>?
-    get() = (this as? CompositeAttributeComponent.Element)?.element
+val VariableAttributeBundle.element: RegistryEntry<ElementType>?
+    get() = (this as? AttributeBundleTrait.Element)?.element
 
 /**
- * 本函数用于构建 [VariableCompositeAttribute].
+ * 本函数用于构建 [VariableAttributeBundle].
  */
-fun VariableCompositeAttribute(
+fun VariableAttributeBundle(
     type: String, node: ConfigurationNode,
-): VariableCompositeAttribute = AttributeRegistry.FACADES[type].convertNode2Variable(node)
+): VariableAttributeBundle = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(type).convertNodeToVariable(node)
 
 /**
- * 代表一个数值可以变化的 [CompositeAttribute].
+ * 代表一个数值可以变化的 [AttributeBundle].
  */
-interface VariableCompositeAttribute : CompositeAttribute {
-    fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute
+interface VariableAttributeBundle : AttributeBundle {
+    fun generate(context: AttributeGenerationContext): ConstantAttributeBundle
 }
 
 /**
- * 代表一个生成 [CompositeAttribute] 的上下文.
+ * 代表一个生成 [AttributeBundle] 的上下文.
  */
 interface AttributeGenerationContext {
     /**
@@ -50,88 +50,88 @@ interface AttributeGenerationContext {
 /* Implementations */
 
 
-internal data class VariableCompositeAttributeR(
+internal data class VariableAttributeBundleR(
     override val id: String,
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-) : VariableCompositeAttribute, CompositeAttributeR<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+) : VariableAttributeBundle, AttributeBundleR<RandomizedValue> {
+    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
-        return ConstantCompositeAttributeR(
+        return ConstantAttributeBundleR(
             id,
             operation,
             min(lower, upper),
             max(lower, upper),
-            ConstantCompositeAttribute.Quality.fromZScore(score2)
+            ConstantAttributeBundle.Quality.fromZScore(score2)
         )
     }
 }
 
-internal data class VariableCompositeAttributeRE(
+internal data class VariableAttributeBundleRE(
     override val id: String,
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
     override val element: RegistryEntry<ElementType>,
-) : VariableCompositeAttribute, CompositeAttributeRE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+) : VariableAttributeBundle, AttributeBundleRE<RandomizedValue> {
+    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
-        return ConstantCompositeAttributeRE(
+        return ConstantAttributeBundleRE(
             id,
             operation,
             min(lower, upper),
             max(lower, upper),
             element,
-            ConstantCompositeAttribute.Quality.fromZScore(score2)
+            ConstantAttributeBundle.Quality.fromZScore(score2)
         )
     }
 }
 
-internal data class VariableCompositeAttributeS(
+internal data class VariableAttributeBundleS(
     override val id: String,
     override val operation: Operation,
     override val value: RandomizedValue,
-) : VariableCompositeAttribute, CompositeAttributeS<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+) : VariableAttributeBundle, AttributeBundleS<RandomizedValue> {
+    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (value, score) = value.calculate(factor)
-        return ConstantCompositeAttributeS(
+        return ConstantAttributeBundleS(
             id,
             operation,
             value,
-            ConstantCompositeAttribute.Quality.fromZScore(score)
+            ConstantAttributeBundle.Quality.fromZScore(score)
         )
     }
 }
 
-internal data class VariableCompositeAttributeSE(
+internal data class VariableAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
     override val value: RandomizedValue,
     override val element: RegistryEntry<ElementType>,
-) : VariableCompositeAttribute, CompositeAttributeSE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantCompositeAttribute {
+) : VariableAttributeBundle, AttributeBundleSE<RandomizedValue> {
+    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
         val factor = context.level ?: 0
         val (value, score) = value.calculate(factor)
-        return ConstantCompositeAttributeSE(
+        return ConstantAttributeBundleSE(
             id,
             operation,
             value,
             element,
-            ConstantCompositeAttribute.Quality.fromZScore(score)
+            ConstantAttributeBundle.Quality.fromZScore(score)
         )
     }
 }
 
-private fun VariableCompositeAttribute.populateContextWithDefault(context: AttributeGenerationContext) {
+private fun VariableAttributeBundle.populateContextWithDefault(context: AttributeGenerationContext) {
     context.attributes += AttributeContextData(id, operation, element)
 }
