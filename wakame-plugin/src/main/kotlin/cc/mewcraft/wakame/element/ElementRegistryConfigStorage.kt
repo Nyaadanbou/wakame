@@ -44,7 +44,7 @@ internal object ElementRegistryConfigStorage : RegistryConfigStorage {
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
             val entry = parseEntry(nodeKey, node)
-            registryAction.invoke(entry.first, entry.second)
+            registryAction(entry.first, entry.second)
         }
     }
 
@@ -61,6 +61,6 @@ internal object ElementRegistryConfigStorage : RegistryConfigStorage {
 
 private object BuiltInElementProvider : ElementProvider {
     override fun get(stringId: String): Element? {
-        return KoishRegistries.ELEMENT.get(stringId)
+        return KoishRegistries.ELEMENT[stringId]
     }
 }

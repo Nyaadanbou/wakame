@@ -30,13 +30,13 @@ object KoishRegistries {
      * 机制.
      */
     @JvmField
-    val ABILITY: WritableRegistry<Ability> = registerSimple(KoishRegistryKeys.ABILITY)
+    val ABILITY = registerSimple<Ability>(KoishRegistryKeys.ABILITY)
 
     /**
      * 属性.
      */
     @JvmField
-    val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys.ATTRIBUTE)
+    val ATTRIBUTE = registerSimple<Attribute>(KoishRegistryKeys.ATTRIBUTE)
 
     /**
      * 实体的默认属性.
@@ -50,25 +50,25 @@ object KoishRegistries {
      * in which case the enum type is not enough to express all types.
      */
     @JvmField
-    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
+    val ATTRIBUTE_SUPPLIER = registerSimple<AttributeSupplier>(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
      * 复合属性.
      */
     @JvmField
-    val COMPOSITE_ATTRIBUTE: WritableRegistry<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>> = registerSimple(KoishRegistryKeys.COMPOSITE_ATTRIBUTE)
+    val ATTRIBUTE_FACADE = registerSimple<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>(KoishRegistryKeys.COMPOSITE_ATTRIBUTE_FACADE)
 
     /**
      * 元素.
      */
     @JvmField
-    val ELEMENT: DefaultedWritableRegistry<Element> = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral")
+    val ELEMENT = registerDefaulted<Element>(KoishRegistryKeys.ELEMENT, "neutral")
 
     /**
      * 实体类型集合.
      */
     @JvmField
-    val ENTITY_TYPE_HOLDER: WritableRegistry<EntityTypeHolder> = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
+    val ENTITY_TYPE_HOLDER = registerSimple<EntityTypeHolder>(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
 
     /**
      * 标准物品.
@@ -76,7 +76,7 @@ object KoishRegistries {
      * 玩家可以直接获得/使用的物品类型.
      */
     @JvmField
-    val ITEM: DefaultedWritableRegistry<NekoItem> = registerDefaulted(KoishRegistryKeys.ITEM, "unknown")
+    val ITEM = registerDefaulted<NekoItem>(KoishRegistryKeys.ITEM, "unknown")
 
     /**
      * 原版套皮物品.
@@ -84,31 +84,31 @@ object KoishRegistries {
      * 玩家无法直接获得/使用, 仅用于给纯原版物品套一层皮 (i.e., 给原版物品添加内容)
      */
     @JvmField
-    val VANILLA_WRAPPER_ITEM: WritableRegistry<NekoItem> = registerSimple(KoishRegistryKeys.VANILLA_PROXY_ITEM)
+    val VANILLA_WRAPPER_ITEM = registerSimple<NekoItem>(KoishRegistryKeys.VANILLA_PROXY_ITEM)
 
     /**
      * 物品皮肤.
      */
     @JvmField
-    val ITEM_SKIN: WritableRegistry<ItemSkin> = registerSimple(KoishRegistryKeys.ITEM_SKIN)
+    val ITEM_SKIN = registerSimple<ItemSkin>(KoishRegistryKeys.ITEM_SKIN)
 
     /**
      * 铭刻.
      */
     @JvmField
-    val KIZAMI: WritableRegistry<KizamiType> = registerSimple(KoishRegistryKeys.KIZAMI)
+    val KIZAMI = registerSimple<KizamiType>(KoishRegistryKeys.KIZAMI)
 
     /**
      * 等级>稀有度映射.
      */
     @JvmField
-    val LEVEL_RARITY_MAPPING: WritableRegistry<LevelMapping> = registerSimple(KoishRegistryKeys.LEVEL_RARITY_MAPPING)
+    val LEVEL_RARITY_MAPPING = registerSimple<LevelMapping>(KoishRegistryKeys.LEVEL_RARITY_MAPPING)
 
     /**
      * 稀有度.
      */
     @JvmField
-    val RARITY: DefaultedWritableRegistry<Rarity> = registerDefaulted(KoishRegistryKeys.RARITY, "common")
+    val RARITY = registerDefaulted<Rarity>(KoishRegistryKeys.RARITY, "common")
 
     ///
 

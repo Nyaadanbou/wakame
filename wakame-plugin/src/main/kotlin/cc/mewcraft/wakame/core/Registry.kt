@@ -39,12 +39,12 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
             return entry
         }
 
-        fun <T> registerForHolder(registry: Registry<T>, key: RegistryKey<T>, entry: T): RegistryEntry.Reference<T> {
+        fun <T> registerReference(registry: Registry<T>, key: RegistryKey<T>, entry: T): RegistryEntry.Reference<T> {
             return registry.asWritable().add(key, entry)
         }
 
-        fun <T> registerForHolder(registry: Registry<T>, id: Identifier, entry: T): RegistryEntry.Reference<T> {
-            return registerForHolder(registry, RegistryKey.of(registry.key, id), entry)
+        fun <T> registerReference(registry: Registry<T>, id: Identifier, entry: T): RegistryEntry.Reference<T> {
+            return registerReference(registry, RegistryKey.of(registry.key, id), entry)
         }
 
         // 创建注册表 //
@@ -66,26 +66,26 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     // 用于序列化, 例如注册表数据之间的依赖, NBT读写, Web系统 等只需要储存键名的地方
     val valueByNameCodec: Codec<T>
         get() = referenceEntryCodec.flatComapMap(
-            { holder -> holder.value },
+            { entry -> entry.value },
             { value -> this.safeCastToReference(this.wrapAsEntry(value)) }
         )
 
-    // 同上, 只不过返回的是 Holder<T>
+    // 同上, 只不过返回的是 RegistryEntry<T>
     val entryCodec: Codec<RegistryEntry<T>>
         get() = referenceEntryCodec.flatComapMap(
-            { holder -> holder },
-            { holder -> this.safeCastToReference(holder) }
+            { entry -> entry },
+            { entry -> this.safeCastToReference(entry) }
         )
 
     private val referenceEntryCodec: Codec<RegistryEntry.Reference<T>>
         get() = Identifiers.CODEC.comapFlatMap(
-            // 如果该 id 已经存在一个 holder, 那么直接返回已存在的, 否则就尝试创建一个 intrusive holder
+            // 如果该 id 已经存在一个 entry, 那么直接返回已存在的, 否则就尝试创建一个 intrusive entry
             { id -> this.getEntry(id)?.let(DataResult<RegistryEntry.Reference<T>>::success) ?: DataResult.success(this.createEntry(id)) },
-            { holder -> holder.getKey().value }
+            { entry -> entry.getKey().value }
         )
 
     private fun safeCastToReference(entry: RegistryEntry<T>): DataResult<RegistryEntry.Reference<T>> {
-        return DataResults.wrap(entry as? RegistryEntry.Reference<T>) { "Unregistered holder in registry ${this.key}: $entry" }
+        return DataResults.wrap(entry as? RegistryEntry.Reference<T>) { "Unregistered entry in registry ${this.key}: $entry" }
     }
 
     /**

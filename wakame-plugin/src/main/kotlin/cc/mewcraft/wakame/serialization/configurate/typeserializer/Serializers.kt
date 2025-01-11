@@ -43,7 +43,7 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     // Koish Registry
     .register(KoishRegistries.ABILITY.holderByNameTypeSerializer())
     .register(KoishRegistries.ATTRIBUTE.holderByNameTypeSerializer())
-    .register(KoishRegistries.COMPOSITE_ATTRIBUTE.holderByNameTypeSerializer())
+    // .register(KoishRegistries.ATTRIBUTE_FACADE.holderByNameTypeSerializer())
     .register(KoishRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(KoishRegistries.ENTITY_TYPE_HOLDER.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM.holderByNameTypeSerializer())

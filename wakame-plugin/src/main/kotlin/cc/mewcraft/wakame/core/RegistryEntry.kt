@@ -64,7 +64,7 @@ interface RegistryEntry<T> {
      */
     fun getKey(): RegistryKey<T>?
     fun getKeyOrThrow(): RegistryKey<T> {
-        return getKey() ?: throw IllegalStateException("No resource key associated with this holder")
+        return getKey() ?: throw IllegalStateException("No resource key associated with this entry")
     }
 
     /**
@@ -100,7 +100,7 @@ interface RegistryEntry<T> {
         REFERENCE
     }
 
-    // Holder.Direct 封装的是没有与 Registry 相关联的数据
+    // RegistryEntry.Direct 封装的是没有与 Registry 相关联的数据
     class Direct<T>
     @ApiStatus.Internal
     constructor(override val value: T) : RegistryEntry<T> {
@@ -126,14 +126,14 @@ interface RegistryEntry<T> {
         override fun toString(): String = "Direct[${this.value}]"
     }
 
-    // Holder.Reference 的设计目的:
-    // 允许外部从 Registry 用 ResourceLocation 请求返回指定的数据, 并满足以下需求.
+    // RegistryEntry.Reference 的设计目的:
+    // 允许外部从 Registry 用 Identifier 请求返回指定的数据, 并满足以下需求.
     //
     // 1) 请求时注册表都已经初始化完毕
-    // 这种场景直接获取数据本身即可, 不需要先获取外层封装 Holder.Ref
+    // 这种场景直接获取数据本身即可, 不需要先获取外层封装 RegistryEntry.Reference
     // 例如在整个系统全部初始化完毕后再获取注册表里的数据, 通常是处理游戏世界内发生的事件
     // 2) 请求时注册表还未初始化完毕
-    // 这种情况一般出现在不同注册表之间相互依赖的场景里
+    // 这种情况一般出现在不同注册表之间相互依赖的场景里 (配置文件反序列化)
     //
     class Reference<T>
     private constructor(
@@ -168,8 +168,8 @@ interface RegistryEntry<T> {
         override val type: RegistryEntry.Type = RegistryEntry.Type.REFERENCE
 
         // 使用场景:
-        // 1) WritableRegistry#register 注册一个新的数据
-        // 1) WritableRegistry#register 为 intrusive holder 绑定数据
+        // 1) WritableRegistry#add 注册一个新的数据
+        // 1) WritableRegistry#add 为 intrusive registry entry 绑定数据
         // 2) 配置文件发生重载
         @ApiStatus.Internal
         fun setValue(value: T): Reference<T> {

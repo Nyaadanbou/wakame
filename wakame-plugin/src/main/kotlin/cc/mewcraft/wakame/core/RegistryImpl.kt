@@ -19,7 +19,7 @@ open class SimpleRegistry<T>(
 
     private var frozen: Boolean = false
 
-    // 还未正式注册好的 intrusive holders.
+    // 还未正式注册好的 intrusive entries.
     // 该映射在最终必须为空, 否则视为注册表错误.
     private val intrusiveIdToEntry: MutableMap<Identifier, RegistryEntry.Reference<T>> = HashMap()
 
@@ -57,11 +57,11 @@ open class SimpleRegistry<T>(
         } else if (this.valueToEntry.containsKey(value)) {
             throw Util.pauseInIde(IllegalStateException("Adding duplicate value '$value' to registry '${this.key}'"))
         } else {
-            // 如果已经存在 intrusiveReferenceHolder, 就不再创建新的 Holder,
-            // 而是把函数传递进来的数据绑定到它上面, 并且将这个 Holder 储存在注册表当中.
-            // 如果没有 intrusiveReferenceHolder, 那么就创建一个新的 Holder.
-            val intrusiveReferenceHolder = this.intrusiveIdToEntry.remove(key.value)?.setValue(value)
-            val resultantReferenceEntry = intrusiveReferenceHolder ?: this.keyToEntry.getOrPut(key) { RegistryEntry.Reference.standalone(this, key, value) }
+            // 如果已经存在 intrusiveReferenceEntry, 就不再创建新的 entry,
+            // 而是把函数传递进来的数据绑定到它上面, 并且将这个 entry 储存在注册表当中.
+            // 如果没有 intrusiveReferenceEntry, 那么就创建一个新的 entry.
+            val intrusiveReferenceEntry = this.intrusiveIdToEntry.remove(key.value)?.setValue(value)
+            val resultantReferenceEntry = intrusiveReferenceEntry ?: this.keyToEntry.getOrPut(key) { RegistryEntry.Reference.standalone(this, key, value) }
 
             this.keyToEntry.put(key, resultantReferenceEntry)
             this.idToEntry.put(key.value, resultantReferenceEntry)
@@ -121,7 +121,7 @@ open class SimpleRegistry<T>(
 
     override fun createEntry(id: Identifier): RegistryEntry.Reference<T> {
         // 如果注册表已经存在 id 对应的数据, 那么直接返回已存在的实例.
-        // 这种情况一般发生在 reload - Holder 已创建, 只需要更新数据.
+        // 这种情况一般发生在 reload - entry 已创建, 只需要更新数据.
         val existing = idToEntry[id]
         if (existing != null) {
             return existing
@@ -131,19 +131,19 @@ open class SimpleRegistry<T>(
             throw Util.pauseInIde(IllegalStateException("Trying to create intrusive entry for '$id' in frozen registry '${this.key}'"))
         }
 
-        // 序列化可能会在该注册表未加载数据时, 多次使用同一个 id 创建 intrusive holder.
+        // 序列化可能会在该注册表未加载数据时, 多次使用同一个 id 创建 intrusive entry.
         // 这里必须保证, 即使多次以同一个 id 调用该函数, 也只会返回最开始创建的那一个实例.
         return intrusiveIdToEntry.getOrPut(id) { RegistryEntry.Reference.intrusive(this, RegistryKey.of(this.key, id)) }
     }
 
     override fun validateEntries(): Result<Registry<T>> = runCatching {
         if (!intrusiveIdToEntry.isEmpty()) {
-            // 检查是否有未注册的 intrusive reference holders.
+            // 检查是否有未注册的 intrusive reference entries.
             // 发生该错误的原因: 通常是引用该注册表的配置文件写错了 id,
             // 例如属性里写了 "fire" 元素但元素注册表里不存在 "fire"
             throw IllegalStateException("Found unregistered intrusive entries in registry '${this.key}': ${intrusiveIdToEntry.keys.joinToString()}")
         } else if (!rawIdToEntry.all(RegistryEntry.Reference<T>::hasValue)) {
-            // 检查所有的 reference holders 都已经绑定了数据.
+            // 检查所有的 reference entries 都已经绑定了数据.
             // 发生该错误的原因: 暂时不太清楚, 等代码跑起来再看.
             throw IllegalStateException("Found unbound reference entries in registry '${this.key}': ${rawIdToEntry.filterNot(RegistryEntry.Reference<T>::hasValue).map(RegistryEntry.Reference<T>::getKey).joinToString()}")
         } else {

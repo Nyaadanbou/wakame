@@ -2,6 +2,8 @@
 
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
@@ -16,10 +18,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.contracts.ExperimentalContracts
@@ -72,9 +70,9 @@ object ImaginaryAttributeMaps {
 /* Implementations */
 
 
-private object AttributeMapSupport : KoinComponent {
+private object AttributeMapSupport {
     val PLAYER_KEY: Key = EntityType.PLAYER.key()
-    val ENTITY_KEY_LOOKUP: EntityKeyLookup by inject()
+    val ENTITY_KEY_LOOKUP: EntityKeyLookup by Injector.inject()
 }
 
 /**
@@ -295,8 +293,7 @@ private class EntityAttributeMap : AttributeMap {
     }
 }
 
-private object ImaginaryAttributeMapRegistry : KoinComponent {
-    private val logger = get<Logger>()
+private object ImaginaryAttributeMapRegistry {
     private val pool = ConcurrentHashMap<Key, ImaginaryAttributeMap>()
 
     fun get(key: Key): ImaginaryAttributeMap {
@@ -320,7 +317,7 @@ private object ImaginaryAttributeMapRegistry : KoinComponent {
     init {
         PluginEventBus.get().subscribe<NekoCommandReloadEvent> {
             reset()
-            logger.info("Reset object pool of ImaginaryAttributeMap")
+            LOGGER.info("Reset object pool of ImaginaryAttributeMap")
         }
     }
 }

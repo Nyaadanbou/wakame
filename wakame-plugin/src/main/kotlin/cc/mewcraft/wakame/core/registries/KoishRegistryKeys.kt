@@ -33,7 +33,7 @@ object KoishRegistryKeys {
     val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField
-    val COMPOSITE_ATTRIBUTE = createRegistryKey<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>("attribute_composition")
+    val COMPOSITE_ATTRIBUTE_FACADE = createRegistryKey<CompositeAttributeFacade<ConstantCompositeAttribute, VariableCompositeAttribute>>("composite_attribute_facade")
 
     @JvmField
     val ELEMENT = createRegistryKey<Element>("element")

@@ -54,7 +54,7 @@ object NekoItemFactory {
             fun <T : ItemTemplate<*>> tryAdd(
                 path: String,
                 type: ItemTemplateType<T>,
-                validator: Validator<T> = Validator.None as Validator<T>,
+                validator: Validator<T> = Validator.none(), // 默认无验证
             ) {
                 val node = root.node(path)
                 if (node.virtual()) {
