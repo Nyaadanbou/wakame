@@ -24,14 +24,17 @@ internal annotation class AbilityWorldInteractionDsl
 internal object AbilityWorldInteraction : KoinComponent {
     private val wakameWorld: WakameWorld by inject()
 
-    fun Player.getMechanicsBy(trigger: Trigger): List<Ability> {
+    fun Player.getAbilityBy(trigger: Trigger): List<Ability> {
         val abilities = mutableListOf<Ability>()
         with(WakameWorld.world()) {
             forEach { entity ->
-                val family = family { all(EntityType.ABILITY, CastBy, TriggerComponent, IdentifierComponent) }
+                val family = family { all(EntityType.ABILITY, CastBy, StatePhaseComponent, TriggerComponent, IdentifierComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[CastBy].entity != this@getMechanicsBy)
+                if (entity[CastBy].entity != this@getAbilityBy)
+                    return@forEach
+                if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
+                    // 只有在 IDLE 状态下才能进行下一个状态的标记.
                     return@forEach
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id

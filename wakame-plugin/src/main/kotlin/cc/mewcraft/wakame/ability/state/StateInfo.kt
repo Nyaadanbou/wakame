@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
@@ -49,7 +48,7 @@ class PlayerStateInfo(
 ) : StateInfo {
     private val weakPlayer: WeakReference<Player> = WeakReference(player)
 
-    private val player: Player
+    internal val player: Player
         get() = requireNotNull(weakPlayer.get())
 
     private val manaNoEnoughSubscription: Subscription = Events.subscribe(PlayerNoEnoughManaEvent::class.java)
@@ -83,17 +82,7 @@ class PlayerStateInfo(
 
     private val manaCostPenalties: MutableMap<String, ManaCostPenalty> = HashMap()
 
-    private val idleResetMechanic: Mechanic = Mechanic(
-        tick = { deltaTime, tickCount, componentMap ->
-            if (tickCount <= 40) {
-                return@Mechanic TickResult.CONTINUE_TICK
-            }
-            TickResult.ALL_DONE
-        },
-        onDisable = {
-            currentSequence.clear()
-        }
-    )
+    private val idleResetMechanic: Mechanic = PlayerStateInfoMechanic(this)
 
     override fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
@@ -177,11 +166,15 @@ class PlayerStateInfo(
     }
 
     private fun getAbilityByTrigger(trigger: Trigger): Ability? = abilityWorldInteraction {
-        val abilities = player.getMechanicsBy(trigger)
+        val abilities = player.getAbilityBy(trigger)
         if (abilities.size > 1) {
             LOGGER.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
         }
         return abilities.firstOrNull()
+    }
+
+    fun clearSequence() {
+        currentSequence.clear()
     }
 
     override fun cleanup() = abilityWorldInteraction {

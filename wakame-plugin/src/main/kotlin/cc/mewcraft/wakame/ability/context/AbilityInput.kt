@@ -1,5 +1,16 @@
 package cc.mewcraft.wakame.ability.context
 
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
+import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.ManaCostComponent
+import cc.mewcraft.wakame.ecs.component.TargetTo
+import cc.mewcraft.wakame.ecs.component.TriggerComponent
+import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
@@ -147,7 +158,7 @@ private class ComponentMapAbilityInput(
     override val castBy: Caster
         get() = requireNotNull(componentMap[CastBy]?.caster) { "Caster not found in componentMap" }
     override val target: Target
-        get() = requireNotNull(componentMap[TargetComponent]?.target) { "Target not found in componentMap" }
+        get() = requireNotNull(componentMap[TargetTo]?.target) { "Target not found in componentMap" }
     override val trigger: Trigger
         get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
     override val user: User<*>?

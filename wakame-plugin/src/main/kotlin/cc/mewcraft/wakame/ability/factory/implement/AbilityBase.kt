@@ -31,8 +31,8 @@ abstract class AbilityBase(
             it += EntityType.ABILITY
             it += Tags.DISPOSABLE
             it += CastBy(input.castBy)
+            it += TargetTo(input.target)
             HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
-            it += TargetComponent(input.target)
             input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
             it += ManaCostComponent(input.manaCost)
             it += MechanicComponent(mechanic(input))

@@ -19,13 +19,7 @@ sealed interface Target {
         override val bukkitLocation: BukkitLocation
             get() = bukkitEntity?.location ?: throw IllegalStateException("Entity is null")
     }
-
-    fun <T : Target> value(clazz: Class<T>): T?
-    fun <T : Target> valueNonNull(clazz: Class<T>): T
 }
-
-inline fun <reified T : Target> Target.value(): T? = value(T::class.java)
-inline fun <reified T : Target> Target.valueNonNull(): T = valueNonNull(T::class.java)
 
 object TargetAdapter {
     fun adapt(user: User<Player>): Target.LivingEntity {

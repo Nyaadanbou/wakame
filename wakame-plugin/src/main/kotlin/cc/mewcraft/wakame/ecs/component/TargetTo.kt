@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.ability.character.Target
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
-data class TargetComponent(
+data class TargetTo(
     var target: Target
-) : Component<TargetComponent> {
-    override fun type(): ComponentType<TargetComponent> = TargetComponent
+) : Component<TargetTo> {
+    override fun type(): ComponentType<TargetTo> = TargetTo
 
-    companion object : ComponentType<TargetComponent>()
+    companion object : ComponentType<TargetTo>()
 }

@@ -13,17 +13,6 @@ import java.util.stream.Stream
 class BukkitLocationTarget(
     override val bukkitLocation: Location,
 ) : Target.Location, Examinable {
-    override fun <T : Target> value(clazz: Class<T>): T? {
-        return when (clazz) {
-            Target.Location::class.java -> this as T
-            else -> null
-        }
-    }
-
-    override fun <T : Target> valueNonNull(clazz: Class<T>): T {
-        return requireNotNull(value(clazz)) { "Target is not $clazz" }
-    }
-
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("location", bukkitLocation)
@@ -42,17 +31,6 @@ class BukkitLivingEntityTarget(
 
     override val bukkitEntity: LivingEntity?
         get() = weakBukkitEntity.get()
-
-    override fun <T : Target> value(clazz: Class<T>): T? {
-        return when (clazz) {
-            Target.LivingEntity::class.java -> this as T
-            else -> null
-        }
-    }
-
-    override fun <T : Target> valueNonNull(clazz: Class<T>): T {
-        return requireNotNull(value(clazz)) { "Target is not $clazz" }
-    }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

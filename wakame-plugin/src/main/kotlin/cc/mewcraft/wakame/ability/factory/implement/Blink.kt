@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.ability.factory.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetComponent
+import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
@@ -120,7 +120,7 @@ private class BlinkAbilityMechanic(
                 end = Position.fine(target)
             )
         )
-        componentMap += TargetComponent(TargetAdapter.adapt(target))
+        componentMap += TargetTo(TargetAdapter.adapt(target))
 
         return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
@@ -141,7 +141,7 @@ private class BlinkAbilityMechanic(
     override fun tickReset(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         isTeleported = false
         componentMap -= ParticleEffectComponent
-        componentMap -= TargetComponent
+        componentMap -= TargetTo
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 }

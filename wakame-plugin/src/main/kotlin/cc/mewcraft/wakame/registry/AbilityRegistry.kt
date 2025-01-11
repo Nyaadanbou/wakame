@@ -9,6 +9,9 @@ import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer.PreWorldDependency
+import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -58,7 +61,7 @@ object AbilityRegistry {
     }
 
     private fun loadTriggers() {
-        val GENERIC_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.ATTACK, SingleTrigger.JUMP)
+        val GENERIC_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.NOOP)
         val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> = listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
 
         // Register Static Triggers

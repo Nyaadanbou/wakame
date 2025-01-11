@@ -3,23 +3,24 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetComponent
+import cc.mewcraft.wakame.ecs.component.TargetTo
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
 class ParticleSystem : IteratingSystem(
-    family = family { all(ParticleEffectComponent, TargetComponent) }
+    family = family { all(ParticleEffectComponent, TargetTo) }
 ) {
-
-    // 假设每个粒子路径可以分为 N 段，进度基于路径段
-    private val numberOfParticles = 100  // 设置每个路径上生成粒子的数量
+    companion object {
+        // 假设每个粒子路径可以分为 N 段，进度基于路径段
+        private const val NUMBER_OF_PARTICLES = 100  // 设置每个路径上生成粒子的数量
+    }
 
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]
         val builderProvider = particleEffectComponent.builderProvider
         val particlePath = particleEffectComponent.particlePath
-        val target = entity[TargetComponent].target
+        val target = entity[TargetTo].target
 
         // 检查是否已经结束
         if (particleEffectComponent.times == 0) {
@@ -29,9 +30,9 @@ class ParticleSystem : IteratingSystem(
         }
 
         // 遍历每个粒子，计算其在路径上的位置
-        for (i in 0 until numberOfParticles) {
+        for (i in 0 until NUMBER_OF_PARTICLES) {
             // 计算每个粒子的进度：在 0 到 1 之间
-            val progress = i / (numberOfParticles - 1).toDouble()  // 进度从 0 到 1
+            val progress = i / (NUMBER_OF_PARTICLES - 1).toDouble()  // 进度从 0 到 1
 
             // 获取粒子在路径上的位置
             val position = particlePath.positionAtProgress(progress)

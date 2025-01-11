@@ -132,9 +132,6 @@ object WakameWorld {
     internal inline fun editEntities(family: World.() -> Family, noinline configuration: EntityUpdateContext.(Entity) -> Unit) {
         with(instance) {
             val family = family()
-            if (family.isEmpty) {
-                error("No entities found for family: $family")
-            }
 
             family.forEach {
                 it.configure(configuration)
