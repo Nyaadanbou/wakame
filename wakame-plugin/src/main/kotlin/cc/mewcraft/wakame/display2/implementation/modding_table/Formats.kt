@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
@@ -20,6 +19,7 @@ import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable

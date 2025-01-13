@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.SimpleRegistry
+import cc.mewcraft.wakame.registry2.Registry
+import cc.mewcraft.wakame.registry2.SimpleRegistry
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire

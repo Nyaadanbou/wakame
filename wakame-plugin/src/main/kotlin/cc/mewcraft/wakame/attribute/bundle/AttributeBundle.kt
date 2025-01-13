@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 
 /**
  * 代表 [AttributeBundle] 的一部分特性, 故命名为 "...Trait".

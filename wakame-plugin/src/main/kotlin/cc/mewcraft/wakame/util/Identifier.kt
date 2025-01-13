@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.util
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult

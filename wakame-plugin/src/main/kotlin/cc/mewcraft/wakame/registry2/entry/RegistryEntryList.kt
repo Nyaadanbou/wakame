@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2.entry
 
 import com.mojang.datafixers.util.Either
 import kotlin.random.Random

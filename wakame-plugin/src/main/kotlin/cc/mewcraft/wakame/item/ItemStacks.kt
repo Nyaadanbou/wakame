@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.CompoundTag
 import org.bukkit.inventory.ItemStack
 

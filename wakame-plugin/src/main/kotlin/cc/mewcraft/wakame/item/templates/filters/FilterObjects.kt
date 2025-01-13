@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item.templates.filters
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.AbilityContextData
 import cc.mewcraft.wakame.item.template.AttributeContextData
@@ -10,6 +9,7 @@ import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILT
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range

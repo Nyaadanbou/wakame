@@ -1,19 +1,19 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.Serializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import org.spongepowered.configurate.kotlin.extensions.get

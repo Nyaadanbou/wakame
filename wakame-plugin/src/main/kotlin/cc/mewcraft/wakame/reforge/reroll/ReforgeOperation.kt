@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.ItemCells
@@ -21,6 +20,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.slf4j.Logger

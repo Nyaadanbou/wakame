@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreConstants
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode

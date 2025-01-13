@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.util.collection
 
 interface IndexedIterable<T> : Iterable<T> {
     companion object {

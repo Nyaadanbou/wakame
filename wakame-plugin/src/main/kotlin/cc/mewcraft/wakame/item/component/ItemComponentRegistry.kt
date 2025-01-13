@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.registry2.Registry
+import cc.mewcraft.wakame.registry2.SimpleRegistry
 import org.koin.core.component.KoinComponent
 
 /**

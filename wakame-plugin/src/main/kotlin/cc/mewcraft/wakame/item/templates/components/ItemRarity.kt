@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -12,6 +10,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken

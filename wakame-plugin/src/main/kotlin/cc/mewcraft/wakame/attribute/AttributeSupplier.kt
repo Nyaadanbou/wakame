@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
+import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable

@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
@@ -13,8 +10,11 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
 import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister

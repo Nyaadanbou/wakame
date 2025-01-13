@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.item.NekoItem
 import cc.mewcraft.wakame.api.item.NekoItemRegistry
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.nekoItem
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
 

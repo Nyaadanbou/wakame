@@ -2,15 +2,15 @@ package cc.mewcraft.wakame.gui
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.MenuIconResolution
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyMenuIconEverything
 import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.resolveMenuIcon
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.plain
 import net.kyori.adventure.text.Component

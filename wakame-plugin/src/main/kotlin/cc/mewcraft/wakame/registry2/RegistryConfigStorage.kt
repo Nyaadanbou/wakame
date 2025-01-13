@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR

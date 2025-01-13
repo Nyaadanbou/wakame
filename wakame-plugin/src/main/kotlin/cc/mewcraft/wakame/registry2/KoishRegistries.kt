@@ -1,14 +1,5 @@
-package cc.mewcraft.wakame.core.registries
+package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.core.MutableRegistryAccess
-import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.RegistryKey
-import cc.mewcraft.wakame.core.SimpleDefaultedFuzzyRegistry
-import cc.mewcraft.wakame.core.SimpleDefaultedRegistry
-import cc.mewcraft.wakame.core.SimpleRegistry
-import cc.mewcraft.wakame.core.WritableDefaultedFuzzyRegistry
-import cc.mewcraft.wakame.core.WritableDefaultedRegistry
-import cc.mewcraft.wakame.core.WritableRegistry
 import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
 

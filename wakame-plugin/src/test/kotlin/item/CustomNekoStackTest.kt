@@ -8,8 +8,6 @@ import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
 import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -23,6 +21,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.world.TimeControl
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey

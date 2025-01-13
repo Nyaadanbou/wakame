@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.core.RegistryEntry
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 

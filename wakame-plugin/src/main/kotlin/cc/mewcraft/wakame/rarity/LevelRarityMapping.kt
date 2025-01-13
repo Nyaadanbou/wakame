@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry.Companion.build
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.ImmutableRangeMap

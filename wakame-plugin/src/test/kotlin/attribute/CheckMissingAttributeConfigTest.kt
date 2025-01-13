@@ -3,11 +3,11 @@ package attribute
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifiers
 import mainEnv
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

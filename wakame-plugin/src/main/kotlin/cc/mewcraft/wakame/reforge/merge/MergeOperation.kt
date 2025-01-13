@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -17,6 +16,7 @@ import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent

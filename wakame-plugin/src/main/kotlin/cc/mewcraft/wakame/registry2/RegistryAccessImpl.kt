@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 

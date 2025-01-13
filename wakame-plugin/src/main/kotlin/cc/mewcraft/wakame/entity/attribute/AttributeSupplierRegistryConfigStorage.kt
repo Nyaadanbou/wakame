@@ -2,15 +2,15 @@ package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.RegistryConfigStorage
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 
 // TODO 把 Attribute 迁移到该 package 下

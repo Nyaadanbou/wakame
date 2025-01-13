@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.RegistryEntry
+import cc.mewcraft.wakame.registry2.Registry
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.MojangRegistry
 import cc.mewcraft.wakame.util.MojangResourceLocation
 import cc.mewcraft.wakame.util.getValueOrThrow

@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.enchantment.wrapper
 
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.enchantment.CustomEnchantment
 import cc.mewcraft.wakame.enchantment.Enchantments
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.enchantments.Enchantment
 

@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.item.templates.filters
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.krequire
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key

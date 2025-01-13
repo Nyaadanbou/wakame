@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -19,6 +17,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.MenuIcon
 import cc.mewcraft.wakame.util.MenuIconDictionary

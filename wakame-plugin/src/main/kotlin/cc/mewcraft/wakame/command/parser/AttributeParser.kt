@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

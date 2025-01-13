@@ -1,6 +1,12 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.core.Keyable
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.registry2.entry.RegistryEntryOwner
 import cc.mewcraft.wakame.util.DataResults
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.collection.IndexedIterable
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps

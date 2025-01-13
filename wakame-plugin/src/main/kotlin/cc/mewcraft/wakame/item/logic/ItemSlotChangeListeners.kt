@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.attribute.AttributeInstance
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.enchantment.CustomEnchantment
 import cc.mewcraft.wakame.enchantment.customEnchantments
 import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
@@ -15,6 +14,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player

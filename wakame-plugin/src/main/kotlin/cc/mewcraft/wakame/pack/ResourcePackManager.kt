@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.pack
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.core.Identifier
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
@@ -13,6 +11,8 @@ import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackModelSortGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile

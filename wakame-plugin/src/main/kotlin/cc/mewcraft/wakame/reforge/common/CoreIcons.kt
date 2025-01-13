@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
@@ -10,6 +9,7 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.realize
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.inventory.ItemStack
 
 /**

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
 /**
  * 提供访问注册表的方式.

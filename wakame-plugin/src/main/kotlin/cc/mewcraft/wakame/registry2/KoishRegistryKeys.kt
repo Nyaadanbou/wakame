@@ -1,13 +1,10 @@
-package cc.mewcraft.wakame.core.registries
+package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.Registry
-import cc.mewcraft.wakame.core.RegistryKey
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -15,6 +12,7 @@ import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
@@ -62,6 +60,6 @@ object KoishRegistryKeys {
     ///
 
     private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
-        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
+        return RegistryKey.Companion.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
     }
 }

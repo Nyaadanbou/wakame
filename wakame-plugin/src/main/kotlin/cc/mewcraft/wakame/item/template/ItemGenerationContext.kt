@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.attribute.bundle.AttributeGenerationContext
-import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext
 import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.CompoundBinaryTag
 import cc.mewcraft.wakame.util.ListBinaryTag
 import cc.mewcraft.wakame.util.getByteOrNull

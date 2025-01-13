@@ -3,13 +3,13 @@ package damage
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.AfterAll

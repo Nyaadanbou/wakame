@@ -1,7 +1,10 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectList

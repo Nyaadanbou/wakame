@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.core.RegistryEntry
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
 import java.util.concurrent.ConcurrentHashMap

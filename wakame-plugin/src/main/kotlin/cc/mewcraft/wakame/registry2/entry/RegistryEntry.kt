@@ -1,14 +1,17 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2.entry
 
+import cc.mewcraft.wakame.registry2.ReactiveRegistryEntry
+import cc.mewcraft.wakame.registry2.RegistryKey
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.asMinimalString2
 import com.mojang.datafixers.util.Either
 import org.jetbrains.annotations.ApiStatus
 import xyz.xenondevs.commons.provider.immutable.provider
 
 /**
- * 用于持有数据的容器, 附加了专用于跟 [Registry] 进行交互的函数.
+ * 用于持有数据的容器, 附加了专用于跟 [cc.mewcraft.wakame.registry2.Registry] 进行交互的函数.
  *
- * @see Registry
+ * @see cc.mewcraft.wakame.registry2.Registry
  */
 interface RegistryEntry<T> {
     companion object {
@@ -54,8 +57,8 @@ interface RegistryEntry<T> {
      * 返回容器的键名.
      *
      * 该键名包含两种信息:
-     * 1. 该容器 [RegistryEntry] 所在的注册表 [Registry]
-     * 2. 该容器 [RegistryEntry] 在 [Registry] 中的位置
+     * 1. 该容器 [RegistryEntry] 所在的注册表 [cc.mewcraft.wakame.registry2.Registry]
+     * 2. 该容器 [RegistryEntry] 在 [cc.mewcraft.wakame.registry2.Registry] 中的位置
      *
      * 因此该键名可用于从任意注册表中确定一个数据.
      *
@@ -70,9 +73,9 @@ interface RegistryEntry<T> {
     /**
      * 返回该容器的注册名. (在已知一个注册表时) 该名字可用来唯一确定该数据.
      *
-     * 当容器数据的命名空间为 [KOISH_NAMESPACE] 时, 返回值部分不包含命名空间.
+     * 当容器数据的命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE] 时, 返回值部分不包含命名空间.
      * 否则返回完整的 `命名空间:路径` 形式. 在已知 [getIdAsString] 的情况下,
-     * 逆操作 ([Identifiers.of]) 也完全遵循该规则.
+     * 逆操作 ([cc.mewcraft.wakame.util.Identifiers.of]) 也完全遵循该规则.
      *
      * 例如从 [Identifier] 转换为 [getIdAsString]:
      * - `"koish:ice"` -> `"ice"` (命名空间为 "koish" 将省略命名空间)
@@ -204,12 +207,12 @@ interface RegistryEntry<T> {
 
         enum class Type {
             /**
-             * 由注册表自己使用 [WritableRegistry.add] 创建的 [Reference].
+             * 由注册表自己使用 [cc.mewcraft.wakame.registry2.WritableRegistry.add] 创建的 [Reference].
              */
             STANDALONE,
 
             /**
-             * 由外部调用 [Registry.createEntry] 创建的 [Reference].
+             * 由外部调用 [cc.mewcraft.wakame.registry2.Registry.createEntry] 创建的 [Reference].
              */
             INTRUSIVE
         }

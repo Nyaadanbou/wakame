@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.core.KOISH_NAMESPACE
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
 import org.jetbrains.annotations.Contract

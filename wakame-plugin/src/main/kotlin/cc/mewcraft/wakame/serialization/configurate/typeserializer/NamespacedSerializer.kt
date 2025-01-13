@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.core.Identifiers
-import cc.mewcraft.wakame.core.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey

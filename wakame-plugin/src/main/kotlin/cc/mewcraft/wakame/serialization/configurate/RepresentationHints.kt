@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate
 
-import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.RepresentationHint
 import kotlin.reflect.KClass

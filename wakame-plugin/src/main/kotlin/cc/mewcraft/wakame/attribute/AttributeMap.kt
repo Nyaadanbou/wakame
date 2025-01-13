@@ -5,10 +5,10 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup

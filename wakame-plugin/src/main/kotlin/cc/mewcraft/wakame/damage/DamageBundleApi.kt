@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.jetbrains.annotations.ApiStatus
 import kotlin.random.Random
 

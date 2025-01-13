@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.registry2
 
 import xyz.xenondevs.commons.provider.Provider
 
