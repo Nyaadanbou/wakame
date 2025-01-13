@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.adventure
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
@@ -12,14 +14,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.Title.Times
 import net.kyori.adventure.util.Ticks
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
-import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.Type
 
 /**
@@ -131,11 +130,6 @@ internal class SoundStopAudienceMessage(
 /* 序列化 */
 
 //<editor-fold desc="Serializers">
-internal interface AudienceMessageSerializer<T> : TypeSerializer<T> {
-    override fun deserialize(type: Type, node: ConfigurationNode): T
-    override fun serialize(type: Type, obj: T?, node: ConfigurationNode): Unit = throw UnsupportedOperationException()
-}
-
 /**
  * 集成所有 [AudienceMessage] 为一体的序列化器.
  *
@@ -148,7 +142,7 @@ internal interface AudienceMessageSerializer<T> : TypeSerializer<T> {
  * (相关设置 ...)
  * ```
  */
-internal object CombinedAudienceMessageSerializer : AudienceMessageSerializer<AudienceMessage> {
+internal object CombinedAudienceMessageSerializer : TypeSerializer<AudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessageSerializer.deserialize(type, node)
@@ -173,7 +167,7 @@ internal object CombinedAudienceMessageSerializer : AudienceMessageSerializer<Au
     }
 }
 
-internal object AudienceMessageGroupSerializer : AudienceMessageSerializer<AudienceMessageGroup> {
+internal object AudienceMessageGroupSerializer : TypeSerializer<AudienceMessageGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessageGroup {
         if (node.rawScalar() != null) {
             return AudienceMessageGroupImpl(listOf(node.krequire()))
@@ -200,7 +194,7 @@ internal object AudienceMessageGroupSerializer : AudienceMessageSerializer<Audie
  * "foo"
  * ```
  */
-internal object ChatAudienceMessageSerializer : AudienceMessageSerializer<ChatAudienceMessage> {
+internal object ChatAudienceMessageSerializer : TypeSerializer<ChatAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ChatAudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessage(node.krequire())
@@ -217,7 +211,7 @@ internal object ChatAudienceMessageSerializer : AudienceMessageSerializer<ChatAu
  * text: "foo"
  * ```
  */
-internal object ActionbarAudienceMessageSerializer : AudienceMessageSerializer<ActionbarAudienceMessage> {
+internal object ActionbarAudienceMessageSerializer : TypeSerializer<ActionbarAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ActionbarAudienceMessage {
         val text = node.node("text").krequire<String>()
         return ActionbarAudienceMessage(text)
@@ -235,7 +229,7 @@ internal object ActionbarAudienceMessageSerializer : AudienceMessageSerializer<A
  * fade_out: # 单位: 刻
  * ```
  */
-internal object TitleAudienceMessageSerializer : AudienceMessageSerializer<TitleAudienceMessage> {
+internal object TitleAudienceMessageSerializer : TypeSerializer<TitleAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): TitleAudienceMessage {
         val title = node.node("title").krequire<String>()
         val subtitle = node.node("subtitle").krequire<String>()
@@ -258,7 +252,7 @@ internal object TitleAudienceMessageSerializer : AudienceMessageSerializer<Title
  * emitter: self # 可选, 默认: 'recipient_location', 可用值: 'self', 'recipient_location'
  * ```
  */
-internal object SoundAudienceMessageSerializer : AudienceMessageSerializer<SoundAudienceMessage> {
+internal object SoundAudienceMessageSerializer : TypeSerializer<SoundAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundAudienceMessage {
         // read name
         val name = node.node("name").krequire<Key>()
@@ -300,7 +294,7 @@ internal object SoundAudienceMessageSerializer : AudienceMessageSerializer<Sound
  * source: "master" # 可选, 默认: MASTER, 可用: https://minecraft.wiki/w/Sound#Categories
  * ```
  */
-internal object SoundStopAudienceMessageSerializer : AudienceMessageSerializer<SoundStopAudienceMessage> {
+internal object SoundStopAudienceMessageSerializer : TypeSerializer<SoundStopAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundStopAudienceMessage {
         // read name
         val name = node.node("name").krequire<Key>()
@@ -320,6 +314,6 @@ internal object SoundStopAudienceMessageSerializer : AudienceMessageSerializer<S
 }
 //</editor-fold>
 
-private object AudienceMessageSupport : KoinComponent {
-    val miniMessage: MiniMessage by inject()
+private object AudienceMessageSupport {
+    val miniMessage: MiniMessage by Injector.inject()
 }

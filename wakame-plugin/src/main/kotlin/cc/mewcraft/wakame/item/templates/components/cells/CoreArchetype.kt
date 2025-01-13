@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.bundle.element
@@ -9,6 +10,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigSt
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
@@ -19,7 +21,6 @@ import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.GroupSerializer
 import cc.mewcraft.wakame.random3.Node
@@ -30,7 +31,6 @@ import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
@@ -39,8 +39,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -151,7 +149,7 @@ internal class CoreArchetypePool(
  *       value: 23
  * ```
  */
-internal object CoreArchetypePoolSerializer : KoinComponent, PoolSerializer<CoreArchetype, ItemGenerationContext>() {
+internal object CoreArchetypePoolSerializer : PoolSerializer<CoreArchetype, ItemGenerationContext>() {
     override val sampleNodeFacade = CoreArchetypeSampleNodeFacade
     override val filterNodeFacade = ItemFilterNodeFacade
 
@@ -173,7 +171,7 @@ internal object CoreArchetypePoolSerializer : KoinComponent, PoolSerializer<Core
 /**
  * [CoreArchetype] 的 [cc.mewcraft.wakame.random3.Group] 的序列化器.
  */
-internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<CoreArchetype, ItemGenerationContext>() {
+internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, ItemGenerationContext>() {
     override val filterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(node: ConfigurationNode): Pool<CoreArchetype, ItemGenerationContext> {
@@ -186,20 +184,19 @@ internal object CoreArchetypeGroupSerializer : KoinComponent, GroupSerializer<Co
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistry::class],
+    runBefore = [ItemRegistryConfigStorage::class],
     runAfter = [AttributeBundleFacadeRegistryConfigStorage::class],
 )
 @Reload(
-    runBefore = [ItemRegistry::class],
+    runBefore = [ItemRegistryConfigStorage::class],
 )
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/cores")
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        registerAll(get(named(ABILITY_EXTERNALS)))
-        registerAll(get(named(EVALUABLE_SERIALIZERS)))
-        kregister(CoreArchetypeSerializer)
-        kregister(FilterSerializer)
-    }.build()
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
+        .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
+        .kregister(CoreArchetypeSerializer)
+        .kregister(FilterSerializer)
+        .build()
     override val repository: NodeRepository<Sample<CoreArchetype, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<CoreArchetype> = typeTokenOf()
     override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade

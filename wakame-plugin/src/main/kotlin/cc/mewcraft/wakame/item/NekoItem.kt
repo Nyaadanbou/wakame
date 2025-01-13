@@ -65,6 +65,13 @@ interface NekoItem : Examinable {
     val slotGroup: ItemSlotGroup
 
     /**
+     * 该物品是否隐藏.
+     *
+     * 隐藏起来的物品无法通过指令访问, 也不会出现在物品图鉴中, 但代码仍然可以通过注册表直接访问.
+     */
+    val hidden: Boolean
+
+    /**
      * 物品组件的模板.
      */
     val templates: ItemTemplateMap
@@ -78,17 +85,17 @@ interface NekoItem : Examinable {
 /* Implementations */
 
 fun NekoItem.realize(): NekoStack {
-    return CustomNekoItemRealizer.realize(this)
+    return StandardNekoItemRealizer.realize(this)
 }
 
 fun NekoItem.realize(context: ItemGenerationContext): NekoStack {
-    return CustomNekoItemRealizer.realize(this, context)
+    return StandardNekoItemRealizer.realize(this, context)
 }
 
 fun NekoItem.realize(user: User<*>): NekoStack {
-    return CustomNekoItemRealizer.realize(this, user)
+    return StandardNekoItemRealizer.realize(this, user)
 }
 
 fun NekoItem.realize(crate: Crate): NekoStack {
-    return CustomNekoItemRealizer.realize(this, crate)
+    return StandardNekoItemRealizer.realize(this, crate)
 }

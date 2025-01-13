@@ -46,8 +46,8 @@ internal data class ExtraLoreRendererFormat(
     fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
         val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val header: List<Component> = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val bottom: List<Component> = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)

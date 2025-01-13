@@ -1,4 +1,5 @@
-# 默认物品.
+# 未知物品.
 # 当内部实现请求的物品不存在时, 将使用该物品.
 
-base: barrier[item_name="错误"]
+base: shulker_shell
+item_name: "<red>未知物品"

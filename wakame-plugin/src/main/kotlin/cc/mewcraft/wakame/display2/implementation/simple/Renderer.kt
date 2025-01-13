@@ -28,13 +28,11 @@ internal class SimpleRendererFormatRegistry : AbstractRendererFormatRegistry(Sim
 
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-internal data object SimpleItemRendererContext
-
 @Init(
     stage = InitStage.POST_WORLD
 )
 @Reload
-internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
+internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()
@@ -56,9 +54,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: NekoStack, context: SimpleItemRendererContext?) {
-        requireNotNull(context) { "context" }
-
+    override fun render(item: NekoStack, context: Nothing?) {
         item.isClientSide = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.core
 
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.nekoItem
 import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -53,7 +53,7 @@ class ItemXNeko(
     private fun getArchetype(): NekoItem? {
         val transformed = identifier.replaceFirst('/', ':')
         val nekoItemId = Key.key(transformed)
-        return ItemRegistry.CUSTOM.getOrNull(nekoItemId)
+        return KoishRegistries.ITEM[nekoItemId]
     }
 }
 

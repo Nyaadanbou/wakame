@@ -33,6 +33,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.Contract
 import kotlin.reflect.KProperty
 
 val NekoItem.universalId: String
@@ -184,8 +185,9 @@ data class MenuIconResolution internal constructor(val name: Component?, val lor
     /**
      * 将此 [MenuIconResolution] 应用到 [item].
      *
-     * @return
+     * @return 应用了修改之后的 [item]
      */
+    @Contract(pure = false)
     fun applyNameAndLoreTo(item: ItemStack): ItemStack {
         item.itemName = name
         item.lore0 = lore

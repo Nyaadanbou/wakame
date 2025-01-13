@@ -28,9 +28,6 @@ internal fun itemModule(): Module = module {
     )
 
     single { DefaultItemSlotRegistry } bind ItemSlotRegistry::class
-//    single { ImaginaryNekoStackRegistry } bind Initializable::class
-//    single { ImaginaryNekoItemRealizer }
-//    single { CustomNekoItemRealizer }
 
     // NekoItem 的序列化器
     single<TypeSerializerCollection>(named(ITEM_PROTO_SERIALIZERS)) {

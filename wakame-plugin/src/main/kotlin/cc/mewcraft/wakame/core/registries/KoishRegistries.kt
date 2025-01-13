@@ -1,12 +1,15 @@
 package cc.mewcraft.wakame.core.registries
 
-import cc.mewcraft.wakame.core.DefaultedWritableRegistry
 import cc.mewcraft.wakame.core.MutableRegistryAccess
 import cc.mewcraft.wakame.core.Registry
 import cc.mewcraft.wakame.core.RegistryKey
+import cc.mewcraft.wakame.core.SimpleDefaultedFuzzyRegistry
 import cc.mewcraft.wakame.core.SimpleDefaultedRegistry
 import cc.mewcraft.wakame.core.SimpleRegistry
+import cc.mewcraft.wakame.core.WritableDefaultedFuzzyRegistry
+import cc.mewcraft.wakame.core.WritableDefaultedRegistry
 import cc.mewcraft.wakame.core.WritableRegistry
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
 
 object KoishRegistries {
@@ -59,20 +62,20 @@ object KoishRegistries {
     val ENTITY_TYPE_HOLDER = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
 
     /**
-     * 标准物品.
+     * 标准物品类型.
      *
      * 玩家可以直接获得/使用的物品类型.
      */
     @JvmField
-    val ITEM = registerDefaulted(KoishRegistryKeys.ITEM, "unknown")
+    val ITEM = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, ItemRegistryConfigStorage.UNKNOWN_ITEM_ID)
 
-    /**
-     * 原版套皮物品.
-     *
-     * 玩家无法直接获得/使用, 仅用于给纯原版物品套一层皮 (i.e., 给原版物品添加内容)
-     */
-    @JvmField
-    val VANILLA_WRAPPER_ITEM = registerSimple(KoishRegistryKeys.VANILLA_PROXY_ITEM)
+    // /**
+    //  * 原版套皮物品.
+    //  *
+    //  * 玩家无法直接获得/使用, 仅用于给纯原版物品套一层皮 (i.e., 给原版物品添加内容)
+    //  */
+    // @JvmField
+    // val VANILLA_WRAPPER_ITEM = registerSimple(KoishRegistryKeys.VANILLA_PROXY_ITEM)
 
     /**
      * 物品皮肤.
@@ -90,7 +93,7 @@ object KoishRegistries {
      * 等级>稀有度映射.
      */
     @JvmField
-    val LEVEL_RARITY_MAPPING = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, LevelRarityMappingRegistryConfigStorage.DEFAULT_MAPPING_NAME)
+    val LEVEL_RARITY_MAPPING = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, LevelRarityMappingRegistryConfigStorage.DEFAULT_ENTRY_NAME)
 
     /**
      * 稀有度.
@@ -108,7 +111,11 @@ object KoishRegistries {
         return ACCESS.add(key, SimpleRegistry(key).apply(initializer))
     }
 
-    private fun <T> registerDefaulted(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): DefaultedWritableRegistry<T> {
-        return ACCESS.add(key, SimpleDefaultedRegistry(defaultId, key).apply(initializer)).asDefaultedWritable()
+    private fun <T> registerDefaulted(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): WritableDefaultedRegistry<T> {
+        return ACCESS.add(key, SimpleDefaultedRegistry(defaultId, key).apply(initializer)) as WritableDefaultedRegistry<T>
+    }
+
+    private fun <T> registerDefaultedFuzzy(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): WritableDefaultedFuzzyRegistry<T> {
+        return ACCESS.add(key, SimpleDefaultedFuzzyRegistry(defaultId, key).apply(initializer)) as WritableDefaultedFuzzyRegistry<T>
     }
 }

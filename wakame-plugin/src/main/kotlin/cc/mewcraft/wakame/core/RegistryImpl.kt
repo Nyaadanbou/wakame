@@ -1,10 +1,14 @@
 package cc.mewcraft.wakame.core
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectList
 import it.unimi.dsi.fastutil.objects.Reference2IntMap
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import java.util.IdentityHashMap
 import kotlin.random.Random
 
@@ -92,6 +96,7 @@ open class SimpleRegistry<T>(
         } else {
             validateEntries().getOrThrow()
             frozen = true
+            LOGGER.info(Component.text("Frozen registry '${this.key}' with ${rawIdToEntry.size} entries").color(NamedTextColor.AQUA))
             return this
         }
     }
@@ -170,8 +175,8 @@ open class SimpleRegistry<T>(
 
 open class SimpleDefaultedRegistry<T>(
     defaultId: String,
-    override val key: RegistryKey<out Registry<T>>,
-) : SimpleRegistry<T>(key), DefaultedWritableRegistry<T> {
+    key: RegistryKey<out Registry<T>>,
+) : SimpleRegistry<T>(key), WritableDefaultedRegistry<T> {
     override val defaultId: Identifier = Identifiers.of(defaultId)
     private lateinit var defaultEntry: RegistryEntry.Reference<T>
 
@@ -232,3 +237,38 @@ open class SimpleDefaultedRegistry<T>(
         }
     }
 }
+
+open class SimpleFuzzyRegistry<T>(
+    key: RegistryKey<out Registry<T>>,
+) : SimpleRegistry<T>(key), WritableFuzzyRegistry<T> {
+    // id's path -> all values with the same id's path
+    private val pathToValue = Object2ObjectOpenHashMap<String, MutableList<T>>()
+
+    override fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
+        val entry = super<SimpleRegistry>.add(key, value)
+        pathToValue.getOrPut(key.value.value(), ::ObjectArrayList).add(value)
+        return entry
+    }
+
+    override fun getFuzzy(id: String): List<T> {
+        return pathToValue[id] ?: emptyList()
+    }
+}
+
+open class SimpleDefaultedFuzzyRegistry<T>(
+    defaultId: String,
+    key: RegistryKey<out Registry<T>>,
+) : SimpleDefaultedRegistry<T>(defaultId, key), WritableDefaultedFuzzyRegistry<T> {
+    private val pathToValue = Object2ObjectOpenHashMap<String, MutableList<T>>()
+
+    override fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
+        val entry = super<SimpleDefaultedRegistry>.add(key, value)
+        pathToValue.getOrPut(key.value.value(), ::ObjectArrayList).add(value)
+        return entry
+    }
+
+    override fun getFuzzy(id: String): List<T> {
+        return pathToValue[id] ?: emptyList()
+    }
+}
+

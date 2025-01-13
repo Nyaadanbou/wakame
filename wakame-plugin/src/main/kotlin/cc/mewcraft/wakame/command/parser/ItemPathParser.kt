@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -33,8 +34,8 @@ class ItemPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestionPro
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<String> {
         val namespaceHint = commandContext.getOrNull<String>(ItemNamespaceParser.NAMESPACE_HINT)
-        val paths = ItemRegistry.NAMESPACE_TO_PATHS[namespaceHint]
-                    ?: return ArgumentParseResult.failure(ItemPathParseException(commandContext))
+        val paths = getPathByNamespace(namespaceHint)
+            ?: return ArgumentParseResult.failure(ItemPathParseException(commandContext))
 
         val peekString = commandInput.peekString()
         if (peekString !in paths) {
@@ -47,7 +48,15 @@ class ItemPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestionPro
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
         val namespaceHint = commandContext.getOrNull<String>(ItemNamespaceParser.NAMESPACE_HINT)
-        return ItemRegistry.NAMESPACE_TO_PATHS[namespaceHint] ?: emptyList()
+        return getPathByNamespace(namespaceHint) ?: emptyList()
+    }
+
+    private fun getPathByNamespace(namespace: String?): List<String>? {
+        if (namespace == null) return null
+        return KoishRegistries.ITEM.ids
+            .filter { id -> id.namespace() == namespace }
+            .map(Identifier::value)
+            .takeIf { list -> list.isNotEmpty() }
     }
 }
 

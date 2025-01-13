@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.initializer2.InitializerSupport.tryInit
 import cc.mewcraft.wakame.util.data.JarUtils
-import cc.mewcraft.wakame.util.registerSuspendingEvents
+import cc.mewcraft.wakame.util.registerEvents
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.coroutineScope
@@ -34,7 +34,7 @@ internal object Reloader : Listener {
      */
     @InitFun
     private fun start() = tryInit {
-        registerSuspendingEvents()
+        registerEvents()
         collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
     }
 
@@ -123,6 +123,8 @@ internal object Reloader : Listener {
     private fun handlePluginReload(event: NekoCommandReloadEvent) {
         if (Initializer.isDone) {
             reload()
-        } else LOGGER.warn("Skipping reload because initialization is not done")
+        } else {
+            LOGGER.warn("Skipping reload because initialization is not done")
+        }
     }
 }

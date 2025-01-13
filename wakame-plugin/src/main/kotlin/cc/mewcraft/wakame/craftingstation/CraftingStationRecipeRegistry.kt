@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
@@ -11,17 +12,15 @@ import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
@@ -29,9 +28,9 @@ import java.io.File
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    runAfter = [ItemRegistry::class],
+    runAfter = [ItemRegistryConfigStorage::class],
 )
-internal object CraftingStationRecipeRegistry : KoinComponent {
+internal object CraftingStationRecipeRegistry {
     private const val RECIPE_DIR_PATH = "station/recipes"
 
     @VisibleForTesting
@@ -59,13 +58,11 @@ internal object CraftingStationRecipeRegistry : KoinComponent {
     fun loadDataIntoRegistry() {
         raw.clear()
 
-        val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
-        val namespacedPaths = NamespacedPathCollector(recipeDir, true).collect("yml")
-        namespacedPaths.forEach {
-            val file = it.file
+        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()
-                val key = Key.key(it.namespace, it.path)
+                val key = Key.key(namespace, path)
 
                 val recipeNode = buildYamlConfigLoader {
                     withDefaults()

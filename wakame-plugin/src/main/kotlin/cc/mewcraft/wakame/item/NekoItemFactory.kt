@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Util
+import cc.mewcraft.wakame.core.Identifier
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
@@ -12,22 +13,25 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.krequire
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
-import java.nio.file.Path
 
 object NekoItemFactory {
-    fun createVanilla(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
-        // read all basic info
-        val itemBase = root.node("base").krequire<ItemBase>()
-        val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
+    val VANILLA: VanillaNekoItemFactory = VanillaNekoItemFactory
+    val STANDARD: StandardNekoItemFactory = StandardNekoItemFactory
+}
 
-        // read all item behaviors
+object VanillaNekoItemFactory {
+    operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
+        // read basic data
+        val itemBase = rootNode.node("base").krequire<ItemBase>()
+        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
+
+        // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {
             fun <T : ItemBehavior> tryAdd(path: String, type: ItemBehaviorType<T>) {
-                // 如果 root 里存在指定 id 的节点, 则添加对应的 behavior
-                if (root.contains(path)) {
+                // 如果 rootNode 里存在指定 id 的节点, 则添加对应的 behavior
+                if (rootNode.contains(path)) {
                     this.put(type, type.create())
                 }
             }
@@ -48,7 +52,7 @@ object NekoItemFactory {
             tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
 
-        // read all item templates (of item components)
+        // read item templates
         val templateMap = ItemTemplateMap.build {
             @Suppress("UNCHECKED_CAST")
             fun <T : ItemTemplate<*>> tryAdd(
@@ -56,13 +60,13 @@ object NekoItemFactory {
                 type: ItemTemplateType<T>,
                 validator: Validator<T> = Validator.none(), // 默认无验证
             ) {
-                val node = root.node(path)
+                val node = rootNode.node(path)
                 if (node.virtual()) {
                     return // 如果节点是虚拟的, 则直接返回
                 }
                 val template = type.decode(node)
                 try {
-                    validator.validate(ValidatorContext(key, type, template))
+                    validator.validate(ValidatorContext(id, type, template))
                 } catch (e: UnsupportedItemTemplateException) {
                     Util.pauseInIde(e)
                 } catch (e: RestrictedItemTemplateException) {
@@ -109,31 +113,33 @@ object NekoItemFactory {
         }
 
         return SimpleNekoItem(
-            id = key, base = itemBase, slotGroup = slotGroup, templates = templateMap, behaviors = behaviorMap
+            id = id,
+            base = itemBase,
+            slotGroup = slotGroup,
+            hidden = true,
+            templates = templateMap,
+            behaviors = behaviorMap
         )
     }
+}
 
-    fun createCustom(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
-        return create(key, relPath, root)
-    }
-
+object StandardNekoItemFactory {
     /**
-     * Creates a [NekoItem] from a [configuration node][ConfigurationNode].
+     * Creates a [NekoItem] from a [ConfigurationNode].
      *
-     * @param key the key of the item
-     * @param relPath the relative path of the item in the configuration
-     * @param root the configuration node holding the data of the item
+     * @param id the key of the item
+     * @param rootNode the configuration node holding the data of the item
      * @return a new [NekoItem]
      */
-    fun create(key: Key, relPath: Path, root: ConfigurationNode): NekoItem {
-        // read all basic info
-        val itemBase = root.node("base").krequire<ItemBase>()
-        val slotGroup = root.node("slot").krequire<ItemSlotGroup>()
+    operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
+        // read basic data
+        val itemBase = rootNode.node("base").krequire<ItemBase>()
+        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
 
-        // read all item behaviors
+        // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {
             fun <T : ItemBehavior> tryAdd(path: String, type: ItemBehaviorType<T>) {
-                if (root.contains(path)) this.put(type, type.create())
+                if (rootNode.contains(path)) this.put(type, type.create())
             }
 
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
@@ -152,10 +158,10 @@ object NekoItemFactory {
             tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
 
-        // read all item templates (of item components)
+        // read item templates
         val templateMap = ItemTemplateMap.build {
             fun <T : ItemTemplate<*>> tryAdd(path: String, type: ItemTemplateType<T>) {
-                val node = root.node(path)
+                val node = rootNode.node(path)
                 if (node.virtual()) return
                 val template = type.decode(node)
                 this.put(type, template)
@@ -202,7 +208,12 @@ object NekoItemFactory {
         }
 
         return SimpleNekoItem(
-            id = key, base = itemBase, slotGroup = slotGroup, templates = templateMap, behaviors = behaviorMap
+            id = id,
+            base = itemBase,
+            slotGroup = slotGroup,
+            hidden = false,
+            templates = templateMap,
+            behaviors = behaviorMap
         )
     }
 }
@@ -241,4 +252,4 @@ private sealed interface Validator<T> {
     }
 }
 
-private class ValidatorContext<T>(val item: Key, val type: ItemTemplateType<*>, val data: T)
+private class ValidatorContext<T>(val item: Identifier, val type: ItemTemplateType<*>, val data: T)

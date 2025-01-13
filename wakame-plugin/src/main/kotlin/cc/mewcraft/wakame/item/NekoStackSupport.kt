@@ -3,6 +3,8 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -10,7 +12,6 @@ import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.ItemStackDSL
@@ -30,7 +31,6 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
-import org.koin.core.component.KoinComponent
 import java.util.stream.Stream
 
 /**
@@ -408,19 +408,19 @@ internal class ImaginaryNekoStack(
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    runAfter = [ItemRegistry::class],
+    runAfter = [ItemRegistryConfigStorage::class],
 )
-internal object ImaginaryNekoStackRegistry : KoinComponent {
-    private val registry: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)
+internal object ImaginaryNekoStackRegistry {
+    private val CACHE: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)
 
     @InitFun
     private fun init() {
-        realizeAndRegister()
+        realizeAndStore()
     }
 
     @ReloadFun
     private fun reload() {
-        realizeAndRegister()
+        realizeAndStore()
     }
 
     fun has(material: Material): Boolean {
@@ -428,7 +428,7 @@ internal object ImaginaryNekoStackRegistry : KoinComponent {
     }
 
     fun has(id: Key): Boolean {
-        return registry.containsKey(id)
+        return CACHE.containsKey(id)
     }
 
     fun get(material: Material): ImaginaryNekoStack? {
@@ -436,18 +436,16 @@ internal object ImaginaryNekoStackRegistry : KoinComponent {
     }
 
     fun get(id: Key): ImaginaryNekoStack? {
-        return registry[id]
+        return CACHE[id]
     }
 
-    fun register(id: Key, stack: ImaginaryNekoStack) {
-        registry[id] = stack
-    }
-
-    private fun realizeAndRegister() {
-        registry.clear()
-        for ((id, prototype) in ItemRegistry.IMAGINARY) {
-            val stack = ImaginaryNekoItemRealizer.realize(prototype)
-            register(id, stack)
+    private fun realizeAndStore() {
+        CACHE.clear()
+        val filter = KoishRegistries.ITEM.filter { it.id.namespace() == Identifier.MINECRAFT_NAMESPACE }
+        for (prototype in filter) {
+            val id = prototype.id
+            val stack = VanillaNekoItemRealizer.realize(prototype)
+            CACHE[id] = stack
         }
     }
 }
@@ -521,13 +519,13 @@ internal object NekoStackImplementations {
 
     fun getArchetypeOrNull(nekoo: CompoundTag): NekoItem? {
         val id = getId(nekoo)
-        val prototype = ItemRegistry.CUSTOM.getOrNull(id)
+        val prototype = KoishRegistries.ITEM[id]
         return prototype
     }
 
     fun getArchetype(nekoo: CompoundTag): NekoItem {
         val id = getId(nekoo)
-        val prototype = requireNotNull(ItemRegistry.CUSTOM.getOrNull(id)) { "Can't find item prototype by id '$id'" }
+        val prototype = requireNotNull(KoishRegistries.ITEM[id]) { "Can't find item prototype by id '$id'" }
         return prototype
     }
 

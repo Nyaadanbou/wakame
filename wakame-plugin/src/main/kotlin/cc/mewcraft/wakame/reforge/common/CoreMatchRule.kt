@@ -140,7 +140,6 @@ private data object CoreMatchRuleEmpty : CoreMatchRule {
     override fun toString(): String = toSimpleString()
 }
 
-
 /**
  * 可以匹配所有核心的匹配规则.
  */

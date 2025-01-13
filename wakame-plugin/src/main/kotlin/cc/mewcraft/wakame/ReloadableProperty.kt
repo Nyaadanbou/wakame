@@ -18,18 +18,13 @@ import kotlin.reflect.KProperty
 class ReloadableProperty<T>(
     private val loader: () -> T,
 ) : ReadOnlyProperty<Any?, T>, Listener {
-    private var value: T? = null
-
     init {
         if (!SharedConstants.IS_RUNNING_IN_IDE) {
             registerEvents()
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST) // properties are reloaded the latest because some of them depend on configs
-    private fun on(e: NekoCommandReloadEvent) {
-        reload()
-    }
+    private var value: T? = null
 
     private fun get(): T {
         val value = this.value
@@ -40,6 +35,9 @@ class ReloadableProperty<T>(
         }
         return value
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST) // properties are reloaded the latest because some of them depend on configs
+    private fun on(e: NekoCommandReloadEvent) = reload()
 
     private fun reload() {
         value = null

@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -22,12 +23,11 @@ import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
-import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
 import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
 import cc.mewcraft.wakame.registry.registryModule
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -39,7 +39,6 @@ import org.koin.test.get
 import org.koin.test.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import testEnv
 import java.io.File
 import java.nio.file.Path
@@ -59,7 +58,6 @@ object CommonNekoStackTest {
                 // dependencies
                 adventureModule(),
                 damageModule(),
-                molangModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
@@ -101,9 +99,12 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
 
     val key = Key.key(namespace, path)
     val relPath = itemFile.toPath()
-    val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) // will be reused
-    val node = loaderBuilder.buildAndLoadString(itemFile.readText())
-    return Triple(key, relPath, node)
+    val loader = buildYamlConfigLoader {
+        withDefaults()
+        serializers { registerAll(ItemRegistryConfigStorage.SERIALIZERS) }
+    }
+    val rootNode = loader.buildAndLoadString(itemFile.readText())
+    return Triple(key, relPath, rootNode)
 }
 
 /**
@@ -111,7 +112,7 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
  */
 fun KoinTest.readVanillaPrototype(path: String): NekoItem {
     val (key, relPath, node) = readItemNode("minecraft", path)
-    return NekoItemFactory.createVanilla(key, relPath, node)
+    return NekoItemFactory.VANILLA(key, node)
 }
 
 /**
@@ -119,7 +120,7 @@ fun KoinTest.readVanillaPrototype(path: String): NekoItem {
  */
 fun KoinTest.readCustomPrototype(namespace: String, path: String): NekoItem {
     val (key, relPath, node) = readItemNode(namespace, path)
-    return NekoItemFactory.createCustom(key, relPath, node)
+    return NekoItemFactory.STANDARD(key, node)
 }
 
 /**

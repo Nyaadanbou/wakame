@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import net.kyori.adventure.key.Key
@@ -29,9 +29,6 @@ internal object RecyclingStationSerializer {
             .resolve(ROOT_DIR_NAME)
             .resolve(ITEMS_DIR_NAME)
 
-        val collector = NamespacedPathCollector(itemsDirectory, true)
-        val itemFiles = collector.collect("yml")
-
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
@@ -40,19 +37,21 @@ internal object RecyclingStationSerializer {
             }
         }
 
-        val result = itemFiles.mapNotNull { (f, ns, ps) ->
-            val itemKey = Key.key(ns, ps)
-            val rootNode = yamlLoader.buildAndLoadString(f.readText())
+        val itemFiles = NamespacedFileTreeWalker(itemsDirectory, "yml", true)
+        val result = itemFiles
+            .mapNotNull { (file, namespace, path) ->
+                val itemKey = Key.key(namespace, path)
+                val rootNode = yamlLoader.buildAndLoadString(file.readText())
 
-            // 反序列化配置文件
-            val priceInstance = rootNode.get<PriceInstance>() ?: run {
-                logger.warn("Failed to load price instance for item: $itemKey")
-                return@mapNotNull null
-            }
+                // 反序列化配置文件
+                val priceInstance = rootNode.get<PriceInstance>() ?: run {
+                    logger.warn("Failed to load price instance for item: $itemKey")
+                    return@mapNotNull null
+                }
 
-            // 构建映射
-            itemKey to priceInstance
-        }.toMap()
+                // 构建映射
+                itemKey to priceInstance
+            }.toMap()
 
         return result
     }

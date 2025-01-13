@@ -1,15 +1,22 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.core.Identifier
+import cc.mewcraft.wakame.core.registries.KoishRegistries
+import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
+import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackModelSortGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
@@ -22,9 +29,8 @@ import java.io.File
 internal class ResourcePackManager(
     private val packReader: ResourcePackReader<FileTreeReader>,
     private val packWriter: ResourcePackWriter<FileTreeWriter>,
-) : KoinComponent {
-    private val logger: Logger by inject()
-    private val pluginDataDirectory: File by inject(named(PLUGIN_DATA_DIR))
+) {
+    private val pluginDataDirectory: File by Injector.inject(named(PLUGIN_DATA_DIR))
     private val generationSettings: ResourcePackGenerationSettings = ResourcePackGenerationSettings()
 
     /**
@@ -52,7 +58,9 @@ internal class ResourcePackManager(
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
                 resourcePack = resourcePack,
-                itemModelInfos = ItemRegistry.CUSTOM.values.map { ItemModelInfo(it.id, it.base.type.key()) }
+                itemModelInfos = KoishRegistries.ITEM
+                    .filter { it.id.namespace() != Identifier.MINECRAFT_NAMESPACE }
+                    .map { ItemModelInfo(it.id, it.base.type.key()) }
             )
 
             // Generate the resource pack
@@ -68,7 +76,7 @@ internal class ResourcePackManager(
             try {
                 generations.forEach { it.process() }
             } catch (t: Throwable) {
-                logger.warn("Failed to generate resourcepack", t)
+                LOGGER.warn("Failed to generate resourcepack", t)
             }
 
             // Write the resource pack to the file
@@ -76,11 +84,11 @@ internal class ResourcePackManager(
             packWriter.writeToZipFile(path = resourcePackFile.toPath(), tempPath = resourceTempFile.toPath(), resourcePack = resourcePack)
             packWriter.writeToDirectory(directory = resourcePackDirectory, tempDir = resourceTempDir, resourcePack = resourcePack)
 
-            logger.info("Resource pack has been generated.")
+            LOGGER.info("Resource pack has been generated.")
             // Build the resource pack to ensure it's valid
             MinecraftResourcePackWriter.minecraft().build(resourcePack)
 
-            logger.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
+            LOGGER.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
         } finally {
             tempDir.deleteRecursively()
         }

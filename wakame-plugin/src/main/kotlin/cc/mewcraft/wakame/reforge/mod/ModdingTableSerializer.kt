@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
@@ -9,15 +11,12 @@ import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.collections.associateNotNull
 import java.io.File
@@ -26,11 +25,10 @@ import java.lang.reflect.Type
 /**
  * [ModdingTable] 的序列化器.
  */
-internal object ModdingTableSerializer : KoinComponent {
+internal object ModdingTableSerializer {
     private const val ROOT_DIR_NAME = "mod"
 
-    private val LOGGER: Logger = get()
-    private val MODDING_DIR by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
+    private val MODDING_DIR by lazy { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
 
     /**
      * 从配置文件夹中加载所有的定制台.
@@ -46,7 +44,7 @@ internal object ModdingTableSerializer : KoinComponent {
                     it.name to table
                 } catch (e: Exception) {
                     LOGGER.error("Can't load modding table: '${it.relativeTo(MODDING_DIR)}'", e)
-                    null
+                    return@mapNotNull null
                 }
             }
             .associate { it }
@@ -97,12 +95,12 @@ internal object ModdingTableSerializer : KoinComponent {
         val currencyCost = tableMainConfigNode.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>>()
 
         // 解析物品规则
-        val itemRuleMap = NamespacedPathCollector(tableItemsDirectory, true)
-            .collect("yml")
-            .associateNotNull {
+        val itemRuleMap = NamespacedFileTreeWalker(tableItemsDirectory, "yml", true)
+            .asIterable()
+            .associateNotNull { (file, namespace, path) ->
                 try {
-                    val itemId = Key.key(it.namespace, it.path)
-                    val fileText = it.file.readText()
+                    val itemId = Key.key(namespace, path)
+                    val fileText = file.readText()
                     val itemNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
@@ -121,8 +119,8 @@ internal object ModdingTableSerializer : KoinComponent {
 
                     itemId to itemRule
                 } catch (e: Exception) {
-                    LOGGER.error("Can't load item rule: '${it.file.relativeTo(MODDING_DIR)}'", e)
-                    null
+                    LOGGER.error("Can't load item rule: '${file.relativeTo(MODDING_DIR)}'", e)
+                    return@associateNotNull null
                 }
             }
             .toMap(HashMap())

@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.templates.components.ArmorTrim
 import cc.mewcraft.wakame.item.templates.components.Castable
 import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.DamageResistant
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.FoodProperties
 import cc.mewcraft.wakame.item.templates.components.HideAdditionalTooltip
 import cc.mewcraft.wakame.item.templates.components.HideTooltip
@@ -256,11 +256,11 @@ object ItemTemplateTypes {
     /**
      * 获取所有模板的序列化器.
      */
-    internal fun collectTypeSerializers(): TypeSerializerCollection {
+    internal fun serializers(): TypeSerializerCollection {
         return ItemTemplateTypeHelper.serializerBuilder.build()
     }
 
-    internal fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
+    private fun <T : ItemTemplate<*>> ItemTemplateType<T>.register(): ItemTemplateType<T> {
         ItemTemplateTypeHelper.serializerBuilder.registerAll(this.childrenCodecs())
         return this
     }

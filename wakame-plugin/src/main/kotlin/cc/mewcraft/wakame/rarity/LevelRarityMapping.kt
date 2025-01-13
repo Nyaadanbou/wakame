@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.core.Identifiers
 import cc.mewcraft.wakame.core.RegistryEntry
 import cc.mewcraft.wakame.core.registries.KoishRegistries
 import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry.Companion.build
@@ -132,7 +133,8 @@ internal object LevelRarityMappingSerializer : TypeSerializer<LevelRarityMapping
             val levelRange = RangeParser.parseIntRange(levelNode)
             val levelMapping = build {
                 for ((nodeKey2, node2) in weightNode.childrenMap()) {
-                    val rarityType = KoishRegistries.RARITY.createEntry(nodeKey2.toString())
+                    val rarityTypeId = Identifiers.of(nodeKey2.toString())
+                    val rarityType = KoishRegistries.RARITY.createEntry(rarityTypeId)
                     val rarityWeight = node2.krequire<Double>()
                     weight[rarityType] = rarityWeight
                 }

@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.RendererFormatRegistry
@@ -7,10 +9,7 @@ import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.krequire
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.provider
 import java.nio.file.Path
@@ -23,8 +22,7 @@ import kotlin.reflect.typeOf
 
 internal abstract class AbstractRendererFormatRegistry(
     protected val renderer: AbstractItemRenderer<*, *>,
-) : RendererFormatRegistry, KoinComponent {
-    protected val logger = get<Logger>()
+) : RendererFormatRegistry {
 
     /**
      * `配置中的节点路径` -> `typeOf<RendererFormat>`, 用于引导配置文件的序列化.
@@ -60,11 +58,11 @@ internal abstract class AbstractRendererFormatRegistry(
         cleanup()
 
         val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(formatPath.readText())
-        val relativeTo = formatPath.relativeTo(get<Path>(named(PLUGIN_DATA_DIR)))
+        val relativeTo = formatPath.relativeTo(Injector.get<Path>(named(PLUGIN_DATA_DIR)))
         for ((id, type) in rendererFormatTypeById) {
             val node = rootNode.node(id)
             if (node.virtual()) {
-                logger.warn("Renderer format '$id' is not found in '$relativeTo'")
+                LOGGER.warn("Renderer format '$id' is not found in '$relativeTo'")
             }
             val format = node.krequire<RendererFormat>(type)
 
@@ -74,7 +72,7 @@ internal abstract class AbstractRendererFormatRegistry(
             textMetaFactoryRegistry.registerFactory(format.textMetaFactory, format.textMetaPredicate)
         }
 
-        logger.info("Registered ${textMetaFactoryRegistry.getKnownFactories().size} TextMetaFactory from '$relativeTo'")
+        LOGGER.info("Registered ${textMetaFactoryRegistry.getKnownFactories().size} TextMetaFactory from '$relativeTo'")
 
         // reload all renderer formats of this renderer
         registeredFormatProviders.values.forEach { provider -> provider.update() }
@@ -83,14 +81,14 @@ internal abstract class AbstractRendererFormatRegistry(
     inline fun <reified F : RendererFormat> registerRendererFormat(id: String): Boolean {
         val previous = rendererFormatTypeById.put(id, typeOf<F>())
         if (previous != null) {
-            logger.error("Renderer format '$id' is already registered with type $previous. This is a bug!")
+            LOGGER.error("Renderer format '$id' is already registered with type $previous. This is a bug!")
             return false
         }
         return true
     }
 
     // 必须外面套个函数来访问 registeredFormats[id] 否则
-    // lambda 好像会被自动 inline ??? 有时间再摸索一下
+// lambda 好像会被自动 inline ??? 有时间再摸索一下
     @Suppress("UNCHECKED_CAST")
     private fun <F : RendererFormat> getRegisteredRendererFormat(id: String): F {
         return (registeredRendererFormats[id] as F?) ?: error("Renderer format '$id' is not registered")

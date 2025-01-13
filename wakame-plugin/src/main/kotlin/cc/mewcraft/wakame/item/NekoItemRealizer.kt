@@ -53,7 +53,19 @@ interface NekoItemRealizer {
 
 }
 
-internal object ImaginaryNekoItemRealizer : NekoItemRealizer {
+internal object VanillaNekoItemRealizer : NekoItemRealizer {
+    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryNekoStack {
+        return realize(prototype)
+    }
+
+    override fun realize(prototype: NekoItem, crate: Crate): ImaginaryNekoStack {
+        return realize(prototype)
+    }
+
+    override fun realize(prototype: NekoItem, context: ItemGenerationContext): ImaginaryNekoStack {
+        return realize(prototype)
+    }
+
     override fun realize(prototype: NekoItem): ImaginaryNekoStack {
         // 没 trigger 的 ctx
         val context = ItemGenerationContexts.create(ItemGenerationTriggers.empty(), prototype.id, 0)
@@ -91,21 +103,9 @@ internal object ImaginaryNekoItemRealizer : NekoItemRealizer {
 
         return nekoStack
     }
-
-    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryNekoStack {
-        return realize(prototype)
-    }
-
-    override fun realize(prototype: NekoItem, crate: Crate): ImaginaryNekoStack {
-        return realize(prototype)
-    }
-
-    override fun realize(prototype: NekoItem, context: ItemGenerationContext): ImaginaryNekoStack {
-        return realize(prototype)
-    }
 }
 
-internal object CustomNekoItemRealizer : NekoItemRealizer {
+internal object StandardNekoItemRealizer : NekoItemRealizer {
     override fun realize(prototype: NekoItem): NekoStack {
         return realizeByTrigger(prototype, ItemGenerationTriggers.empty())
     }

@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.lang.langModule
-import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
@@ -44,7 +43,7 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
 val NEKO: WakamePlugin
-    get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
+    get() = requireNotNull(WakamePlugin.INSTANCE) { "plugin is not initialized yet" }
 
 val LOGGER: ComponentLogger
     get() = if (!SharedConstants.IS_RUNNING_IN_IDE) {
@@ -58,14 +57,15 @@ val SERVER: Server
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
-        var instance: WakamePlugin? = null
+        @JvmField
+        var INSTANCE: WakamePlugin? = null
     }
 
     val version = pluginMeta.version
     val nekooJar = file
 
     override suspend fun load() {
-        instance = this
+        INSTANCE = this
 
         // Start Koin container
         startKoin {
@@ -89,7 +89,6 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 integrationModule(),
                 itemModule(),
                 langModule(),
-                molangModule(),
                 packetModule(),
                 packModule(),
                 playerModule(),
@@ -122,7 +121,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
     override suspend fun disable() {
         Initializer.disable()
         stopKoin()
-        instance = null
+        INSTANCE = null
         NekooProvider.unregister()
     }
 }

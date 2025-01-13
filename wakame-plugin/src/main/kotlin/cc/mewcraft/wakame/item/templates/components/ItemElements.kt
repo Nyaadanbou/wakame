@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -23,7 +24,6 @@ import cc.mewcraft.wakame.random3.Pool
 import cc.mewcraft.wakame.random3.PoolSerializer
 import cc.mewcraft.wakame.random3.Sample
 import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
@@ -85,16 +85,16 @@ data class ItemElements(
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistry::class],
+    runBefore = [ItemRegistryConfigStorage::class],
 )
 @Reload(
-    runBefore = [ItemRegistry::class],
+    runBefore = [ItemRegistryConfigStorage::class],
 )
 internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<ElementType>, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/elements")
-    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder().apply {
-        kregister(FilterSerializer)
-    }.build()
+    override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
+        .kregister(FilterSerializer)
+        .build()
     override val repository: NodeRepository<Sample<RegistryEntry<ElementType>, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<RegistryEntry<ElementType>> = typeTokenOf()
     override val filterNodeFacade: ItemFilterNodeFacade = ItemFilterNodeFacade

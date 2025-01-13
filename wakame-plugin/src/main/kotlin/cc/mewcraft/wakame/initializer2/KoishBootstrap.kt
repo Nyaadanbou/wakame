@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.initializer2
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.attribute.AttributeMapPatchListener
@@ -17,9 +18,11 @@ import cc.mewcraft.wakame.gui.GuiManager
 import cc.mewcraft.wakame.item.ItemBehaviorListener
 import cc.mewcraft.wakame.item.ItemChangeListener
 import cc.mewcraft.wakame.item.ItemMiscellaneousListener
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeManager
 import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
+import cc.mewcraft.wakame.lang.GlobalTranslations
 import cc.mewcraft.wakame.pack.ResourcePackLifecycleListener
 import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
@@ -27,16 +30,11 @@ import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
 import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
 import cc.mewcraft.wakame.world.player.death.PlayerDeathProtect
 import org.bukkit.event.Listener
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.window.WindowManager
 
@@ -46,7 +44,7 @@ import xyz.xenondevs.invui.window.WindowManager
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD
 )
-object KoishBootstrap : KoinComponent {
+object KoishBootstrap {
 
     /**
      * Should be called before the world is loaded.
@@ -73,24 +71,20 @@ object KoishBootstrap : KoinComponent {
 
     private fun saveDefaultConfigs() = with(NEKO) {
         saveDefaultConfig() // config.yml
-        saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
-        saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
+        saveResourceRecursively(ItemRegistryConfigStorage.DIR_PATH)
         saveResourceRecursively(KizamiRegistryConfigStorage.DIR_PATH)
-        saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
+        saveResourceRecursively(GlobalTranslations.DIR_PATH)
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
         saveResource(AttributeBundleFacadeRegistryConfigStorage.FILE_PATH)
-        // saveResource(CATEGORY_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(ElementRegistryConfigStorage.FILE_PATH)
         saveResource(AttributeSupplierRegistryConfigStorage.FILE_PATH)
         saveResource(ItemComponentRegistry.CONFIG_FILE_NAME)
         saveResource(LevelRarityMappingRegistryConfigStorage.FILE_PATH)
-        // saveResource(PROJECTILE_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
         saveResource(RarityRegistryConfigStorage.FILE_PATH)
         saveResourceRecursively("renderers")
         saveResourceRecursively("station")
         saveResourceRecursively("damage")
-        // saveResource(SKIN_GLOBAL_CONFIG_FILE) // 完成该模块后再去掉注释
     }
 
     private fun registerListeners() {
@@ -132,12 +126,12 @@ object KoishBootstrap : KoinComponent {
     private inline fun <reified T : Listener> registerListener(requiredPlugin: String? = null) {
         if (requiredPlugin != null) {
             if (NEKO.isPluginPresent(requiredPlugin)) {
-                NEKO.registerListener(get<T>())
+                NEKO.registerListener(Injector.get<T>())
             } else {
                 LOGGER.info("Plugin $requiredPlugin is not present. Skipping listener ${T::class.simpleName}")
             }
         } else {
-            NEKO.registerListener(get<T>())
+            NEKO.registerListener(Injector.get<T>())
         }
     }
 

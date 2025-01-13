@@ -28,9 +28,6 @@ import cc.mewcraft.wakame.pack.ResourcePackPlayerListener
 import cc.mewcraft.wakame.packet.DamageDisplay
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEventSupport
 import cc.mewcraft.wakame.registry.ABILITY_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.CRATE_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.user.PaperUserManager
 import cc.mewcraft.wakame.user.PlayerLevelListener
@@ -120,10 +117,10 @@ object Initializer : KoinComponent, Listener {
 
     private fun saveDefaultConfiguration() = with(plugin) {
         saveDefaultConfig() // config.yml
-        saveResourceRecursively(CRATE_PROTO_CONFIG_DIR)
-        saveResourceRecursively(ITEM_PROTO_CONFIG_DIR)
+        // saveResourceRecursively(CRATE_PROTO_CONFIG_DIR) // FIXME remove old Initializer
+        // saveResourceRecursively(ITEM_PROTO_CONFIG_DIR) // FIXME remove old Initializer
         // saveResourceRecursively(KIZAMI_DIR_NAME) // FIXME remove old Initializer
-        saveResourceRecursively(LANG_PROTO_CONFIG_DIR)
+        // saveResourceRecursively(LANG_PROTO_CONFIG_DIR) // FIXME remove old Initializer
         saveResourceRecursively("reforge")
         saveResourceRecursively(ABILITY_PROTO_CONFIG_DIR)
         // saveResource(ATTRIBUTE_GLOBAL_CONFIG_FILE) // FIXME remove old Initializer

@@ -5,7 +5,15 @@ package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.IndexedDataRenderer
+import cc.mewcraft.wakame.display2.IndexedDataRenderer2
+import cc.mewcraft.wakame.display2.IndexedDataRenderer3
+import cc.mewcraft.wakame.display2.IndexedDataRenderer4
+import cc.mewcraft.wakame.display2.IndexedDataRenderer5
+import cc.mewcraft.wakame.display2.IndexedDataRenderer6
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.ItemRenderer
+import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -13,18 +21,13 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import xyz.xenondevs.commons.provider.Provider
 import java.nio.file.Path
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
-internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, KoinComponent {
-    protected val logger = get<Logger>()
-
+internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
     /**
      * 渲染器的名字, 用来定位配置文件和生成日志.
      */
@@ -70,7 +73,7 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C>, K
 
     @VisibleForTesting
     fun initialize0() {
-        val renderersDirectory = get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
+        val renderersDirectory = Injector.get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
         val formatPath = renderersDirectory.resolve(name).resolve(FORMAT_FILE_NAME)
         val layoutPath = renderersDirectory.resolve(name).resolve(LAYOUT_FILE_NAME)
         initialize(formatPath, layoutPath)

@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.ability.display.AbilityDisplaySerializer
 import cc.mewcraft.wakame.ability.state.display.PlayerStateDisplay
 import cc.mewcraft.wakame.ability.state.display.StateDisplay
@@ -41,7 +40,6 @@ fun abilityModule(): Module = module {
     single<TypeSerializerCollection>(named(ABILITY_GROUP_SERIALIZERS)) {
         TypeSerializerCollection.builder()
             .kregister(AbilityDisplaySerializer)
-            .registerAll(get(named(EVALUABLE_SERIALIZERS)))
             .build()
     }
 }

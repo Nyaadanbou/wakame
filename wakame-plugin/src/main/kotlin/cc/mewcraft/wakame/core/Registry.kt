@@ -35,12 +35,12 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
         }
 
         fun <V, T : V> register(registry: Registry<V>, key: RegistryKey<V>, entry: T): T {
-            registry.asWritable().add(key, entry as V)
+            (registry as WritableRegistry<V>).add(key, entry as V)
             return entry
         }
 
         fun <T> registerReference(registry: Registry<T>, key: RegistryKey<T>, entry: T): RegistryEntry.Reference<T> {
-            return registry.asWritable().add(key, entry)
+            return (registry as WritableRegistry<T>).add(key, entry)
         }
 
         fun <T> registerReference(registry: Registry<T>, id: Identifier, entry: T): RegistryEntry.Reference<T> {
@@ -58,10 +58,6 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     }
 
     val key: RegistryKey<out Registry<T>>
-
-    fun asWritable(): WritableRegistry<T> = this as WritableRegistry<T>
-    fun asDefaulted(): DefaultedRegistry<T> = this as DefaultedRegistry<T>
-    fun asDefaultedWritable(): DefaultedWritableRegistry<T> = this as DefaultedWritableRegistry<T>
 
     // 用于序列化, 例如注册表数据之间的依赖, NBT读写, Web系统 等只需要储存键名的地方
     val valueByNameCodec: Codec<T>
@@ -221,4 +217,20 @@ interface DefaultedRegistry<T> : Registry<T> {
     override fun getDefaultEntry(): RegistryEntry.Reference<T>
 }
 
-interface DefaultedWritableRegistry<T> : DefaultedRegistry<T>, WritableRegistry<T>
+interface FuzzyRegistry<T> : Registry<T> {
+    /**
+     * 忽略命名空间进行模糊查找.
+     *
+     * @param id 模糊查询的 id, 不包含命名空间
+     * @return 匹配的数据列表
+     */
+    fun getFuzzy(id: String): List<T>
+}
+
+// TODO 排列组合的接口越到后面越难实现, 装饰器模式能派上用场吗? 配合 kotlin 的 by 关键字是不是能简化代码?
+
+interface WritableDefaultedRegistry<T> : WritableRegistry<T>, DefaultedRegistry<T>
+
+interface WritableFuzzyRegistry<T> : WritableRegistry<T>, FuzzyRegistry<T>
+
+interface WritableDefaultedFuzzyRegistry<T> : WritableRegistry<T>, DefaultedRegistry<T>, FuzzyRegistry<T>

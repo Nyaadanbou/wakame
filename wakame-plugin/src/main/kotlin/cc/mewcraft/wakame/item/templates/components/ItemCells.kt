@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -15,13 +16,10 @@ import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeGroupSeri
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -60,7 +58,7 @@ data class ItemCells(
 
     private data class Codec(
         override val id: String,
-    ) : ItemTemplateType<ItemCells>, KoinComponent {
+    ) : ItemTemplateType<ItemCells> {
         override val type: TypeToken<ItemCells> = typeTokenOf()
 
         /**
@@ -118,10 +116,7 @@ data class ItemCells(
                 .kregister(CoreArchetypeGroupSerializer)
 
                 // 技能, 部分核心会用到
-                .registerAll(get(named(ABILITY_EXTERNALS)))
-
-                // 可计算值, 部分核心会用到
-                .registerAll(get(named(EVALUABLE_SERIALIZERS)))
+                .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
 
                 .build()
         }

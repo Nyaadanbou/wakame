@@ -18,6 +18,6 @@ internal fun templateModule(): Module = module {
 
     // Components ...
     single<TypeSerializerCollection>(named(ITEM_COMPONENT_TEMPLATE_SERIALIZERS)) {
-        ItemTemplateTypes.collectTypeSerializers()
+        ItemTemplateTypes.serializers()
     }
 }
