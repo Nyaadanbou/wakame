@@ -236,7 +236,7 @@ private class WrappingItemComponentMap(
             .unsafeNekooTag
             .getCompoundOrNull(TAG_COMPONENTS)
             ?.keySet()
-            ?.mapNotNull(ItemComponentRegistry.TYPES::getOrNull)
+            ?.mapNotNull(ItemComponentRegistry.TYPES::get)
             ?.let(::ReferenceArraySet)
             .orEmpty()
     }

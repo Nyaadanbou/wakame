@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.registry2.Registry
-import cc.mewcraft.wakame.registry2.SimpleRegistry
 import org.koin.core.component.KoinComponent
 
 /**
@@ -21,5 +19,5 @@ internal object ItemComponentRegistry : KoinComponent {
     /**
      * 物品组件类型的注册表.
      */
-    internal val TYPES: Registry<String, ItemComponentType<*>> = SimpleRegistry()
+    internal val TYPES = HashMap<String, ItemComponentType<*>>()
 }

@@ -269,7 +269,7 @@ internal object ItemComponentTypes {
      * 具体是哪些功能, 看看这个 Registry 被哪些代码调用过.
      */
     private fun <T> ItemComponentType<T>.register(): ItemComponentType<T> {
-        ItemComponentRegistry.TYPES.register(this.id, this)
+        ItemComponentRegistry.TYPES[this.id] = this
         return this
     }
 
