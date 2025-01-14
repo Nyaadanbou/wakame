@@ -97,9 +97,10 @@ open class SimpleRegistry<T>(
         if (frozen) {
             return this
         } else {
+            LOGGER.info(Component.text("Freezing registry ${this.key.toPrettyString()}").color(NamedTextColor.AQUA))
             validateEntries().getOrThrow()
             frozen = true
-            LOGGER.info(Component.text("Frozen registry '${this.key}' with ${rawIdToEntry.size} entries").color(NamedTextColor.AQUA))
+            LOGGER.info(Component.text("Frozen registry ${this.key.toPrettyString()} with ${rawIdToEntry.size} entries").color(NamedTextColor.AQUA))
             return this
         }
     }
@@ -174,6 +175,10 @@ open class SimpleRegistry<T>(
     override fun iterator(): Iterator<T> {
         return rawIdToEntry.asSequence().map(RegistryEntry<T>::value).iterator()
     }
+
+    override fun toString(): String {
+        return "SimpleRegistry(key=${key.toPrettyString()}, size=${size()})"
+    }
 }
 
 open class SimpleDefaultedRegistry<T>(
@@ -239,6 +244,10 @@ open class SimpleDefaultedRegistry<T>(
             this
         }
     }
+
+    override fun toString(): String {
+        return "SimpleDefaultedRegistry(key=${key.toPrettyString()}, size=${size()})"
+    }
 }
 
 open class SimpleFuzzyRegistry<T>(
@@ -256,6 +265,10 @@ open class SimpleFuzzyRegistry<T>(
     override fun getFuzzy(id: String): List<T> {
         return pathToValue[id] ?: emptyList()
     }
+
+    override fun toString(): String {
+        return "SimpleFuzzyRegistry(key=${key.toPrettyString()}, size=${size()})"
+    }
 }
 
 open class SimpleDefaultedFuzzyRegistry<T>(
@@ -272,6 +285,10 @@ open class SimpleDefaultedFuzzyRegistry<T>(
 
     override fun getFuzzy(id: String): List<T> {
         return pathToValue[id] ?: emptyList()
+    }
+
+    override fun toString(): String {
+        return "SimpleDefaultedFuzzyRegistry(key=${key.toPrettyString()}, size=${size()})"
     }
 }
 

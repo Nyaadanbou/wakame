@@ -56,6 +56,10 @@ private constructor(
         return ofRegistry<T>(registry)
     }
 
+    fun toPrettyString(): String {
+        return "[${registry} / ${value}]"
+    }
+
     override fun toString(): String {
         return "RegistryKey[$registry / ${value}]"
     }
