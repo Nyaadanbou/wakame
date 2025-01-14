@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.SimpleTextMeta
 import cc.mewcraft.wakame.display2.SourceIndex
 import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.hasComponent
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -31,7 +29,7 @@ internal data class AttributeCoreTextMeta(
         val sourceId = sourceIndex.value()
         val combiner = StringCombiner(sourceId, ".") {
             addList(derivation.operationIndex)
-            addList(derivation.elementIndex, AttributeRegistry.FACADES[sourceId].components.hasComponent<CompositeAttributeComponent.Element>())
+            addList(derivation.elementIndex, KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(sourceId).bundleTrait.has<AttributeBundleTrait.Element>())
         }
         val combinations = combiner.combine()
         return combinations.map { Key.key(sourceNamespace, it) }
@@ -42,8 +40,8 @@ internal data class AttributeCoreTextMeta(
         val elementIndex: List<String>,
     ) {
         init { // validate values
-            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid operation, check your renderer config") }
-            this.elementIndex.forEach { ElementRegistry.INSTANCES.getOrNull(it) ?: error("'$it' is not a valid element, check your renderer config") }
+            this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid attribute modifier operation, check your renderer config") }
+            this.elementIndex.forEach { if (!KoishRegistries.ELEMENT.containsId(it)) error("'$it' is not a valid element type, check your renderer config") }
         }
     }
 }

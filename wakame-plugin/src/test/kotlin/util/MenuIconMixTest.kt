@@ -1,7 +1,7 @@
 package util
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.MenuIconLoreSerializer

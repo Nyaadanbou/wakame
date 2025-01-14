@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.attribute.AttributeInstance
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.enchantment.CustomEnchantment
@@ -8,20 +11,14 @@ import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.kizami.Kizami
 import cc.mewcraft.wakame.kizami.KizamiMap
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry.getBy
-import cc.mewcraft.wakame.ability.PlayerAbility
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.character.CasterAdapter
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 /**
  * 攻击速度.
@@ -129,7 +126,7 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeListener() {
 /**
  * 铭刻.
  *
- * 物品发生变化时, 根据物品铭刻, 修改玩家的 [cc.mewcraft.wakame.kizami.KizamiMap].
+ * 物品发生变化时, 根据物品铭刻, 修改玩家的 [KizamiMap].
  */
 // TODO 重构 Kizami 的数据结构和更新逻辑
 //  灵感: 尝试在 Kizami 中引入一个标记 dirty, 表示是否需要更新 effects.
@@ -148,41 +145,31 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeListener() {
     override fun onBegin(player: Player) {
         val user = player.toUser()
         val kizamiMap = user.kizamiMap
-        for ((kizami, amount) in kizamiMap) {
-            KizamiRegistry.EFFECTS.getBy(kizami, amount).remove(user)
-        }
+        kizamiMap.removeAllEffects()
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamiz -> kizamiMap.subtractOneEach(kizamiz) }
+        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamizSet -> kizamiMap.subtractOneEach(kizamizSet) }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamiz -> kizamiMap.addOneEach(kizamiz) }
+        modifyKizamiAmount(player, nekoStack) { kizamiMap, kizamiSet -> kizamiMap.addOneEach(kizamiSet) }
     }
 
     // 基于当前铭刻数量, 将新的铭刻效果应用到玩家身上.
     override fun onEnd(player: Player) {
         val user = player.toUser()
         val kizamiMap = user.kizamiMap
-        val iterator = kizamiMap.iterator()
-        while (iterator.hasNext()) {
-            val (kizami, amount) = iterator.next()
-            if (amount > 0) {
-                KizamiRegistry.EFFECTS.getBy(kizami, amount).apply(user)
-            } else {
-                iterator.remove()
-            }
-        }
+        kizamiMap.applyAllEffects()
     }
 
-    private fun modifyKizamiAmount(player: Player, nekoStack: NekoStack?, update: (KizamiMap, Set<Kizami>) -> Unit) {
-        val kizamiz = nekoStack?.getKizamiz() ?: return
+    private fun modifyKizamiAmount(player: Player, nekoStack: NekoStack?, update: (KizamiMap, Set<RegistryEntry<KizamiType>>) -> Unit) {
+        val kizamiSet = nekoStack?.getKizamiz() ?: return
         val kizamiMap = player.toUser().kizamiMap
-        update(kizamiMap, kizamiz)
+        update(kizamiMap, kizamiSet)
     }
 
-    private fun NekoStack.getKizamiz(): Set<Kizami>? {
+    private fun NekoStack.getKizamiz(): Set<RegistryEntry<KizamiType>>? {
         return components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz
     }
 }

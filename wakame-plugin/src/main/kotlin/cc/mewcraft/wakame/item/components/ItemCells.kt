@@ -1,13 +1,22 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.*
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.item.components.cells.*
 import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
-import cc.mewcraft.wakame.util.value
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
+import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item.components.cells.isVirtual
+import cc.mewcraft.wakame.util.withValue
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
@@ -213,8 +222,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             for ((id, cell) in this) {
                 val core = cell.getCore() as? AttributeCore ?: continue
                 val attribute = core.attribute
-                val sourceId = context.id.value { value -> "$value/${slot.slotIndex}/$id" }
-                val attributeModifiers = attribute.provideAttributeModifiers(sourceId)
+                val sourceId = context.id.withValue { "$it/${slot.slotIndex}/$id" }
+                val attributeModifiers = attribute.createAttributeModifiers(sourceId)
                 ret.putAll(attributeModifiers.entries)
             }
             return ret.build()

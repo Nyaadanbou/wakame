@@ -10,12 +10,17 @@ import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -23,13 +28,25 @@ internal class SimpleRendererFormatRegistry : AbstractRendererFormatRegistry(Sim
 
 internal class SimpleItemRendererLayout : AbstractRendererLayout(SimpleItemRenderer)
 
-internal data object SimpleItemRendererContext
-
-internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemRendererContext>() {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
+internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
     override val name: String = "simple"
     override val formats: AbstractRendererFormatRegistry = SimpleRendererFormatRegistry()
     override val layout: AbstractRendererLayout = SimpleItemRendererLayout()
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         SimpleRenderingHandlerRegistry.bootstrap()
@@ -37,9 +54,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, SimpleItemR
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: NekoStack, context: SimpleItemRendererContext?) {
-        requireNotNull(context) { "context" }
-
+    override fun render(item: NekoStack, context: Nothing?) {
         item.isClientSide = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()

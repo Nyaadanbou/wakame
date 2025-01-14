@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.bindInstance
@@ -197,7 +198,7 @@ internal class TableCostBinding(
     @Binding("source_rarity")
     fun getSourceRarity(): Double {
         val mapping = session.table.rarityNumberMapping
-        val rarity = session.usableInput?.components?.get(ItemComponentTypes.RARITY)?.rarity?.key ?: return .0
+        val rarity = session.usableInput?.rarity?.getKeyOrThrow()?.value ?: return .0
         return mapping.get(rarity)
     }
 

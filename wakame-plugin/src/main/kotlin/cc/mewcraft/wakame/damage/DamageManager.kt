@@ -264,7 +264,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
         val damageMapping = if (forPlayer) {
             DirectEntityTypeMappings.byPlayerEvent(entityType, event)
         } else {
-            DirectEntityTypeMappings.byNoCauseEvent(entityType, event)
+            DirectEntityTypeMappings.byNoCausingEvent(entityType, event)
         }
         if (damageMapping == null) {
             logger.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not config ! Use default damage metadata.")

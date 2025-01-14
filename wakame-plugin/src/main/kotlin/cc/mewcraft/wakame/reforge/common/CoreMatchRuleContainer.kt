@@ -75,8 +75,7 @@ private object EmptyCoreMatchRuleContainer : CoreMatchRuleContainer {
 internal object CoreMatchRuleContainerSerializer : TypeSerializer<CoreMatchRuleContainer> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRuleContainer {
         val rules = node.getList<CoreMatchRule>(emptyList())
-        val ret = CoreMatchRuleContainer.simple(rules)
-        return ret
+        return CoreMatchRuleContainer.simple(rules)
     }
 
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): CoreMatchRuleContainer? {

@@ -38,9 +38,9 @@ class ItemStackDSL(
         }
 
     var lore
-        get() = target.lore0
+        get() = target.itemLore
         set(value) {
-            target.lore0 = value
+            target.itemLore = value
         }
 
     var customModelData
@@ -114,7 +114,7 @@ val ItemStack.itemNameOrType: Component
     get() = itemName ?: Component.translatable(type)
 
 val ItemStack.itemLoreOrEmpty: List<Component>
-    get() = lore0 ?: emptyList()
+    get() = itemLore ?: emptyList()
 
 /**
  * 检查物品是否允许被损耗.

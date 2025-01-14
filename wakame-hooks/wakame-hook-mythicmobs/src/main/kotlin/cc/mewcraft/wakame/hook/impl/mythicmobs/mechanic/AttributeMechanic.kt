@@ -32,7 +32,7 @@ class AttributeMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.getSingleton(parsed) }
+        ?.let { parsed -> AttributeProvider.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {

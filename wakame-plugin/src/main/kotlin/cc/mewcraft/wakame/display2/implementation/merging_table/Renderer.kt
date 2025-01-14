@@ -13,6 +13,9 @@ import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
@@ -25,6 +28,8 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.merge.MergingSession
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -38,11 +43,25 @@ internal sealed interface MergingTableContext {
     data class MergeOutputSlot(val session: MergingSession) : MergingTableContext
 }
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
 internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, MergingTableContext>() {
     override val name: String = "merging_table"
     override val formats = MergingTableRendererFormatRegistry(this)
     override val layout = MergingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    private fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         MergingTableRenderingHandlerRegistry.bootstrap()

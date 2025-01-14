@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.getByteArrayOrNull
 import cc.mewcraft.wakame.util.toSimpleString
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -17,7 +21,7 @@ data class ItemElements(
     /**
      * 所有的元素.
      */
-    val elements: Set<Element>,
+    val elements: Set<RegistryEntry<ElementType>>,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemElements> {
@@ -29,14 +33,14 @@ data class ItemElements(
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(elements: Collection<Element>): ItemElements {
+        fun of(elements: Collection<RegistryEntry<ElementType>>): ItemElements {
             return ItemElements(ObjectArraySet(elements))
         }
 
         /**
          * 构建一个 [ItemElements] 的实例.
          */
-        fun of(vararg elements: Element): ItemElements {
+        fun of(vararg elements: RegistryEntry<ElementType>): ItemElements {
             return of(elements.toList())
         }
 
@@ -60,16 +64,16 @@ data class ItemElements(
         override fun read(holder: ItemComponentHolder): ItemElements? {
             val elementSet = holder.getTag()
                 ?.getByteArrayOrNull(TAG_VALUE)
-                ?.mapTo(ObjectArraySet(2), ElementRegistry::getBy)
+                ?.mapTo(ObjectArraySet(4)) { KoishRegistries.ELEMENT.getEntryOrThrow(it.toInt()) }
                 ?: return null
-            return ItemElements(elements = elementSet)
+            return ItemElements(elementSet)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
             holder.editTag { tag ->
-                val byteArray = value.elements.mapToByteArray(Element::binaryId)
-                tag.putByteArray(TAG_VALUE, byteArray)
+                val integerIdByteArray = value.elements.mapToByteArray { KoishRegistries.ELEMENT.getRawIdOrThrow(it.value).toByte() }
+                tag.putByteArray(TAG_VALUE, integerIdByteArray)
             }
         }
 

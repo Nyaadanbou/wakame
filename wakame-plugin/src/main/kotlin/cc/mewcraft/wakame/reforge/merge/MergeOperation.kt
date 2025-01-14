@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeR
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeRE
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeSE
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -14,7 +14,9 @@ import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
@@ -91,9 +93,9 @@ private constructor(
         val resultedOperation = attribute1.operation
         val (resultedValue, resultedScore) = session.valueMergeFunction(resultedOperation).evaluate()
         val resultedCore = when (attribute1 /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantCompositeAttributeS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
-            is ConstantCompositeAttributeSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantCompositeAttribute.Quality.fromZScore(resultedScore)))
-            is ConstantCompositeAttributeR, is ConstantCompositeAttributeRE -> {
+            is ConstantAttributeBundleS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleR, is ConstantAttributeBundleRE -> {
                 // 我们不支持拥有两个数值的核心, 原因:
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心
                 // - 代码实现上, 每种组合都得考虑. 目前就有2*3=6种
@@ -108,7 +110,7 @@ private constructor(
             // 选取权重较高的稀有度作为结果的稀有度
             val rarity1 = inputItem1.rarity
             val rarity2 = inputItem2.rarity
-            maxOf(rarity1, rarity2)
+            maxOf(rarity1, rarity2, Comparator.comparing(RegistryEntry<RarityType>::value))
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改

@@ -9,10 +9,10 @@ import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
-import cc.mewcraft.wakame.util.namespace
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
-import cc.mewcraft.wakame.util.value
+import cc.mewcraft.wakame.util.withNamespace
+import cc.mewcraft.wakame.util.withValue
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -190,7 +190,7 @@ internal class ResourcePackCustomModelGeneration(
             val textureWritable = Writable.file(textureFile)
 
             val texture = Texture.texture()
-                .key(originTextureKey.value { "$it.png" })
+                .key(originTextureKey.withValue { "$it.png" })
                 .data(textureWritable)
 
             val metaFile = textureFile.resolveSibling("${textureFile.name}.mcmeta").takeIf { it.exists() }
@@ -226,7 +226,7 @@ internal class ResourcePackCustomModelGeneration(
     private fun CreativeModel.toMinecraftFormat(parentGenerated: Boolean): CreativeModel {
         val parent = parent()
         val newParent = if (parentGenerated) {
-            parent?.namespace { RESOURCE_NAMESPACE }
+            parent?.withNamespace(RESOURCE_NAMESPACE)
         } else {
             parent
         }
@@ -234,31 +234,31 @@ internal class ResourcePackCustomModelGeneration(
         val modelTextures = textures()
         val newLayers = modelTextures.layers().map { texture ->
             val oldKey = texture.key()
-            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
+            val newKey = oldKey!!.withNamespace(RESOURCE_NAMESPACE)
             ModelTexture.ofKey(newKey)
         }
 
         val newParticle = modelTextures.particle()?.let { texture ->
             val oldKey = texture.key()
-            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
+            val newKey = oldKey!!.withNamespace(RESOURCE_NAMESPACE)
             ModelTexture.ofKey(newKey)
         }
 
         val newVariables = modelTextures.variables().map { (name, value) ->
             val oldKey = value.key()
-            val newKey = oldKey!!.namespace { RESOURCE_NAMESPACE }
+            val newKey = oldKey!!.withNamespace(RESOURCE_NAMESPACE)
             name to ModelTexture.ofKey(newKey)
         }.toMap()
 
         val itemOverrides = overrides()
         val newOverrides = itemOverrides.map { override ->
             val oldKey = override.model()
-            val newKey = oldKey.namespace { RESOURCE_NAMESPACE }
+            val newKey = oldKey.withNamespace(RESOURCE_NAMESPACE)
             ItemOverride.of(newKey, override.predicate())
         }
 
         return toBuilder()
-            .key(key().namespace { RESOURCE_NAMESPACE })
+            .key(key().withNamespace(RESOURCE_NAMESPACE))
             .parent(newParent)
             .textures(
                 ModelTextures.builder()

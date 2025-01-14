@@ -4,7 +4,9 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.integration.economy.EconomyType
@@ -21,12 +23,14 @@ import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
-import org.koin.core.component.get
 import org.objectweb.asm.Type
 import org.slf4j.Logger
 import kotlin.reflect.KClass
 
-internal object HooksLoader : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+internal object HooksLoader {
 
     /**
      * 用户指定的玩家等级系统.
@@ -41,7 +45,8 @@ internal object HooksLoader : Initializable {
     // 部分 integration 会在 pre world 阶段加载默认(自带)的钩子,
     // 因此对于外部系统, 应该在 post world 阶段加载它们的钩子,
     // 这样的话外部的钩子实例就可以覆盖默认的钩子实例.
-    override fun onPostWorld() {
+    @InitFun
+    private fun init() {
         loadHooks()
     }
 

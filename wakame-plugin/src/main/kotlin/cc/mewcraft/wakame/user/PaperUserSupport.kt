@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.user
 
+import cc.mewcraft.wakame.ability.state.AbilityState
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.ability.state.AbilityState
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -57,7 +57,6 @@ class PaperUser(
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("player", player),
             ExaminableProperty.of("uniqueId", uniqueId),
             ExaminableProperty.of("level", level),
             ExaminableProperty.of("abilityState", abilityState),

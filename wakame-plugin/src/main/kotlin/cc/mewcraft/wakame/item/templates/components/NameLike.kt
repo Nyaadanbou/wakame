@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentInjections
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.Context
 import net.kyori.adventure.text.minimessage.tag.Tag
@@ -24,8 +26,8 @@ abstract class NameLike : ItemTemplate<Component> {
                 tag("rarity") { queue: ArgumentQueue, ctx: Context ->
                     val arg = queue.popOr("Tag <rarity:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
                     when (arg) {
-                        "name" -> Tag.selfClosingInserting(rarity.displayName)
-                        "style" -> Tag.styling(*rarity.styles)
+                        "name" -> Tag.selfClosingInserting(rarity.value.displayName)
+                        "style" -> Tag.styling(*rarity.value.displayStyles)
                         else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
                     }
                 }

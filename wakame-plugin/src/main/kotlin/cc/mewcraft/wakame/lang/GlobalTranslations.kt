@@ -1,10 +1,17 @@
 package cc.mewcraft.wakame.lang
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
+import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_DIR
-import cc.mewcraft.wakame.registry.LANG_PROTO_CONFIG_LOADER
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
@@ -14,12 +21,6 @@ import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.File
 import java.text.MessageFormat
 import java.util.Locale
 
@@ -32,17 +33,37 @@ fun ComponentLike.translate(locale: Locale): Component {
     }
 }
 
-fun ComponentLike.translate(viewer: Audience): Component = translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
+fun ComponentLike.translate(viewer: Audience): Component {
+    return translate(viewer.get(Identity.LOCALE).orElse(Locale.SIMPLIFIED_CHINESE))
+}
 
 // 如果 ComponentLike 在一个容器里, 那这个容器一般都是 List (或至少是有序的)
 fun List<ComponentLike>.translate(locale: Locale): List<Component> = map { it.translate(locale) }
 fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.translate(viewer) }
 
-object GlobalTranslations : Initializable, KoinComponent {
+@Init(
+    stage = InitStage.PRE_WORLD,
+)
+@Reload
+object GlobalTranslations : RegistryConfigStorage {
+    const val DIR_PATH = "lang/"
+
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
-    private val miniMessage: MiniMessage by inject()
+    private val miniMessage: MiniMessage by Injector.inject()
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, miniMessage)
+
+    @InitFun
+    private fun init() {
+        GlobalTranslator.translator().addSource(translations)
+        loadDataIntoRegistry()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        translations.unregisterAll()
+        loadDataIntoRegistry()
+    }
 
     fun translate(key: String, locale: Locale): MessageFormat? {
         return translations.translate(key, locale)
@@ -52,10 +73,16 @@ object GlobalTranslations : Initializable, KoinComponent {
         return translations.translate(component, locale) ?: component
     }
 
-    private fun loadTranslation() {
+    private fun loadDataIntoRegistry() {
         // Load translation
-        val dataDirectory = get<File>(named(PLUGIN_DATA_DIR)).resolve(LANG_PROTO_CONFIG_DIR)
-        val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(LANG_PROTO_CONFIG_LOADER)) // will be reused
+        val dataDirectory = getFileInConfigDirectory(DIR_PATH)
+        val loaderBuilder = buildYamlConfigLoader {
+            withDefaults()
+            serializers {
+                kregister(AudienceMessageGroupSerializer)
+                kregister(CombinedAudienceMessageSerializer)
+            }
+        }
         val allLocales = Locale.getAvailableLocales()
         for (locale in allLocales) {
             val localeFile = dataDirectory.resolve("${locale.language}_${locale.country}.yml")
@@ -68,15 +95,5 @@ object GlobalTranslations : Initializable, KoinComponent {
                 translations.register(key.toString(), locale, value.krequire())
             }
         }
-    }
-
-    override fun onPreWorld() {
-        GlobalTranslator.translator().addSource(translations)
-        loadTranslation()
-    }
-
-    override fun onReload() {
-        translations.unregisterAll()
-        loadTranslation()
     }
 }

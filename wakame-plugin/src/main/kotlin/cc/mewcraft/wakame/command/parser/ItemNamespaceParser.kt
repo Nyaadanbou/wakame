@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -34,7 +35,7 @@ class ItemNamespaceParser<C : Any> : ArgumentParser<C, String>, BlockingSuggesti
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<String> {
         val peekString = commandInput.peekString()
-        if (peekString !in ItemRegistry.NAMESPACES) {
+        if (peekString !in KoishRegistries.ITEM.ids.map(Identifier::namespace).distinct()) {
             return ArgumentParseResult.failure(ItemNamespaceParseException(commandContext))
         }
 
@@ -44,7 +45,7 @@ class ItemNamespaceParser<C : Any> : ArgumentParser<C, String>, BlockingSuggesti
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return ItemRegistry.NAMESPACES
+        return KoishRegistries.ITEM.ids.map(Identifier::namespace).distinct()
     }
 }
 

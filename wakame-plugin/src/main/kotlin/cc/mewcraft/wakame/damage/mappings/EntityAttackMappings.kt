@@ -2,15 +2,17 @@
 
 package cc.mewcraft.wakame.damage.mappings
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.DamageTypeSerializer
-import cc.mewcraft.wakame.config.configurate.EntityTypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
-import cc.mewcraft.wakame.element.ElementSerializer
-import cc.mewcraft.wakame.initializer.*
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.yamlConfig
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -18,31 +20,31 @@ import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
-import org.spongepowered.configurate.kotlin.dataClassFieldDiscoverer
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.objectmapping.ObjectMapper
-import org.spongepowered.configurate.objectmapping.meta.*
-import org.spongepowered.configurate.util.NamingSchemes
 import java.io.File
 
 /**
  * 依据原版生物的攻击特征来获取萌芽伤害的映射.
  */
-@PostWorldDependency(
-    runBefore = [ElementRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD,
 )
-@ReloadDependency(
-    runBefore = [ElementRegistry::class]
-)
-object EntityAttackMappings : Initializable, KoinComponent {
-    private const val ENTITY_ATTACK_MAPPINGS_CONFIG_FILE = "damage/entity_attack_mappings.yml"
+@Reload
+object EntityAttackMappings {
+    private const val ENTITY_ATTACK_MAPPINGS_CONFIG_PATH = "damage/entity_attack_mappings.yml"
 
-    private val logger: Logger = get()
     private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+
+    @InitFun
+    private fun init() {
+        loadDataIntoRegistry()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        loadDataIntoRegistry()
+    }
 
     /**
      * 获取某一伤害情景下原版生物的伤害映射.
@@ -58,32 +60,13 @@ object EntityAttackMappings : Initializable, KoinComponent {
         return null
     }
 
-    override fun onPostWorld() {
-        loadConfig()
-    }
-
-    override fun onReload() {
-        loadConfig()
-    }
-
-    private fun loadConfig() {
+    private fun loadDataIntoRegistry() {
         mappings.clear()
 
-        val root = yamlConfig {
+        val rootNode = buildYamlConfigLoader {
             withDefaults()
-            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(ENTITY_ATTACK_MAPPINGS_CONFIG_FILE).bufferedReader() }
+            source { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(ENTITY_ATTACK_MAPPINGS_CONFIG_PATH).bufferedReader() }
             serializers {
-                registerAnnotatedObjects(
-                    ObjectMapper.factoryBuilder()
-                        .defaultNamingScheme(NamingSchemes.SNAKE_CASE)
-                        .addNodeResolver(NodeResolver.nodeKey())
-                        .addConstraint(Required::class.java, Constraint.required())
-                        .addDiscoverer(dataClassFieldDiscoverer())
-                        .build()
-                )
-                kregister(ElementSerializer)
-                kregister(EntityTypeSerializer)
-                kregister(DamageTypeSerializer)
                 kregister(DamageMappingSerializer)
                 kregister(DamagePredicateSerializer)
                 kregister(DamageMetadataBuilderSerializer)
@@ -91,19 +74,19 @@ object EntityAttackMappings : Initializable, KoinComponent {
         }.build().load()
 
         val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
-        root.childrenMap()
+        rootNode.childrenMap()
             .mapKeys { (key, _) ->
                 NamespacedKey.minecraft(key.toString())
             }
             .forEach { (key, node) ->
                 val entityType = entityTypeRegistry.get(key) ?: run {
-                    logger.warn("Unknown entity type: ${key.asString()}. Skipped.")
+                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
                     return@forEach
                 }
                 val mappings = node.childrenMap()
                     .map { (_, node) ->
                         node.get<DamageMapping>() ?: run {
-                            logger.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
+                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
                             return@forEach
                         }
                     }

@@ -1,10 +1,13 @@
 package item
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.entity.entityModule
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -19,19 +22,12 @@ import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.kizamiModule
-import cc.mewcraft.wakame.molang.molangModule
-import cc.mewcraft.wakame.rarity.rarityModule
-import cc.mewcraft.wakame.registry.AttributeRegistry
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.EntityRegistry
-import cc.mewcraft.wakame.registry.ITEM_PROTO_CONFIG_LOADER
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.LevelMappingRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
+import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.ability.abilityModule
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
 import nbt.CommonNBT
 import net.kyori.adventure.key.Key
@@ -43,7 +39,6 @@ import org.koin.test.get
 import org.koin.test.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import testEnv
 import java.io.File
 import java.nio.file.Path
@@ -52,26 +47,17 @@ import kotlin.test.fail
 object CommonNekoStackTest {
     fun beforeAll() {
         // 配置依赖注入
-        val app = startKoin {
-            // environment
+        startKoin {
             modules(
-                testEnv()
-            )
+                // environment
+                testEnv(),
 
-            // this module
-            modules(
-                itemModule()
-            )
+                // this module
+                itemModule(),
 
-            // dependencies
-            modules(
+                // dependencies
                 adventureModule(),
                 damageModule(),
-                elementModule(),
-                entityModule(),
-                kizamiModule(),
-                molangModule(),
-                rarityModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
@@ -81,21 +67,19 @@ object CommonNekoStackTest {
         CommonNBT.mockStatic()
 
         // 按依赖顺序, 初始化注册表
-        AttributeRegistry.onPreWorld()
-        ElementRegistry.onPreWorld()
-        AbilityRegistry.onPreWorld()
-        KizamiRegistry.onPreWorld()
-        RarityRegistry.onPreWorld()
-        LevelMappingRegistry.onPreWorld()
-        EntityRegistry.onPreWorld()
+        ElementRegistryConfigStorage.init()
+        AttributeBundleFacadeRegistryConfigStorage.init()
+        AbilityRegistry.init()
+        KizamiRegistryConfigStorage.init()
+        RarityRegistryConfigStorage.init()
+        LevelRarityMappingRegistryConfigStorage.init()
+        EntityTypeHolderRegistryConfigStorage.init()
 
         // 初始化所有 random3.Node 相关的实现
-        with(app.koin) {
-            get<ElementSampleNodeFacade>().onPreWorld()
-            get<KizamiSampleNodeFacade>().onPreWorld()
-            get<CoreArchetypeSampleNodeFacade>().onPreWorld()
-            get<ItemFilterNodeFacade>().onPreWorld()
-        }
+        ElementSampleNodeFacade.init()
+        KizamiSampleNodeFacade.init()
+        CoreArchetypeSampleNodeFacade.init()
+        ItemFilterNodeFacade.init()
     }
 
     fun afterAll() {
@@ -115,9 +99,12 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
 
     val key = Key.key(namespace, path)
     val relPath = itemFile.toPath()
-    val loaderBuilder = get<YamlConfigurationLoader.Builder>(named(ITEM_PROTO_CONFIG_LOADER)) // will be reused
-    val node = loaderBuilder.buildAndLoadString(itemFile.readText())
-    return Triple(key, relPath, node)
+    val loader = buildYamlConfigLoader {
+        withDefaults()
+        serializers { registerAll(ItemRegistryConfigStorage.SERIALIZERS) }
+    }
+    val rootNode = loader.buildAndLoadString(itemFile.readText())
+    return Triple(key, relPath, rootNode)
 }
 
 /**
@@ -125,7 +112,7 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
  */
 fun KoinTest.readVanillaPrototype(path: String): NekoItem {
     val (key, relPath, node) = readItemNode("minecraft", path)
-    return NekoItemFactory.createVanilla(key, relPath, node)
+    return NekoItemFactory.VANILLA(key, node)
 }
 
 /**
@@ -133,7 +120,7 @@ fun KoinTest.readVanillaPrototype(path: String): NekoItem {
  */
 fun KoinTest.readCustomPrototype(namespace: String, path: String): NekoItem {
     val (key, relPath, node) = readItemNode(namespace, path)
-    return NekoItemFactory.createCustom(key, relPath, node)
+    return NekoItemFactory.STANDARD(key, node)
 }
 
 /**

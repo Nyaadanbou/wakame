@@ -3,18 +3,22 @@ display_name: <green>庇护
 styles: ""
 effects:
   1:
-    - type: attribute:universal_defense
+    - type: "attribute_modifier"
+      id: "universal_defense"
       operation: add
       value: 5
   2:
-    - type: attribute:universal_defense
+    - type: "attribute_modifier"
+      id: "universal_defense"
       operation: add
       value: 10
   3:
-    - type: attribute:universal_defense
+    - type: "attribute_modifier"
+      id: "universal_defense"
       operation: add
       value: 15
   4:
-    - type: attribute:universal_defense
+    - type: "attribute_modifier"
+      id: "universal_defense"
       operation: add
       value: 20

@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.getByteOrNull
 import net.kyori.examination.Examinable
 
@@ -12,7 +16,7 @@ data class ItemRarity(
     /**
      * 物品的稀有度.
      */
-    val rarity: Rarity,
+    val rarity: RegistryEntry<RarityType>,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemRarity> {
@@ -31,13 +35,14 @@ data class ItemRarity(
     ) : ItemComponentType<ItemRarity> {
         override fun read(holder: ItemComponentHolder): ItemRarity? {
             val tag = holder.getTag() ?: return null
-            val raw = tag.getByteOrNull(TAG_VALUE)?.let(RarityRegistry::findBy) ?: return null
+            val raw = tag.getByteOrNull(TAG_VALUE)
+                ?.let { KoishRegistries.RARITY.getEntry(it.toInt()) } ?: return null
             return ItemRarity(rarity = raw)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemRarity) {
             holder.editTag { tag ->
-                tag.putByte(TAG_VALUE, value.rarity.binaryId)
+                tag.putByte(TAG_VALUE, KoishRegistries.RARITY.getRawId(value.rarity.value).toByte())
             }
         }
 

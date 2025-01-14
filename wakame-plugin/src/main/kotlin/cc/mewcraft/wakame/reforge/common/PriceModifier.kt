@@ -112,7 +112,7 @@ data class RarityPriceModifier(
     override fun evaluate(item: ItemStack): Double {
         val nekoStack = item.shadowNeko() ?: return .0
         val rarity = nekoStack.rarity
-        val mapped = mapping[rarity.uniqueId] ?: return .0
+        val mapped = mapping[rarity.getIdAsString()] ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RarityBinding(mapped), "query")
         return mocha.eval(expression)

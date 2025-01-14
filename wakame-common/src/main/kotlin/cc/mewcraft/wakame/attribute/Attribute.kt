@@ -9,14 +9,14 @@ import cc.mewcraft.wakame.adventure.key.Keyed
  */
 interface Attribute : Keyed {
     /**
-     * 本属性所属的融合属性的唯一标识.
-     */
-    val compositionId: String
-
-    /**
      * 本属性的唯一标识.
      */
-    val descriptionId: String
+    val id: String
+
+    /**
+     * 本属性所属的属性包的唯一标识.
+     */
+    val bundleId: String
 
     /**
      * 本属性的默认值.

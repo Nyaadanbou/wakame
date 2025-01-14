@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.registry.ItemRegistry
 import cc.mewcraft.wakame.util.giveItemStack
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.toSimpleString
@@ -67,7 +67,7 @@ internal data class ItemResult(
         // 但如果实在有这个需求的话, 也可以写.
 
         // 生成原始的物品堆叠
-        val itemStack = item.createItemStack(amount) ?: ItemRegistry.ERROR_ITEM_STACK
+        val itemStack = item.createItemStack(amount) ?: ItemStacks.createUnknown(item.identifier)
 
         // 然后基于合成站来渲染物品, 主要填充 name & lore
         itemStack.render()

@@ -1,20 +1,19 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 
 /**
  * 定制台的注册表.
  */
-// 在 PreWorld 早已加载的依赖不需要指定 PostWorld
-@ReloadDependency(
-    runBefore = [
-        // 我们仍然直接依赖 Ability 相关的实例, 而不是实例的引用, 因此 Ability 必须在我们之前加载完毕
-        AbilityRegistry::class
-    ]
+@Init(
+    stage = InitStage.POST_WORLD
 )
-object ModdingTableRegistry : Initializable {
+@Reload()
+object ModdingTableRegistry {
     private val tables = HashMap<String, ModdingTable>()
 
     /**
@@ -22,6 +21,16 @@ object ModdingTableRegistry : Initializable {
      */
     val NAMES: Set<String>
         get() = tables.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     /**
      * 获取指定的定制台.
@@ -35,13 +44,5 @@ object ModdingTableRegistry : Initializable {
         val tables = ModdingTableSerializer.loadAll()
         this.tables.putAll(tables)
         this.tables.put("wtf", WtfModdingTable)
-    }
-
-    override fun onPostWorld() {
-        load()
-    }
-
-    override fun onReload() {
-        load()
     }
 }

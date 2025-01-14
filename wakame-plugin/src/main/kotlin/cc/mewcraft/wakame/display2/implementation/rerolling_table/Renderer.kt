@@ -13,6 +13,9 @@ import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererF
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
@@ -28,6 +31,8 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -44,11 +49,25 @@ internal data class RerollingTableContext(
     }
 }
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
 internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, RerollingTableContext>() {
     override val name: String = "rerolling_table"
     override val formats = RerollingTableRendererFormatRegistry(this)
     override val layout = RerollingTableRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         RerollingTableRenderingHandlerRegistry.bootstrap()

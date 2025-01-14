@@ -26,11 +26,8 @@ internal class EnchantmentAttributeComponent(
         val effects = cache
             .getOrPut(level, ::HashMap)
             .getOrPut(slot) {
-                parts.map { part ->
-                    part.createEffect(owner.handle, level, slot)
-                }.map { (attribute, modifier) ->
-                    AttributeEnchantmentEffect(attribute, modifier)
-                }
+                parts.map { part -> part.createEffect(owner.handle, level, slot) }
+                    .map { (attribute, modifier) -> AttributeEnchantmentEffect(attribute, modifier) }
             }
         return effects
     }

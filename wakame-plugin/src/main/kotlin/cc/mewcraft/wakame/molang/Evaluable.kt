@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.molang
 
-import cc.mewcraft.wakame.SchemaSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import me.lucko.helper.function.Numbers
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
@@ -14,6 +14,7 @@ import kotlin.jvm.optionals.getOrNull
  *
  * @param T 该 [Evaluable] 由类型 [T] 的值组成.
  */
+// FIXME 重命名为 Expression(表达式), 去除泛型
 interface Evaluable<T : Any> {
     companion object {
         /**
@@ -29,12 +30,12 @@ interface Evaluable<T : Any> {
 
     fun asString(): String
 
-    fun evaluate(engine: MochaEngine<*>) : Double
+    fun evaluate(engine: MochaEngine<*>): Double
 
     fun evaluate(): Double
 }
 
-internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
+internal object EvaluableSerializer : TypeSerializer<Evaluable<*>> {
     override fun deserialize(type: Type, node: ConfigurationNode): Evaluable<*> {
         val string = node.get<String>()
         val evalNumber = string?.let { Numbers.parse(it).getOrNull() }
@@ -45,7 +46,7 @@ internal object EvaluableSerializer : SchemaSerializer<Evaluable<*>> {
         return evalString ?: throw IllegalArgumentException("Cannot deserialize Evaluable from ${node.path()}")
     }
 
-    override fun emptyValue(specificType: Type?, options: ConfigurationOptions?): Evaluable<*> {
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): Evaluable<*> {
         return Evaluable.parseNumber(0)
     }
 }

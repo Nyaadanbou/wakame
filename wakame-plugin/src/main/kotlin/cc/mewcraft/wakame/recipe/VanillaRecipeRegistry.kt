@@ -1,31 +1,42 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.runTask
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import java.io.File
 
-@ReloadDependency(
-    runBefore = [ItemRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD
 )
-object VanillaRecipeRegistry : Initializable, KoinComponent {
-    private const val RECIPE_DIR_NAME = "recipes"
+@Reload(
+    runAfter = [
+        ItemRegistryConfigStorage::class, // deps: 需要直接的数据
+    ],
+)
+object VanillaRecipeRegistry {
+    private const val RECIPE_DIR_PATH = "recipes"
 
     @VisibleForTesting
-    val raw: MutableMap<Key, VanillaRecipe> = mutableMapOf()
+    val RAW: MutableMap<Key, VanillaRecipe> = mutableMapOf()
 
-    //TODO map直接对外暴露，不安全
+    // TODO 无需在这分类储存, 这部分数据分类应该由需要分类的系统自己实现 (例如图鉴)
     val ALL: MutableMap<Key, VanillaRecipe> = mutableMapOf()
     val BLASTING: MutableMap<Key, BlastingRecipe> = mutableMapOf()
     val CAMPFIRE: MutableMap<Key, CampfireRecipe> = mutableMapOf()
@@ -37,21 +48,35 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
     val SMOKING: MutableMap<Key, SmokingRecipe> = mutableMapOf()
     val STONECUTTING: MutableMap<Key, StonecuttingRecipe> = mutableMapOf()
 
-    private val logger: Logger by inject()
+    @InitFun
+    private fun init() {
+        loadDataIntoRegistry()
+        runTask {
+            registerForBukkitRecipes()
+            Bukkit.updateRecipes() // 向所有客户端发送新的配方数据包
+        }
+    }
+
+    @ReloadFun
+    private fun reload() {
+        loadDataIntoRegistry()
+        runTask {
+            registerForBukkitRecipes()
+            Bukkit.updateRecipes() // 向所有客户端发送新的配方数据包
+        }
+    }
 
     @VisibleForTesting
-    fun loadRecipes() {
-        raw.clear()
+    fun loadDataIntoRegistry() {
+        RAW.clear()
 
-        val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_NAME)
-        val namespacedPaths = NamespacedPathCollector(recipeDir, true).collect("yml")
-        namespacedPaths.forEach {
-            val file = it.file
+        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()
-                val key = Key.key(it.namespace, it.path)
+                val key = Key.key(namespace, path)
 
-                val recipeNode = yamlConfig {
+                val recipeNode = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
                         kregister(VanillaRecipeSerializer)
@@ -66,22 +91,16 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
                 // 反序列化 Recipe
                 val vanillaRecipe = recipeNode.krequire<VanillaRecipe>()
                 // 添加进临时注册表
-                raw[key] = vanillaRecipe
+                RAW[key] = vanillaRecipe
 
             } catch (e: Throwable) {
-                val message = "Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'"
-                if (RunningEnvironment.TEST.isRunning()) {
-                    throw IllegalArgumentException(message, e)
-                }
-                logger.warn(message, e)
+                Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'", e))
             }
         }
     }
 
-    private fun registerRecipes() {
-        ALL.forEach {
-            it.value.unregisterBukkitRecipe()
-        }
+    private fun registerForBukkitRecipes() {
+        ALL.values.forEach(VanillaRecipe::unregisterBukkitRecipe)
         ALL.clear()
         BLASTING.clear()
         CAMPFIRE.clear()
@@ -92,24 +111,25 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
         SMITHING_TRIM.clear()
         SMOKING.clear()
         STONECUTTING.clear()
-        raw.forEach {
+        RAW.forEach {
             try {
-                register(it.key, it.value)
+                registerForBukkitRecipe0(it.key, it.value)
             } catch (e: Throwable) {
-                logger.warn("Can't register vanilla recipe: '${it.key}'", e)
+                Util.pauseInIde(IllegalStateException("Can't register vanilla recipe: '${it.key}'", e))
             }
         }
 
-        logger.info("Registered vanilla recipes: {}", ALL.keys.joinToString(transform = Key::asString))
-        logger.info("Registered ${ALL.size} vanilla recipes")
+        LOGGER.info("Registered vanilla recipes: {}", ALL.keys.joinToString(transform = Key::asString))
+        LOGGER.info("Registered ${ALL.size} vanilla recipes")
     }
 
-    private fun register(key: Key, vanillaRecipe: VanillaRecipe) {
+    private fun registerForBukkitRecipe0(key: Key, vanillaRecipe: VanillaRecipe) {
         val success = vanillaRecipe.registerBukkitRecipe()
         if (!success) {
-            logger.warn("Can't register vanilla recipe: '$key'")
+            LOGGER.warn("Can't register vanilla recipe: '$key'")
             return
         }
+
         ALL[key] = vanillaRecipe
         when (vanillaRecipe) {
             is BlastingRecipe -> {
@@ -147,22 +167,6 @@ object VanillaRecipeRegistry : Initializable, KoinComponent {
             is StonecuttingRecipe -> {
                 STONECUTTING[key] = vanillaRecipe
             }
-        }
-    }
-
-    override fun onPostWorld() {
-        //TODO 待优化写法
-        loadRecipes()
-        runTask { registerRecipes() }
-    }
-
-    override fun onReload() {
-        //TODO 待优化写法
-        loadRecipes()
-        runTask {
-            registerRecipes()
-            //向所有玩家的客户端发送配方刷新数据包
-            Bukkit.updateRecipes()
         }
     }
 }

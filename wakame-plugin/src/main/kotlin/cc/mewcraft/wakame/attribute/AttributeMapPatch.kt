@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.entity.EntityKeyLookup
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.CompoundBinaryTag
 import cc.mewcraft.wakame.util.ListBinaryTag
 import cc.mewcraft.wakame.util.getByteOrNull
 import cc.mewcraft.wakame.util.getDoubleOrNull
 import cc.mewcraft.wakame.util.getListOrNull
 import cc.mewcraft.wakame.util.getStringOrNull
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
@@ -216,7 +217,7 @@ internal class AttributeMapPatchListener : Listener, Terminable, KoinComponent {
         if (entity !is LivingEntity) return
 
         val patch = AttributeMapPatchAccess.get(entity.uniqueId) ?: return
-        val default = DefaultAttributes.getSupplier(entityKeyLookup.get(entity))
+        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityKeyLookup.get(entity))
 
         // 把跟默认属性一样的属性移除
         patch.trimBy(default)
@@ -251,7 +252,7 @@ private data object AttributeMapPatchType {
             override fun toPrimitive(complex: AttributeMapPatch, context: PersistentDataAdapterContext): ByteArray {
                 val serializableInstanceList = complex.map { (type, instance) ->
                     SerializableAttributeInstance(
-                        id = type.descriptionId,
+                        id = type.id,
                         base = instance.getBaseValue(),
                         modifiers = instance.getModifiers().map { modifier ->
                             SerializableAttributeModifier(
@@ -325,7 +326,7 @@ private data class SerializableAttributeInstance(
     }
 
     fun toAttributeInstance(owner: Attributable): AttributeInstance? {
-        val attribute = Attributes.getSingleton(id) ?: return null
+        val attribute = Attributes.get(id) ?: return null
         val attributeInstance = AttributeInstanceFactory.createLiveInstance(attribute, owner, true).apply {
             setBaseValue(base)
         }

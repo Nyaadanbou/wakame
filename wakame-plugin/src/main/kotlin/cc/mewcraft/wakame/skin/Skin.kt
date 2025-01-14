@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.skin
 
-import cc.mewcraft.wakame.FriendlyNamed
+import cc.mewcraft.wakame.core.PlayerFriendlyNamed
 
 /**
  * Represents a skin.
  */
-interface Skin : FriendlyNamed
+interface Skin : PlayerFriendlyNamed

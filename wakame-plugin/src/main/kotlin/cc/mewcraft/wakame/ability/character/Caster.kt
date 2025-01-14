@@ -24,8 +24,8 @@ sealed interface Caster {
 }
 
 object CasterAdapter {
-    fun adapt(user: User<Player>): Caster {
-        return PlayerCaster(user.player)
+    fun adapt(user: User<*>): Caster {
+        return PlayerCaster(user.player())
     }
 
     fun adapt(player: Player): Caster {
@@ -43,7 +43,7 @@ object CasterAdapter {
 /* Implementations */
 
 private class PlayerCaster(
-    bukkitPlayer: BukkitPlayer
+    bukkitPlayer: BukkitPlayer,
 ) : Caster, Examinable {
 
     init {
@@ -69,7 +69,7 @@ private class PlayerCaster(
 }
 
 private class EntityCaster(
-    bukkitEntity: BukkitEntity
+    bukkitEntity: BukkitEntity,
 ) : Caster, Examinable {
     init {
         require(bukkitEntity !is BukkitPlayer) { "EntityCaster should not be a player." }

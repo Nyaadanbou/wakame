@@ -47,7 +47,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
     private fun sendNoAttributeInstanceMessage(sender: CommandSender, source: Entity, attribute: Attribute) {
         sender.sendMessage(text {
             append("The entity does not have the attribute ".mini)
-            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+            append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
             append(".".mini)
             hoverEvent(HoverEvent.showText(Component.text("Click to copy the UUID of this entity")))
             clickEvent(ClickEvent.copyToClipboard(source.uniqueId.toString()))
@@ -81,7 +81,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
 
                     sender.sendMessage(text {
                         append("The base value of ".mini)
-                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                         append(" is ".mini)
                         append(Component.text(DecimalFormat("#.##").format(baseValue)).color(NamedTextColor.GREEN))
                     })
@@ -121,7 +121,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     instance.setBaseValue(value)
                     sender.sendMessage(text {
                         append("The base value of ".mini)
-                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                         append(" has been set to ".mini)
                         append(Component.text(DecimalFormat("#.##").format(value)).color(NamedTextColor.GREEN))
                     })
@@ -166,7 +166,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     if (instance.hasModifier(modifier)) {
                         sender.sendMessage(text {
                             append("The attribute ".mini)
-                            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                            append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                             append(" already has a modifier with the id ".mini)
                             append(Component.text(id.asString()).color(NamedTextColor.RED))
                             append(".".mini)
@@ -177,7 +177,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     instance.addTransientModifier(modifier)
                     sender.sendMessage(text {
                         append("A modifier has been added to ".mini)
-                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                         append(" with ".mini)
                         append(Component.text(modifier.id.asString()).color(NamedTextColor.GREEN))
                         append(" ".mini)
@@ -221,7 +221,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                     if (instance.getModifiers().none { it.id == id }) {
                         sender.sendMessage(text {
                             append("The attribute ".mini)
-                            append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                            append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                             append(" does not have a modifier with the id ".mini)
                             append(Component.text(id.asString()).color(NamedTextColor.RED))
                             append(".".mini)
@@ -234,7 +234,7 @@ object AttributeCommands : CommandFactory<CommandSender> {
                         append("The modifier with the id ".mini)
                         append(Component.text(id.asString()).color(NamedTextColor.GREEN))
                         append(" has been removed from ".mini)
-                        append(Component.text(attribute.descriptionId).color(NamedTextColor.YELLOW))
+                        append(Component.text(attribute.id).color(NamedTextColor.YELLOW))
                     })
                 }
             }.buildAndAdd(this)
@@ -293,7 +293,7 @@ object AttributeReport {
         source: Entity,
         attributes: AttributeMap,
     ): Book {
-        val sortedAttributes = attributes.sortedBy { (type, _) -> type.descriptionId }
+        val sortedAttributes = attributes.sortedBy { (type, _) -> type.id }
         val pages = generateBookPages(sortedAttributes)
         val book = Book.builder()
             .title(text {
@@ -317,7 +317,7 @@ object AttributeReport {
         source: Entity,
         attributes: AttributeMap,
     ): Component {
-        val sorted = attributes.sortedBy { (type, _) -> type.descriptionId }
+        val sorted = attributes.sortedBy { (type, _) -> type.id }
         val result = text {
             content("Hover to check the attribute report of ")
             append(source.name())
@@ -336,7 +336,7 @@ object AttributeReport {
         instance: AttributeInstance,
     ): Component {
         return text {
-            content(instance.attribute.descriptionId + ": ")
+            content(instance.attribute.id + ": ")
             color(NamedTextColor.GREEN)
             append {
                 text {
@@ -382,15 +382,15 @@ object AttributeReport {
                     text {
                         append {
                             text {
-                                if (type.descriptionId.length > 20) {
-                                    content(type.descriptionId.substring(0, 17) + "...")
+                                if (type.id.length > 20) {
+                                    content(type.id.substring(0, 17) + "...")
                                     color(NamedTextColor.DARK_GREEN)
                                 } else {
-                                    content(type.descriptionId)
+                                    content(type.id)
                                     color(NamedTextColor.DARK_GREEN)
                                 }
                                 hoverEvent(HoverEvent.showText(text {
-                                    append(Component.text("${type.descriptionId}: ").color(NamedTextColor.GREEN))
+                                    append(Component.text("${type.id}: ").color(NamedTextColor.GREEN))
                                     appendNewline()
                                     append(generateSingleText(instance))
                                 }))

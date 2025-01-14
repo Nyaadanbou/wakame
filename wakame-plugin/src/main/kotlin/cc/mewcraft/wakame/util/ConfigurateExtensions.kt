@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.config.configurate.ComponentSerializer
-import cc.mewcraft.wakame.config.configurate.IntRangeSerializer
-import cc.mewcraft.wakame.config.configurate.KeySerializer
-import cc.mewcraft.wakame.config.configurate.StyleBuilderApplicableSerializer
-import cc.mewcraft.wakame.config.configurate.StyleSerializer
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -18,43 +15,41 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-internal typealias NekoConfigurationLoader = YamlConfigurationLoader
-
 
 // Builder extensions
 
 
-internal fun yamlConfig(block: YamlConfigDSL.() -> Unit): YamlConfigurationLoader.Builder {
-    return YamlConfigDSL().apply(block).builder
+internal fun buildYamlConfigLoader(block: YamlConfigLoaderDSL.() -> Unit): YamlConfigurationLoader.Builder {
+    return YamlConfigLoaderDSL().apply(block).builder
 }
 
-internal fun gsonConfig(block: GsonConfigDSL.() -> Unit): GsonConfigurationLoader.Builder {
-    return GsonConfigDSL().apply(block).builder
+internal fun buildGsonConfigLoader(block: GsonConfigLoaderDSL.() -> Unit): GsonConfigurationLoader.Builder {
+    return GsonConfigLoaderDSL().apply(block).builder
 }
 
-internal class YamlConfigDSL {
+internal class YamlConfigLoaderDSL {
     /* private */ val builder: YamlConfigurationLoader.Builder = YamlConfigurationLoader.builder()
 
-    fun withDefaults(): YamlConfigDSL {
-        // 应用默认设置的逻辑
-        builder.withDefaults()
+    // 应用默认设置的逻辑
+    fun withDefaults(): YamlConfigLoaderDSL {
+        builder.withDefaultEverything()
         return this
     }
 
-    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): YamlConfigDSL {
-        // 注册序列化器的逻辑
+    // 注册序列化器的逻辑
+    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): YamlConfigLoaderDSL {
         builder.defaultOptions { options -> options.serializers(block) }
         return this
     }
 
-    fun source(reader: () -> BufferedReader): YamlConfigDSL {
-        // 定义数据来源的逻辑
+    // 定义数据来源的逻辑
+    fun source(reader: () -> BufferedReader): YamlConfigLoaderDSL {
         builder.source(reader)
         return this
     }
 
-    fun sink(writer: () -> BufferedWriter): YamlConfigDSL {
-        // 定义数据去向的逻辑
+    // 定义数据去向的逻辑
+    fun sink(writer: () -> BufferedWriter): YamlConfigLoaderDSL {
         builder.sink(writer)
         return this
     }
@@ -64,25 +59,25 @@ internal class YamlConfigDSL {
     }
 }
 
-internal class GsonConfigDSL {
+internal class GsonConfigLoaderDSL {
     /* private */ val builder: GsonConfigurationLoader.Builder = GsonConfigurationLoader.builder()
 
-    fun withDefaults(): GsonConfigDSL {
+    fun withDefaults(): GsonConfigLoaderDSL {
         // TODO GsonConfig 默认的设置 (可能也不需要?)
         return this
     }
 
-    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): GsonConfigDSL {
+    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): GsonConfigLoaderDSL {
         builder.defaultOptions { options -> options.serializers(block) }
         return this
     }
 
-    fun source(reader: () -> BufferedReader): GsonConfigDSL {
+    fun source(reader: () -> BufferedReader): GsonConfigLoaderDSL {
         builder.source(reader)
         return this
     }
 
-    fun sink(writer: () -> BufferedWriter): GsonConfigDSL {
+    fun sink(writer: () -> BufferedWriter): GsonConfigLoaderDSL {
         builder.sink(writer)
         return this
     }
@@ -92,40 +87,44 @@ internal class GsonConfigDSL {
     }
 }
 
-/**
- * Apply common settings for the [YamlConfigurationLoader.Builder].
- */
-internal fun YamlConfigurationLoader.Builder.withDefaults(): YamlConfigurationLoader.Builder {
-    return this
-        // use 2 spaces indent
-        .indent(2)
-        // always use block style
-        .nodeStyle(NodeStyle.BLOCK)
-        // register common serializers
-        .defaultOptions { options ->
-            options
-                // don't automatically write default values from serializers back to config files
-                .shouldCopyDefaults(false)
-                // add common serializers
-                .serializers {
-                    it.kregister(KeySerializer)
-                    it.kregister(IntRangeSerializer)
-                    it.kregister(NumericValueSerializer)
-                    it.register(ComponentSerializer)
-                    it.register(StyleBuilderApplicableSerializer)
-                    it.register(StyleSerializer)
-                }
+internal fun YamlConfigurationLoader.Builder.withDefaultYamlConfigs(): YamlConfigurationLoader.Builder {
+    return apply {
+        indent(2) // use 2 spaces indent
+        nodeStyle(NodeStyle.BLOCK) // always use block style
+    }
+}
+
+internal fun YamlConfigurationLoader.Builder.withDefaultConfigOptions(): YamlConfigurationLoader.Builder {
+    return defaultOptions { options ->
+        options.shouldCopyDefaults(false) // don't automatically write default values from serializers back to config files
+            .implicitInitialization(true) // enable implicit initialization
+    }
+}
+
+internal fun YamlConfigurationLoader.Builder.withDefaultTypeSerializers(): YamlConfigurationLoader.Builder {
+    return this.defaultOptions { options ->
+        options.serializers { collection ->
+            collection.registerAnnotatedObjects(ObjectMappers.DEFAULT)
+            collection.registerAll(KOISH_CONFIGURATE_SERIALIZERS)
         }
+    }
+}
+
+/**
+ * Apply all default settings to the builder.
+ */
+internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
+    return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultTypeSerializers()
 }
 
 /**
  * Creates a basic builder of configuration loader.
  */
 internal fun buildYamlLoader(
-    builder: TypeSerializerCollection.Builder.() -> Unit = { },
+    builder: TypeSerializerCollection.Builder.() -> Unit = {},
 ): YamlConfigurationLoader.Builder {
     return YamlConfigurationLoader.builder()
-        .withDefaults()
+        .withDefaultEverything()
         .defaultOptions { options ->
             options.serializers {
                 it.builder()
@@ -141,7 +140,7 @@ internal inline fun <reified T> TypeSerializerCollection.Builder.kregister(seria
 }
 
 
-// ConfigurationNode extensions
+// Node extensions
 
 
 /**
@@ -156,7 +155,7 @@ internal inline fun <reified T> ConfigurationNode.krequire(): T {
  */
 internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
     val ret = this.get(clazz) ?: throw NoSuchElementException(
-        "can't get the value of type '${clazz}' at '${path().joinToString(" > ")}'"
+        "Can't parse value of type '${clazz}' at '[${path().joinToString()}]'"
     )
     return ret
 }
@@ -166,7 +165,7 @@ internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
  */
 internal fun <T> ConfigurationNode.krequire(type: KType): T {
     val ret = this.get(type) ?: throw NoSuchElementException(
-        "can't get the value of type '${type}' at '${path().joinToString(" > ")}'"
+        "Can't parse value of type '${type}' at '[${path().joinToString()}]'"
     )
     @Suppress("UNCHECKED_CAST")
     return ret as T

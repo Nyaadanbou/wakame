@@ -2,21 +2,24 @@
 
 package cc.mewcraft.wakame.attribute
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.eventbus.PluginEventBus
 import cc.mewcraft.wakame.eventbus.subscribe
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import org.bukkit.entity.*
-import org.koin.core.component.*
-import org.slf4j.Logger
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -40,8 +43,8 @@ fun AttributeMap(player: Player): AttributeMap {
 fun AttributeMap(user: User<Player>): AttributeMap {
     // 创建一个全新的 AttributeMap
     val key = AttributeMapSupport.PLAYER_KEY
-    val default = DefaultAttributes.getSupplier(key)
-    return PlayerAttributeMap(default, user.player)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
+    return PlayerAttributeMap(default, user.player())
 }
 
 /**
@@ -52,7 +55,7 @@ fun AttributeMap(user: User<Player>): AttributeMap {
  */
 fun AttributeMap(entity: LivingEntity): AttributeMap {
     val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
-    val default = DefaultAttributes.getSupplier(key)
+    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
     return EntityAttributeMap(default, entity)
 }
 
@@ -67,9 +70,9 @@ object ImaginaryAttributeMaps {
 /* Implementations */
 
 
-private object AttributeMapSupport : KoinComponent {
+private object AttributeMapSupport {
     val PLAYER_KEY: Key = EntityType.PLAYER.key()
-    val ENTITY_KEY_LOOKUP: EntityKeyLookup by inject()
+    val ENTITY_KEY_LOOKUP: EntityKeyLookup by Injector.inject()
 }
 
 /**
@@ -290,13 +293,12 @@ private class EntityAttributeMap : AttributeMap {
     }
 }
 
-private object ImaginaryAttributeMapRegistry : KoinComponent {
-    private val logger = get<Logger>()
+private object ImaginaryAttributeMapRegistry {
     private val pool = ConcurrentHashMap<Key, ImaginaryAttributeMap>()
 
     fun get(key: Key): ImaginaryAttributeMap {
         return pool.computeIfAbsent(key) { k ->
-            val default = DefaultAttributes.getSupplier(k)
+            val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(k)
             val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
             for (attribute in default.attributes) {
                 val instance = default.createImaginaryInstance(attribute) ?: continue
@@ -315,7 +317,7 @@ private object ImaginaryAttributeMapRegistry : KoinComponent {
     init {
         PluginEventBus.get().subscribe<NekoCommandReloadEvent> {
             reset()
-            logger.info("Reset object pool of ImaginaryAttributeMap")
+            LOGGER.info("Reset object pool of ImaginaryAttributeMap")
         }
     }
 }

@@ -17,7 +17,6 @@ import cc.mewcraft.wakame.display2.implementation.RenderingHandler4
 import cc.mewcraft.wakame.display2.implementation.RenderingHandler5
 import cc.mewcraft.wakame.display2.implementation.RenderingHandler6
 import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
@@ -39,7 +38,7 @@ internal object CommonRenderingHandlers {
 
     @JvmField
     val ELEMENTS: RenderingHandlerRegistry.() -> RenderingHandler<ItemElements, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
-        format.render(data.elements, Element::displayName)
+        format.render(data.elements) { it.value.displayName }
     }
 
     @JvmField

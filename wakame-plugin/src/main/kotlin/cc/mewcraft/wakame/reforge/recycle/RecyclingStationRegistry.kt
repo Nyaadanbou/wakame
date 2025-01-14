@@ -1,16 +1,34 @@
 package cc.mewcraft.wakame.reforge.recycle
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reforge.common.PriceInstance
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
 
-object RecyclingStationRegistry : Initializable {
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
+object RecyclingStationRegistry {
     private val items: MutableMap<Key, PriceInstance> = mutableMapOf()
     private val stations: MutableMap<String, RecyclingStation> = mutableMapOf()
 
-    val names: Set<String>
+    val NAMES: Set<String>
         get() = stations.keys
+
+    @InitFun
+    private fun init() {
+        load()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        load()
+    }
 
     fun getItem(id: Key): PriceInstance? {
         return items[id]
@@ -28,13 +46,5 @@ object RecyclingStationRegistry : Initializable {
         stations.clear()
         stations.putAll(RecyclingStationSerializer.loadAllStations())
         stations.put("wtf", WtfRecyclingStation)
-    }
-
-    override fun onPostWorld() {
-        load()
-    }
-
-    override fun onReload() {
-        load()
     }
 }

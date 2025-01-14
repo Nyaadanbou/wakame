@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.composite.CompositeAttributeComponent
+import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
@@ -134,7 +134,7 @@ internal class SimpleMergingSession(
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
         val core = inputItem?.portableCore?.wrapped as? AttributeCore ?: return .0
-        val scalar = core.attribute as? CompositeAttributeComponent.Scalar<Double>
+        val scalar = core.attribute as? AttributeBundleTrait.Scalar<Double>
         return scalar?.value ?: .0
     }
 
@@ -145,7 +145,7 @@ internal class SimpleMergingSession(
     }
 
     private fun getRarityNumber(inputItem: NekoStack?): Double {
-        return inputItem?.rarity?.key?.let(table.rarityNumberMapping::get) ?: .0
+        return inputItem?.rarity?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
     }
 
     private fun getPenalty(inputItem: NekoStack?): Double {

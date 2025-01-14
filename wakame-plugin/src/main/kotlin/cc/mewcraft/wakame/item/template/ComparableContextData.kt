@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -25,7 +26,7 @@ interface ComparableContextData : Examinable
 class AttributeContextData(
     val id: String,
     val operation: AttributeModifier.Operation?,
-    val element: Element?,
+    val element: RegistryEntry<ElementType>?,
 ) : ComparableContextData {
     override fun examinableProperties(): Stream<out ExaminableProperty?> {
         return Stream.of(

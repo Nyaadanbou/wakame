@@ -6,9 +6,9 @@ import assertAny
 import cc.mewcraft.wakame.attack.HandAttack
 import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttributeS
-import cc.mewcraft.wakame.attribute.composite.element
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.attribute.bundle.element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
@@ -21,9 +21,8 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.registry.KizamiRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.world.TimeControl
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
@@ -248,8 +247,8 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                fun assert(element: Element, expectedMin: Double, expectedMax: Double) {
-                    val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
+                fun assert(element: RegistryEntry<ElementType>, expectedMin: Double, expectedMax: Double) {
+                    val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
                     assertNotNull(modMin)
@@ -258,8 +257,8 @@ class CustomNekoStackTest : KoinTest {
                     assertEquals(expectedMax, modMax.amount)
                 }
 
-                val fire = ElementRegistry.INSTANCES["fire"]
-                val water = ElementRegistry.INSTANCES["water"]
+                val fire = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
+                val water = KoishRegistries.ELEMENT.getEntryOrThrow("water")
                 when (val actual = core.attribute.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
@@ -275,7 +274,7 @@ class CustomNekoStackTest : KoinTest {
                 val core = cell.getCore() as? AttributeCore
                 assertNotNull(core)
 
-                val modMap = core.attribute.provideAttributeModifiers(ZERO_KEY)
+                val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
@@ -302,7 +301,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<ConstantCompositeAttributeS>((cell1.getCore() as? AttributeCore)?.attribute)
+            val core1 = assertIs<ConstantAttributeBundleS>((cell1.getCore() as? AttributeCore)?.attribute)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
             val core2 = assertIs<EmptyCore>(cell2.getCore())
@@ -437,7 +436,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = RarityRegistry.INSTANCES["common"]
+        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -450,7 +449,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("Foo", it.content())
 
-            val expectedStyle = Style.style(*common.styles)
+            val expectedStyle = Style.style(*common.value.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -519,10 +518,10 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val elements = it.elements
             val possibleElements = setOf(
-                ElementRegistry.INSTANCES["neutral"],
-                ElementRegistry.INSTANCES["water"],
-                ElementRegistry.INSTANCES["fire"],
-                ElementRegistry.INSTANCES["wind"],
+                KoishRegistries.ELEMENT.getEntryOrThrow("neutral"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("water"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("fire"),
+                KoishRegistries.ELEMENT.getEntryOrThrow("wind"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })
@@ -670,7 +669,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = RarityRegistry.INSTANCES["common"]
+        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -683,7 +682,7 @@ class CustomNekoStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("普通", it.content())
 
-            val expectedStyle = Style.style(*common.styles)
+            val expectedStyle = Style.style(*common.value.displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -700,7 +699,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val rarity = RarityRegistry.INSTANCES["rare"]
+        val rarity = KoishRegistries.RARITY.getEntryOrThrow("rare")
         context {
             it.rarity = rarity // 假设稀有度
         }
@@ -709,8 +708,8 @@ class CustomNekoStackTest : KoinTest {
             val kizamiz = it.kizamiz
             assertEquals(2, kizamiz.size)
             val possibleKizamiz = setOf(
-                KizamiRegistry.INSTANCES["wind_lace"],
-                KizamiRegistry.INSTANCES["antigravity"],
+                KoishRegistries.KIZAMI.getEntryOrThrow("wind_lace"),
+                KoishRegistries.KIZAMI.getEntryOrThrow("antigravity"),
             )
             assertTrue(kizamiz.all { it in possibleKizamiz })
         }

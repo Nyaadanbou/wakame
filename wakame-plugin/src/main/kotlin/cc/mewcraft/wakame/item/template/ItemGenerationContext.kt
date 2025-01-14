@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.attribute.composite.AttributeGenerationContext
-import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.attribute.bundle.AttributeGenerationContext
+import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -47,17 +48,17 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
     /**
      * 已经生成的物品稀有度.
      */
-    var rarity: Rarity?
+    var rarity: RegistryEntry<RarityType>?
 
     /**
      * 已经生成的物品元素.
      */
-    val elements: MutableCollection<Element>
+    val elements: MutableCollection<RegistryEntry<ElementType>>
 
     /**
      * 已经生成的物品铭刻.
      */
-    val kizamiz: MutableCollection<Kizami>
+    val kizamiz: MutableCollection<RegistryEntry<KizamiType>>
 
     /**
      * 已经生成的物品技能.
@@ -77,7 +78,7 @@ object ItemGenerationContexts {
      * @param seed 用于生成随机数的种子
      */
     fun create(
-        trigger: ItemGenerationTrigger, target: Key, seed: Long = ThreadLocalRandom.current().nextLong()
+        trigger: ItemGenerationTrigger, target: Key, seed: Long = ThreadLocalRandom.current().nextLong(),
     ): ItemGenerationContext {
         return SimpleItemGenerationContext(trigger, target, seed)
     }
@@ -95,9 +96,9 @@ private class SimpleItemGenerationContext(
     override val random: Random = Random(seed)
     override val marks: MutableCollection<Mark> by ObservableDelegates.set(HashSet())
     override var level: Int? by ObservableDelegates.reference(null)
-    override var rarity: Rarity? by ObservableDelegates.reference(null)
-    override val elements: MutableCollection<Element> by ObservableDelegates.set(HashSet())
-    override val kizamiz: MutableCollection<Kizami> by ObservableDelegates.set(HashSet())
+    override var rarity: RegistryEntry<RarityType>? by ObservableDelegates.reference(null)
+    override val elements: MutableCollection<RegistryEntry<ElementType>> by ObservableDelegates.set(HashSet())
+    override val kizamiz: MutableCollection<RegistryEntry<KizamiType>> by ObservableDelegates.set(HashSet())
     override val abilities: MutableCollection<AbilityContextData> by ObservableDelegates.set(HashSet())
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())
 

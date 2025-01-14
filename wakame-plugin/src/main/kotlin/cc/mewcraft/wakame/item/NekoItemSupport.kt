@@ -12,7 +12,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.get
 import java.util.stream.Stream
 
 val ItemStack?.nekoItem: NekoItem?
@@ -25,6 +24,7 @@ internal class SimpleNekoItem(
     override val id: Key,
     override val base: ItemBase,
     override val slotGroup: ItemSlotGroup,
+    override val hidden: Boolean,
     override val templates: ItemTemplateMap,
     override val behaviors: ItemBehaviorMap,
 ) : NekoItem {
@@ -55,6 +55,7 @@ internal class SimpleNekoItem(
         ExaminableProperty.of("id", id.asString()),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("slot_group", slotGroup),
+        ExaminableProperty.of("hidden", hidden),
         ExaminableProperty.of("templates", templates),
         ExaminableProperty.of("behaviors", behaviors),
     )
@@ -76,6 +77,8 @@ internal object EmptyNekoItem : NekoItem {
         get() = ""
     override val slotGroup: ItemSlotGroup
         get() = ItemSlotGroup.empty()
+    override val hidden: Boolean
+        get() = true
     override val templates: ItemTemplateMap
         get() = ItemTemplateMap.empty()
     override val behaviors: ItemBehaviorMap

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.CustomModelData
@@ -14,24 +14,26 @@ import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.MenuIcon
 import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.itemLore
 import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.maxDamage
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.Contract
 import kotlin.reflect.KProperty
 
 val NekoItem.universalId: String
@@ -40,14 +42,14 @@ val NekoItem.universalId: String
         return "${nekoItemId.namespace()}/${nekoItemId.value()}"
     }
 
-val NekoItem.modelKey: Key
-    get() = Key.key(SharedConstants.PLUGIN_NAME, universalId)
-
 val NekoStack.universalId: String
     get() {
         val nekoItemId = this.id
         return "${nekoItemId.namespace()}/${nekoItemId.value()}"
     }
+
+val NekoItem.modelKey: Key
+    get() = Key.key(SharedConstants.PLUGIN_NAME, universalId)
 
 val NekoStack.modelKey: Key
     get() = Key.key(SharedConstants.PLUGIN_NAME, universalId)
@@ -143,9 +145,8 @@ private fun NekoStack.reduceForMenuIcon(): NekoStack {
  * 并把这些内容应用到此物品堆叠上.
  */
 fun NekoStack.applyMenuIconEverything(dsl: MenuIconLore.LineConfig.Builder.() -> Unit = {}): NekoStack {
-    val resolution = prototype.resolveMenuIcon(dsl)
-    this.itemName = resolution.name
-    this.lore = resolution.lore
+    val resolution = this.prototype.resolveMenuIcon(dsl)
+    resolution.applyNameAndLoreTo(this.wrapped)
     return reduceForMenuIcon()
 }
 
@@ -183,11 +184,12 @@ data class MenuIconResolution internal constructor(val name: Component?, val lor
     /**
      * 将此 [MenuIconResolution] 应用到 [item].
      *
-     * @return
+     * @return 应用了修改之后的 [item]
      */
+    @Contract(pure = false)
     fun applyNameAndLoreTo(item: ItemStack): ItemStack {
         item.itemName = name
-        item.lore0 = lore
+        item.itemLore = lore
         return item
     }
 }
@@ -217,21 +219,20 @@ var NekoStack.customName: Component? by direct(ItemComponentTypes.CUSTOM_NAME)
 var NekoStack.itemName: Component? by direct(ItemComponentTypes.ITEM_NAME)
 
 var NekoStack.lore: List<Component>
-    get() = wrapped.lore0.orEmpty()
+    get() = wrapped.itemLore.orEmpty()
     set(value) {
-        wrapped.lore0 = value
+        wrapped.itemLore = value
     }
 
-@Deprecated("将在高版本移除")
 var NekoStack.damageResistant: DamageResistant? by direct(ItemComponentTypes.DAMAGE_RESISTANT)
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
 
-var NekoStack.rarity: Rarity by mapped(ItemComponentTypes.RARITY, RarityRegistry::DEFAULT, ::ItemRarity, ItemRarity::rarity)
+var NekoStack.rarity: RegistryEntry<RarityType> by mapped(ItemComponentTypes.RARITY, KoishRegistries.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
 
-var NekoStack.elements: Set<Element> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
+var NekoStack.elements: Set<RegistryEntry<ElementType>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
 
-var NekoStack.kizamiz: Set<Kizami> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
+var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 
@@ -315,7 +316,7 @@ private class MappedWithDefaultComponentDelegate<T, R>(
     private val unbox: (T) -> R,
 ) {
     operator fun getValue(thisRef: NekoStack, property: KProperty<*>): R {
-        return thisRef.components.getOrDefault(type, box(def())).let(unbox)
+        return unbox(thisRef.components.getOrDefault(type) { box(def()) })
     }
 
     operator fun setValue(thisRef: NekoStack, property: KProperty<*>, value: R?) {

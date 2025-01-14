@@ -1,17 +1,17 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.config.configurate.PotionEffectSerializer
-import cc.mewcraft.wakame.config.configurate.PotionEffectTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import cc.mewcraft.wakame.item.components.FoodProperties as FoodPropertiesData
 
 
@@ -63,13 +63,6 @@ data class FoodProperties(
             val canAlwaysEat = node.node("can_always_eat").getBoolean(false)
             val abilities = node.node("ability").getList<Key>(emptyList())
             return FoodProperties(nutrition, saturation, canAlwaysEat, abilities)
-        }
-
-        override fun childrenCodecs(): TypeSerializerCollection {
-            return TypeSerializerCollection.builder()
-                .kregister(PotionEffectSerializer)
-                .kregister(PotionEffectTypeSerializer)
-                .build()
         }
     }
 }

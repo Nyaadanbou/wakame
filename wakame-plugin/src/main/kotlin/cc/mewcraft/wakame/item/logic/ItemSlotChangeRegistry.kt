@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 
 /**
  * 储存了所有 [ItemSlotChangeListener] 实例.
@@ -12,7 +14,10 @@ import cc.mewcraft.wakame.initializer.Initializable
  *
  * 注意不要重复添加同一个实例.
  */
-internal object ItemSlotChangeRegistry : Initializable {
+@Init(
+    stage = InitStage.PRE_WORLD
+)
+internal object ItemSlotChangeRegistry {
     /**
      * 当前所有已注册的 [ItemSlotChangeListener] 实例.
      *
@@ -20,7 +25,8 @@ internal object ItemSlotChangeRegistry : Initializable {
      */
     val listeners: MutableList<ItemSlotChangeListener> = mutableListOf()
 
-    override fun onPreWorld() {
+    @InitFun
+    private fun init() {
         listeners += AttackSpeedItemSlotChangeListener
         listeners += AttributeItemSlotChangeListener
         listeners += EnchantmentItemSlotChangeListener

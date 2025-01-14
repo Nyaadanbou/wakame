@@ -1,29 +1,27 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import java.io.File
 import java.lang.reflect.Type
 
-internal object RerollingTableSerializer : KoinComponent {
+internal object RerollingTableSerializer {
     private const val ROOT_DIR_NAME = "reroll"
 
-    private val logger: Logger = get()
-    private val rerollDirectory by lazy { get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
+    private val rerollDirectory by lazy { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
 
     /**
      * 从配置文件中加载所有的重造台.
@@ -38,7 +36,7 @@ internal object RerollingTableSerializer : KoinComponent {
                     val table = load(it)
                     it.name to table
                 } catch (e: Exception) {
-                    logger.error("Can't load modding table: '${it.relativeTo(rerollDirectory)}'", e)
+                    LOGGER.error("Can't load modding table: '${it.relativeTo(rerollDirectory)}'", e)
                     null
                 }
             }
@@ -72,7 +70,7 @@ internal object RerollingTableSerializer : KoinComponent {
         val tableMainConfigFile = tableDir.resolve("config.yml")
         val tableItemsDirectory = tableDir.resolve("items")
 
-        val tableMainConfigNode = yamlConfig {
+        val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 kregister(TableCurrencyCostSerializer)
@@ -88,13 +86,12 @@ internal object RerollingTableSerializer : KoinComponent {
         val currencyCost = tableMainConfigNode.node("currency_cost").krequire<RerollingTable.TableCurrencyCost>()
 
         // 反序列化好的 items/
-        val itemRules = NamespacedPathCollector(tableItemsDirectory, true)
-            .collect("yml")
+        val itemRules = NamespacedFileTreeWalker(tableItemsDirectory, "yml", true)
             .associate {
                 val itemId = Key.key(it.namespace, it.path)
                 val itemRule = run {
                     val text = it.file.readText()
-                    val itemRuleNode = yamlConfig {
+                    val itemRuleNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
                             kregister(CellRuleSerializer)

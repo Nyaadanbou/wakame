@@ -1,12 +1,19 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.initializer.Initializable
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 
 /**
  * 负责初始化伤害系统 API 的一些实例.
  */
-internal object AttributeBootstrap : Initializable {
-    override fun onPreWorld() {
+@Init(
+    stage = InitStage.PRE_WORLD
+)
+internal object AttributeBootstrap {
+
+    @InitFun
+    private fun init() {
 
         // 注册 AttributeMapAccess
         AttributeMapAccess.register(DefaultAttributeMapAccess)

@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.registry.ElementRegistry
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
+import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.ImmutableMap
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
@@ -101,13 +102,13 @@ internal constructor(
      */
     fun getModifierValue(type: Attribute, id: Key, attributable: Attributable): Double {
         return requireNotNull(getDefault(type, attributable).getModifier(id)?.amount) {
-            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.id}'"
         }
     }
 
     fun getModifierValue(type: Attribute, id: Key): Double {
         return requireNotNull(getDefault(type).getModifier(id)?.amount) {
-            "can't find attribute modifier '$id' on attribute '${type.descriptionId}'"
+            "can't find attribute modifier '$id' on attribute '${type.id}'"
         }
     }
 
@@ -145,7 +146,7 @@ internal constructor(
         return if (isAbsoluteVanilla(type)) {
             AttributeInstanceFactory.createLiveInstance(type, attributable, false)
         } else {
-            requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
+            requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.id}'" }
         }
     }
 
@@ -155,7 +156,7 @@ internal constructor(
      * @throws IllegalArgumentException 如果 [type] 不在此供应者中
      */
     private fun getDefault(type: Attribute): AttributeInstance {
-        return requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.descriptionId}'" }
+        return requireNotNull(prototypes[type]) { "invalid attribute instance for attribute '${type.id}'" }
     }
 
     /**
@@ -241,131 +242,19 @@ class AttributeSupplierBuilder(
  *   minecraft:living:
  *     parent: ~
  *     values:
- *       <composite_attribute_id_1>: ~
- *       <composite_attribute_id_2>: ~
- *       <composite_attribute_id_3>:
+ *       <attribute_bundle_id_1>: ~
+ *       <attribute_bundle_id_2>: ~
+ *       <attribute_bundle_id_3>:
  *         <element_id_1>: ~
  *         <element_id_2>: ~
  *   minecraft:mob:
  *     parent: minecraft:living
  *     values:
- *       <composite_attribute_id_4>: ~
- *       <composite_attribute_id_5>: ~
+ *       <attribute_bundle_id_4>: ~
+ *       <attribute_bundle_id_5>: ~
  * ```
  */
-internal class AttributeSupplierDeserializer(
-    /**
-     * The configuration node.
-     */
-    private val node: ConfigurationNode,
-) {
-    /**
-     * The builders that have been deserialized successfully so far.
-     */
-    private val builders: MutableMap<Key, AttributeSupplierBuilder> = mutableMapOf()
-
-    /**
-     * Whether the deserializer is `frozen`. This flag is initially `false`.
-     *
-     * Once the function [deserialize] is invoked and returns successfully, this
-     * property should be set to `true`. Invocation on [deserialize] will throw
-     * [IllegalStateException] if [isFrozen] is `true`.
-     */
-    private var isFrozen: Boolean = false
-
-    /**
-     * Contains the intermediate logic to create a valid [AttributeSupplierBuilder].
-     */
-    private inner class IntermediateBuilder(
-        /**
-         * The parent key. TBD.
-         */
-        private val parentKey: Key?,
-        /**
-         * The values map. TBD.
-         */
-        private val valuesMap: Map<String, ConfigurationNode>,
-    ) {
-        // Just an extension to reduce duplicates
-        private fun AttributeSupplierBuilder.add(
-            attribute: Attribute, value: Double?,
-        ): AttributeSupplierBuilder {
-            if (value != null) {
-                add(attribute, value)
-            } else {
-                add(attribute)
-            }
-            return this
-        }
-
-        // Just an extension to reduce duplicates
-        private fun AttributeSupplierBuilder.add(
-            /* all from the composite attribute */ attributes: Collection<Attribute>,
-            /* the node holding the value */ valueNode: ConfigurationNode,
-        ): AttributeSupplierBuilder {
-            for (attribute in attributes) {
-                val value: Double? = run {
-                    if (valueNode.string == "default") {
-                        null // we use null to indicate default value
-                    } else {
-                        valueNode.get<Double>()
-                    }
-                }
-
-                this.add(attribute, value)
-            }
-            return this
-        }
-
-        fun build(): AttributeSupplierBuilder {
-            // Create the builder. Inherit the parent builder if specified
-            val builder = if (parentKey != null) {
-                requireNotNull(
-                    builders[parentKey]?.copy()
-                ) {
-                    "invalid parent '$parentKey'\n\nmake sure you have defined the parent before \"this\" in the configuration!"
-                }
-            } else {
-                AttributeSupplierBuilder()
-            }
-
-            // Put data into the builder
-            for ((compositionId, valueNode) in valuesMap) {
-                if (compositionId in Attributes.elementAttributeNames) {
-                    // it's a node for elemental attributes
-
-                    if (valueNode.isMap) {
-                        // it's a map - there are possibly individual definition for each specified element
-
-                        val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
-                        for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            val element = ElementRegistry.INSTANCES.getOrNull(elementId) ?: error("invalid element id: '$elementId'")
-                            val attributes = Attributes.getComposition("$compositionId/${element.uniqueId}")
-                            builder.add(attributes, valueNodeInMap)
-                        }
-                    } else {
-                        // not a map - then we assume it's a scalar, so
-                        // the value node is used for every single element available in the system
-
-                        for ((_, elementType) in ElementRegistry.INSTANCES) {
-                            val attributes = Attributes.getComposition("$compositionId/${elementType.uniqueId}")
-                            builder.add(attributes, valueNode)
-                        }
-                    }
-
-                } else {
-                    // it's a node for any other attributes
-
-                    val attributes = Attributes.getComposition(compositionId)
-                    builder.add(attributes, valueNode)
-                }
-            }
-
-            // Return the builder
-            return builder
-        }
-    }
-
+internal object AttributeSupplierSerializer {
     /**
      * Validates the map of nodes.
      *
@@ -374,14 +263,14 @@ internal class AttributeSupplierDeserializer(
      */
     private fun validateValuesMap(valuesMap: Map<String, ConfigurationNode>): Map<String, ConfigurationNode> {
         // This will validate two things:
-        // 1. The format of the composition id is correct
+        // 1. The format of the bundle id is correct
         // 2. The config node has correct structure
-        for ((compositionId, valueNode) in valuesMap) {
-            if (!AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(compositionId)) {
-                error("the composition id '$compositionId' is in illegal format (allowed pattern: ${AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING})")
+        for ((bundleId, valueNode) in valuesMap) {
+            if (!ATTRIBUTE_ID_PATTERN_STRING.toRegex().matches(bundleId)) {
+                error("The attribute bundle id '$bundleId' is in illegal format (allowed pattern: ${ATTRIBUTE_ID_PATTERN_STRING})")
             }
-            if (compositionId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
-                error("the attribute '$compositionId' has neither a map structure, nor a scalar value, nor a null")
+            if (bundleId in Attributes.elementAttributeNames && !valueNode.isMap && !valueNode.empty() && valueNode.rawScalar() == null) {
+                error("The config node '$bundleId' has neither a map structure, nor a scalar value, nor a null")
             }
         }
 
@@ -391,15 +280,114 @@ internal class AttributeSupplierDeserializer(
     /**
      * Deserializes the node into a map of [AttributeSupplier].
      *
+     * The assumed node structure is described below:
+     *
+     * ```yaml
+     * <root>:
+     *   minecraft:living:
+     *     parent: ~
+     *     values:
+     *       <attribute_bundle_id_1>: ~
+     *       <attribute_bundle_id_2>: ~
+     *       <attribute_bundle_id_3>:
+     *         <element_id_1>: ~
+     *         <element_id_2>: ~
+     *   minecraft:mob:
+     *     parent: minecraft:living
+     *     values:
+     *       <attribute_bundle_id_4>: ~
+     *       <attribute_bundle_id_5>: ~
+     * ```
      * @return the deserialized objects
-     * @throws IllegalStateException if [isFrozen] is `true`
      */
-    fun deserialize(): Map<Key, AttributeSupplier> {
-        if (isFrozen) {
-            throw IllegalStateException("the function deserialize() can be invoked at most once for the instance")
+    fun deserialize(rootNode: ConfigurationNode): Map<Identifier, AttributeSupplier> {
+        // The builders that have been deserialized successfully so far
+        val builders = mutableMapOf<Key, AttributeSupplierBuilder>()
+
+        // Transform the keys of the children map to ResourceLocation
+        val nodeMap = rootNode.childrenMap().transformKeys<Identifier>()
+
+        // An extension to reduce duplicates
+        fun AttributeSupplierBuilder.add(
+            attribute: Attribute,
+            value: Double?,
+        ): AttributeSupplierBuilder {
+            if (value != null) {
+                add(attribute, value)
+            } else {
+                add(attribute)
+            }
+            return this
         }
 
-        val nodeMap = this.node.childrenMap().mapKeys { (key, _) -> Key(key.toString()) }
+        // An extension to reduce duplicates
+        fun AttributeSupplierBuilder.add(
+            attributes: Collection<Attribute>, // all from the bundle attribute
+            valueNode: ConfigurationNode, // the node holding the value
+        ): AttributeSupplierBuilder {
+            for (attribute in attributes) {
+                val value: Double? =
+                    if (valueNode.string == "default") {
+                        null // we use null to indicate default value
+                    } else {
+                        valueNode.get<Double>()
+                    }
+
+                this.add(attribute, value)
+            }
+            return this
+        }
+
+        // Creates a builder from the given data
+        fun parseBuilder(
+            builders: Map<Identifier, AttributeSupplierBuilder>,
+            parentKey: Key?,
+            valuesMap: Map<String, ConfigurationNode>,
+        ): AttributeSupplierBuilder {
+            // Create the builder. Inherit the parent builder if specified
+            val builder = if (parentKey != null) {
+                requireNotNull(builders[parentKey]?.copy()) { "Invalid parent '$parentKey'!\n\nMake sure you have defined the parent before 'this' in the configuration!" }
+            } else {
+                AttributeSupplierBuilder()
+            }
+
+            // Put data into the builder
+            for ((bundleId, valueNode) in valuesMap) {
+                if (bundleId in Attributes.elementAttributeNames) {
+                    // it's a node for elemental attributes
+
+                    if (valueNode.isMap) {
+                        // it's a map - there are possibly individual definition for each specified element
+
+                        val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
+                        for ((elementId, valueNodeInMap) in valueNodeMap) {
+                            if (!KoishRegistries.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
+                            val bundleIdWithElement = "$bundleId/${elementId.replace(':', '.')}"
+                            val attributes = Attributes.getList(bundleIdWithElement)
+                            builder.add(attributes, valueNodeInMap)
+                        }
+                    } else {
+                        // not a map - then we assume it's a scalar, so
+                        // the value node is used for every single element available in the system
+
+                        for (elementType in KoishRegistries.ELEMENT.entrySequence) {
+                            val bundleIdWithElement = "$bundleId/${elementType.getIdAsString().replace(':', '.')}"
+                            val attributes = Attributes.getList(bundleIdWithElement)
+                            builder.add(attributes, valueNode)
+                        }
+                    }
+
+                } else {
+                    // it's a node for any other attributes
+
+                    val attributes = Attributes.getList(bundleId)
+                    builder.add(attributes, valueNode)
+                }
+            }
+
+            // Return the builder
+            return builder
+        }
 
         for ((entityKey, entityNode) in nodeMap) {
             val parentNode = entityNode.node("parent")
@@ -407,11 +395,9 @@ internal class AttributeSupplierDeserializer(
 
             val parentKey = parentNode.get<Key>()
             val valuesMap = valuesNode.childrenMap().mapKeys { (key, _) -> key.toString() }.run(::validateValuesMap)
-            this.builders[entityKey] = IntermediateBuilder(parentKey, valuesMap).build()
+            builders[entityKey] = parseBuilder(builders, parentKey, valuesMap)
         }
 
-        return this.builders
-            .mapValues { (_, builder) -> builder.build() }
-            .also { isFrozen = true }
+        return builders.mapValues { (_, builder) -> builder.build() }
     }
 }

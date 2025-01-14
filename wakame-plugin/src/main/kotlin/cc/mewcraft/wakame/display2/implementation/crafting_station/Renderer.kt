@@ -13,7 +13,9 @@ import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
@@ -21,8 +23,8 @@ import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.DamageResistant
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
 import cc.mewcraft.wakame.item.templates.components.ItemCells
 import cc.mewcraft.wakame.item.templates.components.ItemCrate
@@ -30,7 +32,8 @@ import cc.mewcraft.wakame.item.templates.components.ItemElements
 import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.kizami.Kizami
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -55,11 +58,25 @@ internal data class CraftingStationContext(
     }
 }
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
 internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, CraftingStationContext>() {
     override val name: String = "crafting_station"
     override val formats = CraftingStationRendererFormatRegistry(this)
     override val layout = CraftingStationRendererLayout(this)
     private val textAssembler = TextAssembler(layout)
+
+    @InitFun
+    private fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         CraftingStationRenderingHandlerRegistry.bootstrap()
@@ -137,7 +154,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         val allPossibleElements = selector.allPossibleSamples
         val maximumElementAmount = selector.maximumSampleAmount
         val resolver = Placeholder.component("count", Component.text(maximumElementAmount))
-        format.render(allPossibleElements, Element::displayName, resolver)
+        format.render(allPossibleElements, { it.value.displayName }, resolver)
     }
 
     @JvmField
@@ -166,7 +183,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         val allPossibleKizamiz = selector.allPossibleSamples
         val maximumKizamiAmount = selector.maximumSampleAmount
         val resolver = Placeholder.component("count", Component.text(maximumKizamiAmount))
-        format.render(allPossibleKizamiz, Kizami::displayName, resolver)
+        format.render(allPossibleKizamiz, { it.value.displayName }, resolver)
     }
 
     @JvmField

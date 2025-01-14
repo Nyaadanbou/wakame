@@ -3,18 +3,22 @@ display_name: <green>生命力
 styles: ""
 effects:
   1:
-    - type: attribute:max_health
+    - type: "attribute_modifier"
+      id: "max_health"
       operation: add
       value: 5
   2:
-    - type: attribute:max_health
+    - type: "attribute_modifier"
+      id: "max_health"
       operation: add
       value: 10
   3:
-    - type: attribute:max_health
+    - type: "attribute_modifier"
+      id: "max_health"
       operation: add
       value: 15
   4:
-    - type: attribute:max_health
+    - type: "attribute_modifier"
+      id: "max_health"
       operation: add
       value: 20

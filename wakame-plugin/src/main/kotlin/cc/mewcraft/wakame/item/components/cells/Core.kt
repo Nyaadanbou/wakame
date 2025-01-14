@@ -4,12 +4,12 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.item.components.cells.cores.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
-import cc.mewcraft.wakame.item.components.cells.cores.AbilityCore
-import cc.mewcraft.wakame.ability.PlayerAbility
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 
@@ -84,13 +84,13 @@ interface VirtualCore : Core
 interface EmptyCore : Core
 
 /**
- * [AttributeCore] 是一个属性核心, 用于表示一个 [ConstantCompositeAttribute].
+ * [AttributeCore] 是一个属性核心, 用于表示一个 [ConstantAttributeBundle].
  */
 interface AttributeCore : Core {
     /**
      * 该属性核心的属性种类及其数值.
      */
-    val attribute: ConstantCompositeAttribute
+    val attribute: ConstantAttributeBundle
 }
 
 /**

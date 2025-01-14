@@ -104,18 +104,6 @@ cells/empty/out:
     unselected:
       style: "<!i><dark_gray>"
 
-# id: `standalone_cell`
-standalone_cell:
-  namespace: reforge
-  # 可用标签
-  # <mod_count> 当前重铸次数
-  # <mod_limit> 重铸次数上限 (dev: 从 ctx 解析)
-  history_format:
-    - "惩罚: <mod_count> / <mod_limit>"
-  overall_ordinal:
-    - core
-    - history
-
 # id: `custom_name`
 custom_name:
   namespace: vanilla

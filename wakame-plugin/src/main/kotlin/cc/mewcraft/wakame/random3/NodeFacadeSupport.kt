@@ -6,7 +6,7 @@ import org.slf4j.Logger
 
 object NodeFacadeSupport : KoinComponent {
     fun reload(facade: NodeFacade<*>) {
-        logger.info("Loading: ${facade.dataDir}")
+        logger.info("Loading global random selectors: ${facade.dataDir}")
         facade.populate()
     }
 

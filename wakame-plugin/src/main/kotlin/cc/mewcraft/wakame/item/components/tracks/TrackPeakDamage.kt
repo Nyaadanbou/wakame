@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.CompoundTag
 import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
@@ -11,7 +11,7 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 /**
  * 跟踪使用物品单次打出过的最高伤害.
  */
-interface TrackPeakDamage : Track, TrackMap<TrackPeakDamage, Element, Double> {
+interface TrackPeakDamage : Track, TrackMap<TrackPeakDamage, ElementType, Double> {
 
     companion object : TrackType<TrackPeakDamage> {
         fun empty(): TrackPeakDamage {
@@ -19,9 +19,9 @@ interface TrackPeakDamage : Track, TrackMap<TrackPeakDamage, Element, Double> {
         }
 
         fun of(nbt: CompoundTag): TrackPeakDamage {
-            val map = if (nbt.size() < 8) Reference2DoubleArrayMap<Element>() else Reference2DoubleOpenHashMap()
+            val map = if (nbt.size() < 8) Reference2DoubleArrayMap<ElementType>() else Reference2DoubleOpenHashMap()
             for (tagKey: String in nbt.keySet()) {
-                val element = ElementRegistry.INSTANCES.getOrNull(tagKey) ?: continue // 直接跳过无效的元素
+                val element = KoishRegistries.ELEMENT[tagKey] ?: continue // 直接跳过无效的元素
                 val damage = nbt.getDouble(tagKey)
                 map[element] = damage
             }
@@ -33,33 +33,31 @@ interface TrackPeakDamage : Track, TrackMap<TrackPeakDamage, Element, Double> {
 }
 
 private class TrackPeakDamageImpl(
-    private val map: Map<Element, Double>,
+    private val map: Map<ElementType, Double>,
 ) : TrackPeakDamage {
-    override fun get(key: Element): Double {
+    override fun get(key: ElementType): Double {
         return map.getOrDefault(key, 0.0)
     }
 
-    override fun set(key: Element, value: Double): TrackPeakDamage {
+    override fun set(key: ElementType, value: Double): TrackPeakDamage {
         return edit { map ->
             map[key] = value
         }
     }
 
-    override fun remove(key: Element): TrackPeakDamage {
+    override fun remove(key: ElementType): TrackPeakDamage {
         return edit { map ->
             map.remove(key)
         }
     }
 
     override fun serializeAsTag(): CompoundTag = CompoundTag {
-        for ((element: Element, damage: Double) in map) {
-            putDouble(element.uniqueId, damage)
+        for ((element: ElementType, damage: Double) in map) {
+            putDouble(element.key.toString(), damage)
         }
     }
 
-    override fun edit(block: (MutableMap<Element, Double>) -> Unit): TrackPeakDamage {
-        val map = Reference2DoubleArrayMap(this.map)
-        block(map)
-        return TrackPeakDamageImpl(map)
+    override fun edit(block: (MutableMap<ElementType, Double>) -> Unit): TrackPeakDamage {
+        return TrackPeakDamageImpl(Reference2DoubleArrayMap(map).apply(block))
     }
 }

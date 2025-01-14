@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.composite.element
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.attribute.bundle.element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
@@ -18,11 +18,11 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.kizami.Kizami
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.kizami.KizamiType
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
 import org.slf4j.Logger
 
 /**
@@ -32,7 +32,7 @@ internal class ReforgeOperation
 private constructor(
     private val session: SimpleRerollingSession,
 ) {
-    companion object : KoinComponent {
+    companion object {
         operator fun invoke(session: SimpleRerollingSession): RerollingSession.ReforgeResult {
             return ReforgeOperation(session).execute()
         }
@@ -142,9 +142,9 @@ private constructor(
     private fun initializeContext(
         itemId: Key,
         itemLevel: Int,
-        itemRarity: Rarity,
-        itemElements: Set<Element>,
-        itemKizamiz: Set<Kizami>,
+        itemRarity: RegistryEntry<RarityType>,
+        itemElements: Set<RegistryEntry<ElementType>>,
+        itemKizamiz: Set<RegistryEntry<KizamiType>>,
         itemCells: ItemCells,
     ): ItemGenerationContext {
         // 创建一个空的 context

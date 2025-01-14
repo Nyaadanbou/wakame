@@ -5,14 +5,14 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.registry.ElementRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.krequire
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
@@ -80,7 +80,7 @@ object VanillaDamageMetadata {
         )
     }
 
-    operator fun invoke(element: Element, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
+    operator fun invoke(element: RegistryEntry<ElementType>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
         return invoke(
             damageBundle {
                 single(element) {
@@ -95,7 +95,7 @@ object VanillaDamageMetadata {
     }
 
     operator fun invoke(damageValue: Double): DamageMetadata {
-        return invoke(ElementRegistry.DEFAULT, damageValue, 0.0, 0.0)
+        return invoke(KoishRegistries.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
     }
 }
 
@@ -172,7 +172,7 @@ interface DamageTagsBuilder {
  * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
  */
 interface DamagePacketBuilder<T> {
-    val element: String
+    val element: RegistryEntry<ElementType>
     val min: T
     val max: T
     val rate: T
@@ -213,10 +213,10 @@ data class DirectDamageMetadataBuilder(
         return build()
     }
 
-    fun build(): DamageMetadata {
+    private fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = ElementRegistry.INSTANCES[element]
+            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -238,7 +238,7 @@ data class VanillaDamageMetadataBuilder(
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
-    val element: Element,
+    val element: RegistryEntry<ElementType>,
     val rate: Double = 1.0,
     val defensePenetration: Double = 0.0,
     val defensePenetrationRate: Double = 0.0,
@@ -268,7 +268,7 @@ data class AttributeDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
-) : DamageMetadataBuilder<Double>, KoinComponent {
+) : DamageMetadataBuilder<Double> {
     override fun build(event: EntityDamageEvent): DamageMetadata {
         val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null"
@@ -300,7 +300,7 @@ data class DirectDamageTagsBuilder(
 data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: String,
+    override val element: RegistryEntry<ElementType>,
     @Required
     override val min: Double,
     @Required
@@ -311,8 +311,7 @@ data class DirectDamagePacketBuilder(
 ) : DamagePacketBuilder<Double> {
 
     override fun build(): DamagePacket {
-        val element = ElementRegistry.INSTANCES[element]
-        return DamagePacket(element, min, max, rate, defensePenetration, defensePenetrationRate)
+        return DamagePacket(element.value, min, max, rate, defensePenetration, defensePenetrationRate)
     }
 }
 
@@ -348,7 +347,7 @@ data class MolangDamageMetadataBuilder(
     fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = ElementRegistry.INSTANCES[element]
+            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -361,7 +360,7 @@ data class MolangDamageMetadataBuilder(
 data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: String,
+    override val element: RegistryEntry<ElementType>,
     @Required
     override val min: Evaluable<*>,
     @Required
@@ -375,7 +374,7 @@ data class MolangDamagePacketBuilder(
 ) : DamagePacketBuilder<Evaluable<*>> {
     override fun build(): DamagePacket {
         val engine = MochaEngine.createStandard()
-        val element = ElementRegistry.INSTANCES[element]
+        val element = element.value
         val min = min.evaluate(engine)
         val max = max.evaluate(engine)
         val rate = rate.evaluate(engine)

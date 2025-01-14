@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
@@ -44,12 +44,17 @@ class ItemParser<C : Any> : AggregateParser<C, NekoItem> {
     override fun mapper(): AggregateResultMapper<C, NekoItem> {
         return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val namespace = aggregateCommandContext.get<String>("namespace")
+            if (namespace == Identifier.MINECRAFT_NAMESPACE) {
+                // 禁止获取原版套皮物品
+                return@agg ArgumentParseResult.failureFuture(ItemParseException(commandContext))
+            }
+
             val path = aggregateCommandContext.get<String>("path")
-            val item = ItemRegistry.CUSTOM.getOrNull(Key.key(namespace, path))
+            val item = KoishRegistries.ITEM["$namespace:$path"]
             if (item == null) {
-                ArgumentParseResult.failureFuture(ItemParseException(commandContext))
+                return@agg ArgumentParseResult.failureFuture(ItemParseException(commandContext))
             } else {
-                ArgumentParseResult.successFuture(item)
+                return@agg ArgumentParseResult.successFuture(item)
             }
         }
     }

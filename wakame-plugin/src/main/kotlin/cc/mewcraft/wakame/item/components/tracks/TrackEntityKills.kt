@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key

@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
@@ -10,9 +9,9 @@ import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.core.qualifier.named
@@ -58,13 +57,12 @@ internal object MergingTableSerializer : KoinComponent {
         require(tableDir.isDirectory) { "not a directory: '$tableDir'" }
 
         val tableMainConfigFile = tableDir.resolve("config.yml")
-        val tableMainConfigNode = yamlConfig {
+        val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 kregister(CoreMatchRuleSerializer)
                 kregister(CoreMatchRuleContainerSerializer)
                 kregister(RarityNumberMappingSerializer)
-                registerAnnotatedObjects(ObjectMappers.DEFAULT)
             }
         }.buildAndLoadString(tableMainConfigFile.readText())
 

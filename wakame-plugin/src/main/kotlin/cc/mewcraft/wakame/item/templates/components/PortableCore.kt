@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.templates.components
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -9,14 +11,10 @@ import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
-import cc.mewcraft.wakame.molang.EVALUABLE_SERIALIZERS
-import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -39,7 +37,7 @@ data class PortableCore(
         }
     }
 
-    private data class Codec(override val id: String) : ItemTemplateType<PortableCore>, KoinComponent {
+    private data class Codec(override val id: String) : ItemTemplateType<PortableCore> {
         override val type: TypeToken<PortableCore> = typeTokenOf()
 
         /**
@@ -56,8 +54,7 @@ data class PortableCore(
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
                 .kregister(CoreArchetypeSerializer)
-                .registerAll(get(named(ABILITY_EXTERNALS))) // 技能, 部分核心会用到
-                .registerAll(get(named(EVALUABLE_SERIALIZERS))) // 可计算值, 部分核心会用到
+                .registerAll(Injector.get(named(ABILITY_EXTERNALS))) // 技能, 部分核心会用到
                 .build()
         }
     }

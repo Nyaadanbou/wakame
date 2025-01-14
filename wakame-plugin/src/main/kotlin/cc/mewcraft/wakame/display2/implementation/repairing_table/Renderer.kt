@@ -8,8 +8,13 @@ import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
 import cc.mewcraft.wakame.display2.implementation.RenderingHandler
 import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.isClientSide
-import cc.mewcraft.wakame.util.lore0
+import cc.mewcraft.wakame.util.itemLore
 import cc.mewcraft.wakame.util.showNothing
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
@@ -25,11 +30,25 @@ internal class RepairingTableItemRendererLayout : AbstractRendererLayout(Repairi
 
 internal data class RepairingTableItemRendererContext(val damage: Int, val maxDamage: Int, val repairCost: Double)
 
+@Init(
+    stage = InitStage.POST_WORLD
+)
+@Reload
 internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()
     private val textAssembler: TextAssembler = TextAssembler(layout)
+
+    @InitFun
+    private fun init() {
+        initialize0()
+    }
+
+    @ReloadFun
+    private fun reload() {
+        initialize0()
+    }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
         RepairingTableRenderingHandlerRegistry.bootstrap()
@@ -50,7 +69,7 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
         RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
-        item.lore0 = textAssembler.assemble(collector)
+        item.itemLore = textAssembler.assemble(collector)
 
         // 渲染其他可见部分
         item.showNothing()

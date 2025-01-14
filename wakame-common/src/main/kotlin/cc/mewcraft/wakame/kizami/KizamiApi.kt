@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.BiIdentifiable
-import cc.mewcraft.wakame.FriendlyNamed
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.core.NumberRepresentable
+import cc.mewcraft.wakame.core.PlayerFriendlyNamed
+import cc.mewcraft.wakame.core.StringRepresentable
 import net.kyori.examination.Examinable
 import org.jetbrains.annotations.ApiStatus
-
 
 /**
  * 代表一个铭刻类型.
  */
-interface Kizami : Keyed, Examinable, FriendlyNamed, BiIdentifiable<String, Byte>
+interface Kizami : Keyed, Examinable, PlayerFriendlyNamed, StringRepresentable, NumberRepresentable
 
 /**
  * 用于获取 [Kizami] 的实例.

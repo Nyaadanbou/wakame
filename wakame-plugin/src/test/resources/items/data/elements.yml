@@ -8,11 +8,11 @@ elements:
   filters: [ ]
   # 抽出来的元素一定是下面 4 个中的 2 个
   entries:
-    - type: element:neutral
+    - type: neutral
       weight: 2
-    - type: element:water
+    - type: water
       weight: 1
-    - type: element:fire
+    - type: fire
       weight: 1
-    - type: element:wind
+    - type: wind
       weight: 1

@@ -9,9 +9,9 @@ kizamiz:
       - type: item:rarity
         rarity: rare
     entries:
-      - type: kizami:wind_lace
+      - type: wind_lace
         weight: 2
-      - type: kizami:antigravity
+      - type: antigravity
         weight: 1
   # 第二个随机池
   pool_b:
@@ -20,9 +20,9 @@ kizamiz:
       - type: item:rarity
         rarity: uncommon
     entries:
-      - type: kizami:berserker
+      - type: berserker
         weight: 3
-      - type: kizami:guarding
+      - type: guarding
         weight: 2
   # 第三个随机池
   pool_c:
@@ -31,7 +31,7 @@ kizamiz:
       - type: item:rarity
         rarity: common
     entries:
-      - type: kizami:magic_affinity
+      - type: magic_affinity
         weight: 5
-      - type: kizami:vitality
+      - type: vitality
         weight: 4

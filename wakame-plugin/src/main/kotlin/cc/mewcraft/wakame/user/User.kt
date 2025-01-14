@@ -1,10 +1,12 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package cc.mewcraft.wakame.user
 
+import cc.mewcraft.wakame.ability.state.AbilityState
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import cc.mewcraft.wakame.resource.ResourceMap
-import cc.mewcraft.wakame.ability.state.AbilityState
 import java.util.UUID
 
 /**
@@ -21,6 +23,13 @@ interface User<P> {
      * The backing player.
      */
     val player: P
+
+    /**
+     * The backing player.
+     */
+    fun <T> player(): T {
+        return player as T // let the runtime check the type
+    }
 
     /**
      * The UUID of the user.

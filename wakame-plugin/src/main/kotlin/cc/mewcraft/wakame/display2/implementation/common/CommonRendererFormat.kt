@@ -9,7 +9,8 @@ import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.rarity.Rarity
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList
@@ -45,8 +46,8 @@ internal data class ExtraLoreRendererFormat(
     fun render(data: List<Component>): IndexedText {
         val size = tooltip.header.size + data.size + tooltip.bottom.size
         val lines = data.mapTo(ObjectArrayList(size)) { MM.deserialize(tooltip.line, component("line", it)) }
-        val header = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
-        val bottom = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val header: List<Component> = tooltip.header.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.header.size), MM::deserialize) ?: ObjectImmutableList.of()
+        val bottom: List<Component> = tooltip.bottom.takeUnlessEmpty()?.mapTo(ObjectArrayList(tooltip.bottom.size), MM::deserialize) ?: ObjectImmutableList.of()
         lines.addAll(0, header)
         lines.addAll(bottom)
         return SimpleIndexedText(index, lines)
@@ -100,23 +101,23 @@ internal data class RarityRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun renderSimple(rarity: Rarity): IndexedText {
+    fun renderSimple(rarity: RegistryEntry<RarityType>): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     simple,
-                    component("rarity_display_name", rarity.displayName)
+                    component("rarity_display_name", rarity.value.displayName)
                 )
             )
         )
     }
 
-    fun renderComplex(rarity: Rarity, modCount: Int): IndexedText {
+    fun renderComplex(rarity: RegistryEntry<RarityType>, modCount: Int): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     complex,
-                    component("rarity_display_name", rarity.displayName),
+                    component("rarity_display_name", rarity.value.displayName),
                     component("reforge_mod_count", Component.text(modCount.toString()))
                 )
             )

@@ -24,54 +24,54 @@ interface AttributeProvider {
             instance = null
         }
 
-        override fun getSingleton(descriptionId: String): Attribute? {
-            return instance().getSingleton(descriptionId)
+        override fun get(id: String): Attribute? {
+            return instance().get(id)
         }
 
-        override fun getComposition(compositionId: String): Collection<Attribute> {
-            return instance().getComposition(compositionId)
+        override fun getList(id: String): Collection<Attribute> {
+            return instance().getList(id)
         }
 
-        override fun isElementalByDescriptionId(descriptionId: String): Boolean {
-            return instance().isElementalByDescriptionId(descriptionId)
+        override fun isElementalById(id: String): Boolean {
+            return instance().isElementalById(id)
         }
 
-        override fun isElementalByCompositionId(compositionId: String): Boolean {
-            return instance().isElementalByCompositionId(compositionId)
+        override fun isElementalByBundleId(bundleId: String): Boolean {
+            return instance().isElementalByBundleId(bundleId)
         }
     }
 
     /**
-     * Gets an [Attribute] by its [descriptionId].
+     * Gets an [Attribute] by its [id].
      */
-    fun getSingleton(descriptionId: String): Attribute?
+    fun get(id: String): Attribute?
 
     /**
-     * Gets a collection of [Attribute]s by [compositionId].
+     * Gets a collection of [Attribute]s by [id].
      *
-     * **Remember that different [Attribute] instances may have the same composition id!**
+     * **Remember that different [Attribute] instances may have the same bundle id!**
      *
      * The returned list may contain zero or more attributes:
-     * - `=0`: the composition is not registered
-     * - `=1`: the composition is bound to exactly one attribute
-     * - `>1`: the composition is bound to more than one attributes
+     * - `=0`: the bundle id is not registered
+     * - `=1`: the bundle id is bound to exactly one attribute
+     * - `>1`: the bundle id is bound to more than one attributes
      *
      * ## Side notes
      *
      * This function is primarily used by the config deserializer.
      *
-     * @param compositionId the composition id
+     * @param id the bundle id
      * @return zero or more attributes
      */
-    fun getComposition(compositionId: String): Collection<Attribute>
+    fun getList(id: String): Collection<Attribute>
 
     /**
-     * 检查 [descriptionId] 是否是一个元素属性.
+     * 检查 [id] 是否是一个元素属性.
      */
-    fun isElementalByDescriptionId(descriptionId: String): Boolean
+    fun isElementalById(id: String): Boolean
 
     /**
-     * 检查 [compositionId] 是否是一个元素属性.
+     * 检查 [bundleId] 是否是一个元素属性.
      */
-    fun isElementalByCompositionId(compositionId: String): Boolean
+    fun isElementalByBundleId(bundleId: String): Boolean
 }

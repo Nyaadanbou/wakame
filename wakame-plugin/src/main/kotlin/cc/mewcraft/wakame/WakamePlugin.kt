@@ -18,20 +18,15 @@ import cc.mewcraft.wakame.display2.display2Module
 import cc.mewcraft.wakame.ecs.ecsModule
 import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
-import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
-import cc.mewcraft.wakame.initializer.Initializer
-import cc.mewcraft.wakame.initializer.initializerModule
+import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.kizami.kizamiModule
 import cc.mewcraft.wakame.lang.langModule
-import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.player.playerModule
 import cc.mewcraft.wakame.random3.randomModule
-import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
@@ -39,7 +34,6 @@ import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.test.testModule
 import cc.mewcraft.wakame.user.userModule
-import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.world.worldModule
 import me.lucko.helper.plugin.KExtendedJavaPlugin
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger
@@ -49,10 +43,10 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.context.stopKoin
 
 val NEKO: WakamePlugin
-    get() = requireNotNull(WakamePlugin.instance) { "plugin is not initialized yet" }
+    get() = requireNotNull(WakamePlugin.INSTANCE) { "plugin is not initialized yet" }
 
 val LOGGER: ComponentLogger
-    get() = if (RunningEnvironment.PRODUCTION.isRunning()) {
+    get() = if (!SharedConstants.IS_RUNNING_IN_IDE) {
         NEKO.componentLogger
     } else {
         ComponentLogger.logger("Test")
@@ -63,14 +57,15 @@ val SERVER: Server
 
 class WakamePlugin : KExtendedJavaPlugin() {
     companion object {
-        var instance: WakamePlugin? = null
+        @JvmField
+        var INSTANCE: WakamePlugin? = null
     }
 
     val version = pluginMeta.version
     val nekooJar = file
 
     override suspend fun load() {
-        instance = this
+        INSTANCE = this
 
         // Start Koin container
         startKoin {
@@ -90,19 +85,14 @@ class WakamePlugin : KExtendedJavaPlugin() {
                 ecsModule(),
                 elementModule(),
                 enchantmentModule(),
-                entityModule(),
                 guiModule(),
-                initializerModule(),
                 integrationModule(),
                 itemModule(),
-                kizamiModule(),
                 langModule(),
-                molangModule(),
                 packetModule(),
                 packModule(),
                 playerModule(),
                 randomModule(),
-                rarityModule(),
                 recipeModule(),
                 reforgeModule(),
                 registryModule(),
@@ -131,7 +121,7 @@ class WakamePlugin : KExtendedJavaPlugin() {
     override suspend fun disable() {
         Initializer.disable()
         stopKoin()
-        instance = null
+        INSTANCE = null
         NekooProvider.unregister()
     }
 }

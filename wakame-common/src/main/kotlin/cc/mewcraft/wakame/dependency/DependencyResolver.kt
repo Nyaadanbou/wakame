@@ -34,7 +34,7 @@ object DependencyResolver {
     /**
      * @throws CircularDependencyException
      */
-    private fun <T : Any> topologicalSort(graph: Graph<T>): List<T> {
+    fun <T : Any> topologicalSort(graph: Graph<T>): List<T> {
         val visited = mutableSetOf<T>()
         val tempMarks = mutableSetOf<T>()
         val pathStack = mutableListOf<T>()

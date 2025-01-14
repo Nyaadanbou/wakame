@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.entity.EntityKeyLookup
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
@@ -10,6 +9,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.item.toNekoStack
+import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity

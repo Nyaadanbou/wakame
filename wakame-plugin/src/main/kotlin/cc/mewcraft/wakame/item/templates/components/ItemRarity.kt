@@ -1,11 +1,17 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.rarity.LevelMappings
-import cc.mewcraft.wakame.rarity.Rarity
-import cc.mewcraft.wakame.registry.LevelMappingRegistry
-import cc.mewcraft.wakame.registry.RarityRegistry
+import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateBridge
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.rarity.LevelRarityMapping
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -17,11 +23,11 @@ data class ItemRarity(
     /**
      * The default rarity held in this schema.
      */
-    private val static: Rarity? = null,
+    private val static: RegistryEntry<RarityType>? = null,
     /**
      * The mappings used to generate the rarity.
      */
-    private val dynamic: LevelMappings? = null,
+    private val dynamic: RegistryEntry<LevelRarityMapping>? = null,
 ) : ItemTemplate<ItemRarityData> {
 
     /**
@@ -45,7 +51,7 @@ data class ItemRarity(
             ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
         }
 
-        val rarity: Rarity?
+        val rarity: RegistryEntry<RarityType>?
 
         when {
             // use static rarity
@@ -57,7 +63,7 @@ data class ItemRarity(
             dynamic != null -> {
                 val level = context.level
                 if (level != null) {
-                    rarity = dynamic.pick(level.toInt(), context.random)
+                    rarity = dynamic.value.pick(level.toInt(), context.random)
                 } else {
                     rarity = null
                     warnNullItemLevel()
@@ -68,7 +74,7 @@ data class ItemRarity(
             else -> {
                 val level = context.level
                 if (level != null) {
-                    rarity = LevelMappingRegistry.INSTANCES[LevelMappingRegistry.GLOBAL_NAME].pick(level.toInt(), context.random)
+                    rarity = KoishRegistries.LEVEL_RARITY_MAPPING.getDefaultEntry().value.pick(level.toInt(), context.random)
                 } else {
                     rarity = null
                     warnNullItemLevel()
@@ -117,11 +123,11 @@ data class ItemRarity(
             val string = node.krequire<String>()
             return when {
                 string.startsWith(MAPPING_PREFIX) -> ItemRarity(
-                    dynamic = LevelMappingRegistry.INSTANCES[string.substringAfter(MAPPING_PREFIX)],
+                    dynamic = KoishRegistries.LEVEL_RARITY_MAPPING.createEntry(string.substringAfter(MAPPING_PREFIX)),
                 )
 
                 string.startsWith(RARITY_PREFIX) -> ItemRarity(
-                    static = RarityRegistry.INSTANCES[string.substringAfter(RARITY_PREFIX)]
+                    static = KoishRegistries.RARITY.createEntry(string.substringAfter(RARITY_PREFIX))
                 )
 
                 else -> throw SerializationException("Can't parse rarity value '$string'")

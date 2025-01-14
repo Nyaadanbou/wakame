@@ -1,32 +1,37 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.ReloadDependency
-import cc.mewcraft.wakame.registry.ItemRegistry
-import cc.mewcraft.wakame.util.NamespacedPathCollector
-import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.koin.core.qualifier.named
 import java.io.File
 
-@ReloadDependency(
-    runBefore = [ItemRegistry::class]
+@Init(
+    stage = InitStage.POST_WORLD,
 )
-internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
-    private const val RECIPE_DIR_NAME = "station/recipes"
+@Reload(
+    runAfter = [ItemRegistryConfigStorage::class],
+)
+internal object CraftingStationRecipeRegistry {
+    private const val RECIPE_DIR_PATH = "station/recipes"
 
     @VisibleForTesting
     val raw: MutableMap<Key, Recipe> = mutableMapOf()
@@ -37,19 +42,29 @@ internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
         return recipes[key]
     }
 
+    @InitFun
+    fun load() {
+        loadDataIntoRegistry()
+        registerStationRecipes()
+    }
+
+    @ReloadFun
+    fun reload() {
+        loadDataIntoRegistry()
+        registerStationRecipes()
+    }
+
     @VisibleForTesting
-    fun loadConfig() {
+    fun loadDataIntoRegistry() {
         raw.clear()
 
-        val recipeDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_NAME)
-        val namespacedPaths = NamespacedPathCollector(recipeDir, true).collect("yml")
-        namespacedPaths.forEach {
-            val file = it.file
+        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()
-                val key = Key.key(it.namespace, it.path)
+                val key = Key.key(namespace, path)
 
-                val recipeNode = yamlConfig {
+                val recipeNode = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
                         kregister(StationRecipeSerializer)
@@ -68,15 +83,13 @@ internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
 
             } catch (e: Throwable) {
                 val message = "Can't load station recipe: '${file.relativeTo(recipeDir)}'"
-                if (RunningEnvironment.TEST.isRunning()) {
-                    throw IllegalArgumentException(message, e)
-                }
+                Util.pauseInIde(IllegalArgumentException(message, e))
                 LOGGER.warn(message, e)
             }
         }
     }
 
-    private fun registerRecipes() {
+    private fun registerStationRecipes() {
         raw.forEach { (key, recipe) ->
             if (recipe.valid()) {
                 recipes[key] = recipe
@@ -87,15 +100,5 @@ internal object CraftingStationRecipeRegistry : Initializable, KoinComponent {
 
         LOGGER.info("Registered station recipes: {}", recipes.keys.joinToString())
         LOGGER.info("Registered ${recipes.size} station recipes")
-    }
-
-    override fun onPostWorld() {
-        loadConfig()
-        registerRecipes()
-    }
-
-    override fun onReload() {
-        loadConfig()
-        registerRecipes()
     }
 }

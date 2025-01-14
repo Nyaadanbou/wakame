@@ -3,7 +3,11 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -12,6 +16,10 @@ import org.intellij.lang.annotations.Pattern
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.immutable.orElse
 import java.util.stream.Stream
+
+internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
+
+internal val GLOBAL_ATTRIBUTE_CONFIG by lazy { Configs.YAML[AttributeBundleFacadeRegistryConfigStorage.FILE_PATH] }
 
 /**
  * An attribute type with a numerical default value.
@@ -22,8 +30,8 @@ import java.util.stream.Stream
  * are generally used as conceptual types. Instead, use the singleton [Attributes]
  * to get the instances. The same also applies to its subtypes.
  *
- * @property compositionId 组合属性的唯一标识
- * @property descriptionId 单个属性的唯一标识
+ * @property bundleId 组合属性的唯一标识
+ * @property id 单个属性的唯一标识
  * @property defaultValue 属性的默认数值 (非 [Provider])
  * @property vanilla 属性是否由原版属性实现
  *
@@ -35,13 +43,17 @@ open class SimpleAttribute
  * @param defaultValue 属性的默认数值 ([Provider])
  */
 protected constructor(
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
-    final override val compositionId: String,
-    @Pattern(AttributeSupport.ATTRIBUTE_ID_PATTERN_STRING)
-    final override val descriptionId: String,
+    @Pattern(ATTRIBUTE_ID_PATTERN_STRING)
+    final override val id: String,
+    @Pattern(ATTRIBUTE_ID_PATTERN_STRING)
+    final override val bundleId: String,
     defaultValue: Provider<Double>,
     final override val vanilla: Boolean = false,
 ) : Examinable, Attribute {
+
+    init {
+        KoishRegistries.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
+    }
 
     // 需要注意 (kotlin 委托基础)
     // 当一个 property 将值委托给 provider 时，其返回的是 provider 的值，而不是 provider
@@ -58,29 +70,29 @@ protected constructor(
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [compositionId] is different from the [descriptionId].
+     * This constructor is used if the [bundleId] is different from the [id].
      *
-     * @param compositionId the ID of the composite attribute to which this attribute is related
+     * @param bundleId the bundle id of attribute to which this attribute is related
      */
     internal constructor(
-        compositionId: String,
-        descriptionId: String,
+        id: String,
+        bundleId: String,
         defaultValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = compositionId,
-        descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
+        id = id,
+        bundleId = bundleId,
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", "default").orElse(defaultValue),
         vanilla = vanilla
     )
 
     internal constructor(
-        descriptionId: String,
+        id: String,
         defaultValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = descriptionId,
-        descriptionId = descriptionId,
+        id = id,
+        bundleId = id,
         defaultValue = defaultValue,
         vanilla = vanilla,
     )
@@ -89,11 +101,11 @@ protected constructor(
         return value
     }
 
-    override val key: Key = Key.key(Namespaces.ATTRIBUTE, descriptionId)
+    override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("descriptionId", descriptionId),
+            ExaminableProperty.of("descriptionId", id),
             ExaminableProperty.of("defaultValue", defaultValue),
             ExaminableProperty.of("vanilla", vanilla),
         )
@@ -103,12 +115,12 @@ protected constructor(
         if (this === other)
             return true
         if (other is Attribute)
-            return descriptionId == other.descriptionId
+            return id == other.id
         return false
     }
 
     override fun hashCode(): Int {
-        return descriptionId.hashCode()
+        return id.hashCode()
     }
 
     override fun toString(): String {
@@ -128,36 +140,36 @@ open class RangedAttribute
  * @param maxValue 该属性允许的最大数值（[Provider]）
  */
 protected constructor(
-    compositionId: String,
-    descriptionId: String,
+    id: String,
+    bundleId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
     vanilla: Boolean = false,
-) : SimpleAttribute(compositionId, descriptionId, defaultValue, vanilla) {
+) : SimpleAttribute(id, bundleId, defaultValue, vanilla) {
     val minValue: Double by minValue
     val maxValue: Double by maxValue
 
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [compositionId] is different from the [descriptionId].
+     * This constructor is used if the [bundleId] is different from the [id].
      *
-     * @param compositionId the ID of the composite attribute to which this attribute is related
+     * @param bundleId the bundle id of attribute to which this attribute is related
      */
     internal constructor(
-        compositionId: String,
-        descriptionId: String,
+        id: String,
+        bundleId: String,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = compositionId,
-        descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", "max").orElse(maxValue),
+        id = id,
+        bundleId = bundleId,
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", "default").orElse(defaultValue),
+        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", "min").orElse(minValue),
+        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", "max").orElse(maxValue),
         vanilla = vanilla
     )
 
@@ -168,8 +180,8 @@ protected constructor(
         maxValue: Double,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = descriptionId,
-        descriptionId = descriptionId,
+        id = descriptionId,
+        bundleId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,
         maxValue = maxValue,
@@ -208,32 +220,32 @@ protected constructor(
         if (this === other)
             return true
         if (other is RangedAttribute)
-            return descriptionId == other.descriptionId /* && element == other.element */
+            return this@RangedAttribute.id == other.id /* && element == other.element */
         return false
     }
 
     override fun hashCode(): Int {
-        val result = descriptionId.hashCode()
+        val result = this@RangedAttribute.id.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }
 }
 
 /**
- * An [Attribute] type with an [Element].
+ * An [Attribute] type with an [ElementType].
  */
 open class ElementAttribute
 protected constructor(
-    compositionId: String,
-    descriptionId: String,
+    id: String,
+    bundleId: String,
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    val element: Element, // TODO 用 Holder 封装
+    val element: RegistryEntry<ElementType>,
     vanilla: Boolean = false,
 ) : RangedAttribute(
-    compositionId + ELEMENT_SEPARATOR + element.uniqueId,
-    descriptionId + ELEMENT_SEPARATOR + element.uniqueId,
+    id + ELEMENT_SEPARATOR + element.getIdAsString(),
+    bundleId + ELEMENT_SEPARATOR + element.getIdAsString(),
     defaultValue,
     minValue,
     maxValue,
@@ -255,24 +267,24 @@ protected constructor(
     /**
      * Instantiates the type using the global attribute config as value providers.
      *
-     * This constructor is used if the [compositionId] is different from the [descriptionId].
+     * This constructor is used if the [bundleId] is different from the [id].
      *
-     * @param compositionId the ID of the composite attribute to which this attribute is related
+     * @param bundleId the bundle id of attribute to which this attribute is related
      */
     internal constructor(
-        compositionId: String,
-        descriptionId: String,
+        id: String,
+        bundleId: String,
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Element,
+        element: RegistryEntry<ElementType>,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = compositionId,
-        descriptionId = descriptionId,
-        defaultValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.uniqueId, "default").orElse(defaultValue),
-        minValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.uniqueId, "min").orElse(minValue),
-        maxValue = AttributeSupport.GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(compositionId, "values", element.uniqueId, "max").orElse(maxValue),
+        id = id,
+        bundleId = bundleId,
+        defaultValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", element.getIdAsString(), "default").orElse(defaultValue),
+        minValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", element.getIdAsString(), "min").orElse(minValue),
+        maxValue = GLOBAL_ATTRIBUTE_CONFIG.optionalEntry<Double>(bundleId, "values", element.getIdAsString(), "max").orElse(maxValue),
         element = element,
         vanilla = vanilla
     )
@@ -282,11 +294,11 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: Element,
+        element: RegistryEntry<ElementType>,
         vanilla: Boolean = false,
     ) : this(
-        compositionId = descriptionId,
-        descriptionId = descriptionId,
+        id = descriptionId,
+        bundleId = descriptionId,
         defaultValue = defaultValue,
         minValue = minValue,
         maxValue = maxValue,
@@ -298,7 +310,7 @@ protected constructor(
         return Stream.concat(
             super.examinableProperties(),
             Stream.of(
-                ExaminableProperty.of("element", element.uniqueId)
+                ExaminableProperty.of("element", element)
             )
         )
     }
@@ -307,12 +319,12 @@ protected constructor(
         if (this === other)
             return true
         if (other is ElementAttribute)
-            return descriptionId == other.descriptionId /* && element == other.element */
+            return this@ElementAttribute.id == other.id /* && element == other.element */
         return false
     }
 
     override fun hashCode(): Int {
-        val result = descriptionId.hashCode()
+        val result = this@ElementAttribute.id.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }

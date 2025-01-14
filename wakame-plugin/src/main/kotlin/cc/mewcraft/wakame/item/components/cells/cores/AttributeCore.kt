@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.attribute.composite.ConstantCompositeAttribute
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreConstants
-import cc.mewcraft.wakame.registry.AttributeRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
@@ -14,7 +14,7 @@ import org.spongepowered.configurate.ConfigurationNode
 val Cell.attributeCore: AttributeCore?
     get() = getCore() as? AttributeCore
 
-val Cell.attribute: ConstantCompositeAttribute?
+val Cell.attribute: ConstantAttributeBundle?
     get() = attributeCore?.attribute
 
 /**
@@ -27,7 +27,7 @@ val Cell.attribute: ConstantCompositeAttribute?
  */
 fun AttributeCore(
     id: Key,
-    attribute: ConstantCompositeAttribute,
+    attribute: ConstantAttributeBundle,
 ): AttributeCore = SimpleAttributeCore(
     id = id,
     attribute = attribute,
@@ -36,7 +36,7 @@ fun AttributeCore(
 /**
  * 本函数用于从 NBT 构建 [AttributeCore].
  *
- * 参考 [ConstantCompositeAttribute] 来了解给定的 [CompoundTag] 需要满足的结构.
+ * 参考 [ConstantAttributeBundle] 来了解给定的 [CompoundTag] 需要满足的结构.
  *
  * @param id 核心的唯一标识, 也就是 [Core.id]
  * @param nbt 包含该核心数据的 NBT
@@ -48,13 +48,13 @@ fun AttributeCore(
     nbt: CompoundTag,
 ): AttributeCore = SimpleAttributeCore(
     id = id,
-    attribute = AttributeRegistry.FACADES[id.value()].convertNBT2Constant(nbt),
+    attribute = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNbtToConstant(nbt),
 )
 
 /**
  * 本函数用于从配置文件构建 [AttributeCore].
  *
- * 参考 [ConstantCompositeAttribute] 来了解给定的 [ConfigurationNode] 需要满足的结构.
+ * 参考 [ConstantAttributeBundle] 来了解给定的 [ConfigurationNode] 需要满足的结构.
  *
  * @param id 核心的唯一标识, 也就是 [Core.id]
  * @param node 包含该核心数据的配置节点
@@ -66,7 +66,7 @@ fun AttributeCore(
     node: ConfigurationNode,
 ): AttributeCore = SimpleAttributeCore(
     id = id,
-    attribute = AttributeRegistry.FACADES[id.value()].convertNode2Constant(node),
+    attribute = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNodeToConstant(node),
 )
 
 /**
@@ -74,7 +74,7 @@ fun AttributeCore(
  */
 internal data class SimpleAttributeCore(
     override val id: Key,
-    override val attribute: ConstantCompositeAttribute,
+    override val attribute: ConstantAttributeBundle,
 ) : AttributeCore {
     override val displayName: Component
         get() = attribute.displayName

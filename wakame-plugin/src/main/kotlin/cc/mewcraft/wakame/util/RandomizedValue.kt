@@ -152,7 +152,7 @@ data class RandomizedValue(
          * @return an instance
          */
         fun create(node: ConfigurationNode): RandomizedValue {
-            return NumericValueSerializer.deserialize(javaTypeOf<RandomizedValue>(), node)
+            return RandomizedValueSerializer.deserialize(javaTypeOf<RandomizedValue>(), node)
         }
     }
 
@@ -238,7 +238,7 @@ data class RandomizedValue(
     }
 }
 
-internal object NumericValueSerializer : TypeSerializer<RandomizedValue> {
+internal object RandomizedValueSerializer : TypeSerializer<RandomizedValue> {
     override fun deserialize(type: Type, node: ConfigurationNode): RandomizedValue {
         val scalar = node.rawScalar()
         if (scalar != null) {

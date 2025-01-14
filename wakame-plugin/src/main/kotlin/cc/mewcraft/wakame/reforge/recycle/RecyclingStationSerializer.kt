@@ -2,20 +2,18 @@ package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.config.configurate.ObjectMappers
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.Reforge
-import cc.mewcraft.wakame.util.NamespacedPathCollector
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.yamlConfig
 import net.kyori.adventure.key.Key
 import org.koin.core.qualifier.named
 import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
-import org.spongepowered.configurate.kotlin.objectMapperFactory
 import java.io.File
 
 internal object RecyclingStationSerializer {
@@ -31,31 +29,29 @@ internal object RecyclingStationSerializer {
             .resolve(ROOT_DIR_NAME)
             .resolve(ITEMS_DIR_NAME)
 
-        val collector = NamespacedPathCollector(itemsDirectory, true)
-        val itemFiles = collector.collect("yml")
-
-        val yamlLoader = yamlConfig {
+        val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                registerAnnotatedObjects(ObjectMappers.DEFAULT)
                 kregister(PriceInstanceSerializer)
                 kregister(PriceModifierSerializer)
             }
         }
 
-        val result = itemFiles.mapNotNull { (f, ns, ps) ->
-            val itemKey = Key.key(ns, ps)
-            val rootNode = yamlLoader.buildAndLoadString(f.readText())
+        val itemFiles = NamespacedFileTreeWalker(itemsDirectory, "yml", true)
+        val result = itemFiles
+            .mapNotNull { (file, namespace, path) ->
+                val itemKey = Key.key(namespace, path)
+                val rootNode = yamlLoader.buildAndLoadString(file.readText())
 
-            // 反序列化配置文件
-            val priceInstance = rootNode.get<PriceInstance>() ?: run {
-                logger.warn("Failed to load price instance for item: $itemKey")
-                return@mapNotNull null
-            }
+                // 反序列化配置文件
+                val priceInstance = rootNode.get<PriceInstance>() ?: run {
+                    logger.warn("Failed to load price instance for item: $itemKey")
+                    return@mapNotNull null
+                }
 
-            // 构建映射
-            itemKey to priceInstance
-        }.toMap()
+                // 构建映射
+                itemKey to priceInstance
+            }.toMap()
 
         return result
     }
@@ -66,11 +62,8 @@ internal object RecyclingStationSerializer {
             .resolve(ROOT_DIR_NAME)
             .resolve(STATIONS_DIR_NAME)
 
-        val yamlLoader = yamlConfig {
+        val yamlLoader = buildYamlConfigLoader {
             withDefaults()
-            serializers {
-                registerAnnotatedObjects(objectMapperFactory())
-            }
         }
 
         val result = tablesDirectory.walk()

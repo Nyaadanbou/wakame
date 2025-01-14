@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.DerivedOrdinal
@@ -11,7 +13,7 @@ import cc.mewcraft.wakame.display2.SourceOrdinal
 import cc.mewcraft.wakame.display2.StaticIndexedText
 import cc.mewcraft.wakame.display2.StaticTextMeta
 import cc.mewcraft.wakame.display2.TextMeta
-import cc.mewcraft.wakame.util.yamlConfig
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
@@ -19,9 +21,6 @@ import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -30,7 +29,7 @@ import kotlin.io.path.readText
 
 internal abstract class AbstractRendererLayout(
     protected val renderer: AbstractItemRenderer<*, *>,
-) : RendererLayout, KoinComponent {
+) : RendererLayout {
 
     companion object Shared {
         val UNPROCESSED_PRIMARY_LINE_PATTERN = "^(?>\\((.+?)\\))?(.*)$".toPattern()
@@ -39,8 +38,7 @@ internal abstract class AbstractRendererLayout(
     override val staticIndexedTextList: ArrayList<IndexedText> = ArrayList()
     override val defaultIndexedTextList: ArrayList<IndexedText> = ArrayList()
 
-    protected val mm = get<MiniMessage>()
-    protected val logger = get<Logger>()
+    protected val mm = Injector.get<MiniMessage>()
 
     // derived index (key) -> ordinal (int)
     private val indexedTextOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
@@ -73,9 +71,9 @@ internal abstract class AbstractRendererLayout(
     fun initialize(layoutPath: Path) {
         reset()
 
-        val root = yamlConfig { withDefaults() }.buildAndLoadString(layoutPath.readText())
+        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
 
-        val unprocessedPrimary = root.node("primary").getList<String>(listOf())
+        val unprocessedPrimary = rootNode.node("primary").getList<String>(listOf())
 
         // accumulative offset of the [DerivedIndex]
         var accIndexOffset = 0
@@ -122,7 +120,7 @@ internal abstract class AbstractRendererLayout(
     private fun createTextMeta(unprocessedLine: String, sourceOrdinal: SourceOrdinal): TextMeta? {
         val matcher = UNPROCESSED_PRIMARY_LINE_PATTERN.matcher(unprocessedLine)
         if (!matcher.matches()) {
-            logger.warn("Invalid line: '$unprocessedLine'")
+            LOGGER.warn("Invalid line: '$unprocessedLine'")
             return null
         }
 
@@ -167,7 +165,7 @@ internal abstract class AbstractRendererLayout(
                                 }
 
                                 else -> {
-                                    logger.warn("Invalid default text while reading line '$unprocessedLine'")
+                                    LOGGER.warn("Invalid default text while reading line '$unprocessedLine'")
                                     return null
                                 }
                             }
@@ -196,7 +194,7 @@ internal abstract class AbstractRendererLayout(
     private fun createTextMeta0(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): TextMeta? {
         val factory = renderer.formats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
         if (factory == null) {
-            logger.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
+            LOGGER.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
             return null
         }
         return factory.create(sourceIndex, sourceOrdinal, defaultText)
@@ -206,7 +204,7 @@ internal abstract class AbstractRendererLayout(
         try {
             return Key.key(unprocessed)
         } catch (_: InvalidKeyException) {
-            logger.warn("Invalid source index while reading line '$unprocessed'")
+            LOGGER.warn("Invalid source index while reading line '$unprocessed'")
             return null
         }
     }
@@ -223,7 +221,7 @@ internal abstract class AbstractRendererLayout(
     override fun <T : TextMeta> getMetadata(index: DerivedIndex): T? {
         val ret = indexedTextMetadataMap[index]
         if (ret == null) {
-            logger.warn("Can't find metadata for derived index '$index'")
+            LOGGER.warn("Can't find metadata for derived index '$index'")
         }
         return ret as T?
     }

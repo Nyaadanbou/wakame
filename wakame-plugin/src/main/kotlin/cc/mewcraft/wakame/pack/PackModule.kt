@@ -1,14 +1,10 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.pack.entity.ModelAnimateTask
-import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.pack.entity.ModelViewPersistenceHandlerImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
 import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
@@ -35,14 +31,14 @@ internal fun packModule(): Module = module {
     single<ResourcePackWriter<FileTreeWriter>> { MinecraftResourcePackWriter.minecraft() }
 
     // 实体模型
-    single { ModelRegistry } bind Initializable::class
-    single { ModelAnimateTask() } bind Initializable::class
+//    single { ModelRegistry } bind Initializable::class
+//    single { ModelAnimateTask } bind Initializable::class
     single<BukkitModelEngine> {
         BukkitModelEngine_v1_20_R3.create(get(), new(::ModelViewPersistenceHandlerImpl))
     }
 
     // 分发, 发布
-    single { ResourcePackLifecycle } bind Initializable::class
+//    single { ResourcePackLifecycle } bind Initializable::class
     singleOf(::ResourcePackLifecycleListener)
     singleOf(::ResourcePackPlayerListener)
 }

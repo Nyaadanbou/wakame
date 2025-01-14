@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 
 /**
  * 防御元数据.
@@ -15,7 +15,7 @@ sealed interface DefenseMetadata {
     /**
      * 计算各元素最终伤害的方法.
      */
-    fun calculateFinalDamage(element: Element, damageMetadata: DamageMetadata): Double
+    fun calculateFinalDamage(element: ElementType, damageMetadata: DamageMetadata): Double
 }
 
 /**
@@ -24,7 +24,7 @@ sealed interface DefenseMetadata {
 class EntityDefenseMetadata(
     override val damageeAttributeMap: AttributeMap,
 ) : DefenseMetadata {
-    override fun calculateFinalDamage(element: Element, damageMetadata: DamageMetadata): Double {
+    override fun calculateFinalDamage(element: ElementType, damageMetadata: DamageMetadata): Double {
         // 当该元素的伤害包不存在时, 返回 0.0
         val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
 

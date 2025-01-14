@@ -6,10 +6,10 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import io.papermc.paper.datacomponent.DataComponentTypes
-import io.papermc.paper.datacomponent.item.DamageResistant as PaperDamageResistant
+import io.papermc.paper.registry.tag.TagKey
 import net.kyori.examination.Examinable
 import org.bukkit.damage.DamageType
-import io.papermc.paper.registry.tag.TagKey
+import io.papermc.paper.datacomponent.item.DamageResistant as PaperDamageResistant
 
 
 data class DamageResistant(

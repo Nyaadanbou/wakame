@@ -41,7 +41,6 @@ class BlacksmithStationSerializationTest : KoinTest {
         RecyclingStationRegistry.load()
 
         // 载入 Blacksmith!
-        val stations = BlacksmithStationSerializer.loadAllStations()
-        stations.forEach(::println)
+        BlacksmithStationSerializer.loadAllStations().forEach(::println)
     }
 }

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.eventbus
 
 import cc.mewcraft.wakame.NEKO
-import cc.mewcraft.wakame.util.RunningEnvironment
+import cc.mewcraft.wakame.SharedConstants
 import com.github.shynixn.mccoroutine.bukkit.scope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,23 +9,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
 
 internal object PluginEventBus {
-    private val eventBus: EventBus = run {
-        when {
-            // 如果是测试环境, 则只能用自定义的 coroutine scope
-            RunningEnvironment.TEST.isRunning() -> {
-                EventBus(CoroutineScope(Dispatchers.Unconfined) + SupervisorJob())
-            }
-
-            // 如果是生产环境, 则使用插件的 coroutine scope
-            RunningEnvironment.PRODUCTION.isRunning() -> {
-                EventBus(NEKO.scope)
-            }
-
-            else -> {
-                throw IllegalStateException("Should never happen")
-            }
+    private val eventBus: EventBus =
+        if (SharedConstants.IS_RUNNING_IN_IDE) {
+            EventBus(CoroutineScope(Dispatchers.Unconfined) + SupervisorJob())
+        } else {
+            EventBus(NEKO.scope)
         }
-    }
 
     /**
      * 获取插件的 [EventBus].
