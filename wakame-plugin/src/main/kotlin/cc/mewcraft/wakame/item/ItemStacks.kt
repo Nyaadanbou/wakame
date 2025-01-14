@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [ItemRegistryConfigStorage::class]
 )
 object ItemStacks {
     private const val DEFAULT_UNKNOWN_ITEM_CACHE_ID = "__default__"

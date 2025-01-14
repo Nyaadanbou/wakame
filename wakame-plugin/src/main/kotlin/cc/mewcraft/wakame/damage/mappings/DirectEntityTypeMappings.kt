@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -28,9 +27,7 @@ import java.io.File
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    runAfter = [ElementRegistryConfigStorage::class]
-)
+@Reload()
 object DirectEntityTypeMappings {
     private const val DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_PATH = "damage/direct_entity_type_mappings.yml"
 

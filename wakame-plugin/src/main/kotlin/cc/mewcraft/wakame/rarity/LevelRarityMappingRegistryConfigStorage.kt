@@ -16,11 +16,8 @@ import org.spongepowered.configurate.ConfigurationNode
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [RarityRegistryConfigStorage::class]
 )
-@Reload(
-    runAfter = [RarityRegistryConfigStorage::class]
-)
+@Reload()
 object LevelRarityMappingRegistryConfigStorage : RegistryConfigStorage {
     const val FILE_PATH = "levels.yml"
     const val DEFAULT_ENTRY_NAME = "__default__"

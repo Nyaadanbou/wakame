@@ -18,10 +18,14 @@ import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [CraftingStationRecipeRegistry::class]
+    runAfter = [
+        CraftingStationRecipeRegistry::class, // deps: 需要直接的数据
+    ]
 )
 @Reload(
-    runAfter = [CraftingStationRecipeRegistry::class]
+    runAfter = [
+        CraftingStationRecipeRegistry::class
+    ]
 )
 internal object CraftingStationRegistry {
     private const val STATION_DIR_PATH = "station/stations"

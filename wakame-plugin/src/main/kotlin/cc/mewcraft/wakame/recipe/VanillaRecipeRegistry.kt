@@ -26,7 +26,9 @@ import java.io.File
     stage = InitStage.POST_WORLD
 )
 @Reload(
-    runAfter = [ItemRegistryConfigStorage::class],
+    runAfter = [
+        ItemRegistryConfigStorage::class, // deps: 需要直接的数据
+    ],
 )
 object VanillaRecipeRegistry {
     private const val RECIPE_DIR_PATH = "recipes"

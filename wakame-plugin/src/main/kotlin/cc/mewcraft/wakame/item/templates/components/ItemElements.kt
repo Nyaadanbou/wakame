@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -85,9 +84,6 @@ data class ItemElements(
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [
-        ElementRegistryConfigStorage::class
-    ]
 )
 @Reload
 internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<ElementType>, ItemGenerationContext>() {

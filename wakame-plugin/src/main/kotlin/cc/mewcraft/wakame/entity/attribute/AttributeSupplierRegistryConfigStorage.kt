@@ -18,8 +18,7 @@ import cc.mewcraft.wakame.util.buildYamlConfigLoader
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        ElementRegistryConfigStorage::class, // 反序列化时知道所有已知的元素类型
-        AttributeBundleFacadeRegistryConfigStorage::class
+        ElementRegistryConfigStorage::class, // deps: 反序列化时必须知道所有已知的元素类型
     ]
 )
 @Reload

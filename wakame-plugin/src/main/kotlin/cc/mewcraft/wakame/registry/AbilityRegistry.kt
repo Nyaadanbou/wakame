@@ -25,7 +25,9 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class]
+    runAfter = [
+        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据
+    ]
 )
 @Reload
 object AbilityRegistry {

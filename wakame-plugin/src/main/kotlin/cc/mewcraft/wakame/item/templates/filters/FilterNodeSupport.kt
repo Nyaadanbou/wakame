@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.FilterNodeFacade
 import cc.mewcraft.wakame.random3.NodeFacadeSupport
 import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
@@ -20,11 +19,8 @@ import kotlin.io.path.Path
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [RarityRegistryConfigStorage::class],
 )
-@Reload(
-    runAfter = [RarityRegistryConfigStorage::class],
-)
+@Reload
 internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/filters")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()

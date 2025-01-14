@@ -406,6 +406,7 @@ internal class ImaginaryNekoStack(
 
 @Init(
     stage = InitStage.POST_WORLD,
+    runAfter = [ItemRegistryConfigStorage::class], // deps: 需要转换成 NekoStack, 因此必须在之后
 )
 @Reload(
     runAfter = [ItemRegistryConfigStorage::class],
@@ -440,7 +441,8 @@ internal object ImaginaryNekoStackRegistry {
     }
 
     private fun realizeAndStore() {
-        CACHE.clear()
+        // CACHE.clear() // 由于 Registry 的 Entry 不会减少, 所以不需要手动 clear, 键名相同的会自动替换掉
+
         val filter = KoishRegistries.ITEM.filter { it.id.namespace() == Identifier.MINECRAFT_NAMESPACE }
         for (prototype in filter) {
             val id = prototype.id

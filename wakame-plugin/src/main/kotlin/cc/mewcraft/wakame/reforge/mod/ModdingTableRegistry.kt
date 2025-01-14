@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 
@@ -13,9 +12,7 @@ import cc.mewcraft.wakame.reloader.ReloadFun
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload(
-    runAfter = [AbilityRegistry::class /* 我们仍然直接依赖 Ability 相关的实例, 而不是实例的引用, 因此 Ability 必须在我们之前加载完毕*/]
-)
+@Reload()
 object ModdingTableRegistry {
     private val tables = HashMap<String, ModdingTable>()
 

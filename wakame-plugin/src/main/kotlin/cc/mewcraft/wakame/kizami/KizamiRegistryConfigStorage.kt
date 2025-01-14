@@ -21,11 +21,11 @@ import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class]
+    runAfter = [
+        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据, 必须在其之后
+    ]
 )
-@Reload(
-    runAfter = []
-)
+@Reload()
 internal object KizamiRegistryConfigStorage : RegistryConfigStorage {
 
     /**

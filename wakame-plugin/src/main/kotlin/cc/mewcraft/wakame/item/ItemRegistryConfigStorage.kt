@@ -1,20 +1,10 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
-import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
-import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
@@ -36,30 +26,11 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class,
-        CoreArchetypeSampleNodeFacade::class,
-        ElementRegistryConfigStorage::class,
-        ElementSampleNodeFacade::class,
-        EntityTypeHolderRegistryConfigStorage::class,
-        ItemFilterNodeFacade::class,
-        LevelRarityMappingRegistryConfigStorage::class,
-        KizamiRegistryConfigStorage::class,
-        KizamiSampleNodeFacade::class,
-        RarityRegistryConfigStorage::class,
         AbilityRegistry::class,
     ]
 )
 @Reload(
     runAfter = [
-        CoreArchetypeSampleNodeFacade::class,
-        ElementRegistryConfigStorage::class,
-        ElementSampleNodeFacade::class,
-        EntityTypeHolderRegistryConfigStorage::class,
-        ItemFilterNodeFacade::class,
-        LevelRarityMappingRegistryConfigStorage::class,
-        KizamiRegistryConfigStorage::class,
-        KizamiSampleNodeFacade::class,
-        RarityRegistryConfigStorage::class,
         AbilityRegistry::class,
     ]
 )

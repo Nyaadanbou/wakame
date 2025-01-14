@@ -184,7 +184,7 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class
+        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据, 必须指定依赖
     ],
 )
 @Reload

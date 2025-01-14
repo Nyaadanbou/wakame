@@ -42,9 +42,6 @@ object KoishRegistryKeys {
     @JvmField
     val ITEM = createRegistryKey<NekoItem>("item")
 
-    // @JvmField
-    // val VANILLA_PROXY_ITEM = createRegistryKey<NekoItem>("vanilla_proxy_item")
-
     @JvmField
     val ITEM_SKIN = createRegistryKey<ItemSkin>("item_skin")
 

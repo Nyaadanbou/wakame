@@ -85,8 +85,7 @@ open class SimpleRegistry<T>(
 
     override fun resetRegistry() {
         if (!SharedConstants.IS_RUNNING_IN_IDE) {
-            // 仅允许在 IDE 环境下调用该函数, 禁止在生产环境下调用
-            return
+            return // 仅允许在 IDE 环境下调用该函数
         }
 
         this.rawIdToEntry.clear()

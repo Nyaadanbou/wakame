@@ -10,10 +10,14 @@ import cc.mewcraft.wakame.reloader.ReloadFun
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
+    runAfter = [
+        RepairingTableRegistry::class, RecyclingStationRegistry::class // deps: 需要直接的数据
+    ],
 )
 @Reload(
-    runAfter = [RepairingTableRegistry::class, RecyclingStationRegistry::class],
+    runAfter = [
+        RepairingTableRegistry::class, RecyclingStationRegistry::class
+    ],
 )
 object BlacksmithStationRegistry {
     private val stations: MutableMap<String, BlacksmithStation> = mutableMapOf()
