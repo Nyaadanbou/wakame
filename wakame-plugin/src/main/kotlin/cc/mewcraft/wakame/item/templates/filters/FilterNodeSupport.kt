@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.templates.filters
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.FilterNodeFacade
@@ -21,11 +20,9 @@ import kotlin.io.path.Path
 
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistryConfigStorage::class],
     runAfter = [RarityRegistryConfigStorage::class],
 )
 @Reload(
-    runBefore = [ItemRegistryConfigStorage::class],
     runAfter = [RarityRegistryConfigStorage::class],
 )
 internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>() {

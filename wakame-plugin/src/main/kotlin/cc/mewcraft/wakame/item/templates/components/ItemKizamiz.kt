@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.item.templates.components
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -13,6 +12,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
+import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Group
@@ -143,11 +143,11 @@ private object KizamiGroupSerializer : GroupSerializer<RegistryEntry<KizamiType>
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistryConfigStorage::class],
+    runAfter = [
+        KizamiRegistryConfigStorage::class,
+    ]
 )
-@Reload(
-    runBefore = [ItemRegistryConfigStorage::class],
-)
+@Reload
 internal object KizamiSampleNodeFacade : SampleNodeFacade<RegistryEntry<KizamiType>, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/kizamiz")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()

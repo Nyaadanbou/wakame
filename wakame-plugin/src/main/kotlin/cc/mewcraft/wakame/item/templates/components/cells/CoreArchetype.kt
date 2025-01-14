@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigSt
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
@@ -184,12 +183,11 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistryConfigStorage::class],
-    runAfter = [AttributeBundleFacadeRegistryConfigStorage::class],
+    runAfter = [
+        AttributeBundleFacadeRegistryConfigStorage::class
+    ],
 )
-@Reload(
-    runBefore = [ItemRegistryConfigStorage::class],
-)
+@Reload
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/cores")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()

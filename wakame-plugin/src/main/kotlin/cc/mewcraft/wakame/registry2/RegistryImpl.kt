@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
@@ -10,6 +11,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectList
 import it.unimi.dsi.fastutil.objects.Reference2IntMap
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.IdentityHashMap
@@ -21,7 +24,7 @@ open class SimpleRegistry<T>(
     private val rawIdToEntry: ObjectList<RegistryEntry.Reference<T>> = ObjectArrayList(256)
     private val entryToRawId: Reference2IntMap<T> = Reference2IntOpenHashMap<T>(1024).apply { defaultReturnValue(-1) }
     private val idToEntry: MutableMap<Identifier, RegistryEntry.Reference<T>> = HashMap(1024)
-    private val keyToEntry: MutableMap<RegistryKey<T>, RegistryEntry.Reference<T>> = HashMap(1024)
+    private val keyToEntry: Reference2ObjectMap<RegistryKey<T>, RegistryEntry.Reference<T>> = Reference2ObjectOpenHashMap(1024)
     private val valueToEntry: MutableMap<T, RegistryEntry.Reference<T>> = IdentityHashMap(1024)
 
     private var frozen: Boolean = false
@@ -81,6 +84,11 @@ open class SimpleRegistry<T>(
     }
 
     override fun resetRegistry() {
+        if (!SharedConstants.IS_RUNNING_IN_IDE) {
+            // 仅允许在 IDE 环境下调用该函数, 禁止在生产环境下调用
+            return
+        }
+
         this.rawIdToEntry.clear()
         this.entryToRawId.clear()
         this.idToEntry.clear()

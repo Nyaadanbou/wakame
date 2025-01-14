@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.templates.components
 
+import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -85,11 +85,11 @@ data class ItemElements(
  */
 @Init(
     stage = InitStage.PRE_WORLD,
-    runBefore = [ItemRegistryConfigStorage::class],
+    runAfter = [
+        ElementRegistryConfigStorage::class
+    ]
 )
-@Reload(
-    runBefore = [ItemRegistryConfigStorage::class],
-)
+@Reload
 internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<ElementType>, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/items/elements")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()

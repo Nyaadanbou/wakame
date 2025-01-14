@@ -166,7 +166,7 @@ interface RegistryEntry<T> {
             get() = _value != null
 
         override val value: T
-            get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry ${this.owner}")
+            get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry '${this.owner}'")
 
         override val type: RegistryEntry.Type = RegistryEntry.Type.REFERENCE
 
