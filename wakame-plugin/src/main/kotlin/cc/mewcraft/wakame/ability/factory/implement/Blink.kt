@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.data.LinePath
+import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.util.require
@@ -107,17 +108,19 @@ private class BlinkAbilityMechanic(
 
         entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
 
-        componentMap += ParticleEffectComponent(
-            builderProvider = { loc ->
-                ParticleBuilder(Particle.END_ROD)
-                    .location(loc)
-                    .receivers(64)
-                    .extra(.0)
-                    .source(entity as? Player)
-            },
-            particlePath = LinePath(
-                start = Position.fine(location),
-                end = Position.fine(target)
+        componentMap.addParticle(
+            ParticleInfo(
+                builderProvider = { loc ->
+                    ParticleBuilder(Particle.END_ROD)
+                        .location(loc)
+                        .receivers(64)
+                        .extra(.0)
+                        .source(entity as? Player)
+                },
+                particlePath = LinePath(
+                    start = Position.fine(location),
+                    end = Position.fine(target)
+                )
             )
         )
         componentMap += TargetTo(TargetAdapter.adapt(target))

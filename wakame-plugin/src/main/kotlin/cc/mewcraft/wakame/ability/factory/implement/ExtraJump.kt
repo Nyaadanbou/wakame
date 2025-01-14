@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.ability.factory.AbilityFactory
 import cc.mewcraft.wakame.ability.factory.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
+import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.SpiralPath
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.util.krequire
@@ -95,21 +95,23 @@ private class ExtraJumpAbilityMechanic(
 
     private fun playParticle(player: Player, componentMap: ComponentMap) = abilitySupport {
         // 设置粒子特效
-        componentMap += ParticleEffectComponent(
-            builderProvider = { loc ->
-                ParticleBuilder(Particle.END_ROD)
-                    .location(loc)
-                    .receivers(64)
-                    .extra(.0)
-                    .source(player)
-            },
-            particlePath = SpiralPath(
-                center = Position.fine(player.location.x, player.location.y, player.location.z),
-                radius = 0.5,
-                height = 0.5,
-                rotations = 1
-            ),
-            times = 1
+        componentMap.addParticle(
+            ParticleInfo(
+                builderProvider = { loc ->
+                    ParticleBuilder(Particle.END_ROD)
+                        .location(loc)
+                        .receivers(64)
+                        .extra(.0)
+                        .source(player)
+                },
+                particlePath = SpiralPath(
+                    center = Position.fine(player.location.x, player.location.y, player.location.z),
+                    radius = 0.5,
+                    height = 0.5,
+                    rotations = 1
+                ),
+                times = 1
+            )
         )
     }
 

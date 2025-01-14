@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.data.CirclePath
+import cc.mewcraft.wakame.ecs.data.FixedPath
+import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
@@ -88,7 +90,9 @@ private class BlackHoleAbilityMechanic(
             }
 
             if (entity is LivingEntity) {
-                entity.teleport(targetLocation)
+                // 给生物给予一个向目标位置的速度
+                val direction = targetLocation.toVector().subtract(entity.location.toVector()).normalize()
+                entity.velocity = direction.multiply(1.0)
                 entity.damage(damage)
             }
         }
@@ -99,22 +103,36 @@ private class BlackHoleAbilityMechanic(
 
         if (tickCount % 10 == 0.0) {
             // 每 10 tick 生成一个粒子效果
-            componentMap += ParticleEffectComponent(
-                builderProvider = { loc ->
-                    ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
-                        .location(loc)
-                        .count(1)
-                        .extra(0.0)
-                        .colorTransition(Color.BLACK, Color.ORANGE)
-                        .receivers(64)
-                        .source(caster as? Player)
-                },
-                particlePath = CirclePath(
-                    center = targetLocation,
-                    radius = radius,
-                    axis = blockFace
+            componentMap.addParticle(
+                ParticleInfo(
+                    builderProvider = { loc ->
+                        ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
+                            .location(loc)
+                            .count(1)
+                            .extra(0.2)
+                            .colorTransition(Color.BLACK, Color.ORANGE)
+                            .receivers(64)
+                            .source(caster as? Player)
+                    },
+                    particlePath = CirclePath(
+                        center = targetLocation,
+                        radius = radius,
+                        axis = blockFace
+                    ),
+                    times = 1
                 ),
-                times = 1
+                ParticleInfo(
+                    builderProvider = { loc ->
+                        ParticleBuilder(Particle.FLAME)
+                            .location(loc)
+                            .count(1)
+                            .extra(0.2)
+                            .receivers(64)
+                            .source(caster as? Player)
+                    },
+                    particlePath = FixedPath(targetLocation),
+                    times = 1
+                )
             )
         }
 

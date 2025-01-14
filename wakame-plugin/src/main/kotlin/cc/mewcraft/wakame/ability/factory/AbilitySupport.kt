@@ -2,10 +2,8 @@ package cc.mewcraft.wakame.ability.factory
 
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.molang.Evaluable
 import org.bukkit.Location
@@ -43,6 +41,15 @@ internal object AbilitySupport {
             evaluable.evaluate(engine)
         } else {
             evaluable.evaluate()
+        }
+    }
+
+    fun ComponentMap.addParticle(vararg particleInfos: ParticleInfo) {
+        val component = this[ParticleEffectComponent]
+        if (component != null) {
+            component.particleInfos.addAll(particleInfos)
+        } else {
+            this += ParticleEffectComponent(*particleInfos)
         }
     }
 

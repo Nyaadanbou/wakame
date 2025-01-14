@@ -12,6 +12,14 @@ interface ParticlePath {
     fun positionAtProgress(progress: Double): Position
 }
 
+data class FixedPath(
+    val position: Position
+) : ParticlePath {
+    override fun positionAtProgress(progress: Double): Position {
+        return position
+    }
+}
+
 /**
  * 直线路径：粒子沿着两点之间的直线运动
  */
