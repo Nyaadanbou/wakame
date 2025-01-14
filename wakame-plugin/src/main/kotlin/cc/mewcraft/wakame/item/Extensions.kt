@@ -25,8 +25,8 @@ import cc.mewcraft.wakame.util.MenuIconDictionary
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.isDamageable
+import cc.mewcraft.wakame.util.itemLore
 import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.lore0
 import cc.mewcraft.wakame.util.maxDamage
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -145,9 +145,8 @@ private fun NekoStack.reduceForMenuIcon(): NekoStack {
  * 并把这些内容应用到此物品堆叠上.
  */
 fun NekoStack.applyMenuIconEverything(dsl: MenuIconLore.LineConfig.Builder.() -> Unit = {}): NekoStack {
-    val resolution = prototype.resolveMenuIcon(dsl)
-    this.itemName = resolution.name
-    this.lore = resolution.lore
+    val resolution = this.prototype.resolveMenuIcon(dsl)
+    resolution.applyNameAndLoreTo(this.wrapped)
     return reduceForMenuIcon()
 }
 
@@ -190,7 +189,7 @@ data class MenuIconResolution internal constructor(val name: Component?, val lor
     @Contract(pure = false)
     fun applyNameAndLoreTo(item: ItemStack): ItemStack {
         item.itemName = name
-        item.lore0 = lore
+        item.itemLore = lore
         return item
     }
 }
@@ -220,9 +219,9 @@ var NekoStack.customName: Component? by direct(ItemComponentTypes.CUSTOM_NAME)
 var NekoStack.itemName: Component? by direct(ItemComponentTypes.ITEM_NAME)
 
 var NekoStack.lore: List<Component>
-    get() = wrapped.lore0.orEmpty()
+    get() = wrapped.itemLore.orEmpty()
     set(value) {
-        wrapped.lore0 = value
+        wrapped.itemLore = value
     }
 
 var NekoStack.damageResistant: DamageResistant? by direct(ItemComponentTypes.DAMAGE_RESISTANT)

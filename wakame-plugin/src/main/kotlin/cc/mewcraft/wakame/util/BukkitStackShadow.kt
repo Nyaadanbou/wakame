@@ -56,7 +56,7 @@ var BukkitStack.customName: Component?
         if (value != null) {
             this.setData(DataComponentTypes.CUSTOM_NAME, value)
         } else {
-            this.unsetData(DataComponentTypes.CUSTOM_NAME)
+            this.resetData(DataComponentTypes.CUSTOM_NAME)
         }
     }
 
@@ -69,7 +69,7 @@ var BukkitStack.itemName: Component?
         if (value != null) {
             this.setData(DataComponentTypes.ITEM_NAME, value)
         } else {
-            this.unsetData(DataComponentTypes.ITEM_NAME)
+            this.resetData(DataComponentTypes.ITEM_NAME)
         }
     }
 
@@ -82,20 +82,20 @@ var BukkitStack.itemModel: Key?
         if (value != null) {
             this.setData(DataComponentTypes.ITEM_MODEL, value)
         } else {
-            this.unsetData(DataComponentTypes.ITEM_MODEL)
+            this.resetData(DataComponentTypes.ITEM_MODEL)
         }
     }
 
 /**
  * 设置物品的描述. 你可以传入 `null` 来移除它.
  */
-var BukkitStack.lore0: List<Component>?
+var BukkitStack.itemLore: List<Component>?
     get() = this.getData(DataComponentTypes.LORE)?.lines()
     set(value) {
         if (value.isNotNullOrEmpty()) {
             this.setData(DataComponentTypes.LORE, ItemLore.lore(value))
         } else {
-            this.unsetData(DataComponentTypes.LORE)
+            this.resetData(DataComponentTypes.LORE)
         }
     }
 
@@ -108,7 +108,7 @@ var BukkitStack.customModelData: Int?
         if (value != null) {
             this.setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData(value))
         } else {
-            this.unsetData(DataComponentTypes.CUSTOM_MODEL_DATA)
+            this.resetData(DataComponentTypes.CUSTOM_MODEL_DATA)
         }
     }
 
@@ -121,7 +121,7 @@ var BukkitStack.hideAdditionalTooltip: Boolean
         if (value) {
             this.setData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
         } else {
-            this.unsetData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
+            this.resetData(DataComponentTypes.HIDE_ADDITIONAL_TOOLTIP)
         }
     }
 
@@ -134,7 +134,7 @@ var BukkitStack.hideTooltip: Boolean
         if (value) {
             this.setData(DataComponentTypes.HIDE_TOOLTIP)
         } else {
-            this.unsetData(DataComponentTypes.HIDE_TOOLTIP)
+            this.resetData(DataComponentTypes.HIDE_TOOLTIP)
         }
     }
 

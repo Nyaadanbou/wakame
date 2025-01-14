@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.isClientSide
-import cc.mewcraft.wakame.util.lore0
+import cc.mewcraft.wakame.util.itemLore
 import cc.mewcraft.wakame.util.showNothing
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
@@ -69,7 +69,7 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
         RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
-        item.lore0 = textAssembler.assemble(collector)
+        item.itemLore = textAssembler.assemble(collector)
 
         // 渲染其他可见部分
         item.showNothing()
