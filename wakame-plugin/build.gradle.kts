@@ -35,13 +35,16 @@ dependencies {
     implementation(platform(local.koin.bom))
     implementation(local.koin.core)
     implementation(local.commons.collections)
+    implementation(local.commons.gson)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
+    implementation(local.commons.tuple)
     implementation(local.fleks) {
         exclude("org.jetbrains")
     }
     implementation(libs.mocha)
     compileOnlyApi(local.shadow.nbt) // 运行时由 wakame-mixin 提供
+    implementation(local.snakeyaml.engine)
     implementation(platform(libs.bom.adventure))
     compileOnlyApi(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.caffeine))

@@ -1,17 +1,25 @@
 [versions]
 
+# Gradle plugins
 kotlin = "2.1.0"
 kotlinx-coroutines-core = "1.10.1"
 nyaadanbou-conventions = "1.1"
+paperweight = "1.7.5"
+
+# Shaded deps
 koin = "4.0.0"
-commons = "1.17"
+commons = "1.24"
 fleks = "2.10"
-shadow-nbt = "1.21.3-SNAPSHOT"
-ignite = "1.1.0"
+snakeyaml-engine = "2.8"
+
+# Server deps
+paper = "1.21.3-R0.1-SNAPSHOT"
 mixin = "0.8.6"
 mixin-extras = "0.3.6"
-paperweight = "1.7.5"
-paper = "1.21.3-R0.1-SNAPSHOT"
+ignite = "1.1.0"
+shadow-nbt = "1.21.3-SNAPSHOT"
+
+# Plugin deps
 helper = "6.0.0"
 adventurelevel = "2.0.0"
 mythicmobs = "5.8.0-SNAPSHOT"
@@ -31,10 +39,9 @@ plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plug
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version.ref = "nyaadanbou-conventions" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 
-# Shaded dependencies
+# Shaded deps
 # 这些依赖属于插件本身, 将打包进插件的 jar
 
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
@@ -47,17 +54,19 @@ commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider",
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 
-# Server dependencies
+# Server deps
 # 这些依赖属于服务端核心, 由服务端的 classloader 加载
 
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
+ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 
-# Plugin dependencies
+# Plugin deps
 # 这些依赖属于插件, 无论是自研的还是第三方的
 
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
