@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.factory
+package cc.mewcraft.wakame.ability.archetype
 
 import cc.mewcraft.wakame.ability.Ability
 import net.kyori.adventure.key.Key
@@ -10,7 +10,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * Example:
  *
  * ```kotlin
- * object MyAbility : AbilityFactory {
+ * object MyAbility : AbilityArchetype {
  *    override fun create(config: ConfigProvider, key: Key): Ability {
  *       return DefaultMyAbility(config.entry("myProperty"))
  *    }
@@ -19,7 +19,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * private class DefaultMyAbility(override val myProperty: String) : Ability
  * ```
  */
-interface AbilityFactory {
+interface AbilityArchetype {
     /**
      * Create a new instance of the ability base on a certain ability type
      *

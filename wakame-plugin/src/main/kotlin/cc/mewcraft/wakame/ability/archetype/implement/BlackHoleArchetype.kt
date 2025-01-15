@@ -1,10 +1,10 @@
-package cc.mewcraft.wakame.ability.factory.implement
+package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.context.AbilityInput
-import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.factory.abilitySupport
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
@@ -27,16 +27,16 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 选定一个位置为中心, 将该位置周围的怪物都吸引到该位置, 并造成伤害.
  */
-object BlackHole : AbilityFactory {
+object BlackHoleArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
         val radius = config.node("radius").krequire<Evaluable<*>>()
         val duration = config.node("duration").krequire<Evaluable<*>>()
         val damage = config.node("damage").krequire<Evaluable<*>>()
-        return BlackHoleAbility(key, config, radius, duration, damage)
+        return BlackHole(key, config, radius, duration, damage)
     }
 }
 
-private class BlackHoleAbility(
+private class BlackHole(
     key: Key,
     config: ConfigurationNode,
     val radius: Evaluable<*>,
@@ -49,7 +49,7 @@ private class BlackHoleAbility(
 }
 
 private class BlackHoleAbilityMechanic(
-    private val blackHole: BlackHoleAbility,
+    private val blackHole: BlackHole,
 ) : ActiveAbilityMechanic() {
     private var blockFace: BlockFace = BlockFace.UP
 

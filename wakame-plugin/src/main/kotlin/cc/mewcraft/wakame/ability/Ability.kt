@@ -26,8 +26,8 @@ interface Ability : Keyed, Examinable {
      * The key of this ability.
      *
      * **Note that the [key] here is specified by the location of the ability
-     * configuration file, not the [cc.mewcraft.wakame.ability.factory.AbilityFactories]'s key**,
-     * which means that a [cc.mewcraft.wakame.ability.factory.AbilityFactory] can have multiple [Ability].
+     * configuration file, not the [cc.mewcraft.wakame.ability.archetype.AbilityArchetypes]'s key**,
+     * which means that a [cc.mewcraft.wakame.ability.archetype.AbilityArchetype] can have multiple [Ability].
      *
      * [Ability] will be stored in the AbilityRegistry, and the corresponding
      * [Ability] will be found by the [key].

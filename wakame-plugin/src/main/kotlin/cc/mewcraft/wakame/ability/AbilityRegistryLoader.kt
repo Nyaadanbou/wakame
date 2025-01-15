@@ -18,7 +18,7 @@ import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 object AbilityRegistryLoader : RegistryConfigStorage {
 
     // TODO 有这么几类东西需要分别放入不同的注册表:
-    // AbilityFactory
+    // AbilityArchetype
     // Ability
     // Trigger
     // PlayerAbility (仅在配置文件中, 不会被直接放进注册表?

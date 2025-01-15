@@ -1,12 +1,12 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.ability.factory.implement
+package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.PassiveAbilityMechanic
 import cc.mewcraft.wakame.ability.context.AbilityInput
-import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.factory.abilitySupport
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
@@ -25,15 +25,15 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
-object ExtraJump : AbilityFactory {
+object ExtraJumpArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
         val count = config.node("count").krequire<Int>()
         val jumpedMessages = config.node("jumped_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
-        return ExtraJumpAbility(key, config, count, jumpedMessages)
+        return ExtraJump(key, config, count, jumpedMessages)
     }
 }
 
-private class ExtraJumpAbility(
+private class ExtraJump(
     key: Key,
     config: ConfigurationNode,
     val count: Int,
@@ -45,7 +45,7 @@ private class ExtraJumpAbility(
 }
 
 private class ExtraJumpAbilityMechanic(
-    private val extraJump: ExtraJumpAbility,
+    private val extraJump: ExtraJump,
 ) : PassiveAbilityMechanic() {
     private lateinit var jumpSubscription: Subscription
     private lateinit var touchGroundSubscription: Subscription

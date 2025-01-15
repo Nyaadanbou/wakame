@@ -1,13 +1,13 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.ability.factory.implement
+package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
-import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.factory.abilitySupport
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
@@ -30,16 +30,16 @@ import org.spongepowered.configurate.kotlin.extensions.get
 /**
  * 短距离瞬移技能.
  */
-object Blink : AbilityFactory {
+object BlinkArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
         val distance = config.node("distance").require<Int>()
         val teleportedMessages = config.node("teleported_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
 
-        return BlinkAbility(key, config, distance, teleportedMessages)
+        return Blink(key, config, distance, teleportedMessages)
     }
 }
 
-private class BlinkAbility(
+private class Blink(
     key: Key,
     config: ConfigurationNode,
     val distance: Int,
@@ -51,7 +51,7 @@ private class BlinkAbility(
 }
 
 private class BlinkAbilityMechanic(
-    private val blink: BlinkAbility
+    private val blink: Blink
 ) : ActiveAbilityMechanic() {
 
     private var isTeleported: Boolean = false

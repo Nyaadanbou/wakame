@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.factory.implement
+package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.context.AbilityInput

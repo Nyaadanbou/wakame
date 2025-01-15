@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.factory
+package cc.mewcraft.wakame.ability.archetype
 
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter

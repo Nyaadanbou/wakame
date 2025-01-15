@@ -5,13 +5,10 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.factory.AbilityFactories
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.initializer.Initializable
-import cc.mewcraft.wakame.initializer.PreWorldDependency
-import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -50,7 +47,7 @@ object AbilityRegistry {
 
     @InitFun
     fun init() {
-        AbilityFactories.load()
+        AbilityArchetypes.load()
         loadConfiguration()
         loadTriggers()
     }
@@ -97,7 +94,7 @@ object AbilityRegistry {
                     val abilityId = Key.key(Namespaces.ABILITY, "${namespace}/$value")
                     val type = node.node("type").require<String>()
                     val ability = try {
-                        requireNotNull(AbilityFactories[type]).create(abilityId, node)
+                        requireNotNull(AbilityArchetypes[type]).create(abilityId, node)
                     } catch (t: Throwable) {
                         LOGGER.warn("Failed to load ability: '$abilityId', Path: '${file.path}'", t)
                         return@forEach

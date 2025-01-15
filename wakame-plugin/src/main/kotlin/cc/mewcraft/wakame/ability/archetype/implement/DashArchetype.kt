@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.factory.implement
+package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.AbilityProvider
@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.factory.abilitySupport
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -25,17 +25,17 @@ import org.spongepowered.configurate.kotlin.extensions.get
 /**
  * 冲刺技能.
  */
-object Dash : AbilityFactory {
+object DashArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
         val stepDistance = config.node("step_distance").require<Double>()
         val duration = config.node("duration").get<Long>() ?: 50
         val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
         val hitEffect = config.node("hit_effects").get<List<AbilityProvider>>() ?: emptyList()
-        return DashAbility(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
+        return Dash(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
     }
 }
 
-private class DashAbility(
+private class Dash(
     key: Key,
     config: ConfigurationNode,
     val stepDistance: Double,
@@ -49,7 +49,7 @@ private class DashAbility(
 }
 
 private class DashAbilityMechanic(
-    private val dash: DashAbility,
+    private val dash: Dash,
 ) : ActiveAbilityMechanic() {
 
     companion object {
