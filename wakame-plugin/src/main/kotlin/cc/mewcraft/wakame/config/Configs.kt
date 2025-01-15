@@ -18,6 +18,9 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import kotlin.io.path.Path
 
+/**
+ * [org.bukkit.plugin.Plugin.getDataFolder] 下的 `config.yml` 配置文件.
+ */
 val MAIN_CONFIG: ConfigProvider by lazy { YAML["config.yml"] }
 
 /**
