@@ -30,38 +30,28 @@ import org.spongepowered.configurate.kotlin.extensions.get
 /**
  * 短距离瞬移技能.
  */
-interface Blink : Ability {
-    /**
-     * 瞬移距离.
-     */
-    val distance: Int
+object Blink : AbilityFactory {
+    override fun create(key: Key, config: ConfigurationNode): Ability {
+        val distance = config.node("distance").require<Int>()
+        val teleportedMessages = config.node("teleported_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
 
-    val teleportedMessages: AudienceMessageGroup
-
-    companion object Factory : AbilityFactory<Blink> {
-        override fun create(key: Key, config: ConfigurationNode): Blink {
-            val distance = config.node("distance").require<Int>()
-            val teleportedMessages = config.node("teleported_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
-
-            return Impl(key, config, distance, teleportedMessages)
-        }
+        return BlinkAbility(key, config, distance, teleportedMessages)
     }
+}
 
-    private class Impl(
-        key: Key,
-        config: ConfigurationNode,
-        override val distance: Int,
-        override val teleportedMessages: AudienceMessageGroup,
-    ) : Blink, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): Mechanic {
-            return BlinkAbilityMechanic(distance, teleportedMessages)
-        }
+private class BlinkAbility(
+    key: Key,
+    config: ConfigurationNode,
+    val distance: Int,
+    val teleportedMessages: AudienceMessageGroup,
+) : AbilityBase(key, config) {
+    override fun mechanic(input: AbilityInput): Mechanic {
+        return BlinkAbilityMechanic(this)
     }
 }
 
 private class BlinkAbilityMechanic(
-    val distance: Int,
-    val teleportedMessages: AudienceMessageGroup,
+    private val blink: BlinkAbility
 ) : ActiveAbilityMechanic() {
 
     private var isTeleported: Boolean = false
@@ -85,7 +75,7 @@ private class BlinkAbilityMechanic(
         val target = location.clone()
 
         // 获取视线上的所有方块, 并将其从远到近排序
-        val blocks = entity.getLineOfSight(null, distance)
+        val blocks = entity.getLineOfSight(null, blink.distance)
 
         // 遍历所有方块，试图找到第一个可传送的方块
         for (block in blocks) {
@@ -137,7 +127,7 @@ private class BlinkAbilityMechanic(
         // 再给予一个向前的固定惯性
         entity.velocity = entity.location.direction.normalize()
 
-        teleportedMessages.send(entity)
+        blink.teleportedMessages.send(entity)
         return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
 

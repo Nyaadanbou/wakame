@@ -25,39 +25,32 @@ import org.bukkit.event.player.PlayerMoveEvent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
-interface ExtraJump : Ability {
-    val count: Int
-
-    val jumpedMessages: AudienceMessageGroup
-
-    companion object Factory : AbilityFactory<ExtraJump> {
-        override fun create(key: Key, config: ConfigurationNode): ExtraJump {
-            val count = config.node("count").krequire<Int>()
-            val jumpedMessages = config.node("jumped_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
-            return Impl(key, config, count, jumpedMessages)
-        }
+object ExtraJump : AbilityFactory {
+    override fun create(key: Key, config: ConfigurationNode): Ability {
+        val count = config.node("count").krequire<Int>()
+        val jumpedMessages = config.node("jumped_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
+        return ExtraJumpAbility(key, config, count, jumpedMessages)
     }
+}
 
-    private class Impl(
-        key: Key,
-        config: ConfigurationNode,
-        override val count: Int,
-        override val jumpedMessages: AudienceMessageGroup,
-    ) : ExtraJump, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): Mechanic {
-            return ExtraJumpAbilityMechanic(count, jumpedMessages)
-        }
+private class ExtraJumpAbility(
+    key: Key,
+    config: ConfigurationNode,
+    val count: Int,
+    val jumpedMessages: AudienceMessageGroup,
+) : AbilityBase(key, config) {
+    override fun mechanic(input: AbilityInput): Mechanic {
+        return ExtraJumpAbilityMechanic(this)
     }
 }
 
 private class ExtraJumpAbilityMechanic(
-    private val count: Int,
-    private val jumpedMessages: AudienceMessageGroup,
+    private val extraJump: ExtraJumpAbility,
 ) : PassiveAbilityMechanic() {
     private lateinit var jumpSubscription: Subscription
     private lateinit var touchGroundSubscription: Subscription
 
-    private var jumpCount: Int = count
+    private var jumpCount: Int = extraJump.count
 
     override fun onEnable(componentMap: ComponentMap) = abilitySupport {
         jumpSubscription = Events.subscribe(PlayerInputEvent::class.java)
@@ -76,7 +69,7 @@ private class ExtraJumpAbilityMechanic(
                 playParticle(player, componentMap)
 
                 // 发送跳跃消息.
-                jumpedMessages.send(player)
+                extraJump.jumpedMessages.send(player)
             }
 
         touchGroundSubscription = Events.subscribe(PlayerMoveEvent::class.java)
@@ -84,7 +77,7 @@ private class ExtraJumpAbilityMechanic(
             .filter { @Suppress("DEPRECATION") it.player.isOnGround }
             .handler {
                 // 重置跳跃状态.
-                jumpCount = count
+                jumpCount = extraJump.count
             }
     }
 

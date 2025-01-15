@@ -27,40 +27,29 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 选定一个位置为中心, 将该位置周围的怪物都吸引到该位置, 并造成伤害.
  */
-interface BlackHole : Ability {
-
-    val radius: Evaluable<*>
-
-    val duration: Evaluable<*>
-
-    val damage: Evaluable<*>
-
-    companion object : AbilityFactory<BlackHole> {
-        override fun create(key: Key, config: ConfigurationNode): BlackHole {
-            val radius = config.node("radius").krequire<Evaluable<*>>()
-            val duration = config.node("duration").krequire<Evaluable<*>>()
-            val damage = config.node("damage").krequire<Evaluable<*>>()
-            return Impl(key, config, radius, duration, damage)
-        }
+object BlackHole : AbilityFactory {
+    override fun create(key: Key, config: ConfigurationNode): Ability {
+        val radius = config.node("radius").krequire<Evaluable<*>>()
+        val duration = config.node("duration").krequire<Evaluable<*>>()
+        val damage = config.node("damage").krequire<Evaluable<*>>()
+        return BlackHoleAbility(key, config, radius, duration, damage)
     }
+}
 
-    private class Impl(
-        key: Key,
-        config: ConfigurationNode,
-        override val radius: Evaluable<*>,
-        override val duration: Evaluable<*>,
-        override val damage: Evaluable<*>,
-    ) : BlackHole, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): Mechanic {
-            return BlackHoleAbilityMechanic(radius, duration, damage)
-        }
+private class BlackHoleAbility(
+    key: Key,
+    config: ConfigurationNode,
+    val radius: Evaluable<*>,
+    val duration: Evaluable<*>,
+    val damage: Evaluable<*>,
+) : AbilityBase(key, config) {
+    override fun mechanic(input: AbilityInput): Mechanic {
+        return BlackHoleAbilityMechanic(this)
     }
 }
 
 private class BlackHoleAbilityMechanic(
-    private val radius: Evaluable<*>,
-    private val duration: Evaluable<*>,
-    private val damage: Evaluable<*>,
+    private val blackHole: BlackHoleAbility,
 ) : ActiveAbilityMechanic() {
     private var blockFace: BlockFace = BlockFace.UP
 
@@ -79,8 +68,8 @@ private class BlackHoleAbilityMechanic(
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
         val caster = componentMap.castByEntity()
         val targetLocation = componentMap.targetToLocation()
-        val radius = componentMap.evaluate(radius)
-        val damage = componentMap.evaluate(damage)
+        val radius = componentMap.evaluate(blackHole.radius)
+        val damage = componentMap.evaluate(blackHole.damage)
 
         // 吸引周围的怪物并造成伤害
         val entities = targetLocation.getNearbyEntities(radius, radius, radius)
@@ -97,7 +86,7 @@ private class BlackHoleAbilityMechanic(
             }
         }
 
-        if (tickCount >= componentMap.evaluate(duration)) {
+        if (tickCount >= componentMap.evaluate(blackHole.duration)) {
             return TickResult.NEXT_STATE_NO_CONSUME
         }
 

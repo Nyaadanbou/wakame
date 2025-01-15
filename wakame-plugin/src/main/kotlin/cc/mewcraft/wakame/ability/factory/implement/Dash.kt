@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.AbilityProvider
+import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
@@ -25,61 +25,31 @@ import org.spongepowered.configurate.kotlin.extensions.get
 /**
  * 冲刺技能.
  */
-interface Dash : Ability {
-
-    /**
-     * 冲刺的距离.
-     */
-    val stepDistance: Double
-
-    /**
-     * 移动的 Tick 数
-     */
-    val duration: Long
-
-    /**
-     * 撞到实体后是否能继续冲刺
-     */
-    val canContinueAfterHit: Boolean
-
-    /**
-     * 撞到实体后触发的效果
-     */
-    val hitEffects: List<AbilityProvider>
-
-    /**
-     * 判定的间隔.
-     */
-    val hitInterval: Long
-
-    companion object Factory : AbilityFactory<Dash> {
-        override fun create(key: Key, config: ConfigurationNode): Dash {
-            val stepDistance = config.node("step_distance").require<Double>()
-            val duration = config.node("duration").get<Long>() ?: 50
-            val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
-            val hitEffect = config.node("hit_effects").get<List<AbilityProvider>>() ?: emptyList()
-            val hitInterval = config.node("hit_interval").get<Long>() ?: 20
-            return Impl(key, config, stepDistance, duration, canContinueAfterHit, hitEffect, hitInterval)
-        }
+object Dash : AbilityFactory {
+    override fun create(key: Key, config: ConfigurationNode): Ability {
+        val stepDistance = config.node("step_distance").require<Double>()
+        val duration = config.node("duration").get<Long>() ?: 50
+        val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
+        val hitEffect = config.node("hit_effects").get<List<AbilityProvider>>() ?: emptyList()
+        return DashAbility(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
     }
+}
 
-    private class Impl(
-        key: Key,
-        config: ConfigurationNode,
-        override val stepDistance: Double,
-        override val duration: Long,
-        override val canContinueAfterHit: Boolean,
-        override val hitEffects: List<AbilityProvider>,
-        override val hitInterval: Long,
-    ) : Dash, AbilityBase(key, config) {
-        override fun mechanic(input: AbilityInput): Mechanic {
-            return DashAbilityMechanic(this)
-        }
+private class DashAbility(
+    key: Key,
+    config: ConfigurationNode,
+    val stepDistance: Double,
+    val duration: Long,
+    val canContinueAfterHit: Boolean,
+    val hitEffects: List<AbilityProvider>,
+) : AbilityBase(key, config) {
+    override fun mechanic(input: AbilityInput): Mechanic {
+        return DashAbilityMechanic(this)
     }
 }
 
 private class DashAbilityMechanic(
-    private val ability: Dash,
+    private val dash: DashAbility,
 ) : ActiveAbilityMechanic() {
 
     companion object {
@@ -94,13 +64,13 @@ private class DashAbilityMechanic(
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        if (tickCount >= ability.duration + STARTING_TICK) {
+        if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
         val entity = componentMap.castByEntity()
         val direction = entity.location.direction.setY(0).normalize()
-        val stepDistance = ability.stepDistance
+        val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
         var stepVector = direction.clone().multiply(stepDistance)
         // 检查前方和脚下的方块
@@ -130,7 +100,7 @@ private class DashAbilityMechanic(
         entity.velocity = stepVector
 
         if (affectEntityNearby(entity)) {
-            if (!ability.canContinueAfterHit) {
+            if (!dash.canContinueAfterHit) {
                 return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
             }
         }
@@ -147,7 +117,7 @@ private class DashAbilityMechanic(
             if (entity !is LivingEntity)
                 continue
 
-            for (abilityProvider in ability.hitEffects) {
+            for (abilityProvider in dash.hitEffects) {
                 val effect = abilityProvider.get()
                 val input = abilityInput(CasterAdapter.adapt(casterEntity)) {
                     target(TargetAdapter.adapt(entity))
