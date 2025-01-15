@@ -4,10 +4,10 @@ package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
-import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.abilitySupport
+import cc.mewcraft.wakame.ability.character.TargetAdapter
+import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
@@ -44,7 +44,7 @@ private class Blink(
     config: ConfigurationNode,
     val distance: Int,
     val teleportedMessages: AudienceMessageGroup,
-) : AbilityBase(key, config) {
+) : Ability(key, config) {
     override fun mechanic(input: AbilityInput): Mechanic {
         return BlinkAbilityMechanic(this)
     }

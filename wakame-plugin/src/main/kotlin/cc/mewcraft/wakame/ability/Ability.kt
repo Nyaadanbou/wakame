@@ -1,17 +1,26 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
-import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
+import java.util.stream.Stream
 
 /**
  * Represents a ability "attached" to a player.
@@ -20,8 +29,7 @@ import java.util.function.Predicate
  * player; By contrast, if the player has no ability, we say that the player
  * has no ability attached.
  */
-interface Ability : Keyed, Examinable {
-
+abstract class Ability(
     /**
      * The key of this ability.
      *
@@ -32,19 +40,46 @@ interface Ability : Keyed, Examinable {
      * [Ability] will be stored in the AbilityRegistry, and the corresponding
      * [Ability] will be found by the [key].
      */
-    override val key: Key
+    final override val key: Key,
+    config: ConfigurationNode,
+) : Keyed, Examinable {
+    companion object : KoinComponent {
+        private val wakameWorld: WakameWorld by inject()
+    }
 
     /**
      * The display infos of this ability.
      */
-    val displays: AbilityDisplay
+    val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay.empty()
+
+    /**
+     * 添加一个 [Ability] 状态.
+     */
+    private fun addMechanic(input: AbilityInput) {
+        wakameWorld.createEntity(key.asString()) {
+            it += EntityType.ABILITY
+            it += Tags.DISPOSABLE
+            it += CastBy(input.castBy)
+            it += TargetTo(input.target)
+            HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
+            input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
+            it += ManaCostComponent(input.manaCost)
+            it += MechanicComponent(mechanic(input))
+            it += StatePhaseComponent(StatePhase.IDLE)
+            it += TickCountComponent(.0)
+            it += TriggerComponent(input.trigger)
+            it += MochaEngineComponent(input.mochaEngine)
+        }
+    }
 
     /**
      * 使用 [input] 记录技能的信息到 ECS 中.
      *
      * 具体是先调用 [mechanic], 再将返回结果添加到 ECS 中.
      */
-    fun recordBy(input: AbilityInput)
+    fun recordBy(input: AbilityInput) {
+        addMechanic(input)
+    }
 
     /**
      * 返回一个技能执行的结果, 只有执行 [Mechanic] 才会真正执行技能逻辑.
@@ -53,21 +88,29 @@ interface Ability : Keyed, Examinable {
      * @see ActiveAbilityMechanic
      * @see PassiveAbilityMechanic
      */
-    fun mechanic(input: AbilityInput): Mechanic
+    abstract fun mechanic(input: AbilityInput): Mechanic
 
-    companion object {
-        /**
-         * An empty ability.
-         */
-        fun empty(): Ability = EmptyAbility
+    override fun examinableProperties(): Stream<out ExaminableProperty> {
+        return Stream.of(
+            ExaminableProperty.of("key", key),
+            ExaminableProperty.of("displays", displays),
+        )
     }
-}
 
-private data object EmptyAbility : Ability {
-    override val key: Key = Key.key(Namespaces.ABILITY, "empty")
-    override val displays: AbilityDisplay = AbilityDisplay.empty()
-    override fun recordBy(input: AbilityInput) = Unit
-    override fun mechanic(input: AbilityInput): Mechanic = EmptyAbilityMechanic
+    override fun toString(): String {
+        return toSimpleString()
+    }
+
+    override fun hashCode(): Int {
+        return key.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Ability) return false
+
+        return key == other.key
+    }
 }
 
 internal object AbilitySerializer : ScalarSerializer<AbilityProvider>(typeTokenOf()) {

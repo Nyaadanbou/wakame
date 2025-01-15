@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.ability.archetype.implement
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.AbilityProvider
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
-import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -42,7 +42,7 @@ private class Dash(
     val duration: Long,
     val canContinueAfterHit: Boolean,
     val hitEffects: List<AbilityProvider>,
-) : AbilityBase(key, config) {
+) : Ability(key, config) {
     override fun mechanic(input: AbilityInput): Mechanic {
         return DashAbilityMechanic(this)
     }
