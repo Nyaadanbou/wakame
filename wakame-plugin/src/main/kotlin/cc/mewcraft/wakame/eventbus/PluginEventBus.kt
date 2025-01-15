@@ -10,7 +10,7 @@ import kotlinx.coroutines.plus
 
 internal object PluginEventBus {
     private val eventBus: EventBus =
-        if (SharedConstants.IS_RUNNING_IN_IDE) {
+        if (SharedConstants.isRunningInIde) {
             EventBus(CoroutineScope(Dispatchers.Unconfined) + SupervisorJob())
         } else {
             EventBus(NEKO.scope)

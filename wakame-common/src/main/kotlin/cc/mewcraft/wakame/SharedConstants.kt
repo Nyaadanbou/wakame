@@ -11,7 +11,7 @@ object SharedConstants {
     /**
      * 检查 JVM 是否在 IDE 中运行.
      */
-    val IS_RUNNING_IN_IDE = listOf(
+    val isRunningInIde = listOf(
         "org.junit.Test", // JUnit 4
         "org.junit.jupiter.api.Test" // JUnit 5
     ).map {

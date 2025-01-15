@@ -96,7 +96,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
                 for (key in recipeKeys) {
-                    val stationRecipe = if (SharedConstants.IS_RUNNING_IN_IDE) {
+                    val stationRecipe = if (SharedConstants.isRunningInIde) {
                         CraftingStationRecipeRegistry.raw[key]
                     } else {
                         CraftingStationRecipeRegistry[key]

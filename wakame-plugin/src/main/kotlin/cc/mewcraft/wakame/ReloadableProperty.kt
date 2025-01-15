@@ -19,7 +19,7 @@ class ReloadableProperty<T>(
     private val loader: () -> T,
 ) : ReadOnlyProperty<Any?, T>, Listener {
     init {
-        if (!SharedConstants.IS_RUNNING_IN_IDE) {
+        if (!SharedConstants.isRunningInIde) {
             registerEvents()
         }
     }

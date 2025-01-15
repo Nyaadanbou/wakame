@@ -4,7 +4,7 @@
 kotlin = "2.1.0"
 kotlinx-coroutines-core = "1.10.1"
 nyaadanbou-conventions = "1.1"
-paperweight = "1.7.5"
+paperweight = "1.7.7"
 
 # Shaded deps
 koin = "4.0.0"

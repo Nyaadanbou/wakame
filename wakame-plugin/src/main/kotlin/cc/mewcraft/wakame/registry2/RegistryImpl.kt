@@ -84,7 +84,7 @@ open class SimpleRegistry<T>(
     }
 
     override fun resetRegistry() {
-        if (!SharedConstants.IS_RUNNING_IN_IDE) {
+        if (!SharedConstants.isRunningInIde) {
             return // 仅允许在 IDE 环境下调用该函数
         }
 

@@ -8,7 +8,7 @@ object Util {
     private var thePauser: Consumer<Throwable> = Consumer { throw it }
 
     fun <T : Throwable> pauseInIde(t: T): T {
-        if (SharedConstants.IS_RUNNING_IN_IDE) {
+        if (SharedConstants.isRunningInIde) {
             LOGGER.error("Trying to throw a fatal exception, pausing in IDE", t)
             doPause(t)
         } else {

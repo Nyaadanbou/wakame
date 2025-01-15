@@ -45,12 +45,13 @@ import org.koin.core.context.stopKoin
 val NEKO: WakamePlugin
     get() = requireNotNull(WakamePlugin.INSTANCE) { "plugin is not initialized yet" }
 
-val LOGGER: ComponentLogger
-    get() = if (!SharedConstants.IS_RUNNING_IN_IDE) {
+val LOGGER: ComponentLogger by lazy {
+    if (!SharedConstants.isRunningInIde) {
         NEKO.componentLogger
     } else {
         ComponentLogger.logger("Test")
     }
+}
 
 val SERVER: Server
     get() = Bukkit.getServer()
