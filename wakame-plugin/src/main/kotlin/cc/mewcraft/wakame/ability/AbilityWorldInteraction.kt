@@ -4,8 +4,7 @@ import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -38,7 +37,7 @@ internal object AbilityWorldInteraction : KoinComponent {
                     return@forEach
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id
-                    abilities.add(AbilityRegistry.INSTANCES[Key.key(id)])
+                    abilities.add(KoishRegistries.ABILITY.getOrThrow(id))
                 }
             }
         }

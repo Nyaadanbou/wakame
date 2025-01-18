@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.ability.TriggerVariantSerializer
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer
 import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
@@ -24,7 +23,6 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     // Koish Object
     .register(AttributeModifierSerializer)
     .register(RandomizedValueSerializer)
-    .register(AbilityTriggerSerializer)
     .register(TriggerVariantSerializer)
     .register(EvaluableSerializer)
     // Adventure Text
@@ -48,6 +46,7 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
     // Koish Registry
     .register(KoishRegistries.ABILITY.holderByNameTypeSerializer())
+    .register(KoishRegistries.ABILITY_ARCHETYPE.valueByNameTypeSerializer())
     .register(KoishRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(KoishRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(KoishRegistries.ENTITY_TYPE_HOLDER.holderByNameTypeSerializer())
@@ -57,6 +56,7 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(KoishRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
+    .register(KoishRegistries.TRIGGER.valueByNameTypeSerializer())
     .build()
 
 object TypeSerializers {

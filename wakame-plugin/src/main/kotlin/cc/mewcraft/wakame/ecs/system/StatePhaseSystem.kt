@@ -5,9 +5,10 @@ import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.bukkit.PlayerAbilityStateChangeEvent
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.serverTick
 import cc.mewcraft.wakame.util.text.mini
+import cc.mewcraft.wakame.event.PlayerAbilityStateChangeEvent
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
@@ -40,7 +41,7 @@ class StatePhaseSystem : IteratingSystem(
 
         entity[StatePhaseComponent].phase = newPhase
         val player = entity[CastBy].entity as? Player ?: return
-        onStateChange(id, player, AbilityRegistry.INSTANCES[Key.key(id)], oldPhase, newPhase)
+        onStateChange(id, player, KoishRegistries.ABILITY.getOrThrow(id), oldPhase, newPhase)
         entity.configure { it -= Tags.NEXT_STATE }
     }
 

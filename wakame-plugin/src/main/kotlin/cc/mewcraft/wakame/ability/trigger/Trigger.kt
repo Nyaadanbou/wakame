@@ -1,19 +1,10 @@
 package cc.mewcraft.wakame.ability.trigger
 
-import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.typeTokenOf
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.spongepowered.configurate.serialize.ScalarSerializer
-import org.spongepowered.configurate.serialize.SerializationException
 import xyz.xenondevs.commons.collections.contentEquals
-import java.lang.reflect.Type
-import java.util.Collections.emptyList
-import java.util.function.Predicate
 import java.util.stream.Stream
 
 /**
@@ -21,69 +12,67 @@ import java.util.stream.Stream
  *
  * 这是一个顶级接口.
  */
-sealed interface Trigger : Keyed, Examinable
+sealed interface Trigger : Examinable {
+    /**
+     * 用来在配置文件里指定该 [Trigger].
+     */
+    val id: String
+}
 
 /**
  * 代表一个由单个按键输入完成的操作.
  */
 enum class SingleTrigger(
     /**
-     * The identifier of the trigger.
-     *
-     * This is used for concatenation of triggers in a [SequenceTrigger].
+     * 用于拼接成 [SequenceTrigger] 的字符.
      */
-    val id: Char,
-
-    /**
-     * 用来在配置文件里指定该 [SingleTrigger].
-     */
-    override val key: Key,
-) : Trigger {
+    val char: Char,
+    override val id: String,
+): Trigger {
     /**
      * 代表玩家按下了左键, 具体上是指左键空气与方块的交互.
      *
      * 不包括对生物的左键攻击.
      */
-    LEFT_CLICK('0', Key.key(Namespaces.TRIGGER, "generic/left_click")),
+    LEFT_CLICK('0', "generic/left_click"),
 
     /**
      * 代表玩家按下了右键, 具体上是指右键空气与方块的交互.
      *
      * 不包括对生物的右键交互.
      */
-    RIGHT_CLICK('1', Key.key(Namespaces.TRIGGER, "generic/right_click")),
+    RIGHT_CLICK('1', "generic/right_click"),
 
     /**
      * 代表玩家按下了攻击键, 具体上是指左键对生物的攻击.
      *
      * 不包括对空气与方块的交互.
      */
-    ATTACK('2', Key.key(Namespaces.TRIGGER, "generic/attack")),
+    ATTACK('2', "generic/attack"),
 
     /**
      * 代表玩家按下了跳跃键.
      */
-    JUMP('3', Key.key(Namespaces.TRIGGER, "generic/jump")),
+    JUMP('3', "generic/jump"),
 
     /**
      * 玩家进行了移动操作, 不包括跳跃.
      */
-    MOVE('4', Key.key(Namespaces.TRIGGER, "generic/walk")),
+    MOVE('4', "generic/walk"),
 
     /**
      * 代表玩家按下了潜行键.
      */
-    SNEAK('5', Key.key(Namespaces.TRIGGER, "generic/sneak")),
-
-    /**
-     * 代表玩家没有进行任何操作.
-     */
-    NOOP(Char.MIN_VALUE, Key.key(Namespaces.TRIGGER, "generic/noop")),
+    SNEAK('5', "generic/sneak"),
     ;
+
+    init {
+        KoishRegistries.TRIGGER.add(id, this)
+    }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("id", id),
+            ExaminableProperty.of("id", char),
             ExaminableProperty.of("name", name),
         )
     }
@@ -96,92 +85,38 @@ enum class SingleTrigger(
 /**
  * 代表一个由多个按键输入组成的操作, 也就是该触发器要求玩家按顺序触发指定的 [SingleTrigger].
  */
-interface SequenceTrigger : Trigger {
+enum class SequenceTrigger(
     /**
      * 组成该触发器序列的触发器 (按顺序).
      */
-    val triggers: List<SingleTrigger>
+    val triggers: List<SingleTrigger>,
+) : Trigger {
+    LLL(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK),
+    LLR(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK),
+    LRL(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK),
+    LRR(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK),
+    RRR(SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK),
+    RRL(SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK),
+    RLR(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK),
+    RLL(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK),
 
-    fun isStartWith(triggers: List<SingleTrigger>): Boolean
+    ;
+
+    constructor(vararg triggers: SingleTrigger) : this(triggers.toList())
+
+    override val id: String = "combo/${triggers.map { it.char }.joinToString("")}"
+
+    init {
+        KoishRegistries.TRIGGER.add(id, this)
+    }
 
     companion object {
-        /**
-         * 从给定的 [序列][sequence] 创建一个 [SequenceTrigger].
-         */
-        fun of(sequence: List<SingleTrigger>): SequenceTrigger {
-            return Impl(sequence)
+        fun fromSingleTriggers(vararg triggers: SingleTrigger): SequenceTrigger? {
+            return fromSingleTriggers(triggers.toList())
         }
 
-        /**
-         * 从给定的 [triggers] 生成所有可能的 [SequenceTrigger].
-         *
-         * 例如 [triggers] 为: `[0, 1]`, [length] 为 `3`, 那么将生成 `2^3=8` 个 [SequenceTrigger]:
-         * `000`, `001`, `010`, `011`, `100`, `101`, `110`, `111`.
-         */
-        fun generate(triggers: List<SingleTrigger>, length: Int): List<SequenceTrigger> {
-            val results = mutableListOf<SequenceTrigger>()
-
-            fun generate(currentCombo: List<SingleTrigger>) {
-                if (currentCombo.size == length) {
-                    results.add(Impl(currentCombo))
-                    return
-                }
-
-                for (i in triggers.indices) {
-                    generate(currentCombo + triggers[i])
-                }
-            }
-
-            generate(emptyList())
-            return results
+        fun fromSingleTriggers(triggers: List<SingleTrigger>): SequenceTrigger? {
+            return SequenceTrigger.entries.find { it.triggers.contentEquals(triggers) }
         }
-    }
-
-    private class Impl(
-        override val triggers: List<SingleTrigger>,
-    ) : SequenceTrigger {
-        override val key: Key = Key.key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
-
-        override fun isStartWith(triggers: List<SingleTrigger>): Boolean {
-            return this.triggers.take(triggers.size).contentEquals(triggers)
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other)
-                return true
-            if (other !is SequenceTrigger)
-                return false
-            if (triggers.size != other.triggers.size)
-                return false
-            triggers.forEachIndexed { index, trigger ->
-                if (trigger != other.triggers[index]) {
-                    return false
-                }
-            }
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return triggers.fold(0) { hash, trigger -> 31 * hash + trigger.hashCode() }
-        }
-    }
-}
-
-internal object AbilityTriggerSerializer : ScalarSerializer<Trigger>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): Trigger {
-        if (obj is String) {
-            val triggers = AbilityRegistry.TRIGGERS
-            val string = obj.lowercase()
-            val trigger = triggers.getOrNull(Key.key(string))
-                ?: triggers.getOrNull(Key.key(Namespaces.TRIGGER, string))
-                ?: throw SerializationException("Cannot find trigger with key $obj")
-            return trigger
-        }
-
-        throw SerializationException("Cannot deserialize object of type ${obj::class.simpleName} to AbilityTrigger")
-    }
-
-    override fun serialize(item: Trigger?, typeSupported: Predicate<Class<*>>?): Any {
-        throw UnsupportedOperationException()
     }
 }

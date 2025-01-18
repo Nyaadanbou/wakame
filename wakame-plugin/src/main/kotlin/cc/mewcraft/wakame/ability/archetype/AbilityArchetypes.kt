@@ -4,24 +4,19 @@ import cc.mewcraft.wakame.ability.archetype.implement.BlackHoleArchetype
 import cc.mewcraft.wakame.ability.archetype.implement.BlinkArchetype
 import cc.mewcraft.wakame.ability.archetype.implement.DashArchetype
 import cc.mewcraft.wakame.ability.archetype.implement.ExtraJumpArchetype
-import cc.mewcraft.wakame.registry.Registry
-import cc.mewcraft.wakame.registry.SimpleRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.Registry
 
 /**
  * 技能工厂的集合. 用于获取用于创建技能的工厂类.
  */
 internal object AbilityArchetypes {
-    private val ARCHETYPES: Registry<String, AbilityArchetype> = SimpleRegistry()
+    val BLACK_HOLE = register("black_hole", BlackHoleArchetype)
+    val BLINK = register("blink", BlinkArchetype)
+    val DASH = register("dash", DashArchetype)
+    val EXTRA_JUMP = register("extra_jump", ExtraJumpArchetype)
 
-    fun load() {
-        ARCHETYPES.register("black_hole", BlackHoleArchetype)
-        ARCHETYPES.register("blink", BlinkArchetype)
-        ARCHETYPES.register("dash", DashArchetype)
-        ARCHETYPES.register("extra_jump", ExtraJumpArchetype)
+    private inline fun <reified T : AbilityArchetype> register(id: String, entry: T): T {
+        return Registry.register(KoishRegistries.ABILITY_ARCHETYPE, id, entry)
     }
-
-    operator fun get(registryName: String): AbilityArchetype? {
-        return ARCHETYPES[registryName]
-    }
-
 }

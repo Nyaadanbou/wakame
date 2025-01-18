@@ -151,8 +151,8 @@ class PlayerStateInfo(
             stateDisplay.displayProgress(completeSequence, player)
 
             if (currentSequence.isFull()) {
-                val sequence = SequenceTrigger.of(completeSequence)
-                val abilityOnSequence = getAbilityByTrigger(sequence)
+                val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
+                val abilityOnSequence = sequence?.let { getAbilityByTrigger(it) }
                 if (abilityOnSequence == null) {
                     currentSequence.clear()
                     stateDisplay.displayFailure(completeSequence, player)

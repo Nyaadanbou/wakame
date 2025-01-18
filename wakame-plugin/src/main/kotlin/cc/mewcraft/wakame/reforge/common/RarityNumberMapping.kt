@@ -45,6 +45,7 @@ internal object RarityNumberMappingSerializer : TypeSerializer<RarityNumberMappi
         type: Type,
         node: ConfigurationNode,
     ): RarityNumberMapping {
+        // FIXME: 稀有度不要 Namespace
         val map = node.childrenMap()
             .mapKeys { Key.key(Namespaces.RARITY, it.key.toString()) }
             .mapValues { it.value.double }

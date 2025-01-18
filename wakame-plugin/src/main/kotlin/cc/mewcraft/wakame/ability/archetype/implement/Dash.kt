@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.ability.archetype.implement
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityProvider
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.abilitySupport
@@ -30,7 +29,7 @@ object DashArchetype : AbilityArchetype {
         val stepDistance = config.node("step_distance").require<Double>()
         val duration = config.node("duration").get<Long>() ?: 50
         val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
-        val hitEffect = config.node("hit_effects").get<List<AbilityProvider>>() ?: emptyList()
+        val hitEffect = config.node("hit_effects").get<List<Ability>>() ?: emptyList()
         return Dash(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
     }
 }
@@ -41,7 +40,7 @@ private class Dash(
     val stepDistance: Double,
     val duration: Long,
     val canContinueAfterHit: Boolean,
-    val hitEffects: List<AbilityProvider>,
+    val hitEffects: List<Ability>,
 ) : Ability(key, config) {
     override fun mechanic(input: AbilityInput): Mechanic {
         return DashAbilityMechanic(this)
@@ -117,12 +116,11 @@ private class DashAbilityMechanic(
             if (entity !is LivingEntity)
                 continue
 
-            for (abilityProvider in dash.hitEffects) {
-                val effect = abilityProvider.get()
+            for (ability in dash.hitEffects) {
                 val input = abilityInput(CasterAdapter.adapt(casterEntity)) {
                     target(TargetAdapter.adapt(entity))
                 }
-                effect.recordBy(input)
+                ability.recordBy(input)
             }
         }
         return true

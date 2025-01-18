@@ -3,19 +3,18 @@ package cc.mewcraft.wakame.ability
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.data.CompoundTag
 import cc.mewcraft.wakame.util.data.getIntOrNull
 import cc.mewcraft.wakame.util.data.getStringOrNull
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.text.mini
 import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
@@ -88,7 +87,7 @@ fun PlayerAbility(
 fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
-    val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
+    val trigger = node.node("trigger").get<Trigger>()
     val variant = node.node("variant").require<TriggerVariant>()
     val manaCost = node.node("mana_cost").require<Evaluable<*>>()
     return SimplePlayerAbility(id, trigger, variant, manaCost)
@@ -115,7 +114,7 @@ interface PlayerAbility {
     /**
      * 触发此技能的触发器.
      */
-    val trigger: Trigger
+    val trigger: Trigger?
 
     /**
      * 可以触发此技能的物品变体.
@@ -165,12 +164,12 @@ interface PlayerAbility {
  */
 internal data class SimplePlayerAbility(
     override val id: Key,
-    override val trigger: Trigger,
+    override val trigger: Trigger?,
     override val variant: TriggerVariant,
     override val manaCost: Evaluable<*>,
 ) : PlayerAbility {
     override val instance: Ability
-        get() = AbilityRegistry.INSTANCES[id]
+        get() = KoishRegistries.ABILITY.getOrThrow(id)
     override val displayName: Component
         get() = instance.displays.name.mini
     override val description: List<Component>
@@ -221,8 +220,8 @@ private const val NBT_ABILITY_TRIGGER = "trigger"
 private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
-private fun CompoundTag.readTrigger(): Trigger {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { AbilityRegistry.TRIGGERS[Key.key(it)] } ?: SingleTrigger.NOOP
+private fun CompoundTag.readTrigger(): Trigger? {
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.TRIGGER[Identifiers.of(it)] }
 }
 
 private fun CompoundTag.readVariant(): TriggerVariant {
@@ -236,10 +235,10 @@ private fun CompoundTag.readEvaluable(): Evaluable<*> {
     return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Evaluable.parseExpression(it) } ?: Evaluable.parseNumber(0)
 }
 
-private fun CompoundTag.writeTrigger(trigger: Trigger) {
-    if (trigger == SingleTrigger.NOOP)
+private fun CompoundTag.writeTrigger(trigger: Trigger?) {
+    if (trigger == null)
         return
-    putString(NBT_ABILITY_TRIGGER, trigger.key.asString())
+    putString(NBT_ABILITY_TRIGGER, trigger.id)
 }
 
 private fun CompoundTag.writeVariant(variant: TriggerVariant) {

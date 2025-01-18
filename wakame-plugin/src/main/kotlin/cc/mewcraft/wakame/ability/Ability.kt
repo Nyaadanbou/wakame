@@ -8,18 +8,15 @@ import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
+import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.serialize.ScalarSerializer
-import java.lang.reflect.Type
-import java.util.function.Predicate
 import java.util.stream.Stream
 
 /**
@@ -50,7 +47,7 @@ abstract class Ability(
     /**
      * The display infos of this ability.
      */
-    val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay.empty()
+    val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay()
 
     /**
      * 添加一个 [Ability] 状态.
@@ -67,7 +64,7 @@ abstract class Ability(
             it += MechanicComponent(mechanic(input))
             it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
-            it += TriggerComponent(input.trigger)
+            input.trigger?.let { trigger -> it += TriggerComponent(trigger) }
             it += MochaEngineComponent(input.mochaEngine)
         }
     }
@@ -110,15 +107,5 @@ abstract class Ability(
         if (other !is Ability) return false
 
         return key == other.key
-    }
-}
-
-internal object AbilitySerializer : ScalarSerializer<AbilityProvider>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): AbilityProvider {
-        return AbilityProvider(Key.key(obj.toString()))
-    }
-
-    override fun serialize(item: AbilityProvider, typeSupported: Predicate<Class<*>>?): Any {
-        throw UnsupportedOperationException()
     }
 }

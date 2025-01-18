@@ -1,20 +1,8 @@
 package cc.mewcraft.wakame.ability.context
 
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.ManaCostComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.TriggerComponent
-import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.external.ComponentMap
@@ -46,9 +34,9 @@ interface AbilityInput {
     val target: Target
 
     /**
-     * 此次技能的触发器 [Trigger].
+     * 此次技能的触发器 [Trigger], null 表示没有触发器.
      */
-    val trigger: Trigger
+    val trigger: Trigger?
 
     /**
      * 如果 [castBy] 可以转变成一个 [User], 则返回它的 [User] 实例.
@@ -91,16 +79,35 @@ class AbilityInputDSL(
     private val castBy: Caster,
 ) {
     private var target: Target = TargetAdapter.adapt(castBy)
-    private var trigger: Trigger = SingleTrigger.NOOP
+    private var trigger: Trigger? = null
     private var holdBy: Pair<ItemSlot, NekoStack>? = null
     private var manaCost: Evaluable<*> = Evaluable.parseNumber(0)
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
-    fun trigger(trigger: Trigger) = apply { this.trigger = trigger }
-    fun target(target: Target) = apply { this.target = target }
-    fun holdBy(holdBy: Pair<ItemSlot, NekoStack>?) = apply { this.holdBy = holdBy }
-    fun manaCost(manaCost: Evaluable<*>) = apply { this.manaCost = manaCost }
-    fun mochaEngine(mochaEngine: MochaEngine<*>) = apply { this.mochaEngine = mochaEngine }
+    fun trigger(trigger: Trigger?): AbilityInputDSL {
+        this.trigger = trigger
+        return this
+    }
+
+    fun target(target: Target): AbilityInputDSL {
+        this.target = target
+        return this
+    }
+
+    fun holdBy(holdBy: Pair<ItemSlot, NekoStack>?): AbilityInputDSL {
+        this.holdBy = holdBy
+        return this
+    }
+
+    fun manaCost(manaCost: Evaluable<*>): AbilityInputDSL {
+        this.manaCost = manaCost
+        return this
+    }
+
+    fun mochaEngine(mochaEngine: MochaEngine<*>): AbilityInputDSL {
+        this.mochaEngine = mochaEngine
+        return this
+    }
 
     fun build(): AbilityInput = SimpleAbilityInput(
         castBy = castBy,
@@ -117,7 +124,7 @@ class AbilityInputDSL(
 private class SimpleAbilityInput(
     override val castBy: Caster,
     override val target: Target,
-    override val trigger: Trigger,
+    override val trigger: Trigger?,
     override val holdBy: Pair<ItemSlot, NekoStack>?,
     override val manaCost: Evaluable<*>,
     override val mochaEngine: MochaEngine<*>,
@@ -136,6 +143,7 @@ private class SimpleAbilityInput(
             .holdBy(holdBy)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
+
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
@@ -159,7 +167,7 @@ private class ComponentMapAbilityInput(
         get() = requireNotNull(componentMap[CastBy]?.caster) { "Caster not found in componentMap" }
     override val target: Target
         get() = requireNotNull(componentMap[TargetTo]?.target) { "Target not found in componentMap" }
-    override val trigger: Trigger
+    override val trigger: Trigger?
         get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
     override val user: User<*>?
         get() = castBy.player?.toUser()
@@ -181,6 +189,7 @@ private class ComponentMapAbilityInput(
             .holdBy(holdBy)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
+
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

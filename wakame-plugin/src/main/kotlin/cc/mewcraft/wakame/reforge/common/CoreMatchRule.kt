@@ -65,7 +65,6 @@ interface CoreMatchRule : Examinable {
  * [CoreMatchRule] 的序列化器.
  *
  * 依赖的序列化器:
- * - [cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer]
  * - [cc.mewcraft.wakame.ability.TriggerVariantSerializer]
  */
 internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {

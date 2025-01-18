@@ -23,10 +23,16 @@ object KoishRegistries {
     ///
 
     /**
-     * 机制.
+     * 技能实例.
      */
     @JvmField
     val ABILITY: WritableRegistry<Ability> = registerSimple(KoishRegistryKeys.ABILITY)
+
+    /**
+     * 技能原型.
+     */
+    @JvmField
+    val ABILITY_ARCHETYPE = registerSimple(KoishRegistryKeys.ABILITY_ARCHETYPE)
 
     /**
      * 属性.
@@ -115,6 +121,12 @@ object KoishRegistries {
      */
     @JvmField
     val RARITY: WritableDefaultedRegistry<RarityType> = registerDefaulted(KoishRegistryKeys.RARITY, "common") // = koish:common
+
+    /**
+     * 触发器.
+     */
+    @JvmField
+    val TRIGGER = registerSimple(KoishRegistryKeys.TRIGGER)
 
     ///
 

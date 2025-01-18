@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -24,7 +24,7 @@ class AbilityPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestion
     }
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<String> {
-        val paths = AbilityRegistry.PATHS
+        val paths = KoishRegistries.ABILITY.keys.map { it.value.value() }
 
         val peekString = commandInput.peekString()
         if (peekString !in paths) {
@@ -36,7 +36,7 @@ class AbilityPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestion
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return AbilityRegistry.PATHS
+        return KoishRegistries.ABILITY.keys.map { it.value.value() }
     }
 }
 

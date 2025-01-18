@@ -18,8 +18,8 @@ conditions:
 
 display:
   triggers:
-    trigger:generic/left_click: "<green><b>L"
-    trigger:generic/right_click: "<green><b>R"
+    generic/left_click: "<green><b>L"
+    generic/right_click: "<green><b>R"
 
   player_state:
     connector: "<gray>-"
