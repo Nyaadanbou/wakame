@@ -56,7 +56,7 @@ class CheckMissingAttributeConfigTest : KoinTest {
         ElementRegistryConfigStorage.init()
         AttributeBundleFacadeRegistryConfigStorage.init()
 
-        val config = Configs.YAML[AttributeBundleFacadeRegistryConfigStorage.FILE_PATH]
+        val config = Configs[AttributeBundleFacadeRegistryConfigStorage.CONFIG_ID]
 
         val rootNode = config.get()
         val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.ids

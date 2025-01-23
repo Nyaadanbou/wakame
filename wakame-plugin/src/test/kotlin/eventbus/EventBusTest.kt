@@ -1,21 +1,10 @@
 package eventbus
 
-import cc.mewcraft.wakame.eventbus.EventBus
-import cc.mewcraft.wakame.eventbus.subscribe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
+import cc.mewcraft.wakame.util.EventBus
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.Executors
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 data class TestEvent(val x: String)
 

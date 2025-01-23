@@ -1,6 +1,6 @@
 package item
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.damageModule
@@ -13,11 +13,7 @@ import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
@@ -33,7 +29,6 @@ import nbt.CommonNBT
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.core.qualifier.named
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.inject
@@ -89,7 +84,7 @@ object CommonNekoStackTest {
 }
 
 fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, ConfigurationNode> {
-    val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
+    val pluginDataDir = get<File>(InjectionQualifier.DATA_FOLDER)
     val itemsDir = pluginDataDir.resolve("items")
     val namespaceDir = itemsDir.resolve(namespace)
     val itemFile = namespaceDir.resolve("$path.yml")

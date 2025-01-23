@@ -41,12 +41,12 @@ class ItemRendererInitTest : KoinTest {
 
     @Test
     fun `initialize item renderers`() {
-        ItemRenderers.SIMPLE.initialize0()
-        ItemRenderers.STANDARD.initialize0()
-        ItemRenderers.CRAFTING_STATION.initialize0()
-        ItemRenderers.MERGING_TABLE.initialize0()
-        ItemRenderers.MODDING_TABLE.initialize0()
-        ItemRenderers.REROLLING_TABLE.initialize0()
-        ItemRenderers.REPAIRING_TABLE.initialize0()
+        ItemRenderers.SIMPLE.loadDataFromConfigs()
+        ItemRenderers.STANDARD.loadDataFromConfigs()
+        ItemRenderers.CRAFTING_STATION.loadDataFromConfigs()
+        ItemRenderers.MERGING_TABLE.loadDataFromConfigs()
+        ItemRenderers.MODDING_TABLE.loadDataFromConfigs()
+        ItemRenderers.REROLLING_TABLE.loadDataFromConfigs()
+        ItemRenderers.REPAIRING_TABLE.loadDataFromConfigs()
     }
 }

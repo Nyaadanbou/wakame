@@ -1,10 +1,11 @@
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.InjectionQualifier
+import cc.mewcraft.wakame.LOGGER
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.koin.core.module.Module
-import org.koin.core.qualifier.named
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolute
@@ -12,19 +13,29 @@ import kotlin.io.path.absolute
 /* Common environment for running unit tests */
 
 fun commonEnv(): Module = module {
-    single<Logger> { LoggerFactory.getLogger("TestEnv") }
-    single<Path>(named(PLUGIN_ASSETS_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).absolute() }
-    single<File>(named(PLUGIN_ASSETS_DIR)) { get<Path>(named(PLUGIN_ASSETS_DIR)).toFile() }
+    single<ComponentLogger> { LOGGER } withOptions { bind<Logger>() }
 }
 
 fun mainEnv(): Module = module {
     includes(commonEnv())
-    single<Path>(named(PLUGIN_DATA_DIR)) { Path.of("src/main/resources").absolute() }
-    single<File>(named(PLUGIN_DATA_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).toFile() }
+
+    val resourcesDir = Path.of("src/main/resources").absolute()
+    single<Path>(InjectionQualifier.DATA_FOLDER) { resourcesDir }
+    single<File>(InjectionQualifier.DATA_FOLDER) { resourcesDir.toFile() }
+
+    val assetsDir = Path.of("src/main/resources/assets").absolute()
+    single<Path>(InjectionQualifier.ASSETS_FOLDER) { assetsDir }
+    single<File>(InjectionQualifier.ASSETS_FOLDER) { assetsDir.toFile() }
 }
 
 fun testEnv(): Module = module {
     includes(commonEnv())
-    single<Path>(named(PLUGIN_DATA_DIR)) { Path.of("src/test/resources").absolute() }
-    single<File>(named(PLUGIN_DATA_DIR)) { get<Path>(named(PLUGIN_DATA_DIR)).toFile() }
+
+    val resourcesDir = Path.of("src/test/resources").absolute()
+    single<Path>(InjectionQualifier.DATA_FOLDER) { resourcesDir }
+    single<File>(InjectionQualifier.DATA_FOLDER) { resourcesDir.toFile() }
+
+    val assetsDir = Path.of("src/test/resources/assets").absolute()
+    single<Path>(InjectionQualifier.ASSETS_FOLDER) { assetsDir }
+    single<File>(InjectionQualifier.ASSETS_FOLDER) { assetsDir.toFile() }
 }
