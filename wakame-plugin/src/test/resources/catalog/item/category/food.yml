@@ -1,4 +1,6 @@
+# 该类别的图标
 icon: "internal:menu/catalog/category/food"
+# 该类别的菜单布局
 menu_settings:
   title: "❊ 食物"
   # x: background

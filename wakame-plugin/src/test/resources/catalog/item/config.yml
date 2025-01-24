@@ -1,7 +1,7 @@
 # 物品图鉴全局设置
 
 # 主菜单布局
-# 展示所有分类的菜单
+# 展示所有类别的菜单
 main_menu_settings:
   title: "物品图鉴"
   # x: background

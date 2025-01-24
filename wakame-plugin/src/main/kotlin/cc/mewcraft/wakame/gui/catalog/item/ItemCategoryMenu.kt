@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.registry.ItemRegistry
+import cc.mewcraft.wakame.item.ItemStacks
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -59,7 +59,7 @@ class ItemCategoryMenu(
         // TODO 可以缓存，只有重载时会变化
         // 类别菜单所展示的物品
         // 无法创建则显示错误占位物品
-        builder.setContent(category.items.map { itemX -> SimpleItem(itemX.createItemStack() ?: ItemRegistry.ERROR_ITEM_STACK) })
+        builder.setContent(category.items.map { itemX -> SimpleItem(itemX.createItemStack() ?: ItemStacks.createUnknown(itemX.identifier)) })
     }
 
     /**

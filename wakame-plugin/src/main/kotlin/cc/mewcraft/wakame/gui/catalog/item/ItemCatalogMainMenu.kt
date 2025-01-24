@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.ItemCatalogManager
-import cc.mewcraft.wakame.display2.NekoItemHolder
+import cc.mewcraft.wakame.catalog.item.CategoryRegistry
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.gui.BasicMenuSettings.SlotDisplay
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -50,7 +52,7 @@ class ItemCatalogMainMenu(
         builder.addIngredient('s', SearchItem())
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // TODO 类别的图标可以缓存，重载才需要变化
-        builder.setContent(ItemCatalogManager.getCategoryMap().values.map { category -> CategoryItem(category) })
+        builder.setContent(CategoryRegistry.getCategoryMap().values.map { category -> CategoryItem(category) })
     }
 
     /**
@@ -117,7 +119,12 @@ class ItemCatalogMainMenu(
         private val category: Category
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return BasicMenuSettings.SlotDisplay(NekoItemHolder.get(category.icon)).resolveToItemWrapper()
+            val itemId = category.icon
+            val itemEntry = KoishRegistries.ITEM.getEntry(itemId) ?: run {
+                LOGGER.warn("Menu icon of category '${category.id}' with item ID '$itemId' not found in the item registry, using default icon")
+                KoishRegistries.ITEM.getDefaultEntry()
+            }
+            return SlotDisplay(itemEntry).resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
