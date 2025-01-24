@@ -1,13 +1,12 @@
-package cc.mewcraft.wakame.gui.guidebook
+package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXRegistry
-import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.display2.NekoItemHolder
-import cc.mewcraft.wakame.display2.implementation.simple.SimpleItemRendererContext
-import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.typeTokenOf
+import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -22,7 +21,8 @@ import java.lang.reflect.Type
  */
 data class Category(
     val id: String,
-    val icon: NekoStack,
+    val icon: Key,
+    val menuSettings: BasicMenuSettings,
     val items: List<ItemX>,
 ) {
 }
@@ -38,9 +38,8 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
             "The hint node for category id is not present"
         )
 
-        val iconKey = node.node("icon").getString("internal:error")
-        val icon = NekoItemHolder.get(iconKey).createNekoStack()
-        ItemRenderers.SIMPLE.render(icon, SimpleItemRendererContext())
+        val icon = node.node("icon").krequire<Key>()
+        val settings = node.node("menu_settings").krequire<BasicMenuSettings>()
 
         val itemUids = node.node("items").getList<String>(emptyList())
         val list: MutableList<ItemX> = mutableListOf()
@@ -52,7 +51,7 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
             }
             list.add(itemX)
         }
-        return Category(id, icon, list)
+        return Category(id, icon, settings, list)
     }
 }
 

@@ -1,0 +1,4 @@
+base: bread
+menu_icon_name: "<gold>❊ 食物"
+menu_icon_lore:
+  - "测试类别"

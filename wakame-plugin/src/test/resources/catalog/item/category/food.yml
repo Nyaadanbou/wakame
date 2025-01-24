@@ -1,0 +1,25 @@
+icon: "internal:menu/catalog/category/food"
+menu_settings:
+  title: "❊ 食物"
+  # x: background
+  # <: prev_page
+  # >: next_page
+  # b: back
+  # .: display
+  structure:
+    - "x x x x x x x x x"
+    - "x . . . . . . . x"
+    - "x . . . . . . . x"
+    - "x . . . . . . . x"
+    - "x x x x x x x x x"
+    - "< x x x b x x x >"
+  icons:
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    back: "internal:menu/common/back"
+    display: "internal:menu/catalog/display"
+items:
+  - minecraft:cake
+  - minecraft:bread
+  - minecraft:cooked_beef

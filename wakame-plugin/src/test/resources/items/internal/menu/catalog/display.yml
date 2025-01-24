@@ -1,0 +1,4 @@
+# 该图标对应物品图鉴里被展示的某一个特定物品.
+menu_icon_name: "<item_name>"
+menu_icon_lore:
+  - "{item_lore}"

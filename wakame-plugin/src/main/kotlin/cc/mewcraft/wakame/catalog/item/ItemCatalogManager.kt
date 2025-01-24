@@ -1,13 +1,13 @@
-package cc.mewcraft.wakame.gui.guidebook
+package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.gui.MenuLayoutSerializer
+import cc.mewcraft.wakame.config.configurate.ObjectMappers
+import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
+import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.initializer.Initializable
 import cc.mewcraft.wakame.initializer.PostWorldDependency
 import cc.mewcraft.wakame.initializer.ReloadDependency
 import cc.mewcraft.wakame.recipe.VanillaRecipeRegistry
-import cc.mewcraft.wakame.station.recipe.StationRecipeRegistry
 import cc.mewcraft.wakame.util.RunningEnvironment
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
@@ -20,38 +20,43 @@ import org.slf4j.Logger
 import java.io.File
 
 @PostWorldDependency(
-    runBefore = [VanillaRecipeRegistry::class, StationRecipeRegistry::class]
+    runBefore = [VanillaRecipeRegistry::class, CraftingStationRecipeRegistry::class]
 )
 @ReloadDependency(
-    runBefore = [VanillaRecipeRegistry::class, StationRecipeRegistry::class]
+    runBefore = [VanillaRecipeRegistry::class, CraftingStationRecipeRegistry::class]
 )
-object GuideBookRegistry : Initializable, KoinComponent {
-    private const val GUIDEBOOK_GLOBAL_CONFIG_FILE = "guidebook/config.yml"
-    private const val CATEGORIES_DIR_NAME = "guidebook/categories"
+object ItemCatalogManager : Initializable, KoinComponent {
+    private const val CATALOG_ITEM_CONFIG_FILE = "catalog/item/config.yml"
+    private const val CATEGORY_DIR_NAME = "catalog/item/category"
     private val categories: MutableMap<String, Category> = mutableMapOf()
     private val logger: Logger by inject()
-    lateinit var mainMenuLayout: MenuLayout
-    lateinit var categoryMenuLayout: MenuLayout
 
+    lateinit var mainMenuSettings: BasicMenuSettings
+
+    fun findCategory(id: String): Category? {
+        return categories[id]
+    }
+
+    fun getCategoryMap(): Map<String, Category> {
+        return categories.toMap()
+    }
 
     fun loadConfig() {
         val root = yamlConfig {
             withDefaults()
-            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(GUIDEBOOK_GLOBAL_CONFIG_FILE).bufferedReader() }
+            source { get<File>(named(PLUGIN_DATA_DIR)).resolve(CATALOG_ITEM_CONFIG_FILE).bufferedReader() }
             serializers {
-                withDefaults()
-                kregister(MenuLayoutSerializer)
+                registerAnnotatedObjects(ObjectMappers.DEFAULT)
             }
         }.build().load()
 
-        mainMenuLayout = root.node("main_menu_layout").krequire<MenuLayout>()
-        categoryMenuLayout = root.node("category_menu_layout").krequire<MenuLayout>()
+        mainMenuSettings = root.node("main_menu_settings").krequire<BasicMenuSettings>()
     }
 
     fun loadCategories() {
         categories.clear()
 
-        val categoryDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(CATEGORIES_DIR_NAME)
+        val categoryDir = get<File>(named(PLUGIN_DATA_DIR)).resolve(CATEGORY_DIR_NAME)
         categoryDir.walk()
             .drop(1)
             .filter { it.extension == "yml" }
@@ -62,8 +67,8 @@ object GuideBookRegistry : Initializable, KoinComponent {
                     val categoryNode = yamlConfig {
                         withDefaults()
                         serializers {
+                            registerAnnotatedObjects(ObjectMappers.DEFAULT)
                             kregister(CategorySerializer)
-                            kregister(MenuLayoutSerializer)
                         }
                     }.buildAndLoadString(fileText)
                     categoryNode.hint(CategorySerializer.HINT_NODE, id)

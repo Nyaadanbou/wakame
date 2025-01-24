@@ -1,9 +1,7 @@
-package cc.mewcraft.wakame.gui.guidebook.menu
+package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.gui.MenuLayout
-import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.gui.getFixedIconItemProvider
-import cc.mewcraft.wakame.gui.guidebook.Category
+import cc.mewcraft.wakame.catalog.item.Category
+import cc.mewcraft.wakame.registry.ItemRegistry
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -13,35 +11,55 @@ import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
+import xyz.xenondevs.invui.item.impl.SimpleItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
  * 类别菜单.
  * 展示某类别的所有物品.
  */
-class CategoryMenu(
+class ItemCategoryMenu(
+    /**
+     * 该菜单展示的 [Category].
+     */
     val category: Category,
-    val layout: MenuLayout,
-    val parent: GuideBookMainMenu
+
+    /**
+     * 该菜单的上一级菜单.
+     * 即物品图鉴主菜单.
+     */
+    val parent: ItemCatalogMainMenu,
+
+    /**
+     * 该菜单的用户, 也就是正在查看该菜单的玩家.
+     */
+    val viewer: Player,
 ) {
+    private val settings = category.menuSettings
 
     /**
      * 菜单的 [Gui].
      *
-     * - `X`: background
-     * - `.`: category
+     * - `x`: background
      * - `<`: prev_page
      * - `>`: next_page
-     * - `B`: back_page
+     * - `b`: back
+     * - `.`: display
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
-        builder.setStructure(*layout.structure)
-        builder.addIngredient('X', BackgroundItem())
+        builder.setStructure(*settings.structure)
+        builder.addIngredient('x', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('B', BackItem())
+        builder.addIngredient('b', BackItem())
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        // TODO 对随机物品的特殊渲染
+        // TODO 可以缓存，只有重载时会变化
+        // 类别菜单所展示的物品
+        // 无法创建则显示错误占位物品
+        builder.setContent(category.items.map { itemX -> SimpleItem(itemX.createItemStack() ?: ItemRegistry.ERROR_ITEM_STACK) })
     }
 
     /**
@@ -49,25 +67,11 @@ class CategoryMenu(
      */
     private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
         setGui(primaryGui)
-        addOpenHandler(::onWindowOpen)
-        addCloseHandler(::onWindowClose)
+        setTitle(settings.title)
     }
 
-    private val playerInventorySuppressor = PlayerInventorySuppressor(viewer)
-
-    /**
-     * 向指定玩家打开合成站的主界面.
-     */
     fun open() {
         primaryWindow.open(viewer)
-    }
-
-    private fun onWindowOpen() {
-        playerInventorySuppressor.startListening()
-    }
-
-    private fun onWindowClose() {
-        playerInventorySuppressor.stopListening()
     }
 
     /**
@@ -75,7 +79,7 @@ class CategoryMenu(
      */
     inner class BackgroundItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getFixedIconItemProvider("background")
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
@@ -88,10 +92,7 @@ class CategoryMenu(
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
-                return layout.getFixedIconItemProvider("background")
-            }
-            return layout.getFixedIconItemProvider("prev_page")
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
@@ -100,10 +101,7 @@ class CategoryMenu(
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
-                return layout.getFixedIconItemProvider("background")
-            }
-            return layout.getFixedIconItemProvider("next_page")
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 
@@ -112,7 +110,7 @@ class CategoryMenu(
      */
     inner class BackItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            return layout.getFixedIconItemProvider("back")
+            return settings.getSlotDisplay("back").resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
