@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.ecs.external
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ecs.WakameWorld
 import com.github.quillraven.fleks.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 data class ComponentMap(
     val entity: Entity,
@@ -21,8 +20,8 @@ data class ComponentMap(
      */
     val tags: List<UniqueId<out Any>>,
 ) {
-    companion object : KoinComponent {
-        private val wakameWorld: WakameWorld by inject()
+    companion object {
+        private val wakameWorld: WakameWorld by Injector.inject()
     }
 
     constructor(

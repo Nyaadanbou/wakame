@@ -1,33 +1,33 @@
 package cc.mewcraft.wakame.reforge.reroll
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import java.io.File
 import java.lang.reflect.Type
 
 internal object RerollingTableSerializer {
-    private const val ROOT_DIR_NAME = "reroll"
-
-    private val rerollDirectory by lazy { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
+    private const val ROOT_DIR = "reroll"
 
     /**
      * 从配置文件中加载所有的重造台.
      */
     fun loadAll(): Map<String, RerollingTable> {
-        val map = rerollDirectory
+        val dataDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            .resolve(ReforgingStationConstants.DATA_DIR)
+            .resolve(ROOT_DIR)
+        val map = dataDir
             .walk().maxDepth(1)
             .drop(1)
             .filter { it.isDirectory }
@@ -36,7 +36,7 @@ internal object RerollingTableSerializer {
                     val table = load(it)
                     it.name to table
                 } catch (e: Exception) {
-                    LOGGER.error("Can't load modding table: '${it.relativeTo(rerollDirectory)}'", e)
+                    LOGGER.error("Can't load modding table: '${it.relativeTo(dataDir)}'", e)
                     null
                 }
             }
@@ -73,17 +73,17 @@ internal object RerollingTableSerializer {
         val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(TableCurrencyCostSerializer)
-                kregister(RarityNumberMappingSerializer)
+                register<RerollingTable.TableCurrencyCost>(TableCurrencyCostSerializer)
+                register<RarityNumberMapping>(RarityNumberMappingSerializer)
             }
-        }.buildAndLoadString(tableMainConfigFile.readText())
+        }.buildAndLoadString(/* input = */ tableMainConfigFile.readText())
 
         // 反序列化好的 config.yml
         val identifier = tableDir.name
-        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
-        val selectionMenuSettings = tableMainConfigNode.node("selection_menu_settings").krequire<BasicMenuSettings>()
-        val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
-        val currencyCost = tableMainConfigNode.node("currency_cost").krequire<RerollingTable.TableCurrencyCost>()
+        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").require<BasicMenuSettings>()
+        val selectionMenuSettings = tableMainConfigNode.node("selection_menu_settings").require<BasicMenuSettings>()
+        val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").require<RarityNumberMapping>()
+        val currencyCost = tableMainConfigNode.node("currency_cost").require<RerollingTable.TableCurrencyCost>()
 
         // 反序列化好的 items/
         val itemRules = NamespacedFileTreeWalker(tableItemsDirectory, "yml", true)
@@ -94,13 +94,13 @@ internal object RerollingTableSerializer {
                     val itemRuleNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
-                            kregister(CellRuleSerializer)
-                            kregister(CellCurrencyCostSerializer)
+                            register<RerollingTable.CellRule>(CellRuleSerializer)
+                            register<RerollingTable.CellCurrencyCost>(CellCurrencyCostSerializer)
                         }
                     }.buildAndLoadString(text)
 
                     val modLimit = itemRuleNode.node("mod_limit").int
-                    val cellRuleMapData = itemRuleNode.node("cells").krequire<Map<String, RerollingTable.CellRule>>()
+                    val cellRuleMapData = itemRuleNode.node("cells").require<Map<String, RerollingTable.CellRule>>()
                     val cellRuleMap = LinkedHashMap(cellRuleMapData)
 
                     // 未来可能会包含更多规则
@@ -129,21 +129,21 @@ internal object RerollingTableSerializer {
 
     private object TableCurrencyCostSerializer : TypeSerializer<RerollingTable.TableCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.TableCurrencyCost {
-            val code = node.krequire<String>()
+            val code = node.require<String>()
             return SimpleRerollingTable.TableCurrencyCost(code)
         }
     }
 
     private object CellCurrencyCostSerializer : TypeSerializer<RerollingTable.CellCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellCurrencyCost {
-            val code = node.krequire<String>()
+            val code = node.require<String>()
             return SimpleRerollingTable.CellCurrencyCost(code)
         }
     }
 
     private object CellRuleSerializer : TypeSerializer<RerollingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellRule {
-            val currencyCost = node.node("currency_cost").krequire<RerollingTable.CellCurrencyCost>()
+            val currencyCost = node.node("currency_cost").require<RerollingTable.CellCurrencyCost>()
             return SimpleRerollingTable.CellRule(currencyCost)
         }
     }

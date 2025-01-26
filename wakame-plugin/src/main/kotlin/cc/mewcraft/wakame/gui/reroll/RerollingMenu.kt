@@ -14,7 +14,6 @@ import cc.mewcraft.wakame.util.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
@@ -32,7 +31,7 @@ import kotlin.properties.Delegates
 internal class RerollingMenu(
     val table: RerollingTable,
     val viewer: Player,
-) : Listener, KoinComponent {
+) : Listener {
 
     /**
      * 给玩家显示 GUI.

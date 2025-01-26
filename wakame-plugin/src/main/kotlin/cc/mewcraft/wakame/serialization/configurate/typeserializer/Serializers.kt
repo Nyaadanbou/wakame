@@ -49,11 +49,9 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     // Koish Registry
     .register(KoishRegistries.ABILITY.holderByNameTypeSerializer())
     .register(KoishRegistries.ATTRIBUTE.holderByNameTypeSerializer())
-    // .register(KoishRegistries.ATTRIBUTE_FACADE.holderByNameTypeSerializer())
     .register(KoishRegistries.ELEMENT.holderByNameTypeSerializer())
     .register(KoishRegistries.ENTITY_TYPE_HOLDER.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM.holderByNameTypeSerializer())
-    // .register(KoishRegistries.VANILLA_PROXY_ITEM.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM_SKIN.holderByNameTypeSerializer())
     .register(KoishRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())

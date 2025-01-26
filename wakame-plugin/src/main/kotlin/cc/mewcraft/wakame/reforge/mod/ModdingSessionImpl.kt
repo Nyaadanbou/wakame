@@ -1,24 +1,17 @@
 package cc.mewcraft.wakame.reforge.mod
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.cells
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.elements
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
-import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
 import cc.mewcraft.wakame.util.decorate
@@ -31,11 +24,12 @@ import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -46,8 +40,8 @@ import kotlin.reflect.KProperty
 internal class SimpleModdingSession(
     override val table: ModdingTable,
     override val viewer: Player,
-) : ModdingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
+) : ModdingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MODDING_LOG_PREFIX)
 
     // 初始为 null
     override var originalInput: ItemStack? by OriginalInputDelegate(null)
@@ -413,7 +407,7 @@ private object ReforgeReplace {
     private class Unchangeable(
         override val session: SimpleModdingSession,
         override val cell: Cell,
-    ) : ModdingSession.Replace, KoinComponent {
+    ) : ModdingSession.Replace {
         override val changeable: Boolean
             get() = false
 
@@ -466,7 +460,7 @@ private object ReforgeReplace {
         override val session: SimpleModdingSession,
         override val cell: Cell,
         override val cellRule: CellRule,
-    ) : ModdingSession.Replace, KoinComponent {
+    ) : ModdingSession.Replace {
         override val total: MochaFunction = cellRule.currencyCost.total.compile(session, this)
 
         override var originalInput: ItemStack? by OriginalInputDelegate(null)

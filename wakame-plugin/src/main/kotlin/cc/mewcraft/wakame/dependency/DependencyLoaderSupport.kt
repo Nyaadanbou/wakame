@@ -3,33 +3,37 @@
 package cc.mewcraft.wakame.dependency
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.initializer2.InitializerRunnable
 import cc.mewcraft.wakame.reloader.ReloaderRunnable
 import com.google.common.graph.Graph
 import kotlinx.coroutines.*
 
+private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "initializer")
+
 @DslMarker
 internal annotation class DependencyLoaderSupportDsl
 
-internal inline fun <T> dependencyLoaderSupport(run: DependencyLoaderSupport.() -> T) = DependencyLoaderSupport.run()
+internal fun <T> dependencyLoaderSupport(run: DependencyLoaderSupport.() -> T) =
+    DependencyLoaderSupport.run()
 
 @DependencyLoaderSupportDsl
 internal object DependencyLoaderSupport {
+
     internal sealed interface RunnableWrapper<T : Any> {
         val value: T
         fun completion(): Deferred<Unit>
         fun dispatcher(): CoroutineDispatcher?
         suspend fun execute()
 
-        @JvmInline
-        value class Init(override val value: InitializerRunnable<*>) : RunnableWrapper<InitializerRunnable<*>> {
+        class Init(override val value: InitializerRunnable<*>) : RunnableWrapper<InitializerRunnable<*>> {
             override fun completion(): Deferred<Unit> = value.completion
             override fun dispatcher(): CoroutineDispatcher? = value.dispatcher
             override suspend fun execute() = value.run()
         }
 
-        @JvmInline
-        value class Reload(override val value: ReloaderRunnable<*>) : RunnableWrapper<ReloaderRunnable<*>> {
+        class Reload(override val value: ReloaderRunnable<*>) : RunnableWrapper<ReloaderRunnable<*>> {
             override fun completion(): Deferred<Unit> = value.completion
             override fun dispatcher(): CoroutineDispatcher? = value.dispatcher
             override suspend fun execute() = value.run()
@@ -51,7 +55,7 @@ internal object DependencyLoaderSupport {
     fun <T : Any> launch(
         scope: CoroutineScope,
         runnable: T,
-        graph: Graph<T>
+        graph: Graph<T>,
     ) {
         scope.launch {
             // await dependencies, which may increase during wait
@@ -71,8 +75,9 @@ internal object DependencyLoaderSupport {
 
             // run in preferred context
             withContext(wrap(runnable).dispatcher() ?: scope.coroutineContext) {
-//                if (LOGGING)
-                LOGGER.info(runnable.toString())
+                if (LOGGING) {
+                    LOGGER.info(runnable.toString())
+                }
 
                 wrap(runnable).execute()
             }

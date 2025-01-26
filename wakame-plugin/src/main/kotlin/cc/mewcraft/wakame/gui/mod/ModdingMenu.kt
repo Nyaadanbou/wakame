@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.gui.mod
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
@@ -13,8 +14,6 @@ import cc.mewcraft.wakame.util.itemLoreOrEmpty
 import cc.mewcraft.wakame.util.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -50,7 +49,7 @@ import kotlin.properties.Delegates
 internal class ModdingMenu(
     val table: ModdingTable,
     val viewer: Player,
-) : KoinComponent {
+) {
 
     /**
      * 向玩家展示定制台菜单.
@@ -76,7 +75,7 @@ internal class ModdingMenu(
     /**
      * 本菜单的日志记录器, 自带前缀.
      */
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MODDING_LOG_PREFIX)
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 10

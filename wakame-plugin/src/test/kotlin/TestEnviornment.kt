@@ -22,10 +22,12 @@ fun mainEnv(): Module = module {
     val resourcesDir = Path.of("src/main/resources").absolute()
     single<Path>(InjectionQualifier.DATA_FOLDER) { resourcesDir }
     single<File>(InjectionQualifier.DATA_FOLDER) { resourcesDir.toFile() }
-
-    val assetsDir = Path.of("src/main/resources/assets").absolute()
-    single<Path>(InjectionQualifier.ASSETS_FOLDER) { assetsDir }
-    single<File>(InjectionQualifier.ASSETS_FOLDER) { assetsDir.toFile() }
+    single<Path>(InjectionQualifier.CONFIGS_FOLDER) { resourcesDir.resolve("configs") }
+    single<File>(InjectionQualifier.CONFIGS_FOLDER) { resourcesDir.resolve("configs").toFile() }
+    single<Path>(InjectionQualifier.LANG_FOLDER) { resourcesDir.resolve("lang") }
+    single<File>(InjectionQualifier.LANG_FOLDER) { resourcesDir.resolve("lang").toFile() }
+    single<Path>(InjectionQualifier.ASSETS_FOLDER) { resourcesDir.resolve("assets") }
+    single<File>(InjectionQualifier.ASSETS_FOLDER) { resourcesDir.resolve("assets").toFile() }
 }
 
 fun testEnv(): Module = module {
@@ -34,8 +36,10 @@ fun testEnv(): Module = module {
     val resourcesDir = Path.of("src/test/resources").absolute()
     single<Path>(InjectionQualifier.DATA_FOLDER) { resourcesDir }
     single<File>(InjectionQualifier.DATA_FOLDER) { resourcesDir.toFile() }
-
-    val assetsDir = Path.of("src/test/resources/assets").absolute()
-    single<Path>(InjectionQualifier.ASSETS_FOLDER) { assetsDir }
-    single<File>(InjectionQualifier.ASSETS_FOLDER) { assetsDir.toFile() }
+    single<Path>(InjectionQualifier.CONFIGS_FOLDER) { resourcesDir.resolve("configs") }
+    single<File>(InjectionQualifier.CONFIGS_FOLDER) { resourcesDir.resolve("configs").toFile() }
+    single<Path>(InjectionQualifier.LANG_FOLDER) { resourcesDir.resolve("lang") }
+    single<File>(InjectionQualifier.LANG_FOLDER) { resourcesDir.resolve("lang").toFile() }
+    single<Path>(InjectionQualifier.ASSETS_FOLDER) { resourcesDir.resolve("assets") }
+    single<File>(InjectionQualifier.ASSETS_FOLDER) { resourcesDir.resolve("assets").toFile() }
 }

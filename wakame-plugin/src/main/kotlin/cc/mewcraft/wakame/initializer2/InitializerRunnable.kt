@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 internal sealed class InitializerRunnable<S : InitializerRunnable<S>> {
 
     val completion = CompletableDeferred<Unit>()
+
     abstract val dispatcher: CoroutineDispatcher?
 
     abstract fun loadDependencies(all: Set<S>, graph: MutableGraph<S>)

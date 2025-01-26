@@ -6,7 +6,10 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.asMinimalString2
 import com.mojang.datafixers.util.Either
 import org.jetbrains.annotations.ApiStatus
-import xyz.xenondevs.commons.provider.immutable.provider
+import xyz.xenondevs.commons.provider.MutableProvider
+import xyz.xenondevs.commons.provider.mutableProvider
+import xyz.xenondevs.commons.provider.provider
+import kotlin.reflect.KProperty
 
 /**
  * 用于持有数据的容器, 附加了专用于跟 [cc.mewcraft.wakame.registry2.Registry] 进行交互的函数.
@@ -31,6 +34,8 @@ interface RegistryEntry<T> {
      * @throws IllegalStateException 如果数据还未绑定
      */
     val value: T
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
     /**
      * 检查该容器是否已经绑定了数据.
@@ -155,11 +160,11 @@ interface RegistryEntry<T> {
             }
         }
 
-        private var reactive: ReactiveRegistryEntry<T>? = null
+        private var reactive: MutableProvider<T>? = null
 
         @Synchronized
         override fun reactive(): ReactiveRegistryEntry<T> {
-            return reactive ?: provider(this::value).also { reactive = it }
+            return reactive ?: mutableProvider(this::value).also { reactive = it }
         }
 
         override val hasValue: Boolean
@@ -179,9 +184,7 @@ interface RegistryEntry<T> {
             _value = value
 
             // 如果存在 reactive, 也要更新 reactive 链上的所有数据
-            if (reactive != null) {
-                reactive!!.update()
-            }
+            reactive?.set(value)
 
             return this // 返回 this, 方便链式调用
         }

@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.util.plain
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.map
 import xyz.xenondevs.invui.item.ItemWrapper
 
 /**

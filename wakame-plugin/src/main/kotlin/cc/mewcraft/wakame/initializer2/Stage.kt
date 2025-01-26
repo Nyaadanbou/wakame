@@ -35,10 +35,9 @@ enum class InitStage(
     runBefore: Set<KClass<*>> = emptySet(),
 ) {
 
-    // TODO !!! make it actually work
     /**
      * Before configs are initialized.
-     * Can be used to register custom config serializers via [Configs.registerSerializers].
+     * Can be used to register custom config serializers via [Configs.registerSerializer].
      */
     PRE_CONFIG(InternalInitStage.PRE_WORLD, runBefore = setOf(Configs::class)),
 

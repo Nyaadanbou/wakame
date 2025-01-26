@@ -1,39 +1,37 @@
 package cc.mewcraft.wakame.reforge.recycle
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
-import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.register
 import net.kyori.adventure.key.Key
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.io.File
 
 internal object RecyclingStationSerializer {
-    private const val ROOT_DIR_NAME = "recycle"
-    private const val ITEMS_DIR_NAME = "items"
-    private const val STATIONS_DIR_NAME = "stations"
+    private const val ROOT_DIR = "recycle"
 
-    private val logger: Logger = Injector.get()
+    private const val ITEMS_DIR = "items"
+    private const val STATIONS_DIR = "stations"
 
     fun loadAllItems(): Map<Key, PriceInstance> {
-        val itemsDirectory = Injector.get<File>(named(PLUGIN_DATA_DIR))
-            .resolve(Reforge.ROOT_DIR_NAME)
-            .resolve(ROOT_DIR_NAME)
-            .resolve(ITEMS_DIR_NAME)
+        val itemsDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            .resolve(ReforgingStationConstants.DATA_DIR)
+            .resolve(ROOT_DIR)
+            .resolve(ITEMS_DIR)
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(PriceInstanceSerializer)
-                kregister(PriceModifierSerializer)
+                register(PriceInstanceSerializer)
+                register(PriceModifierSerializer)
             }
         }
 
@@ -45,7 +43,7 @@ internal object RecyclingStationSerializer {
 
                 // 反序列化配置文件
                 val priceInstance = rootNode.get<PriceInstance>() ?: run {
-                    logger.warn("Failed to load price instance for item: $itemKey")
+                    LOGGER.warn("Failed to load price instance for item: $itemKey")
                     return@mapNotNull null
                 }
 
@@ -57,10 +55,10 @@ internal object RecyclingStationSerializer {
     }
 
     fun loadAllStations(): Map<String, RecyclingStation> {
-        val tablesDirectory = Injector.get<File>(named(PLUGIN_DATA_DIR))
-            .resolve(Reforge.ROOT_DIR_NAME)
-            .resolve(ROOT_DIR_NAME)
-            .resolve(STATIONS_DIR_NAME)
+        val tablesDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            .resolve(ReforgingStationConstants.DATA_DIR)
+            .resolve(ROOT_DIR)
+            .resolve(STATIONS_DIR)
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
@@ -80,7 +78,7 @@ internal object RecyclingStationSerializer {
                     items = items
                 )
 
-                logger.info("Loaded recycling table: $tableId")
+                LOGGER.info("Loaded recycling table: $tableId")
 
                 tableId to table
             }

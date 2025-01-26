@@ -1,17 +1,19 @@
 package cc.mewcraft.wakame.ability.state
 
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.AbilityWorldInteraction
+import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.state.display.StateDisplay
+import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
+import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
-import cc.mewcraft.wakame.ability.ManaCostPenalty
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.AbilityWorldInteraction
-import cc.mewcraft.wakame.ability.state.display.StateDisplay
-import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.toSimpleString
 import me.lucko.helper.Events
@@ -19,9 +21,6 @@ import me.lucko.helper.event.Subscription
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import java.lang.ref.WeakReference
 import java.util.stream.Stream
 
@@ -64,16 +63,15 @@ class PlayerStateInfo(
             }
         }
 
-    companion object : KoinComponent {
+    companion object {
         private const val SEQUENCE_SIZE = 3
 
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
 
-        private val logger: Logger by inject()
-        private val stateDisplay: StateDisplay<Player> by inject()
-        private val abilityWorldInteraction: AbilityWorldInteraction by inject()
-        private val wakameWorld: WakameWorld by inject()
+        private val stateDisplay: StateDisplay<Player> by Injector.inject()
+        private val abilityWorldInteraction: AbilityWorldInteraction by Injector.inject()
+        private val wakameWorld: WakameWorld by Injector.inject()
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
@@ -177,7 +175,7 @@ class PlayerStateInfo(
     private fun getAbilityByTrigger(trigger: Trigger): Ability? {
         val abilities = abilityWorldInteraction.getMechanicsBy(player, trigger)
         if (abilities.size > 1) {
-            logger.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
+            LOGGER.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
         }
         return abilities.firstOrNull()
     }

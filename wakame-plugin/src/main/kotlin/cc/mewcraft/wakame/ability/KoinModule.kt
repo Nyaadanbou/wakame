@@ -25,7 +25,6 @@ fun abilityModule(): Module = module {
     singleOf(::PlayerStateDisplay) bind StateDisplay::class
 
     singleOf(::AbilityWorldInteraction)
-    singleOf(::AbilityEventHandler)
 
     // 用于外部代码
     single<TypeSerializerCollection>(named(ABILITY_EXTERNALS)) {

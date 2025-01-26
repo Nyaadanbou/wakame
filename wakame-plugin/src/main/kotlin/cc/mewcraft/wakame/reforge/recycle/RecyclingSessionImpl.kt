@@ -1,17 +1,16 @@
 package cc.mewcraft.wakame.reforge.recycle
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.decorate
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import java.util.stream.Stream
 import kotlin.random.Random
@@ -27,8 +26,8 @@ internal class SimpleRecyclingSession(
     override val station: RecyclingStation,
     override val viewer: Player,
     private val maxClaims: Int,
-) : RecyclingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
+) : RecyclingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.RECYCLING_LOG_PREFIX)
 
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 

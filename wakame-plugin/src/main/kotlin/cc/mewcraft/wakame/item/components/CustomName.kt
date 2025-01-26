@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.util.customName
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
 
 
 // 开发日记 2024/6/28
@@ -20,7 +19,7 @@ import org.koin.core.component.KoinComponent
 // CustomName 就直接读取原版物品组件 `minecraft:custom_name` 的值吧
 
 interface CustomName {
-    companion object : ItemComponentBridge<Component>, KoinComponent {
+    companion object : ItemComponentBridge<Component> {
         /**
          * 该组件的配置文件.
          */

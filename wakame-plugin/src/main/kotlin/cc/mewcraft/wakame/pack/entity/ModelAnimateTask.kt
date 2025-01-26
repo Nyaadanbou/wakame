@@ -1,40 +1,32 @@
 package cc.mewcraft.wakame.pack.entity
 
-import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import me.lucko.helper.Schedulers
-import me.lucko.helper.scheduler.Task
+import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
-import org.koin.core.component.KoinComponent
 import team.unnamed.hephaestus.animation.Animation
 import team.unnamed.hephaestus.bukkit.BoneView
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.util.Quaternion
 import team.unnamed.hephaestus.view.modifier.BoneModifier
-import java.util.Collections
-import java.util.UUID
-import java.util.WeakHashMap
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Init(
     stage = InitStage.POST_WORLD,
 )
-object ModelAnimateTask : Runnable, KoinComponent {
+object ModelAnimateTask {
     private val viewsWithHeadRotationModifierAlreadyInjected: MutableSet<ModelView> = Collections.newSetFromMap(WeakHashMap())
     private val data: MutableMap<UUID, ModelViewData> = ConcurrentHashMap()
 
-    private lateinit var task: Task
-
     @InitFun
     private fun init() {
-        task = Schedulers.async().runRepeating(this, 0, 1)
-        task.bindWith(NEKO)
+        runTaskTimer(0, 1, ::run)
     }
 
-    override fun run() {
+    private fun run() {
         val now = System.currentTimeMillis()
 
         // reuse location instance

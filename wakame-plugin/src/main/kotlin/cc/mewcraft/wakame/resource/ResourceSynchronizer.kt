@@ -10,17 +10,17 @@ import org.bukkit.persistence.PersistentDataType
 /**
  * 负责在玩家进出服务器 (包括跨服) 时同步玩家资源.
  *
- * 实现应该修复如下几个问题:
+ * 本类的逻辑主要修复了如下几个问题:
  *
  * - [Minecraft 原版本身的问题: MC-17876](https://bugs.mojang.com/browse/MC-17876)
  * - 在服务器安装了跨服同步系统时, 玩家的资源也能够正确同步
  */
 internal object ResourceSynchronizer {
-    private val HEALTH_KEY = NamespacedKey("wakame", "player_health")
-    private val MANA_KEY = NamespacedKey("wakame", "player_mana")
+    private val HEALTH_KEY = NamespacedKey("koish", "player_health")
+    private val MANA_KEY = NamespacedKey("koish", "player_mana")
 
     /**
-     * 保存玩家的资源, 一般在玩家退出服务器或者切换服务器时调用.
+     * 保存玩家的资源, 在玩家退出服务器或者跨服时调用.
      */
     fun save(player: Player) {
         val pdc = player.persistentDataContainer
@@ -37,7 +37,7 @@ internal object ResourceSynchronizer {
     }
 
     /**
-     * 保存所有在线玩家的资源, 一般在服务器关闭时调用.
+     * 保存所有在线玩家的资源, 在服务器关闭时调用.
      */
     fun saveAll() {
         Bukkit.getOnlinePlayers().toList().forEach { save(it) }
@@ -45,6 +45,18 @@ internal object ResourceSynchronizer {
 
     /**
      * 加载玩家的资源, 一般在玩家进入服务器或者切换服务器时调用.
+     *
+     * ### 当前问题
+     * 修复玩家在加入服务器后, 最大生命值会被限制在 `max_health.base`.
+     *
+     * ### 解决方案
+     * 在玩家退出服务器时, 我们将他的当前最大生命值保存到 PDC 中.
+     * 玩家加入服务器后, 我们将 PDC 中的最大生命值设置到玩家身上.
+     *
+     * 如果要考虑跨服, 那么我们将 *加入服务器时* 的时机换成 *数据完成同步时* 即可.
+     *
+     * ### Mojang Bug
+     * [MC-17876](https://bugs.mojang.com/browse/MC-17876).
      */
     fun load(player: Player) {
         val pdc = player.persistentDataContainer

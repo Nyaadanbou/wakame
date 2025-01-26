@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
@@ -35,7 +34,7 @@ internal class CraftingPreviewMenu(
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-) : KoinComponent {
+) {
     /**
      * 该菜单的基本设置.
      */

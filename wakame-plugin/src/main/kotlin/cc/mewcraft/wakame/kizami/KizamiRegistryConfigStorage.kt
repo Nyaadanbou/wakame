@@ -31,7 +31,7 @@ internal object KizamiRegistryConfigStorage : RegistryConfigStorage {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
      */
-    const val DIR_PATH: String = "kizamiz/"
+    const val DIR_PATH: String = "kizami/"
 
     @InitFun
     fun init() {

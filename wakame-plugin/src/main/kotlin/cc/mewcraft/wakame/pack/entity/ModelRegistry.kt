@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.pack.entity
 
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
+import cc.mewcraft.wakame.InjectionQualifier
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.ModelDataCursor
 import team.unnamed.hephaestus.bukkit.ModelView
@@ -21,9 +19,9 @@ import java.util.concurrent.ConcurrentHashMap
     stage = InitStage.PRE_WORLD,
 )
 @Reload
-object ModelRegistry : KoinComponent {
+object ModelRegistry {
     private const val BBMODELS_DIR_PATH = "bbmodels"
-    private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
+    private val assetsDir: File by Injector.inject(InjectionQualifier.ASSETS_FOLDER)
 
     private val models: MutableMap<String, Model> = ConcurrentHashMap()
     private val views: MutableMap<UUID, ModelView> = ConcurrentHashMap()

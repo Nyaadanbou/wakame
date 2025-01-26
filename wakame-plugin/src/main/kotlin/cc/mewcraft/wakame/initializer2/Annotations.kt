@@ -58,7 +58,7 @@ annotation class Init(
  * @param runAfter The classes (and their init functions) which should be initialized before this function is called.
  * (This function is called **after** them.)
  * Those classes must be annotated with [Init] or [InternalInit].
- * @param runAfter The classes (and their init functions) which should be initialized after this function is called.
+ * @param runBefore The classes (and their init functions) which should be initialized after this function is called.
  * (This function is called **before** them.)
  * Those classes must be annotated with [Init] or [InternalInit].
  */
@@ -76,7 +76,7 @@ annotation class InitFun(
  * @param dispatcher Defines how the function is dispatched.
  * @param runAfter The classes whose disable functions should be called before this function.
  * (This function is called **after** them.)
- * @param runAfter The classes whose disable functions should be called after this function.
+ * @param runBefore The classes whose disable functions should be called after this function.
  * (This function is called **before** them.)
  */
 @Retention(AnnotationRetention.RUNTIME)

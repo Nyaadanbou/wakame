@@ -1,29 +1,18 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.WakamePlugin
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.MechanicComponent
-import cc.mewcraft.wakame.ecs.component.Remove
-import cc.mewcraft.wakame.ecs.component.Tags
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.ecs.system.*
+import cc.mewcraft.wakame.Koish
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.system.AbilityBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
+import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.system.*
 import com.github.quillraven.fleks.*
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 
-class WakameWorld(
-    private val plugin: WakamePlugin,
-) {
-    companion object : KoinComponent {
-        private val logger: Logger by inject()
-    }
+object WakameWorld {
 
     /**
      * 缓存了单个 tick 内的 [ComponentMap], 每次更新会进行清除.
@@ -35,9 +24,9 @@ class WakameWorld(
     val instance: World = configureWorld {
 
         injectables {
-            add(plugin)
-            add(logger)
-            add(this@WakameWorld)
+            add(Koish) // FIXME 移除 - 使用单例 Koish
+            add(LOGGER) // FIXME 移除 - 使用全局变量 LOGGER
+            add(this@WakameWorld) // FIXME 移除 - 使用单例 WakameWorld
         }
 
         systems {

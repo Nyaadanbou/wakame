@@ -92,6 +92,7 @@ kotlin {
                 compileOnly(kotlin("stdlib"))
                 compileOnly(kotlin("reflect"))
                 compileOnly(local.kotlinx.coroutines.core)
+                compileOnly(local.kotlinx.coroutines.debug)
             }
         }
         val test by getting {
@@ -100,6 +101,7 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
                 implementation(local.kotlinx.coroutines.core)
+                implementation(local.kotlinx.coroutines.debug)
             }
         }
     }

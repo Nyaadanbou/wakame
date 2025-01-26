@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.api.tileentity;
 
-import cc.mewcraft.wakame.api.block.NekoBlock;
+import cc.mewcraft.wakame.api.block.KoishBlock;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
@@ -20,11 +20,11 @@ public interface TileEntity {
     @Nullable OfflinePlayer getOwner();
 
     /**
-     * Gets the {@link NekoBlock} of this {@link TileEntity}.
+     * Gets the {@link KoishBlock} of this {@link TileEntity}.
      *
-     * @return the {@link NekoBlock} of this {@link TileEntity}
+     * @return the {@link KoishBlock} of this {@link TileEntity}
      */
-    @NotNull NekoBlock getBlock();
+    @NotNull KoishBlock getBlock();
 
     /**
      * Gets the {@link Location} of this {@link TileEntity}.

@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.util.CompoundTag
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 // 开发日记 2024/7/5
 // 用 Int 储存击杀数, 最多可以存 2^31-1
@@ -23,8 +22,8 @@ interface TrackEntityKills : Track, TrackMap<TrackEntityKills, Key, Int> {
      */
     fun grow(key: Key, count: Int = 1): TrackEntityKills
 
-    companion object : TrackType<TrackEntityKills>, KoinComponent {
-        private val entityKeyLookup: EntityKeyLookup by inject()
+    companion object : TrackType<TrackEntityKills> {
+        private val entityKeyLookup: EntityKeyLookup by Injector.inject()
 
         fun empty(): TrackEntityKills {
             return TrackEntityKillsImpl(emptyMap())

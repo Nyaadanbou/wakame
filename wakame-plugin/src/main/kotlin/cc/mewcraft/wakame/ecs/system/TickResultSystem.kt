@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -9,11 +10,9 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
-import org.slf4j.Logger
 
 class TickResultSystem(
     private val wakameWorld: WakameWorld = inject(),
-    private val logger: Logger = inject(),
 ) : IteratingSystem(
     family = family { all(TickResultComponent) }
 ) {
@@ -22,7 +21,7 @@ class TickResultSystem(
 
         when (tickResult) {
             TickResult.INTERRUPT -> {
-                wakameWorld.removeEntity(entity).also { logger.warn("ECS entity ${world.snapshotOf(entity)} Interrupt.") }
+                wakameWorld.removeEntity(entity).also { LOGGER.warn("ECS entity ${world.snapshotOf(entity)} Interrupt.") }
                 return
             }
 

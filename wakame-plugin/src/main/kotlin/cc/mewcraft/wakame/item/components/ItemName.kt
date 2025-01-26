@@ -7,11 +7,10 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.util.itemName
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
 
 
 interface ItemName {
-    companion object : ItemComponentBridge<Component>, KoinComponent {
+    companion object : ItemComponentBridge<Component> {
         /**
          * 该组件的配置文件.
          */

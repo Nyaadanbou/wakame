@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry2
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.element.ElementType
@@ -38,6 +39,9 @@ object KoishRegistryKeys {
 
     @JvmField
     val ENTITY_TYPE_HOLDER = createRegistryKey<EntityTypeHolder>("entity_type_holder")
+
+    @JvmField
+    val IMAGINARY_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("imaginary_attribute_map")
 
     @JvmField
     val ITEM = createRegistryKey<NekoItem>("item")

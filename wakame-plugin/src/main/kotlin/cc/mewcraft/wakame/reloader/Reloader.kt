@@ -2,8 +2,8 @@
 
 package cc.mewcraft.wakame.reloader
 
+import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.NEKO
 import cc.mewcraft.wakame.dependency.dependencyLoaderSupport
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
 import cc.mewcraft.wakame.initializer2.Init
@@ -35,7 +35,7 @@ internal object Reloader : Listener {
     @InitFun
     private fun start() = tryInit {
         registerEvents()
-        collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
+        collectAndRegisterRunnables(KOISH_JAR.toFile(), this.javaClass.classLoader)
     }
 
     private fun collectAndRegisterRunnables(file: File, classLoader: ClassLoader) {

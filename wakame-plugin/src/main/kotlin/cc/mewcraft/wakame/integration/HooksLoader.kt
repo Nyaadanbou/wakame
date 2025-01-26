@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.integration
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.NEKO
+import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
@@ -53,7 +54,7 @@ internal object HooksLoader {
     @Suppress("UNCHECKED_CAST")
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            NEKO.nekooJar,
+            KOISH_JAR.toFile(),
             listOf(Hook::class), emptyList(),
             "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->

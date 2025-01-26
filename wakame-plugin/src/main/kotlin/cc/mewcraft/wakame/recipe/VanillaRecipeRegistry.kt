@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.initializer2.Init
@@ -19,8 +19,8 @@ import cc.mewcraft.wakame.util.runTask
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.qualifier.named
 import java.io.File
+import kotlin.collections.set
 
 @Init(
     stage = InitStage.POST_WORLD
@@ -31,7 +31,6 @@ import java.io.File
     ],
 )
 object VanillaRecipeRegistry {
-    private const val RECIPE_DIR_PATH = "recipes"
 
     @VisibleForTesting
     val RAW: MutableMap<Key, VanillaRecipe> = mutableMapOf()
@@ -70,7 +69,7 @@ object VanillaRecipeRegistry {
     fun loadDataIntoRegistry() {
         RAW.clear()
 
-        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        val recipeDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER).resolve(VanillaRecipeConstants.DATA_DIR)
         for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()

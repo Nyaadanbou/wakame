@@ -83,9 +83,8 @@ class NamespacedFileTreeWalker(
                     .map { file ->
                         val relativePath = if (includeFullPath) {
                             file.relativeTo(namespaceDirectory)
-                                .path
+                                .invariantSeparatorsPath
                                 .removeSuffix(".${file.extension}")
-                                .replace("\\", "/") // for win systems
                         } else {
                             file.nameWithoutExtension
                         }

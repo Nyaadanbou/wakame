@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.world.WeatherControl.execute
@@ -12,7 +13,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
-import xyz.xenondevs.commons.provider.immutable.map
+import xyz.xenondevs.commons.provider.map
 import java.lang.reflect.Type
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -21,7 +22,9 @@ import kotlin.reflect.typeOf
  * 控制所有维度的天气.
  */
 object WeatherControl {
-    private val useInterval: Cooldown by MAIN_CONFIG.entry<Long>("world_weather_control_use_interval_ticks").map(Cooldown::ofTicks)
+    private val useInterval: Cooldown by MAIN_CONFIG
+        .entry<Long>("world_weather_control_use_interval_ticks")
+        .map(Cooldown::ofTicks)
 
     /**
      * 检查全局最小的使用间隔是否已经过去.
@@ -85,7 +88,6 @@ internal object WeatherControlActionSerializer : TypeSerializer<WeatherControl.A
 }
 
 /* implementations of WeatherControl.Action */
-
 
 @ConfigSerializable
 internal data class SetStorm(

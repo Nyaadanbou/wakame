@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
+import cc.mewcraft.wakame.LOGGER
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
@@ -12,17 +13,13 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 // 临时修复 FancyDrops 产生的物品实体依然会被其他玩家拾取的问题
 
 @Deprecated("临时修复 - 如果 MM 修复了那么这个就不需要了")
-object MobDropListener : KoinComponent, Listener {
-    private val logger: Logger = get()
+object MobDropListener : Listener {
 
     // 记录MM怪物将要掉落的物品堆叠, 以及物品对应的所有者
     private val mobDropRecords: Cache<ItemStack, UUID> = Caffeine.newBuilder()
@@ -32,7 +29,7 @@ object MobDropListener : KoinComponent, Listener {
         .expireAfterWrite(10, TimeUnit.SECONDS)
         .removalListener<ItemStack, UUID> { key, value, cause ->
             if (cause != RemovalCause.EXPLICIT) {
-                logger.warn("[MobDropListener] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+                LOGGER.warn("[MobDropListener] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
             }
         }
         .build()

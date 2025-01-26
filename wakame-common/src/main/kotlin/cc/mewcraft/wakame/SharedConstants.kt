@@ -9,6 +9,11 @@ object SharedConstants {
     const val ROOT_NBT_NAME = "wakame"
 
     /**
+     * 是否开启调试模式.
+     */
+    val isDebug = true
+
+    /**
      * 检查 JVM 是否在 IDE 中运行.
      */
     val isRunningInIde = listOf(

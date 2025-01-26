@@ -1,16 +1,15 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
-import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.*
-import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
+import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.stream.Stream
@@ -22,8 +21,8 @@ abstract class AbilityBase(
     final override val key: Key,
     config: ConfigurationNode,
 ) : Ability {
-    companion object : KoinComponent {
-        private val wakameWorld: WakameWorld by inject()
+    companion object {
+        private val wakameWorld: WakameWorld by Injector.inject()
     }
 
     override val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay.empty()

@@ -2,19 +2,22 @@
 
 package cc.mewcraft.wakame.initializer2
 
+import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.Koish
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.NEKO
-import cc.mewcraft.wakame.api.event.NekoLoadDataEvent
+import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
+import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.dependency.dependencyLoaderSupport
 import cc.mewcraft.wakame.initializer2.Initializer.start
 import cc.mewcraft.wakame.initializer2.InitializerSupport.tryInit
 import cc.mewcraft.wakame.util.data.JarUtils
-import cc.mewcraft.wakame.util.registerEvents
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.server.ServerLoadEvent
@@ -22,8 +25,8 @@ import java.io.File
 
 internal object Initializer : Listener {
 
-    private val initializables: HashSet<Initializable> = HashSet<Initializable>()
-    private val disableables: HashSet<Disableable> = HashSet<Disableable>()
+    private val initializables: HashSet<Initializable> = HashSet()
+    private val disableables: HashSet<Disableable> = HashSet()
 
     private val initPreWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
     private val initPostWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
@@ -39,9 +42,7 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryInit {
-        registerEvents()
-
-        collectAndRegisterRunnables(NEKO.nekooJar, this.javaClass.classLoader)
+        collectAndRegisterRunnables(KOISH_JAR.toFile(), this.javaClass.classLoader)
 
         // TODO introduce Addon System
         // for (addon in AddonBootstrapper.addons) {
@@ -147,8 +148,9 @@ internal object Initializer : Listener {
             }
         }
 
-        // if (IS_DEV_SERVER)
+        // if (IS_DEV_SERVER) {
         //     dumpGraphs()
+        // }
     }
 
     // @Suppress("UNCHECKED_CAST")
@@ -199,12 +201,12 @@ internal object Initializer : Listener {
             }
 
             isDone = true
-            NekoLoadDataEvent().callEvent()
+            KoishLoadDataEvent().callEvent()
 
-            // PermanentStorage.store("last_version", Nova.pluginMeta.version)
+            PermanentStorage.store("last_version", Koish.pluginMeta.version)
             // setGlobalIngredients()
             // setupMetrics()
-            LOGGER.info("Done loading")
+            LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
         }
     }
 

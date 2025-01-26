@@ -17,7 +17,7 @@ import java.util.UUID
  *
  * @param P the player type
  */
-interface User<P> {
+interface User<P> { // FIXME: 取消 class 上的泛型, 留一个泛型函数 getPlayer 获取 platform player 即可
 
     /**
      * The backing player.

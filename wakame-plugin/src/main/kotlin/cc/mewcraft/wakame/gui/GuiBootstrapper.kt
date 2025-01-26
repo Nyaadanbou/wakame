@@ -1,0 +1,33 @@
+package cc.mewcraft.wakame.gui
+
+import cc.mewcraft.wakame.initializer2.DisableFun
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.WindowManager
+
+@Init(
+    stage = InitStage.POST_WORLD,
+)
+internal object GuiBootstrapper {
+
+    @InitFun
+    fun init() {
+        // 初始化 InvUI 的 static blocks
+        // 随着 InvUI 更新, 这些代码可能会失效
+        InvUI.getInstance()
+        WindowManager.getInstance()
+    }
+
+    @DisableFun
+    fun close() {
+        closeEachWindow()
+    }
+
+    private fun closeEachWindow() {
+        WindowManager.getInstance().windows.forEach(Window::close)
+    }
+
+}

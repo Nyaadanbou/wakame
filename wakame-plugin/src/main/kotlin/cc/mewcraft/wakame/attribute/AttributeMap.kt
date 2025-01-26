@@ -3,14 +3,18 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ReloadableProperty
-import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import cc.mewcraft.wakame.eventbus.PluginEventBus
-import cc.mewcraft.wakame.eventbus.subscribe
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.reloader.Reload
+import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -19,7 +23,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -60,10 +63,56 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
 }
 
 /**
- * [ImaginaryAttributeMap] 的实例.
+ * 用于直接获取 [ImaginaryAttributeMap] 的实例.
  */
+@Init(
+    stage = InitStage.POST_WORLD, // init 只负责添加 intrusive registry entry
+)
+@Reload(
+    runAfter = [AttributeSupplierRegistryConfigStorage::class]
+)
 object ImaginaryAttributeMaps {
-    val ARROW: ImaginaryAttributeMap by ReloadableProperty { ImaginaryAttributeMapRegistry.get(Key.key("arrow")) }
+    // 通过硬编码注册的 id, 但不确定对应的配置文件是否存在
+    private val intrusiveRegisteredIds = HashSet<String>()
+
+    @JvmField
+    val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("arrow")
+
+    @InitFun
+    private fun init() {
+        applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::add)
+    }
+
+    @ReloadFun
+    private fun reload() {
+        applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::update)
+    }
+
+    private fun applyDataToRegistry(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
+        intrusiveRegisteredIds.forEach { registeredId ->
+            val entryId = Identifiers.of(registeredId)
+            val entryVal = createData(registeredId)
+            registryAction(entryId, entryVal)
+        }
+    }
+
+    private fun createData(id: String): ImaginaryAttributeMap {
+        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(id)
+        val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
+        for (attribute in default.attributes) {
+            val instance = default.createImaginaryInstance(attribute) ?: continue
+            val snapshot = instance.getSnapshot()
+            val imaginary = snapshot.toImaginary()
+            data[attribute] = imaginary
+        }
+        return ImaginaryAttributeMapImpl(data)
+    }
+
+    private fun createEntry(id: String): RegistryEntry<ImaginaryAttributeMap> {
+        val existed = intrusiveRegisteredIds.add(id)
+        if (existed) throw IllegalArgumentException("The id $id has already been registered!")
+        return KoishRegistries.IMAGINARY_ATTRIBUTE_MAP.createEntry(id)
+    }
 }
 
 
@@ -290,35 +339,6 @@ private class EntityAttributeMap : AttributeMap {
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
         return patch.iterator()
-    }
-}
-
-private object ImaginaryAttributeMapRegistry {
-    private val pool = ConcurrentHashMap<Key, ImaginaryAttributeMap>()
-
-    fun get(key: Key): ImaginaryAttributeMap {
-        return pool.computeIfAbsent(key) { k ->
-            val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(k)
-            val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
-            for (attribute in default.attributes) {
-                val instance = default.createImaginaryInstance(attribute) ?: continue
-                val snapshot = instance.getSnapshot()
-                val imaginary = snapshot.toImaginary()
-                data[attribute] = imaginary
-            }
-            ImaginaryAttributeMapImpl(data)
-        }
-    }
-
-    fun reset() {
-        pool.clear()
-    }
-
-    init {
-        PluginEventBus.get().subscribe<NekoCommandReloadEvent> {
-            reset()
-            LOGGER.info("Reset object pool of ImaginaryAttributeMap")
-        }
     }
 }
 

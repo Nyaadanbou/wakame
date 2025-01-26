@@ -10,7 +10,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
-const val ABILITY_CONFIG_FILE = "ability.yml"
+const val ABILITY_CONFIG_ID = "ability"
+const val ABILITY_CONFIG_FILE = "$ABILITY_CONFIG_ID.yml"
 const val ABILITY_PROTO_CONFIG_DIR = "ability"
 const val ABILITY_PROTO_CONFIG_LOADER = "ability_global_config_loader"
 

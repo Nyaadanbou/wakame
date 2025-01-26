@@ -2,8 +2,10 @@
 
 package cc.mewcraft.wakame.pack.generate
 
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.InjectionQualifier
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
@@ -15,10 +17,6 @@ import cc.mewcraft.wakame.util.withNamespace
 import cc.mewcraft.wakame.util.withValue
 import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
@@ -67,8 +65,8 @@ internal class ResourcePackMetaGeneration(
 
 internal class ResourcePackIconGeneration(
     context: ResourcePackGenerationContext,
-) : ResourcePackGeneration(context), KoinComponent {
-    private val assetsDir: File by inject(named(PLUGIN_ASSETS_DIR))
+) : ResourcePackGeneration(context) {
+    private val assetsDir: File by Injector.inject(InjectionQualifier.ASSETS_FOLDER)
 
     override fun process() {
         val icon = assetsDir.resolve("logo.png")
@@ -89,35 +87,34 @@ internal class ResourcePackRegistryModelGeneration(
 
 internal class ResourcePackCustomModelGeneration(
     context: ResourcePackGenerationContext,
-) : ResourcePackGeneration(context), KoinComponent {
-    private val logger: Logger by inject()
+) : ResourcePackGeneration(context) {
 
     override fun process() {
         val resourcePack = context.resourcePack
 
         for (itemModelInfo in context.itemModelInfos) {
-            logger.info("Generating model for $itemModelInfo")
+            LOGGER.info("Generating model for $itemModelInfo")
             try {
                 val models = generateModel(itemModelInfo.modelKey())
 
                 if (models.isEmpty()) {
                     resourcePack.setDefaultModel(itemModelInfo)
-                    logger.warn("Failed to generate model for $itemModelInfo, using default model.")
+                    LOGGER.warn("Failed to generate model for $itemModelInfo, using default model.")
                     continue
                 }
 
                 for (model in models) {
                     if (!resourcePack.setTexture(model)) {
                         resourcePack.setDefaultModel(itemModelInfo)
-                        logger.warn("Failed to generate texture for model $itemModelInfo, using default model.")
+                        LOGGER.warn("Failed to generate texture for model $itemModelInfo, using default model.")
                         continue
                     }
                     resourcePack.model(model)
 
-                    logger.info("Model for $itemModelInfo generated.")
+                    LOGGER.info("Model for $itemModelInfo generated.")
                 }
             } catch (e: Exception) {
-                logger.warn("Failed to generate model for $itemModelInfo. Reason: ${e.message}")
+                LOGGER.warn("Failed to generate model for $itemModelInfo. Reason: ${e.message}")
             }
         }
     }
@@ -199,7 +196,7 @@ internal class ResourcePackCustomModelGeneration(
                 texture.meta(meta)
             }
 
-            logger.info("Texture for $originTextureKey generated.")
+            LOGGER.info("Texture for $originTextureKey generated.")
             texture(texture.build())
         }
 
@@ -210,7 +207,7 @@ internal class ResourcePackCustomModelGeneration(
         val defaultModel = VanillaResourcePack.model(itemModelInfo.base)
             .map { it.toBuilder().key(itemModelInfo.modelKey()).build() }
             .onFailure {
-                logger.warn("Failed to get default model for $itemModelInfo. Reason: ${it.message}")
+                LOGGER.warn("Failed to get default model for $itemModelInfo. Reason: ${it.message}")
                 return
             }
             .getOrThrow()
@@ -275,19 +272,18 @@ internal class ResourcePackCustomModelGeneration(
 internal class ResourcePackMergePackGeneration(
     context: ResourcePackGenerationContext,
     private val packReader: ResourcePackReader<FileTreeReader>,
-) : ResourcePackGeneration(context), KoinComponent {
-    private val logger: Logger by inject()
-    private val pluginDirectory: File by inject(named(PLUGIN_DATA_DIR))
+) : ResourcePackGeneration(context) {
 
     override fun process() {
-        val serverPluginDirectory = pluginDirectory.parentFile
+        // TODO 允许测试环境正常运行
+        val serverPluginDirectory = SERVER.pluginsFolder
         val resourcePack = context.resourcePack
         val mergePacks = context.mergePacks
             .mapNotNull {
                 val file = serverPluginDirectory.resolve(it)
-                logger.info("Merging pack... path: $file")
+                LOGGER.info("Merging pack... path: $file")
                 if (!file.exists()) {
-                    logger.warn("Merge pack not found: $it")
+                    LOGGER.warn("Merge pack not found: $it")
                     return@mapNotNull null
                 }
                 file
@@ -297,7 +293,7 @@ internal class ResourcePackMergePackGeneration(
                     packReader.readFromDirectory(it)
                 } else {
                     if (it.extension != "zip") {
-                        logger.warn("Invalid file extension for merge pack: ${it.extension}")
+                        LOGGER.warn("Invalid file extension for merge pack: ${it.extension}")
                         return@mapNotNull null
                     }
                     packReader.readFromZipFile(it)

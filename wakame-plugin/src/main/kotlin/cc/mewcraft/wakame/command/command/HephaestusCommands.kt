@@ -13,19 +13,17 @@ import org.incendo.cloud.kotlin.extension.commandBuilder
 object HephaestusCommands : CommandFactory<CommandSender> {
     private const val HEPHAESTUS_LITERAL = "hephaestus"
 
-    override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
+    override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> = buildList {
         // TODO("待模型系统框架落地后补充")
-        return buildList {
-            commandManager.commandBuilder(
-                name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Commands for hephaestus")
-            ) {
-                permission(CommandPermissions.HEPHAESTUS)
-                literal(HEPHAESTUS_LITERAL)
-                handler { context ->
-                    context.sender().sendPlainMessage("Hephaestus!")
-                }
-            }.buildAndAdd(this)
-        }
+        commandManager.commandBuilder(
+            name = CommandConstants.ROOT_COMMAND,
+            description = Description.of("Commands for hephaestus")
+        ) {
+            permission(CommandPermissions.HEPHAESTUS)
+            literal(HEPHAESTUS_LITERAL)
+            handler { context ->
+                context.sender().sendPlainMessage("Hephaestus!")
+            }
+        }.buildAndAdd(this)
     }
 }

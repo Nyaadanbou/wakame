@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration.protection
 
-import cc.mewcraft.wakame.NEKO
+import cc.mewcraft.wakame.Koish
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntity
 import cc.mewcraft.wakame.context.Context
@@ -292,7 +292,7 @@ object ProtectionManager {
         args: ProtectionArgs,
         check: ProtectionIntegration.() -> Boolean,
     ): Boolean {
-        if (!NEKO.isEnabled) {
+        if (!Koish.isEnabled) {
             return false
         }
 

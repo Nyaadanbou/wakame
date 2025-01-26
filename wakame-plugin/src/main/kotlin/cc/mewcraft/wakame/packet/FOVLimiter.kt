@@ -15,6 +15,7 @@ private const val SETTING_MAX_SPEED = 0.15f // TODO: 玩家可设置
 /**
  * 限制玩家的最大 FOV 以避免视角变形过大.
  */
+// FIXME: 飞行模式下视角会鬼畜, 暂时不使用
 internal class FOVLimiter : PacketListenerAbstract() {
 
     override fun onPacketSend(event: PacketSendEvent) {

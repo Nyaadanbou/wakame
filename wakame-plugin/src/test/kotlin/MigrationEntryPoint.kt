@@ -9,14 +9,12 @@ class MigrationEntryPoint {
 
     @Test
     fun migrate() {
-        startKoin {
-            modules(
-                testEnv()
-            )
-        }
-
+        startKoin { modules(testEnv()) }
         LegacyDataMigrator.migrate()
+        stopKoin()
 
+        startKoin { modules(mainEnv()) }
+        LegacyDataMigrator.migrate()
         stopKoin()
     }
 

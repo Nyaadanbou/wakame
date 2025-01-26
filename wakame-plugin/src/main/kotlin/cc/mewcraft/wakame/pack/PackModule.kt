@@ -22,7 +22,7 @@ internal const val RESOURCE_PACK_GENERATED_DIR = "generated"
 internal const val GENERATED_RESOURCE_PACK_DIR = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_NAME"
 internal const val GENERATED_RESOURCE_PACK_ZIP_FILE = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_ZIP_NAME"
 
-internal val RESOURCE_PACK_CONFIG by lazy { Configs.YAML["resourcepack.yml"] }
+internal val RESOURCE_PACK_CONFIG = Configs["resourcepack"]
 
 internal fun packModule(): Module = module {
     // 生成(核心)
@@ -31,14 +31,7 @@ internal fun packModule(): Module = module {
     single<ResourcePackWriter<FileTreeWriter>> { MinecraftResourcePackWriter.minecraft() }
 
     // 实体模型
-//    single { ModelRegistry } bind Initializable::class
-//    single { ModelAnimateTask } bind Initializable::class
     single<BukkitModelEngine> {
         BukkitModelEngine_v1_20_R3.create(get(), new(::ModelViewPersistenceHandlerImpl))
     }
-
-    // 分发, 发布
-//    single { ResourcePackLifecycle } bind Initializable::class
-    singleOf(::ResourcePackLifecycleListener)
-    singleOf(::ResourcePackPlayerListener)
 }

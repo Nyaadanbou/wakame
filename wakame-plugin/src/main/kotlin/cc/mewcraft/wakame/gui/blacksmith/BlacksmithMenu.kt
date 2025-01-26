@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.gui.blacksmith
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
@@ -7,20 +8,14 @@ import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.recycle.RecyclingSession
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.recycle.SimpleRecyclingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 import cc.mewcraft.wakame.reforge.repair.SimpleRepairingSession
-import cc.mewcraft.wakame.util.damage
-import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.itemNameOrType
-import cc.mewcraft.wakame.util.maxDamage
-import cc.mewcraft.wakame.util.registerEvents
-import cc.mewcraft.wakame.util.unregisterEvents
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.TranslationArgument
@@ -33,8 +28,6 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.inventory.PlayerInventory
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.TabGui
@@ -52,7 +45,7 @@ import xyz.xenondevs.invui.window.type.context.setTitle
 internal class BlacksmithMenu(
     val station: BlacksmithStation,
     val viewer: Player,
-) : KoinComponent, Listener {
+) : Listener {
 
     fun open() {
         window2.open()
@@ -67,7 +60,7 @@ internal class BlacksmithMenu(
     val recyclingSession: RecyclingSession = SimpleRecyclingSession(recyclingStation, viewer, station.recyclingInventorySize)
     val repairingSession: RepairingSession = SimpleRepairingSession(repairingTable, viewer)
 
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.RECYCLING_LOG_PREFIX)
 
     var confirmed: Boolean = false
 

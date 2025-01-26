@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.key.Key
@@ -75,12 +76,12 @@ object GlobalTranslations : RegistryConfigStorage {
 
     private fun loadDataIntoRegistry() {
         // Load translation
-        val dataDirectory = getFileInConfigDirectory(DIR_PATH)
+        val dataDirectory = getFileInDataDirectory(DIR_PATH)
         val loaderBuilder = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(AudienceMessageGroupSerializer)
-                kregister(CombinedAudienceMessageSerializer)
+                register(AudienceMessageGroupSerializer)
+                register(CombinedAudienceMessageSerializer)
             }
         }
         val allLocales = Locale.getAvailableLocales()

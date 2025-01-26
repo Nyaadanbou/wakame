@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.enchantment
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.DefaultItemSlotRegistry
+import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.VanillaItemSlot
 
 @Init(
@@ -34,6 +34,6 @@ internal object EnchantmentInitializer {
             .flatMap { it.handle.activeSlotGroups }
             .flatMap { VanillaItemSlot.fromEquipmentSlotGroup(it) }
             .distinct()
-            .forEach { DefaultItemSlotRegistry.register(it) }
+            .forEach { ItemSlotRegistry.register(it) }
     }
 }

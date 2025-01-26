@@ -84,9 +84,9 @@ object CommonNekoStackTest {
 }
 
 fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, ConfigurationNode> {
-    val pluginDataDir = get<File>(InjectionQualifier.DATA_FOLDER)
-    val itemsDir = pluginDataDir.resolve("items")
-    val namespaceDir = itemsDir.resolve(namespace)
+    val configsDir = get<File>(InjectionQualifier.CONFIGS_FOLDER)
+    val dataDir = configsDir.resolve("item")
+    val namespaceDir = dataDir.resolve(namespace)
     val itemFile = namespaceDir.resolve("$path.yml")
     if (!itemFile.exists()) {
         fail("File not found: $namespace:$path")

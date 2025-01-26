@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.packet
 
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.standard.StandardContext
-import cc.mewcraft.wakame.initializer.Initializer
 import com.github.retrooper.packetevents.event.PacketListenerAbstract
 import com.github.retrooper.packetevents.event.PacketSendEvent
 import com.github.retrooper.packetevents.protocol.item.ItemStack
@@ -11,19 +12,14 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.server.*
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import kotlin.jvm.optionals.getOrNull
 
 /**
  * 修改 [org.bukkit.inventory.ItemStack].
  */
 internal class ItemStackRenderer : PacketListenerAbstract() {
-    companion object : KoinComponent {
+    companion object {
         private const val PROCESSED_KEY = "processed"
-
-        private val logger: Logger by inject()
     }
 
     override fun onPacketSend(event: PacketSendEvent) {
@@ -134,10 +130,10 @@ internal class ItemStackRenderer : PacketListenerAbstract() {
                 processed = true
                 changed = true
             } catch (e: Throwable) {
-                if (Initializer.isDebug) {
+                if (SharedConstants.isDebug) {
                     e.printStackTrace()
                 } else {
-                    logger.error("An error occurred while rendering network item: ${nekoStack.id}")
+                    LOGGER.error("An error occurred while rendering network item: ${nekoStack.id}")
                 }
             }
         }

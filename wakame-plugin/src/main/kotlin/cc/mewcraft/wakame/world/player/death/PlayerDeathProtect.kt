@@ -1,20 +1,21 @@
 package cc.mewcraft.wakame.world.player.death
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.util.event
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import org.bukkit.entity.EntityType
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -26,9 +27,15 @@ import java.util.concurrent.TimeUnit
  * 未来的功能:
  * - 兼容其他系统???
  */
-class PlayerDeathProtect : Listener, KoinComponent {
+@Init(
+    stage = InitStage.POST_WORLD,
+)
+internal object PlayerDeathProtect {
 
-    private val logger: Logger = get()
+    @InitFun
+    fun init() {
+        registerListeners()
+    }
 
     // 记录了将要掉落的物品堆叠, 以及物品对应的所有者
     private val deathDropRecords: Cache<ItemStack, UUID> = Caffeine.newBuilder()
@@ -36,58 +43,55 @@ class PlayerDeathProtect : Listener, KoinComponent {
         // 理论上一旦玩家死亡爆了物品, 那么缓存应该就立马会被读取, 并被无效化.
         // 理论上这个过期永远都不应该自动触发, 如果是那应该是 BUG.
         .expireAfterWrite(10, TimeUnit.SECONDS)
-        .removalListener<ItemStack, UUID> { key, value, cause ->
+        .removalListener<ItemStack, UUID> { key, _, cause ->
             if (cause != RemovalCause.EXPLICIT) {
-                logger.warn("[PlayerDeathProtect] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+                LOGGER.warn("[${this::class.simpleName}] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
             }
         }
         .build()
 
-    private val onlyOwnerCanPickupDeathDrops: Boolean by MAIN_CONFIG.entry("only_owner_can_pickup_death_drops")
+    private val onlyOwnerCanPickupDeathDrops: Boolean by MAIN_CONFIG.entry<Boolean>("only_owner_can_pickup_death_drops")
 
-    @EventHandler(
-        ignoreCancelled = true,
-        priority = EventPriority.MONITOR
-    )
-    fun on(event: PlayerDeathEvent) {
-        if (!onlyOwnerCanPickupDeathDrops) {
-            return
+    private fun registerListeners() {
+
+        // 在玩家死亡的时候, 记录掉落的物品堆叠, 以及物品对应的所有者
+        event<PlayerDeathEvent>(EventPriority.MONITOR, true) { event->
+            if (!onlyOwnerCanPickupDeathDrops) {
+                return@event
+            }
+
+            if (event.keepInventory) {
+                return@event
+            }
+
+            val player = event.player
+            val drops = event.drops
+            for (drop in drops) {
+                deathDropRecords.put(drop, player.uniqueId)
+            }
         }
 
-        if (event.keepInventory) {
-            return
-        }
+        // 在物品掉落时, 设置物品的所有者, 并移除记录
+        event<ItemSpawnEvent>(EventPriority.HIGHEST, true) { event->
+            if (!onlyOwnerCanPickupDeathDrops) {
+                return@event
+            }
 
-        val player = event.player
-        val drops = event.drops
-        for (drop in drops) {
-            deathDropRecords.put(drop, player.uniqueId)
+            val entityType = event.entityType
+            if (entityType != EntityType.ITEM) {
+                return@event
+            }
+
+            val item = event.entity
+            val itemStack = item.itemStack
+            val ownerUuid = deathDropRecords.getIfPresent(itemStack) ?: return@event
+
+            // 设置物品的所有者
+            item.owner = ownerUuid
+
+            // 移除记录
+           deathDropRecords.invalidate(itemStack)
         }
     }
 
-    @EventHandler(
-        ignoreCancelled = true,
-        // 设置 Item#owner 应该不会造成什么问题, 所以优先级设置为高
-        priority = EventPriority.HIGHEST
-    )
-    fun on(event: ItemSpawnEvent) {
-        if (!onlyOwnerCanPickupDeathDrops) {
-            return
-        }
-
-        val entityType = event.entityType
-        if (entityType != EntityType.ITEM) {
-            return
-        }
-
-        val item = event.entity
-        val itemStack = item.itemStack
-        val ownerUuid = deathDropRecords.getIfPresent(itemStack) ?: return
-
-        // 设置物品的所有者
-        item.owner = ownerUuid
-
-        // 移除记录
-        deathDropRecords.invalidate(itemStack)
-    }
 }

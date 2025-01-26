@@ -10,6 +10,10 @@ import cc.mewcraft.wakame.extensions.toLocation
 import cc.mewcraft.wakame.extensions.toVector3f
 import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
+import cc.mewcraft.wakame.initializer2.Init
+import cc.mewcraft.wakame.initializer2.InitFun
+import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.sound.Sound.Emitter
@@ -27,9 +31,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 import org.joml.Vector3f
 import java.util.WeakHashMap
 import kotlin.math.cos
@@ -40,7 +42,10 @@ import kotlin.random.Random
 /**
  * 以悬浮文字显示玩家造成的伤害.
  */
-internal class DamageDisplay : Listener {
+@Init(
+    stage = InitStage.POST_WORLD,
+)
+internal class DamageDisplay {
 
     companion object {
         // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
@@ -54,48 +59,50 @@ internal class DamageDisplay : Listener {
         private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    private fun onWakameEntityDamage(event: NekoEntityDamageEvent) {
-        val damager = event.damageSource.causingEntity as? Player ?: return
-        val damagee = event.damagee as? LivingEntity ?: return
-        val damageValueMap = event.getFinalDamageMap()
-        val criticalState = event.getCriticalState()
+    @InitFun
+    fun init() {
+        event<NekoEntityDamageEvent>(EventPriority.MONITOR, true) { event ->
+            val damager = event.damageSource.causingEntity as? Player ?: return@event
+            val damagee = event.damagee as? LivingEntity ?: return@event
+            val damageValueMap = event.getFinalDamageMap()
+            val criticalState = event.getCriticalState()
 
-        val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
-        val hologramText = damageValueMap
-            .map { (element, value) ->
-                val damageValue = "%.1f".format(value)
-                val damageText = text {
-                    content(damageValue)
-                    element.displayStyles.forEach { applicableApply(it) }
-                }
-                when (criticalState) {
-                    CriticalStrikeState.POSITIVE -> {
-                        damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
-                        text {
-                            content("\ud83d\udca5 ")
-                            color(TextColor.color(0xff9900))
-                            style { decorate(TextDecoration.BOLD) }
-                            append(damageText)
-                        }
+            val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
+            val hologramText = damageValueMap
+                .map { (element, value) ->
+                    val damageValue = "%.1f".format(value)
+                    val damageText = text {
+                        content(damageValue)
+                        element.displayStyles.forEach { applicableApply(it) }
                     }
-
-                    CriticalStrikeState.NEGATIVE -> {
-                        text {
-                            content("\ud83d\udca5 ")
-                            color(TextColor.color(0x02afff))
-                            style { decorate(TextDecoration.BOLD) }
-                            append(damageText)
+                    when (criticalState) {
+                        CriticalStrikeState.POSITIVE -> {
+                            damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
+                            text {
+                                content("\ud83d\udca5 ")
+                                color(TextColor.color(0xff9900))
+                                style { decorate(TextDecoration.BOLD) }
+                                append(damageText)
+                            }
                         }
+
+                        CriticalStrikeState.NEGATIVE -> {
+                            text {
+                                content("\ud83d\udca5 ")
+                                color(TextColor.color(0x02afff))
+                                style { decorate(TextDecoration.BOLD) }
+                                append(damageText)
+                            }
+                        }
+
+                        CriticalStrikeState.NONE -> damageText
                     }
-
-                    CriticalStrikeState.NONE -> damageText
+                }.let { components ->
+                    Component.join(JoinConfiguration.spaces(), components)
                 }
-            }.let { components ->
-                Component.join(JoinConfiguration.spaces(), components)
-            }
 
-        sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
+            sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
+        }
     }
 
     /**

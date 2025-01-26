@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.display2
 
+import xyz.xenondevs.commons.provider.Provider
+
 // 开发日记 2024/9/17
 // 读取配置文件时, 应该先读 formats.yml, 再读 layout.yml
 
@@ -10,6 +12,6 @@ interface RendererFormatRegistry {
     /**
      * 获取指定的 [RendererFormat].
      */
-    fun <T : RendererFormat> get(id: String): T?
+    fun <T : RendererFormat> getRendererFormat(id: String): Provider<T>
 }
 

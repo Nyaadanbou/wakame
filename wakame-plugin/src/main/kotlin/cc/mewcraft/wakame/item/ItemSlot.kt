@@ -137,7 +137,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
             CustomItemSlot.NAMESPACE -> {
                 val slotIndex = keyValue.toIntOrNull() ?: throw SerializationException(node, type, "Invalid input for ItemSlot: '$rawString'")
 
-                val alreadyRegistered = DefaultItemSlotRegistry.get(slotIndex)
+                val alreadyRegistered = ItemSlotRegistry.get(slotIndex)
                 if (alreadyRegistered != null) {
                     return alreadyRegistered
                 }
@@ -160,7 +160,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
         }
 
         // 每序列化一个 ItemSlot, 都尝试加进注册表
-        DefaultItemSlotRegistry.register(itemSlot)
+        ItemSlotRegistry.register(itemSlot)
 
         return itemSlot
     }

@@ -23,7 +23,9 @@ import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleR
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleRE
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleS
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleSE
-import cc.mewcraft.wakame.config.ConfigProvider
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -48,7 +50,7 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.orElse
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
@@ -61,6 +63,7 @@ import kotlin.reflect.KClass
     ]
 )
 object AttributeBundleFacadeRegistryConfigStorage : RegistryConfigStorage {
+    const val CONFIG_ID: String = "attributes"
     const val FILE_PATH: String = "attributes.yml"
 
     @InitFun
@@ -144,7 +147,7 @@ interface AttributeBundleFacade<T : ConstantAttributeBundle, S : VariableAttribu
     /**
      * 本实例的全局配置文件.
      */
-    val config: ConfigProvider
+    val config: Provider<ConfigurationNode>
 
     /**
      * [属性块][cc.mewcraft.wakame.attribute.bundle.AttributeBundle]的唯一标识.
@@ -289,7 +292,7 @@ private val MM = Injector.get<MiniMessage>()
  * A mutable [AttributeBundleFacade] (except the property [id]).
  */
 private class AttributeBundleFacadeImpl<T : ConstantAttributeBundle, S : VariableAttributeBundle>(
-    override val config: ConfigProvider,
+    override val config: Provider<ConfigurationNode>,
     override val id: String,
     override val bundleTrait: AttributeBundleTraitSet,
     override val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>,
@@ -303,12 +306,12 @@ private class AttributeBundleFacadeImpl<T : ConstantAttributeBundle, S : Variabl
 }
 
 private object AttributeConfigFallback {
-    private val default: ConfigProvider = GLOBAL_ATTRIBUTE_CONFIG.node("__default__")
+    private val default: Provider<ConfigurationNode> = GLOBAL_ATTRIBUTE_CONFIG.node("__default__")
     val quality: Provider<Map<Quality, Component>> = default.entry("quality")
 }
 
 private sealed class Tooltips(
-    config: ConfigProvider,
+    config: Provider<ConfigurationNode>,
 ) : Examinable {
     // These are raw string values from the config
     private val add: String by config.entry("tooltips", "add")
@@ -345,7 +348,7 @@ private sealed class Tooltips(
  * @param config the config of the attribute facade
  */
 private class NumericTooltips(
-    config: ConfigProvider,
+    config: Provider<ConfigurationNode>,
 ) : Tooltips(config), Examinable {
     /**
      * This companion object is an object pool of [DecimalFormat].
@@ -389,7 +392,7 @@ private class NumericTooltips(
 }
 
 private class NumericScaling(
-    config: ConfigProvider,
+    config: Provider<ConfigurationNode>,
 ) : Tooltips(config) {
     private val add: Double by config.optionalEntry<Double>("scaling", "add").orElse(1.0)
     private val multiplyBase: Double by config.optionalEntry<Double>("scaling", "multiply_base").orElse(1.0)
@@ -405,7 +408,7 @@ private class NumericScaling(
 }
 
 private class QualityText(
-    config: ConfigProvider,
+    config: Provider<ConfigurationNode>,
 ) {
     private val quality: Map<Quality, Component> by config.optionalEntry<Map<Quality, Component>>("quality").orElse(AttributeConfigFallback.quality)
 
@@ -429,7 +432,7 @@ private class FormatSelectionImpl(
 private class SingleSelectionImpl(
     private val id: String,
 ) : SingleSelection {
-    private val config: ConfigProvider = GLOBAL_ATTRIBUTE_CONFIG.node(id)
+    private val config: Provider<ConfigurationNode> = GLOBAL_ATTRIBUTE_CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
     private val scaling: NumericScaling = NumericScaling(config)
@@ -483,7 +486,7 @@ private class SingleSelectionImpl(
 private class RangedSelectionImpl(
     private val id: String,
 ) : RangedSelection {
-    private val config: ConfigProvider = GLOBAL_ATTRIBUTE_CONFIG.node(id)
+    private val config: Provider<ConfigurationNode> = GLOBAL_ATTRIBUTE_CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
     private val scaling: NumericScaling = NumericScaling(config)
@@ -544,7 +547,7 @@ private class RangedSelectionImpl(
 private class AttributeBinderSEImpl(
     private val id: String,
 ) : AttributeBinderSE {
-    private val config: ConfigProvider = GLOBAL_ATTRIBUTE_CONFIG.node(id)
+    private val config: Provider<ConfigurationNode> = GLOBAL_ATTRIBUTE_CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
     private val scaling: NumericScaling = NumericScaling(config)
@@ -598,7 +601,7 @@ private class AttributeBinderSEImpl(
 private class AttributeBinderREImpl(
     private val id: String,
 ) : AttributeBinderRE {
-    private val config: ConfigProvider = GLOBAL_ATTRIBUTE_CONFIG.node(id)
+    private val config: Provider<ConfigurationNode> = GLOBAL_ATTRIBUTE_CONFIG.node(id)
     private val displayName: String by config.entry<String>("display_name")
     private val tooltips: NumericTooltips = NumericTooltips(config)
     private val scaling: NumericScaling = NumericScaling(config)

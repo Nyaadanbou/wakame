@@ -1,18 +1,14 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
+import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.plain
 import cc.mewcraft.wakame.util.toSimpleString
@@ -23,8 +19,6 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
 import java.util.stream.Stream
@@ -35,8 +29,8 @@ internal class SimpleMergingSession(
     override val table: MergingTable,
     inputItem1: NekoStack? = null,
     inputItem2: NekoStack? = null,
-) : MergingSession, KoinComponent {
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
+) : MergingSession {
+    private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
     override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem1)
     override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem2)

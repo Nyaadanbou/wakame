@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
+import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
@@ -7,8 +8,6 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 
@@ -24,8 +23,8 @@ import org.spongepowered.configurate.kotlin.extensions.getList
 
 data class ExtraLore(
     val lore: List<String>,
-) : ItemTemplate<Nothing>, KoinComponent {
-    val processedLore: List<Component> = lore.map { get<MiniMessage>().deserialize(it) }
+) : ItemTemplate<Nothing> {
+    val processedLore: List<Component> = lore.map { Injector.get<MiniMessage>().deserialize(it) }
 
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 

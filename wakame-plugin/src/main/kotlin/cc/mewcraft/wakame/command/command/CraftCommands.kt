@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.CraftingStationParser
 import cc.mewcraft.wakame.craftingstation.CraftingStation
 import cc.mewcraft.wakame.gui.craftingstation.CraftingStationMenu
-import cc.mewcraft.wakame.util.ThreadType
+import cc.mewcraft.wakame.util.runTask
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.Command
@@ -22,32 +22,30 @@ object CraftCommands : CommandFactory<CommandSender> {
     private const val CRAFT_LITERAL = "craft"
     private const val STATION_LITERAL = "station"
 
-    override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> {
-        return buildList {
-            commandManager.commandBuilder(
-                name = CommandConstants.ROOT_COMMAND,
-                description = Description.of("Commands for crafting items")
-            ) {
-                permission(CommandPermissions.CRAFT)
-                literal(CRAFT_LITERAL)
-                literal(STATION_LITERAL)
-                required("station", CraftingStationParser.stationParser())
-                optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
-                handler { ctx ->
-                    val sender = ctx.sender()
-                    val station = ctx.get<CraftingStation>("station")
-                    val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
-                    val viewer = player?.single() ?: (sender as? Player) ?: run {
-                        sender.sendPlainMessage("Player not found!")
-                        return@handler
-                    }
-
-                    ThreadType.SYNC.launch {
-                        sender.sendPlainMessage("Opening crafting station ${station.id} for player ${viewer.name}")
-                        CraftingStationMenu(station, viewer).open()
-                    }
+    override fun createCommands(commandManager: CommandManager<CommandSender>): List<Command<out CommandSender>> = buildList {
+        commandManager.commandBuilder(
+            name = CommandConstants.ROOT_COMMAND,
+            description = Description.of("Commands for crafting items")
+        ) {
+            permission(CommandPermissions.CRAFT)
+            literal(CRAFT_LITERAL)
+            literal(STATION_LITERAL)
+            required("station", CraftingStationParser.stationParser())
+            optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
+            handler { ctx ->
+                val sender = ctx.sender()
+                val station = ctx.get<CraftingStation>("station")
+                val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
+                val viewer = player?.single() ?: (sender as? Player) ?: run {
+                    sender.sendPlainMessage("Player not found!")
+                    return@handler
                 }
-            }.buildAndAdd(this)
-        }
+
+                runTask {
+                    sender.sendPlainMessage("Opening crafting station ${station.id} for player ${viewer.name}")
+                    CraftingStationMenu(station, viewer).open()
+                }
+            }
+        }.buildAndAdd(this)
     }
 }

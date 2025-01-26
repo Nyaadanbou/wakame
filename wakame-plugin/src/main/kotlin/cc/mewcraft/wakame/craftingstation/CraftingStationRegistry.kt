@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.craftingstation
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -10,10 +10,9 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.qualifier.named
 import java.io.File
 
 @Init(
@@ -28,7 +27,6 @@ import java.io.File
     ]
 )
 internal object CraftingStationRegistry {
-    private const val STATION_DIR_PATH = "station/stations"
 
     private val stations: MutableMap<String, CraftingStation> = mutableMapOf()
 
@@ -52,7 +50,9 @@ internal object CraftingStationRegistry {
     fun loadDataIntoRegistry() {
         stations.clear()
 
-        val stationDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(STATION_DIR_PATH)
+        val stationDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            .resolve(CraftingStationConstants.DATA_DIR)
+            .resolve("stations")
         stationDir.walk()
             .drop(1)
             .filter { it.extension == "yml" }
@@ -63,7 +63,7 @@ internal object CraftingStationRegistry {
                     val stationNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
-                            kregister(StationSerializer)
+                            register(StationSerializer)
                         }
                     }.buildAndLoadString(fileText)
                     stationNode.hint(StationSerializer.HINT_NODE, stationId)

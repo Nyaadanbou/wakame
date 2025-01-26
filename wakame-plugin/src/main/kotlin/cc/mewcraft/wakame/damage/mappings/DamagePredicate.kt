@@ -3,7 +3,8 @@
 package cc.mewcraft.wakame.damage.mappings
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
+import cc.mewcraft.wakame.util.require
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
@@ -120,37 +121,38 @@ data class VictimEntityTypePredicate(
     }
 }
 
+// FIXME 使用 DispatchingTypeSerializer 替代
 internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicate {
-        val key = node.key().toString()
-        return when (key) {
+        // FIXME 这里没有使用单独的 Node 来指定 type, 而是用的 Node 本身的 key 来指定 type
+        //  截止 1/26 DispatchingTypeSerializer 仅支持在单独的 Node 上指定 type
+        //  新的 DispatchingTypeSerializer 实现应该支持这种 “inline” type
+        return when (val key = node.key().toString()) {
             EntityDataPredicate.TYPE_KEY -> {
-                val map = node.childrenMap().mapKeys { (nodeKey, _) ->
-                    nodeKey.toString()
-                }.mapValues { (_, nodeValue) ->
-                    nodeValue.krequire<Int>()
-                }
-                return EntityDataPredicate(map)
+                val map = node.childrenMap()
+                    .transformKeys<String>()
+                    .mapValues { (_, nodeValue) -> nodeValue.require<Int>() }
+                EntityDataPredicate(map)
             }
 
             DamageTypePredicate.TYPE_KEY -> {
                 val damageTypes = node.getList<DamageType>(emptyList())
-                return DamageTypePredicate(damageTypes.toHashSet())
+                DamageTypePredicate(damageTypes.toHashSet())
             }
 
             CausingEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return CausingEntityTypePredicate(entityTypes.toHashSet())
+                CausingEntityTypePredicate(entityTypes.toHashSet())
             }
 
             DirectEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return DirectEntityTypePredicate(entityTypes.toHashSet())
+                DirectEntityTypePredicate(entityTypes.toHashSet())
             }
 
             VictimEntityTypePredicate.TYPE_KEY -> {
                 val entityTypes = node.getList<EntityType>(emptyList())
-                return VictimEntityTypePredicate(entityTypes.toHashSet())
+                VictimEntityTypePredicate(entityTypes.toHashSet())
             }
 
             else -> {

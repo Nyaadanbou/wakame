@@ -1,11 +1,8 @@
 package cc.mewcraft.wakame.reforge.merge
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
+import cc.mewcraft.wakame.attribute.bundle.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -15,12 +12,10 @@ import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.reforgeHistory
 import cc.mewcraft.wakame.rarity.RarityType
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import kotlin.math.ceil
 
@@ -30,7 +25,7 @@ import kotlin.math.ceil
 internal class MergeOperation
 private constructor(
     private val session: MergingSession,
-) : KoinComponent {
+) {
 
     companion object {
         operator fun invoke(session: MergingSession): MergingSession.ReforgeResult {
@@ -40,7 +35,7 @@ private constructor(
 
     private val player: Player
         get() = session.viewer
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
+    private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
     fun execute(): MergingSession.ReforgeResult {
         if (session.frozen) {

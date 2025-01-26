@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0.0-SNAPSHOT"
+version = "0.0.1-snapshot"
 description = "The core plugin of Nyaadanbou"
 
 dependencies {
@@ -133,9 +133,9 @@ tasks {
 }
 
 paper {
-    main = "cc.mewcraft.wakame.WakamePlugin"
-    // loader = "cc.mewcraft.wakame.loader.WakameLoader"
-    // bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
+    main = "cc.mewcraft.wakame.Koish"
+    loader = "cc.mewcraft.wakame.KoishLoader"
+    bootstrapper = "cc.mewcraft.wakame.KoishBootstrapper"
     name = "Wakame"
     version = "${project.version}"
     description = project.description

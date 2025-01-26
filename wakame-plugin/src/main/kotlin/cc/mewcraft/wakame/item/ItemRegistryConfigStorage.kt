@@ -10,8 +10,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.kregister
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -35,7 +34,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
     ]
 )
 object ItemRegistryConfigStorage : RegistryConfigStorage {
-    const val DIR_PATH = "items/"
+    const val DIR_PATH = "item/"
 
     /**
      * 命名空间 `minecraft` 下的物品仅用于实现原版套皮物品,
@@ -50,18 +49,13 @@ object ItemRegistryConfigStorage : RegistryConfigStorage {
     private const val INTERNAL_NAMESPACE = "internal"
 
     /**
-     * 未知物品的 ID.
-     */
-    const val UNKNOWN_ITEM_ID = "$INTERNAL_NAMESPACE:unknown"
-
-    /**
      * 物品的序列化器集合.
      */
     @JvmField
     internal val SERIALIZERS = TypeSerializerCollection.builder()
-        .kregister(ItemBaseSerializer)
-        .kregister(ItemSlotSerializer)
-        .kregister(ItemSlotGroupSerializer)
+        .register(ItemBaseSerializer)
+        .register(ItemSlotSerializer)
+        .register(ItemSlotGroupSerializer)
         .registerAll(ItemTemplateTypes.serializers()) // 每个模板的序列化器
         .build()
 

@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.registry
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.koin.core.qualifier.named
@@ -73,7 +73,7 @@ object AbilityRegistry {
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        val dataDirectory = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(ABILITY_PROTO_CONFIG_DIR)
+        val dataDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER).resolve(ABILITY_PROTO_CONFIG_DIR)
         val namespaceDirs = dataDirectory.walk().maxDepth(1)
             .drop(1) // exclude the `dataDirectory` itself
             .filter { it.isDirectory }
@@ -94,7 +94,7 @@ object AbilityRegistry {
                     val node = loaderBuilder.buildAndLoadString(text)
 
                     val abilityId = Key(Namespaces.ABILITY, "${namespace}/$value")
-                    val type = node.node("type").krequire<String>()
+                    val type = node.node("type").require<String>()
                     val ability = try {
                         requireNotNull(AbilityFactories[type]).create(abilityId, node)
                     } catch (t: Throwable) {

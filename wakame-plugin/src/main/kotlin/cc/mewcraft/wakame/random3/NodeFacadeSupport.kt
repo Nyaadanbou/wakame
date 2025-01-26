@@ -1,14 +1,10 @@
 package cc.mewcraft.wakame.random3
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import cc.mewcraft.wakame.LOGGER
 
-object NodeFacadeSupport : KoinComponent {
+object NodeFacadeSupport {
     fun reload(facade: NodeFacade<*>) {
-        logger.info("Loading global random selectors: ${facade.dataDir}")
+        LOGGER.info("Loading global random selectors: ${facade.dataDir}")
         facade.populate()
     }
-
-    private val logger: Logger by inject()
 }

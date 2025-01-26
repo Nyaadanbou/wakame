@@ -2,13 +2,7 @@ package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
@@ -61,12 +55,12 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
     @InitFun
     fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {

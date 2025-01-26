@@ -1,23 +1,21 @@
 package cc.mewcraft.wakame.damage.mappings
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
+import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntityDamageEvent
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.io.File
 
@@ -27,25 +25,20 @@ import java.io.File
 @Init(
     stage = InitStage.POST_WORLD
 )
-@Reload()
+@Reload
 object DirectEntityTypeMappings {
-    private const val DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_PATH = "damage/direct_entity_type_mappings.yml"
 
-    private val noCauseMappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
-    private val playerMappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val damageMappingForNoCause: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val damageMappingForPlayer: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
     @InitFun
-    private fun init() {
-        loadDataIntoRegistry()
-    }
+    private fun init() = loadDataIntoRegistry()
 
     @ReloadFun
-    private fun reload() {
-        loadDataIntoRegistry()
-    }
+    private fun reload() = loadDataIntoRegistry()
 
-    fun byNoCausingEvent(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = noCauseMappings[directEntityType] ?: return null
+    fun getForNoCause(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
+        val damageMappings = damageMappingForNoCause[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
             if (damageMapping.match(event)) {
                 return damageMapping
@@ -54,8 +47,8 @@ object DirectEntityTypeMappings {
         return null
     }
 
-    fun byPlayerEvent(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = playerMappings[directEntityType] ?: return null
+    fun getForPlayer(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
+        val damageMappings = damageMappingForPlayer[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
             if (damageMapping.match(event)) {
                 return damageMapping
@@ -65,58 +58,37 @@ object DirectEntityTypeMappings {
     }
 
     private fun loadDataIntoRegistry() {
-        noCauseMappings.clear()
-        playerMappings.clear()
+        damageMappingForNoCause.clear()
+        damageMappingForPlayer.clear()
 
         val rootNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(DamageMappingSerializer)
-                kregister(DamagePredicateSerializer)
-                kregister(DamageMetadataBuilderSerializer)
+                register<DamageMapping>(DamageMappingSerializer)
+                register<DamagePredicate>(DamagePredicateSerializer)
+                register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
             }
-            source { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(DIRECT_ENTITY_TYPE_MAPPINGS_CONFIG_PATH).bufferedReader() }
-        }.build().load()
-
-        val entityTypeRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENTITY_TYPE)
+        }.buildAndLoadString(
+            Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+                .resolve(DamageMappingConstants.DATA_DIR)
+                .resolve("direct_entity_type_mappings.yml")
+                .readText()
+        )
         rootNode.node("no_causing").childrenMap()
-            .mapKeys { (key, _) ->
-                NamespacedKey.minecraft(key.toString())
+            .transformKeys<EntityType>()
+            .forEach { (entityType, node) ->
+                val damageMappingList = node.childrenMap()
+                    .map { (_, node) -> node.get<DamageMapping>()?.also { LOGGER.error("Malformed damage mapping at ${node.path()}. Skipped.") } }
+                    .filterNotNull()
+                damageMappingForNoCause[entityType] = damageMappingList
             }
-            .forEach { (key, node) ->
-                val entityType = entityTypeRegistry.get(key) ?: run {
-                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
-                    return@forEach
-                }
-                val mappings = node.childrenMap()
-                    .map { (_, node) ->
-                        node.get<DamageMapping>() ?: run {
-                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
-                            return@forEach
-                        }
-                    }
-
-                noCauseMappings[entityType] = mappings
-            }
-
         rootNode.node("player").childrenMap()
-            .mapKeys { (key, _) ->
-                NamespacedKey.minecraft(key.toString())
-            }
-            .forEach { (key, node) ->
-                val entityType = entityTypeRegistry.get(key) ?: run {
-                    LOGGER.warn("Unknown entity type: ${key.asString()}. Skipped.")
-                    return@forEach
-                }
-                val mappings = node.childrenMap()
-                    .map { (_, node) ->
-                        node.get<DamageMapping>() ?: run {
-                            LOGGER.warn("Malformed damage mapping at: ${node.path()}. Please correct your config.")
-                            return@forEach
-                        }
-                    }
-
-                playerMappings[entityType] = mappings
+            .transformKeys<EntityType>()
+            .forEach { (entityType, node) ->
+                val damageMappingList = node.childrenMap()
+                    .map { (_, node) -> node.get<DamageMapping>()?.also { LOGGER.error("Malformed damage mapping at ${node.path()}. Skipped.") } }
+                    .filterNotNull()
+                damageMappingForPlayer[entityType] = damageMappingList
             }
     }
 }

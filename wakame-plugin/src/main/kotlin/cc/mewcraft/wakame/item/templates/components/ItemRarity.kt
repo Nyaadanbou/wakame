@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -48,7 +48,7 @@ data class ItemRarity(
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<ItemRarityData> {
         fun warnNullItemLevel() {
-            ItemComponentInjections.logger.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
+            LOGGER.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
         }
 
         val rarity: RegistryEntry<RarityType>?

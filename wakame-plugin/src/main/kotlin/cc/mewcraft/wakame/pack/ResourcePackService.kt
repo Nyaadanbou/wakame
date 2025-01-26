@@ -1,15 +1,16 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.InjectionQualifier
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.util.PathChangeWatcher
 import com.sun.net.httpserver.HttpExchange
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
-import org.koin.core.component.*
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.server.ResourcePackServer
@@ -142,8 +143,7 @@ private class SelfHostService(
     // adhoc
     host: Provider<String>,
     port: Provider<Int>,
-) : ResourcePackService, KoinComponent {
-    private val logger: Logger by inject()
+) : ResourcePackService {
 
     // Http 服务器监听的主机名
     private val host: String by host
@@ -191,11 +191,11 @@ private class SelfHostService(
     private var builtResourcePack: BuiltResourcePack? = buildResourcePack()
 
     private val watcher: PathChangeWatcher = PathChangeWatcher(
-        directory = get<File>(named(PLUGIN_DATA_DIR)).resolve(RESOURCE_PACK_GENERATED_DIR).toPath(),
-        specificFile = get<File>(named(PLUGIN_DATA_DIR)).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toPath(),
+        directory = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(RESOURCE_PACK_GENERATED_DIR).toPath(),
+        specificFile = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toPath(),
         executor = executor,
         onFileChange = {
-            logger.info("Resource pack file changed. Reloading resource pack.")
+            LOGGER.info("Resource pack file changed. Reloading resource pack.")
             builtResourcePack = buildResourcePack()
         }
     )
@@ -252,9 +252,9 @@ private class SelfHostService(
     }
 
     private fun buildResourcePack(): BuiltResourcePack? {
-        val file = get<File>(named(PLUGIN_DATA_DIR)).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        val file = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
         if (!file.exists() || !file.isFile) {
-            logger.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
+            LOGGER.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
             return null
         }
         val hash = computeHash(file)
@@ -278,13 +278,13 @@ private class SelfHostService(
         }.build()
 
     override fun start() {
-        logger.info("Starting resource pack http server. Port: $port")
+        LOGGER.info("Starting resource pack http server. Port: $port")
         watcher.watch()
         server.start()
     }
 
     override fun stop() {
-        logger.info("Stopping resource pack http server. Port: $port")
+        LOGGER.info("Stopping resource pack http server. Port: $port")
         watcher.stop()
         server.stop(0)
     }
@@ -303,8 +303,7 @@ private class OnlyURLService(
     prompt: Provider<Component>,
     // adhoc
     downloadURL: Provider<String>,
-) : ResourcePackService, KoinComponent {
-    private val logger: Logger by inject()
+) : ResourcePackService {
 
     private val required: Boolean by required
     private val prompt: Component by prompt
@@ -318,7 +317,7 @@ private class OnlyURLService(
             val packInfo = try {
                 ResourcePackInfo.resourcePackInfo().id(id).uri(uri).computeHashAndBuild().get(10, TimeUnit.SECONDS)
             } catch (e: Exception) {
-                logger.error("Failed to compute hash for resource pack: '$downloadURL'. No resource pack will be sent to players.", e)
+                LOGGER.error("Failed to compute hash for resource pack: '$downloadURL'. No resource pack will be sent to players.", e)
                 // 返回一个空的 ResourcePackRequest
                 return ResourcePackRequest.resourcePackRequest().build()
             }

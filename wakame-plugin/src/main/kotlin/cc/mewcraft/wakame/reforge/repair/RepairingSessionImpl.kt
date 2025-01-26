@@ -1,28 +1,22 @@
 package cc.mewcraft.wakame.reforge.repair
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.reforge.common.PriceInstance
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.damage
-import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.isDamageable
-import cc.mewcraft.wakame.util.isDamaged
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 
 internal class SimpleRepairingSession(
     override val table: RepairingTable,
     override val viewer: Player,
-) : RepairingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
+) : RepairingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.RECYCLING_LOG_PREFIX)
 
     // 储存了当前所有的 claim.
     // 这里的 index 就是它显示在修理菜单里的位置 (display slot).

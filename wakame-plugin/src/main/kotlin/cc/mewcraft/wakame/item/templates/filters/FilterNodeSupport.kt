@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.kregister
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.nio.file.Path
@@ -43,6 +44,6 @@ internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>()
         // 实现 FilterNodeReader,
         // 这样我们才能获得泛型信息,
         // 否则 krequire 无法工作
-        return node.krequire<Filter<ItemGenerationContext>>()
+        return node.require()
     }
 }

@@ -2,14 +2,13 @@ package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -90,14 +89,14 @@ internal class SimpleRecipe(
 /**
  * [Recipe] 的序列化器.
  */
-internal object StationRecipeSerializer : TypeSerializer<Recipe>, KoinComponent {
+internal object StationRecipeSerializer : TypeSerializer<Recipe> {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
     override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
         val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
         val input = node.node("input").getList<RecipeChoice>(emptyList())
         require(input.isNotEmpty()) { "station recipe input is not present" }
-        val output = node.node("output").krequire<RecipeResult>()
+        val output = node.node("output").require<RecipeResult>()
 
         return SimpleRecipe(key, input, output)
     }

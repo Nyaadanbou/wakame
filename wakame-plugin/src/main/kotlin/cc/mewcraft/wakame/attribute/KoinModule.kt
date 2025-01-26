@@ -6,8 +6,6 @@ import org.koin.dsl.module
 
 internal fun attributeModule(): Module = module {
 
-    single { AttributeMapPatchListener() }
-
     single<AttributeMapAccess> { DefaultAttributeMapAccess }
 
     single { Attributes } bind AttributeProvider::class

@@ -1,18 +1,14 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.PLUGIN_ASSETS_DIR
-import com.google.gson.Gson
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.serialization.json.GSON
 import com.google.gson.JsonElement
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import java.io.File
 
 internal object AssetUtils {
-    private val LOGGER: Logger = Injector.get()
-    private val ASSET_DIR: File by Injector.inject(named(PLUGIN_ASSETS_DIR))
+    private val ASSET_DIR: File by Injector.inject(InjectionQualifier.ASSETS_FOLDER)
 
     /**
      * 从给定的路径 [path] 和扩展名 [ext] 创建一个 [File].
@@ -59,7 +55,6 @@ internal object AssetUtils {
      */
     fun toJsonElement(file: File): JsonElement {
         val readText = file.readText()
-        val gson = Injector.get<Gson>()
-        return gson.fromJson(readText, JsonElement::class.java)
+        return GSON.fromJson(readText, JsonElement::class.java)
     }
 }

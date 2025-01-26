@@ -11,7 +11,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
@@ -27,7 +26,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 internal class ReplaceMenu(
     val parent: ModdingMenu,
     val replace: ModdingSession.Replace,
-) : KoinComponent {
+) {
 
     private val viewer: Player = parent.viewer
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {

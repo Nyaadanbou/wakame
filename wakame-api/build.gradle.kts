@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "cc.mewcraft.wakame"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1-snapshot"
 description = "The API of wakame system"
 
 dependencies {

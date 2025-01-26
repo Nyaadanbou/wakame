@@ -2,11 +2,7 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
@@ -42,12 +38,12 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
     @InitFun
     private fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     private fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {

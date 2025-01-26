@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.gui.merge
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
@@ -14,8 +15,6 @@ import cc.mewcraft.wakame.util.decorate
 import cc.mewcraft.wakame.util.itemLoreOrEmpty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
@@ -27,7 +26,7 @@ import kotlin.properties.Delegates
 internal class MergingMenu(
     val table: MergingTable,
     val viewer: Player,
-) : KoinComponent {
+) {
 
     /**
      * 给玩家展示合并台.
@@ -47,7 +46,7 @@ internal class MergingMenu(
      */
     private val session: MergingSession = SimpleMergingSession(viewer, table)
 
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
+    private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
     private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 3

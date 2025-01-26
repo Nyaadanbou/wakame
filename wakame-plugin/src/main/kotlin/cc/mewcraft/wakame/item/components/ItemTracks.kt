@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.nbt.CompoundTag
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.item.component.*
@@ -73,7 +74,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
                     }
 
                     else -> {
-                        ItemComponentInjections.logger.warn("Found an unknown track type: '$tagKey'")
+                        LOGGER.warn("Found an unknown track type: '$tagKey'")
                     }
                 }
             }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.api.NekooProvider;
+import cc.mewcraft.wakame.api.Koish;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -52,8 +52,7 @@ public class LootNekoItem extends LootPoolSingletonContainer {
         var path = id.getPath();
         var player = getLootingPlayer(context);
 
-        var nekooApi = NekooProvider.get();
-        var nekoItem = nekooApi.getItemRegistry().getOrNull(Key.key(namespace, path));
+        var nekoItem = Koish.get().getItemRegistry().getOrNull(Key.key(namespace, path));
         if (nekoItem == null) {
             LogUtils.getClassLogger().error("No item type with id: {}", id);
             return;

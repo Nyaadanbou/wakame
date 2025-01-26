@@ -20,7 +20,6 @@ import org.spongepowered.configurate.ConfigurationNode
 @Reload()
 object LevelRarityMappingRegistryConfigStorage : RegistryConfigStorage {
     const val FILE_PATH = "levels.yml"
-    const val DEFAULT_ENTRY_NAME = "__default__"
 
     @InitFun
     fun init() {

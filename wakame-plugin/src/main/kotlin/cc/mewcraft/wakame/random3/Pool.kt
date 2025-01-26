@@ -2,11 +2,9 @@
 
 package cc.mewcraft.wakame.random3
 
+import cc.mewcraft.wakame.LOGGER
 import me.lucko.helper.random.RandomSelector
 import me.lucko.helper.random.Weigher
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
@@ -282,8 +280,7 @@ private object PoolEmpty : Pool<Nothing, RandomSelectorContext>() {
     override fun select(context: RandomSelectorContext): List<Nothing> = emptyList()
 }
 
-private object PoolSupport : KoinComponent {
-    private val logger: Logger by inject()
+private object PoolSupport {
 
     fun <S, C : RandomSelectorContext> select(pool: Pool<S, C>, context: C): List<S> {
         // 检查进入该池的条件是否全部满足;
@@ -311,7 +308,7 @@ private object PoolSupport : KoinComponent {
 
         // 如果满足条件的样本数量小于要抽取的数量, 返回空流
         if (correctSamples.size < pool.amount) {
-            logger.warn("The number of correct samples is less than that to be selected.")
+            LOGGER.warn("The number of correct samples is less than that to be selected.")
             return emptyList()
         }
 
@@ -340,7 +337,7 @@ private object PoolSupport : KoinComponent {
                 count++
                 if (count > 500) {
                     // 防止因为似循环而导致的严重问题, 记录日志并中断.
-                    logger.error("Stuck in an endless loop while selecting samples. This is a config error!")
+                    LOGGER.error("Stuck in an endless loop while selecting samples. This is a config error!")
                     break
                 }
 

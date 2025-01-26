@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
-
 object KoishRegistries {
     private val ACCESS = MutableRegistryAccess()
 
@@ -44,7 +41,7 @@ object KoishRegistries {
      * 元素.
      */
     @JvmField
-    val ELEMENT = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral")
+    val ELEMENT = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral") // = koish:neutral
 
     /**
      * 实体类型集合.
@@ -53,12 +50,18 @@ object KoishRegistries {
     val ENTITY_TYPE_HOLDER = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
 
     /**
+     * 虚构的属性映射.
+     */
+    @JvmField
+    val IMAGINARY_ATTRIBUTE_MAP = registerSimple(KoishRegistryKeys.IMAGINARY_ATTRIBUTE_MAP)
+
+    /**
      * 标准物品类型.
      *
      * 玩家可以直接获得/使用的物品类型.
      */
     @JvmField
-    val ITEM = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, ItemRegistryConfigStorage.UNKNOWN_ITEM_ID)
+    val ITEM = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, "internal:unknown")
 
     /**
      * 物品皮肤.
@@ -76,13 +79,13 @@ object KoishRegistries {
      * 等级>稀有度映射.
      */
     @JvmField
-    val LEVEL_RARITY_MAPPING = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, LevelRarityMappingRegistryConfigStorage.DEFAULT_ENTRY_NAME)
+    val LEVEL_RARITY_MAPPING = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, "__default__") // = koish:__default__
 
     /**
      * 稀有度.
      */
     @JvmField
-    val RARITY = registerDefaulted(KoishRegistryKeys.RARITY, "common")
+    val RARITY = registerDefaulted(KoishRegistryKeys.RARITY, "common") // = koish:common
 
     ///
 
@@ -90,15 +93,32 @@ object KoishRegistries {
         ACCESS.resetRegistries()
     }
 
-    private fun <T> registerSimple(key: RegistryKey<out Registry<T>>, initializer: (Registry<T>) -> Unit = {}): WritableRegistry<T> {
+    private fun <T> registerSimple(
+        key: RegistryKey<out Registry<T>>,
+        initializer: (Registry<T>) -> Unit = {}
+    ): WritableRegistry<T> {
         return ACCESS.add(key, SimpleRegistry(key).apply(initializer))
     }
 
-    private fun <T> registerDefaulted(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): WritableDefaultedRegistry<T> {
-        return ACCESS.add(key, SimpleDefaultedRegistry(defaultId, key).apply(initializer)) as WritableDefaultedRegistry<T>
+    private fun <T> registerDefaulted(
+        key: RegistryKey<out Registry<T>>,
+        defaultId: String,
+        initializer: (Registry<T>) -> Unit = {}
+    ): WritableDefaultedRegistry<T> {
+        return ACCESS.add(
+            key,
+            SimpleDefaultedRegistry(defaultId, key).apply(initializer)
+        ) as WritableDefaultedRegistry<T>
     }
 
-    private fun <T> registerDefaultedFuzzy(key: RegistryKey<out Registry<T>>, defaultId: String, initializer: (Registry<T>) -> Unit = {}): WritableDefaultedFuzzyRegistry<T> {
-        return ACCESS.add(key, SimpleDefaultedFuzzyRegistry(defaultId, key).apply(initializer)) as WritableDefaultedFuzzyRegistry<T>
+    private fun <T> registerDefaultedFuzzy(
+        key: RegistryKey<out Registry<T>>,
+        defaultId: String,
+        initializer: (Registry<T>) -> Unit = {}
+    ): WritableDefaultedFuzzyRegistry<T> {
+        return ACCESS.add(
+            key,
+            SimpleDefaultedFuzzyRegistry(defaultId, key).apply(initializer)
+        ) as WritableDefaultedFuzzyRegistry<T>
     }
 }

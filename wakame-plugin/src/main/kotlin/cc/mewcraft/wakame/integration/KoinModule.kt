@@ -8,9 +8,13 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 
 internal fun integrationModule(): Module = module {
+
+    // Economy
     single { ZeroEconomyIntegration }
     single { VanillaEconomyIntegration() }
 
+    // Adventure Level
     single { ZeroLevelIntegration }
     single { VanillaLevelIntegration(get()) }
+
 }

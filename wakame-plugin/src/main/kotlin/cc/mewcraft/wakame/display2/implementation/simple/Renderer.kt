@@ -2,11 +2,7 @@ package cc.mewcraft.wakame.display2.implementation.simple
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
@@ -40,12 +36,12 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() 
 
     @InitFun
     fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
