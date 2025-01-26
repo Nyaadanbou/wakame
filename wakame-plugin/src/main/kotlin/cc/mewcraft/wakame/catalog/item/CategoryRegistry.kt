@@ -2,11 +2,9 @@ package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.initializer2.Init
 import cc.mewcraft.wakame.initializer2.InitFun
 import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.recipe.VanillaRecipeRegistry
 import cc.mewcraft.wakame.reloader.Reload
 import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -21,13 +19,9 @@ import java.io.File
 
 
 @Init(
-    stage = InitStage.POST_WORLD,
-    // TODO 需要这行吗？
-    runAfter = [VanillaRecipeRegistry::class, CraftingStationRecipeRegistry::class]
+    stage = InitStage.POST_WORLD
 )
-@Reload(
-    runAfter = [VanillaRecipeRegistry::class, CraftingStationRecipeRegistry::class]
-)
+@Reload
 object CategoryRegistry : KoinComponent {
     private const val CATEGORY_DIR_NAME = "catalog/item/category"
     private val categories: MutableMap<String, Category> = mutableMapOf()

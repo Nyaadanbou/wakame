@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.catalog.CatalogManager
 import cc.mewcraft.wakame.catalog.item.Category
 import cc.mewcraft.wakame.catalog.item.CategoryRegistry
-import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.BasicMenuSettings.SlotDisplay
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
@@ -24,16 +24,13 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 展示所有的物品类别.
  */
 class ItemCatalogMainMenu(
-    /**
-     * 该菜单的布局
-     */
-    val settings: BasicMenuSettings,
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
 ) {
+    private val settings = CatalogManager.itemCatalogMainMenuSettings
 
     /**
      * 菜单的 [Gui].
