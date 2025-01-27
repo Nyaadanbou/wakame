@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.entity.attribute
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.ReloadableProperty
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation

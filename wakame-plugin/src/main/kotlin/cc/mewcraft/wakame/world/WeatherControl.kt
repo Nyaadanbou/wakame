@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.world.WeatherControl.execute
 import me.lucko.helper.cooldown.Cooldown
@@ -84,7 +83,7 @@ internal object WeatherControlActionSerializer : TypeSerializer<WeatherControl.A
         val actionTypeKType = TYPE_MAPPINGS[actionType] ?: throw SerializationException(
             typeNode, javaTypeOf<WeatherControl.ActionType>(), "unknown action type: $actionType"
         )
-        return node.krequire(actionTypeKType)
+        return node.require(actionTypeKType)
     }
 }
 

@@ -3,14 +3,14 @@ package cc.mewcraft.wakame.item.templates.virtual
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.MenuIconDictionary
+import cc.mewcraft.wakame.util.SlotDisplayDictData
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 
-data class ItemMenuIconDict(
-    val delegate: MenuIconDictionary,
+data class ItemSlotDisplayDict(
+    val delegate: SlotDisplayDictData,
 ) : ItemTemplate<Nothing> {
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 
@@ -19,22 +19,22 @@ data class ItemMenuIconDict(
     }
 
     /**
-     * @see MenuIconDictionary.get
+     * @see SlotDisplayDictData.get
      */
     operator fun get(key: String): String {
         return delegate[key] ?: error("dict key not found: $key")
     }
 
-    companion object : ItemTemplateBridge<ItemMenuIconDict> {
-        override fun codec(id: String): ItemTemplateType<ItemMenuIconDict> {
+    companion object : ItemTemplateBridge<ItemSlotDisplayDict> {
+        override fun codec(id: String): ItemTemplateType<ItemSlotDisplayDict> {
             return Codec(id)
         }
     }
 
     private data class Codec(
         override val id: String,
-    ) : ItemTemplateType<ItemMenuIconDict> {
-        override val type: TypeToken<ItemMenuIconDict> = typeTokenOf()
+    ) : ItemTemplateType<ItemSlotDisplayDict> {
+        override val type: TypeToken<ItemSlotDisplayDict> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -44,8 +44,8 @@ data class ItemMenuIconDict(
          *   key2: "value2"
          * ```
          */
-        override fun decode(node: ConfigurationNode): ItemMenuIconDict {
-            return ItemMenuIconDict(node.require<MenuIconDictionary>())
+        override fun decode(node: ConfigurationNode): ItemSlotDisplayDict {
+            return ItemSlotDisplayDict(node.require<SlotDisplayDictData>())
         }
     }
 }

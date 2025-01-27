@@ -1,5 +1,5 @@
-menu_icon_name: "OUTPUT_OK_UNCONFIRMED"
-menu_icon_lore:
+slot_display_name: "OUTPUT_OK_UNCONFIRMED"
+slot_display_lore:
   - "{item_lore}"
   - ""
   - "{type_description}"

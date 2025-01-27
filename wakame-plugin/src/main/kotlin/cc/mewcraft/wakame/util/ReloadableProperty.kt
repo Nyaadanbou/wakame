@@ -1,9 +1,7 @@
-package cc.mewcraft.wakame
+package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import cc.mewcraft.wakame.util.event
-import cc.mewcraft.wakame.util.registerEvents
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import kotlin.properties.ReadOnlyProperty

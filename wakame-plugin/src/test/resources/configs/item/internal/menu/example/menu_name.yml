@@ -8,4 +8,4 @@ base: bedrock
 #
 # 对于用户:
 # 参考 MenuIconLore.
-menu_icon_name: "你正在出售 <item_count> 组物品"
+slot_display_name: "你正在出售 <item_count> 组物品"

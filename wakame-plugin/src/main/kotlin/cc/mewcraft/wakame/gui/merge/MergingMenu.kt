@@ -244,14 +244,14 @@ internal class MergingMenu(
             ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val resolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 folded("item_lore", output.wrapped.itemLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
                 folded("result_description", result.description)
             }
 
-            return resolution.applyNameAndLoreTo(output.wrapped)
+            return slotDisplayResolved.applyTo(output.wrapped)
         } else {
             return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.

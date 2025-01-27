@@ -1,8 +1,8 @@
 package util
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.util.MenuIconLore
-import cc.mewcraft.wakame.util.MenuIconLoreSerializer
+import cc.mewcraft.wakame.util.SlotDisplayLoreData
+import cc.mewcraft.wakame.util.SlotDisplayLoreDataSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import commonEnv
@@ -17,7 +17,7 @@ import org.spongepowered.configurate.ConfigurationOptions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MenuIconLoreTest : KoinTest {
+class ItemSlotDisplayNameTest : KoinTest {
     @BeforeEach
     fun beforeEach() {
         startKoin {
@@ -36,7 +36,7 @@ class MenuIconLoreTest : KoinTest {
     @Test
     fun `simple case 1`() {
         // Define a MenuLore instance
-        val lore = MenuIconLore.build {
+        val lore = SlotDisplayLoreData.configureAndBuild {
             standard("welcome to <world_name>!")
             folded("choice_list", "*prefix* <choice_list>")
             standard("a bottom line")
@@ -67,7 +67,7 @@ class MenuIconLoreTest : KoinTest {
     @Test
     fun `simple case 2`() {
         // Define a MenuLore instance
-        val lore = MenuIconLore.build {
+        val lore = SlotDisplayLoreData.configureAndBuild {
             standard("this is <landmark> made by <author>!")
             folded("member_list", "*prefix* <member_list>")
             standard("a bottom line")
@@ -102,7 +102,7 @@ class MenuIconLoreTest : KoinTest {
     fun `serialization case 1`() {
         // Deserialize a configuration node
         val node = BasicConfigurationNode.root<RuntimeException>(ConfigurationOptions.defaults().serializers {
-            it.register<MenuIconLore>(MenuIconLoreSerializer)
+            it.register<SlotDisplayLoreData>(SlotDisplayLoreDataSerializer)
         }) { node ->
             node.set(
                 listOf(
@@ -113,7 +113,7 @@ class MenuIconLoreTest : KoinTest {
             )
         }
 
-        val lore = node.require<MenuIconLore>()
+        val lore = node.require<SlotDisplayLoreData>()
 
         // Resolve the MenuLore
         val actual = lore.resolve {

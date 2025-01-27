@@ -15,7 +15,7 @@ base: bedrock
 # 可以使用的占位符取决于此物品从属的特定菜单中的特定图标.
 # 一般来说, 给出的示例配置文件会包含所有可用的占位符.
 # 按需修改和移除即可.
-menu_icon_lore:
+slot_display_lore:
   - "{item_list}"
   - "<!i>---------"
   - "<!i>总价值: <total_worth>"

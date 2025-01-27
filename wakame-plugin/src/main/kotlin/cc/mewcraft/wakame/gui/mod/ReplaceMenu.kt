@@ -127,9 +127,11 @@ internal class ReplaceMenu(
         if (usableInput == null) {
             // 耗材不可用于定制:
 
-            parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
                 folded("result_description", replaceResult.description)
-            }.applyNameAndLoreTo(
+            }
+
+            resolved.applyTo(
                 originalInput
             ).edit {
                 // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
@@ -148,12 +150,12 @@ internal class ReplaceMenu(
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
             // 使用 SlotDisplay 再处理一遍
-            return parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
                 folded("item_lore", usableInput.wrapped.itemLoreOrEmpty)
                 folded("result_description", replaceResult.description)
-            }.applyNameAndLoreTo(
-                usableInput.wrapped
-            )
+            }
+
+            return resolved.applyTo(usableInput.wrapped)
         }
     }
 
@@ -167,12 +169,11 @@ internal class ReplaceMenu(
         override fun getItemProvider(): ItemProvider {
             val core = replace.cell.getCore()
             val icon = CoreIcons.getItemStack(core)
-
-            parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
                 standard { component("core_name", core.displayName) }
                 folded("core_description", core.description)
-            }.applyNameAndLoreTo(icon)
-
+            }
+            resolved.applyTo(icon)
             return ItemWrapper(icon)
         }
 

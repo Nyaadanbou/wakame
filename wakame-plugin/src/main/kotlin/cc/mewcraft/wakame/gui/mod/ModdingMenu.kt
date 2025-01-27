@@ -281,14 +281,14 @@ internal class ModdingMenu(
 
             // 再用 SlotDisplay 处理一下
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val iconResolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 standard { component("item_name", outputItemStack.itemNameOrType) }
                 folded("item_lore", outputItemStack.itemLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
                 folded("result_description", reforgeResult.description)
             }
 
-            iconResolution.applyNameAndLoreTo(outputItemStack)
+            slotDisplayResolved.applyTo(outputItemStack)
         } else {
             // 定制失败了:
 
@@ -342,12 +342,12 @@ internal class ModdingMenu(
         val newItemStack = sourceItem.itemStack
 
         // 再用 SlotDisplay 处理一下
-        table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
+        val resolved = table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
             standard { component("item_name", newItemStack.itemNameOrType) }
             folded("item_lore", newItemStack.itemLoreOrEmpty)
-        }.applyNameAndLoreTo(newItemStack)
+        }
 
-        return newItemStack
+        return resolved.applyTo(newItemStack)
     }
 
     private fun setInputSlot(stack: ItemStack?) {

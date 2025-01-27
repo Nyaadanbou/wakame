@@ -98,7 +98,7 @@ object AnimalTypes {
     val DOG: AnimalType<Dog> = register("dog")
 
     // 定义一个方便函数, 减少重复代码
-    inline fun <reified E : Animal> register(id: String): AnimalType<E> {
+    private inline fun <reified E : Animal> register(id: String): AnimalType<E> {
         return Registry.register(AnimalType.REGISTRY, id, AnimalType(typeTokenOf()))
     }
 }

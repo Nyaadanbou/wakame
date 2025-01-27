@@ -1,2 +1,2 @@
 base: writable_book
-menu_icon_name: "RECYCLE_WHEN_EMPTY"
+slot_display_name: "RECYCLE_WHEN_EMPTY"

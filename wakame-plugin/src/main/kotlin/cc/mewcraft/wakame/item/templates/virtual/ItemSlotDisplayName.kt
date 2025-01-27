@@ -9,8 +9,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.ConfigurationNode
 
-data class ItemMenuIconName(
-    val delegate: MenuIconName,
+data class ItemSlotDisplayName(
+    val delegate: SlotDisplayNameData,
 ) : ItemTemplate<Nothing> {
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 
@@ -19,29 +19,29 @@ data class ItemMenuIconName(
     }
 
     /**
-     * @see MenuIconName.resolve
+     * @see SlotDisplayNameData.resolve
      */
     fun resolve(tagResolver: TagResolver): Component {
         return delegate.resolve(tagResolver)
     }
 
     /**
-     * @see MenuIconName.resolve
+     * @see SlotDisplayNameData.resolve
      */
-    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: MenuIcon.PlaceholderTagResolverBuilder.() -> Unit): Component {
+    fun resolve(dict: SlotDisplayDictData = SlotDisplayDictData(), dsl: SlotDisplayData.PlaceholderBuilder.() -> Unit): Component {
         return delegate.resolve(dict, dsl)
     }
 
-    companion object : ItemTemplateBridge<ItemMenuIconName> {
-        override fun codec(id: String): ItemTemplateType<ItemMenuIconName> {
+    companion object : ItemTemplateBridge<ItemSlotDisplayName> {
+        override fun codec(id: String): ItemTemplateType<ItemSlotDisplayName> {
             return Codec(id)
         }
     }
 
     private data class Codec(
         override val id: String,
-    ) : ItemTemplateType<ItemMenuIconName> {
-        override val type: TypeToken<ItemMenuIconName> = typeTokenOf()
+    ) : ItemTemplateType<ItemSlotDisplayName> {
+        override val type: TypeToken<ItemSlotDisplayName> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -49,8 +49,8 @@ data class ItemMenuIconName(
          * <node>: "item name (MiniMessage string)"
          * ```
          */
-        override fun decode(node: ConfigurationNode): ItemMenuIconName {
-            return ItemMenuIconName(node.require<MenuIconName>())
+        override fun decode(node: ConfigurationNode): ItemSlotDisplayName {
+            return ItemSlotDisplayName(node.require<SlotDisplayNameData>())
         }
     }
 }

@@ -1,3 +1,3 @@
-menu_icon_name: "CORE_UNUSABLE"
-menu_icon_lore:
+slot_display_name: "CORE_UNUSABLE"
+slot_display_lore:
   - "{result_description}"

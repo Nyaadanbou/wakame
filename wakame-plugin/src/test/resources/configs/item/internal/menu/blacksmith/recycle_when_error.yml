@@ -1,2 +1,2 @@
 base: barrier
-menu_icon_name: "<red>内部错误"
+slot_display_name: "<red>内部错误"

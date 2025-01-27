@@ -7,5 +7,5 @@ internal val isServerThread: Boolean
     get() = Bukkit.isPrimaryThread() || Thread.currentThread() is WatchdogThread
 
 internal fun checkServerThread() {
-    check(isServerThread) { "not on server thread" }
+    check(isServerThread) { "Not on server thread" }
 }

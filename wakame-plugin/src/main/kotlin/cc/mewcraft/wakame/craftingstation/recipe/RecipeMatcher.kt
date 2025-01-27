@@ -62,7 +62,7 @@ internal class RecipeMatcherResult(
         val itemStack = recipe.output.displayItemStack(settings)
 
         // 解析展示用的所有占位符
-        val resolution = settings.getSlotDisplay("listing").resolveEverything {
+        val slotDisplayResolved = settings.getSlotDisplay("listing").resolveEverything {
 
             // 适用于整个物品堆叠的占位符
             standard {
@@ -96,10 +96,8 @@ internal class RecipeMatcherResult(
             }
         }
 
-        // 应用解析结果到物品堆叠上
-        resolution.applyNameAndLoreTo(itemStack)
-
-        return itemStack
+        // 应用解析结果到物品堆叠上, 并返回
+        return slotDisplayResolved.applyTo(itemStack)
     }
 
     /**

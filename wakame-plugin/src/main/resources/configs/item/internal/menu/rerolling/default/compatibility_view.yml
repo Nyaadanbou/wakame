@@ -1,4 +1,4 @@
 base: gray_stained_glass_pane
-menu_icon_name: "COMPATIBILITY_VIEW"
-menu_icon_lore:
+slot_display_name: "COMPATIBILITY_VIEW"
+slot_display_lore:
   - "{core}"

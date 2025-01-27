@@ -4,14 +4,14 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.*
-import cc.mewcraft.wakame.util.MenuIconLore.LineConfig
+import cc.mewcraft.wakame.util.SlotDisplayLoreData.LineConfig
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-data class ItemMenuIconLore(
-    val delegate: MenuIconLore,
+data class ItemSlotDisplayLore(
+    val delegate: SlotDisplayLoreData,
 ) : ItemTemplate<Nothing> {
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 
@@ -20,29 +20,29 @@ data class ItemMenuIconLore(
     }
 
     /**
-     * @see MenuIconLore.resolve
+     * @see SlotDisplayLoreData.resolve
      */
     fun resolve(config: LineConfig): List<Component> {
         return delegate.resolve(config)
     }
 
     /**
-     * @see MenuIconLore.resolve
+     * @see SlotDisplayLoreData.resolve
      */
-    fun resolve(dict: MenuIconDictionary = MenuIconDictionary(), dsl: LineConfig.Builder.() -> Unit): List<Component> {
+    fun resolve(dict: SlotDisplayDictData = SlotDisplayDictData(), dsl: LineConfig.Builder.() -> Unit): List<Component> {
         return delegate.resolve(dict, dsl)
     }
 
-    companion object : ItemTemplateBridge<ItemMenuIconLore> {
-        override fun codec(id: String): ItemTemplateType<ItemMenuIconLore> {
+    companion object : ItemTemplateBridge<ItemSlotDisplayLore> {
+        override fun codec(id: String): ItemTemplateType<ItemSlotDisplayLore> {
             return Codec(id)
         }
     }
 
     private data class Codec(
         override val id: String,
-    ) : ItemTemplateType<ItemMenuIconLore> {
-        override val type: TypeToken<ItemMenuIconLore> = typeTokenOf()
+    ) : ItemTemplateType<ItemSlotDisplayLore> {
+        override val type: TypeToken<ItemSlotDisplayLore> = typeTokenOf()
 
         /**
          * ## Node structure
@@ -52,16 +52,16 @@ data class ItemMenuIconLore(
          *   - "line 2 (MiniMessage string)"
          * ```
          *
-         * @see cc.mewcraft.wakame.util.MenuIconLore
-         * @see cc.mewcraft.wakame.util.MenuIconLoreSerializer
+         * @see cc.mewcraft.wakame.util.SlotDisplayLoreData
+         * @see cc.mewcraft.wakame.util.SlotDisplayLoreDataSerializer
          */
-        override fun decode(node: ConfigurationNode): ItemMenuIconLore {
-            return ItemMenuIconLore(node.require<MenuIconLore>())
+        override fun decode(node: ConfigurationNode): ItemSlotDisplayLore {
+            return ItemSlotDisplayLore(node.require<SlotDisplayLoreData>())
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
-                .register<MenuIconLore>(MenuIconLoreSerializer)
+                .register<SlotDisplayLoreData>(SlotDisplayLoreDataSerializer)
                 .build()
         }
     }

@@ -1,5 +1,3 @@
-@file:Suppress("DuplicatedCode")
-
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Util
@@ -54,7 +52,6 @@ object VanillaNekoItemFactory {
 
         // read item templates
         val templateMap = ItemTemplateMap.build {
-            @Suppress("UNCHECKED_CAST")
             fun <T : ItemTemplate<*>> tryAdd(
                 path: String,
                 type: ItemTemplateType<T>,
@@ -191,9 +188,9 @@ object StandardNekoItemFactory {
             tryAdd("level", ItemTemplateTypes.LEVEL)
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE)
-            tryAdd("menu_icon_dict", ItemTemplateTypes.MENU_ICON_DICT)
-            tryAdd("menu_icon_lore", ItemTemplateTypes.MENU_ICON_LORE)
-            tryAdd("menu_icon_name", ItemTemplateTypes.MENU_ICON_NAME)
+            tryAdd("slot_display_dict", ItemTemplateTypes.SLOT_DISPLAY_DICT)
+            tryAdd("slot_display_lore", ItemTemplateTypes.SLOT_DISPLAY_LORE)
+            tryAdd("slot_display_name", ItemTemplateTypes.SLOT_DISPLAY_NAME)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             // tryAdd("skin", ItemTemplateTypes.SKIN)
@@ -224,7 +221,6 @@ internal class UnsupportedItemTemplateException(override val message: String?, o
 
 private sealed interface Validator<T> {
 
-    @Suppress("UNCHECKED_CAST")
     companion object {
         fun <T> none(): Validator<T> = None as Validator<T>
         fun <T> unsupported(): Validator<T> = Unsupported as Validator<T>
@@ -233,11 +229,11 @@ private sealed interface Validator<T> {
 
     fun validate(context: ValidatorContext<T>)
 
-    object None : Validator<Nothing> {
+    data object None : Validator<Nothing> {
         override fun validate(context: ValidatorContext<Nothing>) = Unit
     }
 
-    object Unsupported : Validator<Nothing> {
+    data object Unsupported : Validator<Nothing> {
         override fun validate(context: ValidatorContext<Nothing>) {
             throw UnsupportedItemTemplateException("Adding unsupported config '${context.type.id}' to item type '${context.item}''")
         }

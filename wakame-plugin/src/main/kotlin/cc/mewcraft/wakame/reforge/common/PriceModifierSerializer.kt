@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import kotlin.reflect.typeOf
@@ -19,6 +19,6 @@ object PriceModifierSerializer : TypeSerializer<PriceModifier> {
     override fun deserialize(type: Type, node: ConfigurationNode): PriceModifier {
         val nodeKey = node.key().toString()
         val kType = TYPE_MAPPINGS[nodeKey] ?: throw IllegalArgumentException("Unknown price modifier type: $nodeKey")
-        return node.krequire(kType)
+        return node.require(kType)
     }
 }

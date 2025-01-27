@@ -240,13 +240,13 @@ internal class RerollingMenu(
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 standard { component("item_name", previewItem.wrapped.itemNameOrType) }
                 folded("item_lore", previewItem.wrapped.itemLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
-            }.applyNameAndLoreTo(
-                previewItem.wrapped
-            )
+            }
+
+            slotDisplayResolved.applyTo(previewItem.wrapped)
         } else {
             // 如果不可重造:
 

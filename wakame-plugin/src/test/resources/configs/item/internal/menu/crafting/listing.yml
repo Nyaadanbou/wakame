@@ -1,10 +1,10 @@
 # 该图标对应合成站里主列表中一个特定的[配方]的结果.
 # 该图标基于[配方]的结果本身的信息生成, 因此不需要 base.
 
-menu_icon_name: "合成: <item_name>"
+slot_display_name: "合成: <item_name>"
 # 额外占位符
 # {choice_list}
-menu_icon_lore:
+slot_display_lore:
   - "<!i><color:#afded6><st>                    </color>"
   - "<!i><color:#ffba4a>所需材料</color><gray>:</gray>"
   - "{choice_list}"
@@ -14,7 +14,7 @@ menu_icon_lore:
   - "<!i><color:#fdff87>合成八次</color><dark_gray>:</dark_gray> <color:#7dffb5>潜行单击</color>"
   - "<!i><color:#fdff87>合成全部</color><dark_gray>:</dark_gray> <color:#7dffb5><key:key.drop>键丢出</color>"
   - "<!i><color:#afded6><st>                    </color>"
-menu_icon_dict:
+slot_display_dict:
   ok: "<green>✔</green>"
   bad: "<red>✘</red>"
   choice_item: "<!i><requirement_mark> <white><item></white> <gray>×</gray> <white><amount></white>"

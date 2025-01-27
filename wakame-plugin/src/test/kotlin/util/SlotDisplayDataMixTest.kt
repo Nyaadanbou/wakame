@@ -17,13 +17,13 @@ import kotlin.test.assertEquals
 
 /**
  * 使用以下代码:
- * - [cc.mewcraft.wakame.util.MenuIconName]
- * - [cc.mewcraft.wakame.util.MenuIconLore]
- * - [cc.mewcraft.wakame.util.MenuIconDictionary]
+ * - [cc.mewcraft.wakame.util.SlotDisplayNameData]
+ * - [cc.mewcraft.wakame.util.SlotDisplayLoreData]
+ * - [cc.mewcraft.wakame.util.SlotDisplayDictData]
  *
  * 模拟一个完整的的使用场景.
  */
-class MenuIconMixTest : KoinTest {
+class SlotDisplayDataMixTest : KoinTest {
 
     @BeforeEach
     fun beforeEach() {
@@ -44,7 +44,7 @@ class MenuIconMixTest : KoinTest {
     fun `mix case 1`() {
         val options = ConfigurationOptions.defaults().serializers {
             it.registerAnnotatedObjects(ObjectMappers.DEFAULT)
-            it.register<MenuIconLore>(MenuIconLoreSerializer)
+            it.register<SlotDisplayLoreData>(SlotDisplayLoreDataSerializer)
         }
         val dictNode = BasicConfigurationNode.root<RuntimeException>(options) { node ->
             node.node("choice_item").set("<mark> <item>×<amount>")
@@ -66,15 +66,15 @@ class MenuIconMixTest : KoinTest {
             )
         }
 
-        val actualDict = dictNode.require<MenuIconDictionary>()
+        val actualDict = dictNode.require<SlotDisplayDictData>()
 
         // 把 MenuIconDict 传入 MenuIconName.resolve 以便让 MenuIconName 解析额外的占位符
-        val actualName = nameNode.require<MenuIconName>().resolve(actualDict) {
+        val actualName = nameNode.require<SlotDisplayNameData>().resolve(actualDict) {
             unparsed("player_name", "Nailm")
         }
 
         // 把 MenuIconDict 传入 MenuIconLore.resolve 以便让 MenuIconLore 解析额外的占位符
-        val actualLore = loreNode.require<MenuIconLore>().resolve(actualDict) {
+        val actualLore = loreNode.require<SlotDisplayLoreData>().resolve(actualDict) {
             standard {
                 unparsed("rarity_name", "rare")
                 component("choice_amount", text(3))
@@ -112,7 +112,7 @@ class MenuIconMixTest : KoinTest {
             }
         }
 
-        val expectedDict = MenuIconDictionary(
+        val expectedDict = SlotDisplayDictData(
             mapOf(
                 "mark_success" to "✔",
                 "mark_failure" to "✘",

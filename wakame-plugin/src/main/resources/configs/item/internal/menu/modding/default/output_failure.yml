@@ -1,5 +1,5 @@
 base: barrier
-menu_icon_name: "OUTPUT_FAILURE"
-menu_icon_lore:
+slot_display_name: "OUTPUT_FAILURE"
+slot_display_lore:
   - "{cost_description}"
   - "{result_description}"

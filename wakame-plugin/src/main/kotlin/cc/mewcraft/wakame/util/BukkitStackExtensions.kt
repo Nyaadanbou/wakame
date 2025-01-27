@@ -155,7 +155,9 @@ val ItemStack.isDamaged: Boolean
  */
 var ItemStack.damage: Int
     get() = unwrap?.damageValue ?: 0
-    set(value) = (unwrap?.damageValue = value)
+    set(value) {
+        unwrap?.damageValue = value
+    }
 
 /**
  * 获取物品的最大损耗.

@@ -11,7 +11,7 @@ import xyz.xenondevs.invui.window.WindowManager
 @Init(
     stage = InitStage.POST_WORLD,
 )
-internal object GuiBootstrapper {
+internal object GuiLifecycle {
 
     @InitFun
     fun init() {

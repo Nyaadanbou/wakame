@@ -1,7 +1,7 @@
-menu_icon_name: "LISTING: <item_name>"
-menu_icon_lore:
+slot_display_name: "LISTING: <item_name>"
+slot_display_lore:
   - "{choice_list}"
-menu_icon_dict:
+slot_display_dict:
   ok: "<green>✔</green>"
   bad: "<red>✘</red>"
   choice_item: "<!i><requirement_mark> <item>×<amount>"

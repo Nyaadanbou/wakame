@@ -1,3 +1,3 @@
-menu_icon_name: "<core_name>"
-menu_icon_lore:
+slot_display_name: "<core_name>"
+slot_display_lore:
   - "{core_description}"
