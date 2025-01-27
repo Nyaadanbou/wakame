@@ -1,17 +1,13 @@
 package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.asMinimalString2
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
@@ -52,7 +48,7 @@ internal object ElementRegistryConfigStorage : RegistryConfigStorage {
     private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, ElementType> {
         val id = Identifiers.of(nodeKey.toString())
         val stringId = id.asMinimalString2()
-        val integerId = node.node("binary_index").krequire<Int>()
+        val integerId = node.node("binary_index").require<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
 

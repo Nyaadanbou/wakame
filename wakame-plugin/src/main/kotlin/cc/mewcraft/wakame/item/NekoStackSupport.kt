@@ -3,27 +3,17 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.ItemStackDSL
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.editNekooTag
-import cc.mewcraft.wakame.util.editRootTag
-import cc.mewcraft.wakame.util.nekooTagOrNull
-import cc.mewcraft.wakame.util.rootTagOrNull
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNekooTag
-import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
-import cc.mewcraft.wakame.util.unsafeRootTagOrNull
+import cc.mewcraft.wakame.util.*
 import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -32,6 +22,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
 import java.util.stream.Stream
+import kotlin.collections.set
 
 /**
  * 检查一个物品能否算作 [NekoStack].

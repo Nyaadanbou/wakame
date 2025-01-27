@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder

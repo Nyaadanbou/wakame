@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -89,7 +89,7 @@ internal object KizamiTypeSerializer : TypeSerializer<KizamiType> {
             ?: throw SerializationException(node, type, "No hint '${RepresentationHints.KIZAMI_ID}' is found in node '$node'")
 
         val stringId = kizamiId.value()
-        val integerId = node.node("binary_index").krequire<Int>()
+        val integerId = node.node("binary_index").require<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::uppercaseChar)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
 

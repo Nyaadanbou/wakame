@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.itemModel
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -59,7 +59,7 @@ data class SingleRecipeResult(
  */
 internal object RecipeResultSerializer : TypeSerializer<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
-        val item = node.node("item").krequire<ItemX>()
+        val item = node.node("item").require<ItemX>()
         val amount = node.node("amount").getInt(1).apply {
             require(this >= 1) { "Item amount should not less than 1" }
         }

@@ -2,6 +2,11 @@
 
 package cc.mewcraft.wakame.ability.factory.implement
 
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.AbilityMechanic
+import cc.mewcraft.wakame.ability.character.TargetAdapter
+import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ability.factory.AbilityFactory
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
@@ -10,12 +15,7 @@ import cc.mewcraft.wakame.ecs.component.TargetComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ability.context.AbilityInput
-import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.AbilityMechanic
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.math.Position
@@ -40,7 +40,7 @@ interface Blink : Ability {
 
     companion object Factory : AbilityFactory<Blink> {
         override fun create(key: Key, config: ConfigurationNode): Blink {
-            val distance = config.node("distance").krequire<Int>()
+            val distance = config.node("distance").require<Int>()
             val teleportedMessages = config.node("teleported_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
 
             return Impl(key, config, distance, teleportedMessages)

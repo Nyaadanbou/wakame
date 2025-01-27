@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isEmpty
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -106,7 +106,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
             }
 
             Namespaces.ABILITY -> {
-                val trigger = node.node("trigger").krequire<Trigger>()
+                val trigger = node.node("trigger").require<Trigger>()
                 val variant = node.node("variant").get<TriggerVariant>(TriggerVariant.any())
                 return CoreMatchRuleAbility(pattern, trigger, variant)
             }

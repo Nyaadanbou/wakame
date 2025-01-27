@@ -42,3 +42,5 @@ debug:
     damage: false
     # 记录 Registry
     registry: false
+    # 记录 ItemStackRenderer
+    renderer: false

@@ -8,10 +8,11 @@ import cc.mewcraft.wakame.api.item.KoishItemRegistry
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntityManager
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
+import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.util.ServerUtils
 import cc.mewcraft.wakame.util.registerEvents
+import kotlinx.coroutines.cancel
 import me.lucko.helper.utils.JarExtractor
 import org.bukkit.Bukkit
 import org.bukkit.Server
@@ -42,6 +43,7 @@ internal object Koish : JavaPlugin(), IKoish {
     override fun onDisable() {
         KoishProvider.unregister()
         Initializer.disable()
+        KOISH_SCOPE.cancel("Plugin disabled")
         stopKoin()
 
         if (ServerUtils.isReload()) {

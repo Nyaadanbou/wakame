@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.event
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import java.util.UUID
+import java.util.*
 
 @Init(
     stage = InitStage.POST_WORLD,

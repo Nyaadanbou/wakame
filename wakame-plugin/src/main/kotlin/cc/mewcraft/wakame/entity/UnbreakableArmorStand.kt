@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.entity
 import cc.mewcraft.wakame.adventure.translator.MessageConstants
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.ui.whisper
 import com.github.benmanes.caffeine.cache.Cache

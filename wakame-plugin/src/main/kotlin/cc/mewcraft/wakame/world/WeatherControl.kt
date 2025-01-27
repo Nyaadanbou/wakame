@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.world.WeatherControl.execute
 import me.lucko.helper.cooldown.Cooldown
 import org.spongepowered.configurate.ConfigurationNode
@@ -79,7 +80,7 @@ internal object WeatherControlActionSerializer : TypeSerializer<WeatherControl.A
 
     override fun deserialize(type: Type, node: ConfigurationNode): WeatherControl.Action {
         val typeNode = node.node("type")
-        val actionType = typeNode.krequire<WeatherControl.ActionType>()
+        val actionType = typeNode.require<WeatherControl.ActionType>()
         val actionTypeKType = TYPE_MAPPINGS[actionType] ?: throw SerializationException(
             typeNode, javaTypeOf<WeatherControl.ActionType>(), "unknown action type: $actionType"
         )

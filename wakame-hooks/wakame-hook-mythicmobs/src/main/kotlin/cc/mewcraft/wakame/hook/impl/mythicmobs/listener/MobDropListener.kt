@@ -1,25 +1,30 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.util.event
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import io.lumine.mythic.bukkit.events.MythicMobDeathEvent
 import io.lumine.mythic.bukkit.events.MythicMobItemGenerateEvent
-import io.lumine.mythic.bukkit.events.MythicMobLootDropEvent
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 // 临时修复 FancyDrops 产生的物品实体依然会被其他玩家拾取的问题
+// 如果 MM 修复了这个问题那么这个 object 就不需要了
 
-@Deprecated("临时修复 - 如果 MM 修复了那么这个就不需要了")
-object MobDropListener : Listener {
+//@Init(stage = InitStage.POST_WORLD)
+object MobDropListener {
+
+    @InitFun
+    private fun init() {
+        registerListeners()
+    }
 
     // 记录MM怪物将要掉落的物品堆叠, 以及物品对应的所有者
     private val mobDropRecords: Cache<ItemStack, UUID> = Caffeine.newBuilder()
@@ -27,41 +32,39 @@ object MobDropListener : Listener {
         // 理论上一旦玩家死亡爆了物品, 那么缓存应该就立马会被读取, 并被无效化.
         // 理论上这个过期永远都不应该自动触发, 如果是那应该是 BUG.
         .expireAfterWrite(10, TimeUnit.SECONDS)
-        .removalListener<ItemStack, UUID> { key, value, cause ->
+        .removalListener<ItemStack, UUID> { key, _, cause ->
             if (cause != RemovalCause.EXPLICIT) {
-                LOGGER.warn("[MobDropListener] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+                LOGGER.warn("[${this::class.simpleName}] ItemStack $key was evicted (but not explicitly) from cache. This is a bug!")
+            }
+        }.build()
+
+    private fun registerListeners() {
+        event<MythicMobDeathEvent>(EventPriority.MONITOR) { event ->
+            val killer = event.killer as? Player ?: return@event
+            val drops = event.drops
+            // foobar
+        }
+
+        event<MythicMobItemGenerateEvent> { event ->
+            val trigger = event.trigger as? Player ?: return@event
+            val itemStack = event.itemStack
+            // foobar
+        }
+
+        event<MythicMobDeathEvent>(EventPriority.MONITOR) { event ->
+            val killer = event.killer as? Player ?: return@event
+            val drops = event.drops
+            for (stack in drops) {
+                mobDropRecords.put(stack, killer.uniqueId)
             }
         }
-        .build()
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun on(e: MythicMobLootDropEvent) {
-        val killer = e.killer as? Player ?: return
-        val drops = e.drops
-        // foobar
-    }
-
-    @EventHandler
-    fun on(e: MythicMobItemGenerateEvent) {
-        val trigger = e.trigger as? Player ?: return
-        val itemStack = e.itemStack
-        // foobar
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    fun on(e: MythicMobDeathEvent) {
-        val killer = e.killer as? Player ?: return
-        val drops = e.drops
-        for (stack in drops) {
-            mobDropRecords.put(stack, killer.uniqueId)
+        event<ItemSpawnEvent>(EventPriority.HIGHEST) { event ->
+            val item = event.entity.itemStack
+            val owner = mobDropRecords.getIfPresent(item) ?: return@event
+            event.entity.owner = owner
+            mobDropRecords.invalidate(item)
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    fun on(e: ItemSpawnEvent) {
-        val item = e.entity.itemStack
-        val owner = mobDropRecords.getIfPresent(item) ?: return
-        e.entity.owner = owner
-        mobDropRecords.invalidate(item)
-    }
 }

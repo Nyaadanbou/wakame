@@ -1,20 +1,18 @@
 package cc.mewcraft.wakame.user
 
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
-import cc.mewcraft.wakame.Koish
-import cc.mewcraft.wakame.initializer2.DisableFun
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.integration.HooksLoader
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.util.concurrent.isServerThread
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent

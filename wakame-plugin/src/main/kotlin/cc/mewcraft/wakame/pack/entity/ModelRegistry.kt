@@ -2,17 +2,17 @@ package cc.mewcraft.wakame.pack.entity
 
 import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.ModelDataCursor
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader
 import java.io.File
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 @Init(

@@ -13,8 +13,6 @@ class NamedQualifier : Qualifier {
 }
 
 /**
- * I(injection)Q(qualifier).
- *
  * 包含整个 Koish 项目的依赖坐标, 用于区分类型相同但实例不同的依赖.
  */
 enum class InjectionQualifier : Qualifier by NamedQualifier() {

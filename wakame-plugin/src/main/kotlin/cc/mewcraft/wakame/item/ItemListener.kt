@@ -7,11 +7,11 @@ import cc.mewcraft.wakame.ability.AbilityEntryPointHandler
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventListenerRegistry
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
@@ -19,11 +19,8 @@ import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.Bukkit
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.ThrowableProjectile
+import org.bukkit.entity.*
+import org.bukkit.event.EventPriority
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
@@ -31,11 +28,7 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 
 @Init(
@@ -81,7 +74,7 @@ object ItemListener {
      * 这些都是 *物品行为* 的一部分.
      */
     private fun registerItemBehaviorListeners() {
-        event<ArmorChangeEvent> { event ->
+        event<ArmorChangeEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val previous = event.previous?.takeUnlessEmpty()
@@ -91,7 +84,7 @@ object ItemListener {
             current?.shadowNeko()?.handleEquip(player, current, true, event)
         }
 
-        event<WrappedPlayerInteractEvent> { wrappedEvent ->
+        event<WrappedPlayerInteractEvent>(EventPriority.NORMAL) { wrappedEvent ->
             val event = wrappedEvent.event
             val player = event.player
             if (!player.isHandleableByKoish) return@event
@@ -104,7 +97,7 @@ object ItemListener {
             nekoStack.handleInteract(event.player, itemStack, event.action, wrappedEvent)
         }
 
-        event<PlayerInteractAtEntityEvent> { event ->
+        event<PlayerInteractAtEntityEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.player.inventory.itemInMainHand.takeUnlessEmpty()
@@ -122,7 +115,7 @@ object ItemListener {
             nekoStack.handleAttackEntity(player, itemStack, event.damagee, event)
         }
 
-        event<ProjectileLaunchEvent> { event ->
+        event<ProjectileLaunchEvent>(EventPriority.HIGHEST, true) { event ->
             val projectile = event.entity
             val itemStack = projectile.itemStack ?: return@event
             val ownerUniqueId = projectile.ownerUniqueId ?: return@event
@@ -132,7 +125,7 @@ object ItemListener {
             itemStack.shadowNeko()?.handleItemProjectileLaunch(player, itemStack, projectile, event)
         }
 
-        event<ProjectileHitEvent> { event ->
+        event<ProjectileHitEvent>(EventPriority.HIGHEST, true) { event ->
             val projectile = event.entity
             val itemStack = projectile.itemStack ?: return@event
             val ownerUniqueId = projectile.ownerUniqueId ?: return@event
@@ -142,7 +135,7 @@ object ItemListener {
             itemStack.shadowNeko()?.handleItemProjectileHit(player, itemStack, projectile, event)
         }
 
-        event<BlockBreakEvent> { event ->
+        event<BlockBreakEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
@@ -151,7 +144,7 @@ object ItemListener {
             nekoStack.handleBreakBlock(player, itemStack, event)
         }
 
-        event<PlayerItemDamageEvent> { event ->
+        event<PlayerItemDamageEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
@@ -160,7 +153,7 @@ object ItemListener {
             nekoStack.handleDamage(player, itemStack, event)
         }
 
-        event<PlayerItemBreakEvent> { event ->
+        event<PlayerItemBreakEvent>(EventPriority.HIGH) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.brokenItem.takeUnlessEmpty() ?: return@event
@@ -169,7 +162,7 @@ object ItemListener {
             nekoStack.handleBreak(player, itemStack, event)
         }
 
-        event<InventoryClickEvent> { event ->
+        event<InventoryClickEvent>(EventPriority.HIGH, true) { event ->
             val player = event.whoClicked as Player
             if (!player.isHandleableByKoish) return@event
             val clickedItem = event.currentItem
@@ -183,7 +176,7 @@ object ItemListener {
             }
         }
 
-        event<PlayerStopUsingItemEvent> { event ->
+        event<PlayerStopUsingItemEvent>(EventPriority.HIGHEST) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
@@ -192,7 +185,7 @@ object ItemListener {
             nekoStack.handleRelease(player, itemStack, event)
         }
 
-        event<PlayerItemConsumeEvent> { event ->
+        event<PlayerItemConsumeEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
@@ -201,7 +194,7 @@ object ItemListener {
             nekoStack.handleConsume(player, itemStack, event)
         }
 
-        event<PlayerAbilityPrepareCastEvent> { event ->
+        event<PlayerAbilityPrepareCastEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.caster
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item ?: return@event

@@ -21,10 +21,12 @@ import org.spongepowered.configurate.kotlin.extensions.getList
 // 支持在模板 lore 的基础之上添加额外的内容. 这一
 // 机制依赖于 MiniMessage 的解析.
 
+private val MM = Injector.get<MiniMessage>()
+
 data class ExtraLore(
     val lore: List<String>,
 ) : ItemTemplate<Nothing> {
-    val processedLore: List<Component> = lore.map { Injector.get<MiniMessage>().deserialize(it) }
+    val processedLore: List<Component> = lore.map { MM.deserialize(it) }
 
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 

@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
@@ -40,7 +40,7 @@ data class ItemAttackSpeed(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemAttackSpeed {
-            val raw = node.krequire<AttackSpeedLevel>()
+            val raw = node.require<AttackSpeedLevel>()
             return ItemAttackSpeed(raw)
         }
     }

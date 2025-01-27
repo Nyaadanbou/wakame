@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ability.trigger
 
-import cc.mewcraft.wakame.util.kregister
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -11,7 +10,7 @@ const val ABILITY_TRIGGER_SERIALIZERS = "ability_trigger_serializers"
 internal fun abilityTriggerModule(): Module = module {
     single<TypeSerializerCollection>(named(ABILITY_TRIGGER_SERIALIZERS)) {
         TypeSerializerCollection.builder()
-            .kregister(AbilityTriggerSerializer)
+            .register(AbilityTriggerSerializer)
             .build()
     }
 }

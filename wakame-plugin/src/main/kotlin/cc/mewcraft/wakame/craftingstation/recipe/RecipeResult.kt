@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.giveItemStack
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -91,7 +91,7 @@ internal data class ItemResult(
  */
 internal object StationResultSerializer : TypeSerializer<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
-        val item = node.node("item").krequire<ItemX>()
+        val item = node.node("item").require<ItemX>()
         val amount = node.node("amount").getInt(1)
         require(amount >= 1) { "item amount should not less than 1" }
         return ItemResult(item, amount)

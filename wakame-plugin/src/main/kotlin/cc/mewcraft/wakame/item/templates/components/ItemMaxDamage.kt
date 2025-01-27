@@ -2,13 +2,9 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toStableInt
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -47,7 +43,7 @@ data class ItemMaxDamage(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemMaxDamage {
-            val maxDamage = node.krequire<RandomizedValue>()
+            val maxDamage = node.require<RandomizedValue>()
             return ItemMaxDamage(maxDamage)
         }
     }

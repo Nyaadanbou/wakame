@@ -4,9 +4,6 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.*
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
@@ -18,9 +15,12 @@ import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.packet.PacketNekoStack
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.network.PacketNekoStack
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -31,13 +31,11 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
-internal data object StandardContext // 等之后需要的时候, 改成 class 即可
-
 @Init(
     stage = InitStage.POST_WORLD
 )
 @Reload
-internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
+internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
@@ -62,9 +60,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: PacketNekoStack, context: StandardContext?) {
-        requireNotNull(context) { "context" }
-
+    override fun render(item: PacketNekoStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates

@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.itemLoreOrEmpty
 import cc.mewcraft.wakame.util.itemNameOrType
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -19,6 +19,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
+import kotlin.collections.set
 
 /**
  * 合成站的一项输入要求.
@@ -179,17 +180,17 @@ internal data class ExpChoice(
  */
 internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val choiceType = node.node("type").krequire<String>()
+        val choiceType = node.node("type").require<String>()
         when (choiceType) {
             ItemChoice.TYPE -> {
-                val item = node.node("id").krequire<ItemX>()
+                val item = node.node("id").require<ItemX>()
                 val amount = node.node("amount").getInt(1)
                 require(amount > 0) { "Item amount must more than 0" }
                 return ItemChoice(item, amount)
             }
 
             ExpChoice.TYPE -> {
-                val amount = node.node("amount").krequire<Int>()
+                val amount = node.node("amount").require<Int>()
                 require(amount > 0) { "Exp amount must more than 0" }
                 return ExpChoice(amount)
             }

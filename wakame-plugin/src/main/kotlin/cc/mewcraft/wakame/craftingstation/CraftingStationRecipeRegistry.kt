@@ -9,12 +9,12 @@ import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register

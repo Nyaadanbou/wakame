@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.initializer2.DisableFun
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
@@ -36,17 +36,8 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.util.*
-import kotlin.collections.Iterable
-import kotlin.collections.Iterator
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.Set
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.emptyList
-import kotlin.collections.flatMap
-import kotlin.collections.forEach
-import kotlin.collections.map
 import kotlin.collections.set
 
 internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {

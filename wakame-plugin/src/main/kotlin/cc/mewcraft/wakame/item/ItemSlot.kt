@@ -3,13 +3,17 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.item.VanillaItemSlot.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
-import org.bukkit.inventory.*
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
@@ -118,7 +122,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
     }
 
     override fun deserialize(type: Type, node: ConfigurationNode): ItemSlot {
-        val rawString = node.krequire<String>()
+        val rawString = node.require<String>()
 
         val key = try {
             Key.key(rawString)

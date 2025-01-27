@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.event
 import com.destroystokyo.paper.event.server.ServerTickStartEvent

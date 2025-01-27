@@ -1,6 +1,6 @@
-import cc.mewcraft.wakame.dependency.CircularDependencyException
-import cc.mewcraft.wakame.dependency.DependencyComponent
-import cc.mewcraft.wakame.dependency.DependencyResolver
+import cc.mewcraft.wakame.util.dependency.CircularDependencyException
+import cc.mewcraft.wakame.util.dependency.DependencyComponent
+import cc.mewcraft.wakame.util.dependency.DependencyResolver
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

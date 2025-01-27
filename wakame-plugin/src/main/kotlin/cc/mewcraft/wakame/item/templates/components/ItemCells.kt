@@ -5,19 +5,13 @@ import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.templates.components.cells.CellArchetype
-import cc.mewcraft.wakame.item.templates.components.cells.CellArchetypeSerializer
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeGroupSerializer
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypePoolSerializer
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSerializer
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.templates.components.cells.*
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.random3.Pool
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.koin.core.qualifier.named
@@ -97,7 +91,7 @@ data class ItemCells(
                     // 先把节点 “selectors” 注入到节点 “buckets.<id>”
                     node.hint(CellArchetypeSerializer.HINT_NODE_SELECTORS, selectors)
                     // 再反序列化 “buckets.<id>”, 最后转成 Pair
-                    id to node.krequire<CellArchetype>()
+                    id to node.require<CellArchetype>()
                 }.toMap(
                     // 显式构建为有序 Map
                     LinkedHashMap()
@@ -110,10 +104,10 @@ data class ItemCells(
             return TypeSerializerCollection.builder()
 
                 // 随机选择器
-                .kregister(CellArchetypeSerializer)
-                .kregister(CoreArchetypeSerializer)
-                .kregister(CoreArchetypePoolSerializer)
-                .kregister(CoreArchetypeGroupSerializer)
+                .register<CellArchetype>(CellArchetypeSerializer)
+                .register<CoreArchetype>(CoreArchetypeSerializer)
+                .register<Pool<CoreArchetype, ItemGenerationContext>>(CoreArchetypePoolSerializer)
+                .register<Group<CoreArchetype, ItemGenerationContext>>(CoreArchetypeGroupSerializer)
 
                 // 技能, 部分核心会用到
                 .registerAll(Injector.get(named(ABILITY_EXTERNALS)))

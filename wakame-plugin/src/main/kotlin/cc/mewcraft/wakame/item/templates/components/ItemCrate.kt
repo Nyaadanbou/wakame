@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.templates.components
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
@@ -40,7 +40,7 @@ data class ItemCrate(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemCrate {
-            val raw = node.node("id").krequire<String>()
+            val raw = node.node("id").require<String>()
             return ItemCrate(raw)
         }
     }

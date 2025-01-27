@@ -4,14 +4,14 @@ import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import org.jetbrains.annotations.VisibleForTesting
 import java.io.File
 
@@ -67,7 +67,7 @@ internal object CraftingStationRegistry {
                         }
                     }.buildAndLoadString(fileText)
                     stationNode.hint(StationSerializer.HINT_NODE, stationId)
-                    val station = stationNode.krequire<CraftingStation>()
+                    val station = stationNode.require<CraftingStation>()
                     stations[stationId] = station
 
                 } catch (e: Throwable) {

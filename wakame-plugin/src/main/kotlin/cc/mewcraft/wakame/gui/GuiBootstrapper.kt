@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.gui
 
-import cc.mewcraft.wakame.initializer2.DisableFun
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.WindowManager

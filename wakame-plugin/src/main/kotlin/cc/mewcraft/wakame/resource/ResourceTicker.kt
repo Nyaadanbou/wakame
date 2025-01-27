@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.resource
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.initializer2.DisableFun
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.runTaskTimer
@@ -16,7 +16,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import java.util.WeakHashMap
+import java.util.*
 
 @Init(
     stage = InitStage.PRE_WORLD,

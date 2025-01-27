@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 /**
  * 储存了所有 [ItemSlotChangeEventListener] 实例.

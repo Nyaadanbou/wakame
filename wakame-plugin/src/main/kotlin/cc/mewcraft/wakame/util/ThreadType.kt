@@ -7,47 +7,29 @@ import cc.mewcraft.wakame.util.coroutine.async
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.*
 
+// 截止 2025/1/27, 如果要在任意地方启动一个协程, 比较好的做法
+// 应该是使用 KOISH_SCOPE#launch 来启动一个协程, 而不是
+// 使用这里的 ThreadType.
+
 enum class ThreadType {
     SYNC,
     ASYNC,
     REMAIN,
     ;
 
-    suspend fun <T> switchContext(block: suspend () -> T): T {
+    fun launch(block: suspend CoroutineScope.() -> Unit): Job {
         if (!Koish.isEnabled) {
-            return block()
-        }
-        if (this == REMAIN) {
-            return block()
-        }
-
-        return withContext(
-            when (this) {
-                SYNC -> Dispatchers.minecraft
-                ASYNC -> Dispatchers.async
-                else -> throw IllegalStateException("Unknown thread type: $this")
-            }
-        ) {
-            block()
-        }
-    }
-
-    fun launch(block: suspend () -> Unit): Job {
-        if (!Koish.isEnabled) {
-            runBlocking {
-                block()
-            }
+            runBlocking { block() }
             return Job()
         }
 
         return KOISH_SCOPE.launch(
-            when (this) {
+            context = when (this) {
                 SYNC -> Dispatchers.minecraft
                 ASYNC -> Dispatchers.async
                 REMAIN -> if (isServerThread) Dispatchers.minecraft else Dispatchers.async
-            }
-        ) {
-            block()
-        }
+            },
+            block = block
+        )
     }
 }

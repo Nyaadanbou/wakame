@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.feature.Feature
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InternalInit
-import cc.mewcraft.wakame.initializer2.InternalInitStage
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -26,8 +26,9 @@ import xyz.xenondevs.commons.provider.Provider
 import java.nio.file.Path
 import kotlin.io.path.*
 
-private val DEFAULT_CONFIG_ID = Identifier.key("koish", "configs")
+private val DEFAULT_CONFIG_ID = Identifier.key("koish", "config")
 private const val DEFAULT_CONFIG_PATH = "configs/config.yml" // relative to Plugin#dataFolder
+
 val MAIN_CONFIG: Provider<CommentedConfigurationNode> = Configs[DEFAULT_CONFIG_ID]
 
 /**
@@ -101,8 +102,8 @@ object Configs {
             .filter { (_, provider) ->
                 // 表示文件之前存在但现在不存在了
                 (!provider.path.exists() && provider.fileExisted) ||
-                    // 表示文件存在，并且文件的最后修改时间晚于上次重新加载的时间
-                    (provider.path.exists() && (provider.path.getLastModifiedTime().toMillis() > lastReload))
+                        // 表示文件存在，并且文件的最后修改时间晚于上次重新加载的时间
+                        (provider.path.exists() && (provider.path.getLastModifiedTime().toMillis() > lastReload))
             } // 只重新加载动过的文件
             .onEach { (_, provider) -> provider.reload() } // 调用 RootConfigProvider#reload 方法
             .mapTo(ArrayList()) { (id, _) -> id }

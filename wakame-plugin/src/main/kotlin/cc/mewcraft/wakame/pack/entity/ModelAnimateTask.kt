@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.pack.entity
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.runTaskTimer
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity

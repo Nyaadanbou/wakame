@@ -2,20 +2,17 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.Serializers
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.TypeSerializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
+import cc.mewcraft.wakame.util.*
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.io.File
 
@@ -53,11 +50,11 @@ internal object KizamiRegistryConfigStorage : RegistryConfigStorage {
         val loader = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(KizamiTypeSerializer)
-                kregister(Serializers.dispatching(KizamiEffect::type, KizamiEffectType<*>::type))
-                kregister(KizamiEffectType.REGISTRY.valueByNameTypeSerializer())
-                kregister(KizamiEffectAttributeModifier.SERIALIZER)
-                kregister(KizamiEffectPlayerAbility.SERIALIZER)
+                register<KizamiType>(KizamiTypeSerializer)
+                register<KizamiEffect>(TypeSerializers.dispatching(KizamiEffect::type, KizamiEffectType<*>::type))
+                register(KizamiEffectType.REGISTRY.valueByNameTypeSerializer())
+                register<KizamiEffectAttributeModifier>(KizamiEffectAttributeModifier.SERIALIZER)
+                register<KizamiEffectPlayerAbility>(KizamiEffectPlayerAbility.SERIALIZER)
             }
         }
 

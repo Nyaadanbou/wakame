@@ -5,9 +5,6 @@ import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.integration.economy.EconomyType
@@ -19,6 +16,9 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.integration.townflight.TownFlightIntegration
 import cc.mewcraft.wakame.integration.townflight.TownFlightManager
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.data.JarUtils
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.NamedTextColor

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.display
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
@@ -28,8 +28,8 @@ private data class AbilityDisplayImpl(
 internal object AbilityDisplaySerializer : TypeSerializer<AbilityDisplay> {
     override fun deserialize(type: Type, node: ConfigurationNode): AbilityDisplay {
         return AbilityDisplayImpl(
-            name = node.node("name").krequire(),
-            tooltips = node.node("tooltips").krequire()
+            name = node.node("name").require<String>(),
+            tooltips = node.node("tooltips").require<List<String>>()
         )
     }
 }

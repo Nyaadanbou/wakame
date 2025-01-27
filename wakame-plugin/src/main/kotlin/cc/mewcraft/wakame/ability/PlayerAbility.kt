@@ -13,12 +13,7 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.getIntOrNull
-import cc.mewcraft.wakame.util.getStringOrNull
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -92,8 +87,8 @@ fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
     val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
-    val variant = node.node("variant").krequire<TriggerVariant>()
-    val manaCost = node.node("mana_cost").krequire<Evaluable<*>>()
+    val variant = node.node("variant").require<TriggerVariant>()
+    val manaCost = node.node("mana_cost").require<Evaluable<*>>()
     return SimplePlayerAbility(id, trigger, variant, manaCost)
 }
 

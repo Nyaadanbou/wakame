@@ -2,16 +2,8 @@ package cc.mewcraft.wakame.item.templates.virtual
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.MenuIcon
-import cc.mewcraft.wakame.util.MenuIconDictionary
-import cc.mewcraft.wakame.util.MenuIconName
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.util.*
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -58,7 +50,7 @@ data class ItemMenuIconName(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemMenuIconName {
-            return ItemMenuIconName(node.krequire<MenuIconName>())
+            return ItemMenuIconName(node.require<MenuIconName>())
         }
     }
 }

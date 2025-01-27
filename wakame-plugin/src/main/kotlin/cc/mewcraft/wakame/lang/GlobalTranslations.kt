@@ -4,16 +4,15 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.key.Key
@@ -23,7 +22,7 @@ import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
 import java.text.MessageFormat
-import java.util.Locale
+import java.util.*
 
 fun ComponentLike.translate(locale: Locale): Component {
     val component = asComponent() // 如果是 TranslatableComponent.Builder 会隐式调用 #build()
@@ -93,7 +92,7 @@ object GlobalTranslations : RegistryConfigStorage {
             val localeConfig = loaderBuilder.file(localeFile).build()
             val localeNode = localeConfig.load()
             for ((key, value) in localeNode.childrenMap().entries) {
-                translations.register(key.toString(), locale, value.krequire())
+                translations.register(key.toString(), locale, value.require<String>())
             }
         }
     }

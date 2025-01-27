@@ -5,12 +5,13 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.util.PathChangeWatcher
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.sun.net.httpserver.HttpExchange
 import net.kyori.adventure.resource.ResourcePackInfo
 import net.kyori.adventure.resource.ResourcePackRequest
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
+import org.spongepowered.configurate.reference.WatchServiceListener
 import team.unnamed.creative.BuiltResourcePack
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.server.ResourcePackServer
@@ -18,9 +19,13 @@ import team.unnamed.creative.server.request.ResourcePackDownloadRequest
 import xyz.xenondevs.commons.provider.Provider
 import java.io.File
 import java.net.URI
+import java.nio.file.Path
+import java.nio.file.StandardWatchEventKinds
 import java.security.MessageDigest
-import java.util.UUID
-import java.util.concurrent.*
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -73,7 +78,7 @@ object ResourcePackServiceProvider {
      * - 非线程安全.
      */
     fun get(): ResourcePackService {
-        return INSTANCE ?: loadAndSet()
+        return INSTANCE ?: set()
     }
 
     /**
@@ -84,14 +89,14 @@ object ResourcePackServiceProvider {
      * - 该函数不负责启动新创建的服务.
      * - 非线程安全.
      */
-    fun loadAndSet(): ResourcePackService {
+    fun set(): ResourcePackService {
         // 停止旧实例
         INSTANCE?.stop()
 
         val config = RESOURCE_PACK_CONFIG.node("service")
         val required = config.entry<Boolean>("required")
         val prompt = config.entry<Component>("prompt")
-        val inst = when (
+        val instance = when (
             val type = config.entry<String>("type").get()
         ) {
             "none" -> {
@@ -114,7 +119,7 @@ object ResourcePackServiceProvider {
             }
         }
 
-        return inst.also {
+        return instance.also {
             INSTANCE = it // 设置新实例
         }
     }
@@ -145,23 +150,34 @@ private class SelfHostService(
     port: Provider<Int>,
 ) : ResourcePackService {
 
-    // Http 服务器监听的主机名
+    // HTTP 服务器监听的主机名
     private val host: String by host
 
-    // Http 服务器监听的端口
+    // HTTP 服务器监听的端口
     private val port: Int by port
 
+    // 是否要求玩家下载资源包
     private val required: Boolean by required
+
+    // 玩家下载资源包的提示信息
     private val prompt: Component by prompt
 
-    // Http 服务器的 Executor
-    private val executor: ExecutorService = Executors.newCachedThreadPool()
+    // HTTP 服务器的 Executor
+    private val executor: ExecutorService = Executors.newCachedThreadPool(ThreadFactoryBuilder().setNameFormat("Koish-Self-Host-Service-%d").build())
 
-    // Http 服务器实例
-    private val server: ResourcePackServer = buildResourcePackServer()
+    // HTTP 服务器实例
+    private val httpServer: ResourcePackServer = ResourcePackServer.server()
+        // 端口设置为用户指定的, 但 IP 永远绑定到 0.0.0.0 (IPv4)
+        // 经过测试, 使用 ::0 (IPv6) 会导致客户端无法下载资源包.
+        // 必须添加启动参数 -Djava.net.preferIPv4Stack=true
+        .address(this.port)
+        .handler(this::handleRequest)
+        .executor(this.executor)
+        .build()
 
     // 资源包请求, 将发送给玩家
     private val resourcePackRequest: ResourcePackRequest
+        // 使用 getter 使得每次返回一个新的 ResourcePackRequest
         get() {
             // 构建下载链接
             val hash = builtResourcePack?.hash() ?: return ResourcePackRequest.resourcePackRequest().build()
@@ -174,7 +190,7 @@ private class SelfHostService(
             // 构建 ResourcePackInfo
             val id = UUID.nameUUIDFromBytes(downloadURL.encodeToByteArray())
             val uri = URI.create(downloadURL)
-            val packInfo = ResourcePackInfo.resourcePackInfo().id(id).uri(uri).hash(hash) // !!! 阻塞
+            val packInfo = ResourcePackInfo.resourcePackInfo().id(id).uri(uri).hash(hash)
 
             // 构建 ResourcePackRequest
             val request = ResourcePackRequest.resourcePackRequest()
@@ -190,15 +206,7 @@ private class SelfHostService(
     // 当前生成好的资源包
     private var builtResourcePack: BuiltResourcePack? = buildResourcePack()
 
-    private val watcher: PathChangeWatcher = PathChangeWatcher(
-        directory = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(RESOURCE_PACK_GENERATED_DIR).toPath(),
-        specificFile = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toPath(),
-        executor = executor,
-        onFileChange = {
-            LOGGER.info("Resource pack file changed. Reloading resource pack.")
-            builtResourcePack = buildResourcePack()
-        }
-    )
+    private val watchServiceListener: WatchServiceListener = WatchServiceListener.create()
 
     private fun handleRequest(request: ResourcePackDownloadRequest?, exchange: HttpExchange) {
         // request == null 的情况一般就是用浏览器直接下载资源包.
@@ -263,30 +271,26 @@ private class SelfHostService(
         return BuiltResourcePack.of(data, hash)
     }
 
-    private fun buildResourcePackServer(): ResourcePackServer =
-        ResourcePackServer.server().apply {
-
-            // 端口设置为用户指定的, 但 IP 永远绑定到 0.0.0.0 (IPv4)
-            // 经过测试, 使用 ::0 (IPv6) 会导致客户端无法下载资源包.
-            // 必须添加启动参数 -Djava.net.preferIPv4Stack=true
-            address(port)
-            // 使用我们自己定义的请求处理器
-            handler(::handleRequest)
-            // 使用自定义的 Executor
-            executor(executor)
-
-        }.build()
-
     override fun start() {
         LOGGER.info("Starting resource pack http server. Port: $port")
-        watcher.watch()
-        server.start()
+
+        watchServiceListener.listenToFile(
+            Injector.get<Path>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        ) { event ->
+            if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                LOGGER.info("Resource pack file changed. Reloading resource pack.")
+                builtResourcePack = buildResourcePack()
+                LOGGER.info("Resource pack reloaded.")
+            }
+        }
+
+        httpServer.start()
     }
 
     override fun stop() {
-        LOGGER.info("Stopping resource pack http server. Port: $port")
-        watcher.stop()
-        server.stop(0)
+        LOGGER.info("Stopping resource pack http server at port $port")
+        watchServiceListener.close()
+        httpServer.stop(10)
     }
 
     override fun sendPack(player: Player) {
@@ -305,8 +309,13 @@ private class OnlyURLService(
     downloadURL: Provider<String>,
 ) : ResourcePackService {
 
+    // 要求玩家必须安装资源包?
     private val required: Boolean by required
+
+    // 玩家安装资源包后, 弹出的提示信息
     private val prompt: Component by prompt
+
+    // 资源包的下载链接
     private val downloadURL: String by downloadURL
 
     private val resourcePackRequest: ResourcePackRequest

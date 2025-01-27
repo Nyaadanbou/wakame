@@ -4,13 +4,13 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.Identifier

@@ -15,12 +15,12 @@ import cc.mewcraft.wakame.element.elementModule
 import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
-import cc.mewcraft.wakame.initializer2.Initializer
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.lang.langModule
+import cc.mewcraft.wakame.lifecycle.initializer.Initializer
+import cc.mewcraft.wakame.network.packetModule
 import cc.mewcraft.wakame.pack.packModule
-import cc.mewcraft.wakame.packet.packetModule
 import cc.mewcraft.wakame.random3.randomModule
 import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule

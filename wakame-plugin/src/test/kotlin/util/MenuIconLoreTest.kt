@@ -3,8 +3,8 @@ package util
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.util.MenuIconLore
 import cc.mewcraft.wakame.util.MenuIconLoreSerializer
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import commonEnv
 import net.kyori.adventure.text.Component.text
 import org.junit.jupiter.api.AfterEach
@@ -102,7 +102,7 @@ class MenuIconLoreTest : KoinTest {
     fun `serialization case 1`() {
         // Deserialize a configuration node
         val node = BasicConfigurationNode.root<RuntimeException>(ConfigurationOptions.defaults().serializers {
-            it.kregister(MenuIconLoreSerializer)
+            it.register<MenuIconLore>(MenuIconLoreSerializer)
         }) { node ->
             node.set(
                 listOf(
@@ -113,7 +113,7 @@ class MenuIconLoreTest : KoinTest {
             )
         }
 
-        val lore = node.krequire<MenuIconLore>()
+        val lore = node.require<MenuIconLore>()
 
         // Resolve the MenuLore
         val actual = lore.resolve {

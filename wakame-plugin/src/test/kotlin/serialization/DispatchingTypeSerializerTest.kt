@@ -3,10 +3,10 @@ package serialization
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.SimpleRegistry
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.Serializers
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.TypeSerializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,8 +44,8 @@ class DispatchingTypeSerializerTest {
     fun `using object mapper`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.registerAnnotatedObjects(objectMapperFactory())
-            builder.kregister<AnimalType<*>>(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.kregister<Animal>(Serializers.dispatching(Animal::type, AnimalType<*>::type))
+            builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
+            builder.register<Animal>(TypeSerializers.dispatching(Animal::type, AnimalType<*>::type))
         })
 
         assertNode(node)
@@ -54,10 +54,10 @@ class DispatchingTypeSerializerTest {
     @Test
     fun `using type serializer`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
-            builder.kregister<AnimalType<*>>(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.kregister<Animal>(Serializers.dispatching(Animal::type, AnimalType<*>::type))
-            builder.kregister<Cat>(CatSerializer)
-            builder.kregister<Dog>(DogSerializer)
+            builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
+            builder.register<Animal>(TypeSerializers.dispatching(Animal::type, AnimalType<*>::type))
+            builder.register<Cat>(CatSerializer)
+            builder.register<Dog>(DogSerializer)
         })
 
         assertNode(node)
@@ -112,7 +112,7 @@ object AnimalTypes {
 // Cat 的 TypeSerializer
 object CatSerializer : TypeSerializer<Cat> {
     override fun deserialize(type: Type, node: ConfigurationNode): Cat {
-        return Cat(node.node("color").krequire())
+        return Cat(node.node("color").require<String>())
     }
 
     override fun serialize(type: Type, obj: Cat?, node: ConfigurationNode) {
@@ -123,7 +123,7 @@ object CatSerializer : TypeSerializer<Cat> {
 // Dog 的 TypeSerializer
 object DogSerializer : TypeSerializer<Dog> {
     override fun deserialize(type: Type, node: ConfigurationNode): Dog {
-        return Dog(node.node("weight").krequire())
+        return Dog(node.node("weight").require<Int>())
     }
 
     override fun serialize(type: Type, obj: Dog?, node: ConfigurationNode) {

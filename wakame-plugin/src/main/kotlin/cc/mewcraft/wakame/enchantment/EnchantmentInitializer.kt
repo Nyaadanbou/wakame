@@ -2,11 +2,11 @@
 
 package cc.mewcraft.wakame.enchantment
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.VanillaItemSlot
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 @Init(
     stage = InitStage.POST_WORLD

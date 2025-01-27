@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
 import org.bukkit.event.player.PlayerJoinEvent
@@ -31,7 +31,7 @@ internal object ResourcePackLifecycle {
     @ReloadFun
     fun reload() {
         // 重新配置 资源包分发系统
-        val service = ResourcePackServiceProvider.loadAndSet()
+        val service = ResourcePackServiceProvider.set()
         service.start()
 
         // 重新配置 资源包发布系统

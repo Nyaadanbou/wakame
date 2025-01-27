@@ -2,12 +2,7 @@ package util
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
-import cc.mewcraft.wakame.util.MenuIconDictionary
-import cc.mewcraft.wakame.util.MenuIconLore
-import cc.mewcraft.wakame.util.MenuIconLoreSerializer
-import cc.mewcraft.wakame.util.MenuIconName
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.*
 import commonEnv
 import net.kyori.adventure.text.Component.text
 import org.junit.jupiter.api.AfterEach
@@ -49,7 +44,7 @@ class MenuIconMixTest : KoinTest {
     fun `mix case 1`() {
         val options = ConfigurationOptions.defaults().serializers {
             it.registerAnnotatedObjects(ObjectMappers.DEFAULT)
-            it.kregister(MenuIconLoreSerializer)
+            it.register<MenuIconLore>(MenuIconLoreSerializer)
         }
         val dictNode = BasicConfigurationNode.root<RuntimeException>(options) { node ->
             node.node("choice_item").set("<mark> <item>×<amount>")
@@ -71,15 +66,15 @@ class MenuIconMixTest : KoinTest {
             )
         }
 
-        val actualDict = dictNode.krequire<MenuIconDictionary>()
+        val actualDict = dictNode.require<MenuIconDictionary>()
 
         // 把 MenuIconDict 传入 MenuIconName.resolve 以便让 MenuIconName 解析额外的占位符
-        val actualName = nameNode.krequire<MenuIconName>().resolve(actualDict) {
+        val actualName = nameNode.require<MenuIconName>().resolve(actualDict) {
             unparsed("player_name", "Nailm")
         }
 
         // 把 MenuIconDict 传入 MenuIconLore.resolve 以便让 MenuIconLore 解析额外的占位符
-        val actualLore = loreNode.krequire<MenuIconLore>().resolve(actualDict) {
+        val actualLore = loreNode.require<MenuIconLore>().resolve(actualDict) {
             standard {
                 unparsed("rarity_name", "rare")
                 component("choice_amount", text(3))

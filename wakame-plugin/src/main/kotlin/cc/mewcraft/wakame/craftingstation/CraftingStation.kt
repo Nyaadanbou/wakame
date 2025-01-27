@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -66,11 +66,11 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
     val HINT_NODE: RepresentationHint<String> = RepresentationHint.of("id", typeTokenOf<String>())
     override fun deserialize(type: Type, node: ConfigurationNode): CraftingStation {
         val id = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station id is not present")
-        val stationType = node.node("type").krequire<String>()
+        val stationType = node.node("type").require<String>()
         when (stationType) {
             SimpleCraftingStation.TYPE -> {
                 // 获取合成站菜单布局
-                val stationLayout = node.node("listing_layout").krequire<BasicMenuSettings>().apply {
+                val stationLayout = node.node("listing_layout").require<BasicMenuSettings>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()
@@ -81,7 +81,7 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
                 }
 
                 // 获取合成站预览菜单布局
-                val previewLayout = node.node("preview_layout").krequire<BasicMenuSettings>().apply {
+                val previewLayout = node.node("preview_layout").require<BasicMenuSettings>().apply {
                     val illegalChars = this.structure.map { it.toCharArray() }
                         .reduce { acc, chars -> acc + chars }
                         .distinct()

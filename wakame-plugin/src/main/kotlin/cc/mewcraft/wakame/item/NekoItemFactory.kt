@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
 
@@ -24,8 +24,8 @@ object NekoItemFactory {
 object VanillaNekoItemFactory {
     operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
         // read basic data
-        val itemBase = rootNode.node("base").krequire<ItemBase>()
-        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
+        val itemBase = rootNode.node("base").require<ItemBase>()
+        val slotGroup = rootNode.node("slot").require<ItemSlotGroup>()
 
         // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {
@@ -133,8 +133,8 @@ object StandardNekoItemFactory {
      */
     operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
         // read basic data
-        val itemBase = rootNode.node("base").krequire<ItemBase>()
-        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
+        val itemBase = rootNode.node("base").require<ItemBase>()
+        val slotGroup = rootNode.node("slot").require<ItemSlotGroup>()
 
         // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {

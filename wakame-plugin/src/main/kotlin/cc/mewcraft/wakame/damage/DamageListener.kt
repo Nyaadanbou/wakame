@@ -2,13 +2,15 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.SharedConstants
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.event
 import io.papermc.paper.event.entity.EntityKnockbackEvent
+import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.LinearComponents
@@ -21,6 +23,8 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+
+private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
 
 /**
  * 伤害系统的监听器, 也是代码入口.
@@ -58,8 +62,7 @@ internal object DamageListener {
             event.damage = nekoEntityDamageEvent.getFinalDamage()
 
             // 记录日志
-
-            if (SharedConstants.isDebug) {
+            if (LOGGING) {
                 LOGGER.info("${entity.type}(${entity.uniqueId}) 受到了 ${event.damage} 点伤害")
 
                 // 记录聊天
@@ -74,7 +77,7 @@ internal object DamageListener {
                 ).hoverEvent(
                     damageMetadata.damageBundle.packets()
                         .map { packet -> LinearComponents.linear(packet.element.displayName, text(": "), text(packet.damageValue())) }
-                        .let { components -> join(JoinConfiguration.newlines(), components) }
+                        .join(JoinConfiguration.newlines())
                         .let { component ->
                             HoverEvent.showText(
                                 component
@@ -89,7 +92,7 @@ internal object DamageListener {
                     ClickEvent.copyToClipboard(entity.uniqueId.toString())
                 )
 
-                SERVER.filterAudience { it is Player }.sendMessage(message)
+                SERVER.sendMessage(message)
             }
         }
 

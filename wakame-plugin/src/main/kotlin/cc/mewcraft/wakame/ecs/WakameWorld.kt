@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.Koish
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.system.AbilityBukkitEntityMetadataSystem
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
@@ -24,8 +22,6 @@ object WakameWorld {
     val instance: World = configureWorld {
 
         injectables {
-            add(Koish) // FIXME 移除 - 使用单例 Koish
-            add(LOGGER) // FIXME 移除 - 使用全局变量 LOGGER
             add(this@WakameWorld) // FIXME 移除 - 使用单例 WakameWorld
         }
 
