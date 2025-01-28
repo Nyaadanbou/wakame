@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.resource
+package cc.mewcraft.wakame.entity.resource
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes

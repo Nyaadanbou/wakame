@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.resource
+package cc.mewcraft.wakame.entity.resource
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
@@ -19,7 +19,7 @@ import org.bukkit.scheduler.BukkitTask
 import java.util.*
 
 @Init(
-    stage = InitStage.PRE_WORLD,
+    stage = InitStage.POST_WORLD,
 )
 @Reload
 object ResourceTicker {
@@ -29,21 +29,21 @@ object ResourceTicker {
 
     @InitFun
     private fun init() {
-        start()
+        startTick()
     }
 
     @DisableFun
-    private fun close() {
+    private fun stopTick() {
         resourceTickTask?.cancel()
     }
 
     @ReloadFun
     private fun reload() {
-        close()
-        start()
+        stopTick()
+        startTick()
     }
 
-    fun start() {
+    private fun startTick() {
         // 开始一个每 t 执行一次的循环任务,
         // 每次任务执行时:
         // * 恢复定量魔法值

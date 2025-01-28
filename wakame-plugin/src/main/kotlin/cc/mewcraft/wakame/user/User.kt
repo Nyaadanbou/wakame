@@ -4,10 +4,10 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.ability.state.AbilityState
 import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
-import cc.mewcraft.wakame.resource.ResourceMap
-import java.util.UUID
+import java.util.*
 
 /**
  * Represents a user in the system.
@@ -17,7 +17,10 @@ import java.util.UUID
  *
  * @param P the player type
  */
-interface User<P> { // FIXME: 取消 class 上的泛型, 留一个泛型函数 getPlayer 获取 platform player 即可
+// TODO: 移动到 `entity` package
+// TODO: 改名为 KoishPlayer
+// FIXME: 取消 class 上的泛型, 留一个泛型函数 getPlayer 获取 platform player 即可
+interface User<P> {
 
     /**
      * The backing player.

@@ -36,6 +36,7 @@ internal object DamageListener {
 
     @InitFun
     fun init() {
+
         // 由于 MythicMobs 的各种问题, priority 必须设置为 MONITOR.
         event<EntityDamageEvent>(EventPriority.MONITOR, true) { event ->
             val entity = event.entity

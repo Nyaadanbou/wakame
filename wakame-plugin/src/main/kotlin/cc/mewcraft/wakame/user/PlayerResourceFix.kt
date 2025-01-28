@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.user
 
 import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.entity.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.integration.HooksLoader
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
@@ -8,7 +10,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.resource.ResourceSynchronizer
 import cc.mewcraft.wakame.util.concurrent.isServerThread
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
@@ -39,8 +40,12 @@ internal object PlayerResourceFix {
             ResourceSynchronizer.save(player)
         }
 
-        // 在冒险等级加载完毕后, 加载玩家的资源数据
-        when (PlayerLevelManager.integration.type) {
+        // 在冒险等级加载完毕后, 加载玩家的资源数据:
+        // 这里根据运行时的冒险等级系统加载对应的监听器
+        when (val type = PlayerLevelManager.integration.type) {
+
+            // 这两冒险等级系统完全依赖原版游戏自身, 没有额外的数据储存,
+            // 所以可以直接在进入游戏时读取玩家的等级信息并且加载资源数据.
             PlayerLevelType.ZERO,
             PlayerLevelType.VANILLA -> event<PlayerJoinEvent> { event ->
                 val player = event.player
@@ -49,25 +54,32 @@ internal object PlayerResourceFix {
                 ResourceSynchronizer.load(player)
             }
 
+            // 冒险等级插件的数据是异步加载, 需要处理一下线程同步问题.
             PlayerLevelType.ADVENTURE -> event<AdventureLevelDataLoadEvent> { event ->
-                // 注意事项 2024/11/2:
-                // 当服务器安装了 HuskSync 时, AdventureLevelDataLoadEvent 会在 HuskSync 的 BukkitSyncCompleteEvent 之后触发.
-                // 也就是说, 如果 HuskSync 没有完成同步, 那么 AdventureLevelDataLoadEvent 永远不会触发.
-                val data = event.userData
-                val player = Bukkit.getPlayer(data.uuid) ?: return@event
-                val user = player.toUser()
+                fun execute() {
+                    // 注意事项 2024/11/2:
+                    // 该逻辑高度依赖 HuskSync 的运行情况.
+                    // 当服务器安装了 HuskSync 时, AdventureLevelDataLoadEvent 会在 HuskSync 的 BukkitSyncCompleteEvent 之后触发.
+                    // 也就是说, 如果 HuskSync 没有完成同步, 那么 AdventureLevelDataLoadEvent 永远不会触发.
+                    val data = event.userData
+                    val player = Bukkit.getPlayer(data.uuid) ?: run {
+                        LOGGER.warn("Player ${data.uuid} is not online, skipping resource synchronization")
+                        return
+                    }
+                    val user = player.toUser()
 
-                // 标记玩家的背包可以被监听了
-                if (!user.isInventoryListenable) {
-                    user.isInventoryListenable = true
+                    // 标记玩家的背包可以被监听了
+                    if (!user.isInventoryListenable) {
+                        user.isInventoryListenable = true
+                    }
+
+                    ResourceSynchronizer.load(player)
                 }
 
                 if (isServerThread) {
-                    // 如果事件是同步触发的, 那么直接操作玩家的状态
-                    ResourceSynchronizer.load(player)
+                    execute()
                 } else {
-                    // 如果事件是异步触发的, 必须在主线程操作玩家的状态
-                    runTask { ResourceSynchronizer.load(player) }
+                    runTask(::execute)
                 }
             }
         }

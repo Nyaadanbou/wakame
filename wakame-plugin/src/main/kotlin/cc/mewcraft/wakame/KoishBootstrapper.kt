@@ -25,7 +25,6 @@ import cc.mewcraft.wakame.random3.randomModule
 import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.resource.resourceModule
 import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.user.userModule
 import cc.mewcraft.wakame.util.data.Version
@@ -113,7 +112,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 recipeModule(),
                 reforgeModule(),
                 registryModule(),
-                resourceModule(),
                 skinModule(),
                 abilityModule(),
                 stationModule(),

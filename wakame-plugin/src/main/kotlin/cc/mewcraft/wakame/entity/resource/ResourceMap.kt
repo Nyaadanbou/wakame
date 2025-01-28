@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.resource
+package cc.mewcraft.wakame.entity.resource
 
 /**
  * Represents a ResourceMap owned by a subject.
