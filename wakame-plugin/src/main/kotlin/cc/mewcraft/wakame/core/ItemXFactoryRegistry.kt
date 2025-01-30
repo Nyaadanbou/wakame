@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.core
 import org.bukkit.inventory.ItemStack
 
 
-object ItemXRegistry {
-    private val builderMap: HashMap<String, ItemXFactory> = HashMap()
-    private val builderList: ArrayList<ItemXFactory> = ArrayList()
+object ItemXFactoryRegistry {
+    private val factoryMap: HashMap<String, ItemXFactory> = HashMap()
+    private val factoryList: ArrayList<ItemXFactory> = ArrayList()
 
     operator fun get(uid: String): ItemX? {
         val split = uid.split(":")
@@ -14,14 +14,14 @@ object ItemXRegistry {
     }
 
     operator fun get(plugin: String, identifier: String): ItemX? {
-        val builder = builderMap[plugin] ?: return null
+        val builder = factoryMap[plugin] ?: return null
         return builder.create(plugin, identifier)
     }
 
     operator fun get(itemStack: ItemStack): ItemX? {
         if (itemStack.isEmpty)
             return null
-        for (builder in builderList) {
+        for (builder in factoryList) {
             val itemX = builder.create(itemStack) ?: continue
             return itemX
         }
@@ -29,17 +29,17 @@ object ItemXRegistry {
     }
 
     fun register(plugin: String, itemXFactory: ItemXFactory) {
-        builderMap[plugin.lowercase()] = itemXFactory
-        builderList += itemXFactory
+        factoryMap[plugin.lowercase()] = itemXFactory
+        factoryList += itemXFactory
     }
 
     fun unregister(pluginId: String) {
-        builderMap.remove(pluginId.lowercase())
-        builderList.removeIf { it.plugin.lowercase() == pluginId.lowercase() }
+        factoryMap.remove(pluginId.lowercase())
+        factoryList.removeIf { it.plugin.lowercase() == pluginId.lowercase() }
     }
 
     fun unregisterAll() {
-        builderMap.clear()
-        builderList.clear()
+        factoryMap.clear()
+        factoryList.clear()
     }
 }

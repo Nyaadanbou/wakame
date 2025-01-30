@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXRegistry
+import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
@@ -84,7 +84,7 @@ internal class ItemChoiceCheckerContext(
             if (itemStack == null) {
                 continue
             }
-            val itemX = ItemXRegistry[itemStack]
+            val itemX = ItemXFactoryRegistry[itemStack]
             val amount = itemStack.amount
             ret.mergeInt(itemX, amount) { old, given -> old + given }
         }

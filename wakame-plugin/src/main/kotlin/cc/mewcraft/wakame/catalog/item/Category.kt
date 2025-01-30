@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.catalog.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXRegistry
+import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.krequire
@@ -45,7 +45,7 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
         val itemUids = node.node("items").getList<String>(emptyList())
         val list: MutableList<ItemX> = mutableListOf()
         for (uid in itemUids) {
-            val itemX = ItemXRegistry[uid]
+            val itemX = ItemXFactoryRegistry[uid]
             if (itemX == null) {
                 LOGGER.warn("Cannot deserialize string '$uid' into ItemX. Skip add it to category: '$id'")
                 continue
