@@ -41,7 +41,7 @@ internal object VanillaEconomyIntegration : EconomyIntegration {
     }
 
     private fun getPlayer(uuid: UUID): Player {
-        return SERVER.getPlayer(uuid) ?: error("player is not online.")
+        return SERVER.getPlayer(uuid) ?: error("Player is not online")
     }
 
 }
