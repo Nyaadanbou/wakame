@@ -35,7 +35,7 @@ interface SlotDisplayData {
          */
         fun dict(key: String): String {
             // 开发日记 2024/12/25: 返回空字符串?
-            return dictionary[key] ?: error("no such key in dict: $key")
+            return dictionary[key] ?: error("No such key in dict: $key")
         }
 
         /**
@@ -376,7 +376,7 @@ data class SlotDisplayLoreData(
 
             fun dict(key: String): String {
                 // 开发日记 2024/12/25: 返回空字符串?
-                return dictionary[key] ?: error("no such key in dict: $key")
+                return dictionary[key] ?: error("No such key in dict: $key")
             }
 
             // 使用该函数以 DSL 的形式添加 placeholders.
