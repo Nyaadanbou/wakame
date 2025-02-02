@@ -2,31 +2,17 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
-import cc.mewcraft.wakame.core.coreModule
-import cc.mewcraft.wakame.craftingstation.stationModule
-import cc.mewcraft.wakame.crate.crateModule
-import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.display2.display2Module
 import cc.mewcraft.wakame.ecs.ecsModule
-import cc.mewcraft.wakame.element.elementModule
-import cc.mewcraft.wakame.enchantment.enchantmentModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.lang.langModule
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
-import cc.mewcraft.wakame.network.packetModule
 import cc.mewcraft.wakame.pack.packModule
-import cc.mewcraft.wakame.random3.randomModule
-import cc.mewcraft.wakame.recipe.recipeModule
 import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
-import cc.mewcraft.wakame.skin.skinModule
-import cc.mewcraft.wakame.user.userModule
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import cc.mewcraft.wakame.world.worldModule
@@ -44,11 +30,11 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext.startKoin
 import java.nio.file.Path
+import kotlin.reflect.KProperty
 
 private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.3")..Version("1.21.3")
-
-internal val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
+internal val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
 
 internal lateinit var BOOTSTRAPPER: KoishBootstrapper private set
 internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
@@ -56,29 +42,11 @@ internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
 lateinit var KOISH_VERSION: Version private set
 lateinit var KOISH_JAR: Path private set
 
+@PublishedApi
 internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
-@JvmField // 避免函数调用的成本
-val LOGGER: ComponentLogger = KoishLoggerHolder.get()
-
-private object KoishLoggerHolder {
-    private var LOGGER: ComponentLogger? = null
-
-    init {
-        if (SharedConstants.isRunningInIde) {
-            // 单元测试使用专门的 Logger, 服务端上则由 PluginBootstrap#bootstrap 分配
-            set(ComponentLogger.logger("KoishTest"))
-        }
-    }
-
-    fun set(logger: ComponentLogger) {
-        LOGGER = logger
-    }
-
-    fun get(): ComponentLogger {
-        return LOGGER ?: error("Koish logger not initialized!")
-    }
-}
+@get:JvmName("getLogger")
+val LOGGER: ComponentLogger by KoishLoggerHolder
 
 internal class KoishBootstrapper : PluginBootstrap {
     init {
@@ -88,34 +56,17 @@ internal class KoishBootstrapper : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         startKoin {
             modules(
-                // main module
-                koishModule(),
-
-                // sub modules (按字母顺序)
+                // submodules (按字母顺序)
                 adventureModule(),
-                attributeModule(),
-                coreModule(),
-                crateModule(),
-                damageModule(),
-                display2Module(),
                 ecsModule(),
-                elementModule(),
-                enchantmentModule(),
                 entityModule(),
                 guiModule(),
                 integrationModule(),
                 itemModule(),
-                langModule(),
-                packetModule(),
                 packModule(),
-                randomModule(),
-                recipeModule(),
                 reforgeModule(),
                 registryModule(),
-                skinModule(),
                 abilityModule(),
-                stationModule(),
-                userModule(),
                 worldModule(),
             )
         }
@@ -154,11 +105,7 @@ internal class KoishBootstrapper : PluginBootstrap {
 
     private fun init() {
         try {
-            if (PREVIOUS_KOISH_VERSION == null) {
-                LegacyDataMigrator.migrate()
-            }
-
-            if (PREVIOUS_KOISH_VERSION != null && PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
+            if (PREVIOUS_KOISH_VERSION == null || PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
                 LegacyDataMigrator.migrate()
             }
 
@@ -176,4 +123,25 @@ internal class KoishBootstrapper : PluginBootstrap {
             Runtime.getRuntime().halt(-1) // force-quit
         }
     }
+}
+
+private object KoishLoggerHolder {
+    private var LOGGER: ComponentLogger? = null
+
+    init {
+        if (SharedConstants.isRunningInIde) {
+            // 单元测试使用专门的 Logger, 服务端上则由 PluginBootstrap#bootstrap 分配
+            set(ComponentLogger.logger("KoishTest"))
+        }
+    }
+
+    fun set(logger: ComponentLogger) {
+        LOGGER = logger
+    }
+
+    fun get(): ComponentLogger {
+        return LOGGER ?: error("Koish logger not initialized!")
+    }
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>?): ComponentLogger = get()
 }

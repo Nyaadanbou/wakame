@@ -3,19 +3,16 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.VisibleForTesting
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.requireNotNull
-import java.nio.file.Path
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
@@ -65,7 +62,7 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
 
     @VisibleForTesting
     fun loadDataFromConfigs() {
-        val renderersDirectory = Injector.get<Path>(InjectionQualifier.CONFIGS_FOLDER).resolve(ItemRendererConstants.DATA_DIR)
+        val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
         val formatPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.FORMAT_FILE_NAME)
         val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
         initialize(formatPath, layoutPath)
@@ -132,11 +129,6 @@ internal abstract class RenderingHandlerRegistry(
     protected data class HandlerParams<F : RendererFormat>(
         val format: Provider<F>,
     )
-
-    protected companion object {
-        @JvmField
-        val MM: MiniMessage = Injector.get()
-    }
 }
 
 /* RenderingHandler: 渲染的一部分 */

@@ -7,10 +7,10 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.util.metadata.MetadataKey
 import cc.mewcraft.wakame.util.ui.whisper
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
-import me.lucko.helper.metadata.MetadataKey
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDeathEvent
@@ -35,7 +35,7 @@ internal object UnbreakableArmorStand {
     private fun registerListeners() {
         // 首先在 ProjectileHitEvent 将盔甲架上面的物品保存下来,
         // 然后在 EntityDeathEvent 里面恢复在这里保存的物品.
-        event<ProjectileHitEvent>(ignoreCancelled = true){
+        event<ProjectileHitEvent>(ignoreCancelled = true) {
             val armorStand = it.hitEntity as? ArmorStand ?: return@event
             val player = it.entity.shooter as? Player ?: return@event
             if (requireSneakingToBreakArmorStand && !player.isSneaking) {
@@ -45,7 +45,7 @@ internal object UnbreakableArmorStand {
         }
 
         // 在 EntityDeathEvent 里面恢复在 ProjectileHitEvent 里面保存的物品.
-        event<EntityDeathEvent>(ignoreCancelled = true){
+        event<EntityDeathEvent>(ignoreCancelled = true) {
             val armorStand = it.entity as? ArmorStand ?: return@event
             val player = it.damageSource.causingEntity as? Player ?: return@event
             if (requireSneakingToBreakArmorStand && !player.isSneaking) {

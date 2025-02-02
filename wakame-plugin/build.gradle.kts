@@ -1,4 +1,3 @@
-import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
 
@@ -60,14 +59,13 @@ dependencies {
         exclude("net.kyori")
         exclude("org.jetbrains")
     }
-    implementation(platform(libs.bom.invui)) {
+    compileOnly(platform(libs.bom.invui)) { // 由自定义的 classloader 加载
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
     implementation(platform(libs.bom.packetevents.spigot))
 
     // other plugins (hard dependencies)
-    compileOnlyApi(local.helper)
     compileOnly(local.adventurelevel)
 
     // test
@@ -75,22 +73,20 @@ dependencies {
     testImplementation(project(":wakame-common"))
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(local.helper)
     testImplementation(local.shadow.nbt)
     testImplementation(local.koin.test.junit5)
 }
 
 tasks {
-    // test {
-    //     forkEvery = 1 // 给每个 Test 开一个新的 JVM 进程
-    // }
     shadowJar {
+        // 2025/2/2 更新: 使用自定义的 classloader 加载 InvUI 依赖
+        //
         // invui 的 nms 模块只能在 spigot-mapping 下运行,
         // 因此必须告知服务端我们用的是 spigot-mapping,
         // 这样才能触发 paper 的 remapping 机制.
-        manifest {
-            attributes["paperweight-mappings-namespace"] = "spigot"
-        }
+        //manifest {
+        //    attributes["paperweight-mappings-namespace"] = "spigot"
+        //}
 
         val shadedPattern = "cc.mewcraft.wakame.external."
         relocate("com.github.benmanes.caffeine.cache", shadedPattern + "caffeine")
@@ -116,18 +112,23 @@ tasks {
         // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
 
+    // 2025/2/2 更新: 使用自定义的 classloader 加载 InvUI 依赖
+    //
     // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
-    assemble {
-        dependsOn(reobfJar)
-    }
+    //assemble {
+    //    dependsOn(reobfJar)
+    //}
 
-    paperweight {
-        reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
-    }
+    // 2025/2/2 更新: 使用自定义的 classloader 加载 InvUI 依赖
+    //
+    //paperweight {
+    //    reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
+    //}
 
     copyJar {
         environment = "paper"
-        jarTaskName = "reobfJar"
+        // 2025/2/2 更新: 使用自定义的 classloader 加载 InvUI 依赖
+        //jarTaskName = "reobfJar"
         jarFileName = "wakame-${project.version}.jar"
     }
 }
@@ -143,10 +144,6 @@ paper {
     author = "Nailm"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     serverDependencies {
-        register("helper") {
-            required = true
-            load = RelativeLoadOrder.BEFORE
-        }
         register("AdventureLevel") {
             required = false
             load = RelativeLoadOrder.BEFORE

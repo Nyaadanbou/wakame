@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.util.ui
 
-import me.lucko.helper.cooldown.Cooldown
-import me.lucko.helper.metadata.Metadata
-import me.lucko.helper.metadata.MetadataKey
+import cc.mewcraft.wakame.util.cooldown.Cooldown
+import cc.mewcraft.wakame.util.metadata.Metadata
+import cc.mewcraft.wakame.util.metadata.MetadataKey
 import org.bukkit.entity.Player
 import java.util.concurrent.TimeUnit
 

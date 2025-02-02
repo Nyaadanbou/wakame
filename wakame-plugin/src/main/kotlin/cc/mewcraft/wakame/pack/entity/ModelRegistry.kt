@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.pack.entity
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -11,7 +10,6 @@ import team.unnamed.hephaestus.Model
 import team.unnamed.hephaestus.ModelDataCursor
 import team.unnamed.hephaestus.bukkit.ModelView
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader
-import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -21,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap
 @Reload
 object ModelRegistry {
     private const val BBMODELS_DIR_PATH = "bbmodels"
-    private val assetsDir: File by Injector.inject(InjectionQualifier.ASSETS_FOLDER)
 
     private val models: MutableMap<String, Model> = ConcurrentHashMap()
     private val views: MutableMap<UUID, ModelView> = ConcurrentHashMap()
@@ -42,7 +39,7 @@ object ModelRegistry {
     }
 
     private fun loadModel(fileName: String): Model {
-        val modelFile = assetsDir.resolve(BBMODELS_DIR_PATH).resolve(fileName)
+        val modelFile = KoishDataPaths.ASSETS.resolve(BBMODELS_DIR_PATH).resolve(fileName).toFile()
         if (!modelFile.exists()) {
             throw IllegalArgumentException("BBModel file $fileName not found")
         }

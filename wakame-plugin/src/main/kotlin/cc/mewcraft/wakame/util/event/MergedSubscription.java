@@ -25,8 +25,8 @@
 
 package cc.mewcraft.wakame.util.event;
 
-import javax.annotation.Nonnull;
 import org.bukkit.event.Event;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Set;
 
@@ -35,6 +35,7 @@ import java.util.Set;
  *
  * @param <T> the handled type
  */
+@NullMarked
 public interface MergedSubscription<T> extends Subscription {
 
     /**
@@ -42,7 +43,6 @@ public interface MergedSubscription<T> extends Subscription {
      *
      * @return the handled class
      */
-    @Nonnull
     Class<? super T> getHandledClass();
 
     /**
@@ -50,7 +50,6 @@ public interface MergedSubscription<T> extends Subscription {
      *
      * @return the individual classes
      */
-    @Nonnull
     Set<Class<? extends Event>> getEventClasses();
 
 }

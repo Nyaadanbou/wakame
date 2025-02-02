@@ -11,9 +11,9 @@ import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.util.ServerUtils
+import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.registerEvents
 import kotlinx.coroutines.cancel
-import me.lucko.helper.utils.JarExtractor
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.plugin.java.JavaPlugin
@@ -29,6 +29,11 @@ internal var PLUGIN_READY: Boolean = false
     private set
 
 internal object Koish : JavaPlugin(), IKoish {
+
+    // onLoad 晚于 bootstrap 但早于 onEnable, 适合初始化 Koin 容器
+    override fun onLoad() {
+
+    }
 
     override fun onEnable() {
         PLUGIN_READY = true
@@ -58,7 +63,7 @@ internal object Koish : JavaPlugin(), IKoish {
         return server.pluginManager.getPlugin(name) != null
     }
 
-    fun getRelativeFile(name: String): File {
+    private fun getRelativeFile(name: String): File {
         dataFolder.mkdirs()
         return File(dataFolder, name)
     }
@@ -85,15 +90,15 @@ internal object Koish : JavaPlugin(), IKoish {
     fun saveResourceRecursively(name: String, overwrite: Boolean) {
         val targetDirectory = getRelativeFile(name)
         if (overwrite || !targetDirectory.exists()) {
-            JarExtractor.extractJar(classLoader, name, targetDirectory)
+            JarUtils.extractJar(classLoader, name, targetDirectory)
         }
     }
 
     //<editor-fold desc="koish-api">
-    override fun getTileEntityManager(): TileEntityManager? = TODO("Not yet implemented")
-    override fun getBlockManager(): BlockManager? = TODO("Not yet implemented")
-    override fun getBlockRegistry(): KoishBlockRegistry? = TODO("Not yet implemented")
-    override fun getItemRegistry(): KoishItemRegistry? = ApiItemRegistry
+    override fun getTileEntityManager(): TileEntityManager = TODO("Not yet implemented")
+    override fun getBlockManager(): BlockManager = TODO("Not yet implemented")
+    override fun getBlockRegistry(): KoishBlockRegistry = TODO("Not yet implemented")
+    override fun getItemRegistry(): KoishItemRegistry = ApiItemRegistry
 
     override fun registerProtectionIntegration(integration: ProtectionIntegration) {
         ProtectionManager.integrations += integration

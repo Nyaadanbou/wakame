@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.random3
 
 import cc.mewcraft.wakame.GenericKeys
-import me.lucko.helper.random.RandomSelector
 import net.kyori.adventure.key.Key
 
 /**

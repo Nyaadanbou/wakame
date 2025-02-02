@@ -28,8 +28,7 @@ package cc.mewcraft.wakame.util.event.functional.merged;
 import cc.mewcraft.wakame.util.event.MergedSubscription;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
-import javax.annotation.Nonnull;
-import me.lucko.helper.Helper;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -37,15 +36,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -53,6 +47,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@NullMarked
 class HelperMergedEventListener<T> implements MergedSubscription<T>, EventExecutor, Listener {
     private final TypeToken<T> handledClass;
     private final Map<Class<? extends Event>, MergedHandlerMapping<T, ? extends Event>> mappings;
@@ -97,7 +92,7 @@ class HelperMergedEventListener<T> implements MergedSubscription<T>, EventExecut
                 continue;
             }
 
-            Helper.plugins().registerEvent(registrationType, this, ent.getValue().getPriority(), this, plugin, false);
+            Bukkit.getPluginManager().registerEvent(registrationType, this, ent.getValue().getPriority(), this, plugin, false);
         }
     }
 
@@ -210,13 +205,11 @@ class HelperMergedEventListener<T> implements MergedSubscription<T>, EventExecut
         return functions;
     }
 
-    @Nonnull
     @Override
     public Class<? super T> getHandledClass() {
         return this.handledClass.getRawType();
     }
 
-    @Nonnull
     @Override
     public Set<Class<? extends Event>> getEventClasses() {
         return this.mappings.keySet();

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.javaTypeOf
@@ -135,8 +134,9 @@ abstract class NodeFacade<T> {
     }
 
     private fun getEntryRef(file: File): String {
-        val base = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
-            .resolve(dataDir.toFile())
+        val base = KoishDataPaths.CONFIGS
+            .resolve(dataDir)
+            .toFile()
         return file.toPath()
             .relativeTo(base.toPath())
             .invariantSeparatorsPathString
@@ -153,7 +153,7 @@ abstract class NodeFacade<T> {
     }
 
     private fun forEachEntryFile(block: (File) -> Unit) {
-        val entriesDataDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER).resolve(dataDir.toFile())
+        val entriesDataDir = KoishDataPaths.CONFIGS.resolve(dataDir).toFile()
         entriesDataDir
             .walk()
             .drop(1) // exclude the directory itself

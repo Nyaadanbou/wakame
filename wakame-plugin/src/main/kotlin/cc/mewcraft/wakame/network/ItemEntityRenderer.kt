@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * 修改 [Item].
  */
-internal class ItemEntityRenderer : PacketListenerAbstract() {
+internal object ItemEntityRenderer : PacketListenerAbstract() {
 
     // 目前用于彩色物品发光的实现
     private val entityId2EntityUniqueId = ConcurrentHashMap<Int, UUID>()

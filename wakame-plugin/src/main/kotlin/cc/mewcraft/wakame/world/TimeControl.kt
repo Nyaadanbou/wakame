@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.world.TimeControl.addTime
 import cc.mewcraft.wakame.world.TimeControl.setTime
-import me.lucko.helper.cooldown.Cooldown
 import xyz.xenondevs.commons.provider.map
 
 /**

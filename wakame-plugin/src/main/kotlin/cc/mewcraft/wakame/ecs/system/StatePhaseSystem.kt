@@ -8,10 +8,10 @@ import cc.mewcraft.wakame.event.PlayerAbilityStateChangeEvent
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.serverTick
+import cc.mewcraft.wakame.util.text.mini
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.entity.Player
 

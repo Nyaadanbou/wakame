@@ -25,32 +25,31 @@
 
 package cc.mewcraft.wakame.util.event.functional.merged;
 
+import cc.mewcraft.wakame.Koish;
 import cc.mewcraft.wakame.util.event.MergedSubscription;
-import javax.annotation.Nonnull;
-import me.lucko.helper.internal.LoaderUtils;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
+@NullMarked
 class MergedHandlerListImpl<T> implements MergedHandlerList<T> {
     private final MergedSubscriptionBuilderImpl<T> builder;
     private final List<BiConsumer<MergedSubscription<T>, ? super T>> handlers = new ArrayList<>(1);
 
-    MergedHandlerListImpl(@Nonnull MergedSubscriptionBuilderImpl<T> builder) {
+    MergedHandlerListImpl(MergedSubscriptionBuilderImpl<T> builder) {
         this.builder = builder;
     }
 
-    @Nonnull
     @Override
-    public MergedHandlerList<T> biConsumer(@Nonnull BiConsumer<MergedSubscription<T>, ? super T> handler) {
+    public MergedHandlerList<T> biConsumer(BiConsumer<MergedSubscription<T>, ? super T> handler) {
         Objects.requireNonNull(handler, "handler");
         this.handlers.add(handler);
         return this;
     }
 
-    @Nonnull
     @Override
     public MergedSubscription<T> register() {
         if (this.handlers.isEmpty()) {
@@ -58,7 +57,7 @@ class MergedHandlerListImpl<T> implements MergedHandlerList<T> {
         }
 
         HelperMergedEventListener<T> listener = new HelperMergedEventListener<>(this.builder, this.handlers);
-        listener.register(LoaderUtils.getPlugin());
+        listener.register(Koish.INSTANCE);
         return listener;
     }
 }

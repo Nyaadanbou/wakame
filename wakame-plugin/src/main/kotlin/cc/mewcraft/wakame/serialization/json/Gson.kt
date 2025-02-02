@@ -1,11 +1,7 @@
 package cc.mewcraft.wakame.serialization.json
 
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.serialization.json.serializer.ItemStackSerialization
-import cc.mewcraft.wakame.serialization.json.serializer.LocationSerialization
-import cc.mewcraft.wakame.serialization.json.serializer.RegistryElementSerializer
-import cc.mewcraft.wakame.serialization.json.serializer.UUIDTypeAdapter
-import cc.mewcraft.wakame.serialization.json.serializer.VersionSerialization
+import cc.mewcraft.wakame.serialization.json.serializer.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -17,6 +13,7 @@ import xyz.xenondevs.commons.gson.toJsonTreeTyped
 private val GSON_BUILDER = GsonBuilder()
     .disableHtmlEscaping()
     .enableComplexMapKeySerialization()
+    .registerTypeAdapterFactory(NamespacedTypeAdapters)
     .registerTypeHierarchyAdapter(ItemStackSerialization)
     .registerTypeHierarchyAdapter(LocationSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)

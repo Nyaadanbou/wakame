@@ -3,8 +3,8 @@
 package cc.mewcraft.wakame.random3
 
 import cc.mewcraft.wakame.LOGGER
-import me.lucko.helper.random.RandomSelector
-import me.lucko.helper.random.Weigher
+import cc.mewcraft.wakame.util.random.RandomSelector
+import cc.mewcraft.wakame.util.random.Weigher
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer

@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.world.WeatherControl.execute
-import me.lucko.helper.cooldown.Cooldown
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting

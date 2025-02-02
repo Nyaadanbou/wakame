@@ -15,9 +15,9 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
+import cc.mewcraft.wakame.util.event.Events
+import cc.mewcraft.wakame.util.event.Subscription
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.Events
-import me.lucko.helper.event.Subscription
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player

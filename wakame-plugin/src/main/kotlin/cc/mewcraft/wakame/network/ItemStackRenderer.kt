@@ -19,10 +19,8 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer"
 /**
  * 修改 [org.bukkit.inventory.ItemStack].
  */
-internal class ItemStackRenderer : PacketListenerAbstract() {
-    companion object {
-        private const val PROCESSED_KEY = "processed"
-    }
+internal object ItemStackRenderer : PacketListenerAbstract() {
+    private const val PROCESSED_KEY = "processed"
 
     override fun onPacketSend(event: PacketSendEvent) {
         // 不修改发给创造模式玩家的物品包

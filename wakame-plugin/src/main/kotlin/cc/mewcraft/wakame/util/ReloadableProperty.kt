@@ -1,14 +1,12 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
+import cc.mewcraft.wakame.eventbus.ConfigurationReloadEvent
+import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 /**
- * A property that will be reset using [loader] upon [NekoCommandReloadEvent] being fired.
+ * A property that will be reset using [loader] upon [ConfigurationReloadEvent] being fired.
  *
  * @param T the property type
  * @property loader the loader to load the value
@@ -16,12 +14,10 @@ import kotlin.reflect.KProperty
  */
 class ReloadableProperty<T>(
     private val loader: () -> T,
-) : ReadOnlyProperty<Any?, T>, Listener {
+) : ReadOnlyProperty<Any?, T> {
+
     init {
-        if (!SharedConstants.isRunningInIde) {
-            // properties are reloaded the latest because some of them depend on configs
-            event<NekoCommandReloadEvent>(EventPriority.HIGHEST) { reload() }
-        }
+        MapEventBus.subscribe<ConfigurationReloadEvent> { reload() }
     }
 
     private var value: T? = null

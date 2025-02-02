@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
@@ -19,7 +19,8 @@ import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
 import xyz.xenondevs.commons.provider.orElse
-import java.io.File
+
+internal val RESOURCE_PACK_CONFIG = Configs["resourcepack"]
 
 internal class ResourcePackManager(
     private val packReader: ResourcePackReader<FileTreeReader>,
@@ -33,10 +34,10 @@ internal class ResourcePackManager(
      * @return 包含生成是否成功的结果
      */
     fun generate() {
-        val tempDir = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(".temp").apply { mkdirs() }
+        val tempDir = KoishDataPaths.ROOT.resolve(".temp").toFile().apply { mkdirs() }
         try {
-            val resourcePackFile = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-            val resourcePackDirectory = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_DIR)
+            val resourcePackFile = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toFile()
+            val resourcePackDirectory = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_DIR).toFile()
 
             resourcePackFile.delete()
             resourcePackDirectory.deleteRecursively()

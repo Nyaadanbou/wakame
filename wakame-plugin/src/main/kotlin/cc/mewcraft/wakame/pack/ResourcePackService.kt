@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
@@ -19,7 +18,6 @@ import team.unnamed.creative.server.request.ResourcePackDownloadRequest
 import xyz.xenondevs.commons.provider.Provider
 import java.io.File
 import java.net.URI
-import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
 import java.security.MessageDigest
 import java.util.*
@@ -206,6 +204,7 @@ private class SelfHostService(
     // 当前生成好的资源包
     private var builtResourcePack: BuiltResourcePack? = buildResourcePack()
 
+    // 负责监听文件变动
     private val watchServiceListener: WatchServiceListener = WatchServiceListener.create()
 
     private fun handleRequest(request: ResourcePackDownloadRequest?, exchange: HttpExchange) {
@@ -260,7 +259,7 @@ private class SelfHostService(
     }
 
     private fun buildResourcePack(): BuiltResourcePack? {
-        val file = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+        val file = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toFile()
         if (!file.exists() || !file.isFile) {
             LOGGER.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
             return null
@@ -275,10 +274,10 @@ private class SelfHostService(
         LOGGER.info("Starting resource pack http server. Port: $port")
 
         watchServiceListener.listenToFile(
-            Injector.get<Path>(InjectionQualifier.DATA_FOLDER).resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+            KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
         ) { event ->
             if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                LOGGER.info("Resource pack file changed. Reloading resource pack.")
+                LOGGER.info("Resource pack file changed. Reloading resource pack...")
                 builtResourcePack = buildResourcePack()
                 LOGGER.info("Resource pack reloaded.")
             }
@@ -318,6 +317,7 @@ private class OnlyURLService(
     // 资源包的下载链接
     private val downloadURL: String by downloadURL
 
+    // 发送给玩家的 ResourcePackRequest
     private val resourcePackRequest: ResourcePackRequest
         get() {
             // 构建 ResourcePackInfo

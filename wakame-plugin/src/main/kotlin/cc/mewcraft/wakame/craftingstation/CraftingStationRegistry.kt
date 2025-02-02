@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.craftingstation
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -13,7 +12,6 @@ import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import org.jetbrains.annotations.VisibleForTesting
-import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
@@ -50,9 +48,10 @@ internal object CraftingStationRegistry {
     fun loadDataIntoRegistry() {
         stations.clear()
 
-        val stationDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val stationDir = KoishDataPaths.CONFIGS
             .resolve(CraftingStationConstants.DATA_DIR)
             .resolve("stations")
+            .toFile()
         stationDir.walk()
             .drop(1)
             .filter { it.extension == "yml" }

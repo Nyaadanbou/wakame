@@ -2,8 +2,7 @@
 
 package cc.mewcraft.wakame.pack.generate
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.pack.AssetUtils
@@ -13,9 +12,9 @@ import cc.mewcraft.wakame.pack.VanillaResourcePack
 import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
+import cc.mewcraft.wakame.util.text.mini
 import cc.mewcraft.wakame.util.withNamespace
 import cc.mewcraft.wakame.util.withValue
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Readable
@@ -32,7 +31,6 @@ import team.unnamed.creative.serialize.minecraft.metadata.MetadataSerializer
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
 import team.unnamed.hephaestus.writer.ModelWriter
-import java.io.File
 import team.unnamed.creative.model.Model as CreativeModel
 
 /**
@@ -66,10 +64,9 @@ internal class ResourcePackMetaGeneration(
 internal class ResourcePackIconGeneration(
     context: ResourcePackGenerationContext,
 ) : ResourcePackGeneration(context) {
-    private val assetsDir: File by Injector.inject(InjectionQualifier.ASSETS_FOLDER)
 
     override fun process() {
-        val icon = assetsDir.resolve("logo.png")
+        val icon = KoishDataPaths.ASSETS.resolve("logo.png").toFile()
         if (!icon.exists()) {
             return
         }

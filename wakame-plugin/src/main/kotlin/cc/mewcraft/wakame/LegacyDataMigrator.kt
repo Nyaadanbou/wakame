@@ -5,9 +5,15 @@ import java.io.File
 internal object LegacyDataMigrator {
 
     fun migrate() {
-        val dataFolder = Injector.get<File>(InjectionQualifier.DATA_FOLDER)
-        val cfgFolder = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        // 在服务端上该函数执行时 Koin 容器还未初始化,
+        // 因此这里手动指定了文件路径
+        val dataFolder = KoishDataPaths.ROOT.toFile()
+        val cfgFolder = KoishDataPaths.CONFIGS.toFile()
 
+        migrate0(dataFolder, cfgFolder)
+    }
+
+    private fun migrate0(dataFolder: File, cfgFolder: File) {
         // 检查是否存在旧版配置文件
         if (!dataFolder.resolve("items.yml").exists()) return
 

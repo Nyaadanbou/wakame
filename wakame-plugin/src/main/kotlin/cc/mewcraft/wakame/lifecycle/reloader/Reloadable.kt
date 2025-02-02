@@ -36,8 +36,9 @@ internal abstract class Reloadable(
                 ?: throw IllegalArgumentException("Could not find reloadable class '$runAfterName', which is a runAfter of '${this@Reloadable}'")
             runAfters += runAfterClass
 
-            if (runAfterClass != reloadClass)
+            if (runAfterClass != reloadClass) {
                 runAfters += runAfterClass.reloadFunctions
+            }
 
             for (runAfter in runAfters) {
                 graph.tryPutEdge(runAfter, this@Reloadable)
@@ -47,8 +48,7 @@ internal abstract class Reloadable(
 
     companion object {
         fun findReloadClass(all: Set<Reloadable>, className: String): ReloadableClass? {
-            return all.filterIsInstance<ReloadableClass>()
-                .firstOrNull { candidate -> candidate.reloadClass.className == className }
+            return all.filterIsInstance<ReloadableClass>().firstOrNull { candidate -> candidate.reloadClass.className == className }
         }
     }
 }
@@ -79,26 +79,26 @@ internal class ReloadableClass(
 
     companion object {
 
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = withLifecycleDependencyCreation{
+        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = withLifecycleDependencyCreation {
             val (dispatcher, runBefore, runAfter) = getAnnotationCommons(annotation)
             // Configs 需要在所有类之前重载之前被重载.
             runBefore += Configs::class.internalName
 
             return ReloadableClass(
-                classLoader, clazz,
-                (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
-                runBefore, runAfter
+                classLoader, clazz, (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher, runBefore, runAfter
             )
         }
 
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = withLifecycleDependencyCreation{
+        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): ReloadableClass = withLifecycleDependencyCreation {
             val dispatcher = getDispatcher(annotation)
             val dependsOn = getStrings("dependsOn", annotation)
 
             return ReloadableClass(
-                classLoader, clazz,
+                classLoader,
+                clazz,
                 (dispatcher ?: LifecycleDispatcher.SYNC).dispatcher,
-                emptySet(), dependsOn
+                emptySet(),
+                dependsOn
             )
         }
 
@@ -132,9 +132,11 @@ internal class ReloadableFunction(
         fun fromInitAnnotation(clazz: ReloadableClass, methodName: String, annotation: Map<String, Any?>): ReloadableFunction = withLifecycleDependencyCreation {
             val (dispatcher, runBefore, runAfter) = getAnnotationCommons(annotation)
             val func = ReloadableFunction(
-                clazz, methodName,
+                clazz,
+                methodName,
                 dispatcher?.dispatcher ?: clazz.dispatcher,
-                runBefore, runAfter
+                runBefore,
+                runAfter
             )
             clazz.reloadFunctions += func
             return func

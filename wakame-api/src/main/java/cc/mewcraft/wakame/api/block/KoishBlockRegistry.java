@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.api.block;
 
 import net.kyori.adventure.key.Key;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @SuppressWarnings("unused")
+@NullMarked
 public interface KoishBlockRegistry {
 
     /**
@@ -14,7 +15,7 @@ public interface KoishBlockRegistry {
      * @return the block with the specified id
      * @throws IllegalArgumentException if there is no block with the specified id
      */
-    @NotNull KoishBlock get(@NotNull String id);
+    KoishBlock get(String id);
 
     /**
      * Gets the {@link KoishBlock} with the specified id.
@@ -23,7 +24,7 @@ public interface KoishBlockRegistry {
      * @return the block with the specified id
      * @throws IllegalArgumentException if there is no block with the specified id
      */
-    @NotNull KoishBlock get(@NotNull Key id);
+    KoishBlock get(Key id);
 
     /**
      * Gets the {@link KoishBlock} with the specified id, or null if there is none.
@@ -31,7 +32,8 @@ public interface KoishBlockRegistry {
      * @param id the id of the block
      * @return the block with the specified id, or null if there is none
      */
-    @Nullable KoishBlock getOrNull(@NotNull String id);
+    @Nullable
+    KoishBlock getOrNull(String id);
 
     /**
      * Gets the {@link KoishBlock} with the specified id, or null if there is none.
@@ -39,6 +41,7 @@ public interface KoishBlockRegistry {
      * @param id the id of the block
      * @return the block with the specified id, or null if there is none
      */
-    @Nullable KoishBlock getOrNull(@NotNull Key id);
+    @Nullable
+    KoishBlock getOrNull(Key id);
 
 }

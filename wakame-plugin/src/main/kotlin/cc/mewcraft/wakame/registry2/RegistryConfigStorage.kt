@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import java.io.File
 import java.nio.file.Path
 
@@ -15,7 +14,7 @@ interface RegistryConfigStorage {
     }
 
     fun getFileInConfigDirectory(path: Path): File {
-        return Injector.get<Path>(InjectionQualifier.DATA_FOLDER).resolve("configs").resolve(path).toFile()
+        return KoishDataPaths.ROOT.resolve("configs").resolve(path).toFile()
     }
 
     fun getFileInDataDirectory(path: String): File {
@@ -23,7 +22,7 @@ interface RegistryConfigStorage {
     }
 
     fun getFileInDataDirectory(path: Path): File {
-        return Injector.get<Path>(InjectionQualifier.DATA_FOLDER).resolve(path).toFile()
+        return KoishDataPaths.ROOT.resolve(path).toFile()
     }
 
 }

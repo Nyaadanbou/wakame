@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.RendererFormatRegistry
@@ -48,7 +47,7 @@ internal abstract class AbstractRendererFormatRegistry(
         textMetaFactoryRegistry.reset()
 
         val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(formatPath.readText())
-        val relativeTo = formatPath.relativeTo(Injector.get<Path>(InjectionQualifier.CONFIGS_FOLDER))
+        val relativeTo = formatPath.relativeTo(KoishDataPaths.CONFIGS)
         for ((id, type) in typeIdToRendererFormatType) {
             val node = rootNode.node(id)
             if (node.virtual()) {

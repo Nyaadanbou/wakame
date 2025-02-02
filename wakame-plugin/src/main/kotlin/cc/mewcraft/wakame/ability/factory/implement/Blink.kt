@@ -16,10 +16,10 @@ import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.text.mini
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.math.Position
-import me.lucko.helper.text3.mini
 import net.kyori.adventure.key.Key
 import org.bukkit.Particle
 import org.bukkit.entity.LivingEntity

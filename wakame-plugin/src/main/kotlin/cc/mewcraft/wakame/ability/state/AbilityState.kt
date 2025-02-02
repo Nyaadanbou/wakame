@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.cooldown.Cooldown
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player

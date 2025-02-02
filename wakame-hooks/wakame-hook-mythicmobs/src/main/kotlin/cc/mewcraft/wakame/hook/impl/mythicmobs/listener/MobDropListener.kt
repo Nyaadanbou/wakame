@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.listener
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.util.event
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -21,7 +20,7 @@ import java.util.concurrent.TimeUnit
 //@Init(stage = InitStage.POST_WORLD)
 object MobDropListener {
 
-    @InitFun
+    //@InitFun
     private fun init() {
         registerListeners()
     }

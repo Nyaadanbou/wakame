@@ -101,6 +101,7 @@ kotlin {
                 implementation(kotlin("stdlib"))
                 implementation(kotlin("reflect"))
                 implementation(local.kotlinx.coroutines.core)
+                implementation(local.kotlinx.coroutines.test)
                 implementation(local.kotlinx.coroutines.debug)
             }
         }

@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.event.functional;
 
-import javax.annotation.Nonnull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,6 +36,7 @@ import java.util.function.Consumer;
  * @param <T> the handled type
  * @param <R> the resultant subscription type
  */
+@NullMarked
 public interface FunctionalHandlerList<T, R> {
 
     /**
@@ -44,8 +45,7 @@ public interface FunctionalHandlerList<T, R> {
      * @param handler the handler
      * @return this handler list
      */
-    @Nonnull
-    FunctionalHandlerList<T, R> consumer(@Nonnull Consumer<? super T> handler);
+    FunctionalHandlerList<T, R> consumer(Consumer<? super T> handler);
 
     /**
      * Add a {@link BiConsumer} handler.
@@ -53,8 +53,7 @@ public interface FunctionalHandlerList<T, R> {
      * @param handler the handler
      * @return this handler list
      */
-    @Nonnull
-    FunctionalHandlerList<T, R> biConsumer(@Nonnull BiConsumer<R, ? super T> handler);
+    FunctionalHandlerList<T, R> biConsumer(BiConsumer<R, ? super T> handler);
 
     /**
      * Builds and registers the Handler.
@@ -62,7 +61,6 @@ public interface FunctionalHandlerList<T, R> {
      * @return a registered {@link R} instance.
      * @throws IllegalStateException if no handlers have been registered
      */
-    @Nonnull
     R register();
 
 }

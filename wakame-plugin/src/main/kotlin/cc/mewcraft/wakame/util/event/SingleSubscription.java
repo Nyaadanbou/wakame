@@ -25,14 +25,15 @@
 
 package cc.mewcraft.wakame.util.event;
 
-import javax.annotation.Nonnull;
 import org.bukkit.event.Event;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Represents a subscription to a single given event.
  *
  * @param <T> the event type
  */
+@NullMarked
 public interface SingleSubscription<T extends Event> extends Subscription {
 
     /**
@@ -40,7 +41,6 @@ public interface SingleSubscription<T extends Event> extends Subscription {
      *
      * @return the class the handler is handling.
      */
-    @Nonnull
     Class<T> getEventClass();
 
 }

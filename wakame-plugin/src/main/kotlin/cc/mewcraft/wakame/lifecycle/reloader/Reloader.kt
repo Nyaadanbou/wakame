@@ -2,46 +2,35 @@ package cc.mewcraft.wakame.lifecycle.reloader
 
 import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.event.NekoCommandReloadEvent
+import cc.mewcraft.wakame.eventbus.ConfigurationReloadEvent
 import cc.mewcraft.wakame.lifecycle.LifecycleExecutionHelper.tryExecute
-import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.lifecycle.withLifecycleDependencyExecution
 import cc.mewcraft.wakame.util.data.JarUtils
-import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
 import java.io.File
 
-@Init(
-    stage = InitStage.PRE_WORLD
+@InternalInit(
+    stage = InternalInitStage.PRE_WORLD,
 )
-internal object Reloader : Listener {
+internal object Reloader {
 
     private val reloadables: HashSet<Reloadable> = HashSet()
     private val dependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
-    /**
-     * Stats the reloading process.
-     */
     @InitFun
-    private fun start() = tryExecute {
-        registerEvents()
-        collectAndRegisterRunnables(KOISH_JAR.toFile(), this.javaClass.classLoader)
+    private fun collectAndRegisterTasks() = tryExecute {
+        registerTasks(collectTasks(KOISH_JAR.toFile(), this.javaClass.classLoader))
     }
 
-    private fun collectAndRegisterRunnables(file: File, classLoader: ClassLoader) {
-        val reloadables = collectRunnables(file, classLoader)
-        addRunnables(reloadables)
-    }
-
-    private fun collectRunnables(file: File, classLoader: ClassLoader): List<Reloadable> {
+    private fun collectTasks(file: File, classLoader: ClassLoader): List<Reloadable> {
         val reloadables = ArrayList<Reloadable>()
         val reloadableClasses = HashMap<String, ReloadableClass>()
 
@@ -84,9 +73,7 @@ internal object Reloader : Listener {
      *
      * This method can only be called before the reloading process has completed.
      */
-    private fun addRunnables(reloadables: List<Reloadable>) {
-        check(!Initializer.isDone) { "Cannot add runnables after initialization has completed" }
-
+    private fun registerTasks(reloadables: List<Reloadable>) {
         // add vertices
         for (reloadable in reloadables) {
             Reloader.reloadables += reloadable
@@ -105,24 +92,24 @@ internal object Reloader : Listener {
     /**
      * Reloads all [ReloadableFunctions][ReloadableFunction].
      */
-    private fun reload() = withLifecycleDependencyExecution {
-        runBlocking {
-            tryExecute {
-                coroutineScope {
-                    launchAll(this, dependencyGraph)
-                }
-            }
-
-            LOGGER.info("Done reloading")
-        }
-    }
-
-    @EventHandler
-    private fun handlePluginReload(event: NekoCommandReloadEvent) {
+    internal fun reload() = withLifecycleDependencyExecution {
         if (Initializer.isDone) {
-            reload()
+            runBlocking {
+                LOGGER.info("Calling Reload Functions")
+                tryExecute {
+                    coroutineScope {
+                        launchAll(this, dependencyGraph)
+                    }
+                }
+
+                LOGGER.info("Calling Reload Events")
+                MapEventBus.post(ConfigurationReloadEvent)
+
+                LOGGER.info("Done reloading")
+            }
         } else {
             LOGGER.error("Skipping reload because initialization is not done")
         }
     }
+
 }

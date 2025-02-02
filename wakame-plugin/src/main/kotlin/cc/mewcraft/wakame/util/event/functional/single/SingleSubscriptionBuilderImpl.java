@@ -27,9 +27,9 @@ package cc.mewcraft.wakame.util.event.functional.single;
 
 import cc.mewcraft.wakame.util.event.SingleSubscription;
 import cc.mewcraft.wakame.util.event.functional.ExpiryTestStage;
-import javax.annotation.Nonnull;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+@NullMarked
 class SingleSubscriptionBuilderImpl<T extends Event> implements SingleSubscriptionBuilder<T> {
     final Class<T> eventClass;
     final EventPriority priority;
@@ -55,9 +56,8 @@ class SingleSubscriptionBuilderImpl<T extends Event> implements SingleSubscripti
         this.priority = priority;
     }
 
-    @Nonnull
     @Override
-    public SingleSubscriptionBuilder<T> expireIf(@Nonnull BiPredicate<SingleSubscription<T>, T> predicate, @Nonnull ExpiryTestStage... testPoints) {
+    public SingleSubscriptionBuilder<T> expireIf(BiPredicate<SingleSubscription<T>, T> predicate, ExpiryTestStage... testPoints) {
         Objects.requireNonNull(testPoints, "testPoints");
         Objects.requireNonNull(predicate, "predicate");
         for (ExpiryTestStage testPoint : testPoints) {
@@ -78,30 +78,26 @@ class SingleSubscriptionBuilderImpl<T extends Event> implements SingleSubscripti
         return this;
     }
 
-    @Nonnull
     @Override
-    public SingleSubscriptionBuilder<T> filter(@Nonnull Predicate<T> predicate) {
+    public SingleSubscriptionBuilder<T> filter(Predicate<T> predicate) {
         Objects.requireNonNull(predicate, "predicate");
         this.filters.add(predicate);
         return this;
     }
 
-    @Nonnull
     @Override
-    public SingleSubscriptionBuilder<T> exceptionConsumer(@Nonnull BiConsumer<? super T, Throwable> exceptionConsumer) {
+    public SingleSubscriptionBuilder<T> exceptionConsumer(BiConsumer<? super T, Throwable> exceptionConsumer) {
         Objects.requireNonNull(exceptionConsumer, "exceptionConsumer");
         this.exceptionConsumer = exceptionConsumer;
         return this;
     }
 
-    @Nonnull
     @Override
     public SingleSubscriptionBuilder<T> handleSubclasses() {
         this.handleSubclasses = true;
         return this;
     }
 
-    @Nonnull
     @Override
     public SingleHandlerList<T> handlers() {
         return new SingleHandlerListImpl<>(this);

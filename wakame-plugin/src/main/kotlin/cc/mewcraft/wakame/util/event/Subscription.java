@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.event;
 
-import me.lucko.helper.terminable.Terminable;
+import cc.mewcraft.wakame.util.terminable.Terminable;
 
 import java.util.Collection;
 

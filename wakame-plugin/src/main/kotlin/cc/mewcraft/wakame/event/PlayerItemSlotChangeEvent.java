@@ -5,22 +5,23 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Called when a slot contents change in a player's inventory.
  */
+@NullMarked
 public class PlayerItemSlotChangeEvent extends PlayerEvent {
-    public static final @NotNull HandlerList HANDLERS = new HandlerList();
+    public static final HandlerList HANDLERS = new HandlerList();
 
     private final ItemSlot slot;
     private final ItemStack oldItemStack;
     private final ItemStack newItemStack;
 
     public PlayerItemSlotChangeEvent(
-            @NotNull Player player,
-            @NotNull ItemSlot slot,
+            Player player,
+            ItemSlot slot,
             @Nullable ItemStack oldItemStack,
             @Nullable ItemStack newItemStack
     ) {
@@ -35,7 +36,7 @@ public class PlayerItemSlotChangeEvent extends PlayerEvent {
      *
      * @return the {@link #slot}.
      */
-    public @NotNull ItemSlot getSlot() {
+    public ItemSlot getSlot() {
         return slot;
     }
 
@@ -58,11 +59,11 @@ public class PlayerItemSlotChangeEvent extends PlayerEvent {
     }
 
     @Override
-    public @NotNull HandlerList getHandlers() {
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    public static @NotNull HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 }

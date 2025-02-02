@@ -2,8 +2,7 @@
 
 package cc.mewcraft.wakame.damage.mappings
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
@@ -20,7 +19,6 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.io.File
 
 /**
  * 依据原版生物的攻击特征来获取萌芽伤害的映射.
@@ -64,9 +62,10 @@ object EntityAttackMappings {
                 register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
             }
         }.buildAndLoadString(
-            Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            KoishDataPaths.CONFIGS
                 .resolve(DamageMappingConstants.DATA_DIR)
                 .resolve("entity_attack_mappings.yml")
+                .toFile()
                 .readText()
         )
         for ((entityType, node) in rootNode.childrenMap().transformKeys<EntityType>()) {

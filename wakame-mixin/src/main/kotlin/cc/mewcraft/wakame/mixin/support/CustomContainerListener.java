@@ -9,8 +9,9 @@ import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class CustomContainerListener implements ContainerListener {
     private final ServerPlayer serverPlayer;
 
@@ -19,7 +20,7 @@ public class CustomContainerListener implements ContainerListener {
     }
 
     @Override
-    public void slotChanged(@NotNull AbstractContainerMenu handler, int slotId, @NotNull ItemStack stack) {
+    public void slotChanged(AbstractContainerMenu handler, int slotId, ItemStack stack) {
         Slot slot = handler.getSlot(slotId);
 
         if (!(slot instanceof ResultSlot)) {
@@ -31,7 +32,7 @@ public class CustomContainerListener implements ContainerListener {
 
     // Paper start - Add PlayerInventorySlotChangeEvent
     @Override
-    public void slotChanged(@NotNull AbstractContainerMenu handler, int slotId, @NotNull ItemStack oldStack, @NotNull ItemStack stack) {
+    public void slotChanged(AbstractContainerMenu handler, int slotId, ItemStack oldStack, ItemStack stack) {
         Slot slot = handler.getSlot(slotId);
         if (!(slot instanceof ResultSlot)) {
             if (slot.container == this.serverPlayer.getInventory()) {
@@ -52,5 +53,6 @@ public class CustomContainerListener implements ContainerListener {
     // Paper end - Add PlayerInventorySlotChangeEvent
 
     @Override
-    public void dataChanged(@NotNull AbstractContainerMenu handler, int property, int value) {}
+    public void dataChanged(AbstractContainerMenu handler, int property, int value) {
+    }
 }

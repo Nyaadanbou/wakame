@@ -2,8 +2,7 @@
 
 package cc.mewcraft.wakame.damage.mappings
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -20,7 +19,6 @@ import org.bukkit.damage.DamageType
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
-import java.io.File
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -65,9 +63,11 @@ object DamageTypeMappings {
                 register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
             }
         }.buildAndLoadString(
-            Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            KoishDataPaths.CONFIGS
                 .resolve(DamageMappingConstants.DATA_DIR)
-                .resolve("damage_type_mappings.yml").readText()
+                .resolve("damage_type_mappings.yml")
+                .toFile()
+                .readText()
         )
         for ((damageType, node) in rootNode.childrenMap().transformKeys<DamageType>(throwIfFail = false)) {
             val mapping = node.get<DamageTypeMapping>()

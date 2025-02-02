@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
@@ -15,7 +14,6 @@ import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
-import java.io.File
 import kotlin.collections.set
 
 @Init(
@@ -65,7 +63,7 @@ object VanillaRecipeRegistry {
     fun loadDataIntoRegistry() {
         RAW.clear()
 
-        val recipeDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER).resolve(VanillaRecipeConstants.DATA_DIR)
+        val recipeDir = KoishDataPaths.CONFIGS.resolve(VanillaRecipeConstants.DATA_DIR).toFile()
         for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()

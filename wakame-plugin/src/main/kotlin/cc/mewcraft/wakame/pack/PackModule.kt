@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.pack.entity.ModelViewPersistenceHandlerImpl
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.new
@@ -21,8 +20,6 @@ internal const val RESOURCE_PACK_ZIP_NAME = "$RESOURCE_PACK_NAME.zip"
 internal const val RESOURCE_PACK_GENERATED_DIR = "generated"
 internal const val GENERATED_RESOURCE_PACK_DIR = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_NAME"
 internal const val GENERATED_RESOURCE_PACK_ZIP_FILE = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_ZIP_NAME"
-
-internal val RESOURCE_PACK_CONFIG = Configs["resourcepack"]
 
 internal fun packModule(): Module = module {
     // 生成(核心)

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.damage.mappings
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.damage.DamageMetadataBuilderSerializer
@@ -17,7 +16,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.io.File
 
 /**
  * 依据直接伤害实体的类型来获取萌芽伤害的映射.
@@ -69,9 +67,10 @@ object DirectEntityTypeMappings {
                 register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
             }
         }.buildAndLoadString(
-            Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+            KoishDataPaths.CONFIGS
                 .resolve(DamageMappingConstants.DATA_DIR)
                 .resolve("direct_entity_type_mappings.yml")
+                .toFile()
                 .readText()
         )
         rootNode.node("no_causing").childrenMap()

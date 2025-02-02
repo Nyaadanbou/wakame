@@ -25,8 +25,8 @@
 
 package cc.mewcraft.wakame.util.event.filter;
 
-import javax.annotation.Nonnull;
 import org.bukkit.event.Cancellable;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Consumer;
 
@@ -34,6 +34,7 @@ import java.util.function.Consumer;
  * Defines standard event predicates for use in functional event handlers.
  */
 @SuppressWarnings("unchecked")
+@NullMarked
 public final class EventHandlers {
 
     private static final Consumer<? extends Cancellable> SET_CANCELLED = e -> e.setCancelled(true);
@@ -45,7 +46,6 @@ public final class EventHandlers {
      * @param <T> the event type
      * @return a consumer which cancels the event
      */
-    @Nonnull
     public static <T extends Cancellable> Consumer<T> cancel() {
         return (Consumer<T>) SET_CANCELLED;
     }
@@ -56,7 +56,6 @@ public final class EventHandlers {
      * @param <T> the event type
      * @return a consumer which un-cancels the event
      */
-    @Nonnull
     public static <T extends Cancellable> Consumer<T> uncancel() {
         return (Consumer<T>) UNSET_CANCELLED;
     }

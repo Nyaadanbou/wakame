@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.craftingstation
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
@@ -21,7 +20,6 @@ import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
@@ -56,9 +54,10 @@ internal object CraftingStationRecipeRegistry {
     fun loadDataIntoRegistry() {
         raw.clear()
 
-        val recipeDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val recipeDir = KoishDataPaths.CONFIGS
             .resolve(CraftingStationConstants.DATA_DIR)
             .resolve("recipes")
+            .toFile()
         for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()

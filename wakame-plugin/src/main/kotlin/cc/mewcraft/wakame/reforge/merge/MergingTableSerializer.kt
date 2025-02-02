@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.*
@@ -17,9 +16,10 @@ internal object MergingTableSerializer {
      * 从配置文件夹中加载所有的合并台.
      */
     fun loadAll(): Map<String, MergingTable> {
-        val dataDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val dataDir = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
+            .toFile()
         val map = dataDir
             .walk().maxDepth(1)
             .drop(1)

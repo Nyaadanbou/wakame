@@ -12,12 +12,13 @@ package cc.mewcraft.wakame.api.tileentity;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
+@NullMarked
 public interface TileEntityManager {
 
     /**
@@ -26,7 +27,7 @@ public interface TileEntityManager {
      * @return the {@link TileEntity} at that {@link Location} or null if there isn't one
      */
     @Nullable
-    TileEntity getTileEntity(@NotNull Location location);
+    TileEntity getTileEntity(Location location);
 
     /**
      * Gets all loaded {@link TileEntity TileEntities} in the specified {@link Chunk}.
@@ -34,8 +35,7 @@ public interface TileEntityManager {
      * @param chunk the {@link Chunk} to get the {@link TileEntity TileEntities} from
      * @return all loaded {@link TileEntity TileEntities} in the specified {@link Chunk}
      */
-    @NotNull
-    List<@NotNull TileEntity> getTileEntities(@NotNull Chunk chunk);
+    List<TileEntity> getTileEntities(Chunk chunk);
 
     /**
      * Gets all loaded {@link TileEntity TileEntities} in the specified {@link World}.
@@ -43,15 +43,13 @@ public interface TileEntityManager {
      * @param world the {@link World} to get the {@link TileEntity TileEntities} from
      * @return all loaded {@link TileEntity TileEntities} in the specified {@link World}
      */
-    @NotNull
-    List<@NotNull TileEntity> getTileEntities(@NotNull World world);
+    List<TileEntity> getTileEntities(World world);
 
     /**
      * Gets all loaded {@link TileEntity TileEntities}.
      *
      * @return all loaded {@link TileEntity TileEntities}
      */
-    @NotNull
-    List<@NotNull TileEntity> getTileEntities();
+    List<TileEntity> getTileEntities();
 
 }

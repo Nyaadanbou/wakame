@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.registry
 
-import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.Ability
@@ -21,7 +21,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
@@ -73,7 +72,7 @@ object AbilityRegistry {
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        val dataDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER).resolve(ABILITY_PROTO_CONFIG_DIR)
+        val dataDirectory = KoishDataPaths.CONFIGS.resolve(ABILITY_PROTO_CONFIG_DIR).toFile()
         val namespaceDirs = dataDirectory.walk().maxDepth(1)
             .drop(1) // exclude the `dataDirectory` itself
             .filter { it.isDirectory }

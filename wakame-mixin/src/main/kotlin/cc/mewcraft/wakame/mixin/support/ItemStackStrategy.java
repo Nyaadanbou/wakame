@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.mixin.support;
 
 import it.unimi.dsi.fastutil.Hash;
-import javax.annotation.Nullable;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -17,6 +17,7 @@ import java.util.Objects;
  * 当物品不是萌芽物品时, 产生的哈希值将基于游戏原本的哈希算法, 也就是基于物品类型和完整的物品组件.
  */
 @SuppressWarnings("deprecation")
+@NullMarked
 public class ItemStackStrategy {
     public static final Hash.Strategy<? super ItemStack> CUSTOM_STRATEGY = new Hash.Strategy<>() {
         @Override
@@ -43,16 +44,16 @@ public class ItemStackStrategy {
         @Override
         public boolean equals(@Nullable ItemStack itemStack, @Nullable ItemStack itemStack2) {
             return itemStack == itemStack2 ||
-                   itemStack != null && itemStack2 != null &&
-                   itemStack.isEmpty() == itemStack2.isEmpty() &&
-                   (
-                           isSameNyaItem(itemStack, itemStack2) ||
-                           ItemStack.isSameItemSameComponents(itemStack, itemStack2)
-                   );
+                    itemStack != null && itemStack2 != null &&
+                            itemStack.isEmpty() == itemStack2.isEmpty() &&
+                            (
+                                    isSameNyaItem(itemStack, itemStack2) ||
+                                            ItemStack.isSameItemSameComponents(itemStack, itemStack2)
+                            );
         }
     };
 
-    private static boolean isSameNyaItem(@NotNull ItemStack itemStack1, @NotNull ItemStack itemStack2) {
+    private static boolean isSameNyaItem(ItemStack itemStack1, ItemStack itemStack2) {
         CustomData customData1 = itemStack1.get(DataComponents.CUSTOM_DATA);
         CustomData customData2 = itemStack2.get(DataComponents.CUSTOM_DATA);
         if (customData1 == null || customData2 == null) {

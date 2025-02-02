@@ -26,8 +26,8 @@
 package cc.mewcraft.wakame.util.event.functional;
 
 import cc.mewcraft.wakame.util.event.Subscription;
-import javax.annotation.Nonnull;
-import me.lucko.helper.internal.exception.HelperExceptions;
+import cc.mewcraft.wakame.util.exception.HelperExceptions;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -38,6 +38,7 @@ import java.util.function.Predicate;
  *
  * @param <T> the handled / event type
  */
+@NullMarked
 public interface SubscriptionBuilder<T> {
 
     BiConsumer<Object, Throwable> DEFAULT_EXCEPTION_CONSUMER = HelperExceptions::reportEvent;
@@ -48,8 +49,7 @@ public interface SubscriptionBuilder<T> {
      * @param predicate the expiry test
      * @return ths builder instance
      */
-    @Nonnull
-    SubscriptionBuilder<T> expireIf(@Nonnull Predicate<T> predicate);
+    SubscriptionBuilder<T> expireIf(Predicate<T> predicate);
 
     /**
      * Sets the expiry time on the handler
@@ -59,8 +59,7 @@ public interface SubscriptionBuilder<T> {
      * @return the builder instance
      * @throws IllegalArgumentException if duration is not greater than or equal to 1
      */
-    @Nonnull
-    SubscriptionBuilder<T> expireAfter(long duration, @Nonnull TimeUnit unit);
+    SubscriptionBuilder<T> expireAfter(long duration, TimeUnit unit);
 
     /**
      * Sets the number of calls until the handler will automatically be unregistered
@@ -72,7 +71,6 @@ public interface SubscriptionBuilder<T> {
      * @return the builder instance
      * @throws IllegalArgumentException if maxCalls is not greater than or equal to 1
      */
-    @Nonnull
     SubscriptionBuilder<T> expireAfter(long maxCalls);
 
     /**
@@ -84,7 +82,6 @@ public interface SubscriptionBuilder<T> {
      * @param predicate the filter
      * @return the builder instance
      */
-    @Nonnull
-    SubscriptionBuilder<T> filter(@Nonnull Predicate<T> predicate);
+    SubscriptionBuilder<T> filter(Predicate<T> predicate);
 
 }

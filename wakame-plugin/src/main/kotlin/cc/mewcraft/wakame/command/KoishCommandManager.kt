@@ -13,7 +13,7 @@ import org.incendo.cloud.paper.LegacyPaperCommandManager
 import org.incendo.cloud.setting.ManagerSetting
 
 @Init(
-    stage = InitStage.PRE_WORLD,
+    stage = InitStage.POST_WORLD,
 )
 internal object KoishCommandManager {
 

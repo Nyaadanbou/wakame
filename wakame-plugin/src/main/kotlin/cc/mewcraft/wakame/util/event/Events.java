@@ -25,18 +25,18 @@
 
 package cc.mewcraft.wakame.util.event;
 
+import cc.mewcraft.wakame.util.Schedulers;
+import cc.mewcraft.wakame.util.event.functional.merged.MergedSubscriptionBuilder;
+import cc.mewcraft.wakame.util.event.functional.single.SingleSubscriptionBuilder;
 import com.google.common.reflect.TypeToken;
-import javax.annotation.Nonnull;
-import me.lucko.helper.Helper;
-import me.lucko.helper.Schedulers;
-import me.lucko.helper.event.functional.merged.MergedSubscriptionBuilder;
-import me.lucko.helper.event.functional.single.SingleSubscriptionBuilder;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A functional event listening utility.
  */
+@NullMarked
 public final class Events {
 
     /**
@@ -47,8 +47,7 @@ public final class Events {
      * @return a {@link SingleSubscriptionBuilder} to construct the event handler
      * @throws NullPointerException if eventClass is null
      */
-    @Nonnull
-    public static <T extends Event> SingleSubscriptionBuilder<T> subscribe(@Nonnull Class<T> eventClass) {
+    public static <T extends Event> SingleSubscriptionBuilder<T> subscribe(Class<T> eventClass) {
         return SingleSubscriptionBuilder.newBuilder(eventClass);
     }
 
@@ -61,8 +60,7 @@ public final class Events {
      * @return a {@link SingleSubscriptionBuilder} to construct the event handler
      * @throws NullPointerException if eventClass or priority is null
      */
-    @Nonnull
-    public static <T extends Event> SingleSubscriptionBuilder<T> subscribe(@Nonnull Class<T> eventClass, @Nonnull EventPriority priority) {
+    public static <T extends Event> SingleSubscriptionBuilder<T> subscribe(Class<T> eventClass, EventPriority priority) {
         return SingleSubscriptionBuilder.newBuilder(eventClass, priority);
     }
 
@@ -73,8 +71,7 @@ public final class Events {
      * @param <T>          the super type class
      * @return a {@link MergedSubscriptionBuilder} to construct the event handler
      */
-    @Nonnull
-    public static <T> MergedSubscriptionBuilder<T> merge(@Nonnull Class<T> handledClass) {
+    public static <T> MergedSubscriptionBuilder<T> merge(Class<T> handledClass) {
         return MergedSubscriptionBuilder.newBuilder(handledClass);
     }
 
@@ -85,8 +82,7 @@ public final class Events {
      * @param <T>  the super type class
      * @return a {@link MergedSubscriptionBuilder} to construct the event handler
      */
-    @Nonnull
-    public static <T> MergedSubscriptionBuilder<T> merge(@Nonnull TypeToken<T> type) {
+    public static <T> MergedSubscriptionBuilder<T> merge(TypeToken<T> type) {
         return MergedSubscriptionBuilder.newBuilder(type);
     }
 
@@ -98,9 +94,8 @@ public final class Events {
      * @param <S>          the super class type
      * @return a {@link MergedSubscriptionBuilder} to construct the event handler
      */
-    @Nonnull
     @SafeVarargs
-    public static <S extends Event> MergedSubscriptionBuilder<S> merge(@Nonnull Class<S> superClass, @Nonnull Class<? extends S>... eventClasses) {
+    public static <S extends Event> MergedSubscriptionBuilder<S> merge(Class<S> superClass, Class<? extends S>... eventClasses) {
         return MergedSubscriptionBuilder.newBuilder(superClass, eventClasses);
     }
 
@@ -113,9 +108,8 @@ public final class Events {
      * @param <S>          the super class type
      * @return a {@link MergedSubscriptionBuilder} to construct the event handler
      */
-    @Nonnull
     @SafeVarargs
-    public static <S extends Event> MergedSubscriptionBuilder<S> merge(@Nonnull Class<S> superClass, @Nonnull EventPriority priority, @Nonnull Class<? extends S>... eventClasses) {
+    public static <S extends Event> MergedSubscriptionBuilder<S> merge(Class<S> superClass, EventPriority priority, Class<? extends S>... eventClasses) {
         return MergedSubscriptionBuilder.newBuilder(superClass, priority, eventClasses);
     }
 
@@ -124,8 +118,8 @@ public final class Events {
      *
      * @param event the event to call
      */
-    public static void call(@Nonnull Event event) {
-        Helper.plugins().callEvent(event);
+    public static void call(Event event) {
+        event.callEvent();
     }
 
     /**
@@ -133,7 +127,7 @@ public final class Events {
      *
      * @param event the event to call
      */
-    public static void callAsync(@Nonnull Event event) {
+    public static void callAsync(Event event) {
         Schedulers.async().run(() -> call(event));
     }
 
@@ -142,7 +136,7 @@ public final class Events {
      *
      * @param event the event to call
      */
-    public static void callSync(@Nonnull Event event) {
+    public static void callSync(Event event) {
         Schedulers.sync().run(() -> call(event));
     }
 
@@ -151,9 +145,8 @@ public final class Events {
      *
      * @param event the event to call
      */
-    @Nonnull
-    public static <T extends Event> T callAndReturn(@Nonnull T event) {
-        Helper.plugins().callEvent(event);
+    public static <T extends Event> T callAndReturn(T event) {
+        event.callEvent();
         return event;
     }
 
@@ -162,8 +155,7 @@ public final class Events {
      *
      * @param event the event to call
      */
-    @Nonnull
-    public static <T extends Event> T callAsyncAndJoin(@Nonnull T event) {
+    public static <T extends Event> T callAsyncAndJoin(T event) {
         return Schedulers.async().supply(() -> callAndReturn(event)).join();
     }
 
@@ -172,8 +164,7 @@ public final class Events {
      *
      * @param event the event to call
      */
-    @Nonnull
-    public static <T extends Event> T callSyncAndJoin(@Nonnull T event) {
+    public static <T extends Event> T callSyncAndJoin(T event) {
         return Schedulers.sync().supply(() -> callAndReturn(event)).join();
     }
 

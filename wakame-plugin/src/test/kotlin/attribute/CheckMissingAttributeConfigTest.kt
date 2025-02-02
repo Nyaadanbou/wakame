@@ -1,7 +1,6 @@
 package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.attribute.attributeModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
@@ -28,7 +27,6 @@ class CheckMissingAttributeConfigTest : KoinTest {
         startKoin {
             modules(
                 adventureModule(),
-                attributeModule(),
                 registryModule(),
             )
         }

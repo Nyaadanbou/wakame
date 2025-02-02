@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.config
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.feature.Feature
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
@@ -49,14 +48,14 @@ object Configs {
     internal fun extractDefaultConfig() {
         KOISH_JAR.useZip { zip ->
             val from = zip.resolve(DEFAULT_CONFIG_PATH)
-            val to = Injector.get<Path>(InjectionQualifier.DATA_FOLDER).resolve(DEFAULT_CONFIG_PATH)
+            val to = KoishDataPaths.ROOT.resolve(DEFAULT_CONFIG_PATH)
             extractConfig(from, to, DEFAULT_CONFIG_ID)
         }
     }
 
     @InitFun
     private fun extractAllConfigs() {
-        extractConfigs("koish", KOISH_JAR, Injector.get<Path>(InjectionQualifier.DATA_FOLDER))
+        extractConfigs("koish", KOISH_JAR, KoishDataPaths.ROOT)
         // TODO: 提取 Feature 的配置文件
 
         lastReload = System.currentTimeMillis()
@@ -86,7 +85,7 @@ object Configs {
 
     private fun resolveConfigPath(configId: Identifier): Path {
         val dataFolder = when (configId.namespace()) {
-            KOISH_NAMESPACE -> Injector.get<Path>(InjectionQualifier.DATA_FOLDER) // -> plugins/Koish
+            KOISH_NAMESPACE -> KoishDataPaths.ROOT // -> plugins/<data_folder>
             else -> throw IllegalArgumentException("Only 'koish' namespace is currently supported.")
         }
         return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
@@ -116,13 +115,20 @@ object Configs {
     }
 
     /**
+     * 返回指定配置文件的 [Provider].
+     *
+     * 传入的 [id] 可以是以下形式, 将转译成具体的文件路径:
+     * - `"koish:items"` -> `configs/items.yml`
+     * - `"koish:recipe/dirt"` -> `configs/recipe/dirt.yml`
+     * - `"koish:enchantment/agility"` -> `configs/enchantment/agility.yml`
+     *
      * @param id 配置文件的 id, 必须是 `namespace:path` 的形式. 如果省略 `namespace`, 则默认为 `koish`
      */
     operator fun get(id: String): Provider<CommentedConfigurationNode> =
         get(Identifiers.of(id))
 
     /**
-     * @param feature 对应的 Feature (仅取其命名空间)
+     * @param feature 对应的 [Feature] (仅取其命名空间)
      * @param path 相对于 [feature] 文件夹的文件路径
      */
     operator fun get(feature: Feature, path: String): Provider<CommentedConfigurationNode> =

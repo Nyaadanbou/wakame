@@ -25,14 +25,14 @@
 
 package cc.mewcraft.wakame.util.event.functional.single;
 
+import cc.mewcraft.wakame.util.Delegates;
 import cc.mewcraft.wakame.util.event.SingleSubscription;
 import cc.mewcraft.wakame.util.event.functional.ExpiryTestStage;
 import cc.mewcraft.wakame.util.event.functional.SubscriptionBuilder;
 import com.google.common.base.Preconditions;
-import javax.annotation.Nonnull;
-import me.lucko.helper.utils.Delegates;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +46,7 @@ import java.util.function.Predicate;
  *
  * @param <T> the event type
  */
+@NullMarked
 public interface SingleSubscriptionBuilder<T extends Event> extends SubscriptionBuilder<T> {
 
     /**
@@ -56,8 +57,7 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      * @return a {@link SingleSubscriptionBuilder} to construct the event handler
      * @throws NullPointerException if eventClass is null
      */
-    @Nonnull
-    static <T extends Event> SingleSubscriptionBuilder<T> newBuilder(@Nonnull Class<T> eventClass) {
+    static <T extends Event> SingleSubscriptionBuilder<T> newBuilder(Class<T> eventClass) {
         return newBuilder(eventClass, EventPriority.NORMAL);
     }
 
@@ -70,8 +70,7 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      * @return a {@link SingleSubscriptionBuilder} to construct the event handler
      * @throws NullPointerException if eventClass or priority is null
      */
-    @Nonnull
-    static <T extends Event> SingleSubscriptionBuilder<T> newBuilder(@Nonnull Class<T> eventClass, @Nonnull EventPriority priority) {
+    static <T extends Event> SingleSubscriptionBuilder<T> newBuilder(Class<T> eventClass, EventPriority priority) {
         Objects.requireNonNull(eventClass, "eventClass");
         Objects.requireNonNull(priority, "priority");
         return new SingleSubscriptionBuilderImpl<>(eventClass, priority);
@@ -79,41 +78,36 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
 
     // override return type - we return SingleSubscriptionBuilder, not SubscriptionBuilder
 
-    @Nonnull
     @Override
-    default SingleSubscriptionBuilder<T> expireIf(@Nonnull Predicate<T> predicate) {
+    default SingleSubscriptionBuilder<T> expireIf(Predicate<T> predicate) {
         return expireIf(Delegates.predicateToBiPredicateSecond(predicate), ExpiryTestStage.PRE, ExpiryTestStage.POST_HANDLE);
     }
 
-    @Nonnull
     @Override
-    default SingleSubscriptionBuilder<T> expireAfter(long duration, @Nonnull TimeUnit unit) {
+    default SingleSubscriptionBuilder<T> expireAfter(long duration, TimeUnit unit) {
         Objects.requireNonNull(unit, "unit");
         Preconditions.checkArgument(duration >= 1, "duration < 1");
         long expiry = Math.addExact(System.currentTimeMillis(), unit.toMillis(duration));
         return expireIf((handler, event) -> System.currentTimeMillis() > expiry, ExpiryTestStage.PRE);
     }
 
-    @Nonnull
     @Override
     default SingleSubscriptionBuilder<T> expireAfter(long maxCalls) {
         Preconditions.checkArgument(maxCalls >= 1, "maxCalls < 1");
         return expireIf((handler, event) -> handler.getCallCounter() >= maxCalls, ExpiryTestStage.PRE, ExpiryTestStage.POST_HANDLE);
     }
 
-    @Nonnull
     @Override
-    SingleSubscriptionBuilder<T> filter(@Nonnull Predicate<T> predicate);
+    SingleSubscriptionBuilder<T> filter(Predicate<T> predicate);
 
     /**
      * Add a expiry predicate.
      *
-     * @param predicate the expiry test
+     * @param predicate  the expiry test
      * @param testPoints when to test the expiry predicate
      * @return ths builder instance
      */
-    @Nonnull
-    SingleSubscriptionBuilder<T> expireIf(@Nonnull BiPredicate<SingleSubscription<T>, T> predicate, @Nonnull ExpiryTestStage... testPoints);
+    SingleSubscriptionBuilder<T> expireIf(BiPredicate<SingleSubscription<T>, T> predicate, ExpiryTestStage... testPoints);
 
     /**
      * Sets the exception consumer for the handler.
@@ -124,15 +118,13 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      * @return the builder instance
      * @throws NullPointerException if the consumer is null
      */
-    @Nonnull
-    SingleSubscriptionBuilder<T> exceptionConsumer(@Nonnull BiConsumer<? super T, Throwable> consumer);
+    SingleSubscriptionBuilder<T> exceptionConsumer(BiConsumer<? super T, Throwable> consumer);
 
     /**
      * Sets that the handler should accept subclasses of the event type.
      *
      * @return the builder instance
      */
-    @Nonnull
     SingleSubscriptionBuilder<T> handleSubclasses();
 
     /**
@@ -140,7 +132,6 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      *
      * @return the handler list
      */
-    @Nonnull
     SingleHandlerList<T> handlers();
 
     /**
@@ -150,8 +141,7 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      * @return a registered {@link SingleSubscription} instance.
      * @throws NullPointerException if the handler is null
      */
-    @Nonnull
-    default SingleSubscription<T> handler(@Nonnull Consumer<? super T> handler) {
+    default SingleSubscription<T> handler(Consumer<? super T> handler) {
         return handlers().consumer(handler).register();
     }
 
@@ -162,9 +152,8 @@ public interface SingleSubscriptionBuilder<T extends Event> extends Subscription
      * @return a registered {@link SingleSubscription} instance.
      * @throws NullPointerException if the handler is null
      */
-    @Nonnull
-    default SingleSubscription<T> biHandler(@Nonnull BiConsumer<SingleSubscription<T>, ? super T> handler) {
+    default SingleSubscription<T> biHandler(BiConsumer<SingleSubscription<T>, ? super T> handler) {
         return handlers().biConsumer(handler).register();
     }
-    
+
 }

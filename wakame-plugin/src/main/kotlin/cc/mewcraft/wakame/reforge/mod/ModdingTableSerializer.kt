@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
@@ -26,9 +25,10 @@ internal object ModdingTableSerializer {
      * 从配置文件夹中加载所有的定制台.
      */
     fun loadAll(): Map<String, ModdingTable> {
-        val dataDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val dataDir = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
+            .toFile()
         val result = dataDir
             .walk()
             .maxDepth(1)

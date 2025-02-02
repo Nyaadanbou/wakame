@@ -4,12 +4,12 @@ import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.EntityType
 import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.util.metadata.Metadata
+import cc.mewcraft.wakame.util.metadata.MetadataKey
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import com.github.quillraven.fleks.World.Companion.inject
-import me.lucko.helper.metadata.Metadata
-import me.lucko.helper.metadata.MetadataKey
 
 class AbilityBukkitEntityMetadataSystem(
     private val wakameWorld: WakameWorld = inject()

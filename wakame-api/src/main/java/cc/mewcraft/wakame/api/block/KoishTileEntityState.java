@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.api.block;
 
 import cc.mewcraft.wakame.api.tileentity.TileEntity;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 @SuppressWarnings("unused")
+@NullMarked
 public interface KoishTileEntityState extends KoishBlockState {
 
     /**
@@ -11,6 +12,6 @@ public interface KoishTileEntityState extends KoishBlockState {
      *
      * @return the {@link TileEntity} represented by this {@link KoishTileEntityState}
      */
-    @NotNull TileEntity getTileEntity();
+    TileEntity getTileEntity();
 
 }

@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.github.GithubRepoManager
-import java.io.File
 
 /**
  * 负责将资源包推送到指定的位置, 比如 Github 仓库.
@@ -105,7 +103,7 @@ private data class GithubPublisher(
 
     override fun publish(): Boolean {
         LOGGER.info("Publishing resource pack to Github (repo: $repo, branch: $branch, path: $remotePath)")
-        val dataFolder = Injector.get<File>(InjectionQualifier.DATA_FOLDER)
+        val dataFolder = KoishDataPaths.ROOT.toFile()
         val manager = GithubRepoManager(
             localRepoPath = dataFolder.resolve(".cache/repo"),
             resourcePackDirPath = dataFolder.resolve(GENERATED_RESOURCE_PACK_DIR),

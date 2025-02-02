@@ -16,8 +16,8 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,6 +27,7 @@ import java.util.function.Consumer;
  * <p>
  * 本实现相当于新增了一个 {@code Singleton Entry}. 具体请参考 <a href="https://minecraft.wiki/w/Loot_table#Singleton_entry">Loot table</a>.
  */
+@NullMarked
 public class LootNekoItem extends LootPoolSingletonContainer {
     public static final MapCodec<LootNekoItem> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
@@ -41,13 +42,12 @@ public class LootNekoItem extends LootPoolSingletonContainer {
     }
 
     @Override
-    public @NotNull LootPoolEntryType getType() {
+    public LootPoolEntryType getType() {
         return LootPoolEntryInitializer.NEKO_ITEM;
     }
 
-    @SuppressWarnings("PatternValidation")
     @Override
-    public void createItemStack(@NotNull Consumer<ItemStack> lootConsumer, @NotNull LootContext context) {
+    public void createItemStack(Consumer<ItemStack> lootConsumer, LootContext context) {
         var namespace = id.getNamespace();
         var path = id.getPath();
         var player = getLootingPlayer(context);

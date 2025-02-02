@@ -7,10 +7,10 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RangeParser
+import cc.mewcraft.wakame.util.random.RandomSelector
 import cc.mewcraft.wakame.util.require
 import com.google.common.collect.ImmutableRangeMap
 import com.google.common.collect.RangeMap
-import me.lucko.helper.random.RandomSelector
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type

@@ -2,8 +2,7 @@
 
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.formatSize
 import net.kyori.adventure.key.Key
@@ -17,7 +16,7 @@ object VanillaResourcePack {
     private const val VANILLA_RESOURCE_PACK_CACHE_DIRECTORY = "generated/cache/"
     private const val VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/<version>/"
 
-    private val resourcePackDirectory: File = Injector.get<File>(InjectionQualifier.DATA_FOLDER).resolve(VANILLA_RESOURCE_PACK_CACHE_DIRECTORY)
+    private val resourcePackDirectory: File = KoishDataPaths.ROOT.resolve(VANILLA_RESOURCE_PACK_CACHE_DIRECTORY).toFile()
     private val versionedDownloadURL: String = VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL.replace("<version>", Bukkit.getMinecraftVersion())
 
     fun model(key: Key): Result<Model> {

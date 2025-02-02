@@ -40,26 +40,20 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryExecute {
-        collectAndRegisterRunnables(KOISH_JAR.toFile(), this.javaClass.classLoader)
-
-        // TODO introduce Addon System
-        // for (addon in AddonBootstrapper.addons) {
-        //     collectAndRegisterRunnables(addon.file, addon.javaClass.classLoader)
-        // }
-
+        collectAndRegisterTasks(KOISH_JAR.toFile(), this.javaClass.classLoader)
         initPreWorld()
     }
 
-    private fun collectAndRegisterRunnables(file: File, classLoader: ClassLoader) {
-        val (initializables, disableables) = collectRunnables(file, classLoader)
-        addRunnables(initializables, disableables)
+    private fun collectAndRegisterTasks(file: File, classLoader: ClassLoader) {
+        val (initializables, disableables) = collectTasks(file, classLoader)
+        addTasks(initializables, disableables)
     }
 
     /**
      * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions annotated by
      * [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][Disableable].
      */
-    private fun collectRunnables(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<Disableable>> {
+    private fun collectTasks(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<Disableable>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<Disableable>()
         val initializableClasses = HashMap<String, InitializableClass>()
@@ -109,7 +103,7 @@ internal object Initializer : Listener {
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    private fun addRunnables(initializables: List<Initializable>, disableables: List<Disableable>) = withLifecycleDependencyExecution {
+    private fun addTasks(initializables: List<Initializable>, disableables: List<Disableable>) = withLifecycleDependencyExecution {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices

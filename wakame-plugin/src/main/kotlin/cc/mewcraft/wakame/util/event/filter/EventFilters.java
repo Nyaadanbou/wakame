@@ -25,15 +25,15 @@
 
 package cc.mewcraft.wakame.util.event.filter;
 
-import javax.annotation.Nonnull;
-import me.lucko.helper.metadata.Metadata;
-import me.lucko.helper.metadata.MetadataKey;
+import cc.mewcraft.wakame.util.metadata.Metadata;
+import cc.mewcraft.wakame.util.metadata.MetadataKey;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Predicate;
 
@@ -41,6 +41,7 @@ import java.util.function.Predicate;
  * Defines standard event predicates for use in functional event handlers.
  */
 @SuppressWarnings("unchecked")
+@NullMarked
 public final class EventFilters {
 
     private static final Predicate<? extends Cancellable> IGNORE_CANCELLED = e -> !e.isCancelled();
@@ -50,19 +51,19 @@ public final class EventFilters {
 
     private static final Predicate<? extends PlayerMoveEvent> IGNORE_SAME_BLOCK = e ->
             e.getFrom().getBlockX() != e.getTo().getBlockX() ||
-            e.getFrom().getBlockZ() != e.getTo().getBlockZ() ||
-            e.getFrom().getBlockY() != e.getTo().getBlockY() ||
-            !e.getFrom().getWorld().equals(e.getTo().getWorld());
+                    e.getFrom().getBlockZ() != e.getTo().getBlockZ() ||
+                    e.getFrom().getBlockY() != e.getTo().getBlockY() ||
+                    !e.getFrom().getWorld().equals(e.getTo().getWorld());
 
     private static final Predicate<? extends PlayerMoveEvent> IGNORE_SAME_BLOCK_AND_Y = e ->
             e.getFrom().getBlockX() != e.getTo().getBlockX() ||
-            e.getFrom().getBlockZ() != e.getTo().getBlockZ() ||
-            !e.getFrom().getWorld().equals(e.getTo().getWorld());
+                    e.getFrom().getBlockZ() != e.getTo().getBlockZ() ||
+                    !e.getFrom().getWorld().equals(e.getTo().getWorld());
 
     private static final Predicate<? extends PlayerMoveEvent> IGNORE_SAME_CHUNK = e ->
             (e.getFrom().getBlockX() >> 4) != (e.getTo().getBlockX() >> 4) ||
-            (e.getFrom().getBlockZ() >> 4) != (e.getTo().getBlockZ() >> 4) ||
-            !e.getFrom().getWorld().equals(e.getTo().getWorld());
+                    (e.getFrom().getBlockZ() >> 4) != (e.getTo().getBlockZ() >> 4) ||
+                    !e.getFrom().getWorld().equals(e.getTo().getWorld());
 
     /**
      * Returns a predicate which only returns true if the event isn't cancelled
@@ -70,7 +71,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the event isn't cancelled
      */
-    @Nonnull
     public static <T extends Cancellable> Predicate<T> ignoreCancelled() {
         return (Predicate<T>) IGNORE_CANCELLED;
     }
@@ -81,7 +81,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the event is cancelled
      */
-    @Nonnull
     public static <T extends Cancellable> Predicate<T> ignoreNotCancelled() {
         return (Predicate<T>) IGNORE_UNCANCELLED;
     }
@@ -92,7 +91,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the login is allowed
      */
-    @Nonnull
     public static <T extends PlayerLoginEvent> Predicate<T> ignoreDisallowedLogin() {
         return (Predicate<T>) IGNORE_DISALLOWED_LOGIN;
     }
@@ -103,7 +101,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the login is allowed
      */
-    @Nonnull
     public static <T extends AsyncPlayerPreLoginEvent> Predicate<T> ignoreDisallowedPreLogin() {
         return (Predicate<T>) IGNORE_DISALLOWED_PRE_LOGIN;
     }
@@ -114,7 +111,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the player has moved over a block
      */
-    @Nonnull
     public static <T extends PlayerMoveEvent> Predicate<T> ignoreSameBlock() {
         return (Predicate<T>) IGNORE_SAME_BLOCK;
     }
@@ -126,7 +122,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the player has moved across a block border
      */
-    @Nonnull
     public static <T extends PlayerMoveEvent> Predicate<T> ignoreSameBlockAndY() {
         return (Predicate<T>) IGNORE_SAME_BLOCK_AND_Y;
     }
@@ -137,7 +132,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the player has moved over a chunk border
      */
-    @Nonnull
     public static <T extends PlayerMoveEvent> Predicate<T> ignoreSameChunk() {
         return (Predicate<T>) IGNORE_SAME_CHUNK;
     }
@@ -149,7 +143,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the entity has a given metadata key
      */
-    @Nonnull
     public static <T extends EntityEvent> Predicate<T> entityHasMetadata(MetadataKey<?> key) {
         return e -> Metadata.provideForEntity(e.getEntity()).has(key);
     }
@@ -161,7 +154,6 @@ public final class EventFilters {
      * @param <T> the event type
      * @return a predicate which only returns true if the player has a given metadata key
      */
-    @Nonnull
     public static <T extends PlayerEvent> Predicate<T> playerHasMetadata(MetadataKey<?> key) {
         return e -> Metadata.provideForPlayer(e.getPlayer()).has(key);
     }
@@ -170,10 +162,9 @@ public final class EventFilters {
      * Returns a predicate which only returns true if the player has the given permission
      *
      * @param permission the permission
-     * @param <T> the event type
+     * @param <T>        the event type
      * @return a predicate which only returns true if the player has the given permission
      */
-    @Nonnull
     public static <T extends PlayerEvent> Predicate<T> playerHasPermission(String permission) {
         return e -> e.getPlayer().hasPermission(permission);
     }

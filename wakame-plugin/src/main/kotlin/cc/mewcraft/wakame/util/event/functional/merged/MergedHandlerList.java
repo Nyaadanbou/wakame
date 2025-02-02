@@ -25,25 +25,24 @@
 
 package cc.mewcraft.wakame.util.event.functional.merged;
 
+import cc.mewcraft.wakame.util.Delegates;
 import cc.mewcraft.wakame.util.event.MergedSubscription;
 import cc.mewcraft.wakame.util.event.functional.FunctionalHandlerList;
-import javax.annotation.Nonnull;
-import me.lucko.helper.utils.Delegates;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@NullMarked
 public interface MergedHandlerList<T> extends FunctionalHandlerList<T, MergedSubscription<T>> {
 
-    @Nonnull
     @Override
-    default MergedHandlerList<T> consumer(@Nonnull Consumer<? super T> handler) {
+    default MergedHandlerList<T> consumer(Consumer<? super T> handler) {
         Objects.requireNonNull(handler, "handler");
         return biConsumer(Delegates.consumerToBiConsumerSecond(handler));
     }
 
-    @Nonnull
     @Override
-    MergedHandlerList<T> biConsumer(@Nonnull BiConsumer<MergedSubscription<T>, ? super T> handler);
+    MergedHandlerList<T> biConsumer(BiConsumer<MergedSubscription<T>, ? super T> handler);
 }

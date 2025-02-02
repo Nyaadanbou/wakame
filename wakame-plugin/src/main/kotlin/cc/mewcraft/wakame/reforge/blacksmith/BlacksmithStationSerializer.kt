@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.blacksmith
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
@@ -9,15 +8,15 @@ import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
-import java.io.File
 
 internal object BlacksmithStationSerializer {
     private const val DATA_DIR = "blacksmith"
 
     fun loadAllStations(): Map<String, BlacksmithStation> {
-        val blacksmithDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val blacksmithDirectory = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(DATA_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()

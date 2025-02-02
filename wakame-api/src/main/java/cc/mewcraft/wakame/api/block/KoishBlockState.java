@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.api.block;
 
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public interface KoishBlockState {
 
     /**
@@ -10,13 +11,13 @@ public interface KoishBlockState {
      *
      * @return the block of this block state
      */
-    @NotNull KoishBlock getBlock();
+    KoishBlock getBlock();
 
     /**
      * Gets the {@link Location} of this {@link KoishBlockState}.
      *
      * @return the location of this block state
      */
-    @NotNull Location getLocation();
+    Location getLocation();
 
 }

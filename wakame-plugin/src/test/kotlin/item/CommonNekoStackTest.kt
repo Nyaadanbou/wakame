@@ -3,7 +3,6 @@ package item
 import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.damage.damageModule
 import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
 import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
@@ -35,7 +34,6 @@ import org.koin.test.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import testEnv
-import java.io.File
 import java.nio.file.Path
 import kotlin.test.fail
 
@@ -52,7 +50,6 @@ object CommonNekoStackTest {
 
                 // dependencies
                 adventureModule(),
-                damageModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
@@ -84,7 +81,7 @@ object CommonNekoStackTest {
 }
 
 fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, ConfigurationNode> {
-    val configsDir = get<File>(InjectionQualifier.CONFIGS_FOLDER)
+    val configsDir = get<Path>(InjectionQualifier.CONFIGS_FOLDER).toFile()
     val dataDir = configsDir.resolve("item")
     val namespaceDir = dataDir.resolve(namespace)
     val itemFile = namespaceDir.resolve("$path.yml")

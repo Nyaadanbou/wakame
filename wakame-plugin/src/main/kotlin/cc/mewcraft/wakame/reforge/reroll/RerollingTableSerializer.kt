@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
@@ -24,9 +23,10 @@ internal object RerollingTableSerializer {
      * 从配置文件中加载所有的重造台.
      */
     fun loadAll(): Map<String, RerollingTable> {
-        val dataDir = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val dataDir = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
+            .toFile()
         val map = dataDir
             .walk().maxDepth(1)
             .drop(1)

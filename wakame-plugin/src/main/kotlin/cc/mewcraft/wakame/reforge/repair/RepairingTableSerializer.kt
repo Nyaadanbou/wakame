@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.repair
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.reforge.common.*
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
@@ -10,7 +9,6 @@ import cc.mewcraft.wakame.util.register
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
-import java.io.File
 
 internal object RepairingTableSerializer {
     private const val ROOT_DIR = "repair"
@@ -26,10 +24,11 @@ internal object RepairingTableSerializer {
      * - 如果是自定义物品, 则为自定义物品的命名空间路径, 例如: `material:tin_ingot`.
      */
     fun loadAllItems(): Map<Key, PriceInstance> {
-        val itemsDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val itemsDirectory = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
             .resolve(ITEMS_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
@@ -63,10 +62,11 @@ internal object RepairingTableSerializer {
      * 该映射的键 ([String]) 为 [RepairingTable.id].
      */
     fun loadAllTables(): Map<String, RepairingTable> {
-        val tablesDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val tablesDirectory = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
             .resolve(TABLES_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()

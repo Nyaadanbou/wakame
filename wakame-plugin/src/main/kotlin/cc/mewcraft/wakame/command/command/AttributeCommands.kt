@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.buildAndAdd
 import cc.mewcraft.wakame.command.parser.AttributeModifierOperationParser
 import cc.mewcraft.wakame.command.parser.AttributeParser
-import me.lucko.helper.text3.mini
+import cc.mewcraft.wakame.util.text.mini
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.extra.kotlin.translatable
@@ -34,16 +34,8 @@ import org.incendo.cloud.parser.standard.DoubleParser
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.buildList
-import kotlin.collections.chunked
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.map
-import kotlin.collections.none
-import kotlin.collections.plusAssign
-import kotlin.collections.sortedBy
 
 private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 

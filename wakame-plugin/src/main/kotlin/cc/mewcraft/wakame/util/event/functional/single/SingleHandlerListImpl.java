@@ -25,33 +25,32 @@
 
 package cc.mewcraft.wakame.util.event.functional.single;
 
+import cc.mewcraft.wakame.Koish;
 import cc.mewcraft.wakame.util.event.SingleSubscription;
-import javax.annotation.Nonnull;
-import me.lucko.helper.internal.LoaderUtils;
 import org.bukkit.event.Event;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
+@NullMarked
 class SingleHandlerListImpl<T extends Event> implements SingleHandlerList<T> {
     private final SingleSubscriptionBuilderImpl<T> builder;
     private final List<BiConsumer<SingleSubscription<T>, ? super T>> handlers = new ArrayList<>(1);
 
-    SingleHandlerListImpl(@Nonnull SingleSubscriptionBuilderImpl<T> builder) {
+    SingleHandlerListImpl(SingleSubscriptionBuilderImpl<T> builder) {
         this.builder = builder;
     }
 
-    @Nonnull
     @Override
-    public SingleHandlerList<T> biConsumer(@Nonnull BiConsumer<SingleSubscription<T>, ? super T> handler) {
+    public SingleHandlerList<T> biConsumer(BiConsumer<SingleSubscription<T>, ? super T> handler) {
         Objects.requireNonNull(handler, "handler");
         this.handlers.add(handler);
         return this;
     }
 
-    @Nonnull
     @Override
     public SingleSubscription<T> register() {
         if (this.handlers.isEmpty()) {
@@ -59,7 +58,7 @@ class SingleHandlerListImpl<T extends Event> implements SingleHandlerList<T> {
         }
 
         HelperEventListener<T> listener = new HelperEventListener<>(this.builder, this.handlers);
-        listener.register(LoaderUtils.getPlugin());
+        listener.register(Koish.INSTANCE);
         return listener;
     }
 }

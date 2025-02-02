@@ -28,20 +28,17 @@ package cc.mewcraft.wakame.util.event.functional.merged;
 import cc.mewcraft.wakame.util.event.MergedSubscription;
 import cc.mewcraft.wakame.util.event.functional.ExpiryTestStage;
 import com.google.common.reflect.TypeToken;
-import javax.annotation.Nonnull;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
+import org.jspecify.annotations.NullMarked;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@NullMarked
 class MergedSubscriptionBuilderImpl<T> implements MergedSubscriptionBuilder<T> {
     final TypeToken<T> handledClass;
     final Map<Class<? extends Event>, MergedHandlerMapping<T, ? extends Event>> mappings = new HashMap<>();
@@ -57,15 +54,13 @@ class MergedSubscriptionBuilderImpl<T> implements MergedSubscriptionBuilder<T> {
         this.handledClass = handledClass;
     }
 
-    @Nonnull
     @Override
-    public <E extends Event> MergedSubscriptionBuilder<T> bindEvent(@Nonnull Class<E> eventClass, @Nonnull Function<E, T> function) {
+    public <E extends Event> MergedSubscriptionBuilder<T> bindEvent(Class<E> eventClass, Function<E, T> function) {
         return bindEvent(eventClass, EventPriority.NORMAL, function);
     }
 
-    @Nonnull
     @Override
-    public <E extends Event> MergedSubscriptionBuilder<T> bindEvent(@Nonnull Class<E> eventClass, @Nonnull EventPriority priority, @Nonnull Function<E, T> function) {
+    public <E extends Event> MergedSubscriptionBuilder<T> bindEvent(Class<E> eventClass, EventPriority priority, Function<E, T> function) {
         Objects.requireNonNull(eventClass, "eventClass");
         Objects.requireNonNull(priority, "priority");
         Objects.requireNonNull(function, "function");
@@ -74,9 +69,8 @@ class MergedSubscriptionBuilderImpl<T> implements MergedSubscriptionBuilder<T> {
         return this;
     }
 
-    @Nonnull
     @Override
-    public MergedSubscriptionBuilder<T> expireIf(@Nonnull BiPredicate<MergedSubscription<T>, T> predicate, @Nonnull ExpiryTestStage... testPoints) {
+    public MergedSubscriptionBuilder<T> expireIf(BiPredicate<MergedSubscription<T>, T> predicate, ExpiryTestStage... testPoints) {
         Objects.requireNonNull(testPoints, "testPoints");
         Objects.requireNonNull(predicate, "predicate");
         for (ExpiryTestStage testPoint : testPoints) {
@@ -97,23 +91,20 @@ class MergedSubscriptionBuilderImpl<T> implements MergedSubscriptionBuilder<T> {
         return this;
     }
 
-    @Nonnull
     @Override
-    public MergedSubscriptionBuilder<T> filter(@Nonnull Predicate<T> predicate) {
+    public MergedSubscriptionBuilder<T> filter(Predicate<T> predicate) {
         Objects.requireNonNull(predicate, "predicate");
         this.filters.add(predicate);
         return this;
     }
 
-    @Nonnull
     @Override
-    public MergedSubscriptionBuilder<T> exceptionConsumer(@Nonnull BiConsumer<Event, Throwable> exceptionConsumer) {
+    public MergedSubscriptionBuilder<T> exceptionConsumer(BiConsumer<Event, Throwable> exceptionConsumer) {
         Objects.requireNonNull(exceptionConsumer, "exceptionConsumer");
         this.exceptionConsumer = exceptionConsumer;
         return this;
     }
 
-    @Nonnull
     @Override
     public MergedHandlerList<T> handlers() {
         if (this.mappings.isEmpty()) {

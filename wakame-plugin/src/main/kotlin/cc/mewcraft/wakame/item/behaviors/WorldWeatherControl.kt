@@ -5,10 +5,10 @@ import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.util.text.arguments
+import cc.mewcraft.wakame.util.time.DurationFormatter
 import cc.mewcraft.wakame.world.WeatherControl
 import io.papermc.paper.util.Tick
-import me.lucko.helper.text3.arguments
-import me.lucko.helper.time.DurationFormatter
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack

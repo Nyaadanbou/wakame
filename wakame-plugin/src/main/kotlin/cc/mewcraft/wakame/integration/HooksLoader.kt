@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.integration
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
@@ -20,12 +20,10 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.data.JarUtils
-import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
 import org.objectweb.asm.Type
-import org.slf4j.Logger
 import kotlin.reflect.KClass
 
 @Init(
@@ -72,13 +70,10 @@ internal object HooksLoader {
                 if (shouldLoadHook(plugins, unless, requireAll)) {
                     loadHook(className.replace('/', '.'), loadListener)
 
-                    // 记录加载的钩子
-                    Injector.get<ComponentLogger>().info(text {
-                        content("Hook ${className.substringAfterLast('/')} loaded"); color(NamedTextColor.AQUA)
-                    })
+                    LOGGER.info(Component.text("Hook ${className.substringAfterLast('/')} loaded").color(NamedTextColor.AQUA))
                 }
             } catch (t: Throwable) {
-                Injector.get<Logger>().error("Failed to load hook $className", t)
+                LOGGER.error("Failed to load hook $className", t)
             }
         }
     }

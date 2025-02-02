@@ -109,8 +109,8 @@ object ImaginaryAttributeMaps {
     }
 
     private fun createEntry(id: String): RegistryEntry<ImaginaryAttributeMap> {
-        val existed = intrusiveRegisteredIds.add(id)
-        if (existed) throw IllegalArgumentException("The id $id has already been registered!")
+        val notExisted = intrusiveRegisteredIds.add(id)
+        if (!notExisted) throw IllegalArgumentException("The id $id has already been registered!")
         return KoishRegistries.IMAGINARY_ATTRIBUTE_MAP.createEntry(id)
     }
 }

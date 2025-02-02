@@ -18,8 +18,8 @@ class NamedQualifier : Qualifier {
 enum class InjectionQualifier : Qualifier by NamedQualifier() {
     DATA_FOLDER, // Plugin#dataFolder
     CONFIGS_FOLDER, // Plugin#dataFolder/configs
+    ASSETS_FOLDER, // Plugin#dataFolder/assets
     LANG_FOLDER, // Plugin#dataFolder/lang
-    ASSETS_FOLDER // Plugin#dataFolder/assets
 }
 
 object Injector : KoinComponent {

@@ -5,13 +5,14 @@ import cc.mewcraft.wakame.api.block.KoishBlockRegistry;
 import cc.mewcraft.wakame.api.item.KoishItemRegistry;
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration;
 import cc.mewcraft.wakame.api.tileentity.TileEntityManager;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The Koish API.
  * <p>
  * Use {@link KoishProvider} to get the instance of this class.
  */
+@NullMarked
 public interface Koish {
 
     /**
@@ -57,5 +58,5 @@ public interface Koish {
      *
      * @param integration The {@link ProtectionIntegration} to register.
      */
-    void registerProtectionIntegration(@NotNull ProtectionIntegration integration);
+    void registerProtectionIntegration(ProtectionIntegration integration);
 }

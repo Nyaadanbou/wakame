@@ -26,14 +26,14 @@
 package cc.mewcraft.wakame.util.event.functional.single;
 
 import cc.mewcraft.wakame.util.event.SingleSubscription;
-import javax.annotation.Nonnull;
-import me.lucko.helper.Helper;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NullMarked;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,6 +46,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+@NullMarked
 class HelperEventListener<T extends Event> implements SingleSubscription<T>, EventExecutor, Listener {
     private final Class<T> eventClass;
     private final EventPriority priority;
@@ -77,7 +78,7 @@ class HelperEventListener<T extends Event> implements SingleSubscription<T>, Eve
     }
 
     void register(Plugin plugin) {
-        Helper.plugins().registerEvent(this.eventClass, this, this.priority, this, plugin, false);
+        Bukkit.getPluginManager().registerEvent(this.eventClass, this, this.priority, this, plugin, false);
     }
 
     @Override
@@ -150,7 +151,6 @@ class HelperEventListener<T extends Event> implements SingleSubscription<T>, Eve
         }
     }
 
-    @Nonnull
     @Override
     public Class<T> getEventClass() {
         return this.eventClass;
@@ -197,7 +197,6 @@ class HelperEventListener<T extends Event> implements SingleSubscription<T>, Eve
         return functions;
     }
 
-    @SuppressWarnings("JavaReflectionMemberAccess")
     private static void unregisterListener(Class<? extends Event> eventClass, Listener listener) {
         try {
             // unfortunately we can't cache this reflect call, as the method is static

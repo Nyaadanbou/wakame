@@ -25,26 +25,25 @@
 
 package cc.mewcraft.wakame.util.event.functional.single;
 
+import cc.mewcraft.wakame.util.Delegates;
 import cc.mewcraft.wakame.util.event.SingleSubscription;
 import cc.mewcraft.wakame.util.event.functional.FunctionalHandlerList;
-import javax.annotation.Nonnull;
-import me.lucko.helper.utils.Delegates;
 import org.bukkit.event.Event;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@NullMarked
 public interface SingleHandlerList<T extends Event> extends FunctionalHandlerList<T, SingleSubscription<T>> {
 
-    @Nonnull
     @Override
-    default SingleHandlerList<T> consumer(@Nonnull Consumer<? super T> handler) {
+    default SingleHandlerList<T> consumer(Consumer<? super T> handler) {
         Objects.requireNonNull(handler, "handler");
         return biConsumer(Delegates.consumerToBiConsumerSecond(handler));
     }
 
-    @Nonnull
     @Override
-    SingleHandlerList<T> biConsumer(@Nonnull BiConsumer<SingleSubscription<T>, ? super T> handler);
+    SingleHandlerList<T> biConsumer(BiConsumer<SingleSubscription<T>, ? super T> handler);
 }

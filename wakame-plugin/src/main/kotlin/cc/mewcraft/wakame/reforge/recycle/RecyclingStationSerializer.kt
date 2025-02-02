@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.recycle
 
-import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
@@ -13,7 +12,6 @@ import cc.mewcraft.wakame.util.register
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
-import java.io.File
 
 internal object RecyclingStationSerializer {
     private const val ROOT_DIR = "recycle"
@@ -22,10 +20,11 @@ internal object RecyclingStationSerializer {
     private const val STATIONS_DIR = "stations"
 
     fun loadAllItems(): Map<Key, PriceInstance> {
-        val itemsDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val itemsDirectory = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
             .resolve(ITEMS_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
@@ -55,10 +54,11 @@ internal object RecyclingStationSerializer {
     }
 
     fun loadAllStations(): Map<String, RecyclingStation> {
-        val tablesDirectory = Injector.get<File>(InjectionQualifier.CONFIGS_FOLDER)
+        val tablesDirectory = KoishDataPaths.CONFIGS
             .resolve(ReforgingStationConstants.DATA_DIR)
             .resolve(ROOT_DIR)
             .resolve(STATIONS_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
