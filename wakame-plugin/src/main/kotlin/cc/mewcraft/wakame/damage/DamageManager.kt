@@ -192,7 +192,7 @@ object DamageManager : DamageManagerApi {
                 if (directEntity.type == EntityType.TNT || directEntity.type == EntityType.END_CRYSTAL) {
                     return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
                 }
-                val mapping = EntityAttackMappings.getForVanilla(causingEntity, event)
+                val mapping = EntityAttackMappings.get(causingEntity, event)
                 if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
@@ -255,10 +255,10 @@ object DamageManager : DamageManagerApi {
         val damageMapping = if (forPlayer) {
             DirectEntityTypeMappings.getForPlayer(entityType, event)
         } else {
-            DirectEntityTypeMappings.getForNoCause(entityType, event)
+            DirectEntityTypeMappings.getForNoCausing(entityType, event)
         }
         if (damageMapping == null) {
-            LOGGER.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not config ! Use default damage metadata.")
+            LOGGER.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not defined in the configs! Fallback to default damage metadata.")
             return VanillaDamageMetadata(event.damage)
         }
         return damageMapping.builder.build(event)

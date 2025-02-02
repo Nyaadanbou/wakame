@@ -81,7 +81,7 @@ private class LastItemRecord {
      *
      * 该映射不储存 [ItemStack.isEmpty] 为 `true` 的物品. 对于这类物品, 该映射会直接将其储存为 `null`.
      */
-    private val lastItems: Reference2ObjectOpenHashMap<ItemSlot, ItemStack?> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 1f)
+    private val lastItems: Reference2ObjectOpenHashMap<ItemSlot, ItemStack?> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f)
 
     /**
      * 获取上一个 tick 的物品.

@@ -15,19 +15,20 @@ import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.EntityType
 import org.bukkit.event.entity.EntityDamageEvent
+import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
 /**
  * 依据直接伤害实体的类型来获取萌芽伤害的映射.
  */
 @Init(
-    stage = InitStage.POST_WORLD
+    stage = InitStage.POST_WORLD,
 )
 @Reload
 object DirectEntityTypeMappings {
 
-    private val damageMappingForNoCause: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
-    private val damageMappingForPlayer: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val noCausingDamageMapping: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val playerDamageMapping: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
     @InitFun
     private fun init() = loadDataIntoRegistry()
@@ -35,8 +36,8 @@ object DirectEntityTypeMappings {
     @ReloadFun
     private fun reload() = loadDataIntoRegistry()
 
-    fun getForNoCause(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = damageMappingForNoCause[directEntityType] ?: return null
+    fun getForNoCausing(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
+        val damageMappings = noCausingDamageMapping[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
             if (damageMapping.match(event)) {
                 return damageMapping
@@ -46,7 +47,7 @@ object DirectEntityTypeMappings {
     }
 
     fun getForPlayer(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = damageMappingForPlayer[directEntityType] ?: return null
+        val damageMappings = playerDamageMapping[directEntityType] ?: return null
         for (damageMapping in damageMappings) {
             if (damageMapping.match(event)) {
                 return damageMapping
@@ -56,8 +57,8 @@ object DirectEntityTypeMappings {
     }
 
     private fun loadDataIntoRegistry() {
-        damageMappingForNoCause.clear()
-        damageMappingForPlayer.clear()
+        noCausingDamageMapping.clear()
+        playerDamageMapping.clear()
 
         val rootNode = buildYamlConfigLoader {
             withDefaults()
@@ -70,24 +71,29 @@ object DirectEntityTypeMappings {
             KoishDataPaths.CONFIGS
                 .resolve(DamageMappingConstants.DATA_DIR)
                 .resolve("direct_entity_type_mappings.yml")
-                .toFile()
-                .readText()
+                .toFile().readText()
         )
-        rootNode.node("no_causing").childrenMap()
-            .transformKeys<EntityType>()
-            .forEach { (entityType, node) ->
-                val damageMappingList = node.childrenMap()
-                    .map { (_, node) -> node.get<DamageMapping>()?.also { LOGGER.error("Malformed damage mapping at ${node.path()}. Skipped.") } }
-                    .filterNotNull()
-                damageMappingForNoCause[entityType] = damageMappingList
-            }
-        rootNode.node("player").childrenMap()
-            .transformKeys<EntityType>()
-            .forEach { (entityType, node) ->
-                val damageMappingList = node.childrenMap()
-                    .map { (_, node) -> node.get<DamageMapping>()?.also { LOGGER.error("Malformed damage mapping at ${node.path()}. Skipped.") } }
-                    .filterNotNull()
-                damageMappingForPlayer[entityType] = damageMappingList
-            }
+
+        processDamageMappings(rootNode, noCausingDamageMapping, "no_causing")
+        processDamageMappings(rootNode, playerDamageMapping, "player")
+    }
+
+    private fun processDamageMappings(
+        rootNode: ConfigurationNode,
+        targetMap: MutableMap<EntityType, List<DamageMapping>>,
+        nodeName: String
+    ) {
+        val entityTypeToNode = rootNode.node(nodeName).childrenMap()
+        for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
+            val damageMappingList = node.childrenMap().map { (_, node) ->
+                val result: DamageMapping? = node.get<DamageMapping>()
+                if (result == null) {
+                    LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
+                }
+                result
+            }.filterNotNull()
+
+            targetMap[entityType] = damageMappingList
+        }
     }
 }

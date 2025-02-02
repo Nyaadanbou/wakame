@@ -34,19 +34,17 @@ import kotlin.random.Random
 @Init(
     stage = InitStage.POST_WORLD,
 )
-internal class DamageDisplay {
+internal object DamageDisplay {
 
-    companion object {
-        // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
-        private val ZERO = Vector3f(0f, 0f, 0f)
-        private val UNIT_X = Vector3f(1f, 0f, 0f)
-        private val UNIT_Y = Vector3f(0f, 1f, 0f)
-        private val UNIT_Z = Vector3f(0f, 0f, 1f)
-        private val ONE = Vector3f(1f, 1f, 1f)
+    // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
+    private val ZERO = Vector3f(0f, 0f, 0f)
+    private val UNIT_X = Vector3f(1f, 0f, 0f)
+    private val UNIT_Y = Vector3f(0f, 1f, 0f)
+    private val UNIT_Z = Vector3f(0f, 0f, 1f)
+    private val ONE = Vector3f(1f, 1f, 1f)
 
-        // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
-        private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
-    }
+    // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
+    private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
 
     @InitFun
     fun init() {

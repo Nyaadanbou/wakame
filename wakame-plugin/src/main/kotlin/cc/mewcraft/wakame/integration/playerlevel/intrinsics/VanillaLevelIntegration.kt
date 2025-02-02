@@ -1,22 +1,17 @@
 package cc.mewcraft.wakame.integration.playerlevel.intrinsics
 
+import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
-import org.bukkit.Server
-import java.util.UUID
+import java.util.*
 
 /**
  * A [player level integration][PlayerLevelIntegration] that returns the
  * [vanilla experience level](https://minecraft.wiki/w/Experience).
  */
-class VanillaLevelIntegration(
-    private val server: Server,
-) : PlayerLevelIntegration {
+object VanillaLevelIntegration : PlayerLevelIntegration {
 
     override val type: PlayerLevelType = PlayerLevelType.VANILLA
-
-    override fun get(uuid: UUID): Int? {
-        return server.getPlayer(uuid)?.level
-    }
+    override fun get(uuid: UUID): Int? = SERVER.getPlayer(uuid)?.level
 
 }

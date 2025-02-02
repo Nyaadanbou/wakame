@@ -41,7 +41,7 @@ object EntityAttackMappings {
      * 获取某一伤害情景下原版生物的伤害映射.
      * 返回空表示未指定该情景下的伤害映射.
      */
-    fun getForVanilla(damager: LivingEntity, event: EntityDamageEvent): DamageMapping? {
+    fun get(damager: LivingEntity, event: EntityDamageEvent): DamageMapping? {
         val damageMappings = mappings[damager.type] ?: return null
         for (damageMapping in damageMappings) {
             if (damageMapping.match(event)) {
@@ -68,10 +68,19 @@ object EntityAttackMappings {
                 .toFile()
                 .readText()
         )
-        for ((entityType, node) in rootNode.childrenMap().transformKeys<EntityType>()) {
-            val damageMappingList = node.childrenMap().map { (_, node) ->
-                node.get<DamageMapping>()?.also { LOGGER.error("Malformed damage mapping at ${node.path()}. Skipped.") }
-            }.filterNotNull()
+
+        val entityTypeToNode = rootNode.childrenMap()
+        for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
+            val damageMappingList = node.childrenMap()
+                .map { (_, node) ->
+                    val result: DamageMapping? = node.get<DamageMapping>()
+                    if (result == null) {
+                        LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
+                    }
+                    result
+                }
+                .filterNotNull()
+
             mappings[entityType] = damageMappingList
         }
     }

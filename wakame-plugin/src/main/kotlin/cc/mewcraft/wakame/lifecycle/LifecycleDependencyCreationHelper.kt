@@ -27,7 +27,7 @@ internal object LifecycleDependencyCreationHelper {
                     it.parameters[0].kind == KParameter.Kind.INSTANCE
         }
         function.isAccessible = true
-        function.callSuspend(objectInstance)
+        function.callSuspend(objectInstance ?: throw IllegalArgumentException("$simpleName is not an object"))
         completion.complete(Unit)
     }
 

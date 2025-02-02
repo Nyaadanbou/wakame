@@ -23,11 +23,15 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
+
+@ConfigSerializable
+data class DamageTypeMapping(@Setting("damage_metadata") val builder: DamageMetadataBuilder<*>)
+
 /**
  * 依据原版伤害类型来获取萌芽伤害的映射.
  */
 @Init(
-    stage = InitStage.POST_WORLD
+    stage = InitStage.POST_WORLD,
 )
 @Reload
 object DamageTypeMappings {
@@ -69,7 +73,9 @@ object DamageTypeMappings {
                 .toFile()
                 .readText()
         )
-        for ((damageType, node) in rootNode.childrenMap().transformKeys<DamageType>(throwIfFail = false)) {
+
+        val damageTypeToNode = rootNode.childrenMap()
+        for ((damageType, node) in damageTypeToNode.transformKeys<DamageType>(throwIfFail = false)) {
             val mapping = node.get<DamageTypeMapping>()
             if (mapping == null) {
                 LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
@@ -79,6 +85,3 @@ object DamageTypeMappings {
         }
     }
 }
-
-@ConfigSerializable
-data class DamageTypeMapping(@Setting("damage_metadata") val builder: DamageMetadataBuilder<*>)

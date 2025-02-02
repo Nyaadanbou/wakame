@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.ecs.ecsModule
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
-import cc.mewcraft.wakame.integration.integrationModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.packModule
@@ -61,7 +60,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 ecsModule(),
                 entityModule(),
                 guiModule(),
-                integrationModule(),
                 itemModule(),
                 packModule(),
                 reforgeModule(),

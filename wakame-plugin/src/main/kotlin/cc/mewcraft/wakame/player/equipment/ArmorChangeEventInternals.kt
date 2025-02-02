@@ -20,7 +20,9 @@ internal object ArmorChangeEventInternals {
 
     @InitFun
     fun init() {
-        event<ArmorChangeEvent>(EventPriority.MONITOR, true) { event ->
+        event<ArmorChangeEvent>(EventPriority.MONITOR) { event ->
+            if (!event.isCancelled)
+                return@event
             if (event.action == ArmorChangeEvent.Action.UNEQUIP)
                 return@event
 

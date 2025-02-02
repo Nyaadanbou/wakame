@@ -74,6 +74,8 @@ internal object Reloader {
      * This method can only be called before the reloading process has completed.
      */
     private fun registerTasks(reloadables: List<Reloadable>) {
+        check(!Initializer.isDone) { "Cannot register tasks after initialization has completed" }
+
         // add vertices
         for (reloadable in reloadables) {
             Reloader.reloadables += reloadable

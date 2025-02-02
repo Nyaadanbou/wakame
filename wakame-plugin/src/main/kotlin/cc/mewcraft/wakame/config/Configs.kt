@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.feature.Feature
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
+import cc.mewcraft.wakame.lifecycle.reloader.InternalReload
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -36,6 +37,7 @@ val MAIN_CONFIG: Provider<CommentedConfigurationNode> = Configs[DEFAULT_CONFIG_I
 @InternalInit(
     stage = InternalInitStage.PRE_WORLD,
 )
+@InternalReload
 object Configs {
 
     private val customSerializers = HashMap<String, TypeSerializerCollection.Builder>()

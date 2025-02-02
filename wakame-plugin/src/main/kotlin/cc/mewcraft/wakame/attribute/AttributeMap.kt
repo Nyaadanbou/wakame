@@ -76,7 +76,7 @@ object ImaginaryAttributeMaps {
     private val intrusiveRegisteredIds = HashSet<String>()
 
     @JvmField
-    val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("arrow")
+    val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("minecraft:arrow")
 
     @InitFun
     private fun init() {

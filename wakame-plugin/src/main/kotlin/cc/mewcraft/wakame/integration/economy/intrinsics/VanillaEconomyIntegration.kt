@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.integration.economy.intrinsics
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyType
-import org.bukkit.Server
 import org.bukkit.entity.Player
-import org.koin.core.component.get
-import java.util.UUID
+import java.util.*
 
 /**
  * 一种以经验等级为货币单位的经济系统.
@@ -16,7 +14,7 @@ import java.util.UUID
  *
  * 仅用于开发与测试, 勿用于生产环境!
  */
-class VanillaEconomyIntegration : EconomyIntegration {
+internal object VanillaEconomyIntegration : EconomyIntegration {
 
     override val type: EconomyType = EconomyType.VANILLA
 
@@ -43,7 +41,7 @@ class VanillaEconomyIntegration : EconomyIntegration {
     }
 
     private fun getPlayer(uuid: UUID): Player {
-        return Injector.get<Server>().getPlayer(uuid) ?: error("player is not online.")
+        return SERVER.getPlayer(uuid) ?: error("player is not online.")
     }
 
 }

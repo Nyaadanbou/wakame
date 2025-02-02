@@ -27,7 +27,7 @@ import org.objectweb.asm.Type
 import kotlin.reflect.KClass
 
 @Init(
-    stage = InitStage.POST_WORLD
+    stage = InitStage.POST_WORLD,
 )
 internal object HooksLoader {
 
@@ -64,7 +64,7 @@ internal object HooksLoader {
                 val loadListener = annotation["loadListener"] as? Type
 
                 if (plugins.isEmpty()) {
-                    throw IllegalStateException("hook annotation on $className does not specify any plugins")
+                    throw IllegalStateException("Hook annotation on $className does not specify any plugins")
                 }
 
                 if (shouldLoadHook(plugins, unless, requireAll)) {
@@ -80,7 +80,7 @@ internal object HooksLoader {
 
     private fun shouldLoadHook(plugins: List<String>, unless: List<String>, requireAll: Boolean): Boolean {
         if (plugins.isEmpty())
-            throw IllegalStateException("no plugins specified")
+            throw IllegalStateException("No plugins specified")
 
         val pluginManager = Bukkit.getPluginManager()
 
@@ -95,7 +95,7 @@ internal object HooksLoader {
         if (loadListener != null) {
             @Suppress("UNCHECKED_CAST")
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
-                ?: throw IllegalStateException("the LoadListener $loadListener is not an object class")
+                ?: throw IllegalStateException("The LoadListener $loadListener is not an object class")
 
             if (!obj.loaded.get()) { // blocking call
                 return
@@ -104,7 +104,7 @@ internal object HooksLoader {
 
         val hookClass = Class.forName(className).kotlin
         val hookInstance = hookClass.objectInstance
-            ?: throw IllegalStateException("hook $hookClass is not an object class")
+            ?: throw IllegalStateException("Hook $hookClass is not an object class")
 
         useHook(hookInstance)
     }
