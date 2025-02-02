@@ -67,7 +67,7 @@ enchantments:
 # id: `damage_resistant`
 damage_resistant:
   namespace: general
-  tooltip: "免疫火焰伤害"
+  tooltip: "免疫伤害"
 
 # id: `food`
 food:

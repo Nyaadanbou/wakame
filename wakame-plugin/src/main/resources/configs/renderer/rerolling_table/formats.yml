@@ -91,15 +91,6 @@ cells/empty/out:
     unselected:
       style: "<!i><dark_gray>"
 
-# id: `standalone_cell`
-standalone_cell:
-  namespace: reforge
-  history_format:
-    - "惩罚: <mod_count> / <mod_limit>"
-  overall_ordinal:
-    - core
-    - history
-
 # id: `custom_name`
 custom_name:
   namespace: vanilla
