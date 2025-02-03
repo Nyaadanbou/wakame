@@ -23,7 +23,7 @@ interface TrackEntityKills : Track, TrackMap<TrackEntityKills, Key, Int> {
     fun grow(key: Key, count: Int = 1): TrackEntityKills
 
     companion object : TrackType<TrackEntityKills> {
-        private val entityKeyLookup: EntityKeyLookup by Injector.inject()
+        private val entityKeyLookup: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
 
         fun empty(): TrackEntityKills {
             return TrackEntityKillsImpl(emptyMap())

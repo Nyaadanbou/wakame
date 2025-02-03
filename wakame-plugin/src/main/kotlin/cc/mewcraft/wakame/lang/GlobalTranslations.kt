@@ -46,12 +46,11 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 )
 @Reload
 object GlobalTranslations : RegistryConfigStorage {
-    const val DIR_PATH = "lang/"
+    private const val DIR_PATH = "lang/"
 
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
-    private val miniMessage: MiniMessage by Injector.inject()
-    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, miniMessage)
+    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, Injector.get<MiniMessage>())
 
     @InitFun
     private fun init() {

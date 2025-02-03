@@ -1,16 +1,14 @@
 package cc.mewcraft.wakame.item.templates.components
 
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.Context
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
-
-private val MM = MiniMessage.miniMessage()
 
 abstract class NameLike : ItemTemplate<Component> {
     abstract val plainName: String // 纯文本

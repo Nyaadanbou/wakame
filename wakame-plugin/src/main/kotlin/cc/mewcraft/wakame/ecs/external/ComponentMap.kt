@@ -21,7 +21,7 @@ data class ComponentMap(
     val tags: List<UniqueId<out Any>>,
 ) {
     companion object {
-        private val wakameWorld: WakameWorld by Injector.inject()
+        private val wakameWorld: WakameWorld by Injector.inject<WakameWorld>()
     }
 
     constructor(

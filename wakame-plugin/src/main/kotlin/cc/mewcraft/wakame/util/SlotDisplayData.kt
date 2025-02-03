@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -80,8 +79,6 @@ interface SlotDisplayData {
     }
 
 }
-
-private val MM = Injector.get<MiniMessage>()
 
 /**
  * 菜单图标的字符串字典.

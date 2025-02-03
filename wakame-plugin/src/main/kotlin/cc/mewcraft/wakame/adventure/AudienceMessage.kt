@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.adventure
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.audience.Audience
@@ -9,7 +9,6 @@ import net.kyori.adventure.sound.Sound
 import net.kyori.adventure.sound.Sound.Emitter
 import net.kyori.adventure.sound.Sound.Source
 import net.kyori.adventure.sound.SoundStop
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.Title.Times
@@ -67,7 +66,7 @@ internal class ChatAudienceMessage(
     private val text: String,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val component = AudienceMessageSupport.miniMessage.deserialize(text, tagResolver)
+        val component = MM.deserialize(text, tagResolver)
         audience.sendMessage(component)
     }
 }
@@ -76,7 +75,7 @@ internal class ActionbarAudienceMessage(
     private val text: String,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val component = AudienceMessageSupport.miniMessage.deserialize(text, tagResolver)
+        val component = MM.deserialize(text, tagResolver)
         audience.sendActionBar(component)
     }
 }
@@ -87,8 +86,8 @@ internal class TitleAudienceMessage(
     private val times: Times,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
-        val titleComponent = AudienceMessageSupport.miniMessage.deserialize(title, tagResolver)
-        val subtitleComponent = AudienceMessageSupport.miniMessage.deserialize(subtitle, tagResolver)
+        val titleComponent = MM.deserialize(title, tagResolver)
+        val subtitleComponent = MM.deserialize(subtitle, tagResolver)
         audience.showTitle(Title.title(titleComponent, subtitleComponent, times))
     }
 }
@@ -313,7 +312,3 @@ internal object SoundStopAudienceMessageSerializer : TypeSerializer<SoundStopAud
 
 }
 //</editor-fold>
-
-private object AudienceMessageSupport {
-    val miniMessage: MiniMessage by Injector.inject()
-}

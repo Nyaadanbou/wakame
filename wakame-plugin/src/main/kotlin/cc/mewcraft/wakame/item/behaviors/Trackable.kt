@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemTracks
 import cc.mewcraft.wakame.item.components.tracks.TrackTypes
 import cc.mewcraft.wakame.item.projectNeko
-import cc.mewcraft.wakame.item.toNekoStack
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
@@ -20,7 +19,7 @@ import org.bukkit.inventory.ItemStack
 
 interface Trackable : ItemBehavior {
     private object Default : Trackable {
-        private val entityKeyLookup: EntityKeyLookup by Injector.inject()
+        private val entityKeyLookup: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
 
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
             if (damagee !is LivingEntity) {

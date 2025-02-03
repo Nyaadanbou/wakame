@@ -121,7 +121,7 @@ object ImaginaryAttributeMaps {
 
 private object AttributeMapSupport {
     val PLAYER_KEY: Key = EntityType.PLAYER.key()
-    val ENTITY_KEY_LOOKUP: EntityKeyLookup by Injector.inject()
+    val ENTITY_KEY_LOOKUP: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
 }
 
 /**

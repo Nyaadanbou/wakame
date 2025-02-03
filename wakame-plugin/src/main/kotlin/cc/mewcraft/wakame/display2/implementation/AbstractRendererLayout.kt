@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -11,7 +11,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -28,8 +27,6 @@ internal abstract class AbstractRendererLayout(
 
     override val staticIndexedTextList: ArrayList<IndexedText> = ArrayList()
     override val defaultIndexedTextList: ArrayList<IndexedText> = ArrayList()
-
-    protected val miniMessage = Injector.get<MiniMessage>()
 
     // derived index (key) -> ordinal (int)
     private val indexedTextOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
@@ -201,7 +198,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun deserializeToComponents(text: String): List<Component> {
-        return text.split("\\r").map(miniMessage::deserialize)
+        return text.split("\\r").map(MM::deserialize)
     }
 
     override fun getOrdinal(index: DerivedIndex): DerivedOrdinal {

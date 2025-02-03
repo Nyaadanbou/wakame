@@ -1,16 +1,11 @@
 package cc.mewcraft.wakame.display2.implementation.crafting_station
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -37,10 +32,6 @@ internal data class FuzzyEnchantmentRendererFormat(
             )
         }
         return SimpleIndexedText(index, tooltip)
-    }
-
-    companion object {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.attribute.*
@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.Tag
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -267,8 +266,6 @@ private interface AttributeBinderRE {
 
 
 //<editor-fold desc="Implementations">
-private val MM = Injector.get<MiniMessage>()
-
 /**
  * A mutable [AttributeBundleFacade] (except the property [id]).
  */

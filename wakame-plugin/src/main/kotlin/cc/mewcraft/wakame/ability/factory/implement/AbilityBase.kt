@@ -22,7 +22,7 @@ abstract class AbilityBase(
     config: ConfigurationNode,
 ) : Ability {
     companion object {
-        private val wakameWorld: WakameWorld by Injector.inject()
+        private val wakameWorld: WakameWorld by Injector.inject<WakameWorld>()
     }
 
     override val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay.empty()

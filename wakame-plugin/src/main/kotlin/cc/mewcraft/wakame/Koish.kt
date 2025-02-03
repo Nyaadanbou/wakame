@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.util.ServerUtils
 import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.registerEvents
 import kotlinx.coroutines.cancel
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Server
 import org.bukkit.plugin.java.JavaPlugin
@@ -23,17 +24,13 @@ import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
 
+internal val MM: MiniMessage = MiniMessage.miniMessage()
 internal val SERVER: Server
     get() = Bukkit.getServer()
 internal var PLUGIN_READY: Boolean = false
     private set
 
 internal object Koish : JavaPlugin(), IKoish {
-
-    // onLoad 晚于 bootstrap 但早于 onEnable, 适合初始化 Koin 容器
-    override fun onLoad() {
-
-    }
 
     override fun onEnable() {
         PLUGIN_READY = true

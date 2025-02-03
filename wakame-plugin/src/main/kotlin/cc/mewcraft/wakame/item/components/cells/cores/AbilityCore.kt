@@ -1,17 +1,15 @@
 package cc.mewcraft.wakame.item.components.cells.cores
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.ability.PlayerAbility
+import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.CoreConstants
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.util.CompoundTag
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import org.koin.core.component.get
 import org.spongepowered.configurate.ConfigurationNode
 
 val Cell.abilityCore: AbilityCore?
@@ -90,10 +88,6 @@ internal data class SimpleAbilityCore(
         baseTag.merge(abilityTag)
 
         return baseTag
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 

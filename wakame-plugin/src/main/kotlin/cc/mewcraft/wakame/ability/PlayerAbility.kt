@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.context.abilityInput
@@ -14,9 +13,9 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.text.mini
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -169,9 +168,9 @@ internal data class SimplePlayerAbility(
     override val instance: Ability
         get() = AbilityRegistry.INSTANCES[id]
     override val displayName: Component
-        get() = instance.displays.name.let(MM::deserialize)
+        get() = instance.displays.name.mini
     override val description: List<Component>
-        get() = instance.displays.tooltips.map(MM::deserialize)
+        get() = instance.displays.tooltips.mini
 
     override fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val input = abilityInput(caster) {
@@ -187,10 +186,6 @@ internal data class SimplePlayerAbility(
         writeTrigger(trigger)
         writeVariant(variant)
         writeEvaluable(manaCost)
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 
