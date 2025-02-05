@@ -1,9 +1,17 @@
-# 元素
+# 该文件定义了所有的元素
 
-# 所有的元素
+# FIXME 移除 binary_index, 持久化直接储存 id
+
+# 每个元素的具体定义
 elements:
 
-  # 排在首位的元素将成为默认元素
+  # 默认元素
+  # 当游戏尝试寻找一个元素但不存在时将使用该元素
+  # id 为 "neutral" 的元素将自动作为默认元素
+  #
+  # 默认元素有如下特殊要求:
+  # - 禁止修改这里的节点 `binary_index`
+  # - 禁止修改这里的字段 "neutral"
   neutral:
     binary_index: 0
     display_name: 中立

@@ -1,8 +1,21 @@
 base: writable_book
-slot_display_name: "RECYCLE_WHEN_CONFIRMED"
+slot_display_name: "你正在出售"
+
+# 额外占位符
+# {item_list}
+# {total_worth}
 slot_display_lore:
-  - "{item_list}"
-  - "<total_worth>"
+  - "<gray>- {item_list}"
+  - ""
+  - "<gray>总价值: <yellow><total_worth>"
+  - ""
+  - "<aqua>点击确认."
+
 slot_display_dict:
-  with_level: "<item_name> <item_level>"
+  # 额外占位符
+  # <item_name>
+  # <item_level>
+  with_level: "<item_name> <gray>[<yellow>lv. <item_level></yellow>]"
+  # 额外占位符
+  # <item_name>
   without_level: "<item_name>"

@@ -1,48 +1,25 @@
-# 元素
-
-# 所有的元素
 elements:
-
-  # FIXME 移除 binary_index, 由注册表自动分配
-
-  # !!! 配置文件中元素的顺序很重要, 一旦确定好顺序就不要再修改.
-  # !!! 内部实现会按照读取顺序给每个元素分配一个整数 id, 从 0 开始.
-  # !!! 元素的整数 id 主要用于数据的持久化, 提高持久化的压缩效率.
-  #
-  # !!! 除非是全新的地图存档, 否则请遵循以下原则来修改这里的配置文件:
-  # !!! 1) 如果要添加元素, 请在最后添加
-  # !!! 2) 永远不要删除元素
-
-  # 名为 "neutral" 的元素为默认元素
-  # 禁止修改数字 id `binary_index`
-  # 禁止修改字符串 id "neutral"
-  # 否则 koish 会强制关服
   neutral:
     binary_index: 0
-    display_name: 中立
+    display_name: Neutral
     styles: "<white>"
-
   fire:
     binary_index: 1
-    display_name: 火
+    display_name: Fire
     styles: "<white>"
-
   water:
     binary_index: 2
-    display_name: 水
+    display_name: Water
     styles: "<white>"
-
   wind:
     binary_index: 3
-    display_name: 风
+    display_name: Wind
     styles: "<white>"
-
   earth:
     binary_index: 4
-    display_name: 土
+    display_name: Earth
     styles: "<white>"
-
   thunder:
     binary_index: 5
-    display_name: 雷
+    display_name: Thunder
     styles: "<white>"

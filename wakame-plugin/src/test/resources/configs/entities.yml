@@ -1,13 +1,3 @@
-# 实体 Entities
-
-# 实体的默认属性:
-# 你必须在这里定义每种实体所拥有的属性及其数值
-# 如果一个实体没有定义属性X，则该实体没有属性X
-#
-# 例外的默认属性:
-# 如果一个属性X它是基于原版属性，并且
-# - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性X
-# - 在这里存在节点，那么最终将返回这里X指定的值，或X的全局默认值，如果值为空
 entity_attributes:
 
   minecraft:living:
@@ -51,7 +41,7 @@ entity_attributes:
     values:
       max_health: 60.0
       attack_damage:
-        neutral: 5.0 # attack_damage 是由两个属性组成的 (min 和 max). 这里指定的值将同时指定 min 和 max!
+        neutral: 5.0 # attack_damage 是由两个属性组成的 (min 和 max). 这里指定的值将同时指定 min 和 max
 
   minecraft:spider:
     parent: minecraft:monster
@@ -68,29 +58,13 @@ entity_attributes:
       defense:
         neutral: 4.0
 
-# 实体索引表（目前仅用于条件判断）
 entity_type_holders:
 
-  demo_bosses_1: # 索引的唯一标识
-    - minecraft:ender_dragon # 原版怪物 minecraft:{value}（必须小写）
-    - minecraft:wither # 可用值参考 https://jd.papermc.io/paper/1.20/org/bukkit/entity/EntityType.html
+  demo_bosses_1:
+    - minecraft:ender_dragon
+    - minecraft:wither
 
   demo_bosses_2:
-    - mythicmobs:soul_knight # MM 怪物 mythicmobs:{value}（必须小写）
+    - mythicmobs:soul_knight
     - mythicmobs:nature_golem
 
-  demo_bosses_3:
-    - mythicmobs:king_slime
-    - mythicmobs:eye_of_cthulhu
-
-  demo_creeps_1:
-    - minecraft:zombie
-    - minecraft:skeleton
-
-  demo_creeps_2:
-    - mythicmobs:flying_fish
-    - mythicmobs:goblin_thief
-
-  demo_creeps_3:
-    - mythicmobs:mister_stabby
-    - mythicmobs:snow_balla

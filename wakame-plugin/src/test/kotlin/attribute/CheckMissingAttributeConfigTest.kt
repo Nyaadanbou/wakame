@@ -59,7 +59,7 @@ class CheckMissingAttributeConfigTest : KoinTest {
         val rootNode = config.get()
         val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.ids
         val idsPresentInConfig = rootNode.childrenMap().keys.map(Any::toString).map(Identifiers::of)
-        val missingIdsInConfig = idsPresentInRegistry subtract idsPresentInConfig
+        val missingIdsInConfig = idsPresentInRegistry subtract idsPresentInConfig.toSet()
 
         if (missingIdsInConfig.isNotEmpty()) {
             fail("Missing attribute configs for: ${missingIdsInConfig.joinToString(", ")}")

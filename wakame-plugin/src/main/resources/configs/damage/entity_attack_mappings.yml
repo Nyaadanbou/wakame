@@ -1,79 +1,147 @@
-# 映射:
-# 原版生物的攻击特征 -> 萌芽伤害
+# 映射: 原版生物的攻击特征 -> 萌芽伤害
 #
 # 何时使用?
 # 当伤害存在直接实体、且直接实体为非玩家生物时调用.
 
-#  blaze:  # 进行攻击的实体类型
-#    映射_a: # 任意不重复的键
-#      predicates:  # 判定本次伤害事件相关场景的谓词
-#        entity_data:  # 检查攻击实体的特定数据
-#          adult: 0  # 攻击实体是否成年, 0表示否, 1表示是, 面对无年龄的实体会不通过
-#          size: 1  # 攻击实体的尺寸, 面对非史莱姆/岩浆怪的实体会不通过
-#          puff_state: 1  # 河豚的碰撞状态, 面对非河豚的实体会不通过
-#        damage_type:  # 检查本次伤害的类型, 类型必须是列表其一
-#          - mob_attack
-#          - mob_attack_no_aggro
-#        direct_entity_type:  # 检查本次伤害直接实体的类型, 类型必须是列表其一
-#          - small_fireball
-#          - arrow
-#        victim_entity_type:  # 检查本次伤害受伤实体的类型, 类型必须是列表其一
-#          - blaze
-#          - cod
-#      damage_metadata:  # 本次伤害应使用的 DamageMetadata, type 为 DamageMetadataBuilder 的类型, 类型含义见下
-#        type: direct  # 伤害的所有内容均有配置文件指定, 支持多元素
-#        damage_tags: [ ]
-#        damage_bundle:
-#          neutral:
-#            min: 3.0
-#            max: 3.0
-#            rate: 1.0  # 可省略, 默认 1.0
-#            defense_penetration: 0.0  # 可省略, 默认 0.0
-#            defense_penetration_rate: 0.0  # 可省略, 默认 0.0
-#        critical_strike_metadata:
-#          chance: 0.0
-#          positive_power: 1.0  # 可省略, 默认 1.0
-#          negative_power: 1.0  # 可省略, 默认 1.0
-#          none_power: 1.0  # 可省略, 默认 1.0
-#    映射_b:
-#      predicates:
-#        ...
-#      damage_metadata:
-#        type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
-#        damage_tags: [ ]
-#        element: fire
-#        rate: 1.0  # 可省略, 默认 1.0
-#        defense_penetration: 0.0  # 可省略, 默认 0.0
-#        defense_penetration_rate: 0.0  # 可省略, 默认 0.0
-#        critical_strike_metadata:
-#          chance: 0.0
-#          positive_power: 1.0  # 可省略, 默认 1.0
-#          negative_power: 1.0  # 可省略, 默认 1.0
-#          none_power: 1.0  # 可省略, 默认 1.0
-#    映射_c:
-#      predicates:
-#        ...
-#      damage_metadata:
-#        type: attribute  # 基于攻击实体的 AttributeMap 获取
-#        damage_tags: [ ]
-#    映射_d:
-#      predicates:
-#        ...
-#      damage_metadata:
-#        type: molang  # 基于 Molang 获取
-#        damage_tags: [ ]
-#        damage_bundle:
-#          neutral:
-#            min: <evaluable>
-#            max: <evaluable>
-#            rate: <evaluable>
-#            defense_penetration: <evaluable>
-#            defense_penetration_rate: <evaluable>
-#        critical_strike_metadata:
-#          chance: <evaluable>
-#          positive_power: <evaluable>
-#          negative_power: <evaluable>
-#          none_power: <evaluable>
+# 这是一个示例, 用来说明如何编写一个伤害映射
+# 这一级的每一个 node 将被视作一种特定实体的伤害映射
+# 这里的 node key 为发起攻击的实体类型的 id, 参考 https://github.com/misode/mcmeta/blob/registries/entity_type/data.json
+# 这里的 node value 描述这个实体的伤害映射将如何运行
+interaction:
+
+  # 这一级的每一个 node 将被视作一个映射
+  # 每一个映射由两部分构成:
+  #   predicates: 用于控制使用该映射的谓词(条件)
+  #   damage_metadata: 用于描述该伤害的元数据
+  # 注意, 务必将条件 (predicates) 最严格的映射写在前面
+  #
+  # 这里的 node key 可以为任意值
+  映射/1:
+
+    # 用于判定是否使用该映射的谓词
+    predicates:
+
+      # 检查攻击实体的特定数据
+      entity_data:
+        # 攻击实体是否成年, 0表示否, 1表示是, 面对无年龄的实体会不通过
+        adult: 0
+        # 攻击实体的尺寸, 面对非史莱姆/岩浆怪的实体会不通过
+        size: 1
+        # 河豚的碰撞状态, 面对非河豚的实体会不通过
+        puff_state: 1
+
+      # 检查本次伤害的类型, 类型必须是列表其一
+      damage_type:
+        - mob_attack
+        - mob_attack_no_aggro
+
+      # 检查本次伤害直接实体的类型, 类型必须是列表其一
+      direct_entity_type:
+        - small_fireball
+        - arrow
+
+      # 检查本次伤害受伤实体的类型, 类型必须是列表其一
+      victim_entity_type:
+        - blaze
+        - cod
+
+    # 当谓词通过后, 本次伤害的元数据
+    damage_metadata:
+
+      # 此 node 用于指定该 <伤害元数据> 的类型
+      # 根据类型的不同, 其余 node 的配置也不同
+      #
+      # 这里先说明 direct 类型的具体写法
+      # 其他类型将在其他下面几个映射里说明
+      #
+      # direct: 伤害的所有内容均有配置文件指定, 支持多元素
+      type: direct
+
+      # 伤害的标签
+      damage_tags: [ ]
+
+      # 伤害的数值
+      damage_bundle:
+        # 这一级 node 的 key 为元素, value 为该元素对应的伤害数值
+        # 如果想让这次伤害存在多个元素, 添加多个 node 即可
+        neutral:
+          # 最小值
+          min: 3.0
+          # 最大值
+          max: 3.0
+          # 可省略, 默认 1.0
+          rate: 1.0
+          # 可省略, 默认 0.0
+          defense_penetration: 0.0
+          # 可省略, 默认 0.0
+          defense_penetration_rate: 0.0
+
+      # 暴击的元数据
+      critical_strike_metadata:
+        # 必填
+        chance: 0.0
+        # 可省略, 默认 1.0
+        positive_power: 1.0
+        # 可省略, 默认 1.0
+        negative_power: 1.0
+        # 可省略, 默认 1.0
+        none_power: 1.0
+
+  映射/2:
+    predicates: { }
+    damage_metadata:
+      # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
+      type: vanilla
+      # 伤害的标签
+      damage_tags: [ ]
+      # 元素的类型
+      element: fire
+      # 可省略, 默认 1.0
+      rate: 1.0
+      # 可省略, 默认 0.0
+      defense_penetration: 0.0
+      # 可省略, 默认 0.0
+      defense_penetration_rate: 0.0
+      # 暴击的元数据
+      critical_strike_metadata:
+        # 必填
+        chance: 0.0
+        # 可省略, 默认 0.0
+        positive_power: 1.0
+        # 可省略, 默认 1.0
+        negative_power: 1.0
+        # 可省略, 默认 1.0
+        none_power: 1.0
+
+  映射/3:
+    predicates: { }
+    damage_metadata:
+      # 基于攻击实体的 AttributeMap 获取
+      type: attribute
+      # 伤害的标签
+      damage_tags: [ ]
+
+  映射/4:
+    predicates: { }
+    damage_metadata:
+      # 基于 Molang 表达式
+      type: molang
+      # 伤害的标签
+      damage_tags: [ ]
+      # 伤害的数值
+      damage_bundle:
+        neutral:
+          min: "10 + math.random(1,2)"
+          max: "15 + math.random(1,2)"
+          rate: 1.0
+          defense_penetration: 0.0
+          defense_penetration_rate: "math.random(0,1)"
+      # 暴击的元数据
+      critical_strike_metadata:
+        chance: 0.0
+        positive_power: "math.random(1,1.5)"
+        negative_power: "math.random(1,1.5)"
+        none_power: "math.random(1,1.5)"
 
 axolotl:
   melee:
@@ -84,9 +152,7 @@ axolotl:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 bee:
@@ -98,9 +164,7 @@ bee:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 blaze:
@@ -112,9 +176,7 @@ blaze:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 5.0
-          max: 5.0
+        neutral: { min: 5.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -125,9 +187,7 @@ blaze:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 bogged:
@@ -139,9 +199,7 @@ bogged:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 5.0
+        neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -152,9 +210,7 @@ bogged:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 breeze:
@@ -166,9 +222,7 @@ breeze:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 1.5
-          max: 1.5
+        neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
         chance: 0.0
 cat:
@@ -180,9 +234,7 @@ cat:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 cave_spider:
@@ -194,9 +246,7 @@ cave_spider:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 creeper:
@@ -222,9 +272,7 @@ dolphin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
 drowned:
@@ -249,9 +297,7 @@ drowned:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
 elder_guardian:
@@ -263,9 +309,7 @@ elder_guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 7.5
-          max: 7.5
+        neutral: { min: 7.5, max: 7.5 }
       critical_strike_metadata:
         chance: 0.0
   spikes:
@@ -276,9 +320,7 @@ elder_guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -289,9 +331,7 @@ elder_guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 12.0
-          max: 12.0
+        neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
 # 末影龙数据与原版有些不一致
@@ -304,9 +344,7 @@ ender_dragon:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 7.0
-          max: 15.0
+        neutral: { min: 7.0, max: 15.0 }
       critical_strike_metadata:
         chance: 0.0
   dragon_breath:
@@ -317,9 +355,7 @@ ender_dragon:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 6.0
+        neutral: { min: 3.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
 enderman:
@@ -331,9 +367,7 @@ enderman:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 10.5
-          max: 10.5
+        neutral: { min: 10.5, max: 10.5 }
       critical_strike_metadata:
         chance: 0.0
 endermite:
@@ -345,9 +379,7 @@ endermite:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 evoker:
@@ -373,9 +405,7 @@ fox:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 frog:
@@ -387,9 +417,7 @@ frog:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 10.0
-          max: 10.0
+        neutral: { min: 10.0, max: 10.0 }
       critical_strike_metadata:
         chance: 0.0
 ghast:
@@ -416,9 +444,7 @@ ghast:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 giant:
@@ -430,9 +456,7 @@ giant:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 75.0
-          max: 75.0
+        neutral: { min: 75.0, max: 75.0 }
       critical_strike_metadata:
         chance: 0.0
 goat:
@@ -446,9 +470,7 @@ goat:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   baby_melee:
@@ -461,9 +483,7 @@ goat:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 1.5
-          max: 1.5
+        neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
         chance: 0.0
 guardian:
@@ -475,9 +495,7 @@ guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
   spikes:
@@ -488,9 +506,7 @@ guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -501,9 +517,7 @@ guardian:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 hoglin:
@@ -517,9 +531,7 @@ hoglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 12.0
+        neutral: { min: 4.5, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
   baby_melee:
@@ -532,9 +544,7 @@ hoglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 0.75
-          max: 0.75
+        neutral: { min: 0.75, max: 0.75 }
       critical_strike_metadata:
         chance: 0.0
 husk:
@@ -546,9 +556,7 @@ husk:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
 illusioner:
@@ -560,9 +568,7 @@ illusioner:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 5.0
+        neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
 iron_golem:
@@ -574,9 +580,7 @@ iron_golem:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 11.25
-          max: 32.25
+        neutral: { min: 11.25, max: 32.25 }
       critical_strike_metadata:
         chance: 0.0
 llama:
@@ -588,9 +592,7 @@ llama:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 1.5
-          max: 1.5
+        neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
         chance: 0.0
 magma_cube:
@@ -602,9 +604,7 @@ magma_cube:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 3.0
+        neutral: { min: 4.5, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   size_2_melee:
@@ -615,9 +615,7 @@ magma_cube:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 6.0
-          max: 6.0
+        neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
   size_4_melee:
@@ -628,9 +626,7 @@ magma_cube:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 ocelot:
@@ -642,9 +638,7 @@ ocelot:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 panda:
@@ -656,9 +650,7 @@ panda:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 phantom:
@@ -670,9 +662,7 @@ phantom:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 piglin:
@@ -684,9 +674,7 @@ piglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 5.0
+        neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   firework:
@@ -707,9 +695,7 @@ piglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 7.5
-          max: 7.5
+        neutral: { min: 7.5, max: 7.5 }
       critical_strike_metadata:
         chance: 0.0
 piglin_brute:
@@ -721,9 +707,7 @@ piglin_brute:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 19.5
-          max: 19.5
+        neutral: { min: 19.5, max: 19.5 }
       critical_strike_metadata:
         chance: 0.0
 pillager:
@@ -735,9 +719,7 @@ pillager:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 5.0
-          max: 5.0
+        neutral: { min: 5.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   firework:
@@ -759,9 +741,7 @@ polar_bear:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 9.0
-          max: 9.0
+        neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
         chance: 0.0
 pufferfish:
@@ -773,9 +753,7 @@ pufferfish:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
   puff_1_melee:
@@ -786,9 +764,7 @@ pufferfish:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 rabbit:
@@ -800,9 +776,7 @@ rabbit:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 12.0
-          max: 12.0
+        neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
 # 劫掠兽无法区分普通近战和吼叫
@@ -815,9 +789,7 @@ ravager:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 18.0
-          max: 18.0
+        neutral: { min: 18.0, max: 18.0 }
       critical_strike_metadata:
         chance: 0.0
 shulker:
@@ -829,9 +801,7 @@ shulker:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 6.0
-          max: 6.0
+        neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
 silverfish:
@@ -843,9 +813,7 @@ silverfish:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 1.5
-          max: 1.5
+        neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
         chance: 0.0
 skeleton:
@@ -857,9 +825,7 @@ skeleton:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.0
-          max: 5.0
+        neutral: { min: 4.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -870,9 +836,7 @@ skeleton:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 slime:
@@ -884,9 +848,7 @@ slime:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   size_4_melee:
@@ -897,9 +859,7 @@ slime:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 6.0
-          max: 6.0
+        neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
 snow_golem:
@@ -913,9 +873,7 @@ snow_golem:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
   snowball_to_other:
@@ -926,9 +884,7 @@ snow_golem:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 0.0
-          max: 0.0
+        neutral: { min: 0.0, max: 0.0 }
       critical_strike_metadata:
         chance: 0.0
 spider:
@@ -940,9 +896,7 @@ spider:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 stray:
@@ -954,9 +908,7 @@ stray:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 5.0
+        neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -967,9 +919,7 @@ stray:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 3.0
-          max: 3.0
+        neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
         chance: 0.0
 trader_llama:
@@ -981,9 +931,7 @@ trader_llama:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 1.5
-          max: 1.5
+        neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
         chance: 0.0
 vex:
@@ -995,9 +943,7 @@ vex:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 13.5
-          max: 13.5
+        neutral: { min: 13.5, max: 13.5 }
       critical_strike_metadata:
         chance: 0.0
 villager:
@@ -1020,9 +966,7 @@ vindicator:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 19.5
-          max: 19.5
+        neutral: { min: 19.5, max: 19.5 }
       critical_strike_metadata:
         chance: 0.0
 warden:
@@ -1034,9 +978,7 @@ warden:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 15.0
-          max: 15.0
+        neutral: { min: 15.0, max: 15.0 }
       critical_strike_metadata:
         chance: 0.0
   melee:
@@ -1047,9 +989,7 @@ warden:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 45.0
-          max: 45.0
+        neutral: { min: 45.0, max: 45.0 }
       critical_strike_metadata:
         chance: 0.0
 witch:
@@ -1061,9 +1001,7 @@ witch:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 6.0
-          max: 6.0
+        neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
 wither:
@@ -1090,9 +1028,7 @@ wither:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 12.0
-          max: 12.0
+        neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
   self_explore:
@@ -1117,9 +1053,7 @@ wither_skeleton:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 12.0
-          max: 12.0
+        neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
 wolf:
@@ -1131,9 +1065,7 @@ wolf:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 6.0
-          max: 6.0
+        neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
         chance: 0.0
 zoglin:
@@ -1147,9 +1079,7 @@ zoglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 12.0
+        neutral: { min: 4.5, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
   baby_melee:
@@ -1162,9 +1092,7 @@ zoglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 0.75
-          max: 0.75
+        neutral: { min: 0.75, max: 0.75 }
       critical_strike_metadata:
         chance: 0.0
 zombie:
@@ -1176,9 +1104,7 @@ zombie:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0
 zombified_piglin:
@@ -1190,9 +1116,7 @@ zombified_piglin:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 12.0
-          max: 12.0
+        neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
         chance: 0.0
 zombie_villager:
@@ -1204,8 +1128,6 @@ zombie_villager:
       type: direct
       damage_tags: [ ]
       damage_bundle:
-        neutral:
-          min: 4.5
-          max: 4.5
+        neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
         chance: 0.0

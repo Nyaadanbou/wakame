@@ -1,0 +1,43 @@
+# 这是一个合成站配方的示例
+#
+# 该文件名为 "raw_bronze", 意思是其路径为 "raw_bronze"
+# 该文件位于文件夹 "example_1" 下, 意思是位于命名空间 "example_1" 下
+# 命名空间+路径共同组成了该配方的 id: "example_1:raw_bronze"
+#
+# 不同命名空间下的配方文件名可以重复
+
+# 配方的输入
+# 这里的 node value 为一个 list, list 中的每一个 node value 为一个 map
+# map 中必须存在一个形如 "type: <id>" 的 node, 用于指定配方输入的类型
+# 目前支持的配方输入类型:
+#   "item" - 物品
+#   "exp" - 经验值
+# 其他 node 根据类型的不同也将不同, 下面将作详细说明
+input:
+  # 这是类型为 “item” 的配方输入
+  # 必须指定 “id” 和 “amount”
+  #
+  # id:
+  #   格式: "namespace:id"
+  #   其中 namespace 支持这些:
+  #     wakame: Koish 物品
+  #     minecraft: Minecraft 物品
+  #   其中 id 取决于具体实现
+  # amount:
+  #   物品堆叠的数量, 可以超过单个堆叠的最大数量
+  - { type: item, id: minecraft:raw_copper, amount: 3 }
+  - { type: item, id: wakame:material/raw_tin, amount: 1 }
+
+  # 这是类型为 “exp” 的配方输入
+  # 必须指定 “amount”
+  #
+  # amount:
+  #   经验值数量
+  - { type: exp, amount: 1 }
+
+# 配方的输出
+output:
+  # 该物品格式为 "namespace:id", 同配方输入的写法
+  item: wakame:material/raw_bronze
+  # 物品堆叠的数量, 可以超过单个堆叠的最大数量
+  amount: 4

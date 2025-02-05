@@ -1,4 +1,0 @@
-base: barrier
-slot_display_name: "<white>结果: 无输出"
-slot_display_lore:
-  - "<dark_gray>这里将输出合并后的核心."

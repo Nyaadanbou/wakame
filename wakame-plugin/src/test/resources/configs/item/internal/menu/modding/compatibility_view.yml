@@ -1,4 +1,0 @@
-base: gray_stained_glass_pane
-slot_display_name: "适用的核心"
-slot_display_lore:
-  - "* {core}"

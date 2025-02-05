@@ -1,22 +1,18 @@
 # 全局配置文件
 
-# 性能设置
-performance: { }
-
-# 所使用的经济系统
+# Koish 所使用的经济系统
 # 可用选项:
-# ECONOMY - Economy 插件的账户余额
-# VANILLA - Minecraft 的原版经验等级
-# ZERO - 无经济系统 (永远为 0)
-economy_provider: VANILLA
+#   economy: Economy 插件的账户余额
+#   vanilla: Minecraft 的原版经验等级
+#   zero: 无经济系统 (永远为 0)
+economy_provider: vanilla
 
-# 玩家等级如何计算
-#
+# Koish 如何计算玩家的等级
 # 可用选项:
-# ADVENTURE - AdventureLevel 插件的冒险等级
-# VANILLA - Minecraft 的原版经验等级
-# ZERO - 无等级 (永远为 0)
-player_level_provider: VANILLA
+#   adventure: AdventureLevel 插件的冒险等级
+#   vanilla: Minecraft 的原版经验等级
+#   zero: 无等级 (永远为 0)
+player_level_provider: vanilla
 
 # 只有物品的所有者可以拾起死亡掉落的物品
 only_owner_can_pickup_death_drops: false

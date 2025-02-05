@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceFunction
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
@@ -75,7 +76,7 @@ object ItemSlotRegistry {
     }
 
     /**
-     * ��册一个 [ItemSlot] 实例.
+     * 注册一个 [ItemSlot] 实例.
      *
      * 每当一个 [ItemSlot] 被创建时, 应该调用此函数.
      *
@@ -89,9 +90,7 @@ object ItemSlotRegistry {
         when (slot) {
             is VanillaItemSlot -> {
                 vanillaBySlot.putIfAbsent(slot.slot, slot)
-                vanillaByGroup.computeIfAbsent(slot.slot.group) {
-                    ObjectArraySet()
-                }.add(slot)
+                vanillaByGroup.computeIfAbsent(slot.slot.group, Reference2ReferenceFunction { ObjectArraySet() }).add(slot)
             }
 
             is CustomItemSlot -> {

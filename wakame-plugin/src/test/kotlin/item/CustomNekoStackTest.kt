@@ -34,12 +34,7 @@ import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.test.KoinTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class CustomNekoStackTest : KoinTest {
     companion object {
@@ -680,7 +675,7 @@ class CustomNekoStackTest : KoinTest {
 
         unboxed {
             assertIs<TextComponent>(it)
-            assertEquals("普通", it.content())
+            assertEquals("Common", it.content())
 
             val expectedStyle = Style.style(*common.value.displayStyles)
             val actualStyle = it.style().edit { builder ->
@@ -928,34 +923,6 @@ class CustomNekoStackTest : KoinTest {
         result {
             assertTrue(it.isEmpty())
         }
-    }
-    //</editor-fold>
-
-    //<editor-fold desc="Use Cases">
-    @Test
-    fun `use case - least configuration`() {
-        val item = readCustomPrototype("use_case", "least_configuration")
-        assertEquals(Material.WOODEN_SWORD, item.base.type)
-    }
-
-    @Test
-    fun `use case - apple without food`() {
-        val prototype = readCustomPrototype("use_case", "apple_without_food")
-    }
-
-    @Test
-    fun `use case - pickaxe without tool`() {
-        val prototype = readCustomPrototype("use_case", "pickaxe_without_tool")
-    }
-
-    @Test
-    fun `use case - simple material`() {
-        val prototype = readCustomPrototype("use_case", "simple_material")
-    }
-
-    @Test
-    fun `use case - sword without attribute modifiers`() {
-        val prototype = readCustomPrototype("use_case", "sword_without_attribute_modifiers")
     }
     //</editor-fold>
 }

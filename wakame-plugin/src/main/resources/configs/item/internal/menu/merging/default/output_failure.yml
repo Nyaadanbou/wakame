@@ -1,6 +1,0 @@
-base: barrier
-slot_display_name: "OUTPUT_FAILURE"
-slot_display_lore:
-  - "{type_description}"
-  - "{cost_description}"
-  - "{result_description}"

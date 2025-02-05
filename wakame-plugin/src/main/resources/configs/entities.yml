@@ -1,36 +1,66 @@
-# 实体 Entities
-
 # 实体的默认属性
+#
 # 你必须在这里定义每种实体所拥有的属性及其数值
-# 如果一个实体没有定义属性X，则该实体没有属性X
+# 如果一个实体没有定义属性 X, 则该实体没有属性 X
 #
-# 例外：
-# 如果一个属性X它是基于原版属性，并且
-# - 在这里没有节点，那么最终将返回X所对应原版属性的数值，而非没有属性X
-# - 在这里存在节点，那么最终将返回这里X指定的值，或X的全局默认值，如果值为空
-#
-# 解释：
-# 没有定义 = 不存在节点(node)
-# 没有数值 = 存在节点但值为空(~)
+# 例外:
+# 如果一个属性 X 它是基于原版属性, 并且
+# - 在这里没有节点, 那么最终将返回 X 所对应原版属性的数值, 而非没有属性 X
+# - 在这里存在节点, 那么最终将返回这里 X 指定的值, 或 X 的全局默认值, 如果值为空
 entity_attributes:
 
-  minecraft:living: # 这里写实体的 key，也可以是符合命名空间规范的任意值
-    parent: ~ # 父属性配置的 key，必须出现在该属性配置之前。可为空
+  # 这是一个例子, 用来说明配置的格式
+  #
+  # 这里指定实体的 id, 必须是命名空间格式
+  # 这里的 id 不一定要来自游戏内, 可以按需编造, 例如这里的 "koish:example"
+  # 但如果要为游戏内的某个实体类型指定默认属性, 该 id 必须能够匹配一个实际存在的实体 id
+  koish:example/1:
+    # 父属性配置的 key, 必须出现在该属性配置之前. 可为空
+    parent: ~
+    # 在 values 下指定该实体的默认属性及其数值
     values:
-      defense: default # 如果一个属性带元素，并且没有 map 结构，则相当于给该属性的每个元素都指定了一个值
-      max_mana: 100.0 # 如果一个属性不带元素，则直接写标量来指定其数值
+      # 如果一个属性带元素, 并且不是 map 结构, 则相当于给该属性的每个元素都指定了一个值
+      # 例如这里的 defense 属性, 它是一个元素属性, 所以相当于指定每个元素都使用默认值
+      defense: default # default 意为自动采用属性的全局默认值
+      # 如果一个属性带元素, 并且是 map 结构, 则可以单独给某个元素指定一个值
+      # 如果这里缺失了某个元素类型, 则缺失元素对应的属性将采用全局属性默认值
+      attack_damage_rate:
+        neutral: 1.0
+        thunder: 0.5
+      # 如果一个属性不带元素, 则直接写标量来指定其数值
+      max_mana: 100.0
+      # 对于那些由两个数值组成的属性, 例如 attack_damage (min 和 max),
+      # 永远是(也只能)同时指定 min 和 max, 无法单独指定其 min 和 max.
+      # 也就是说, 写法上这些属性与只有一个数值的属性没有任何区别.
+      attack_damage: 5.0
+
+  # 这是一个例子, 用来说明配置的格式
+  #
+  # 这个例子说明了继承的基本概念和用法
+  koish:example/2:
+    parent: koish:example/1
+    values:
+      attack_effect_chance: default
+      # 这里的 defense 属性虽然被注释了, 但 koish:example/2 依然拥有 defense 属性!
+      # 这是因为其继承了 koish:example/1, 而 koish:example/1 拥有 defense 属性
+      # defense: default
+
+  minecraft:living:
+    parent: ~
+    values:
+      defense: default
+      max_mana: 100.0
 
   minecraft:player:
     parent: minecraft:living
     values:
-      attack_damage: default # default 意为采用全局默认值
+      attack_damage: default
       attack_damage_rate: default
       attack_effect_chance: default
       attack_knockback: default
       block_interaction_range: default
       critical_strike_chance: default
       critical_strike_power: default
-      # defense: default # 这里被注释了，但 player 依然拥有 defense 属性。这因为其继承了 living，而 living 拥有 defense 属性
       defense_penetration: default
       defense_penetration_rate: default
       entity_interaction_range: default
@@ -58,7 +88,7 @@ entity_attributes:
 
   minecraft:mob:
     parent: minecraft:living
-    values: { } # 属性值 map 可以为空，虽然没什么用
+    values: { }
 
   minecraft:damageable:
     parent: ~
@@ -399,7 +429,7 @@ entity_attributes:
     parent: minecraft:damageable
     values: { }
 
-  minecraft:all_zero:
+  minecraft:all_zeros:
     parent: ~
     values:
       attack_damage: 0
@@ -413,33 +443,19 @@ entity_attributes:
       universal_defense_penetration_rate: 0
 
   minecraft:arrow:
-    parent: minecraft:all_zero
+    parent: minecraft:all_zeros
     values: { }
 
-
-# 实体索引表（目前仅用于条件判断）
+# 实体索引表 (目前仅用于条件判断)
 entity_type_holders:
 
-  demo_bosses_1: # 索引的唯一标识
-    - minecraft:ender_dragon # 原版怪物 minecraft:{value}（必须小写）
-    - minecraft:wither # 可用值参考 https://jd.papermc.io/paper/1.20/org/bukkit/entity/EntityType.html
+  # 原版怪物 minecraft:{value} (必须小写); 可用值参考 https://jd.papermc.io/paper/1.21.4/org/bukkit/entity/EntityType.html
+  # MM 怪物 mythicmobs:{value} (必须小写)
+
+  demo_bosses_1: # 索引的 id
+    - minecraft:ender_dragon
+    - minecraft:wither
 
   demo_bosses_2:
-    - mythicmobs:soul_knight # MM 怪物 mythicmobs:{value}（必须小写）
+    - mythicmobs:soul_knight
     - mythicmobs:nature_golem
-
-  demo_bosses_3:
-    - mythicmobs:king_slime
-    - mythicmobs:eye_of_cthulhu
-
-  demo_creeps_1:
-    - minecraft:zombie
-    - minecraft:skeleton
-
-  demo_creeps_2:
-    - mythicmobs:flying_fish
-    - mythicmobs:goblin_thief
-
-  demo_creeps_3:
-    - mythicmobs:mister_stabby
-    - mythicmobs:snow_balla

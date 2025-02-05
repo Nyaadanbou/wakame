@@ -1,4 +1,0 @@
-base: barrier
-slot_display_name: "<white>结果: <red>合并失败"
-slot_display_lore:
-  - "{result_description}"

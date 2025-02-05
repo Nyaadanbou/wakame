@@ -2,4 +2,4 @@
 #
 # 该原型*不应该*加载成功
 
-rarity: mapping:demo_1 # 仅支持静态稀有度
+rarity: mapping:__default__ # 仅支持静态稀有度

@@ -1,4 +1,0 @@
-base: barrier
-slot_display_name: "OUTPUT_FAILURE"
-slot_display_lore:
-  - "{failure_reason}"

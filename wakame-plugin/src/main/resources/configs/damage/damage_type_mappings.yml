@@ -6,21 +6,36 @@
 # 为了完整性, 这里涉及了原版的所有伤害类型,
 # 有些伤害类型实际上必然存在直接实体 (例如: arrow),
 # 给这些伤害类型写的映射自然没有任何作用.
-#
 
+# 这是一个示例, 用来说明如何编写一个伤害映射
+# 这一级的每一个 node 将被视作一种特定实体的伤害映射
+# node key 为实体的类型的 id, 参考 https://github.com/misode/mcmeta/blob/registries/entity_type/data.json
+# node value 描述这个实体的萌芽伤害类型
 arrow:
+  # 伤害的元数据
   damage_metadata:
     type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
+    # 伤害的标签
     damage_tags: [ ]
+    # 伤害的元素类型
     element: neutral
-    rate: 1.0  # 可省略, 默认 1.0
-    defense_penetration: 0.0  # 可省略, 默认 0.0
-    defense_penetration_rate: 0.0  # 可省略, 默认 0.0
+    # 可省略, 默认 1.0
+    rate: 1.0
+    # 可省略, 默认 0.0
+    defense_penetration: 0.0
+    # 可省略, 默认 0.0
+    defense_penetration_rate: 0.0
+    # 暴击的元数据
     critical_strike_metadata:
+      # 必填
       chance: 0.0
-      positive_power: 1.0  # 可省略, 默认 1.0
-      negative_power: 1.0  # 可省略, 默认 1.0
-      none_power: 1.0  # 可省略, 默认 1.0
+      # 可省略, 默认 1.0
+      positive_power: 1.0
+      # 可省略, 默认 1.0
+      negative_power: 1.0
+      # 可省略, 默认 1.0
+      none_power: 1.0
+
 bad_respawn_point:
   damage_metadata:
     type: vanilla
@@ -75,14 +90,14 @@ dry_out:
     defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
-#  ender_pearl:
-#    damage_metadata:
-#      type: vanilla
-#      damage_tags: [ ]
-#      element: neutral
-#      defense_penetration_rate: 1.0
-#      critical_strike_metadata:
-#        chance: 0.0
+# ender_pearl:
+#   damage_metadata:
+#     type: vanilla
+#     damage_tags: [ ]
+#     element: neutral
+#     defense_penetration_rate: 1.0
+#     critical_strike_metadata:
+#       chance: 0.0
 explosion:
   damage_metadata:
     type: vanilla
@@ -223,13 +238,13 @@ magic:
     defense_penetration_rate: 1.0
     critical_strike_metadata:
       chance: 0.0
-#  mace_smash:
-#    damage_metadata:
-#      type: vanilla
-#      damage_tags: [ ]
-#      element: neutral
-#      critical_strike_metadata:
-#        chance: 0.0
+# mace_smash:
+#   damage_metadata:
+#     type: vanilla
+#     damage_tags: [ ]
+#     element: neutral
+#     critical_strike_metadata:
+#       chance: 0.0
 mob_attack:
   damage_metadata:
     type: vanilla

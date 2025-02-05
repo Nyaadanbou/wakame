@@ -1,0 +1,5 @@
+# 该文件名必须是一个合法的原版物品 id, 参考: https://github.com/misode/mcmeta/blob/registries/item/data.json
+# 如此设置, 使得所有原版的钻石(minecraft:diamond)拥有一行自定义描述.
+
+lore:
+  - "<dark_gray>闪闪发光!"

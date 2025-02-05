@@ -1,161 +1,144 @@
-# 物品相关
-
-# 物品组件
 components:
+
   arrow:
     enabled: true
-    display_name: "弹药"
+    display_name: "Arrow"
 
   attack_speed:
     enabled: true
-    display_name: "攻击速度"
-    tooltips:
-      single: "<!i>攻击速度: <value>"
-    mappings:
-      0: "非常慢"
-      1: "慢"
-      2: "普通"
-      3: "快"
-      4: "非常快"
+    display_name: "Attack Speed"
 
   attribute_modifiers:
     enabled: true
-    display_name: "属性修饰符"
+    display_name: "Attribute Modifiers"
 
   can_break:
     enabled: true
-    display_name: "CAN_BREAK"
+    display_name: "Can Break"
 
   can_place_on:
     enabled: true
-    display_name: "CAN_PLACE_ON"
+    display_name: "Can Place On"
 
   castable:
     enabled: true
-    display_name: "可以施放技能"
+    display_name: "Castable"
 
   cells:
     enabled: true
-    display_name: "核孔"
-    # 虚核心的全局设置
+    display_name: "Cells"
     virtual_core:
-      display_name: "虚核心"
+      display_name: "Virtual Core"
       description: [ ]
-    # 空核心的全局设置
     empty_core:
-      display_name: "空核心"
+      display_name: "Empty Core"
       description: [ ]
 
   crate:
     enabled: true
-    display_name: "盲盒"
+    display_name: "Crate"
 
   custom_model_data:
     enabled: true
-    display_name: "自定义模型数据"
+    display_name: "Custom Model Data"
 
   custom_name:
     enabled: true
-    display_name: "自定义名字"
+    display_name: "Custom Name"
 
   damage:
     enabled: true
-    display_name: "耐久损耗"
+    display_name: "Damage"
 
   dyed_color:
     enabled: true
-    display_name: "染色"
+    display_name: "Dyed Color"
 
   elements:
     enabled: true
-    display_name: "元素"
+    display_name: "Elements"
 
   enchantments:
     enabled: true
-    display_name: "附魔"
+    display_name: "Enchantments"
 
   damage_resistant:
     enabled: true
-    display_name: "免疫火焰伤害"
+    display_name: "Damage Resistant"
 
   food:
     enabled: true
-    display_name: "作为食物"
+    display_name: "Food"
 
   glowable:
     enabled: true
-    display_name: "可发光"
+    display_name: "Glowable"
 
   hide_tooltip:
     enabled: true
-    display_name: "隐藏提示框"
+    display_name: "Hide Tooltip"
 
   hide_additional_tooltip:
     enabled: true
-    display_name: "隐藏额外提示框"
+    display_name: "Hide Additional Tooltip"
 
   item_name:
     enabled: true
-    display_name: "物品名字"
+    display_name: "Item Name"
 
   kizamiz:
     enabled: true
-    display_name: "铭刻"
+    display_name: "Kizamiz"
 
   level:
     enabled: true
-    display_name: "等级"
-    # 读取或生成的最小物品等级
+    display_name: "Level"
     minimum_level: 1
 
   lore:
     enabled: true
-    display_name: "描述"
+    display_name: "Lore"
 
   max_damage:
     enabled: true
-    display_name: "最大耐久损耗"
+    display_name: "Max Damage"
 
   portable_core:
     enabled: true
-    display_name: "便携式核心"
+    display_name: "Portable Core"
 
   rarity:
     enabled: true
-    display_name: "稀有度"
+    display_name: "Rarity"
 
   reforge_history:
     enabled: true
-    display_name: "重铸历史"
+    display_name: "Reforge History"
 
   skin:
     enabled: true
-    display_name: "皮肤"
+    display_name: "Skin"
 
   skin_owner:
     enabled: true
-    display_name: "皮肤所有者"
-
-  standalone_cell:
-    enabled: true
-    display_name: "独立核孔"
+    display_name: "Skin Owner"
 
   stored_enchantments:
     enabled: true
-    display_name: "存储的附魔"
+    display_name: "Stored Enchantments"
 
   tool:
     enabled: true
-    display_name: "工具"
+    display_name: "Tool"
 
   tracks:
     enabled: true
-    display_name: "信息跟踪"
+    display_name: "Tracks"
 
   trim:
     enabled: true
-    display_name: "纹饰"
+    display_name: "Trim"
 
   unbreakable:
     enabled: true
-    display_name: "无耐久损耗"
+    display_name: "Unbreakable"

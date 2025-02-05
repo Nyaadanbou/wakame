@@ -1,4 +1,0 @@
-# 默认的核心图标.
-# 当内部实现请求的物品不存在时, 将使用此物品.
-
-base: sentry_armor_trim_smithing_template[hide_additional_tooltip={}]

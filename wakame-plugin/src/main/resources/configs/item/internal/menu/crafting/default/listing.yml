@@ -1,8 +1,0 @@
-slot_display_name: "LISTING: <item_name>"
-slot_display_lore:
-  - "{choice_list}"
-slot_display_dict:
-  ok: "<green>✔</green>"
-  bad: "<red>✘</red>"
-  choice_item: "<!i><requirement_mark> <item>×<amount>"
-  choice_exp: "<!i><requirement_mark> EXP×<amount>"

@@ -1,40 +1,46 @@
 # 稀有度
-
-# 所有的稀有度
 rarities:
 
-  # 排在首位的稀有度将成为默认稀有度
+  # 该 node 是默认的稀有度, 不可删除
+  # 该 node key 必须为 “common”, 否则 Koish 将强制关服
   common:
+
+    # FIXME 移除, 持久化直接储存字符串 id 而非数字 id
+    # 该稀有度的数字 id, 一旦创建好世界不要再修改
     binary_index: 0
+
+    # 该稀有度的展示名字
     display_name: 普通
+
+    # 该稀有度的风格样式
+    # 注意, 该风格样式跟上面的 display_name 没有关系
+    # 该风格样式将应用于诸如物品名字之类的文本上, 例如让具有普通稀有度的物品名字为白色, 而稀有的为青色
     styles: "<white>"
+
+    # 该稀有度的发光颜色
     glow_color: WHITE
 
+  # 其余的 node 为自行创建的稀有度 ...
   uncommon:
     binary_index: 1
     display_name: 罕见
-    styles: "<white>"
+    styles: "<green>"
     glow_color: GREEN
 
   rare:
     binary_index: 2
     display_name: 稀有
-    styles: "<white>"
+    styles: "<aqua>"
     glow_color: AQUA
 
   epic:
     binary_index: 3
     display_name: 史诗
-    styles: "<white>"
+    styles: "<dark_purple>"
     glow_color: DARK_PURPLE
 
   ancient:
     binary_index: 4
     display_name: 上古
-    styles: "<white>"
+    styles: "<gold>"
     glow_color: GOLD
-
-  demo: # 稀有度的 name，供其他模块引用，一旦确定不要修改
-    binary_index: 99 # 稀有度的二进制形式，最大 127，一旦确定不要修改
-    display_name: 演示 # 稀有度的展示名字，会出现在聊天消息等地方，可以随意修改
-    styles: "<white>" # 稀有度提供的风格样式，用于影响其他文本内容

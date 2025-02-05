@@ -1,33 +1,4 @@
-# 属性
-
-# 属性的标识符
-# empty:
-#
-#   是否启用属性
-#   enabled: true
-#
-#   属性的名字，展示给玩家看的
-#   display_name: "无属性"
-#
-#   属性在提示框里的样式
-#   tooltips:
-#     add: "Empty"
-#     multiply_base: "Empty"
-#     multiply_total: "Empty"
-#
-#   属性的各项数值，将作为所有生物（包括玩家）所缺省的默认值
-#   根据属性的具体种类（例如有无元素），有不同的设置可用
-#   values: { }
-
-# 默认值
-# 如果属性的某项设置没有出现在配置文件中, 将回退到这里的默认值.
-# 目前只有 `quality` 设置存在默认值, 其他的设置没有默认值.
 __default__:
-  # 属性数值的好坏格式. 按顺序进行如下判断:
-  # 当 z-score <3 或 z-score >3 时, 输出 l3 或 u3
-  # 当 z-score <2 或 z-score >2 时, 输出 l2 或 u2
-  # 当 z-score <1 或 z-score >1 时, 输出 l1 或 u1
-  # 否则, 输出 mu
   quality:
     l3: "<red>***</red>"
     l2: "<red>**</red>"
@@ -37,47 +8,17 @@ __default__:
     u2: "<green>**</green>"
     u3: "<green>***</green>"
 
-# 空属性, 仅用于说明每个属性的格式, 无任何实际作用
-__empty__:
-  # 属性的名字, 将用于某些需要显示属性名字的地方
-  display_name: "空属性"
-  # 属性在提示框中的渲染格式
-  tooltips:
-    add: "空属性: <value>"
-    multiply_base: "空属性: <value>"
-    multiply_total: "空属性: <value>"
-  # 属性在渲染前的数值缩放, 可以省略
-  scaling:
-    add: 1.0
-    multiply_base: 1.0
-    multiply_total: 1.0
-  # 属性的数值质量的渲染格式, 可以省略
-  quality:
-    l3: "<red>⭑⭑⭑</red>"
-    l2: "<red>⭑⭑</red>"
-    l1: "<red>⭑</red>"
-    mu: ""
-    u1: "<green>⭑</green>"
-    u2: "<green>⭑⭑</green>"
-    u3: "<green>⭑⭑⭑</green>"
-  # 属性的全局默认数值, 以及上下界, 不能省略
-  values: { }
-
-# 从这里开始是非技术类型的属性设置,
-# 也就是游戏里玩家能看到用到的属性.
-# ...
-
 attack_damage:
-  display_name: "<element>攻击力"
+  display_name: "Attack Damage"
   tooltips:
-    add: "<element>攻击力 <min:#;-.> ⎓ <max:#;-.><quality>"
+    add: "Attack Damage <min:#;-.> ⎓ <max:#;-.><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
-    neutral: # 如果属性是带元素的，这一级缩进为元素的标识符，然后下一级缩进才是属性的默认/最小/最大
-      default: .0 # 默认值
-      min: -16384.0 # 最小值
-      max: 16384.0 # 最大值
+    neutral:
+      default: .0
+      min: -16384.0
+      max: 16384.0
     fire:
       default: .0
       min: -16384.0
@@ -100,9 +41,9 @@ attack_damage:
       max: 16384.0
 
 attack_damage_rate:
-  display_name: "<element>攻击力"
+  display_name: "Attack Damage Rate"
   tooltips:
-    add: "<element>攻击力 <value:+#%;-.%><quality>"
+    add: "Attack Damage <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -132,42 +73,42 @@ attack_damage_rate:
       max: 16384.0
 
 attack_effect_chance:
-  display_name: "元素叠加"
+  display_name: "Attack Effect Chance"
   tooltips:
-    add: "元素叠加 <value:+#%;-.%><quality>"
+    add: "Attack Effect Chance <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
-    default: .01 # 默认值（这个属性不带元素，所以这一级缩进就是属性的默认/最小/最大）
-    min: .0 # 最小值
-    max: 1.0 # 最大值
+    default: .01
+    min: .0
+    max: 1.0
 
 attack_knockback:
-  display_name: "攻击击退"
+  display_name: "Attack Knockback"
   tooltips:
-    add: "攻击击退 <value:+#.#;-.><quality>"
-    multiply_base: "攻击击退 <value:+#%;-.%><quality>"
-    multiply_total: "攻击击退 ×<value:+#%;-.%><quality>"
+    add: "Attack Knockback <value:+#.#;-.><quality>"
+    multiply_base: "Attack Knockback <value:+#%;-.%><quality>"
+    multiply_total: "Attack Knockback ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 5.0
 
 block_interaction_range:
-  display_name: "方块交互距离"
+  display_name: "Block Interaction Range"
   tooltips:
-    add: "方块交互距离 <value:+#.#;-.><quality>"
-    multiply_base: "方块交互距离 <value:+#%;-.%><quality>"
-    multiply_total: "方块交互距离 ×<value:+#%;-.%><quality>"
+    add: "Block Interaction Range <value:+#.#;-.><quality>"
+    multiply_base: "Block Interaction Range <value:+#%;-.%><quality>"
+    multiply_total: "Block Interaction Range ×<value:+#%;-.%><quality>"
   values:
     default: 4.5
     min: 1.0
     max: 64.0
 
 critical_strike_chance:
-  display_name: "暴击概率"
+  display_name: "Critical Strike Chance"
   tooltips:
-    add: "暴击概率 <value:+#%;-.%>"
+    add: "Critical Strike Chance <value:+#%;-.%>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -176,9 +117,9 @@ critical_strike_chance:
     max: 1.0
 
 critical_strike_power:
-  display_name: "暴击伤害"
+  display_name: "Critical Strike Power"
   tooltips:
-    add: "暴击伤害 <value:+#%;-.%><quality>"
+    add: "Critical Strike Power <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -187,11 +128,11 @@ critical_strike_power:
     max: 16384.0
 
 defense:
-  display_name: "<element>防御力"
+  display_name: "Defense"
   tooltips:
-    add: "<element>防御力 <value:+#;-.><quality>"
-    multiply_base: "<element>防御力 <value:+#%;-.%><quality>"
-    multiply_total: "<element>防御力 ×<value:+#%;-.%><quality>"
+    add: "Defense <value:+#;-.><quality>"
+    multiply_base: "Defense <value:+#%;-.%><quality>"
+    multiply_total: "Defense ×<value:+#%;-.%><quality>"
   values:
     neutral:
       default: .0
@@ -219,9 +160,9 @@ defense:
       max: 16384.0
 
 defense_penetration:
-  display_name: "<element>防御穿透"
+  display_name: "Defense Penetration"
   tooltips:
-    add: "<element>防御穿透 <value:+#;-.><quality>"
+    add: "Defense Penetration <value:+#;-.><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -251,9 +192,9 @@ defense_penetration:
       max: 16384.0
 
 defense_penetration_rate:
-  display_name: "<element>防御穿透率"
+  display_name: "Defense Penetration Rate"
   tooltips:
-    add: "<element>防御穿透率 <value:+#%;-.%><quality>"
+    add: "Defense Penetration Rate <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -283,31 +224,31 @@ defense_penetration_rate:
       max: 1.0
 
 entity_interaction_range:
-  display_name: "实体交互距离"
+  display_name: "Entity Interaction Range"
   tooltips:
-    add: "实体交互距离 <value:+#.#;-.><quality>"
-    multiply_base: "实体交互距离 <value:+#%;-.%><quality>"
-    multiply_total: "实体交互距离 ×<value:+#%;-.%><quality>"
+    add: "Entity Interaction Range <value:+#.#;-.><quality>"
+    multiply_base: "Entity Interaction Range <value:+#%;-.%><quality>"
+    multiply_total: "Entity Interaction Range ×<value:+#%;-.%><quality>"
   values:
     default: 3.0
     min: 1.0
     max: 64.0
 
 hammer_damage_range:
-  display_name: "锤击范围"
+  display_name: "Hammer Damage Range"
   tooltips:
-    add: "锤击范围 <value:+#.#;-.><quality>"
-    multiply_base: "锤击范围 <value:+#%;-.%><quality>"
-    multiply_total: "锤击范围 ×<value:+#%;-.%><quality>"
+    add: "Hammer Damage Range <value:+#.#;-.><quality>"
+    multiply_base: "Hammer Damage Range <value:+#%;-.%><quality>"
+    multiply_total: "Hammer Damage Range ×<value:+#%;-.%><quality>"
   values:
     default: 0.0
     min: 0.0
     max: 64.0
 
 hammer_damage_ratio:
-  display_name: "锤击比率"
+  display_name: "Hammer Damage Ratio"
   tooltips:
-    add: "锤击比率 <value:+#%;-.%>"
+    add: "Hammer Damage Ratio <value:+#%;-.%>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -316,20 +257,20 @@ hammer_damage_ratio:
     max: 1.0
 
 health_regeneration:
-  display_name: "生命恢复"
+  display_name: "Health Regeneration"
   tooltips:
-    add: "生命恢复 <value:+#;-.><quality>"
-    multiply_base: "生命恢复 <value:+#%;-.%><quality>"
-    multiply_total: "生命恢复 ×<value:+#%;-.%><quality>"
+    add: "Health Regeneration <value:+#;-.><quality>"
+    multiply_base: "Health Regeneration <value:+#%;-.%><quality>"
+    multiply_total: "Health Regeneration ×<value:+#%;-.%><quality>"
   values:
     default: 1.0
     min: .0
     max: 5.0
 
 incoming_damage_rate:
-  display_name: "<element>承伤百分比"
+  display_name: "Incoming Damage Rate"
   tooltips:
-    add: "<element>承伤百分比 <value:+#%;-.%><quality>"
+    add: "Incoming Damage Rate <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -359,32 +300,31 @@ incoming_damage_rate:
       max: 16384.0
 
 knockback_resistance:
-  display_name: "击退抗性"
+  display_name: "Knockback Resistance"
   tooltips:
-    add: "击退抗性 <value:+#;-.><quality>"
-    multiply_base: "击退抗性 <value:+#%;-.%><quality>"
-    multiply_total: "击退抗性 ×<value:+#%;-.%><quality>"
+    add: "Knockback Resistance <value:+#;-.><quality>"
+    multiply_base: "Knockback Resistance <value:+#%;-.%><quality>"
+    multiply_total: "Knockback Resistance ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 1.0
 
-
 lifesteal:
-  display_name: "攻击吸血"
+  display_name: "Lifesteal"
   tooltips:
-    add: "攻击吸血 <value:+#;-.><quality>"
-    multiply_base: "攻击吸血 <value:+#%;-.%><quality>"
-    multiply_total: "攻击吸血 ×<value:+#%;-.%><quality>"
+    add: "Lifesteal <value:+#;-.><quality>"
+    multiply_base: "Lifesteal <value:+#%;-.%><quality>"
+    multiply_total: "Lifesteal ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 16384.0
 
 mana_consumption_rate:
-  display_name: "魔法消耗百分比"
+  display_name: "Mana Consumption Rate"
   tooltips:
-    add: "魔法消耗率 <value:+#%;-.%>"
+    add: "Mana Consumption Rate <value:+#%;-.%>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -393,86 +333,86 @@ mana_consumption_rate:
     max: 5.0
 
 mana_regeneration:
-  display_name: "魔法恢复"
+  display_name: "Mana Regeneration"
   tooltips:
-    add: "魔法恢复 <value:+#;-.><quality>"
-    multiply_base: "魔法恢复 <value:+#%;-.%><quality>"
-    multiply_total: "魔法恢复 ×<value:+#%;-.%><quality>"
+    add: "Mana Regeneration <value:+#;-.><quality>"
+    multiply_base: "Mana Regeneration <value:+#%;-.%><quality>"
+    multiply_total: "Mana Regeneration ×<value:+#%;-.%><quality>"
   values:
     default: 1.0
     min: .0
     max: 16384.0
 
 manasteal:
-  display_name: "魔法汲取"
+  display_name: "Manasteal"
   tooltips:
-    add: "魔法汲取 <value:+#;-.><quality>"
-    multiply_base: "魔法汲取 <value:+#%;-.%><quality>"
-    multiply_total: "魔法汲取 ×<value:+#%;-.%><quality>"
+    add: "Manasteal <value:+#;-.><quality>"
+    multiply_base: "Manasteal <value:+#%;-.%><quality>"
+    multiply_total: "Manasteal ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 64.0
 
 max_absorption:
-  display_name: "最大护盾"
+  display_name: "Max Absorption"
   tooltips:
-    add: "最大护盾 <value:+#;-.><quality>"
-    multiply_base: "最大护盾 <value:+#%;-.%><quality>"
-    multiply_total: "最大护盾 ×<value:+#%;-.%><quality>"
+    add: "Max Absorption <value:+#;-.><quality>"
+    multiply_base: "Max Absorption <value:+#%;-.%><quality>"
+    multiply_total: "Max Absorption ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 2048.0
 
 max_health:
-  display_name: "最大生命"
+  display_name: "Max Health"
   tooltips:
-    add: "最大生命 <value:+#;-.><quality>"
-    multiply_base: "最大生命 <value:+#%;-.%><quality>"
-    multiply_total: "最大生命 ×<value:+#%;-.%><quality>"
+    add: "Max Health <value:+#;-.><quality>"
+    multiply_base: "Max Health <value:+#%;-.%><quality>"
+    multiply_total: "Max Health ×<value:+#%;-.%><quality>"
   values:
     default: 30.0
     min: 1.0
     max: 16384.0
 
 max_mana:
-  display_name: "最大魔法"
+  display_name: "Max Mana"
   tooltips:
-    add: "最大魔法 <value:+#;-.><quality>"
-    multiply_base: "最大魔法 <value:+#%;-.%><quality>"
-    multiply_total: "最大魔法 ×<value:+#%;-.%><quality>"
+    add: "Max Mana <value:+#;-.><quality>"
+    multiply_base: "Max Mana <value:+#%;-.%><quality>"
+    multiply_total: "Max Mana ×<value:+#%;-.%><quality>"
   values:
     default: 100.0
     min: .0
     max: 16384.0
 
 mining_efficiency:
-  display_name: "挖掘效率"
+  display_name: "Mining Efficiency"
   tooltips:
-    add: "挖掘效率 <value:+#;-.><quality>"
-    multiply_base: "挖掘效率 <value:+#%;-.%><quality>"
-    multiply_total: "挖掘效率 ×<value:+#%;-.%><quality>"
+    add: "Mining Efficiency <value:+#;-.><quality>"
+    multiply_base: "Mining Efficiency <value:+#%;-.%><quality>"
+    multiply_total: "Mining Efficiency ×<value:+#%;-.%><quality>"
   values:
     default: .0
     min: .0
     max: 1024.0
 
 movement_speed:
-  display_name: "移动速度"
+  display_name: "Movement Speed"
   tooltips:
-    add: "移动速度 <value:+#.#;-.><quality>"
-    multiply_base: "移动速度 <value:+#%;-.%><quality>"
-    multiply_total: "移动速度 ×<value:+#%;-.%><quality>"
+    add: "Movement Speed <value:+#.#;-.><quality>"
+    multiply_base: "Movement Speed <value:+#%;-.%><quality>"
+    multiply_total: "Movement Speed ×<value:+#%;-.%><quality>"
   values:
     default: 0.1
     min: -1.0
     max: 4.0
 
 negative_critical_strike_power:
-  display_name: "负暴击伤害"
+  display_name: "Negative Critical Strike Power"
   tooltips:
-    add: "负暴击伤害 <value:+#%;-.%><quality>"
+    add: "Negative Critical Strike Power <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -481,9 +421,9 @@ negative_critical_strike_power:
     max: 1.0
 
 none_critical_strike_power:
-  display_name: "无暴击伤害"
+  display_name: "None Critical Strike Power"
   tooltips:
-    add: "无暴击伤害 <value:+#%;-.%><quality>"
+    add: "None Critical Strike Power <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -492,42 +432,42 @@ none_critical_strike_power:
     max: 1.0
 
 safe_fall_distance:
-  display_name: "安全摔落高度"
+  display_name: "Safe Fall Distance"
   tooltips:
-    add: "安全摔落高度 <value:+#.#;-.><quality>"
-    multiply_base: "安全摔落高度 <value:+#%;-.%><quality>"
-    multiply_total: "安全摔落高度 ×<value:+#%;-.%><quality>"
+    add: "Safe Fall Distance <value:+#.#;-.><quality>"
+    multiply_base: "Safe Fall Distance <value:+#%;-.%><quality>"
+    multiply_total: "Safe Fall Distance ×<value:+#%;-.%><quality>"
   values:
     default: 3.0
     min: -1024.0
     max: 1024.0
 
 scale:
-  display_name: "尺寸"
+  display_name: "Scale"
   tooltips:
-    add: "尺寸 <value:+#.#;-.><quality>"
-    multiply_base: "尺寸 <value:+#%;-.%><quality>"
-    multiply_total: "尺寸 ×<value:+#%;-.%><quality>"
+    add: "Scale <value:+#.#;-.><quality>"
+    multiply_base: "Scale <value:+#%;-.%><quality>"
+    multiply_total: "Scale ×<value:+#%;-.%><quality>"
   values:
     default: 1.0
     min: 0.0625
     max: 16.0
 
 step_height:
-  display_name: "行走高度"
+  display_name: "Step Height"
   tooltips:
-    add: "行走高度 <value:+#.#;-.><quality>"
-    multiply_base: "行走高度 <value:+#%;-.%><quality>"
-    multiply_total: "行走高度 ×<value:+#%;-.%><quality>"
+    add: "Step Height <value:+#.#;-.><quality>"
+    multiply_base: "Step Height <value:+#%;-.%><quality>"
+    multiply_total: "Step Height ×<value:+#%;-.%><quality>"
   values:
     default: 0.6
     min: .0
     max: 10.0
 
 sweeping_damage_ratio:
-  display_name: "横扫伤害比率"
+  display_name: "Sweeping Damage Ratio"
   tooltips:
-    add: "横扫伤害比率 <value:+#%;-.%><quality>"
+    add: "Sweeping Damage Ratio <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -536,9 +476,9 @@ sweeping_damage_ratio:
     max: 1.0
 
 universal_attack_damage:
-  display_name: "通用攻击力"
+  display_name: "Universal Attack Damage"
   tooltips:
-    add: "通用攻击力 <min:#;-.> ⎓ <max:#;-.><quality>"
+    add: "Universal Attack Damage <min:#;-.> ⎓ <max:#;-.><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -547,9 +487,9 @@ universal_attack_damage:
     max: 16384.0
 
 universal_defense:
-  display_name: "通用防御"
+  display_name: "Universal Defense"
   tooltips:
-    add: "通用防御 <value:+#;-.><quality>"
+    add: "Universal Defense <value:+#;-.><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -558,9 +498,9 @@ universal_defense:
     max: 16384.0
 
 universal_defense_penetration:
-  display_name: "通用防御穿透"
+  display_name: "Universal Defense Penetration"
   tooltips:
-    add: "通用防御穿透 <value:+#;-.><quality>"
+    add: "Universal Defense Penetration <value:+#;-.><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -569,9 +509,9 @@ universal_defense_penetration:
     max: 16384.0
 
 universal_defense_penetration_rate:
-  display_name: "通用防御穿透率"
+  display_name: "Universal Defense Penetration Rate"
   tooltips:
-    add: "通用防御穿透率 <value:+#%;-.%><quality>"
+    add: "Universal Defense Penetration Rate <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:
@@ -580,9 +520,9 @@ universal_defense_penetration_rate:
     max: 1.0
 
 water_movement_efficiency:
-  display_name: "水中移动效率"
+  display_name: "Water Movement Efficiency"
   tooltips:
-    add: "水中移动效率 <value:+#%;-.%><quality>"
+    add: "Water Movement Efficiency <value:+#%;-.%><quality>"
     multiply_base: "DO_NOT_USE"
     multiply_total: "DO_NOT_USE"
   values:

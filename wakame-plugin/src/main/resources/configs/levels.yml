@@ -1,12 +1,27 @@
+# 默认映射
+# 该映射的 id 为 "__default__", 不可修改!
+# 当没有指定映射时, 将使用这里的映射
+# 无法移除, 否则 Koish 将强制关服
 __default__:
+
+  # 这里的 node key 可以是任意值
+  # 这里的 node value 指定了一个适用于特定等级范围的稀有度映射
   tier_1:
+
+    # 适用的等级范围
     level: "[0,20)"
+
+    # 每个稀有度的权重, 必须大于 0，支持小数
+    # 如果想让一个稀有度永远不会出现在这个等级范围内, 只需要不写那个稀有度即可
+    # 反之, 如果写了一个稀有度, 则那个稀有度总有机会出现, 无论其权重有多小
     weight:
+      # 这一级的 node key 写稀有度的 id, node value 写权重
       common: 10.0
       uncommon: 5.0
       rare: 4.0
       epic: 3.0
       ancient: 2.0
+
   tier_2:
     level: "[20,40)"
     weight:
@@ -15,6 +30,7 @@ __default__:
       rare: 5
       epic: 4
       ancient: 3
+
   tier_3:
     level: "[40,60)"
     weight:
@@ -23,6 +39,7 @@ __default__:
       rare: 6
       epic: 5
       ancient: 4
+
   tier_4:
     level: "[60,80)"
     weight:
@@ -31,6 +48,7 @@ __default__:
       rare: 7
       epic: 6
       ancient: 5
+
   tier_5:
     level: "[80,)"
     weight:
@@ -39,3 +57,52 @@ __default__:
       rare: 8
       epic: 7
       ancient: 6
+
+# 自行添加的映射
+# 这里的 node key 将作为该映射的 id
+# 可以复制该 node 然后修改 node key 来创建新的映射
+station:
+
+  tier_1:
+    level: "[0,10)"
+    weight:
+      rare: 95
+      epic: 4
+      legendary: 1
+
+  tier_2:
+    level: "[10,20)"
+    weight:
+      rare: 90
+      epic: 8
+      legendary: 2
+
+  tier_3:
+    level: "[20,30)"
+    weight:
+      rare: 85
+      epic: 12
+      legendary: 3
+
+  tier_4:
+    level: "[30,40)"
+    weight:
+      rare: 80
+      epic: 15
+      legendary: 5
+
+  tier_5:
+    level: "[40,45)"
+    weight:
+      rare: 74
+      epic: 18
+      legendary: 7
+      ancient: 1
+
+  tier_6:
+    level: "[45,)"
+    weight:
+      rare: 68
+      epic: 20
+      legendary: 9
+      ancient: 3

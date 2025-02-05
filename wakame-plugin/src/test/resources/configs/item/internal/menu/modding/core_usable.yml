@@ -1,5 +1,0 @@
-slot_display_name: "<white>结果: <green>就绪"
-slot_display_lore:
-  - "{item_lore}"
-  - ""
-  - "<aqua>点击取出物品"

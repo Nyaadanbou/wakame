@@ -1,2 +1,2 @@
 base: barrier
-slot_display_name: "RECYCLE_WHEN_ERROR"
+slot_display_name: "<red>内部错误"

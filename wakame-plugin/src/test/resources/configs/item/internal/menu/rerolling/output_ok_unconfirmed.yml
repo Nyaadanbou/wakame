@@ -1,7 +1,0 @@
-slot_display_name: "<item_name>"
-slot_display_lore:
-  - "{item_lore}"
-  - ""
-  - "{cost_description}"
-  - ""
-  - "<aqua>点击确认重造物品"
