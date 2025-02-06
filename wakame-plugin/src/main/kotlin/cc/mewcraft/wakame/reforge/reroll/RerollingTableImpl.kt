@@ -38,11 +38,11 @@ internal object WtfRerollingTable : RerollingTable {
             "background" to Key.key("internal:menu/common/default/background"),
             "prev_page" to Key.key("internal:menu/common/default/prev_page"),
             "next_page" to Key.key("internal:menu/common/default/next_page"),
-            "compatibility_view" to Key.key("internal:menu/rerolling/default/compatibility_view"),
-            "output_ok_confirmed" to Key.key("internal:menu/rerolling/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling/default/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/rerolling/default/output_empty"),
-            "output_failure" to Key.key("internal:menu/rerolling/default/output_failure"),
+            "compatibility_view" to Key.key("internal:menu/rerolling_table/default/compatibility_view"),
+            "output_ok_confirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/rerolling_table/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/rerolling_table/default/output_failure"),
         )
     )
 
@@ -51,9 +51,9 @@ internal object WtfRerollingTable : RerollingTable {
         structure = arrayOf("a", "b"),
         icons = hashMapOf(
             "error" to Key.key("internal:menu/common/default/error"),
-            "core_view" to Key.key("internal:menu/rerolling/default/core_view"),
-            "core_selected" to Key.key("internal:menu/rerolling/default/core_selected"),
-            "core_unselected" to Key.key("internal:menu/rerolling/default/core_unselected"),
+            "core_view" to Key.key("internal:menu/rerolling_table/default/core_view"),
+            "core_selected" to Key.key("internal:menu/rerolling_table/default/core_selected"),
+            "core_unselected" to Key.key("internal:menu/rerolling_table/default/core_unselected"),
         )
     )
 
