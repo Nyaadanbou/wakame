@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # 支持全局配置的技能条件
 conditions:
   mana:

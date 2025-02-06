@@ -1,4 +1,5 @@
-# 该文件定义了所有的元素
+# 不要修改!
+version: 1
 
 # FIXME 移除 binary_index, 持久化直接储存 id
 

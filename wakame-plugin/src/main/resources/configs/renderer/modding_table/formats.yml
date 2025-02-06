@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # id: <有效的属性 id>
 cells/attributes/in:
   namespace: attribute

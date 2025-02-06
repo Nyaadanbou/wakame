@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 primary:
   - title:sell_button_title
   - (fixed:items)

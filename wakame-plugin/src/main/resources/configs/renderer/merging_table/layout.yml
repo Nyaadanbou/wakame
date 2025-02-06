@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 primary:
   - (fixed:reforge)
   - reforge:merge_input

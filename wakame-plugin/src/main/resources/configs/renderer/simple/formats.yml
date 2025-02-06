@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # id: `custom_name`
 custom_name:
   namespace: vanilla

@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # id: `attack_speed`
 attack_speed:
   namespace: topmost

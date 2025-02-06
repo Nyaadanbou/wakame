@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # 映射: 直接伤害实体(direct_entity)的类型 -> 萌芽伤害
 #
 # 如果来源实体是 [非玩家生物], 应该认为是 [原版生物的攻击], 应该在 entity_attack_mappings.yml 中配置.

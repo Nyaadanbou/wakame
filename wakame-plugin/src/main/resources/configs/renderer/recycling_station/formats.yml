@@ -1,3 +1,6 @@
+# 不要修改!
+version: 1
+
 # id: `sell_button_title`
 sell_button_title:
   namespace: title

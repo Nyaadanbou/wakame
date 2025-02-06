@@ -1,9 +1,0 @@
-# 该文件只是用来演示可以存在多个命名空间
-
-input:
-  - type: item
-    id: minecraft:raw_copper_block
-    amount: 1
-output:
-  item: minecraft:raw_copper
-  amount: 9
