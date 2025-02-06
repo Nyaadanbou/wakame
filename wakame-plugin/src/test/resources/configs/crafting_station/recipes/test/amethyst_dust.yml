@@ -1,7 +1,5 @@
 input:
-  - type: item
-    id: minecraft:amethyst_shard
-    amount: 1
+  - { type: item, id: minecraft:amethyst_shard, amount: 1 }
 output:
   item: wakame:material/amethyst_dust
   amount: 2
