@@ -25,15 +25,20 @@ input:
   #   其中 id 取决于具体实现
   # amount:
   #   物品堆叠的数量, 可以超过单个堆叠的最大数量
-  - { type: item, id: minecraft:raw_copper, amount: 3 }
-  - { type: item, id: wakame:material/raw_tin, amount: 1 }
+  - type: item
+    id: minecraft:raw_copper
+    amount: 3
+  - type: item
+    id: wakame:material/raw_tin
+    amount: 1
 
   # 这是类型为 “exp” 的配方输入
   # 必须指定 “amount”
   #
   # amount:
   #   经验值数量
-  - { type: exp, amount: 1 }
+  - type: exp
+    amount: 1
 
 # 配方的输出
 output:
