@@ -22,19 +22,15 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
         private val commandManager: CommandManager<C>,
     ) {
         private val commandList: ArrayList<Command<C>> = ArrayList()
+        private val pluginName = Koish.name.lowercase()
 
         /**
          * 创建一个 [Command] 并添加到 [commandList].
          */
         fun buildAndAdd(
-            name: String = Koish.name.lowercase(), // root command 默认为插件名
-            description: Description = Description.empty(),
-            aliases: Array<String> = emptyArray(),
             lambda: MutableCommandBuilder<C>.() -> Unit,
         ) {
-            val builder = MutableCommandBuilder(name, description, aliases, commandManager, lambda)
-            val command = builder.build()
-            commandList.add(command)
+            commandList += build(lambda).build()
         }
 
         /**
@@ -44,28 +40,22 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
             builder: MutableCommandBuilder<C>,
             lambda: MutableCommandBuilder<C>.() -> Unit,
         ) {
-            val command = builder.copy(lambda).build()
-            commandList.add(command)
+            commandList.add(builder.copy(lambda).build())
         }
 
         /**
          * 创建一个 [MutableCommandBuilder].
          */
         fun build(
-            name: String = Koish.name.lowercase(), // root command 默认为插件名
-            description: Description = Description.empty(),
-            aliases: Array<String> = emptyArray(),
             lambda: MutableCommandBuilder<C>.() -> Unit,
         ): MutableCommandBuilder<C> {
-            return MutableCommandBuilder(name, description, aliases, commandManager, lambda)
+            return MutableCommandBuilder(pluginName, Description.empty(), emptyArray(), commandManager, lambda)
         }
 
         /**
          * 获取已经创建好的 [Command].
          */
-        fun getAddedCommands(): List<Command<C>> {
-            return commandList
-        }
+        fun getAddedCommands(): List<Command<C>> = commandList
     }
 
 }
