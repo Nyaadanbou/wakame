@@ -12,9 +12,7 @@ import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.paper.LegacyPaperCommandManager
 import org.incendo.cloud.setting.ManagerSetting
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(stage = InitStage.POST_WORLD)
 internal object KoishCommandManager {
 
     @InitFun
@@ -34,16 +32,14 @@ internal object KoishCommandManager {
             settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true)
 
             // Register commands
-            command(AttributeCommands)
-            command(CraftCommands)
-            command(DebugCommands)
-            command(HephaestusCommands)
-            command(ItemCommands)
-            command(LootCommands)
-            command(PluginCommands)
-            command(ReforgeCommands)
-            command(ResourcepackCommands)
-            command(AbilityCommands)
+            command(AbilityCommand)
+            command(AttributeCommand)
+            command(CraftCommand)
+            command(DebugCommand)
+            command(ItemCommand)
+            command(PluginCommand)
+            command(ReforgeCommand)
+            command(ResourcepackCommand)
         }
     }
 
