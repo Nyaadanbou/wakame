@@ -69,6 +69,10 @@ internal class ConfigExtractor(
                 // update value of scalar/sequence node (which cannot be walked down further), if unchanged by user
                 val serverValueNode = serverKeyValueNodes.second
                 val extractedValueNode = extractedCfg.get(path)?.second
+
+                // 如果内部配置中的值与服务器配置中的值不同,
+                // 但已提取配置中的值与服务器配置中的值相同,
+                // 则说明用户没有修改过这个值, 可以安全地更新为内部配置中的最新值
                 if (!internalValueNode.deepEquals(serverKeyValueNodes.second) && extractedValueNode.deepEquals(serverValueNode)) {
                     serverCfg.set(path, internalValueNode, aboveEntry)
                     extractedCfg.set(path, internalValueNode)
