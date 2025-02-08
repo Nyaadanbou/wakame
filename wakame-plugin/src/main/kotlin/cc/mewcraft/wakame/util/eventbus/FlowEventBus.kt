@@ -29,7 +29,7 @@ object FlowEventBus {
     fun post(
         event: Any,
         dispatcher: CoroutineDispatcher = Dispatchers.minecraft,
-        delay: Long = 0
+        delay: Long = 0,
     ) {
         KOISH_SCOPE.launch(dispatcher) {
             delay(delay)
@@ -41,7 +41,7 @@ object FlowEventBus {
     internal fun <T : Any> subscribe(
         clazz: KClass<T>,
         dispatcher: CoroutineDispatcher = Dispatchers.minecraft,
-        handler: (T) -> Unit
+        handler: suspend (T) -> Unit,
     ): Job = KOISH_SCOPE.launch(dispatcher) {
         getFlow(clazz.java.simpleName).collect {
             if (clazz.isInstance(it)) {
@@ -57,7 +57,7 @@ object FlowEventBus {
 
     inline fun <reified T : Any> subscribe(
         dispatcher: CoroutineDispatcher = Dispatchers.minecraft,
-        noinline handler: (T) -> Unit
+        noinline handler: suspend (T) -> Unit,
     ): Job = subscribe(T::class, dispatcher, handler)
 
 }
