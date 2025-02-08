@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.packModule
-import cc.mewcraft.wakame.reforge.reforgeModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
@@ -62,7 +61,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 guiModule(),
                 itemModule(),
                 packModule(),
-                reforgeModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
