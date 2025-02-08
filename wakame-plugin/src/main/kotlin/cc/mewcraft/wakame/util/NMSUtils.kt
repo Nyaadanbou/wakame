@@ -2,15 +2,10 @@
 
 package cc.mewcraft.wakame.util
 
+import io.netty.buffer.Unpooled
 import net.kyori.adventure.key.Key
-import net.minecraft.core.DefaultedRegistry
-import net.minecraft.core.Holder
-import net.minecraft.core.HolderGetter
-import net.minecraft.core.MappedRegistry
-import net.minecraft.core.RegistrationInfo
-import net.minecraft.core.Registry
-import net.minecraft.core.RegistryAccess
-import net.minecraft.core.WritableRegistry
+import net.minecraft.core.*
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
@@ -28,8 +23,9 @@ import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import java.util.Optional
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 typealias MojangUnit = net.minecraft.util.Unit
@@ -281,4 +277,35 @@ fun Packet<*>.sendTo(vararg players: Player) {
 
 fun Packet<*>.sendTo(players: Iterable<Player>) {
     players.forEach { it.send(this) }
+}
+
+fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
+    RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
+
+fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
+    val nonNullList: NonNullList<E>
+    if (default == null) {
+        nonNullList = NonNullList.createWithCapacity(list.size)
+        nonNullList.addAll(list)
+    } else {
+        nonNullList = NonNullList.withSize(list.size, default)
+        list.forEachIndexed { index, e -> nonNullList[index] = e }
+    }
+
+    return nonNullList
+}
+
+object NMSUtils {
+    fun getEntity(entityId: Int, world: World? = null): Entity? {
+        if (world != null) {
+            return world.serverLevel.getEntity(entityId)?.bukkitEntity
+        }
+        for (world in Bukkit.getWorlds()) {
+            val entity = world.serverLevel.getEntity(entityId)?.bukkitEntity
+            if (entity != null) {
+                return entity
+            }
+        }
+        return null
+    }
 }

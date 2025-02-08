@@ -1,36 +1,31 @@
 package cc.mewcraft.wakame.util
 
+import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class MutableLazy<T>(val initializer: () -> T) {
-    private object UninitializedValue
+internal class MutableLazy<T>(
+    private val setHandler: (() -> Unit)? = null,
+    private val initializer: () -> T
+) : ReadWriteProperty<Any, T> {
 
-    @Volatile
-    private var propValue: Any? = UninitializedValue
+    private var value: T? = null
+
+    var isInitialized = false
+        private set
 
     @Suppress("UNCHECKED_CAST")
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        val localValue = propValue
-
-        if (localValue != UninitializedValue) {
-            return localValue as T
+    override fun getValue(thisRef: Any, property: KProperty<*>): T {
+        if (!isInitialized) {
+            value = initializer()
+            isInitialized = true
         }
-
-        return synchronized(this) {
-            val localValue2 = propValue
-            if (localValue2 != UninitializedValue) {
-                localValue2 as T
-            } else {
-                val initializedValue = initializer()
-                propValue = initializedValue
-                initializedValue
-            }
-        }
+        return value as T
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        synchronized(this) {
-            propValue = value
-        }
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
+        this.value = value
+        isInitialized = true
+        setHandler?.invoke()
     }
+
 }

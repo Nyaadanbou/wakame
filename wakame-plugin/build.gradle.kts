@@ -58,7 +58,6 @@ dependencies {
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
-    implementation(platform(libs.bom.packetevents.spigot))
 
     // other plugins (hard dependencies)
     compileOnly(local.adventurelevel)

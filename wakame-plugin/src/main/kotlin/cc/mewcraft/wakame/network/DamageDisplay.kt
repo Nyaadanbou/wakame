@@ -2,7 +2,12 @@ package cc.mewcraft.wakame.network
 
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.extensions.*
+import cc.mewcraft.wakame.extensions.cross
+import cc.mewcraft.wakame.extensions.minus
+import cc.mewcraft.wakame.extensions.mul
+import cc.mewcraft.wakame.extensions.plus
+import cc.mewcraft.wakame.extensions.toLocation
+import cc.mewcraft.wakame.extensions.toVector3f
 import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -11,7 +16,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.sound.Sound.*
+import net.kyori.adventure.sound.Sound.Emitter
+import net.kyori.adventure.sound.Sound.Source
+import net.kyori.adventure.sound.Sound.sound
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.TextColor
@@ -19,7 +26,11 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.Sound
-import org.bukkit.entity.*
+import org.bukkit.entity.Display
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.TextDisplay
 import org.bukkit.event.EventPriority
 import org.joml.Vector3f
 import java.util.*

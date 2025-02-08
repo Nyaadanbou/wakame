@@ -4,137 +4,130 @@ import cc.mewcraft.wakame.item.isNeko
 import cc.mewcraft.wakame.item.rarity
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.network.event.PacketHandler
+import cc.mewcraft.wakame.network.event.PacketListener
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundRemoveEntitiesEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import cc.mewcraft.wakame.network.event.registerPacketListener
+import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.rarity.GlowColor
+import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
+import cc.mewcraft.wakame.util.NMSUtils
+import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.connection
+import cc.mewcraft.wakame.util.coroutine.DispatcherContainer
 import cc.mewcraft.wakame.util.itemName
-import com.github.retrooper.packetevents.event.PacketListenerAbstract
-import com.github.retrooper.packetevents.event.PacketSendEvent
-import com.github.retrooper.packetevents.protocol.entity.data.EntityData
-import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes
-import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDestroyEntities
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerTeams
-import io.github.retrooper.packetevents.util.SpigotConversionUtil
-import net.kyori.adventure.text.Component
+import cc.mewcraft.wakame.util.serverPlayer
+import io.papermc.paper.adventure.PaperAdventure
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import me.lucko.shadow.bukkit.BukkitShadowFactory
+import me.lucko.shadow.staticShadow
+import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.world.scores.PlayerTeam
+import net.minecraft.world.scores.Scoreboard
 import org.bukkit.entity.Item
+import org.bukkit.entity.Player
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 修改 [Item].
  */
-internal object ItemEntityRenderer : PacketListenerAbstract() {
+@Init(stage = InitStage.POST_WORLD)
+internal object ItemEntityRenderer : PacketListener {
+
+    private val shadowEntity: ShadowEntity = BukkitShadowFactory.global().staticShadow<ShadowEntity>()
 
     // 目前用于彩色物品发光的实现
     private val entityId2EntityUniqueId = ConcurrentHashMap<Int, UUID>()
 
-    override fun onPacketSend(event: PacketSendEvent) {
-        when (event.packetType) {
-            PacketType.Play.Server.ENTITY_METADATA -> {
-                val wrapper = WrapperPlayServerEntityMetadata(event)
-
-                val item = SpigotConversionUtil.getEntityById(null, wrapper.entityId) as? Item ?: return
-
-                var changed = false
-
-                changed = handleCustomName(event, wrapper, item) || changed
-                changed = handleGlowEffect(event, wrapper, item) || changed
-
-                if (changed) {
-                    event.markForReEncode(true)
-                }
-            }
-
-            PacketType.Play.Server.DESTROY_ENTITIES -> {
-                val wrapper = WrapperPlayServerDestroyEntities(event)
-                handleGlowEffect(event, wrapper)
-            }
-        }
+    @InitFun
+    private fun init() {
+        registerPacketListener()
     }
 
-    private fun handleCustomName(event: PacketSendEvent, wrapper: WrapperPlayServerEntityMetadata, item: Item): Boolean {
-        val changed = tryAddCustomNameEntityData(item, wrapper.entityMetadata)
-        return changed
+    @DisableFun
+    private fun disable() {
+        unregisterPacketListener()
     }
 
-    private fun handleGlowEffect(event: PacketSendEvent, wrapper: WrapperPlayServerEntityMetadata, item: Item): Boolean {
-        val changed = tryAddGlowEffectEntityData(item, wrapper.entityMetadata)
-        sendGlowColorPacket(event, item)
-        return changed
+    @PacketHandler
+    private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
+        val oldData = event.packedItems
+        val item = runBlocking { withContext(DispatcherContainer.sync) { NMSUtils.getEntity(event.id) as? Item } }
+        if (item == null || !item.itemStack.isNeko)
+            return
+        val newData = oldData.toMutableList()
+        tryAddCustomNameEntityData(item, newData)
+        tryAddGlowEffectEntityData(item, newData)
+        event.packedItems = newData
+        sendGlowColorPacket(event.player, item)
     }
 
-    private fun handleGlowEffect(event: PacketSendEvent, wrapper: WrapperPlayServerDestroyEntities) {
-        for (entityId in wrapper.entityIds) {
+    @PacketHandler
+    private fun handleEntitiesRemove(event: ClientboundRemoveEntitiesEvent) {
+        for (entityId in event.entityIds.intIterator()) {
             entityId2EntityUniqueId.remove(entityId)
                 ?.let { entityUniqueId -> buildRemoveTeamPacket(entityUniqueId) }
-                ?.let { serverTeamPacket -> event.user.sendPacketSilently(serverTeamPacket) }
+                ?.let { serverTeamPacket -> event.player.connection.send(serverTeamPacket) }
         }
     }
 
-    /**
-     * @return 如果成功添加了数据则返回 `true`, 否则返回 `false`
-     */
-    private fun tryAddGlowEffectEntityData(entity: Item, entityData: MutableList<EntityData>): Boolean {
-        val nekoStack = entity.itemStack.shadowNeko() ?: return false
+    private fun tryAddGlowEffectEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
+        val nekoStack = item.itemStack.shadowNeko()!!
         val templates = nekoStack.templates
         if (!templates.has(ItemTemplateTypes.GLOWABLE))
-            return false
+            return
 
-        // Glow effect flag (0x40)
-        entityData.add(EntityData(0, EntityDataTypes.BYTE, 0x40.toByte()))
-
-        return true
+        // Glow effect flag
+        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_SHARED_FLAGS_ID, 0x40))
     }
 
-    /**
-     * @return 如果成功添加了数据则返回 `true`, 否则返回 `false`
-     */
-    private fun tryAddCustomNameEntityData(entity: Item, entityData: MutableList<EntityData>): Boolean {
-        val itemStack = entity.itemStack
-        if (!itemStack.isNeko)
-            return false
-
+    private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
+        val itemStack = item.itemStack
         // CustomName
-        entityData.add(EntityData(2, EntityDataTypes.OPTIONAL_ADV_COMPONENT, Optional.ofNullable(itemStack.itemName)))
+        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME, Optional.ofNullable(itemStack.itemName?.toNMSComponent())))
 
         // CustomNameVisible
-        entityData.add(EntityData(3, EntityDataTypes.BOOLEAN, true))
-
-        return true
+        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME_VISIBLE, true))
     }
 
-    private fun sendGlowColorPacket(event: PacketSendEvent, entity: Item) {
+    private fun sendGlowColorPacket(player: Player, entity: Item) {
         val nekoStack = entity.itemStack.shadowNeko() ?: return
-        val user = event.user
         val rarityColor = nekoStack.rarity.value.glowColor.takeIf { it != GlowColor.empty() } ?: return
         val teamPacket = buildCreateTeamPacket(entity, rarityColor)
         entityId2EntityUniqueId[entity.entityId] = entity.uniqueId
-        user.sendPacketSilently(teamPacket)
+        player.serverPlayer.connection.send(teamPacket)
     }
 
-    private fun buildCreateTeamPacket(itemEntity: Item, color: GlowColor): WrapperPlayServerTeams {
+    private fun buildCreateTeamPacket(itemEntity: Item, color: GlowColor): ClientboundSetPlayerTeamPacket {
         val entityUniqueId = itemEntity.uniqueId
-        return WrapperPlayServerTeams(
-            /* teamName = */ "glow_item_$entityUniqueId",
-            /* teamMode = */ WrapperPlayServerTeams.TeamMode.CREATE,
-            /* teamInfo = */ WrapperPlayServerTeams.ScoreBoardTeamInfo(
-                /* displayName = */ Component.empty(),
-                /* prefix = */ null,
-                /* suffix = */ null,
-                /* tagVisibility = */ WrapperPlayServerTeams.NameTagVisibility.NEVER,
-                /* collisionRule = */ WrapperPlayServerTeams.CollisionRule.NEVER,
-                /* color = */ color.color,
-                /* optionData = */ WrapperPlayServerTeams.OptionData.NONE
-            ),
-            /* entities = */ listOf(entityUniqueId.toString())
+        return ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(
+            /* team = */ PlayerTeam(
+                Scoreboard(),
+                "glow_item_$entityUniqueId"
+            ).also {
+                it.color = PaperAdventure.asVanilla(color.color)
+                it.players += entityUniqueId.toString()
+            },
+            /* updatePlayers = */ true
         )
     }
 
-    private fun buildRemoveTeamPacket(entityUniqueId: UUID): WrapperPlayServerTeams {
-        return WrapperPlayServerTeams(
-            /* teamName = */ "glow_item_$entityUniqueId",
-            /* teamMode = */ WrapperPlayServerTeams.TeamMode.REMOVE,
-            /* teamInfo = */ null as WrapperPlayServerTeams.ScoreBoardTeamInfo?,
+    private fun buildRemoveTeamPacket(entityUniqueId: UUID): ClientboundSetPlayerTeamPacket {
+        return ClientboundSetPlayerTeamPacket.createRemovePacket(
+            /* team = */ PlayerTeam(
+                Scoreboard(),
+                "glow_item_$entityUniqueId"
+            ).also {
+                it.players += entityUniqueId.toString()
+            }
         )
     }
 }

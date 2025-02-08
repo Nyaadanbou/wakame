@@ -4,12 +4,14 @@ import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
 import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.lore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
@@ -20,7 +22,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.network.PacketNekoStack
+import cc.mewcraft.wakame.util.showAttributeModifiers
+import cc.mewcraft.wakame.util.showEnchantments
+import cc.mewcraft.wakame.util.showStoredEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -35,7 +39,7 @@ internal class StandardRendererLayout(renderer: StandardItemRenderer) : Abstract
     stage = InitStage.POST_WORLD
 )
 @Reload
-internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Nothing>() {
+internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
@@ -60,7 +64,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Not
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: PacketNekoStack, context: Nothing?) {
+    override fun render(item: NekoStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
@@ -99,7 +103,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Not
             // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
 
             val lore = item.lore
-            if (lore.isNullOrEmpty()) {
+            if (lore.isEmpty()) {
                 itemLore
             } else {
                 itemLore + buildList {
@@ -108,9 +112,11 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Not
                 }
             }
         }
-        item.showAttributeModifiers(false)
-        item.showEnchantments(false)
-        item.showStoredEnchantments(false)
+        with(item.wrapped) {
+            showAttributeModifiers(false)
+            showEnchantments(false)
+            showStoredEnchantments(false)
+        }
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {

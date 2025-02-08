@@ -4,14 +4,38 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display2.ItemRenderers
-import com.github.retrooper.packetevents.event.PacketListenerAbstract
-import com.github.retrooper.packetevents.event.PacketSendEvent
-import com.github.retrooper.packetevents.protocol.item.ItemStack
-import com.github.retrooper.packetevents.protocol.nbt.NBTByte
-import com.github.retrooper.packetevents.protocol.packettype.PacketType
-import com.github.retrooper.packetevents.wrapper.play.server.*
+import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.network.event.PacketHandler
+import cc.mewcraft.wakame.network.event.PacketListener
+import cc.mewcraft.wakame.network.event.PlayerPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetContentPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import cc.mewcraft.wakame.network.event.registerPacketListener
+import cc.mewcraft.wakame.network.event.unregisterPacketListener
+import cc.mewcraft.wakame.util.toNMS
+import com.mojang.datafixers.util.Pair
+import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponentPredicate
+import net.minecraft.core.component.DataComponents
+import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataSerializers
+import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.trading.ItemCost
+import net.minecraft.world.item.trading.MerchantOffer
+import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
-import org.bukkit.entity.Player
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer")
@@ -19,88 +43,94 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer"
 /**
  * 修改 [org.bukkit.inventory.ItemStack].
  */
-internal object ItemStackRenderer : PacketListenerAbstract() {
+@Init(stage = InitStage.POST_WORLD)
+internal object ItemStackRenderer : PacketListener {
     private const val PROCESSED_KEY = "processed"
 
-    override fun onPacketSend(event: PacketSendEvent) {
-        // 不修改发给创造模式玩家的物品包
+    @InitFun
+    private fun init() {
+        registerPacketListener()
+    }
+
+    @DisableFun
+    private fun disable() {
+        unregisterPacketListener()
+    }
+
+    @PacketHandler
+    private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
         if (isCreative(event))
             return
-
-        // 修改发给非创造模式玩家的物品包
-        val changed = when (event.packetType) {
-            PacketType.Play.Server.SET_SLOT -> handleSetSlot(event)
-            PacketType.Play.Server.WINDOW_ITEMS -> handleWindowItems(event)
-            PacketType.Play.Server.ENTITY_METADATA -> handleEntityData(event)
-            PacketType.Play.Server.ENTITY_EQUIPMENT -> handleSetEquipment(event)
-            PacketType.Play.Server.MERCHANT_OFFERS -> handleMerchantOffers(event)
-            else -> false
-        }
-        if (changed) {
-            event.markForReEncode(true)
-        }
+        event.item = event.item.copy().modify()
     }
 
-    private fun handleSetSlot(event: PacketSendEvent): Boolean {
-        val wrapper = WrapperPlayServerSetSlot(event)
-        var changed = wrapper.item.modify()
-        return changed
+    @PacketHandler
+    private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
+        if (isCreative(event))
+            return
+        val newSlots = ArrayList<Pair<EquipmentSlot, ItemStack>>()
+        for (equipment in event.slots) {
+            val item = equipment.second.modify()
+            newSlots.add(equipment.mapSecond { item })
+        }
+        event.slots = newSlots
     }
 
-    private fun handleSetEquipment(event: PacketSendEvent): Boolean {
-        val wrapper = WrapperPlayServerEntityEquipment(event)
-        var changed = false
+    @PacketHandler
+    private fun handleContainerSetContent(event: ClientboundContainerSetContentPacketEvent) {
+        if (isCreative(event))
+            return
+        val newItems = ArrayList<ItemStack>()
+        for (item in event.items) {
+            val item = item.modify()
+            newItems.add(item)
+        }
+        event.items = newItems
 
-        for (equipment in wrapper.equipment) {
-            changed = equipment.item.modify() || changed
+        val carriedItem = event.carriedItem.modify()
+        event.carriedItem = carriedItem
+    }
+
+    @PacketHandler
+    private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
+        if (isCreative(event))
+            return
+        val newMerchantOffers = MerchantOffers()
+
+        for (offer in event.offers) {
+            val itemCostA = offer.itemCostA.itemStack
+                .modify()
+                .let { itemStack -> ItemCost(Holder.direct(itemStack.item), itemStack.count, DataComponentPredicate.allOf(itemStack.components)) }
+            val itemCostB = offer.itemCostB
+                .getOrNull()
+                ?.itemStack
+                ?.modify()
+                ?.let { itemStack -> ItemCost(Holder.direct(itemStack.item), itemStack.count, DataComponentPredicate.allOf(itemStack.components)) }
+                .let { Optional.ofNullable(it) }
+            val result = offer.result.modify()
+            val newOffer = MerchantOffer(itemCostA, itemCostB, result, offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand, offer.ignoreDiscounts, offer.asBukkit())
+            newMerchantOffers.add(newOffer)
         }
 
-        return changed
+        event.offers = newMerchantOffers
     }
 
-    private fun handleWindowItems(event: PacketSendEvent): Boolean {
-        val wrapper = WrapperPlayServerWindowItems(event)
-        var changed = false
-
-        for (item in wrapper.items) {
-            changed = item.modify() || changed
-        }
-
-        val carriedItem = wrapper.carriedItem.getOrNull()?.modify()
-        changed = changed || (carriedItem == true)
-
-        return changed
-    }
-
-    private fun handleMerchantOffers(event: PacketSendEvent): Boolean {
-        val wrapper = WrapperPlayServerMerchantOffers(event)
-        var changed = false
-
-        for (offer in wrapper.merchantOffers) {
-            changed = offer.firstInputItem.modify() || changed
-            changed = (offer.secondInputItem?.modify() == true) || changed
-            changed = offer.outputItem.modify() || changed
-        }
-
-        return changed
-    }
-
-    private fun handleEntityData(event: PacketSendEvent): Boolean {
-        val wrapper = WrapperPlayServerEntityMetadata(event)
-        var changed = false
-
-        for (metadata in wrapper.entityMetadata) {
+    @PacketHandler
+    private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
+        val newValues = ArrayList<SynchedEntityData.DataValue<*>>()
+        for (metadata in event.packedItems) {
             val value = metadata.value
             if (value !is ItemStack) {
                 continue
             }
-            changed = value.modify() || changed
+            val newValue = value.modify()
+            newValues += SynchedEntityData.DataValue(metadata.id, EntityDataSerializers.ITEM_STACK, newValue)
         }
 
-        return changed
+        event.packedItems = newValues
     }
 
-    private fun isCreative(event: PacketSendEvent): Boolean {
+    private fun isCreative(event: PlayerPacketEvent<*>): Boolean {
         // 创造模式会1:1复制它接收到的物品到客户端本地,
         // 而我们发给客户端的萌芽物品并不是原始物品, 而是修改过的.
         // 问题在于, 修改过的萌芽物品并不包含任何 wakame 数据,
@@ -111,24 +141,26 @@ internal object ItemStackRenderer : PacketListenerAbstract() {
         //
         // 因此, 我们现阶段能做的就是忽略该问题.
 
-        return event.getPlayer<Player>()?.gameMode == GameMode.CREATIVE
+        return event.player.gameMode == GameMode.CREATIVE
     }
 
     /**
-     * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
+     * @return 如果物品发生了变化则返回新的 ItemStack, 否则返回它本身.
      */
-    private fun ItemStack.modify(): Boolean {
-        var changed: Boolean
+    private fun ItemStack.modify(): ItemStack {
+        val origin = this.copy()
 
         // 移除任意物品的 PDC
-        changed = customData?.removeTag("PublicBukkitValues") != null
+        val updateCustomData = get(DataComponents.CUSTOM_DATA)?.update { it.remove("PublicBukkitValues") }
+            ?: return origin
+        set(DataComponents.CUSTOM_DATA, updateCustomData)
 
-        val nekoStack = tryNekoStack
+        val nekoStack = asBukkitMirror().shadowNeko(false)
         if (nekoStack != null) {
             try {
                 ItemRenderers.STANDARD.render(nekoStack)
                 processed = true
-                changed = true
+                return nekoStack.wrapped.toNMS()
             } catch (e: Throwable) {
                 if (LOGGING) {
                     LOGGER.error("An error occurred while rendering network item: ${nekoStack.id}", e)
@@ -136,16 +168,22 @@ internal object ItemStackRenderer : PacketListenerAbstract() {
             }
         }
 
-        return changed
+        return origin
     }
 
     private var ItemStack.processed: Boolean
-        get() = customData?.getTagOrNull(PROCESSED_KEY) == null
+        get() = get(DataComponents.CUSTOM_DATA)?.contains(PROCESSED_KEY) == true
         set(value) {
             if (value) {
-                customData?.setTag(PROCESSED_KEY, NBTByte(0))
+                val customData = getOrDefault(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag()))
+                val newCustomData = customData.update { it.put(PROCESSED_KEY, ByteTag.valueOf(true)) }
+                set(DataComponents.CUSTOM_DATA, newCustomData)
             } else {
-                customData?.removeTag(PROCESSED_KEY)
+                val customData = get(DataComponents.CUSTOM_DATA)
+                if (customData != null) {
+                    val newCustomData = customData.update { it.remove(PROCESSED_KEY) }
+                    set(DataComponents.CUSTOM_DATA, newCustomData)
+                }
             }
         }
 }
