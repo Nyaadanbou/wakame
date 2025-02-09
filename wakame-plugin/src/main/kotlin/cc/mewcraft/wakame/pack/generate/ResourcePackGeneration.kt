@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
-import cc.mewcraft.wakame.pack.entity.ModelRegistry
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.text.mini
@@ -30,7 +29,6 @@ import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.metadata.MetadataSerializer
 import team.unnamed.creative.serialize.minecraft.model.ModelSerializer
 import team.unnamed.creative.texture.Texture
-import team.unnamed.hephaestus.writer.ModelWriter
 import team.unnamed.creative.model.Model as CreativeModel
 
 /**
@@ -71,14 +69,6 @@ internal class ResourcePackIconGeneration(
             return
         }
         context.resourcePack.icon(Writable.file(icon))
-    }
-}
-
-internal class ResourcePackRegistryModelGeneration(
-    context: ResourcePackGenerationContext,
-) : ResourcePackGeneration(context) {
-    override fun process() {
-        ModelWriter.resource(RESOURCE_NAMESPACE).write(context.resourcePack, ModelRegistry.models())
     }
 }
 
@@ -300,29 +290,5 @@ internal class ResourcePackMergePackGeneration(
         for (mergePack in mergePacks) {
             resourcePack.merge(mergePack, MergeStrategy.mergeAndKeepFirstOnError())
         }
-    }
-}
-
-internal class ResourcePackModelSortGeneration(
-    context: ResourcePackGenerationContext,
-) : ResourcePackGeneration(context) {
-    override fun process() {
-        val resourcePack = context.resourcePack
-        for (model in resourcePack.models()) {
-            if (model.key().namespace() != Key.MINECRAFT_NAMESPACE) {
-                continue
-            }
-            val newModelBuilder = model.toBuilder()
-            val overrides = model.overrides()
-            val sortedOverrides = overrides.sortedBy { it.customModelData() }
-            newModelBuilder.overrides(sortedOverrides)
-            resourcePack.model(newModelBuilder.build())
-        }
-    }
-
-    private fun ItemOverride.customModelData(): Int? {
-        val predicates = predicate()
-        val customModelData = predicates.find { it.name() == "custom_model_data" }
-        return customModelData?.value() as? Int
     }
 }

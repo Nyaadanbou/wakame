@@ -54,11 +54,6 @@ dependencies {
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
     implementation(platform(libs.bom.cloud.kotlin))
-    implementation(platform(libs.bom.hephaestus)) {
-        exclude("com.google.code.gson")
-        exclude("net.kyori")
-        exclude("org.jetbrains")
-    }
     compileOnly(platform(libs.bom.invui)) { // 由自定义的 classloader 加载
         exclude("org.jetbrains")
     }

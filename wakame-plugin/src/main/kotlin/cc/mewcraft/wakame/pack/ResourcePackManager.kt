@@ -6,7 +6,12 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.pack.generate.*
+import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
+import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.formatSize
@@ -62,10 +67,8 @@ internal class ResourcePackManager(
             val generations: List<ResourcePackGeneration> = listOf(
                 ResourcePackMetaGeneration(context),
                 ResourcePackIconGeneration(context),
-                ResourcePackRegistryModelGeneration(context),
                 ResourcePackCustomModelGeneration(context),
                 ResourcePackMergePackGeneration(context, packReader),
-                ResourcePackModelSortGeneration(context)
             )
 
             try {

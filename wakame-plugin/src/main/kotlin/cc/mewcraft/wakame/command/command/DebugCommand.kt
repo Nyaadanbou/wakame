@@ -1,12 +1,9 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.item.tryNekoStack
-import cc.mewcraft.wakame.pack.entity.ModelRegistry
-import cc.mewcraft.wakame.pack.entity.OnGroundBoneModifier
+import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.takeUnlessEmpty
 import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
@@ -14,12 +11,9 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Pig
 import org.bukkit.entity.Player
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.parser.standard.IntegerParser
-import team.unnamed.hephaestus.bukkit.BukkitModelEngine
-
 
 internal object DebugCommand : KoishCommandFactory<CommandSender> {
 
@@ -44,17 +38,10 @@ internal object DebugCommand : KoishCommandFactory<CommandSender> {
             required("variant", IntegerParser.integerParser(0, 127))
             koishHandler(context = Dispatchers.minecraft, handler = ::handleChangeVariant)
         }
-
-        // <root> debug summon_model_engine_entity
-        // Summons an entity from our model engine
-        buildAndAdd(commonBuilder) {
-            literal("summon_entity")
-            koishHandler(context = Dispatchers.minecraft, handler = ::handleSummonEntity)
-        }
     }
 
     private fun String.prettifyJson(): String {
-        val json = JsonParser.parseString(this).getAsJsonObject()
+        val json = JsonParser.parseString(this).asJsonObject
         val gson = GsonBuilder().setPrettyPrinting().create()
         val prettyJson = gson.toJson(json)
         return prettyJson
@@ -75,7 +62,7 @@ internal object DebugCommand : KoishCommandFactory<CommandSender> {
             return
         }
 
-        val nekoStack = itemInMainHand.tryNekoStack
+        val nekoStack = itemInMainHand.shadowNeko(false)
         if (nekoStack == null) {
             sender.sendPlainMessage("Item is not a legal wakame item")
             return
@@ -84,25 +71,5 @@ internal object DebugCommand : KoishCommandFactory<CommandSender> {
         val oldVariant = nekoStack.variant
         nekoStack.variant = variant
         sender.sendPlainMessage("Variant has been changed from $oldVariant to $variant")
-    }
-
-    private fun handleSummonEntity(context: CommandContext<CommandSender>) {
-        val player = context.sender() as Player
-        val model = ModelRegistry.models().first()
-
-        val engine = Injector.get<BukkitModelEngine>()
-
-        // Spawn base entity
-        val pig = player.world.spawn(player.location, Pig::class.java)
-        // Make the pig invisible
-        pig.isInvisible = true
-        // Create the model view on the pig
-        val view = engine.spawn(model, pig)
-        // Make the model bones be on the ground
-        OnGroundBoneModifier(pig).apply(view)
-        // Save the created view so it's animated
-        ModelRegistry.view(view)
-
-        player.sendPlainMessage("Summoned " + model.name())
     }
 }
