@@ -71,7 +71,6 @@ class PlayerStateInfo(
 
         private val stateDisplay: StateDisplay<Player> by Injector.inject()
         private val abilityWorldInteraction: AbilityWorldInteraction by Injector.inject()
-        private val wakameWorld: WakameWorld by Injector.inject()
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
@@ -100,7 +99,7 @@ class PlayerStateInfo(
             if (sequenceAbility != null) {
                 stateDisplay.displaySuccess(currentSequence.readAll(), player)
                 currentSequence.clear()
-                wakameWorld.removeEntity(mechanicName)
+                WakameWorld.removeEntity(mechanicName)
                 markNextState(sequenceAbility)
                 return AbilityStateResult.CANCEL_EVENT
             }
@@ -109,7 +108,7 @@ class PlayerStateInfo(
         // Single trigger abilities
         val singleAbility = getAbilityByTrigger(castTrigger)
         if (singleAbility != null) {
-            wakameWorld.removeEntity(mechanicName)
+            WakameWorld.removeEntity(mechanicName)
             markNextState(singleAbility)
             return AbilityStateResult.CANCEL_EVENT
         }
@@ -153,7 +152,7 @@ class PlayerStateInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
-            wakameWorld.createMechanic(mechanicName) { idleResetMechanic }
+            WakameWorld.createMechanic(mechanicName) { idleResetMechanic }
             val completeSequence = currentSequence.readAll()
             stateDisplay.displayProgress(completeSequence, player)
 

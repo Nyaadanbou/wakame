@@ -1,11 +1,20 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.EntityType
+import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.ManaCostComponent
+import cc.mewcraft.wakame.ecs.component.MechanicComponent
+import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
+import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
+import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.TargetComponent
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.TriggerComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
@@ -21,9 +30,6 @@ abstract class AbilityBase(
     final override val key: Key,
     config: ConfigurationNode,
 ) : Ability {
-    companion object {
-        private val wakameWorld: WakameWorld by Injector.inject<WakameWorld>()
-    }
 
     override val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay.empty()
 
@@ -31,7 +37,7 @@ abstract class AbilityBase(
      * 添加一个 [Ability] 状态.
      */
     private fun addMechanic(input: AbilityInput) {
-        wakameWorld.createEntity(key.asString()) {
+        WakameWorld.createEntity(key.asString()) {
             it += EntityType.ABILITY
             it += Tags.DISPOSABLE
             it += CastBy(input.castBy)

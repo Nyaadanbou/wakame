@@ -9,11 +9,8 @@ import cc.mewcraft.wakame.util.metadata.MetadataKey
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
-import com.github.quillraven.fleks.World.Companion.inject
 
-class AbilityBukkitEntityMetadataSystem(
-    private val wakameWorld: WakameWorld = inject()
-) : IteratingSystem(
+class AbilityBukkitEntityMetadataSystem : IteratingSystem(
     family = family { all(CastBy, EntityType.ABILITY) }
 ) {
     companion object {
@@ -23,7 +20,7 @@ class AbilityBukkitEntityMetadataSystem(
     override fun onTickEntity(entity: Entity) {
         val bukkitEntity = entity[CastBy].entity ?: return
         val metadata = Metadata.provide(bukkitEntity)
-        val componentMap = wakameWorld.componentMap(entity)
+        val componentMap = WakameWorld.componentMap(entity)
 
         metadata.put(COMPONENT_MAP_KEY, componentMap)
     }
