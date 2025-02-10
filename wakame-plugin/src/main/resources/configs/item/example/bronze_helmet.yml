@@ -1,0 +1,65 @@
+# Use case: 新的头盔
+
+base: leather_helmet
+
+slot: vanilla:feet
+
+item_name:
+  plain: "青铜头盔"
+  fancy: "<rarity:style>青铜头盔"
+
+level:
+  base: CONTEXT
+  float_chance: 0.15
+  float_amount: "[-2,3]"
+  max: 30
+
+rarity: "mapping:station"
+
+elements:
+  sample: 1
+  filters: [ ]
+  entries:
+    - type: "global:example"
+
+kizamiz:
+  pool/1:
+    sample: 1
+    filters: [ ]
+    entries:
+      - type: "global:example"
+
+cells:
+  buckets:
+    slot/1: { core: example_group_1 }
+    slot/2: { core: example_group_2 }
+    slot/3: { core: example_group_3 }
+  selectors:
+    core_groups:
+      example_group_1:
+        filters: [ ]
+        selects:
+          pool/1:
+            filters:
+              - { type: "item:toss", chance: 0.5 }
+            entries:
+              - { type: "global:example_1" }
+          pool/2:
+            filters: [ ]
+            entries:
+              - { type: "attribute:max_mana", value: 100.0, weight: 1 }
+              - { type: "attribute:max_mana", value: 200.0, weight: 1 }
+      example_group_2:
+        filters: [ ]
+        selects:
+          pool/1:
+            filters: [ ]
+            entries:
+              - { type: "attribute:max_health", value: 20.0, weight: 1 }
+      example_group_3:
+        filters: [ ]
+        selects:
+          pool/1:
+            filters: [ ]
+            entries:
+              - { type: "global:deep/example_3" }

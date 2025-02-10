@@ -1,0 +1,16 @@
+# 烟熏炉配方, 参考: https://minecraft.wiki/w/Recipe#smoking
+type: smoking
+
+# 输入
+input: minecraft:cobblestone
+
+# 烧炼时间
+cooking_time: 100
+
+# 该配方产生的经验值
+exp: 2
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:netherrack
+  amount: 1

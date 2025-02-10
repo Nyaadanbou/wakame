@@ -1,0 +1,33 @@
+# 高炉配方, 参考: https://minecraft.wiki/w/Recipe#blasting
+type: blasting
+
+# 输入
+input:
+  - minecraft:glass
+  - minecraft:white_stained_glass
+  - minecraft:orange_stained_glass
+  - minecraft:magenta_stained_glass
+  - minecraft:light_blue_stained_glass
+  - minecraft:yellow_stained_glass
+  - minecraft:lime_stained_glass
+  - minecraft:pink_stained_glass
+  - minecraft:gray_stained_glass
+  - minecraft:light_gray_stained_glass
+  - minecraft:cyan_stained_glass
+  - minecraft:purple_stained_glass
+  - minecraft:blue_stained_glass
+  - minecraft:brown_stained_glass
+  - minecraft:green_stained_glass
+  - minecraft:red_stained_glass
+  - minecraft:black_stained_glass
+
+# 烧炼时间
+cooking_time: 40
+
+# 该配方产生的经验值
+exp: 495
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:quartz
+  amount: 1

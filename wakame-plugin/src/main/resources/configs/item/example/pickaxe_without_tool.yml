@@ -1,3 +1,0 @@
-# Use case: 一把不是镐子的钻石镐
-
-base: diamond_sword[!tool]

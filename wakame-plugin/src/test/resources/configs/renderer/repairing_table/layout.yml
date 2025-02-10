@@ -1,5 +1,3 @@
-# 在这里设置修复台物品的 *渲染布局*.
-
 primary:
   - durability:durability
   - (fixed)

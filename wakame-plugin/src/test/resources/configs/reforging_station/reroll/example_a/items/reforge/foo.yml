@@ -1,27 +1,12 @@
-# 物品重铸的次数上限
 mod_limit: 8
 
-# 核孔的重造设置
 cells:
-  # 这里每个节点的 key 对应一个核孔的 id.
-  # 如果定义了一个节点, 则允许重造该核孔.
-  # 反之, 未定义的核孔不允许被重造.
 
-  # 对应 id 为 "a" 的核孔
   a:
-    # 本核孔的货币花费.
-    #
-    # 可用上下文:
-    # query.mod_limit()
-    #   物品的重铸次数上限
-    # query.mod_count()
-    #   物品经历的重铸次数 // dev: 从物品 NBT 读取
     currency_cost: "100.0 * query.mod_count()"
 
-  # 对应 id 为 "b" 的核孔
   b:
     currency_cost: "150.0 * query.mod_count()"
 
-  # 对应 id 为 "c" 的核孔
   c:
     currency_cost: "200.0 * query.mod_count()"

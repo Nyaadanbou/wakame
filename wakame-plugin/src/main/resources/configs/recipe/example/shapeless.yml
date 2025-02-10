@@ -1,0 +1,17 @@
+# 无序配方, 参考: https://minecraft.wiki/w/Recipe#crafting_shapeless
+type: shapeless
+
+# 输入
+ingredients:
+  A: minecraft:poppy
+  B: minecraft:poppy
+  C: minecraft:poppy
+  D: minecraft:poppy
+  E:
+    - minecraft:red_dye
+    - minecraft:pink_dye
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:rose_bush
+  amount: 2

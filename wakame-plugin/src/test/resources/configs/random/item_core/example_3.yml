@@ -1,0 +1,6 @@
+nodes:
+  - type: global:example_2
+  - type: ability:foo/bar
+    trigger: trigger:generic/attack
+    variant: 0
+    weight: 1

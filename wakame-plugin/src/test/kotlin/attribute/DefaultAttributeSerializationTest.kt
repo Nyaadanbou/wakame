@@ -2,7 +2,7 @@ package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.registry.registryModule
@@ -42,7 +42,7 @@ class DefaultAttributeSerializationTest : KoinTest {
                 )
             }
 
-            ElementRegistryLoader.init()
+            ElementTypeRegistryLoader.init()
             Attributes.init()
             AttributeBundleFacadeRegistryLoader.init()
             AttributeSupplierRegistryLoader.init()

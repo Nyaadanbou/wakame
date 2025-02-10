@@ -131,7 +131,7 @@ private object KizamiGroupSerializer : GroupSerializer<RegistryEntry<KizamiType>
 )
 @Reload
 internal object KizamiSampleNodeFacade : SampleNodeFacade<RegistryEntry<KizamiType>, ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/kizamiz")
+    override val dataDir: Path = Path("random/item_kizami/")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
         .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()

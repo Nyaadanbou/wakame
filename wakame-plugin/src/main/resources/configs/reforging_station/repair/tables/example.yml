@@ -1,0 +1,5 @@
+# 该修复台接受的物品列表
+# 每个字符串都是物品的 id
+items:
+  - "example:bronze_helmet"
+  - "minecraft:golden_sword"

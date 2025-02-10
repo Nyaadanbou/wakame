@@ -1,5 +1,3 @@
-# 在这里设置重造台物品的 *渲染布局*.
-
 primary:
   - (fixed:general)
   - general:level

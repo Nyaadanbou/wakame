@@ -1,0 +1,13 @@
+nodes:
+  - type: "neutral"
+    weight: 1
+  - type: "fire"
+    weight: 1
+  - type: "water"
+    weight: 1
+  - type: "wind"
+    weight: 1
+  - type: "earth"
+    weight: 1
+  - type: "thunder"
+    weight: 1

@@ -75,7 +75,7 @@ data class ItemElements(
 )
 @Reload
 internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<ElementType>, ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/elements")
+    override val dataDir: Path = Path("random/item_element/")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
         .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()

@@ -1,18 +1,10 @@
-# 在这里设置定制台的物品 *渲染内容*.
-
 # id: <有效的属性 id>
 cells/attributes/in:
   namespace: attribute
-  # 用于区分核孔是否 要将定制,可被定制,... 的一些渲染格式
   diff_formats:
-    # 可被定制的核孔
     changeable: { }
-    # 不可被定制的核孔
-    unchangeable:
-      style: "<!i><dark_gray>"
-    # 选择要定制的核孔
+    unchangeable: { }
     has_input: { }
-    # 未选择要定制的核孔
     has_no_input: { }
   ordinal:
     element:
@@ -32,13 +24,9 @@ cells/attributes/out:
   namespace: attribute
   diff_formats:
     changeable: { }
-    unchangeable:
-      style: "<!i><dark_gray>"
-    has_input:
-      style: "<st><gray>"
-      suffix: " <gray>???"
-    has_no_input:
-      style: "<!i><dark_gray>"
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
   ordinal:
     element:
       - neutral
@@ -57,8 +45,7 @@ cells/abilities/in:
   namespace: ability
   diff_formats:
     changeable: { }
-    unchangeable:
-      style: "<!i><dark_gray>"
+    unchangeable: { }
     has_input: { }
     has_no_input: { }
 
@@ -67,81 +54,58 @@ cells/abilities/out:
   namespace: ability
   diff_formats:
     changeable: { }
-    unchangeable:
-      style: "<!i><dark_gray>"
-    has_input:
-      style: "<st><gray>"
-      suffix: " <gray>???"
-    has_no_input:
-      style: "<!i><dark_gray>"
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
 
 # id: `cells/empty`
 cells/empty/in:
   namespace: stash
-  tooltip: "[ 空核孔 ]"
+  tooltip: "[ Empty Slot ]"
   diff_formats:
     changeable: { }
-    unchangeable:
-      style: "<!i><dark_gray>"
+    unchangeable: { }
     has_input: { }
     has_no_input: { }
 
 # id: `cells/empty`
 cells/empty/out:
   namespace: stash
-  tooltip: "[ 空核孔 ]"
+  tooltip: "[ Empty Slot ]"
   diff_formats:
     changeable: { }
-    unchangeable:
-      style: "<!i><dark_gray>"
-    has_input:
-      style: "<st><gray>"
-      suffix: " <gray>???"
-    has_no_input:
-      style: "<!i><dark_gray>"
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
 
 # id: `custom_name`
 custom_name:
   namespace: vanilla
-  # 可用标签
-  # <value> 物品的 `minecraft:custom_name`
-  tooltip: "定制名: <value>"
+  tooltip: "Custom Name: <value>"
 
 # id: `elements`
 elements:
   namespace: general
-  # 可用标签
-  # <merged> 多个元素合并后的文本
-  # <single> 单个元素
   tooltip:
-    merged: "元素: <merged>"
+    merged: "Element: <merged>"
     single: "<single>"
     separator: ", "
 
 # id: `item_name`
 item_name:
   namespace: vanilla
-  # 可用标签
-  # <value> 物品的 `minecraft:item_name`
-  tooltip: "物品名: <value>"
+  tooltip: "Item Name: <value>"
 
 # id: `level`
 level:
   namespace: general
-  # 可用标签
-  # <value> 等级值
-  tooltip: "等级: <value>"
+  tooltip: "Level: <value>"
 
 # id: `rarity`
 rarity:
   namespace: general
-  # 可用标签
-  # <rarity_display_name> 稀有度的名字
-  # <reforge_mod_count> 被重铸的次数
-  # 重铸次数为零的格式
-  simple: "稀有度: <rarity_display_name>"
-  # 重铸次数不为零的格式
-  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"
+  simple: "Rarity: <rarity_display_name>"
+  complex: "Rarity: <rarity_display_name> [<reforge_mod_count>]"
 
 # id: `reforge_cost`
 reforge_cost:

@@ -1,0 +1,21 @@
+# 切石机配方, 参考: https://minecraft.wiki/w/Recipe#stonecutting
+type: stonecutting
+
+# 表示该配方的原料物品. 作为原料的物品不能为空气 (minecraft:air)
+input:
+  - minecraft:oak_planks
+  - minecraft:spruce_planks
+  - minecraft:birch_planks
+  - minecraft:jungle_planks
+  - minecraft:acacia_planks
+  - minecraft:dark_oak_planks
+  - minecraft:mangrove_planks
+  - minecraft:cherry_planks
+  - minecraft:bamboo_planks
+  - minecraft:crimson_planks
+  - minecraft:warped_planks
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:stick
+  amount: 2

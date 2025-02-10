@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
@@ -51,7 +51,7 @@ class DamageBundleDSLTest : KoinTest {
             }
 
             // 按依赖顺序, 初始化注册表
-            ElementRegistryLoader.init()
+            ElementTypeRegistryLoader.init()
         }
 
         @AfterAll

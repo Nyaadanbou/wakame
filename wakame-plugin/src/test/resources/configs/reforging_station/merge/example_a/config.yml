@@ -1,18 +1,11 @@
-# 基本菜单设置
 primary_menu_settings:
   title: "合并工作台: example_a"
-  # a: 输入1
-  # b: 输入2
-  # c: 输出
   structure:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
     - ". a . b . . . c ."
     - ". . . . . . . . ."
     - ". . . . . . . . ."
-  # background: 背景
-  # output_ok: 输出
-  # output_empty: 输出
   icons:
     background: "internal:menu/common/background"
     output_ok: "internal:menu/merging/output_ok"
@@ -20,20 +13,12 @@ primary_menu_settings:
     output_failure: "internal:menu/merging/output_failure"
     output_insufficient_resource: "internal:menu/merging/output_insufficient_resource"
 
-# 合并工作台可以接受的最大物品等级.
-# 如果玩家放入的物品等级超过了这个值, 合并将算作失败.
 input_level_limit: 30
 
-# 合并工作台可以输出的最大物品等级.
-# 如果输出的物品等级超过了这个值, 合并将算作失败.
 output_level_limit: 60
 
-# 合并工作台可以输出的最大物品惩罚值.
-# 如果输出的物品惩罚值超过了这个值, 合并将算作失败.
 output_penalty_limit: 3
 
-# [稀有度] -> [数值] 的映射表.
-# 用于在数值计算公式中使用稀有度.
 rarity_number_mapping:
   common: 1.0
   uncommon: 1.5
@@ -41,83 +26,29 @@ rarity_number_mapping:
   epic: 2.5
   ancient: 3.0
 
-# 属性数值合并的算法.
-# 流程概述:
-# 使用一个自定义函数计算合并后的数值,
-# 然后把该数值作为正态分布的平均数,
-# 最后在正态分布上生成一个最终数值.
-# 由于数值呈正态分布, 所以也存在[数值质量]这一信息.
 value_merge_method:
-  # 正态分布函数: 其随机生成的 Z-score 也将用于渲染数值质量.
-  # 当操作模式为 add_value 时:
   add_value:
-    # 分布的平均值.
-    # 自定义函数: 输入为两个属性核心的数值, 输出为合并后的数值.
-    # 注意: 不要在这里使用随机数, 否则[数值质量]将没有实际作用.
-    # 可用参数:
-    # query.value_1()
-    #   第一个属性修饰符的数值
-    # query.value_2()
-    #   第二个属性修饰符的数值
     base: "( query.value_1() + query.value_2() ) * 0.9"
-    # 分布的分散程度, 类似标准差.
     spread: 0.2
-    # 最终的最小分散程度.
     min: -0.2
-    # 最终的最大分散程度.
     max: +0.7
-  # 当操作模式为 add_multiplied_base 时:
   add_multiplied_base:
     base: "( query.value_1() + query.value_2() ) * 0.9"
     spread: 0.2
     min: -0.2
     max: +0.7
-  # 当操作模式为 add_multiplied_total 时:
   add_multiplied_total:
     base: "( query.value_1() + query.value_2() ) * 0.9"
     spread: 0.2
     min: -0.2
     max: +0.7
 
-# 输出核心的等级的自定义函数.
-#
-# 可用参数:
-# query.level_1()
-#   第一个核心的等级
-# query.level_2()
-#   第二个核心的等级
 level_merge_method: "math.max( query.level_1(), query.level_2() )"
 
-# 输出核心的惩罚的自定义函数.
-#
-# 可用参数:
-# query.penalty_1()
-#   第一个核心的惩罚值
-# query.penalty_2()
-#   第二个核心的惩罚值
 penalty_merge_method: "query.penalty_1() + query.penalty_2() + 1"
 
-# 在这里设置完成合并操作所需要消耗的货币资源.
-# 如果玩家没有足够的货币资源, 合并将算作失败.
-# 数据类型: molang
-#
-# 可用参数:
-# query.level_1()
-#   第一个物品的等级
-# query.level_2()
-#   第二个物品的等级
-# query.rarity_1()
-#   第一个物品的稀有度对应的数值
-# query.rarity_2()
-#   第二个物品的稀有度对应的数值
-# query.penalty_1()
-#   第一个物品的惩罚值
-# query.penalty_2()
-#   第二个物品的惩罚值
 total_cost: "200.0 + 100.0 * ( query.penalty_1() + query.penalty_2() )"
 
-# 合并工作台可以接受的核心类型.
-# 如果玩家放入的核心不在这个列表中, 那么合并将算作失败.
 accepted_cores:
   - type: attribute:mana_regeneration
     element: ~

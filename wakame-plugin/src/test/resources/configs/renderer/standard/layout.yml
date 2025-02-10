@@ -1,5 +1,3 @@
-# 在这里设置标准物品的 *渲染布局*.
-
 primary:
   - (default:blank)topmost:attack_speed
 

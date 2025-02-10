@@ -22,7 +22,7 @@ import kotlin.io.path.Path
 )
 @Reload
 internal object ItemFilterNodeFacade : FilterNodeFacade<ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/filters")
+    override val dataDir: Path = Path("random/item_filter/")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
         .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()

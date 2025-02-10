@@ -3,26 +3,36 @@ version: 1
 
 # id: `arrow`
 arrow:
-  namespace: ammo
+  namespace: special
+  # 可用标签
+  # <pierce_level> 穿透等级
+  # <fire_ticks> 箭矢本身的着火时间
+  # <hit_fire_ticks> 击中实体造成的着火时间
+  # <hit_frozen_ticks> 击中实体造成的冰冻时间
+  # <glow_ticks> 击中实体造成的发光时间
   tooltip:
-    - "穿透: <pierce_level>"
+    - "<!i><blue>穿透: <pierce_level>"
 
-# id: `attack_speed`
+# id: `arrow`
 attack_speed:
   namespace: topmost
   tooltip:
-    line: "攻击速度: <value>"
+    # 可用标签
+    # <value> 攻击速度值
+    line: "<!i><white>攻击速度<gray>: <value>"
+    # 数值对应的描述
     level:
-      0: "非常慢"
-      1: "慢"
-      2: "普通"
-      3: "快"
-      4: "非常快"
+      0: "<color:#ff8882>很慢"
+      1: "<color:#ff8882>较慢"
+      2: "<color:#fffd80>普通"
+      3: "<color:#91ffa9>较快"
+      4: "<color:#91ffa9>很快"
 
 # id: <有效的属性 id>
 cells/attributes:
   namespace: attribute
   ordinal:
+    # 元素排序
     element:
       - neutral
       - fire
@@ -30,38 +40,47 @@ cells/attributes:
       - wind
       - earth
       - thunder
+    # 运算模式排序
     operation:
       - add
       - multiply_base
       - multiply_total
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/abilities:
-  namespace: ability
+cells/skills:
+  namespace: skill
 
 # id: `cells/empty`
 cells/empty:
   namespace: stash
   tooltip:
-    - "[ 空核孔 ]"
+    - "<dark_gray>[ 空核孔 ]"
 
 # id: `crate`
 crate:
   namespace: special
-  tooltip: "盲盒: <name>"
+  # 可用标签
+  # <id> 盲盒的标识
+  # <name> 盲盒的名字
+  tooltip: "<!i><gray>盲盒: <yellow><name>"
 
 # id: `custom_name`
 custom_name:
-  namespace: vanilla
-  tooltip: "定制名: <value>"
+  namespace: general
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<value>"
 
 # id: `elements`
 elements:
   namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
   tooltip:
-    merged: "元素: <merged>"
+    merged: "<!i><gray>主要元素: <merged>"
     single: "<single>"
-    separator: ", "
+    separator: "<gray>, </gray>"
 
 # id: `enchantments`
 enchantments:
@@ -69,42 +88,55 @@ enchantments:
 
 # id: `damage_resistant`
 damage_resistant:
-  namespace: general
-  tooltip: "免疫伤害"
+  namespace: vanilla
+  tooltip: "<!i><blue>伤害免疫"
 
 # id: `food`
 food:
-  namespace: general
+  namespace: vanilla
+  # 可用标签
+  # <nutrition> 食物增加的饥饿值
+  # <saturation> 食物增加的饱和度
+  # <eat_seconds> 食用所需要的时间
   tooltip:
-    - "饥饿值: <nutrition>"
-    - "饱和度: <saturation>"
-    - "食用时间: <eat_seconds>"
+    - "<!i><blue>饥饿值 +<nutrition>"
+    - "<!i><blue>饱和度 +<saturation>"
+    - "<!i><blue>食用时间: <eat_seconds>"
 
 # id: `item_name`
 item_name:
-  namespace: vanilla
-  tooltip: "物品名: <value>"
+  namespace: general
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<value>"
 
 # id: `kizamiz`
 kizamiz:
   namespace: general
+  # 可用标签
+  # <merged> 多个铭刻合并后的文本
+  # <single> 单个铭刻
   tooltip:
-    merged: "铭刻: <merged>"
-    single: "<single>"
-    separator: ", "
+    merged: "<!i><gray>铭刻: <merged>"
+    single: "<!i><gray><single>"
+    separator: "<gray>, </gray>"
 
 # id: `level`
 level:
   namespace: general
-  tooltip: "等级: <value>"
+  # 可用标签
+  # <value> 等级值
+  tooltip: "<!i><yellow>lv. <value>"
 
 # id: `lore`
 lore:
   namespace: general
+  # 可用标签
+  # <line> 描述内容
   tooltip:
-    line: "<line>"
-    header: [ ]
-    bottom: [ ]
+    line: "<dark_gray><line>"
+    header: []
+    bottom: []
 
 # id: `portable_core`
 portable_core:
@@ -113,5 +145,10 @@ portable_core:
 # id: `rarity`
 rarity:
   namespace: general
-  simple: "稀有度: <rarity_display_name>"
-  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"
+  # 可用标签
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "<!i><rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "<!i><rarity_display_name><white>[<reforge_mod_count>]"

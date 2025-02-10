@@ -3,7 +3,7 @@ version: 1
 
 primary:
   - durability:durability
-  - (fixed)
+  - (fixed)<st><dark_gray>             </dark_gray></st>
   - repair_cost:repair_cost
-  - (fixed)
+  - (fixed)<st><dark_gray>             </dark_gray></st>
   - repair_usage:repair_usage

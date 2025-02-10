@@ -58,8 +58,22 @@ internal object LegacyDataMigrator {
                     source.deleteRecursively()
                 }
             }
+
+            // 迁移 random/ 下的文件夹
+            val dirsToMigrate2 = mapOf(
+                "cores" to "item_core",
+                "elements" to "item_element",
+                "filters" to "item_filter",
+                "kizamiz" to "item_kizami"
+            )
+            cfgFolder.resolve("random/item/curses/").delete()
+            dirsToMigrate2.forEach { (sourceDir, targetDir) ->
+                val source = cfgFolder.resolve("random/item/").resolve(sourceDir)
+                val target = cfgFolder.resolve("random/").resolve(targetDir)
+                source.copyRecursively(target)
+            }
+
         } catch (e: Exception) {
-            // 记录错误日志或采取其他措施
             throw RuntimeException("Migration failed: ${e.message}", e)
         }
     }

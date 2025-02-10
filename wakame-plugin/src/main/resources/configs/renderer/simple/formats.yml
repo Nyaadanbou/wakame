@@ -4,17 +4,23 @@ version: 1
 # id: `custom_name`
 custom_name:
   namespace: vanilla
-  tooltip: "定制名: <value>"
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<!i><gray>定制名: <value>"
 
 # id: `item_name`
 item_name:
   namespace: vanilla
-  tooltip: "物品名: <value>"
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<!i><gray>物品名: <value>"
 
 # id: `lore`
 lore:
   namespace: general
+  # 可用标签：
+  # <line> 描述内容
   tooltip:
-    line: "<line>"
-    header: [ ]
-    bottom: [ ]
+    line: "<dark_gray><line>"
+    header: []
+    bottom: []

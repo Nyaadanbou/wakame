@@ -4,13 +4,19 @@ version: 1
 # id: <有效的属性 id>
 cells/attributes/in:
   namespace: attribute
+  # 用于区分核孔是否 要将重造,可被重造,... 的一些渲染格式
   diff_formats:
-    changeable: { }
+    # 可被重造的核孔
+    changeable: {}
+    # 不可被重造的核孔
     unchangeable:
       style: "<!i><dark_gray>"
-    selected: { }
-    unselected: { }
+    # 选择要重造的核孔
+    selected: {}
+    # 未选择要重造的核孔
+    unselected: {}
   ordinal:
+    # 元素的顺序
     element:
       - neutral
       - fire
@@ -18,6 +24,7 @@ cells/attributes/in:
       - wind
       - earth
       - thunder
+    # 运算模式的顺序
     operation:
       - add
       - multiply_base
@@ -27,14 +34,15 @@ cells/attributes/in:
 cells/attributes/out:
   namespace: attribute
   diff_formats:
-    changeable: { }
+    changeable: {}
     unchangeable:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
     selected:
-      style: "<st><gray>"
-      suffix: " <gray>???"
+      prefix: "<dark_gray>[<green>将被修改</green>] "
     unselected:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
   ordinal:
     element:
       - neutral
@@ -50,75 +58,95 @@ cells/attributes/out:
 
 # id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
 cells/abilities/in:
-  namespace: ability
+  namespace: skill
   diff_formats:
-    changeable: { }
+    # 可被重造的核孔
+    changeable: {}
+    # 不可被重造的核孔
     unchangeable:
       style: "<!i><dark_gray>"
-    selected: { }
-    unselected: { }
+    # 选择要重造的核孔
+    selected: {}
+    # 未选择要重造的核孔
+    unselected: {}
 
 cells/abilities/out:
   namespace: ability
   diff_formats:
-    changeable: { }
+    changeable: {}
     unchangeable:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
     selected:
-      style: "<st><gray>"
-      suffix: " <gray>???"
+      prefix: "<dark_gray>[<green>将被修改</green>] "
     unselected:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
 
 # id: `cells/empty`
 cells/empty/in:
   namespace: stash
-  tooltip: "[ 空核孔 ]"
+  tooltip: "<!i><gray>[ 空核孔 ]"
   diff_formats:
-    changeable: { }
+    changeable: {}
     unchangeable:
       style: "<!i><dark_gray>"
-    selected: { }
-    unselected: { }
+    selected: {}
+    unselected: {}
 
 cells/empty/out:
   namespace: stash
-  tooltip: "[ 空核孔 ]"
+  tooltip: "<!i><gray>[ 空核孔 ]"
   diff_formats:
-    changeable: { }
+    changeable: {}
     unchangeable:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
     selected:
-      style: "<st><gray>"
-      suffix: " <gray>???"
+      prefix: "<dark_gray>[<green>将被修改</green>] "
     unselected:
       style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
 
 # id: `custom_name`
 custom_name:
   namespace: vanilla
-  tooltip: "定制名: <value>"
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<!i><value>"
 
 # id: `elements`
 elements:
   namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
   tooltip:
-    merged: "元素: <merged>"
+    merged: "<!i><gray>元素: <merged>"
     single: "<single>"
     separator: ", "
 
 # id: `item_name`
 item_name:
   namespace: vanilla
-  tooltip: "物品名: <value>"
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<!i><value>"
 
 # id: `level`
 level:
   namespace: general
-  tooltip: "等级: <value>"
+  # 可用标签
+  # <value> 等级值
+  tooltip: "<!i><yellow>lv. <value>"
 
 # id: `rarity`
 rarity:
   namespace: general
-  simple: "稀有度: <rarity_display_name>"
-  complex: "稀有度: <rarity_display_name> [<reforge_mod_count>]"
+  # 可用标签
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "<!i><rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "<!i><rarity_display_name><white>[<reforge_mod_count>]"

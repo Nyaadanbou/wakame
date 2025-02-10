@@ -2,15 +2,10 @@
 version: 1
 
 primary:
-  - (fixed:reforge)
+  - general:level
+  - (fixed:reforge)<st><dark_gray>             </dark_gray></st>
   - reforge:merge_input
   - reforge:merge_output
-
-  - (fixed:general)
-  - general:level
-  - general:rarity
+  - (fixed:general)<st><dark_gray>             </dark_gray></st>
   - general:elements
-
-  - (fixed:vanilla)
-  - vanilla:item_name
-  - vanilla:custom_name
+  - general:rarity
