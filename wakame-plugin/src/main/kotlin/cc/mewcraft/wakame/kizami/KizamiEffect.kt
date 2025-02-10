@@ -40,7 +40,7 @@ class KizamiEffectType<T : KizamiEffect>(val type: TypeToken<T>) {
 /**
  * 铭刻效果类型的注册表.
  */
-object KizamiEffectTypes {
+internal object KizamiEffectTypes {
     val PLAYER_ABILITY = register<KizamiEffectPlayerAbility>("player_ability")
     val ATTRIBUTE_MODIFIER = register<KizamiEffectAttributeModifier>("attribute_modifier")
 
@@ -52,7 +52,7 @@ object KizamiEffectTypes {
 /**
  * 铭刻效果：玩家技能.
  */
-class KizamiEffectPlayerAbility(
+internal class KizamiEffectPlayerAbility(
     private val ability: PlayerAbility,
 ) : KizamiEffect {
     override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
@@ -78,7 +78,7 @@ class KizamiEffectPlayerAbility(
 /**
  * 铭刻效果：属性修饰器.
  */
-class KizamiEffectAttributeModifier(
+internal class KizamiEffectAttributeModifier(
     private val modifiers: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect {
     override val type: KizamiEffectType<*> = KizamiEffectTypes.ATTRIBUTE_MODIFIER
