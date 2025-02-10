@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 /**
- * 该单例用于解决玩家资源(当前血量,当前魔法值)在进出服务器时无法正确加载的问题.
+ * 该 object 用于解决玩家资源(当前血量/魔法值)在进出服务器时无法正确加载的问题.
  */
 @Init(
     stage = InitStage.POST_WORLD,
@@ -32,7 +32,7 @@ internal object PlayerResourceFix {
     @InitFun
     fun init() {
 
-        // 在 PlayerQuitEvent 保存玩家的资源数据
+        // 在玩家退出服务器时, 保存玩家的资源数据
         event<PlayerQuitEvent>(
             priority = EventPriority.LOWEST, // 尽可能早的储存 PDC, 让 HuskSync 能够同步到
         ) { event ->
@@ -40,14 +40,12 @@ internal object PlayerResourceFix {
             ResourceSynchronizer.save(player)
         }
 
-        // 在冒险等级加载完毕后, 加载玩家的资源数据:
-        // 这里根据运行时的冒险等级系统加载对应的监听器
+        // 在玩家的冒险等级加载完毕后, 加载玩家的资源数据 (这里根据运行时的冒险等级系统加载对应的监听器)
         when (val type = PlayerLevelManager.integration.type) {
 
             // 这两冒险等级系统完全依赖原版游戏自身, 没有额外的数据储存,
             // 所以可以直接在进入游戏时读取玩家的等级信息并且加载资源数据.
-            PlayerLevelType.ZERO,
-            PlayerLevelType.VANILLA -> event<PlayerJoinEvent> { event ->
+            PlayerLevelType.ZERO, PlayerLevelType.VANILLA -> event<PlayerJoinEvent> { event ->
                 val player = event.player
                 val user = player.toUser()
                 user.isInventoryListenable = true
