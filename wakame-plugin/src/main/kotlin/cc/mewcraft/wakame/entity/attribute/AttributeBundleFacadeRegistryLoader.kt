@@ -436,13 +436,13 @@ private class SingleSelectionImpl(
                 )
             },
             convertNodeToVariable = { node ->
-                val operation = node.getOperation()
-                val value = node.getVariableScalar()
+                val operation = node.operation
+                val value = node.variableScalar
                 VariableAttributeBundleS(id, operation, value)
             },
             convertNodeToConstant = { node ->
-                val operation = node.getOperation()
-                val value = node.getSimpleScalar()
+                val operation = node.operation
+                val value = node.scalar
                 ConstantAttributeBundleS(id, operation, value)
             },
             convertNbtToConstant = { tag ->
@@ -494,15 +494,15 @@ private class RangedSelectionImpl(
                 )
             },
             convertNodeToVariable = { node ->
-                val operation = node.getOperation()
-                val lower = node.getVariableMin()
-                val upper = node.getVariableMax()
+                val operation = node.operation
+                val lower = node.variableMin
+                val upper = node.variableMax
                 VariableAttributeBundleR(id, operation, lower, upper)
             },
             convertNodeToConstant = { node ->
-                val operation = node.getOperation()
-                val lower = node.getSimpleMin()
-                val upper = node.getSimpleMax()
+                val operation = node.operation
+                val lower = node.min
+                val upper = node.max
                 ConstantAttributeBundleR(id, operation, lower, upper)
             },
             convertNbtToConstant = { tag ->
@@ -547,15 +547,15 @@ private class AttributeBinderSEImpl(
                 ImmutableMap.of(k1, v1)
             },
             convertNodeToVariable = { node ->
-                val operation = node.getOperation()
-                val value = node.getVariableScalar()
-                val element = node.getElement()
+                val operation = node.operation
+                val value = node.variableScalar
+                val element = node.element
                 VariableAttributeBundleSE(id, operation, value, element)
             },
             convertNodeToConstant = { node ->
-                val operation = node.getOperation()
-                val value = node.getSimpleScalar()
-                val element = node.getElement()
+                val operation = node.operation
+                val value = node.scalar
+                val element = node.element
                 ConstantAttributeBundleSE(id, operation, value, element)
             },
             convertNbtToConstant = { tag ->
@@ -605,17 +605,17 @@ private class AttributeBinderREImpl(
                 )
             },
             convertNodeToVariable = { node ->
-                val operation = node.getOperation()
-                val lower = node.getVariableMin()
-                val upper = node.getVariableMax()
-                val element = node.getElement()
+                val operation = node.operation
+                val lower = node.variableMin
+                val upper = node.variableMax
+                val element = node.element
                 VariableAttributeBundleRE(id, operation, lower, upper, element)
             },
             convertNodeToConstant = { node ->
-                val operation = node.getOperation()
-                val lower = node.getSimpleMin()
-                val upper = node.getSimpleMax()
-                val element = node.getElement()
+                val operation = node.operation
+                val lower = node.min
+                val upper = node.max
+                val element = node.element
                 ConstantAttributeBundleRE(id, operation, lower, upper, element)
             },
             convertNbtToConstant = { tag ->
@@ -641,35 +641,27 @@ private class AttributeBinderREImpl(
 /* Specialized Configuration Operations */
 
 
-private fun ConfigurationNode.getOperation(): Operation {
-    return node("operation").string?.let { Operation.byName(it) } ?: Operation.ADD
-}
+private val ConfigurationNode.operation: Operation
+    get() = node("operation").string?.let(Operation.Companion::byName) ?: Operation.ADD
 
-private fun ConfigurationNode.getElement(): RegistryEntry<ElementType> {
-    return node("element").require<RegistryEntry<ElementType>>()
-}
+private val ConfigurationNode.element: RegistryEntry<ElementType>
+    get() = node("element").require<RegistryEntry<ElementType>>()
 
-private fun ConfigurationNode.getSimpleScalar(): Double {
-    return node("value").require<Double>()
-}
+private val ConfigurationNode.scalar: Double
+    get() = node("value").require<Double>()
 
-private fun ConfigurationNode.getSimpleMin(): Double {
-    return node("lower").require<Double>()
-}
+private val ConfigurationNode.min: Double
+    get() = node("lower").require<Double>()
 
-private fun ConfigurationNode.getSimpleMax(): Double {
-    return node("upper").require<Double>()
-}
+private val ConfigurationNode.max: Double
+    get() = node("upper").require<Double>()
 
-private fun ConfigurationNode.getVariableScalar(): RandomizedValue {
-    return node("value").require<RandomizedValue>()
-}
+private val ConfigurationNode.variableScalar: RandomizedValue
+    get() = node("value").require<RandomizedValue>()
 
-private fun ConfigurationNode.getVariableMin(): RandomizedValue {
-    return node("lower").require<RandomizedValue>()
-}
+private val ConfigurationNode.variableMin: RandomizedValue
+    get() = node("lower").require<RandomizedValue>()
 
-private fun ConfigurationNode.getVariableMax(): RandomizedValue {
-    return node("upper").require<RandomizedValue>()
-}
+private val ConfigurationNode.variableMax: RandomizedValue
+    get() = node("upper").require<RandomizedValue>()
 //</editor-fold>
