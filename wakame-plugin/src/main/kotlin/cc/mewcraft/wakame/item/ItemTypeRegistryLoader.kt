@@ -34,7 +34,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
         AbilityRegistry::class,
     ]
 )
-object ItemRegistryConfigStorage : RegistryConfigStorage {
+object ItemTypeRegistryLoader : RegistryConfigStorage {
     const val DIR_PATH = "item/"
 
     /**

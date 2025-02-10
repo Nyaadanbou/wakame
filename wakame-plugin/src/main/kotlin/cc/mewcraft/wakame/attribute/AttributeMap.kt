@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -69,7 +69,7 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
     stage = InitStage.POST_WORLD, // init 只负责添加 intrusive registry entry
 )
 @Reload(
-    runAfter = [AttributeSupplierRegistryConfigStorage::class]
+    runAfter = [AttributeSupplierRegistryLoader::class]
 )
 object ImaginaryAttributeMaps {
     // 通过硬编码注册的 id, 但不确定对应的配置文件是否存在

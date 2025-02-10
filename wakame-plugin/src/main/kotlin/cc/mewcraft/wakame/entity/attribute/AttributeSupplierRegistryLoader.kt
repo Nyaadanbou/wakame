@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -18,11 +18,11 @@ import cc.mewcraft.wakame.util.buildYamlConfigLoader
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        ElementRegistryConfigStorage::class, // deps: 反序列化时必须知道所有已知的元素类型
+        ElementTypeRegistryLoader::class, // deps: 反序列化时必须知道所有已知的元素类型
     ]
 )
 @Reload
-internal object AttributeSupplierRegistryConfigStorage : RegistryConfigStorage {
+internal object AttributeSupplierRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "entities.yml"
 
     @InitFun

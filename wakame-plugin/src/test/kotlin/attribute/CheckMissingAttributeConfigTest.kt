@@ -2,8 +2,8 @@ package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifiers
@@ -51,10 +51,10 @@ class CheckMissingAttributeConfigTest : KoinTest {
     }
 
     private fun checkMissingConfigs() {
-        ElementRegistryConfigStorage.init()
-        AttributeBundleFacadeRegistryConfigStorage.init()
+        ElementRegistryLoader.init()
+        AttributeBundleFacadeRegistryLoader.init()
 
-        val config = Configs[AttributeBundleFacadeRegistryConfigStorage.CONFIG_ID]
+        val config = Configs[AttributeBundleFacadeRegistryLoader.CONFIG_ID]
 
         val rootNode = config.get()
         val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.ids

@@ -397,10 +397,10 @@ internal class ImaginaryNekoStack(
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [ItemRegistryConfigStorage::class], // deps: 需要转换成 NekoStack, 因此必须在之后
+    runAfter = [ItemTypeRegistryLoader::class], // deps: 需要转换成 NekoStack, 因此必须在之后
 )
 @Reload(
-    runAfter = [ItemRegistryConfigStorage::class],
+    runAfter = [ItemTypeRegistryLoader::class],
 )
 internal object ImaginaryNekoStackRegistry {
     private val CACHE: Object2ObjectOpenHashMap<Key, ImaginaryNekoStack> = Object2ObjectOpenHashMap(16)

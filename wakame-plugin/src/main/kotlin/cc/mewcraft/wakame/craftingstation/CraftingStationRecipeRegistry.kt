@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
+import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.VisibleForTesting
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    runAfter = [ItemRegistryConfigStorage::class],
+    runAfter = [ItemTypeRegistryLoader::class],
 )
 internal object CraftingStationRecipeRegistry {
 

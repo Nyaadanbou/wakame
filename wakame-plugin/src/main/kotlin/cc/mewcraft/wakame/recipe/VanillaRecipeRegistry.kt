@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
+import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -21,7 +21,7 @@ import kotlin.collections.set
 )
 @Reload(
     runAfter = [
-        ItemRegistryConfigStorage::class, // deps: 需要直接的数据
+        ItemTypeRegistryLoader::class, // deps: 需要直接的数据
     ],
 )
 object VanillaRecipeRegistry {

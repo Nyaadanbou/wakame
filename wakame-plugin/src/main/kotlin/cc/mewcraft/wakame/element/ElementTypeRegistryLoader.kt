@@ -17,7 +17,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
     stage = InitStage.PRE_WORLD
 )
 @Reload
-internal object ElementRegistryConfigStorage : RegistryConfigStorage {
+internal object ElementTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH: String = "elements.yml"
 
     @InitFun

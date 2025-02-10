@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
@@ -175,12 +175,12 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据, 必须指定依赖
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须指定依赖
     ],
 )
 @Reload
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/cores")
+    override val dataDir: Path = Path("random/item_core")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
         .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
         .register<CoreArchetype>(CoreArchetypeSerializer)

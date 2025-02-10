@@ -42,7 +42,7 @@ import kotlin.reflect.KClass
         Attributes::class,
     ]
 )
-object AttributeBundleFacadeRegistryConfigStorage : RegistryConfigStorage {
+object AttributeBundleFacadeRegistryLoader : RegistryConfigStorage {
     const val CONFIG_ID: String = "attributes"
     const val FILE_PATH: String = "attributes.yml"
 

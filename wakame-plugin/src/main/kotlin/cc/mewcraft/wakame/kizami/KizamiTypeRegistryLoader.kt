@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -19,11 +19,11 @@ import java.io.File
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据, 必须在其之后
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须在其之后
     ]
 )
-@Reload()
-internal object KizamiRegistryConfigStorage : RegistryConfigStorage {
+@Reload
+internal object KizamiTypeRegistryLoader : RegistryConfigStorage {
 
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).

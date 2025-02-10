@@ -14,7 +14,7 @@ import org.spongepowered.configurate.ConfigurationNode
     stage = InitStage.PRE_WORLD,
 )
 @Reload
-object LevelRarityMappingRegistryConfigStorage : RegistryConfigStorage {
+object LevelRarityMappingRegistryLoader : RegistryConfigStorage {
     private const val FILE_PATH = "levels.yml"
 
     @InitFun

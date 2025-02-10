@@ -17,7 +17,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
     stage = InitStage.PRE_WORLD
 )
 @Reload
-object RarityRegistryConfigStorage : RegistryConfigStorage {
+object RarityTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "rarities.yml"
 
     @InitFun

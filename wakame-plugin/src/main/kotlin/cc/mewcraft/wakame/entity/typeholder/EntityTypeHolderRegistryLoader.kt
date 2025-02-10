@@ -19,7 +19,7 @@ import org.spongepowered.configurate.kotlin.extensions.getList
     stage = InitStage.PRE_WORLD
 )
 @Reload
-internal object EntityTypeHolderRegistryConfigStorage : RegistryConfigStorage {
+internal object EntityTypeHolderRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "entities.yml"
 
     @InitFun

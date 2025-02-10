@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -11,11 +11,11 @@ import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
     ]
 )
 @Reload
-object AbilityRegistryConfigStorage : RegistryConfigStorage {
+object AbilityRegistryLoader : RegistryConfigStorage {
 
     // TODO 有这么几类东西需要分别放入不同的注册表:
     // AbilityFactory

@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -25,7 +25,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
     ]
 )
 @Reload
