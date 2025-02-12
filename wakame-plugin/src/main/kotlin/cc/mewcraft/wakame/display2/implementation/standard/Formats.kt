@@ -3,11 +3,9 @@ package cc.mewcraft.wakame.display2.implementation.standard
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.common.*
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -32,26 +30,6 @@ internal data class CellularAttributeRendererFormat(
      */
     override fun computeIndex(data: AttributeCore): Key {
         return data.computeIndex(namespace)
-    }
-}
-
-@ConfigSerializable
-internal data class CellularAbilityRendererFormat(
-    override val namespace: String,
-) : RendererFormat.Dynamic<AbilityCore> {
-    override val textMetaFactory: TextMetaFactory = AbilityCoreTextMetaFactory(namespace)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AbilityRegistry.INSTANCES::has)
-
-    fun render(data: AbilityCore): IndexedText {
-        val instance = data.ability.instance
-        val tooltip = instance.displays.tooltips.map(MM::deserialize)
-        return SimpleIndexedText(computeIndex(data), tooltip)
-    }
-
-    override fun computeIndex(data: AbilityCore): Key {
-        val dataId = data.ability.id
-        val indexId = dataId.namespace() + "/" + dataId.value()
-        return Key.key(namespace, indexId)
     }
 }
 

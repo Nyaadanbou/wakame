@@ -70,6 +70,7 @@ object ItemConstants {
     const val SLOT_DISPLAY_LORE = "slot_display_lore"
     const val SLOT_DISPLAY_NAME = "slot_display_name"
     const val SLOT_DISPLAY_DICT = "slot_display_dict"
+    const val PLAYER_ABILITY = "player_ability"
     const val PORTABLE_CORE = "portable_core"
     const val RARITY = "rarity"
     const val REFORGE_HISTORY = "reforge_history"

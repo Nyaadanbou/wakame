@@ -40,24 +40,6 @@ cells/attributes/out:
       - multiply_base
       - multiply_total
 
-# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/abilities/in:
-  namespace: ability
-  diff_formats:
-    changeable: { }
-    unchangeable: { }
-    has_input: { }
-    has_no_input: { }
-
-# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/abilities/out:
-  namespace: ability
-  diff_formats:
-    changeable: { }
-    unchangeable: { }
-    has_input: { }
-    has_no_input: { }
-
 # id: `cells/empty`
 cells/empty/in:
   namespace: stash

@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.enchantment.effects.EnchantmentEffect
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.playerAbilities
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
@@ -19,6 +20,7 @@ import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 
 /**
  * 攻击速度.
@@ -187,8 +189,8 @@ internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        nekoStack ?: return
-        val abilities = nekoStack.getAbilities() ?: return
+        if (nekoStack == null) return
+        val abilities = nekoStack.playerAbilities.takeUnlessEmpty() ?: return
         abilities.forEach { ability -> recordAbility(player, ability, slot to nekoStack) }
     }
 
@@ -196,13 +198,6 @@ internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
         // 清空技能状态.
         val user = player.toUser()
         user.abilityState.reset()
-    }
-
-    private fun NekoStack.getAbilities(): Collection<PlayerAbility>? {
-        val cells = components.get(ItemComponentTypes.CELLS) ?: return null
-        // FIXME 这里有潜在 BUG, 详见: https://github.com/Nyaadanbou/wakame/issues/132
-        val abilities = cells.collectAbilityModifiers(this, ItemSlot.imaginary())
-        return abilities
     }
 
     private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {

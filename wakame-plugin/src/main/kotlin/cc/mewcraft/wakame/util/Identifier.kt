@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.util
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 
 const val KOISH_NAMESPACE = "koish"
@@ -13,10 +14,13 @@ const val KOISH_NAMESPACE = "koish"
  */
 typealias Identifier = Key
 
+@Deprecated("Use IdentifierExt instead.", replaceWith = ReplaceWith("IdentifierExt"))
+typealias Identifiers = IdentifierExt
+
 /**
- * 包含 [Identifier] 的静态函数, 用于统一创建实例的方式.
+ * 包含 [Identifier] 的静态函数.
  */
-object Identifiers {
+object IdentifierExt {
     @JvmField
     val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::toString)
 
@@ -25,14 +29,88 @@ object Identifiers {
      * 如果字符串不包含命名空间与路径的分隔符 [Key.DEFAULT_SEPARATOR]
      * 则自动将其命名空间设置为 [KOISH_NAMESPACE].
      *
-     * @param string 用于创建实例的字符串
-     * @return 创建的实例
+     * @param id the string
+     * @return the identifier
      */
-    fun of(string: String): Identifier {
-        val index = string.indexOf(Key.DEFAULT_SEPARATOR);
-        val namespace = if (index >= 1) string.substring(0, index) else KOISH_NAMESPACE
-        val value = if (index >= 0) string.substring(index + 1) else string
-        return Identifier.key(namespace, value)
+    fun of(id: String): Identifier {
+        val index = id.indexOf(Key.DEFAULT_SEPARATOR);
+        val namespace = if (index >= 1) id.substring(0, index) else KOISH_NAMESPACE
+        val path = if (index >= 0) id.substring(index + 1) else id
+        return Identifier.key(namespace, path)
+    }
+
+    /**
+     * Creates an identifier from namespace and path.
+     * When passed an invalid value, this throws [InvalidKeyException].
+     *
+     * @param namespace the namespace
+     * @param path the path
+     * @return the identifier
+     * @throws InvalidKeyException
+     */
+    fun of(namespace: String, path: String): Identifier {
+        return Identifier.key(namespace, path)
+    }
+
+    /**
+     * Creates an identifier in the [KOISH_NAMESPACE] namespace.
+     *
+     * @param path the path
+     * @return the identifier
+     */
+    fun ofKoish(path: String): Identifier {
+        return Identifier.key(KOISH_NAMESPACE, path)
+    }
+
+    /**
+     * Creates an identifier from a string in `<namespace>:<path>` format.
+     * If the colon is missing, the created identifier has the namespace [KOISH_NAMESPACE] and the argument is used as the path.
+     * When passed an invalid value, this returns null.
+     *
+     * @param id the string
+     * @return the identifier
+     */
+    fun tryParse(id: String): Identifier? {
+        return runCatching { of(id) }.getOrNull()
+    }
+
+    /**
+     * Creates an identifier from namespace and path.
+     * When passed an invalid value, this returns null.
+     *
+     * @param namespace the namespace
+     * @param path the path
+     * @return the identifier
+     */
+    fun tryParse(namespace: String, path: String): Identifier? {
+        return runCatching { of(namespace, path) }.getOrNull()
+    }
+
+    /**
+     * Creates an identifier.
+     * This will parse string as an identifier, using character as a separator between the namespace and the path.
+     * The namespace is optional. If you do not provide one (for example, if you provide player or character + "player" as the string)
+     * then [KOISH_NAMESPACE] will be used as a namespace and [id] will be used as the path,
+     * removing the provided separator character if necessary.
+     *
+     * @param id the string
+     * @param delimiter the character to split the namespace and path
+     * @return the identifier
+     * @throws InvalidKeyException if the string [id] is not a valid identifier
+     */
+    fun splitOn(id: String, delimiter: Char): Identifier {
+        return Identifier.key(id, delimiter)
+    }
+
+    /**
+     * Creates an identifier from a string with specific [delimiter].
+     *
+     * @param id the string
+     * @param delimiter the character to split the namespace and path
+     * @return the identifier
+     */
+    fun trySplitOn(id: String, delimiter: Char): Identifier? {
+        return runCatching { Identifier.key(id, delimiter) }.getOrNull()
     }
 
     /**

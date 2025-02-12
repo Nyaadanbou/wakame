@@ -1,6 +1,3 @@
 nodes:
-  - type: global:example_2
-  - type: ability:foo/bar
-    trigger: trigger:generic/attack
-    variant: 0
-    weight: 1
+  - { type: global:example_2 }
+  - { type: attribute:defense, value: 30.0, element: neutral, weight: 1 }

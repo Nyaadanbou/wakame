@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
@@ -122,7 +121,6 @@ internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>(
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
             is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
-            is AbilityCore -> StandardRenderingHandlerRegistry.CELLULAR_ABILITY.process(collector, core)
             is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
         }
     }
@@ -147,11 +145,6 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val CELLULAR_ATTRIBUTE: RenderingHandler<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
-        format.render(data)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY: RenderingHandler<AbilityCore, CellularAbilityRendererFormat> = configure("cells/abilities") { data, format ->
         format.render(data)
     }
 

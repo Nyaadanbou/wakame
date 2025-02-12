@@ -40,10 +40,6 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
-# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/abilities:
-  namespace: ability
-
 # id: `cells/empty`
 cells/empty:
   namespace: stash

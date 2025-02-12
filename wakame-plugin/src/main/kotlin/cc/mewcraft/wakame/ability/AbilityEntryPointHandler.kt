@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.state.AbilityStateResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.playerAbilities
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.*
@@ -13,6 +13,7 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.collections.takeUnlessEmpty
 
 /**
  * 控制 [Ability] 开始执行的逻辑.
@@ -64,8 +65,7 @@ internal object AbilityEntryPointHandler {
         when (projectile) {
             is AbstractArrow -> {
                 val nekoStack = projectile.itemStack.shadowNeko(false) ?: return
-                val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
-                val abilities = cells.collectAbilityModifiers(nekoStack, ItemSlot.imaginary())
+                val abilities = nekoStack.playerAbilities.takeUnlessEmpty() ?: return
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 for (ability in abilities) {
                     ability.recordBy(CasterAdapter.adapt(projectile.shooter as Player), target, ItemSlot.imaginary() to nekoStack)

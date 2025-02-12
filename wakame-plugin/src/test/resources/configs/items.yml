@@ -103,6 +103,10 @@ components:
     enabled: true
     display_name: "Max Damage"
 
+  player_ability:
+    enabled: true
+    display_name: "Player Ability"
+
   portable_core:
     enabled: true
     display_name: "Portable Core"

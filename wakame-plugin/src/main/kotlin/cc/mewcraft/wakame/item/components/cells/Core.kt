@@ -4,9 +4,7 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.item.components.cells.cores.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleEmptyCore
 import cc.mewcraft.wakame.item.components.cells.cores.SimpleVirtualCore
@@ -94,16 +92,6 @@ interface AttributeCore : Core {
 }
 
 /**
- * [AbilityCore] 是一个技能核心, 用于表示一个 [PlayerAbility].
- */
-interface AbilityCore : Core {
-    /**
-     * 该技能核心的技能种类及其变体.
-     */
-    val ability: PlayerAbility
-}
-
-/**
  * 本单例用于构建 [Core] 的实例.
  */
 object CoreFactory {
@@ -147,13 +135,9 @@ object CoreFactory {
                 AttributeCore(coreId, tag)
             }
 
-            coreId.namespace() == Namespaces.ABILITY -> {
-                AbilityCore(coreId, tag)
-            }
-
             // 无法识别 NBT
             else -> {
-                throw IllegalArgumentException("failed to parse NBT tag ${tag.asString()}")
+                throw IllegalArgumentException("Failed to parse NBT tag ${tag.asString()}")
             }
         }
 

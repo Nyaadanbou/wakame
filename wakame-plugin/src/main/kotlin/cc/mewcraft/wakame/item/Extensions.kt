@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.SharedConstants
+import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -137,6 +138,8 @@ var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTyp
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 
 var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)
+
+var NekoStack.playerAbilities: List<PlayerAbility> by mapped(ItemComponentTypes.PLAYER_ABILITY, ::emptyList, ::ItemPlayerAbility, ItemPlayerAbility::abilities)
 
 var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_CORE)
 

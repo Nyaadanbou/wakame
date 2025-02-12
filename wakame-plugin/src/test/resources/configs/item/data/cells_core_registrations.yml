@@ -125,14 +125,3 @@ cells:
           - type: attribute:universal_defense_penetration_rate
             value: 0.0
             weight: 1
-        all_abilities:
-          # 演示1
-          - type: ability:melee/demo
-            trigger: trigger:generic/attack
-            variant: 0
-            weight: 1
-          # 演示2
-          - type: ability:ranged/demo
-            trigger: trigger:generic/attack
-            variant: 0
-            weight: 1

@@ -9,11 +9,9 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreArchetype
-import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
@@ -79,11 +77,6 @@ internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
             type1.namespace() == Namespaces.ATTRIBUTE -> {
                 val attributeId = type1
                 AttributeCoreArchetype(attributeId, node)
-            }
-
-            type1.namespace() == Namespaces.ABILITY -> {
-                val abilityId = type1
-                AbilityCoreArchetype(abilityId, node)
             }
 
             // 大概是配置文件写错了
@@ -219,14 +212,6 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
                 val attributeId = value.id.value()
                 val attribute = value.attribute
                 AttributeFilter(true, attributeId, attribute.operation, attribute.element)
-            }
-
-            // By design, a ability is considered generated
-            // if there is already a ability with the same key
-            // in the selection context, ignoring the trigger.
-            is AbilityCoreArchetype -> {
-                val abilityId = value.id
-                AbilityFilter(true, abilityId)
             }
 
             // Throw if we see an unknown schema core type

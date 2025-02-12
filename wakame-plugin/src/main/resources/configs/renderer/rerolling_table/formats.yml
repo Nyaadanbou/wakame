@@ -56,33 +56,6 @@ cells/attributes/out:
       - multiply_base
       - multiply_total
 
-# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/abilities/in:
-  namespace: skill
-  diff_formats:
-    # 可被重造的核孔
-    changeable: {}
-    # 不可被重造的核孔
-    unchangeable:
-      style: "<!i><dark_gray>"
-    # 选择要重造的核孔
-    selected: {}
-    # 未选择要重造的核孔
-    unselected: {}
-
-cells/abilities/out:
-  namespace: ability
-  diff_formats:
-    changeable: {}
-    unchangeable:
-      style: "<!i><dark_gray>"
-      prefix: "<dark_gray>[<gray>不可修改</gray>] "
-    selected:
-      prefix: "<dark_gray>[<green>将被修改</green>] "
-    unselected:
-      style: "<!i><dark_gray>"
-      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
-
 # id: `cells/empty`
 cells/empty/in:
   namespace: stash

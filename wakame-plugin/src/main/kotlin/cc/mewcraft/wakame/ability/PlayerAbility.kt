@@ -102,6 +102,7 @@ fun PlayerAbility(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
+// TODO 改成 class, 不要 interface - 此处接口没有实际作用
 interface PlayerAbility : BinarySerializable<CompoundTag> {
     /**
      * 技能的唯一标识.

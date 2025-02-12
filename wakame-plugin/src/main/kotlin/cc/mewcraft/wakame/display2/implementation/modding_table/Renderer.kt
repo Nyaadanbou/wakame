@@ -8,7 +8,6 @@ import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -99,7 +98,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_IN.process(collector, cell.getId(), core, context)
                     is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
                 }
             }
@@ -109,7 +107,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             components.process(ItemComponentTypes.CELLS) { data ->
                 for ((_, cell) in data) when (val core = cell.getCore()) {
                     is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_OUT.process(collector, cell.getId(), core, context)
                     is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
                 }
             }
@@ -150,16 +147,6 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     @JvmField
     val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
         format.render(id, attribute, context)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY_IN: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/in") { id, ability, context, format ->
-        format.render(id, ability, context)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY_OUT: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/out") { id, ability, context, format ->
-        format.render(id, ability, context)
     }
 
     @JvmField

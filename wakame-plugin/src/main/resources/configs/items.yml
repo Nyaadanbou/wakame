@@ -117,6 +117,10 @@ components:
     enabled: true
     display_name: "<!i><white>最大耐久损耗"
 
+  player_ability:
+    enabled: true
+    display_name: "<!i><white>物品技能"
+
   portable_core:
     enabled: true
     display_name: "<!i><white>便携式核心"

@@ -1,24 +1,10 @@
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
-import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
-import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
-import cc.mewcraft.wakame.display2.implementation.standard.AbilityCoreTextMetaFactory
+import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -84,28 +70,6 @@ internal data class CellularAttributeRendererFormat(
      */
     override fun computeIndex(data: AttributeCore): Key {
         return data.computeIndex(namespace)
-    }
-}
-
-@ConfigSerializable
-internal data class CellularAbilityRendererFormat(
-    override val namespace: String,
-    private val diffFormats: ModdingDifferenceFormats,
-) : RendererFormat.Dynamic<AbilityCore> {
-    override val textMetaFactory: TextMetaFactory = AbilityCoreTextMetaFactory(namespace)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, AbilityRegistry.INSTANCES::has)
-
-    fun render(id: String, core: AbilityCore, context: ModdingTableContext): IndexedText {
-        val original = core.description
-        val processed = diffFormats.render(id, original, context)
-        return SimpleIndexedText(computeIndex(core), processed)
-    }
-
-    override fun computeIndex(data: AbilityCore): Key {
-        val ability = data.ability
-        val dataId = ability.id
-        val indexId = dataId.namespace() + "/" + dataId.value()
-        return Key.key(namespace, indexId)
     }
 }
 

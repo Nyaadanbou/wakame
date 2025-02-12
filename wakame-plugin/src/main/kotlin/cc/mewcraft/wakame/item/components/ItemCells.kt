@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.ability.PlayerAbility
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemConstants
@@ -11,7 +9,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
@@ -114,11 +111,6 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
      * 获取所有核孔上的 [AttributeModifier].
      */
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
-
-    /**
-     * 获取所有核孔上的 [PlayerAbility].
-     */
-    fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -227,25 +219,6 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                 ret.putAll(attributeModifiers.entries)
             }
             return ret.build()
-        }
-
-        override fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility> {
-            val ret = ArrayList<PlayerAbility>()
-            for ((_, cell) in this) {
-                val core = cell.getCore() as? AbilityCore ?: continue
-                val ability = core.ability
-
-                val abilityVariant = ability.variant
-                if (abilityVariant == TriggerVariant.any()) {
-                    ret.add(ability)
-                    continue
-                }
-                if (abilityVariant.id != context.variant) {
-                    continue
-                }
-                ret.add(ability)
-            }
-            return ret
         }
 
         override fun containSimilarCore(core: Core): Boolean {

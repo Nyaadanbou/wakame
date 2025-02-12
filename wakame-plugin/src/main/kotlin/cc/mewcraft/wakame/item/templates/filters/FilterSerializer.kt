@@ -23,11 +23,6 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
         val inverted = node.node("invert").getBoolean(false) // check if we should invert the original result
 
         val ret: Filter<ItemGenerationContext> = when (rawType) {
-            AbilityFilter.TYPE -> {
-                val key = node.node("ability").require<Key>()
-                AbilityFilter(inverted, key)
-            }
-
             AttributeFilter.TYPE -> {
                 val id = node.node("attribute").require<String>()
                 val operation = node.node("operation").get<AttributeModifier.Operation>()

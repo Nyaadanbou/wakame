@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.templates.archetype.ItemPlayerAbilityArchetype
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.item.templates.virtual.ItemSlotDisplayDict
 import cc.mewcraft.wakame.item.templates.virtual.ItemSlotDisplayLore
@@ -169,6 +170,12 @@ object ItemTemplateTypes {
      */
     @JvmField
     val SLOT_DISPLAY_DICT: ItemTemplateType<ItemSlotDisplayDict> = ItemSlotDisplayDict.codec(ItemConstants.SLOT_DISPLAY_DICT).register()
+
+    /**
+     * 组件: [cc.mewcraft.wakame.item.components.ItemPlayerAbility]
+     */
+    @JvmField
+    val PLAYER_ABILITY: ItemTemplateType<ItemPlayerAbilityArchetype> = ItemPlayerAbilityArchetype.codec(ItemConstants.PLAYER_ABILITY).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.PortableCore]

@@ -18,9 +18,6 @@ primary:
   - attribute:max_health
   - attribute:movement_speed
 
-  - ability:blink
-  - ability:frost
-
   - stash:cells/empty
 
   - (fixed:vanilla)222
