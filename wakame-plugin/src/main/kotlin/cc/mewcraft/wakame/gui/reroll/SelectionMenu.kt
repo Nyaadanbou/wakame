@@ -37,7 +37,7 @@ private constructor(
         override fun getItemProvider(): ItemProvider {
             val sourceItem = parent.session.usableInput ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
             val sourceCell = sourceItem.cells?.get(selection.id) ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
-            val sourceCore = sourceCell.getCore()
+            val sourceCore = sourceCell.core
             return parent.table.selectionMenuSettings.getSlotDisplay("core_view").resolveToItemWrapper {
                 standard { component("core_name", sourceCore.displayName) }
                 folded("core_description", sourceCore.description)

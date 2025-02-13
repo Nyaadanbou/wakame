@@ -47,7 +47,7 @@ internal data class FuzzyPortableCoreRendererFormat(
     fun render(data: PortableCore): IndexedText {
         val core = data.wrapped as? AttributeCore
             ?: return SimpleIndexedText(unknownIndex, listOf())
-        val index = Key.key(namespace, core.attribute.id)
+        val index = Key.key(namespace, core.data.id)
         return SimpleIndexedText(index, core.description)
     }
 

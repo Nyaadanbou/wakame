@@ -95,7 +95,7 @@ private constructor(
             val wrappedCore = portableCore.wrapped
 
             builder.modify(id) { cell ->
-                cell.setCore(wrappedCore)
+                cell.copy(core = wrappedCore)
             }
         }
 

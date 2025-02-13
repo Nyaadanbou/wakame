@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.CoreFactory
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
@@ -55,13 +54,13 @@ data class PortableCore(
                 tag.merge(old)
             }
 
-            val core = CoreFactory.deserialize(tag)
+            val core = Core.fromNbt(tag)
             return PortableCore(core)
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
             holder.editTag { tag ->
-                tag.merge(value.wrapped.serializeAsTag())
+                tag.merge(value.wrapped.saveNbt())
             }
         }
 

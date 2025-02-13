@@ -176,7 +176,7 @@ private class CoreMatchRuleAttribute(
             return false
         }
 
-        val attribute = core.attribute
+        val attribute = core.data
         if (operation != null && attribute.operation != operation) {
             return false
         }

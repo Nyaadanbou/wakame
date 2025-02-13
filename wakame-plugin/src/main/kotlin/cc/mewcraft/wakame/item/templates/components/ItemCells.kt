@@ -38,7 +38,7 @@ data class ItemCells(
             }
 
             // collect all and put it into the builder
-            builder.put(id, Cell.of(id, core))
+            builder.put(id, Cell(id, core))
         }
 
         return ItemGenerationResult.of(builder.build())

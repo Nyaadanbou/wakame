@@ -15,68 +15,57 @@ import net.kyori.adventure.key.Key
 /**
  * 跟踪使用物品击杀实体的数量.
  */
-interface TrackEntityKills : Track, TrackMap<TrackEntityKills, Key, Int> {
-
-    /**
-     * 给指定的 [key] 增加击杀数.
-     */
-    fun grow(key: Key, count: Int = 1): TrackEntityKills
+class TrackEntityKills(
+    private val map: Map<Key, Int>,
+) : Track, TrackMap<TrackEntityKills, Key, Int> {
 
     companion object : TrackType<TrackEntityKills> {
+
         private val entityKeyLookup: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
 
+        override val id: String = StatisticsConstants.ENTITY_KILLS
+
         fun empty(): TrackEntityKills {
-            return TrackEntityKillsImpl(emptyMap())
+            return TrackEntityKills(emptyMap())
         }
 
-        fun of(nbt: CompoundTag): TrackEntityKills {
+        fun fromNbt(nbt: CompoundTag): TrackEntityKills {
             val map = if (nbt.size() < 8) Object2IntArrayMap<Key>() else Object2IntOpenHashMap()
             for (tagKey in nbt.keySet()) {
-                val entityKey = Key.key(tagKey).takeIf {
-                    entityKeyLookup.validate(it)
-                } ?: continue // 直接跳过无效的 key
+                val entityKey = Key.key(tagKey).takeIf { entityKeyLookup.validate(it) } ?: continue // 直接跳过无效的 key
                 val kills = nbt.getInt(tagKey)
                 map[entityKey] = kills
             }
-            return TrackEntityKillsImpl(map)
+            return TrackEntityKills(map)
         }
 
-        override val id: String = StatisticsConstants.ENTITY_KILLS
     }
-}
 
-private class TrackEntityKillsImpl(
-    private val map: Map<Key, Int>,
-) : TrackEntityKills {
     override fun get(key: Key): Int {
         return map.getOrDefault(key, 0)
     }
 
     override fun set(key: Key, value: Int): TrackEntityKills {
-        return edit { map ->
-            map[key] = value
-        }
+        return edit { map -> map[key] = value }
     }
 
     override fun remove(key: Key): TrackEntityKills {
-        return edit { map ->
-            map.remove(key)
-        }
+        return edit { map -> map.remove(key) }
     }
 
-    override fun grow(key: Key, count: Int): TrackEntityKills {
+    fun grow(key: Key, count: Int): TrackEntityKills {
         return set(key, get(key) + count)
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
-        for ((entityKey, kills) in map) {
-            putInt(entityKey.asString(), kills)
+    override fun saveNbt(): CompoundTag {
+        return CompoundTag {
+            for ((entityKey, kills) in map) {
+                putInt(entityKey.toString(), kills)
+            }
         }
     }
 
     override fun edit(block: (MutableMap<Key, Int>) -> Unit): TrackEntityKills {
-        val map = Object2IntOpenHashMap(this.map)
-        block(map)
-        return TrackEntityKillsImpl(map)
+        return TrackEntityKills(Object2IntOpenHashMap(map).apply(block))
     }
 }

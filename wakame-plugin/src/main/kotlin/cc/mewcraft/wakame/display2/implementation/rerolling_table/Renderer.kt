@@ -99,7 +99,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, id: String, cell: Cell, context: RerollingTableContext) {
-        val core = cell.getCore()
+        val core = cell.core
         val slot = context.slot
         when (slot) {
             RerollingTableContext.Slot.INPUT -> {

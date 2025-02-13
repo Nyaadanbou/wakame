@@ -239,11 +239,11 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCore() as? AttributeCore
+                val core = cell.core as? AttributeCore
                 assertNotNull(core)
 
                 fun assert(element: RegistryEntry<ElementType>, expectedMin: Double, expectedMax: Double) {
-                    val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
+                    val modMap = core.data.createAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
                     assertNotNull(modMin)
@@ -254,7 +254,7 @@ class CustomNekoStackTest : KoinTest {
 
                 val fire = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
                 val water = KoishRegistries.ELEMENT.getEntryOrThrow("water")
-                when (val actual = core.attribute.element) {
+                when (val actual = core.data.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
                 }
@@ -266,10 +266,10 @@ class CustomNekoStackTest : KoinTest {
                 assertNotNull(cell)
 
                 // 测试核心
-                val core = cell.getCore() as? AttributeCore
+                val core = cell.core as? AttributeCore
                 assertNotNull(core)
 
-                val modMap = core.attribute.createAttributeModifiers(ZERO_KEY)
+                val modMap = core.data.createAttributeModifiers(ZERO_KEY)
                 val mod = modMap[Attributes.CRITICAL_STRIKE_CHANCE]
                 assertNotNull(mod)
                 assertEquals(0.75, mod.amount, 1e-5)
@@ -296,10 +296,10 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             assertEquals(2, it.size)
             val cell1 = assertNotNull(it.get("foo_1"))
-            val core1 = assertIs<ConstantAttributeBundleS>((cell1.getCore() as? AttributeCore)?.attribute)
+            val core1 = assertIs<ConstantAttributeBundleS>((cell1.core as? AttributeCore)?.data)
             assertEquals(5.0, core1.value)
             val cell2 = assertNotNull(it.get("foo_2"))
-            val core2 = assertIs<EmptyCore>(cell2.getCore())
+            val core2 = assertIs<EmptyCore>(cell2.core)
         }
     }
 
@@ -320,8 +320,8 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(cell)
             assertAny(
                 // 要么是 noop, 要么是 empty
-                { assertIs<VirtualCore>(cell.getCore()) },
-                { assertIs<EmptyCore>(cell.getCore()) },
+                { assertIs<VirtualCore>(cell.core) },
+                { assertIs<EmptyCore>(cell.core) },
             )
         }
     }
@@ -348,7 +348,7 @@ class CustomNekoStackTest : KoinTest {
             assertNotNull(cell)
             // CoreNoop 在第一个无条件的池中,
             // 因此生成出来的肯定是 CoreNoop
-            assertIs<VirtualCore>(cell.getCore())
+            assertIs<VirtualCore>(cell.core)
         }
     }
 
@@ -371,7 +371,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo")
             assertNotNull(cell)
-            val core = cell.getCore() as? AttributeCore
+            val core = cell.core as? AttributeCore
             assertNotNull(core)
             assertEquals(Key.key("attribute:attack_damage_rate"), core.id)
         }
@@ -396,7 +396,7 @@ class CustomNekoStackTest : KoinTest {
         unboxed {
             val cell = it.get("foo_b")
             assertNotNull(cell)
-            val core = cell.getCore() as? AttributeCore
+            val core = cell.core as? AttributeCore
             assertNotNull(core)
             assertAny(
                 { assertEquals(Key.key("attribute:critical_strike_chance"), core.id) },

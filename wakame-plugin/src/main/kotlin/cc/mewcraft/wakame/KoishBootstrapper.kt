@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.wakame.KoishLoggerHolder.getValue
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
-import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.registry.registryModule
@@ -58,7 +56,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 adventureModule(),
                 entityModule(),
                 guiModule(),
-                itemModule(),
                 packModule(),
                 registryModule(),
                 abilityModule(),

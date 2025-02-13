@@ -4,7 +4,10 @@ import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.tracks.*
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable
@@ -62,11 +65,11 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
                 val tag = nbt.get(tagKey) as? CompoundTag ?: continue
                 when (tagKey) {
                     StatisticsConstants.ENTITY_KILLS -> {
-                        builder.set(TrackTypes.ENTITY_KILLS, TrackEntityKills.of(tag))
+                        builder.set(TrackTypes.ENTITY_KILLS, TrackEntityKills.fromNbt(tag))
                     }
 
                     StatisticsConstants.PEAK_DAMAGE -> {
-                        builder.set(TrackTypes.PEAK_DAMAGE, TrackPeakDamage.of(tag))
+                        builder.set(TrackTypes.PEAK_DAMAGE, TrackPeakDamage.fromNbt(tag))
                     }
 
                     StatisticsConstants.REFORGE_HISTORY -> {
@@ -170,7 +173,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
                 tag.clear() // 总是重新写入所有数据
                 for ((trackType, track) in value) {
                     val tagKey = trackType.id
-                    val tagValue = track.serializeAsTag()
+                    val tagValue = track.saveNbt()
                     tag.put(tagKey, tagValue)
                 }
             }

@@ -108,7 +108,7 @@ private constructor(
                     modify(id) { cell ->
                         val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreArchetype
                         val generated = selected.generate(context)
-                        cell.setCore(generated)
+                        cell.copy(core = generated)
                     }
                 }
             }
@@ -158,16 +158,16 @@ private constructor(
             // 如果不跳过, 那么新的核孔将无法被正确生成.
             // 这是因为截止至 2024/8/20, 我们的设计不允许
             // 相似的核心出现在同一个物品上.
-            .filter2 { cell -> !selectionMap[cell.getId()].selected }
+            .filter2 { cell -> !selectionMap[cell.id].selected }
             .forEach { (_, cell) ->
                 when (
-                    val core = cell.getCore()
+                    val core = cell.core
                 ) {
                     is AttributeCore -> {
                         context.attributes += AttributeContextData(
                             id = core.id.value(),
-                            operation = core.attribute.operation,
-                            element = core.attribute.element
+                            operation = core.data.operation,
+                            element = core.data.element
                         )
                     }
                 }

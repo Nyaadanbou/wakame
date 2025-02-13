@@ -26,7 +26,6 @@ import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
-import net.kyori.examination.Examinable
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -38,7 +37,7 @@ import kotlin.io.path.Path
 /**
  * 代表一个 [核心][Core] 的模板.
  */
-interface CoreArchetype : Examinable {
+interface CoreArchetype {
     /**
      * 核心的唯一标识. 主要用于序列化实现.
      *
@@ -210,7 +209,7 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
             // key, operation and element in the selection context.
             is AttributeCoreArchetype -> {
                 val attributeId = value.id.value()
-                val attribute = value.attribute
+                val attribute = value.data
                 AttributeFilter(true, attributeId, attribute.operation, attribute.element)
             }
 

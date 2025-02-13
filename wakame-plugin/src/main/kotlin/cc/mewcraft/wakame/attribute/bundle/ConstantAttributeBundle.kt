@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.BinarySerializable
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
@@ -123,7 +122,7 @@ fun ConstantAttributeBundle(
 /**
  * 代表一个数值恒定的 [AttributeBundle].
  */
-sealed class ConstantAttributeBundle : BinarySerializable<CompoundTag>, AttributeBundle, AttributeModifierSource {
+sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource {
 
     /**
      * 数值的质量, 通常以正态分布的 Z-score 转换而来.
@@ -159,9 +158,9 @@ sealed class ConstantAttributeBundle : BinarySerializable<CompoundTag>, Attribut
                     score < -2.5 -> L3
                     score < -1.5 -> L2
                     score < -0.5 -> L1
-                    score < +0.5 -> MU
-                    score < +1.5 -> U1
-                    score < +2.5 -> U2
+                    score < 0.5 -> MU
+                    score < 1.5 -> U1
+                    score < 2.5 -> U2
                     else -> U3
                 }
             }
@@ -181,7 +180,7 @@ sealed class ConstantAttributeBundle : BinarySerializable<CompoundTag>, Attribut
     /**
      * 序列化为 NBT 标签. 请注意这并不包含 [id] 的信息.
      */
-    abstract override fun serializeAsTag(): CompoundTag
+    abstract fun saveNbt(): CompoundTag
 
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
         return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
@@ -209,7 +208,7 @@ internal data class ConstantAttributeBundleS(
                 other.operation == operation
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         writeQuality(quality)
@@ -239,7 +238,7 @@ internal data class ConstantAttributeBundleR(
                 other.operation == operation
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
@@ -271,7 +270,7 @@ internal data class ConstantAttributeBundleSE(
                 other.element == element
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         writeElement(element)
@@ -305,7 +304,7 @@ internal data class ConstantAttributeBundleRE(
                 && other.element == element
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)

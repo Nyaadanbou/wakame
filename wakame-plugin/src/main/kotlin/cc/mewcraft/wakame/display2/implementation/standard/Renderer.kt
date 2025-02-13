@@ -76,7 +76,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>(
 
         val components = item.components
         components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.getCore()) }
+        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.core) }
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }

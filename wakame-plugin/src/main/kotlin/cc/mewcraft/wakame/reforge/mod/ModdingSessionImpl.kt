@@ -438,7 +438,7 @@ private object ReforgeReplace {
         override fun getIngredientRarityNumber(): Double = .0
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("id", cell.getId()),
+            ExaminableProperty.of("id", cell.id),
         )
 
         override fun toString(): String = toSimpleString()
@@ -539,14 +539,14 @@ private object ReforgeReplace {
             }
 
             // 源物品的核孔上 必须没有与便携核心相似的核心
-            val inputCellsExcludingThis = inputCells.filter2 { it.getId() != cell.getId() }
+            val inputCellsExcludingThis = inputCells.filter2 { it.id != cell.id }
             if (inputCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
                 return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
             }
 
             if (
                 session.replaceParams
-                    .filter { it.key != cell.getId() } // 排除掉当前的核孔
+                    .filter { it.key != cell.id } // 排除掉当前的核孔
                     .any { it.value.usableInput?.portableCore?.wrapped?.similarTo(portableCore.wrapped) == true }
             ) {
                 return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
@@ -561,7 +561,7 @@ private object ReforgeReplace {
             if (cellRule.requireElementMatch) {
                 val elementsOnInput = usableInput.elements
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
-                val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
+                val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.data?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnInput) {
                     return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
                 }
@@ -586,7 +586,7 @@ private object ReforgeReplace {
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("id", cell.getId()),
+            ExaminableProperty.of("id", cell.id),
         )
 
         override fun toString(): String = toSimpleString()
@@ -669,7 +669,7 @@ private object ReforgeReplaceMap {
         override fun get(id: String): ModdingSession.Replace {
             // 始终返回一个 unchangeable replace.
             return store.getOrPut(id) {
-                val dummyCell = Cell.of(id) // it should never be accessed
+                val dummyCell = Cell(id) // it should never be accessed
                 ReforgeReplace.unchangeable(session, dummyCell)
             }
         }
@@ -694,7 +694,7 @@ private object ReforgeReplaceMap {
 
         override fun get(id: String): ModdingSession.Replace {
             // the dummy cell should never be accessed
-            return data.getOrPut(id) { ReforgeReplace.unchangeable(session, Cell.of(id)) }
+            return data.getOrPut(id) { ReforgeReplace.unchangeable(session, Cell(id)) }
         }
 
         override fun contains(id: String): Boolean {

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.attribute.bundle.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.cores.AttributeCore
 import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.portableCore
 import cc.mewcraft.wakame.item.rarity
@@ -84,12 +83,12 @@ private constructor(
             return ReforgeResult.failure(player, MessageConstants.MSG_MERGING_RESULT_PENALTY_TOO_HIGH)
         }
 
-        val attribute1 = core1.attribute
+        val attribute1 = core1.data
         val resultedOperation = attribute1.operation
         val (resultedValue, resultedScore) = session.valueMergeFunction(resultedOperation).evaluate()
         val resultedCore = when (attribute1 /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantAttributeBundleS -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
-            is ConstantAttributeBundleSE -> AttributeCore(id = core1.id, attribute = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleS -> AttributeCore(id = core1.id, data = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleSE -> AttributeCore(id = core1.id, data = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
             is ConstantAttributeBundleR, is ConstantAttributeBundleRE -> {
                 // 我们不支持拥有两个数值的核心, 原因:
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心

@@ -2,13 +2,9 @@ package cc.mewcraft.wakame.item.templates.components.cells.cores
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.CoreFactory
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.examination.ExaminableProperty
-import java.util.stream.Stream
 
 
 /**
@@ -17,22 +13,12 @@ import java.util.stream.Stream
  * 设计上, 无操作核心不会写入到物品上.
  */
 data object VirtualCoreArchetype : CoreArchetype {
-    override val id: Key = GenericKeys.NOOP
+    override val id: Key
+        get() = GenericKeys.NOOP
 
-    override fun generate(context: ItemGenerationContext): Core {
-        // 无操作核心应该不需要写入上下文
-        return CoreFactory.virtual()
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("id", id)
-        )
-    }
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    // 无操作核心应该不需要写入上下文
+    override fun generate(context: ItemGenerationContext): Core =
+        Core.virtual()
 }
 
 /**
@@ -42,18 +28,10 @@ data object VirtualCoreArchetype : CoreArchetype {
  * 如果核孔没有核心, 那也就意味着可以被替换成其他的.
  */
 data object EmptyCoreArchetype : CoreArchetype {
-    override val id: Key = GenericKeys.EMPTY
+    override val id: Key
+        get() = GenericKeys.EMPTY
 
-    override fun generate(context: ItemGenerationContext): Core {
-        // 空核孔应该不需要写入上下文
-        return CoreFactory.empty()
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id)
-    )
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    // 空核孔应该不需要写入上下文
+    override fun generate(context: ItemGenerationContext): Core =
+        Core.empty()
 }

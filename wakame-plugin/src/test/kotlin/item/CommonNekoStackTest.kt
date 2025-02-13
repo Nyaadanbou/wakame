@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
@@ -44,9 +43,6 @@ object CommonNekoStackTest {
             modules(
                 // environment
                 testEnv(),
-
-                // this module
-                itemModule(),
 
                 // dependencies
                 adventureModule(),

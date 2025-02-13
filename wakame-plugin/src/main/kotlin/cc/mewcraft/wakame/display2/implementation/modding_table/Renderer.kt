@@ -96,18 +96,18 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
         if (context is ModdingTableContext.Input) {
             components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
+                for ((_, cell) in data) when (val core = cell.core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.id, context)
                 }
             }
         }
 
         if (context is ModdingTableContext.Output) {
             components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
+                for ((_, cell) in data) when (val core = cell.core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.id, context)
                 }
             }
 

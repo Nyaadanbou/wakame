@@ -29,16 +29,16 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.CELLS)
 
         /**
-         * 构建一个 [ItemCells] 的实例.
+         * 构建一个空的 [ItemCells] 的实例.
          */
-        fun of(): ItemCells {
+        fun empty(): ItemCells {
             return Value(emptyMap())
         }
 
         /**
          * 构建一个 [ItemCells] 的实例, 初始值为给定的参数
          */
-        fun of(cells: Map<String, Cell>): ItemCells {
+        fun fromMap(cells: Map<String, Cell>): ItemCells {
             return Value(cells)
         }
 
@@ -212,8 +212,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
-                val core = cell.getCore() as? AttributeCore ?: continue
-                val attribute = core.attribute
+                val core = cell.core as? AttributeCore ?: continue
+                val attribute = core.data
                 val sourceId = context.id.withValue { "$it/${slot.slotIndex}/$id" }
                 val attributeModifiers = attribute.createAttributeModifiers(sourceId)
                 ret.putAll(attributeModifiers.entries)
@@ -222,7 +222,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         }
 
         override fun containSimilarCore(core: Core): Boolean {
-            return cells.values.any { cell -> cell.getCore().similarTo(core) }
+            return cells.values.any { cell -> cell.core.similarTo(core) }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, Cell>> {
@@ -248,7 +248,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
 
             for (id in tag.keySet()) {
                 val nbt = tag.getCompound(id)
-                val cell = Cell.of(id, nbt)
+                val cell = Cell.fromNbt(id, nbt)
                 cells.put(id, cell)
             }
 
@@ -260,11 +260,11 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
                 tag.clear() // 总是重新写入全部数据
 
                 for ((id, cell) in value) {
-                    if (cell.getCore().isVirtual) {
+                    if (cell.core.isVirtual) {
                         continue // 拥有虚拟核心的核孔不应该写入物品
                     }
 
-                    tag.put(id, cell.serializeAsTag())
+                    tag.put(id, cell.saveNbt())
                 }
             }
         }

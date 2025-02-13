@@ -128,7 +128,7 @@ internal class SimpleMergingSession(
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
         val core = inputItem?.portableCore?.wrapped as? AttributeCore ?: return .0
-        val scalar = core.attribute as? AttributeBundleTrait.Scalar<Double>
+        val scalar = core.data as? AttributeBundleTrait.Scalar<Double>
         return scalar?.value ?: .0
     }
 

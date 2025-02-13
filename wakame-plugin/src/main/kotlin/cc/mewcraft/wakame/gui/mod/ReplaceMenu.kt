@@ -167,7 +167,7 @@ internal class ReplaceMenu(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val core = replace.cell.getCore()
+            val core = replace.cell.core
             val icon = CoreIcons.getItemStack(core)
             val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
                 standard { component("core_name", core.displayName) }
