@@ -20,6 +20,7 @@ import org.bukkit.Server
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.stopKoin
 import xyz.xenondevs.invui.InvUI
+import xyz.xenondevs.invui.window.WindowManager
 import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
@@ -33,16 +34,19 @@ internal var PLUGIN_READY: Boolean = false
 internal object Koish : JavaPlugin(), IKoish {
 
     override fun onEnable() {
-        PLUGIN_READY = true
-        LIFECYCLE_MANAGER = lifecycleManager
-
-        InvUI.getInstance().setPlugin(this)
+        InvUI.getInstance().setPlugin(this) // https://docs.xen.cx/invui/#paper-plugin
+        WindowManager.getInstance() // 初始化 static blocks
         Initializer.registerEvents()
         ItemXBootstrap.init()
         KoishProvider.register(this)
+
+        LIFECYCLE_MANAGER = lifecycleManager
+        PLUGIN_READY = true
     }
 
     override fun onDisable() {
+        PLUGIN_READY = false
+
         KoishProvider.unregister()
         Initializer.disable()
         KOISH_SCOPE.cancel("Plugin disabled")
