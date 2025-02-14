@@ -5,9 +5,6 @@ package cc.mewcraft.wakame
  */
 object SharedConstants {
     const val PLUGIN_NAME = "wakame"
-    const val PLUGIN_NAME_2 = "koish"
-    const val ROOT_NBT_NAME = "wakame"
-    const val ROOT_NBT_NAME_2 = "koish"
 
     /**
      * 检查 JVM 是否在 IDE 中运行.

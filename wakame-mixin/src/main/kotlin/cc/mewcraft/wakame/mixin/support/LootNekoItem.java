@@ -43,7 +43,7 @@ public class LootNekoItem extends LootPoolSingletonContainer {
 
     @Override
     public LootPoolEntryType getType() {
-        return LootPoolEntryInitializer.NEKO_ITEM;
+        return LootPoolEntriesPatch.NEKO_ITEM;
     }
 
     @Override

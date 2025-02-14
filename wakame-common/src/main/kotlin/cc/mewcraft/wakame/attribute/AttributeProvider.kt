@@ -6,12 +6,14 @@ import org.jetbrains.annotations.ApiStatus
  * Holds one or more instances of [Attribute].
  */
 interface AttributeProvider {
-    companion object Holder : AttributeProvider {
+
+    companion object Holder {
+
         private var instance: AttributeProvider? = null
 
         @JvmStatic
         fun instance(): AttributeProvider {
-            return instance ?: throw IllegalStateException("AttributeProvider has not been initialized.")
+            return instance ?: error("AttributeProvider has not been initialized")
         }
 
         @ApiStatus.Internal
@@ -24,21 +26,6 @@ interface AttributeProvider {
             instance = null
         }
 
-        override fun get(id: String): Attribute? {
-            return instance().get(id)
-        }
-
-        override fun getList(id: String): Collection<Attribute> {
-            return instance().getList(id)
-        }
-
-        override fun isElementalById(id: String): Boolean {
-            return instance().isElementalById(id)
-        }
-
-        override fun isElementalByBundleId(bundleId: String): Boolean {
-            return instance().isElementalByBundleId(bundleId)
-        }
     }
 
     /**
@@ -74,4 +61,5 @@ interface AttributeProvider {
      * 检查 [bundleId] 是否是一个元素属性.
      */
     fun isElementalByBundleId(bundleId: String): Boolean
+
 }

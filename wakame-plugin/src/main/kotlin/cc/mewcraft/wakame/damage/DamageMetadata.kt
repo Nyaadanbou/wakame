@@ -273,7 +273,7 @@ data class AttributeDamageMetadataBuilder(
         val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null"
         )
-        val attributeMap = AttributeMapAccess.get(damager).getOrElse {
+        val attributeMap = AttributeMapAccess.instance().get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
         }
         val damageTags = damageTags.build()

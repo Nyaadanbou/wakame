@@ -139,28 +139,26 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     }
 }
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(stage = InitStage.POST_WORLD)
 internal object AttributeMapPatchAccess {
 
     private val entityKeyLookup: EntityKeyLookup by Injector.inject()
-    private val uuidToPatches = Object2ObjectOpenHashMap<UUID, AttributeMapPatch>()
+    private val uuidToPatch = Object2ObjectOpenHashMap<UUID, AttributeMapPatch>()
 
     fun get(attributable: UUID): AttributeMapPatch? {
-        return uuidToPatches[attributable]
+        return uuidToPatch[attributable]
     }
 
     fun getOrCreate(attributable: UUID): AttributeMapPatch {
-        return uuidToPatches.computeIfAbsent(attributable, Object2ObjectFunction { AttributeMapPatch() })
+        return uuidToPatch.computeIfAbsent(attributable, Object2ObjectFunction { AttributeMapPatch() })
     }
 
     fun put(attributable: UUID, patch: AttributeMapPatch) {
-        uuidToPatches[attributable] = patch
+        uuidToPatch[attributable] = patch
     }
 
     fun remove(attributable: UUID) {
-        uuidToPatches.remove(attributable)
+        uuidToPatch.remove(attributable)
     }
 
     @InitFun
@@ -186,7 +184,7 @@ internal object AttributeMapPatchAccess {
                 put(entity.uniqueId, patch)
 
                 // 触发 AttributeMap 的初始化, 例如应用原版属性
-                AttributeMapAccess.get(entity).onFailure {
+                AttributeMapAccess.instance().get(entity).onFailure {
                     LOGGER.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
                 }
             }
@@ -197,7 +195,7 @@ internal object AttributeMapPatchAccess {
 
             // 触发 AttributeMap 的初始化, 例如应用原版属性
             val entity = event.entity
-            val attributeMap = AttributeMapAccess.get(entity)
+            val attributeMap = AttributeMapAccess.instance().get(entity)
                 .onFailure { LOGGER.error("Failed to initialize the attribute map for entity $entity: ${it.message}") }
                 .getOrNull() ?: return@event
 

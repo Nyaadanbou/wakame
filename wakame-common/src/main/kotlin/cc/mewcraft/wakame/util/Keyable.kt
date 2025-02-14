@@ -1,9 +1,10 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.util
 
 import com.mojang.serialization.DynamicOps
 import java.util.function.Supplier
 
 interface Keyable {
+
     fun <T> keys(ops: DynamicOps<T>): Sequence<T>
 
     companion object {
@@ -15,4 +16,5 @@ interface Keyable {
             }
         }
     }
+
 }

@@ -8,12 +8,14 @@ import org.jetbrains.annotations.ApiStatus
  * See the document of the subtypes for more details of usage.
  */
 interface AttributeMapAccess {
-    companion object Holder : AttributeMapAccess {
+
+    companion object Holder {
+
         private var instance: AttributeMapAccess? = null
 
         @JvmStatic
         fun instance(): AttributeMapAccess {
-            return instance ?: throw IllegalStateException("AttributeMapAccess has not been initialized.")
+            return instance ?: throw IllegalStateException("AttributeMapAccess has not been initialized")
         }
 
         @ApiStatus.Internal
@@ -26,13 +28,11 @@ interface AttributeMapAccess {
             instance = null
         }
 
-        override fun get(subject: Any): Result<AttributeMap> {
-            return instance().get(subject)
-        }
     }
 
     /**
      * Gets the [AttributeMap] for the specified subject.
      */
     fun get(subject: Any): Result<AttributeMap>
+
 }

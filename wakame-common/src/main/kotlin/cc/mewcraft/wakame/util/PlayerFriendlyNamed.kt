@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.core
+package cc.mewcraft.wakame.util
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable

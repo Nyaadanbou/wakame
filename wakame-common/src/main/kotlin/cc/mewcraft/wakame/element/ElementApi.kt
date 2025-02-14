@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.core.NumberRepresentable
-import cc.mewcraft.wakame.core.PlayerFriendlyNamed
-import cc.mewcraft.wakame.core.StringRepresentable
+import cc.mewcraft.wakame.util.NumberIdentifiable
+import cc.mewcraft.wakame.util.PlayerFriendlyNamed
+import cc.mewcraft.wakame.util.StringIdentifiable
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import org.jetbrains.annotations.ApiStatus
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * 代表一个元素类型.
  */
-interface Element : Keyed, Examinable, PlayerFriendlyNamed, StringRepresentable, NumberRepresentable {
+interface Element : Keyed, Examinable, PlayerFriendlyNamed, StringIdentifiable, NumberIdentifiable {
     // 形如 "koish:ice", "koish:fire"
     // 用于配置文件
     override val key: Key

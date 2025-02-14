@@ -279,7 +279,7 @@ object DamageManager : DamageManagerApi {
             }
 
             is LivingEntity -> {
-                EntityDefenseMetadata(AttributeMapAccess.get(damagee).getOrElse {
+                EntityDefenseMetadata(AttributeMapAccess.instance().get(damagee).getOrElse {
                     error("Failed to generate defense metadata because the entity does not have an attribute map.")
                 })
             }

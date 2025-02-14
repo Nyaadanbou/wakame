@@ -22,7 +22,7 @@ import java.util.*
     stage = InitStage.POST_WORLD,
 )
 @Reload
-object ResourceTicker {
+internal object ResourceTicker {
 
     private val bossBarMap: WeakHashMap<Player, BossBar> = WeakHashMap()
     private var resourceTickTask: BukkitTask? = null

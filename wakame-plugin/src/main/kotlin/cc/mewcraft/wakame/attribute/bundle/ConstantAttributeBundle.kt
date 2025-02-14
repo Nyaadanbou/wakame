@@ -339,7 +339,7 @@ private fun CompoundTag.writeElement(element: RegistryEntry<ElementType>) {
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {
-    putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.binary)
+    putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.id.toByte())
 }
 
 private fun CompoundTag.writeQuality(quality: ConstantAttributeBundle.Quality?) {

@@ -1,11 +1,7 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.core.NumberRepresentable
-import cc.mewcraft.wakame.core.PlayerFriendlyNamed
-import cc.mewcraft.wakame.core.StringRepresentable
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -16,7 +12,7 @@ import java.util.stream.Stream
 /**
  * 代表一个稀有度类型.
  */
-interface Rarity : Keyed, Examinable, PlayerFriendlyNamed, StringRepresentable, NumberRepresentable, Comparable<Rarity> {
+interface Rarity : Keyed, Examinable, PlayerFriendlyNamed, StringIdentifiable, NumberIdentifiable, Comparable<Rarity> {
     val weight: Int
     val glowColor: GlowColor
 }

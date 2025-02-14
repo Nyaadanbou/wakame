@@ -14,13 +14,13 @@ const val KOISH_NAMESPACE = "koish"
  */
 typealias Identifier = Key
 
-@Deprecated("Use IdentifierExt instead.", replaceWith = ReplaceWith("IdentifierExt"))
 typealias Identifiers = IdentifierExt
 
 /**
  * 包含 [Identifier] 的静态函数.
  */
 object IdentifierExt {
+
     @JvmField
     val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::toString)
 
@@ -121,4 +121,5 @@ object IdentifierExt {
     } catch (e: Exception) {
         DataResult.error { "Not a valid resource location: '$string' ${e.message}" }
     }
+
 }

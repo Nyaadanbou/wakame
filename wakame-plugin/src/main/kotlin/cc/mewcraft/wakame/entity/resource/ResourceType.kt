@@ -2,8 +2,6 @@ package cc.mewcraft.wakame.entity.resource
 
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.util.toSimpleString
-import net.kyori.examination.Examinable
 
 /**
  * The registry of all resource types.
@@ -11,12 +9,14 @@ import net.kyori.examination.Examinable
  * You can use it to get an instance of [ResourceType].
  */
 object ResourceTypeRegistry {
-    // Add more ResourceType here ...
+
+    @JvmStatic
     val MANA = object : ResourceType {
         override fun initialAmount(attributeMap: AttributeMap): Int = 0
         override fun maximumAmount(attributeMap: AttributeMap): Int = attributeMap.getValue(Attributes.MAX_MANA).toInt()
-        override fun toString(): String = toSimpleString()
+        override fun toString(): String = "ResourceType[MANA]"
     }
+
 }
 
 /**
@@ -26,7 +26,7 @@ object ResourceTypeRegistry {
  *
  * @see ResourceTypeRegistry
  */
-interface ResourceType : Examinable {
+interface ResourceType {
     /**
      * Computes the initial amount of the resource.
      */

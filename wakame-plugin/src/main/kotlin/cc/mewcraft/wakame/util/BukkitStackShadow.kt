@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.SharedConstants
 import io.papermc.paper.datacomponent.DataComponentTypes
 import io.papermc.paper.datacomponent.item.CustomModelData
 import io.papermc.paper.datacomponent.item.ItemLore
@@ -17,6 +16,7 @@ import cc.mewcraft.nbt.CompoundTag as CompoundShadowTag
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.inventory.ItemStack as BukkitStack
 
+private const val ROOT_NBT_FIELD = "wakame"
 private const val CLIENT_SIDE_KEY = "client_side"
 
 internal val CompoundTag.wrap: CompoundShadowTag
@@ -303,20 +303,20 @@ private var MojangStack.unsafeRootTagOrNull: CompoundShadowTag?
  * 最后将副本写入物品.
  */
 private var MojangStack.nekooTagOrNull: CompoundShadowTag?
-    get() = this.getCustomData()?.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME)?.wrap
+    get() = this.getCustomData()?.getCompoundOrNull(ROOT_NBT_FIELD)?.wrap
     set(value) {
         val data = this.getCustomData()
         if (data === null) {
             if (value != null) {
                 val tag = CompoundTag()
-                tag.put(SharedConstants.ROOT_NBT_NAME, value.unwrap)
+                tag.put(ROOT_NBT_FIELD, value.unwrap)
                 this.setCustomData(tag)
             }
         } else {
             if (value != null) {
-                data.put(SharedConstants.ROOT_NBT_NAME, value.unwrap)
+                data.put(ROOT_NBT_FIELD, value.unwrap)
             } else {
-                data.remove(SharedConstants.ROOT_NBT_NAME)
+                data.remove(ROOT_NBT_FIELD)
             }
             this.setCustomData(data)
         }
@@ -335,20 +335,20 @@ private var MojangStack.nekooTagOrNull: CompoundShadowTag?
  * 最后将引用写入物品.
  */
 private var MojangStack.unsafeNekooTagOrNull: CompoundShadowTag?
-    get() = this.getUnsafeCustomData()?.getCompoundOrNull(SharedConstants.ROOT_NBT_NAME)?.wrap
+    get() = this.getUnsafeCustomData()?.getCompoundOrNull(ROOT_NBT_FIELD)?.wrap
     set(value) {
         val data = this.getUnsafeCustomData()
         if (data === null) {
             if (value != null) {
                 val tag = CompoundTag()
-                tag.put(SharedConstants.ROOT_NBT_NAME, value.unwrap)
+                tag.put(ROOT_NBT_FIELD, value.unwrap)
                 this.setUnsafeCustomData(tag)
             }
         } else {
             if (value != null) {
-                data.put(SharedConstants.ROOT_NBT_NAME, value.unwrap)
+                data.put(ROOT_NBT_FIELD, value.unwrap)
             } else {
-                data.remove(SharedConstants.ROOT_NBT_NAME)
+                data.remove(ROOT_NBT_FIELD)
             }
         }
     }

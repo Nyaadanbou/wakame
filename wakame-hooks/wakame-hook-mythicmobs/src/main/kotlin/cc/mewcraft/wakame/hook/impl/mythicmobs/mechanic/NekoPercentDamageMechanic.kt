@@ -2,16 +2,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.AttributeProvider
-import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
-import cc.mewcraft.wakame.damage.CriticalStrikeState
-import cc.mewcraft.wakame.damage.DamageBundle
-import cc.mewcraft.wakame.damage.DamageBundleFactory
-import cc.mewcraft.wakame.damage.DamageManagerApi
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.DamagePacket
-import cc.mewcraft.wakame.damage.DamageTag
-import cc.mewcraft.wakame.damage.DamageTags
-import cc.mewcraft.wakame.damage.DamageTagsFactory
+import cc.mewcraft.wakame.damage.*
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -81,8 +72,8 @@ class NekoPercentDamageMechanic(
             val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
                 target.health * percent
             } else {
-                val maxHealthAttribute = requireNotNull(AttributeProvider.get("max_health")) { "Max health attribute is Null!" }
-                val maxHealth = AttributeMapAccess.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
+                val maxHealthAttribute = requireNotNull(AttributeProvider.instance().get("max_health")) { "Max health attribute is Null!" }
+                val maxHealth = AttributeMapAccess.instance().get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }
             damage

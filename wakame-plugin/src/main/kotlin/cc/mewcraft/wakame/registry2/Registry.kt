@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.core.Keyable
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.registry2.entry.RegistryEntryOwner
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.Keyable
 import cc.mewcraft.wakame.util.collection.IndexedIterable
 import cc.mewcraft.wakame.util.dfu.DataResults
 import com.mojang.serialization.Codec

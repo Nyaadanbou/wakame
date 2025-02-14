@@ -23,8 +23,8 @@ public abstract class MixinAbstractContainerMenu {
     public abstract ItemStack getCarried();
 
     /**
-     * @author Nailm, Flandre, g2213swo
-     * @reason 防止服务端修正 wakame 的物品.
+     * @author g2213swo
+     * @reason 防止服务端修正 Koish 物品.
      */
     @Overwrite
     private void synchronizeCarriedToRemote() {
