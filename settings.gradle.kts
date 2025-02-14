@@ -43,6 +43,8 @@ rootProject.name = "wakame"
 
 include(":wakame-api")
 include(":wakame-common")
+include(":koish-features:koish-feature-enchantment-flan")
+include(":koish-features:koish-feature-enchantment-nyaa")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-chestsort")
 include(":wakame-hooks:wakame-hook-economy")
