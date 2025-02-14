@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
+import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
 
 /**
@@ -72,6 +73,16 @@ interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Ma
      * 如果指定的 [attribute] 不存在, 则返回 `null`.
      */
     fun getInstance(attribute: Attribute): AttributeInstance?
+
+    /**
+     * 添加临时的 [AttributeModifier].
+     */
+    fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
+
+    /**
+     * 移除非默认的 [AttributeModifier].
+     */
+    fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
 
     /**
      * 注册指定 [attribute]. 这将覆盖任何已存在的 [AttributeInstance].

@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
+import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
@@ -227,6 +228,25 @@ private class PlayerAttributeMap(
         return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, player)
     }
 
+    override fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.forEach { attribute, modifier ->
+            val attributeInstance = this.getInstance(attribute)
+            if (attributeInstance != null) {
+                attributeInstance.removeModifier(modifier.id)
+                attributeInstance.addTransientModifier(modifier)
+            }
+        }
+    }
+
+    override fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.asMap().forEach { (attribute, modifiers) ->
+            val attributeInstance = this.patch[attribute]
+            if (attributeInstance != null) {
+                modifiers.forEach { modifier -> attributeInstance.removeModifier(modifier.id) }
+            }
+        }
+    }
+
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
         return patch.reference2ObjectEntrySet().iterator()
     }
@@ -335,6 +355,25 @@ private class EntityAttributeMap : AttributeMap {
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
         return patch[attribute]?.getModifier(id)?.amount ?: default.getModifierValue(attribute, id, entity)
+    }
+
+    override fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.forEach { attribute, modifier ->
+            val attributeInstance = this.getInstance(attribute)
+            if (attributeInstance != null) {
+                attributeInstance.removeModifier(modifier.id)
+                attributeInstance.addTransientModifier(modifier)
+            }
+        }
+    }
+
+    override fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.asMap().forEach { (attribute, modifiers) ->
+            val attributeInstance = this.patch[attribute]
+            if (attributeInstance != null) {
+                modifiers.forEach { modifier -> attributeInstance.removeModifier(modifier.id) }
+            }
+        }
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
