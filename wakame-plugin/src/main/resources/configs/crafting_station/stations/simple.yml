@@ -5,7 +5,7 @@ type: simple
 # 出现在该合成站里的配方列表
 # 确保这些配方都已在 recipes/ 目录下注册
 recipes:
-  - example:raw_bronze
+  - example:bronze_ingot
 
 # 合成站 listing 菜单的布局
 # 该菜单显示所有可以合成的物品, 也是玩家刚打开合成站看到的样子

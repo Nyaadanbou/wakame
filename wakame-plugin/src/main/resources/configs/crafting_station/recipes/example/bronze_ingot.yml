@@ -25,12 +25,12 @@
 # amount: <经验值数量>
 input:
   - { type: item, id: minecraft:raw_copper, amount: 3 }
-  - { type: item, id: wakame:material/raw_tin, amount: 1 }
+  - { type: item, id: wakame:example/raw_tin, amount: 1 }
   - { type: exp, amount: 1 }
 
 # 配方的输出
 output:
   # 该物品格式为 "namespace:id", 同配方输入的写法
-  item: wakame:material/raw_bronze
+  item: wakame:example/bronze_ingot
   # 物品堆叠的数量, 可以超过单个堆叠的最大数量
   amount: 4
