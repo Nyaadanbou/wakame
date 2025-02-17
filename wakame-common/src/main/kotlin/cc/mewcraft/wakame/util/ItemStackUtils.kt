@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.util
 
+import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -22,4 +23,11 @@ inline fun <reified T : ItemMeta> ItemStack.editMeta(crossinline block: (T) -> U
 
 fun ItemStack.toNMS(): MojangStack {
     return (this as CraftItemStack).handle
+}
+
+/**
+ * Convert [ItemStack] to JSON string (much more readable than [ItemStack.toString]).
+ */
+fun ItemStack?.toJsonString(): String {
+    return if (this != null) Bukkit.getUnsafe().serializeItemAsJson(this).toString() else "null"
 }

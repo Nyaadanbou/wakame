@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.toJsonString
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.*
@@ -53,16 +54,16 @@ object ItemListener {
             for (listener in ItemSlotChangeEventListenerRegistry.listeners) {
                 try {
                     listener.handleEvent(event)
-                } catch (_: Exception) {
+                } catch (e: Exception) {
                     LOGGER.error(
                         """
-                    An error occurred while executing listener: ${listener::class.simpleName} 
+                        An error occurred while executing listener: ${listener::class.simpleName} 
                     
-                    Player: ${event.player.name}
-                    Slot: ${event.slot}
-                    Prev: ${event.oldItemStack}
-                    Curr: ${event.newItemStack}
-                    """.trimIndent()
+                        Player: ${event.player.name}
+                        Slot: ${event.slot}
+                        Prev: ${event.oldItemStack.toJsonString()}
+                        Curr: ${event.newItemStack.toJsonString()}
+                    """.trimIndent(), e
                     )
                 }
             }
