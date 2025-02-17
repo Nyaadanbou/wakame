@@ -28,22 +28,22 @@ import java.util.function.Consumer;
  * 本实现相当于新增了一个 {@code Singleton Entry}. 具体请参考 <a href="https://minecraft.wiki/w/Loot_table#Singleton_entry">Loot table</a>.
  */
 @NullMarked
-public class LootNekoItem extends LootPoolSingletonContainer {
-    public static final MapCodec<LootNekoItem> CODEC = RecordCodecBuilder.mapCodec(
+public class LootKoishItem extends LootPoolSingletonContainer {
+    public static final MapCodec<LootKoishItem> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
                     .and(singletonFields(instance))
-                    .apply(instance, LootNekoItem::new)
+                    .apply(instance, LootKoishItem::new)
     );
     private final ResourceLocation id;
 
-    private LootNekoItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
+    private LootKoishItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
         super(weight, quality, conditions, functions);
         this.id = id;
     }
 
     @Override
     public LootPoolEntryType getType() {
-        return LootPoolEntriesPatch.NEKO_ITEM;
+        return LootPoolEntriesPatch.KOISH_ITEM;
     }
 
     @Override

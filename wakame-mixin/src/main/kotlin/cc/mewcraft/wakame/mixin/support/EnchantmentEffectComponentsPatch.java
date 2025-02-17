@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.mixin.core.MixinEnchantmentEffectComponents;
+import cc.mewcraft.wakame.mixin.core.InvokerEnchantmentEffectComponents;
 import net.minecraft.core.component.DataComponentType;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class EnchantmentEffectComponentsPatch {
 
-    DataComponentType<List<EnchantmentAttributeEffect>> KOISH_ATTRIBUTES = MixinEnchantmentEffectComponents.register(
+    DataComponentType<List<EnchantmentAttributeEffect>> KOISH_ATTRIBUTES = InvokerEnchantmentEffectComponents.register(
             "koish_attributes", builder -> builder.persistent(EnchantmentAttributeEffect.CODEC.codec().listOf())
     );
 
