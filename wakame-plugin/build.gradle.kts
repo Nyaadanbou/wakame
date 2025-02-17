@@ -17,6 +17,7 @@ dependencies {
     // internal
     compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnlyApi(project(":wakame-common")) // 同上
+    compileOnly(project(":wakame-mixin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
@@ -72,6 +73,10 @@ dependencies {
 }
 
 tasks {
+    compileJava {
+        mustRunAfter(":wakame-mixin:copyJar") // gradle sucks :(
+    }
+
     shadowJar {
         // 2025/2/2 更新: 使用自定义的 classloader 加载 InvUI 依赖
         //

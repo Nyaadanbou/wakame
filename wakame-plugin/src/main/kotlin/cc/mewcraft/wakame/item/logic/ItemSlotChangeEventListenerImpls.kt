@@ -100,31 +100,31 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeEventListener(
     )
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { effect, user -> effect.removeFrom(user) }
-    }
-
-    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { effect, user -> effect.applyTo(user) }
-    }
-
-    private fun modifyEnchantmentEffects(player: Player, slot: ItemSlot, itemStack: ItemStack, update: (EnchantmentEffect, User<Player>) -> Unit) {
-        val user = player.toUser()
-        val customEnchantments = itemStack.customEnchantments
-        for ((enchantment, level) in customEnchantments) {
-            if (!testEnchantmentSlot(slot, enchantment)) {
-                // 附魔是否生效, 取决于附魔(nms)本身的 slots 设置,
-                // 但这样就无法支持原版之外的 slot (例如让饰品附魔生效).
-                // 到底该设计成什么样还有待进一步讨论???
-                continue
-            }
-            for (effect in enchantment.getEffects(level, slot)) {
-                update(effect, user)
-            }
+        modifyEnchantmentEffects(player, slot, itemStack) { xlevel, xplayer, xslot, effect ->
+            effect.remove(xlevel, xslot, xplayer)
         }
     }
 
-    private fun testEnchantmentSlot(slot: ItemSlot, enchantment: CustomEnchantment): Boolean {
-        return slot.testEquipmentSlotGroup(enchantment.handle.activeSlotGroups)
+    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
+        modifyEnchantmentEffects(player, slot, itemStack) { xlevel, xplayer, xslot, effect ->
+            effect.apply(xlevel, xslot, xplayer)
+        }
+    }
+
+    private fun modifyEnchantmentEffects(
+        player: Player, slot: ItemSlot, itemStack: ItemStack,
+        action: (level: Int, player: Player, slot: ItemSlot, effect: EnchantmentAttributeEffect) -> Unit,
+    ) {
+        val enchantments = itemStack.koishEnchantments
+        for ((enchantment, level) in enchantments) {
+            // 处理 enchantment effect component: koish:attributes
+            for (effect in enchantment.getEffects(EnchantmentEffectComponentsPatch.ATTRIBUTES)) {
+                action(level, player, slot, effect)
+            }
+
+            // 处理 enchantment effect component: koish:abilities
+            //
+        }
     }
 }
 

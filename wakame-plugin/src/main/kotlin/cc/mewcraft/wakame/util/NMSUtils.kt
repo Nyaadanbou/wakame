@@ -21,8 +21,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import java.util.*
@@ -32,6 +34,7 @@ typealias MojangUnit = net.minecraft.util.Unit
 typealias MojangResourceKey<T> = ResourceKey<T>
 typealias MojangResourceLocation = ResourceLocation
 typealias MojangRegistry<T> = Registry<T>
+typealias MojangEnchantment = net.minecraft.world.item.enchantment.Enchantment
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -57,6 +60,9 @@ val Player.connection: ServerGamePacketListenerImpl
 
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
+
+val Enchantment.handle: MojangEnchantment
+    get() = (this as CraftEnchantment).handle
 
 fun Key.toResourceLocation(): ResourceLocation =
     ResourceLocation.fromNamespaceAndPath(namespace(), value())
