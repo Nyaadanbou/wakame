@@ -9,12 +9,14 @@ sealed interface Target {
 
     val bukkitLocation: BukkitLocation
 
+    val bukkitEntity: BukkitLivingEntity?
+
     interface Location : Target {
         override val bukkitLocation: BukkitLocation
     }
 
     interface LivingEntity : Target {
-        val bukkitEntity: BukkitLivingEntity?
+        override val bukkitEntity: BukkitLivingEntity?
 
         override val bukkitLocation: BukkitLocation
             get() = bukkitEntity?.location ?: throw IllegalStateException("Entity is null")

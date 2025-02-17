@@ -9,11 +9,31 @@ import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.EntityType
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.MechanicComponent
+import cc.mewcraft.wakame.ecs.component.Remove
+import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.system.InitSystem
 import cc.mewcraft.wakame.ecs.system.MechanicSystem
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.RemoveSystem
+import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
+import cc.mewcraft.wakame.ecs.system.TickCountSystem
+import cc.mewcraft.wakame.ecs.system.TickResultSystem
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityCreateContext
+import com.github.quillraven.fleks.EntityUpdateContext
+import com.github.quillraven.fleks.Family
+import com.github.quillraven.fleks.World
+import com.github.quillraven.fleks.configureWorld
+import cc.mewcraft.wakame.ecs.system.InitSystem
+import cc.mewcraft.wakame.ecs.system.MechanicSystem
+import cc.mewcraft.wakame.ecs.system.ParticleSystem
+import cc.mewcraft.wakame.ecs.system.RemoveSystem
+import cc.mewcraft.wakame.ecs.system.StackCountSystem
 import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.ecs.system.TickResultSystem
@@ -57,6 +77,7 @@ object WakameWorld {
             // 会改变状态的系统
 
             add(StatePhaseSystem())
+            add(StackCountSystem())
             add(AbilityMechanicRemoveSystem())
             add(TickResultSystem())
 

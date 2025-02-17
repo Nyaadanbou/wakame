@@ -4,7 +4,7 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
 data class StackCountComponent(
-    var count: Int
+    var count: Int = 1
 ) : Component<StackCountComponent> {
     override fun type(): ComponentType<StackCountComponent> = StackCountComponent
 

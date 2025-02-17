@@ -13,6 +13,8 @@ import java.util.stream.Stream
 class BukkitLocationTarget(
     override val bukkitLocation: Location,
 ) : Target.Location, Examinable {
+    override val bukkitEntity: LivingEntity? = null
+
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("location", bukkitLocation)
