@@ -34,6 +34,11 @@ import org.bukkit.inventory.ItemStack
 internal abstract class ItemSlotChangeEventListener {
 
     /**
+     * 用于判断是否处理一个物品变化的谓词列表.
+     */
+    abstract val predicates: List<(Player, ItemSlot, ItemStack, NekoStack?) -> Boolean>
+
+    /**
      * 检查物品 [itemStack] 是否为需要处理的对象.
      *
      * @param player 涉及的玩家
@@ -41,7 +46,9 @@ internal abstract class ItemSlotChangeEventListener {
      * @param itemStack 涉及的物品, 保证不为空气
      * @param nekoStack 对应的萌芽物品, 可能为 `null`
      */
-    protected abstract fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean
+    private fun test(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
+        return predicates.all { predicate -> predicate(player, slot, itemStack, nekoStack) }
+    }
 
     /**
      * 流程最开始执行的逻辑.
@@ -82,7 +89,7 @@ internal abstract class ItemSlotChangeEventListener {
     protected open fun onEnd(player: Player) = Unit
 
     /**
-     * 检查物品 [itemStack] 是否在“正确”的物品槽.
+     * 检查物品 [itemStack] 在“正确”的物品槽.
      */
     protected fun testSlot(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         if (nekoStack == null) {
@@ -93,7 +100,7 @@ internal abstract class ItemSlotChangeEventListener {
     }
 
     /**
-     * 检查冒险等级.
+     * 检查物品 [itemStack] 的物品等级小于等于玩家的冒险等级.
      */
     protected fun testLevel(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         if (nekoStack == null) {
@@ -109,6 +116,9 @@ internal abstract class ItemSlotChangeEventListener {
         return itemLevel <= playerLevel
     }
 
+    /**
+     * 检查物品 [itemStack] 没有损坏.
+     */
     protected fun testDurability(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?): Boolean {
         if (nekoStack == null) {
             return true // 如果不是萌芽物品, 那么该物品应该按照游戏原版的逻辑处理
@@ -125,34 +135,32 @@ internal abstract class ItemSlotChangeEventListener {
         return true
     }
 
-    ///
+    /**
+     * 用于在特殊时机强制更新物品提供给玩家的效果.
+     */
+    internal fun forceUpdate(player: Player) {
+        val everyItemSlot = ItemSlotRegistry.all()
+        for (itemSlot in everyItemSlot) {
+            val itemStack = itemSlot.getItem(player) ?: continue
+            val nekoStack = itemStack.shadowNeko()
+            if (test(player, itemSlot, itemStack, nekoStack)) {
+                onBegin(player)
 
-    // /**
-    //  * 用于在特殊时机强制更新物品提供给玩家的效果.
-    //  */
-    // fun forceUpdate(player: Player) {
-    //     val everyItemSlot = ItemSlotRegistry.all()
-    //     for (itemSlot in everyItemSlot) {
-    //         val itemStack = itemSlot.getItem(player) ?: continue
-    //         val nekoStack = itemStack.shadowNeko()
-    //         if (test(player, itemSlot, itemStack, nekoStack)) {
-    //             onBegin(player)
-    //
-    //             // 这里我们对同一个物品进行两次操作:
-    //             // 先从玩家身上移除物品“自己”的效果,
-    //             // 然后再把物品的效果添加到玩家身上.
-    //             handlePreviousItem(player, itemSlot, itemStack, nekoStack)
-    //             handleCurrentItem(player, itemSlot, itemStack, nekoStack)
-    //
-    //             onEnd(player)
-    //         }
-    //     }
-    // }
+                // 这里我们对同一个物品进行两次操作:
+                // 先从玩家身上移除物品“自己”的效果,
+                // 然后再把物品的效果添加到玩家身上.
+                handlePreviousItem(player, itemSlot, itemStack, nekoStack)
+                handleCurrentItem(player, itemSlot, itemStack, nekoStack)
+
+                onEnd(player)
+            }
+        }
+    }
 
     /**
      * 用于正常处理 [PlayerItemSlotChangeEvent].
      */
-    fun handleEvent(event: PlayerItemSlotChangeEvent) {
+    internal fun handleEvent(event: PlayerItemSlotChangeEvent) {
         val player = event.player
         val slot = event.slot
         val oldItemStack = event.oldItemStack?.takeUnlessEmpty()

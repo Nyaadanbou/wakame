@@ -14,9 +14,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
  *
  * 注意不要重复添加同一个实例.
  */
-@Init(
-    stage = InitStage.PRE_WORLD
-)
+@Init(stage = InitStage.PRE_WORLD)
 internal object ItemSlotChangeEventListenerRegistry {
 
     /**
@@ -30,7 +28,7 @@ internal object ItemSlotChangeEventListenerRegistry {
     fun init() {
         listeners += AttackSpeedItemSlotChangeListener
         listeners += AttributeItemSlotChangeListener
-        //listeners += EnchantmentItemSlotChangeListener
+        listeners += EnchantmentItemSlotChangeListener
         listeners += KizamiItemSlotChangeListener
         listeners += AbilityItemSlotChangeListener
     }
