@@ -10,8 +10,8 @@ import java.util.List;
  */
 public class EnchantmentEffectComponentsPatch {
 
-    DataComponentType<List<EnchantmentAttributeEffect>> KOISH_ATTRIBUTES = InvokerEnchantmentEffectComponents.register(
-            "koish_attributes", builder -> builder.persistent(EnchantmentAttributeEffect.CODEC.codec().listOf())
+    public static final DataComponentType<List<EnchantmentAttributeEffect>> KOISH_ATTRIBUTES = InvokerEnchantmentEffectComponents.register(
+            "koish:attributes", builder -> builder.persistent(EnchantmentAttributeEffect.CODEC.codec().listOf())
     );
 
     public static void bootstrap() {

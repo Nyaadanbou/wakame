@@ -7,6 +7,6 @@ import com.mojang.serialization.Codec
 internal object AttributeModifierOperationCodec {
 
     @JvmStatic
-    val INSTANCE: Codec<AttributeModifier.Operation> = StringIdentifiable.createBasicCodec(AttributeModifier.Operation::values)
+    val INSTANCE: Codec<AttributeModifier.Operation> = StringIdentifiable.createCodec(AttributeModifier.Operation::values)
 
 }
