@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.level
 import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.entity.Entity

@@ -1,11 +1,7 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.DamageTag
-import cc.mewcraft.wakame.damage.DamageTags
-import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.item.damageItemStack2

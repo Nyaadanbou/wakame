@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.eventbus.ConfigurationReloadEvent
+import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty

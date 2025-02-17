@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.lifecycle.reloader
 
 import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.eventbus.ConfigurationReloadEvent
+import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.lifecycle.LifecycleExecutionHelper.tryExecute
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer

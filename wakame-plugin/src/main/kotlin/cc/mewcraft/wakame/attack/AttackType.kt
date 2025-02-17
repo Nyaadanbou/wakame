@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent

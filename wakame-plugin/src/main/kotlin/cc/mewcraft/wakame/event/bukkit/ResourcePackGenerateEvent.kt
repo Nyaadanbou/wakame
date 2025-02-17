@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.event
+package cc.mewcraft.wakame.event.bukkit
 
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event

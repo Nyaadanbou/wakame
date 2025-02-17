@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.ability.Ability
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player

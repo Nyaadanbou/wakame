@@ -1,3 +1,3 @@
-package cc.mewcraft.wakame.eventbus
+package cc.mewcraft.wakame.event.map
 
 internal object ConfigurationReloadEvent

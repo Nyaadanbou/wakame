@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init

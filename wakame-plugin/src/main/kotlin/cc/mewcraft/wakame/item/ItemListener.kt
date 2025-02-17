@@ -4,9 +4,9 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.AbilityEntryPointHandler
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
-import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventListenerRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init

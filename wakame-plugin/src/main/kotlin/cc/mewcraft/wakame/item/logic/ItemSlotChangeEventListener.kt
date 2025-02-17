@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.event.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.user.toUser

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.event;
+package cc.mewcraft.wakame.event.bukkit;
 
 import cc.mewcraft.wakame.item.ItemSlot;
 import org.bukkit.entity.Player;

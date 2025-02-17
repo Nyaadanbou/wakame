@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentMaps

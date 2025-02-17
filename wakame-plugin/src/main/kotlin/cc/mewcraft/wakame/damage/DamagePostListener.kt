@@ -4,7 +4,7 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun

@@ -1,18 +1,18 @@
-package cc.mewcraft.wakame.event
+package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.character.Target
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
-import org.bukkit.event.player.PlayerEvent
+import org.bukkit.inventory.ItemStack
 
-class PlayerAbilityStateChangeEvent(
-    player: Player,
-    val ability: Ability,
-    val oldPhase: StatePhase,
-    val newPhase: StatePhase
-) : PlayerEvent(player) {
-
+class PlayerAbilityPrepareCastEvent(
+    ability: Ability,
+    val caster: Player,
+    val target: Target?,
+    val item: ItemStack?
+) : AbilityPrepareCastEvent(ability) {
+    
     override fun getHandlers(): HandlerList {
         return HANDLER_LIST
     }

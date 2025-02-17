@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.entity.resource.ResourceTypeRegistry
-import cc.mewcraft.wakame.event.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.molang.ManaPenalty
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.bindInstance

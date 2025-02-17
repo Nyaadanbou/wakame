@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.event.PlayerAbilityStateChangeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityStateChangeEvent
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.serverTick

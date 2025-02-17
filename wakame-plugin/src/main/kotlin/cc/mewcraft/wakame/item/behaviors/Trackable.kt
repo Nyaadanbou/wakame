@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes

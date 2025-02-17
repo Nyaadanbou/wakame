@@ -1,12 +1,12 @@
-package cc.mewcraft.wakame.event
+package cc.mewcraft.wakame.event.bukkit
 
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 
-class PlayerManaCostEvent(
+class PlayerNoEnoughManaEvent(
     player: Player,
-    val manaCost: Int,
+    val requiredMana: Int,
 ) : PlayerEvent(player) {
     override fun getHandlers(): HandlerList {
         return HANDLER_LIST

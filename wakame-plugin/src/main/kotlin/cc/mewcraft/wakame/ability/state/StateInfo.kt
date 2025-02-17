@@ -12,8 +12,8 @@ import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.event.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
