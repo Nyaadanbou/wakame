@@ -22,7 +22,7 @@ data class Cell(
          * NBT 标签的结构要求可以参考本项目的 `README`.
          */
         fun fromNbt(id: String, nbt: CompoundTag): Cell {
-            return Cell(id = id, Core.fromNbt(nbt))
+            return Cell(id = id, Core.fromNbt(nbt.getCompound("core")))
         }
 
     }
