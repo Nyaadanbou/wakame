@@ -30,7 +30,7 @@ internal object ItemSlotChangeEventListenerRegistry {
     fun init() {
         listeners += AttackSpeedItemSlotChangeListener
         listeners += AttributeItemSlotChangeListener
-        listeners += EnchantmentItemSlotChangeListener
+        //listeners += EnchantmentItemSlotChangeListener
         listeners += KizamiItemSlotChangeListener
         listeners += AbilityItemSlotChangeListener
     }
