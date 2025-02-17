@@ -2,36 +2,8 @@
 
 package cc.mewcraft.wakame.network.event
 
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundActionBarPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundBlockDestructionPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundBlockEventPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundBlockUpdatePacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundBossEventPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetContentPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetDataPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundLevelChunkWithLightPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundLevelEventPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundOpenScreenPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetCursorItemPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetPassengersPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSoundEntityPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSoundPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSystemChatPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundUpdateAttributesPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundContainerClickPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundInteractPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundPlaceRecipePacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundPlayerActionPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
-import cc.mewcraft.wakame.network.event.serverbound.ServerboundUseItemPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.*
+import cc.mewcraft.wakame.network.event.serverbound.*
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
@@ -80,6 +52,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
         registerPlayerEventType(::ClientboundRecipeBookAddPacketEvent)
         registerPlayerEventType(::ClientboundPlaceGhostRecipePacketEvent)
+        registerEventType(::ClientboundRegistryDataPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
@@ -89,10 +62,9 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundInteractPacketEvent)
         registerPlayerEventType(::ServerboundContainerClickPacketEvent)
         registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
-//        registerPlayerEventType(::ServerboundPickItemFromBlockPacketEvent)
     }
     
-    private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
+    private inline fun <reified P : Packet<*>, reified E : PacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
         eventTypes[P::class] = E::class
         eventConstructors[P::class] = constructor as (Packet<*>) -> PacketEvent<Packet<*>>
     }
