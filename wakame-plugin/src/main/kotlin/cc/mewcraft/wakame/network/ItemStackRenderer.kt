@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.network.event.PacketEvent
 import cc.mewcraft.wakame.network.event.PacketHandler
 import cc.mewcraft.wakame.network.event.PacketListener
 import cc.mewcraft.wakame.network.event.PlayerPacketEvent
@@ -50,60 +51,47 @@ internal object ItemStackRenderer : PacketListener {
     private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
         if (isCreative(event))
             return
-        event.changed = event.item.modify()
+        event.item.modify(event)
     }
 
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         if (isCreative(event))
             return
-        var changed = false
 
         for (equipment in event.slots) {
-            changed = equipment.second.modify() || changed
+            equipment.second.modify(event)
         }
-
-        event.changed = changed
     }
 
     @PacketHandler
     private fun handleContainerSetContent(event: ClientboundContainerSetContentPacketEvent) {
-        var changed = false
         for (item in event.items) {
-            changed = item.modify() || changed
+            item.modify(event)
         }
-        val carriedItem = event.carriedItem.modify()
-        changed = changed || (carriedItem == true)
-
-        event.changed = changed
+        event.carriedItem.modify(event)
     }
 
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
         if (isCreative(event))
             return
-        var changed = false
         for (offer in event.offers) {
-            changed = offer.itemCostA.itemStack.modify() || changed
-            changed = (offer.itemCostB.getOrNull()?.itemStack?.modify() == true) || changed
-            changed = offer.result.modify() || changed
+            offer.itemCostA.itemStack.modify(event)
+            offer.itemCostB.getOrNull()?.itemStack?.modify(event)
+            offer.result.modify(event)
         }
-
-        event.changed = changed
     }
 
     @PacketHandler
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
-        var changed = false
         for (metadata in event.packedItems) {
             val value = metadata.value
             if (value !is ItemStack) {
                 continue
             }
-            changed = value.modify() || changed
+            value.modify(event)
         }
-
-        event.changed = changed
     }
 
     private fun isCreative(event: PlayerPacketEvent<*>): Boolean {
@@ -121,9 +109,9 @@ internal object ItemStackRenderer : PacketListener {
     }
 
     /**
-     * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
+     * @return 如果物品发生了变化则修改 [PacketEvent.changed]
      */
-    private fun ItemStack.modify(): Boolean {
+    private fun ItemStack.modify(event: PacketEvent<*>) {
         var changed: Boolean
 
         // 移除任意物品的 PDC
@@ -142,7 +130,7 @@ internal object ItemStackRenderer : PacketListener {
             }
         }
 
-        return changed
+        event.changed = changed
     }
 
     private var ItemStack.processed: Boolean
