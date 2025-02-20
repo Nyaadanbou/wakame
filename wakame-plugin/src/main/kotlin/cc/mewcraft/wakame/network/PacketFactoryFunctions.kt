@@ -48,7 +48,7 @@ fun ClientboundSoundEntityPacket(sound: Holder<SoundEvent>, source: SoundSource,
     buf.writeFloat(volume)
     buf.writeFloat(pitch)
     buf.writeLong(seed)
-    
+
     return ClientboundSoundEntityPacket.STREAM_CODEC.decode(buf)
 }
 
@@ -70,14 +70,14 @@ fun ServerboundPlaceRecipePacket(containerId: Int, recipe: ResourceLocation, shi
 
 fun ServerboundInteractPacket(entityId: Int, action: ServerboundInteractPacketEvent.Action, isUsingSecondaryAction: Boolean): ServerboundInteractPacket {
     val buf = FriendlyByteBuf(Unpooled.buffer())
-    
+
     buf.writeVarInt(entityId)
     when (action) {
         is ServerboundInteractPacketEvent.Action.Interact -> {
             buf.writeVarInt(0)
             buf.writeVarInt(action.hand.ordinal)
         }
-        
+
         is ServerboundInteractPacketEvent.Action.InteractAtLocation -> {
             buf.writeVarInt(2)
             buf.writeFloat(action.location.x.toFloat())
@@ -85,13 +85,13 @@ fun ServerboundInteractPacket(entityId: Int, action: ServerboundInteractPacketEv
             buf.writeFloat(action.location.z.toFloat())
             buf.writeVarInt(action.hand.ordinal)
         }
-        
+
         is ServerboundInteractPacketEvent.Action.Attack -> {
             buf.writeVarInt(1)
         }
     }
     buf.writeBoolean(isUsingSecondaryAction)
-    
+
     return ServerboundInteractPacket.STREAM_CODEC.decode(buf)
 }
 

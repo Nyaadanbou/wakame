@@ -19,23 +19,12 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPack
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
-import cc.mewcraft.wakame.util.toNMS
-import com.mojang.datafixers.util.Pair
-import net.minecraft.core.Holder
-import net.minecraft.core.component.DataComponentPredicate
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.network.syncher.EntityDataSerializers
-import net.minecraft.network.syncher.SynchedEntityData
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
-import net.minecraft.world.item.trading.ItemCost
-import net.minecraft.world.item.trading.MerchantOffer
-import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
-import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer")
@@ -61,73 +50,60 @@ internal object ItemStackRenderer : PacketListener {
     private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
         if (isCreative(event))
             return
-        event.item = event.item.copy().modify()
+        event.changed = event.item.modify()
     }
 
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
         if (isCreative(event))
             return
-        val newSlots = ArrayList<Pair<EquipmentSlot, ItemStack>>()
+        var changed = false
+
         for (equipment in event.slots) {
-            val item = equipment.second.modify()
-            newSlots.add(equipment.mapSecond { item })
+            changed = equipment.second.modify() || changed
         }
-        event.slots = newSlots
+
+        event.changed = changed
     }
 
     @PacketHandler
     private fun handleContainerSetContent(event: ClientboundContainerSetContentPacketEvent) {
-        if (isCreative(event))
-            return
-        val newItems = ArrayList<ItemStack>()
+        var changed = false
         for (item in event.items) {
-            val item = item.modify()
-            newItems.add(item)
+            changed = item.modify() || changed
         }
-        event.items = newItems
-
         val carriedItem = event.carriedItem.modify()
-        event.carriedItem = carriedItem
+        changed = changed || (carriedItem == true)
+
+        event.changed = changed
     }
 
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
         if (isCreative(event))
             return
-        val newMerchantOffers = MerchantOffers()
-
+        var changed = false
         for (offer in event.offers) {
-            val itemCostA = offer.itemCostA.itemStack
-                .modify()
-                .let { itemStack -> ItemCost(Holder.direct(itemStack.item), itemStack.count, DataComponentPredicate.allOf(itemStack.components)) }
-            val itemCostB = offer.itemCostB
-                .getOrNull()
-                ?.itemStack
-                ?.modify()
-                ?.let { itemStack -> ItemCost(Holder.direct(itemStack.item), itemStack.count, DataComponentPredicate.allOf(itemStack.components)) }
-                .let { Optional.ofNullable(it) }
-            val result = offer.result.modify()
-            val newOffer = MerchantOffer(itemCostA, itemCostB, result, offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand, offer.ignoreDiscounts, offer.asBukkit())
-            newMerchantOffers.add(newOffer)
+            changed = offer.itemCostA.itemStack.modify() || changed
+            changed = (offer.itemCostB.getOrNull()?.itemStack?.modify() == true) || changed
+            changed = offer.result.modify() || changed
         }
 
-        event.offers = newMerchantOffers
+        event.changed = changed
     }
 
     @PacketHandler
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
-        val newValues = ArrayList<SynchedEntityData.DataValue<*>>()
+        var changed = false
         for (metadata in event.packedItems) {
             val value = metadata.value
             if (value !is ItemStack) {
                 continue
             }
-            val newValue = value.modify()
-            newValues += SynchedEntityData.DataValue(metadata.id, EntityDataSerializers.ITEM_STACK, newValue)
+            changed = value.modify() || changed
         }
 
-        event.packedItems = newValues
+        event.changed = changed
     }
 
     private fun isCreative(event: PlayerPacketEvent<*>): Boolean {
@@ -145,22 +121,20 @@ internal object ItemStackRenderer : PacketListener {
     }
 
     /**
-     * @return 如果物品发生了变化则返回新的 ItemStack, 否则返回它本身.
+     * @return 如果物品发生了变化则返回 `true`, 否则返回 `false`
      */
-    private fun ItemStack.modify(): ItemStack {
-        val origin = this.copy()
+    private fun ItemStack.modify(): Boolean {
+        var changed: Boolean
 
         // 移除任意物品的 PDC
-        val updateCustomData = get(DataComponents.CUSTOM_DATA)?.update { it.remove("PublicBukkitValues") }
-            ?: return origin
-        set(DataComponents.CUSTOM_DATA, updateCustomData)
+        changed = get(DataComponents.CUSTOM_DATA)?.update { it.remove("PublicBukkitValues") } != null
 
         val nekoStack = asBukkitMirror().shadowNeko(false)
         if (nekoStack != null) {
             try {
                 ItemRenderers.STANDARD.render(nekoStack)
                 processed = true
-                return nekoStack.wrapped.toNMS()
+                changed = true
             } catch (e: Throwable) {
                 if (LOGGING) {
                     LOGGER.error("An error occurred while rendering network item: ${nekoStack.id}", e)
@@ -168,7 +142,7 @@ internal object ItemStackRenderer : PacketListener {
             }
         }
 
-        return origin
+        return changed
     }
 
     private var ItemStack.processed: Boolean

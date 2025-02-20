@@ -17,7 +17,7 @@ abstract class PacketEvent<P : Packet<*>> internal constructor(packet: P) {
     
     var isCancelled = false
     
-    protected var changed = false
+    var changed = false
     
     protected open fun buildChangedPacket(): P =
         throw NotImplementedError()
