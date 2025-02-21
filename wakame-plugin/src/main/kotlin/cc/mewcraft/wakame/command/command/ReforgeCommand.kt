@@ -18,16 +18,16 @@ import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.paper.util.sender.Source
 import kotlin.jvm.optionals.getOrNull
 
-internal object ReforgeCommand : KoishCommandFactory<CommandSender> {
+internal object ReforgeCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         // Open a blacksmith menu for a player
         buildAndAdd {
             permission(CommandPermissions.REFORGE.and(CommandPermissions.REFORGE_BLACKSMITH))
@@ -69,8 +69,8 @@ internal object ReforgeCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private suspend fun handleOpenRerollingTableMenu(ctx: CommandContext<CommandSender>) {
-        val sender = ctx.sender()
+    private suspend fun handleOpenRerollingTableMenu(ctx: CommandContext<Source>) {
+        val sender = ctx.sender().source()
         val table = ctx.get<RerollingTable>("table")
         val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
         val viewer = player?.single() ?: (sender as? Player) ?: run {
@@ -82,8 +82,8 @@ internal object ReforgeCommand : KoishCommandFactory<CommandSender> {
         withContext(Dispatchers.minecraft) { menu.open() }
     }
 
-    private suspend fun handleOpenModdingTableMenu(ctx: CommandContext<CommandSender>) {
-        val sender = ctx.sender()
+    private suspend fun handleOpenModdingTableMenu(ctx: CommandContext<Source>) {
+        val sender = ctx.sender().source()
         val table = ctx.get<ModdingTable>("table")
         val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
         val viewer = player?.single() ?: (sender as? Player) ?: run {
@@ -95,8 +95,8 @@ internal object ReforgeCommand : KoishCommandFactory<CommandSender> {
         withContext(Dispatchers.minecraft) { menu.open() }
     }
 
-    private suspend fun handleOpenMergingTableMenu(ctx: CommandContext<CommandSender>) {
-        val sender = ctx.sender()
+    private suspend fun handleOpenMergingTableMenu(ctx: CommandContext<Source>) {
+        val sender = ctx.sender().source()
         val table = ctx.get<MergingTable>("table")
         val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
         val viewer = player?.single() ?: (sender as? Player) ?: run {
@@ -108,8 +108,8 @@ internal object ReforgeCommand : KoishCommandFactory<CommandSender> {
         withContext(Dispatchers.minecraft) { menu.open() }
     }
 
-    private suspend fun handleOpenBlacksmithMenu(ctx: CommandContext<CommandSender>) {
-        val sender = ctx.sender()
+    private suspend fun handleOpenBlacksmithMenu(ctx: CommandContext<Source>) {
+        val sender = ctx.sender().source()
         val table = ctx.get<BlacksmithStation>("station")
         val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
         val viewer = player?.single() ?: (sender as? Player) ?: run {

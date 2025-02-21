@@ -10,16 +10,16 @@ import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
-import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.paper.util.sender.PlayerSource
+import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.IntegerParser
 
-internal object DebugCommand : KoishCommandFactory<CommandSender> {
+internal object DebugCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
-            senderType<Player>()
+            senderType<PlayerSource>()
             permission(CommandPermissions.DEBUG)
             literal("debug")
         }
@@ -47,14 +47,14 @@ internal object DebugCommand : KoishCommandFactory<CommandSender> {
         return prettyJson
     }
 
-    private fun handleInspectNbt(context: CommandContext<CommandSender>) {
-        val sender = context.sender() as Player
+    private fun handleInspectNbt(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
         val nbtOrNull = sender.inventory.itemInMainHand.unsafeNekooTagOrNull
         sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
     }
 
-    private fun handleChangeVariant(context: CommandContext<CommandSender>) {
-        val sender = context.sender() as Player
+    private fun handleChangeVariant(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
         val variant = context.get<Int>("variant")
         val itemInMainHand = sender.inventory.itemInMainHand.takeUnlessEmpty()
         if (itemInMainHand == null) {

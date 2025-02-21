@@ -2,6 +2,7 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
+import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.entity.entityModule
@@ -35,6 +36,7 @@ internal val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
 internal lateinit var BOOTSTRAPPER: KoishBootstrapper private set
 internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
 
+lateinit var KOISH_NAME: String private set
 lateinit var KOISH_VERSION: Version private set
 lateinit var KOISH_JAR: Path private set
 
@@ -65,6 +67,7 @@ internal class KoishBootstrapper : PluginBootstrap {
 
         LIFECYCLE_MANAGER = context.lifecycleManager
         KoishLoggerHolder.set(context.logger)
+        KOISH_NAME = context.pluginMeta.name
         KOISH_VERSION = Version(context.pluginMeta.version)
         KOISH_JAR = context.pluginSource
 
@@ -87,6 +90,9 @@ internal class KoishBootstrapper : PluginBootstrap {
         //     throw Exception("This version of Koish is not compatible with the version that was previously installed.\n" +
         //             "Please erase all data related to Koish and try again.")
         // }
+
+        // initialize commands
+        KoishCommandManager.bootstrap(context)
 
         init()
     }

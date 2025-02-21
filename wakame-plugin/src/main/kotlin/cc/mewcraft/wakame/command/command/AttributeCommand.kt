@@ -28,18 +28,17 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.kotlin.extension.getOrNull
+import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.DoubleParser
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 private const val ATTRIBUTE_COUNT_PER_PAGE = 14
 
-internal object AttributeCommand : KoishCommandFactory<CommandSender> {
+internal object AttributeCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
             permission(CommandPermissions.ATTRIBUTE)
             literal("attribute")
@@ -100,8 +99,8 @@ internal object AttributeCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handleGetBaseValue(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleGetBaseValue(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val source = context.get<SingleEntitySelector>("source").single()
         val attribute = context.get<Attribute>("attribute")
 
@@ -120,8 +119,8 @@ internal object AttributeCommand : KoishCommandFactory<CommandSender> {
         })
     }
 
-    private fun handleSetBaseValue(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleSetBaseValue(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val source = context.get<SingleEntitySelector>("source").single()
         val attribute = context.get<Attribute>("attribute")
         val value = context.get<Double>("value")
@@ -147,8 +146,8 @@ internal object AttributeCommand : KoishCommandFactory<CommandSender> {
         })
     }
 
-    private fun handleAddModifier(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleAddModifier(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val source = context.get<SingleEntitySelector>("source").single()
         val attribute = context.get<Attribute>("attribute")
         val id = context.get<NamespacedKey>("id")
@@ -192,8 +191,8 @@ internal object AttributeCommand : KoishCommandFactory<CommandSender> {
         })
     }
 
-    private fun handleRemoveModifier(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleRemoveModifier(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val source = context.get<SingleEntitySelector>("source").single()
         val attribute = context.get<Attribute>("attribute")
         val id = context.get<NamespacedKey>("id")
@@ -230,8 +229,8 @@ internal object AttributeCommand : KoishCommandFactory<CommandSender> {
         })
     }
 
-    private fun handleReport(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleReport(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val source = context.getOrNull<SingleEntitySelector>("source")?.single() ?: sender as? Entity
         if (source == null) {
             sender.sendMessage(text {

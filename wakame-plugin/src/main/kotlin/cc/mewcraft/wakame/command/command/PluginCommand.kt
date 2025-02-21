@@ -7,13 +7,13 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.lifecycle.reloader.Reloader
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
-import org.bukkit.command.CommandSender
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.paper.util.sender.Source
 import kotlin.system.measureTimeMillis
 
-internal object PluginCommand : KoishCommandFactory<CommandSender> {
+internal object PluginCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         // <root> reload config
         // Reloads the config files
         buildAndAdd {
@@ -24,13 +24,14 @@ internal object PluginCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handleReload(context: CommandContext<CommandSender>) {
-        context.sender().sendMessage("Start reloading process, it may take a while ...")
+    private fun handleReload(context: CommandContext<Source>) {
+        val sender = context.sender().source()
+        sender.sendMessage("Start reloading process, it may take a while ...")
         val reloadTime = measureTimeMillis {
             Configs.reload()
             Reloader.reload()
         }
-        context.sender().sendMessage("Koish has been reloaded successfully! ${reloadTime}ms elapsed.")
+        sender.sendMessage("Koish has been reloaded successfully! ${reloadTime}ms elapsed.")
     }
 
 }

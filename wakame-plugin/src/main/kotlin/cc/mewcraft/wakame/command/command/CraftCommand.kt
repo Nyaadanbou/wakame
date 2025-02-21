@@ -9,18 +9,18 @@ import cc.mewcraft.wakame.gui.craftingstation.CraftingStationMenu
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.paper.util.sender.Source
 import kotlin.jvm.optionals.getOrNull
 
-internal object CraftCommand : KoishCommandFactory<CommandSender> {
+internal object CraftCommand : KoishCommandFactory<Source> {
 
     // TODO 各种 “station” 应该划为一类指令
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         buildAndAdd {
             permission(CommandPermissions.CRAFT)
             literal("craft")
@@ -31,8 +31,8 @@ internal object CraftCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private suspend fun handleOpenCraftingStation(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private suspend fun handleOpenCraftingStation(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val station = context.get<CraftingStation>("station")
         val player = context.optional<SinglePlayerSelector>("player").getOrNull()
         val viewer = player?.single() ?: (sender as? Player) ?: run {

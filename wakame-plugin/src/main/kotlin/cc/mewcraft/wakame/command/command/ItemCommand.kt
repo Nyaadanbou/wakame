@@ -10,17 +10,17 @@ import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.MultiplePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.kotlin.extension.getOrNull
+import org.incendo.cloud.paper.util.sender.Source
 import org.incendo.cloud.parser.standard.IntegerParser
 
-internal object ItemCommand : KoishCommandFactory<CommandSender> {
+internal object ItemCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
             permission(CommandPermissions.ITEM)
             literal("item")
@@ -37,8 +37,8 @@ internal object ItemCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private suspend fun handleGiveItem(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private suspend fun handleGiveItem(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val item = context.get<NekoItem>("item")
         val amount = context.getOrNull("amount") ?: 1
         val recipients = context.getOrNull<MultiplePlayerSelector>("player")?.values()

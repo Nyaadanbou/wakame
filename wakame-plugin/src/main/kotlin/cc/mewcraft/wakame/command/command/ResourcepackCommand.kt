@@ -8,16 +8,16 @@ import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.pack.ResourcePackPublisherProvider
 import cc.mewcraft.wakame.pack.ResourcePackServiceProvider
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.MultiplePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.paper.util.sender.Source
 import kotlin.jvm.optionals.getOrNull
 
-internal object ResourcepackCommand : KoishCommandFactory<CommandSender> {
+internal object ResourcepackCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
             permission(CommandPermissions.RESOURCEPACK)
             literal("resourcepack")
@@ -47,8 +47,8 @@ internal object ResourcepackCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handleGenerateResourcepack(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleGenerateResourcepack(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val manager = Injector.get<ResourcePackManager>()
 
         try {
@@ -60,8 +60,8 @@ internal object ResourcepackCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handlePublishResourcepack(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handlePublishResourcepack(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val publisher = ResourcePackPublisherProvider.get()
         val result = publisher.publish()
         if (result) {
@@ -71,8 +71,8 @@ internal object ResourcepackCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handleResnedResourcepack(context: CommandContext<CommandSender>) {
-        val sender = context.sender()
+    private fun handleResnedResourcepack(context: CommandContext<Source>) {
+        val sender = context.sender().source()
         val recipient = context.optional<MultiplePlayerSelector>("recipient")
             .getOrNull()
             ?.values()

@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.AbilityParser
 import org.bukkit.Location
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
@@ -19,11 +18,12 @@ import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.description.Description
+import org.incendo.cloud.paper.util.sender.Source
 import kotlin.jvm.optionals.getOrNull
 
-internal object AbilityCommand : KoishCommandFactory<CommandSender> {
+internal object AbilityCommand : KoishCommandFactory<Source> {
 
-    override fun KoishCommandFactory.Builder<CommandSender>.createCommands() {
+    override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
             permission(CommandPermissions.ABILITY)
             literal("ability")
@@ -39,7 +39,7 @@ internal object AbilityCommand : KoishCommandFactory<CommandSender> {
         }
     }
 
-    private fun handleCastAbilityAtTarget(context: CommandContext<CommandSender>) {
+    private fun handleCastAbilityAtTarget(context: CommandContext<Source>) {
         val casterPlayer = context.optional<SinglePlayerSelector>("caster").getOrNull()?.single() ?: context.sender() as? Player ?: return
         val targetEntity = context.flags().get<SingleEntitySelector>("target_entity")?.single() as? LivingEntity
         val targetLocation = context.flags().get<Location>("target_location")
