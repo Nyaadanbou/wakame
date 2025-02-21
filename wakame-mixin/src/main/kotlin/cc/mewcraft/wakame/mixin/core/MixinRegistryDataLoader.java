@@ -1,9 +1,12 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.EnchantmentPatch;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.animal.WolfVariant;
@@ -11,6 +14,7 @@ import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import net.minecraft.world.item.equipment.trim.TrimPattern;
 import net.minecraft.world.level.biome.Biome;
@@ -46,7 +50,19 @@ public class MixinRegistryDataLoader {
             InvokerRegistryData.create(Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.BANNER_PATTERN, BannerPattern.DIRECT_CODEC),
             // Koish start - 替换 Codec
-            InvokerRegistryData.create(Registries.ENCHANTMENT, EnchantmentPatch.PARTIAL_CODEC),
+            InvokerRegistryData.create(Registries.ENCHANTMENT, RecordCodecBuilder.create(
+                    instance -> instance.group(
+                                    ComponentSerialization.CODEC.fieldOf("description").forGetter(Enchantment::description),
+                                    Enchantment.EnchantmentDefinition.CODEC.forGetter(Enchantment::definition),
+                                    RegistryCodecs.homogeneousList(Registries.ENCHANTMENT)
+                                            .optionalFieldOf("exclusive_set", HolderSet.direct())
+                                            .forGetter(Enchantment::exclusiveSet),
+                                    EnchantmentEffectComponents.CODEC.optionalFieldOf("effects", DataComponentMap.EMPTY)
+                                            // 序列化时 (encode) 始终返回空的 effects
+                                            .forGetter(xenchantment -> DataComponentMap.EMPTY)
+                            )
+                            .apply(instance, Enchantment::new)
+            )),
             // Koish end - 替换 Codec
             InvokerRegistryData.create(Registries.JUKEBOX_SONG, JukeboxSong.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.INSTRUMENT, Instrument.DIRECT_CODEC)

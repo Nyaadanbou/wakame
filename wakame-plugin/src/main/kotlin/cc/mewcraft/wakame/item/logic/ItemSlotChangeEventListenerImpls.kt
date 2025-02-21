@@ -100,26 +100,26 @@ internal object EnchantmentItemSlotChangeListener : ItemSlotChangeEventListener(
     )
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { xlevel, xplayer, xslot, effect ->
-            effect.remove(xlevel, xslot, xplayer)
+        modifyEnchantmentEffects(player, slot, itemStack) { xeffect, xlevel, xplayer, xslot ->
+            xeffect.remove(xlevel, xslot, xplayer)
         }
     }
 
     override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { xlevel, xplayer, xslot, effect ->
-            effect.apply(xlevel, xslot, xplayer)
+        modifyEnchantmentEffects(player, slot, itemStack) { xeffect, xlevel, xplayer, xslot ->
+            xeffect.apply(xlevel, xslot, xplayer)
         }
     }
 
     private fun modifyEnchantmentEffects(
         player: Player, slot: ItemSlot, itemStack: ItemStack,
-        action: (level: Int, player: Player, slot: ItemSlot, effect: EnchantmentAttributeEffect) -> Unit,
+        action: (effect: EnchantmentAttributeEffect, level: Int, player: Player, slot: ItemSlot) -> Unit,
     ) {
         val enchantments = itemStack.koishEnchantments
         for ((enchantment, level) in enchantments) {
             // 处理 enchantment effect component: koish:attributes
             for (effect in enchantment.getEffects(EnchantmentEffectComponentsPatch.ATTRIBUTES)) {
-                action(level, player, slot, effect)
+                action(effect, level, player, slot)
             }
 
             // 处理 enchantment effect component: koish:abilities
