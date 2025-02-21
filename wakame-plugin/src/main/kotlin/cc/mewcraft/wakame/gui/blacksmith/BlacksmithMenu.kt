@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.blacksmith
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
 import cc.mewcraft.wakame.item.level
@@ -49,7 +49,7 @@ internal class BlacksmithMenu(
 
     fun open() {
         window2.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_BLACKSMITH_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_BLACKSMITH_MENU)
     }
 
     val recyclingStation: RecyclingStation
@@ -95,8 +95,8 @@ internal class BlacksmithMenu(
                 // 如果未能成功加入回收列表, 则向玩家发送失败信息.
                 // 本次交互后, 整个菜单里的物品也不需要发生变化.
                 when (claimResult.reason) {
-                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(MessageConstants.MSG_ERR_FULL_RECYCLING_STASH_LIST)
-                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(MessageConstants.MSG_ERR_UNSUPPORTED_RECYCLING_ITEM_TYPE)
+                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(TranslatableMessages.MSG_ERR_FULL_RECYCLING_STASH_LIST)
+                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(TranslatableMessages.MSG_ERR_UNSUPPORTED_RECYCLING_ITEM_TYPE)
                 }
                 event.result = Event.Result.DENY
                 return
@@ -248,7 +248,7 @@ internal class BlacksmithMenu(
 
                     // 发送消息
                     viewer.sendMessage(
-                        MessageConstants.MSG_SPENT_X_REPAIRING_ITEM.arguments(
+                        TranslatableMessages.MSG_SPENT_X_REPAIRING_ITEM.arguments(
                             TranslationArgument.numeric(claim.repairCost.value),
                             TranslationArgument.component(claim.originalItem.itemName ?: translatable(claim.originalItem))
                         )
@@ -261,7 +261,7 @@ internal class BlacksmithMenu(
                     syncRepairingInventory()
 
                 } else {
-                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM)
                 }
             }
         }
@@ -365,7 +365,7 @@ internal class BlacksmithMenu(
                     station.recyclingMenuSettings.getSlotDisplay(slotDisplayId).resolveToItemWrapper {
                         standard {
                             component(
-                                "total_worth", MessageConstants.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
+                                "total_worth", TranslatableMessages.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
                                     TranslationArgument.numeric(purchaseResult.minPrice),
                                     TranslationArgument.numeric(purchaseResult.maxPrice)
                                 ).translate(viewer)
@@ -415,13 +415,13 @@ internal class BlacksmithMenu(
 
                 is RecyclingSession.PurchaseResult.Failure -> {
                     // 如果购买失败, 则向玩家发送失败信息.
-                    viewer.sendMessage(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
                 }
 
                 is RecyclingSession.PurchaseResult.Success -> {
                     // 如果购买成功, 则向玩家发送成功信息.
                     viewer.sendMessage(
-                        MessageConstants.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
+                        TranslatableMessages.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
                             TranslationArgument.numeric(purchaseResult.fixPrice)
                         )
                     )

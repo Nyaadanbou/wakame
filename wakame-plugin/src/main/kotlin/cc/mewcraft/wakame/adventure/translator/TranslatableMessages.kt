@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.adventure.translator
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 
-object MessageConstants {
+object TranslatableMessages {
     val MSG_ERR_CANCELLED = create("msg_err_cancelled")
     val MSG_ERR_INTERNAL_ERROR = create("msg_err_internal_error")
     val MSG_OPENED_MERGING_MENU = create("msg_opened_merging_menu")

@@ -14,7 +14,7 @@ import net.kyori.adventure.text.format.TextColor
 /**
  * A collection of formatted messages used by the plugin.
  */
-object Messages {
+object BuiltInMessages {
 
     // 定义颜色常量
     val PRIMARY_COLOR = TextColor.color(0x1D3557)  // 深蓝色

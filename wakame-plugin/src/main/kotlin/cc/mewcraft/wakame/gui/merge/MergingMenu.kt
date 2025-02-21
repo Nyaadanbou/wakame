@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.merge
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
@@ -33,7 +33,7 @@ internal class MergingMenu(
      */
     fun open() {
         primaryWindow.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_MERGING_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_MERGING_MENU)
     }
 
     /**
@@ -105,13 +105,13 @@ internal class MergingMenu(
         when {
             e.isSwap -> {
                 e.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             e.isAdd -> {
                 val added = newItem?.shadowNeko(true) ?: run {
                     e.isCancelled = true
-                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_AUGMENT_CORE)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_AUGMENT_CORE)
                     return
                 }
 
@@ -163,7 +163,7 @@ internal class MergingMenu(
         when {
             e.isSwap || e.isAdd -> {
                 e.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             e.isRemove -> {

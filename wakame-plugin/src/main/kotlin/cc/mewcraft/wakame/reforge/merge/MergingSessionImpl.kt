@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
@@ -101,7 +101,7 @@ internal class SimpleMergingSession(
             MergeOperation(this)
         } catch (e: Exception) {
             logger.error("An unknown error occurred while merging. This is a bug!", e)
-            ReforgeResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+            ReforgeResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -172,7 +172,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(player: Player): MergingSession.ReforgeResult {
-        return Simple(false, MessageConstants.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
+        return Simple(false, TranslatableMessages.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
     }
 
     /**
@@ -186,7 +186,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
     fun success(player: Player, item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
-        return Simple(true, MessageConstants.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
+        return Simple(true, TranslatableMessages.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
     }
 
     private class Simple(
@@ -245,28 +245,28 @@ internal object ReforgeType {
     private data class Empty(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_EMPTY.translate(viewer))
     }
 
     private data class Failure(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_FAILURE.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_FAILURE.translate(viewer))
     }
 
     private class Success0(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_0.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_0.translate(viewer))
     }
 
     private class Success1(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_BASE
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_1.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_1.translate(viewer))
     }
 
     private class Success2(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_TOTAL
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_2.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_2.translate(viewer))
     }
 }
 
@@ -300,13 +300,13 @@ internal object ReforgeCost {
     private class Zero(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_ZERO.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_ZERO.translate(viewer))
     }
 
     private class Failure(viewer: Player) : Base() {
         override fun take(viewer: Player): Unit = throw IllegalStateException("this cost is not supposed to be taken.")
         override fun test(viewer: Player): Boolean = throw IllegalStateException("this cost is not supposed to be tested.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_EMPTY.translate(viewer))
     }
 
     private data class Success(
@@ -321,6 +321,6 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
     }
 }

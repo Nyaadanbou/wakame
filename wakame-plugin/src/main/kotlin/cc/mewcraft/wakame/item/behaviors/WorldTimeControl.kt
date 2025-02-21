@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.projectNeko
@@ -21,7 +21,7 @@ interface WorldTimeControl : ItemBehavior {
             if (!TimeControl.isReady()) {
                 event.isCancelled = true
                 player.sendMessage(
-                    MessageConstants.MSG_ERR_WORLD_TIME_CONTROL_NOT_READY.arguments(
+                    TranslatableMessages.MSG_ERR_WORLD_TIME_CONTROL_NOT_READY.arguments(
                         DurationFormatter.format(Tick.of(TimeControl.getTimeUntilReadyTicks()), true)
                     )
                 )
@@ -32,7 +32,7 @@ interface WorldTimeControl : ItemBehavior {
                 TimeControl.ActionType.SET_TIME -> TimeControl.setTime(timeControl.time)
                 TimeControl.ActionType.ADD_TIME -> TimeControl.addTime(timeControl.time)
             }
-            player.sendMessage(MessageConstants.MSG_WORLD_TIME_CONTROL_EXECUTED)
+            player.sendMessage(TranslatableMessages.MSG_WORLD_TIME_CONTROL_EXECUTED)
         }
     }
 

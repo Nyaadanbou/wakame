@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.reforge.common.CoreIcons
@@ -62,7 +62,7 @@ internal class ReplaceMenu(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             // 玩家尝试向 inputSlot 中添加物品:

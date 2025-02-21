@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.*
@@ -49,32 +49,32 @@ private constructor(
         val originalInput = session.originalInput ?: return ReforgeResult.empty(viewer)
 
         // 获取 usableInput. 如果不存在, 则代表物品无法重造
-        val usableInput = session.usableInput ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_NOT_USABLE)
+        val usableInput = session.usableInput ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_NOT_USABLE)
 
         // 获取 itemRule. 如果不存在, 则代表物品无法重造
-        val itemRule = session.itemRule ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_ITEM_RULE_NOT_FOUND)
+        val itemRule = session.itemRule ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_ITEM_RULE_NOT_FOUND)
 
         // 获取核孔的选择状态. 如果没有可重造的核孔, 返回一个失败结果
         val selectionMap = session.selectionMap
         if (!selectionMap.values.any { it.changeable }) {
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_CHANGEABLE)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_NOTHING_CHANGEABLE)
         }
 
         // 如果没有选择任何核孔, 返回一个失败结果
         if (!selectionMap.values.any { it.selected }) {
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_NOTHING_SELECTED)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_NOTHING_SELECTED)
         }
 
         // 获取必要的物品组件
         val itemId = usableInput.id
         val itemLevel = usableInput.level
-        val itemCells = usableInput.cells ?: return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
+        val itemCells = usableInput.cells ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
 
         // 检查重铸次数是否超过了重铸次数上限
         val modCount = usableInput.reforgeHistory.modCount
         val modLimit = itemRule.modLimit
         if (modCount >= modLimit) {
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT)
         }
 
         // 获取可有可无的物品组件

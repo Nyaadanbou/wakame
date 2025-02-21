@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.projectNeko
@@ -21,7 +21,7 @@ interface WorldWeatherControl : ItemBehavior {
             if (!WeatherControl.isReady()) {
                 event.isCancelled = true
                 player.sendMessage(
-                    MessageConstants.MSG_ERR_WORLD_WEATHER_CONTROL_NOT_READY.arguments(
+                    TranslatableMessages.MSG_ERR_WORLD_WEATHER_CONTROL_NOT_READY.arguments(
                         DurationFormatter.format(Tick.of(WeatherControl.getTimeUntilReadyTicks()), true)
                     )
                 )
@@ -29,7 +29,7 @@ interface WorldWeatherControl : ItemBehavior {
             }
 
             WeatherControl.execute(weatherControl.actions)
-            player.sendMessage(MessageConstants.MSG_WORLD_WEATHER_CONTROL_EXECUTED)
+            player.sendMessage(TranslatableMessages.MSG_WORLD_WEATHER_CONTROL_EXECUTED)
         }
     }
 

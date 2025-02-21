@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -58,7 +58,7 @@ internal object UnbreakableArmorStand {
                 it.isCancelled = true
 
                 // 提示玩家潜行后才能破坏盔甲架.
-                whisper(player, 10, MESSAGE_COOLDOWN) { sendMessage(MessageConstants.MSG_SNEAK_TO_BREAK_ARMOR_STAND) }
+                whisper(player, 10, MESSAGE_COOLDOWN) { sendMessage(TranslatableMessages.MSG_SNEAK_TO_BREAK_ARMOR_STAND) }
             }
         }
     }

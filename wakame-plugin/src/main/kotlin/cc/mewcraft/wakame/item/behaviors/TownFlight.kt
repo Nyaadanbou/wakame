@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townflight.TownFlightManager
 import cc.mewcraft.wakame.integration.townflight.TownyNotAvailable
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
@@ -22,9 +22,9 @@ interface TownFlight : ItemBehavior {
                 .onFailure { ex ->
                     event.isCancelled = true
                     if (ex is TownyNotAvailable) {
-                        player.sendMessage(MessageConstants.MSG_ERR_NOT_INSIDE_TOWN)
+                        player.sendMessage(TranslatableMessages.MSG_ERR_NOT_INSIDE_TOWN)
                     } else {
-                        player.sendMessage(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                        player.sendMessage(TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
                     }
                 }
                 .onSuccess {

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
@@ -163,7 +163,7 @@ internal object ReforgeResult {
      * 成功结果; 用于表示重造已准备就绪.
      */
     fun success(viewer: Player, item: NekoStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
-        return Simple(true, MessageConstants.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
+        return Simple(true, TranslatableMessages.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
     }
 
     private abstract class Base : RerollingSession.ReforgeResult {
@@ -180,14 +180,14 @@ internal object ReforgeResult {
     // FIXME data class
     private class Error(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
 
     private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
@@ -256,13 +256,13 @@ internal object ReforgeCost {
     private class Error(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
     }
 
     private class Empty(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_COST_EMPTY.translate(viewer))
     }
 
     private class Simple(viewer: Player, val amount: Double) : RerollingSession.ReforgeCost {
@@ -274,7 +274,7 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
