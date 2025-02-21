@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.lifecycle.initializer
 import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.Koish
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.adventure.Messages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.lifecycle.LifecycleExecutionHelper.tryExecute
@@ -198,6 +200,7 @@ internal object Initializer : Listener {
             PermanentStorage.store("last_version", Koish.pluginMeta.version)
             // setGlobalIngredients()
             // setupMetrics()
+            Messages.STARTUP_BANNER.send(SERVER.consoleSender)
             LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
         }
     }
