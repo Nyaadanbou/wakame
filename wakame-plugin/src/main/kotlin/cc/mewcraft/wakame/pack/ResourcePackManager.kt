@@ -38,7 +38,7 @@ internal class ResourcePackManager(
      *
      * @return 包含生成是否成功的结果
      */
-    fun generate() {
+    suspend fun generate() {
         val tempDir = KoishDataPaths.ROOT.resolve(".temp").toFile().apply { mkdirs() }
         try {
             val resourcePackFile = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toFile()

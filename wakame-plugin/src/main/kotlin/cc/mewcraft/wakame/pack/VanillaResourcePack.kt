@@ -4,7 +4,10 @@ package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.util.coroutine.async
 import cc.mewcraft.wakame.util.formatSize
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import team.unnamed.creative.model.Model
@@ -19,19 +22,19 @@ object VanillaResourcePack {
     private val resourcePackDirectory: File = KoishDataPaths.ROOT.resolve(VANILLA_RESOURCE_PACK_CACHE_DIRECTORY).toFile()
     private val versionedDownloadURL: String = VANILLA_RESOURCE_PACK_BASE_DOWNLOAD_URL.replace("<version>", Bukkit.getMinecraftVersion())
 
-    fun model(key: Key): Result<Model> {
+    suspend fun model(key: Key): Result<Model> = withContext(Dispatchers.async) {
         val modelPath = "assets/${key.namespace()}/models/item/${key.value()}.json"
         val modelFile = resourcePackDirectory.resolve(modelPath)
         val modelDownloadURL = versionedDownloadURL + modelPath
 
         if (!modelFile.exists()) {
             modelFile.parentFile.mkdirs()
-            return downloadModelFile(modelDownloadURL, modelFile)
+            return@withContext downloadModelFile(modelDownloadURL, modelFile)
                 .onFailure { LOGGER.error("Failed to download vanilla resource pack file from $modelDownloadURL.", it) }
                 .map { ModelSerializer.INSTANCE.deserialize(it.inputStream().buffered(), key) }
         }
 
-        return Result.success(ModelSerializer.INSTANCE.deserialize(modelFile.inputStream().buffered(), key))
+        return@withContext Result.success(ModelSerializer.INSTANCE.deserialize(modelFile.inputStream().buffered(), key))
     }
 
     private fun downloadModelFile(downloadUrl: String, modelFile: File): Result<File> {

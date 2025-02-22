@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.pack
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.serialization.json.GSON
 import com.google.gson.JsonElement
 import java.io.File
@@ -20,11 +19,9 @@ internal object AssetUtils {
         val pathWithExt = "$path.$ext"
         val assetFile = KoishDataPaths.ASSETS.resolve(pathWithExt).toFile()
         if (!assetFile.exists()) {
-            LOGGER.warn("No such file: '$assetFile'")
             return null
         }
         if (assetFile.extension != ext) {
-            LOGGER.warn("Invalid file extension: '$assetFile', expected: '$ext'")
             return null
         }
         return assetFile

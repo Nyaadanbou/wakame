@@ -47,7 +47,7 @@ internal object ResourcepackCommand : KoishCommandFactory<Source> {
         }
     }
 
-    private fun handleGenerateResourcepack(context: CommandContext<Source>) {
+    private suspend fun handleGenerateResourcepack(context: CommandContext<Source>) {
         val sender = context.sender().source()
         val manager = Injector.get<ResourcePackManager>()
 
