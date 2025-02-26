@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
-import nbt.CommonNBT
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -52,8 +51,6 @@ object CommonNekoStackTest {
             )
         }
 
-        CommonNBT.mockStatic()
-
         // 按依赖顺序, 初始化注册表
         ElementTypeRegistryLoader.init()
         AttributeBundleFacadeRegistryLoader.init()
@@ -71,7 +68,6 @@ object CommonNekoStackTest {
     }
 
     fun afterAll() {
-        CommonNBT.unmockStatic()
         stopKoin()
     }
 }
