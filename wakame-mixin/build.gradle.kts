@@ -12,7 +12,7 @@ description = "The mixin part"
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
 
-    remapper("net.fabricmc", "tiny-remapper", "0.10.1", classifier = "fat")
+    remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
 
     compileOnly(local.ignite)
     compileOnly(local.mixin)

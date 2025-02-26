@@ -14,8 +14,8 @@ snakeyaml-engine = "2.8"
 
 # Server deps
 paper = "1.21.3-R0.1-SNAPSHOT"
-mixin = "0.8.6"
-mixin-extras = "0.3.6"
+mixin = "0.8.7"
+mixin-extras = "0.4.1"
 ignite = "1.1.0"
 shadow-nbt = "1.21.3-SNAPSHOT"
 
