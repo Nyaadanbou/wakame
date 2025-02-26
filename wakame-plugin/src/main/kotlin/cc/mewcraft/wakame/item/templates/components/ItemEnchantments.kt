@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.ShownInTooltip
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.ShownInTooltip
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.require

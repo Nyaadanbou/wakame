@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.components.cells
 
-import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.data.CompoundTag
+import net.minecraft.nbt.CompoundTag
 
 /**
  * 核孔.

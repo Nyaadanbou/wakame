@@ -5,13 +5,18 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.extension.portableCore
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
@@ -21,6 +26,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
 import java.util.stream.Stream
 import kotlin.properties.Delegates
 
@@ -51,7 +57,7 @@ internal class SimpleMergingSession(
         val item = when (slot) {
             InputSlot.INPUT1 -> inputItem1
             InputSlot.INPUT2 -> inputItem2
-        }?.itemStack
+        }?.bukkitStack?.clone()
 
         if (item != null) {
             try {
@@ -71,7 +77,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
     override fun getFinalOutputs(): Array<ItemStack> {
         if (latestResult.isSuccess) {
-            return arrayOf(latestResult.output.itemStack)
+            return arrayOf(latestResult.output.bukkitStack.clone())
         } else {
             return emptyArray()
         }

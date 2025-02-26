@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.ability.character
 
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import com.sun.org.apache.bcel.internal.util.Args.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
-import java.util.UUID
+import java.util.*
 import java.util.stream.Stream
 import org.bukkit.entity.Entity as BukkitEntity
 import org.bukkit.entity.Player as BukkitPlayer

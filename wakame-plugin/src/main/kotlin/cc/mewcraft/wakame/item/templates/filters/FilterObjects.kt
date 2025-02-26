@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key

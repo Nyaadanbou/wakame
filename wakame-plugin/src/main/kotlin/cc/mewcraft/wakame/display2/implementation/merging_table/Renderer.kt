@@ -7,16 +7,20 @@ import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.extension.resetMinecraftData
+import cc.mewcraft.wakame.item.isClientSide
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.merge.MergingSession
+import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -82,20 +86,18 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
             }
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        // 本 ItemRenderer 专门渲染放在菜单里面的物品,
+        // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
+        // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
+        // 我们在这里统一清除掉这个组件.
+        item.resetMinecraftData(DataComponentTypes.CUSTOM_NAME)
+
+        item.hideAll()
 
         item.erase()
-
-        item.unsafeEdit {
-            // 本 ItemRenderer 专门渲染放在菜单里面的物品,
-            // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
-            // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
-            // 我们在这里统一清除掉这个组件.
-            customName = null
-
-            lore = itemLore
-            showNothing()
-        }
     }
 }
 

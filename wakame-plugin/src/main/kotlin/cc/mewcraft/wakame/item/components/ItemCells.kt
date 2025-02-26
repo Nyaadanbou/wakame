@@ -13,11 +13,14 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isVirtual
-import cc.mewcraft.wakame.util.withValue
+import cc.mewcraft.wakame.util.adventure.withValue
+import cc.mewcraft.wakame.util.data.removeAll
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.examination.Examinable
+import java.util.*
+import java.util.Collections.emptyMap
 
 
 interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
@@ -241,12 +244,12 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override val id: String,
     ) : ItemComponentType<ItemCells> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
 
             // 优化: 核孔绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap<String, Cell>(tag.size())
 
-            for (id in tag.keySet()) {
+            for (id in tag.allKeys) {
                 val nbt = tag.getCompound(id)
                 val cell = Cell.fromNbt(id, nbt)
                 cells.put(id, cell)
@@ -256,8 +259,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCells) {
-            holder.editTag { tag ->
-                tag.clear() // 总是重新写入全部数据
+            holder.editNbt { tag ->
+                tag.removeAll() // 总是重新写入全部数据
 
                 for ((id, cell) in value) {
                     if (cell.core.isVirtual) {
@@ -270,7 +273,7 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
     }
 }

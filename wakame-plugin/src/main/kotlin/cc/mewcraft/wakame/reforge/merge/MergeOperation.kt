@@ -6,16 +6,18 @@ import cc.mewcraft.wakame.attribute.bundle.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.extension.portableCore
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item.template.EmptyItemGenerationTrigger.level
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
 import org.slf4j.Logger
+import java.util.*
 import kotlin.math.ceil
 
 /**

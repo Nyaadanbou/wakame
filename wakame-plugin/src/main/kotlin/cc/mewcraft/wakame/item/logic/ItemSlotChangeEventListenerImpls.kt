@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.enchantment2.koishEnchantments
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.playerAbilities
+import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.mixin.support.EnchantmentAttributeEffect

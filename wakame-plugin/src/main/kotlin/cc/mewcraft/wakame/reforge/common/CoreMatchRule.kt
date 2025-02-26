@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isEmpty
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode

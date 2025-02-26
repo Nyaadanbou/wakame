@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.component
 
-import cc.mewcraft.nbt.CompoundTag
+import net.minecraft.nbt.CompoundTag
 
 /**
  * 本接口封装了一个物品组件的 *读取/写入/删除* 逻辑.
@@ -8,6 +8,7 @@ import cc.mewcraft.nbt.CompoundTag
  * @param T 组件的类型, 设计上应该具有不可变的性质
  */
 interface ItemComponentType<T> {
+
     /**
      * `组件类型`的唯一标识. 用于配置文件和NBT的序列化.
      */
@@ -37,24 +38,25 @@ interface ItemComponentType<T> {
     //
 
     /**
-     * 使用前请先熟悉 [ItemComponentHolder.hasTag].
+     * 使用前请先熟悉 [ItemComponentHolder.hasNbt].
      */
-    fun ItemComponentHolder.hasTag(): Boolean = this.hasTag(id)
+    fun ItemComponentHolder.hasNbt(): Boolean = this.hasNbt(id)
 
     /**
-     * 使用前请先熟悉 [ItemComponentHolder.getTag].
+     * 使用前请先熟悉 [ItemComponentHolder.getNbt].
      */
-    fun ItemComponentHolder.getTag(): CompoundTag? = this.getTag(id)
+    fun ItemComponentHolder.getNbt(): CompoundTag? = this.getNbt(id)
 
     /**
-     * 使用前请先熟悉 [ItemComponentHolder.editTag].
+     * 使用前请先熟悉 [ItemComponentHolder.editNbt].
      */
-    fun ItemComponentHolder.editTag(edit: (CompoundTag) -> Unit = {}) = this.editTag(id, edit)
+    fun ItemComponentHolder.editNbt(edit: (CompoundTag) -> Unit = {}) = this.editNbt(id, edit)
 
     /**
-     * 使用前请先熟悉 [ItemComponentHolder.removeTag].
+     * 使用前请先熟悉 [ItemComponentHolder.removeNbt].
      */
-    fun ItemComponentHolder.removeTag() = this.removeTag(id)
+    fun ItemComponentHolder.removeNbt() = this.removeNbt(id)
+
 }
 
 // 开发日记 2024/6/26

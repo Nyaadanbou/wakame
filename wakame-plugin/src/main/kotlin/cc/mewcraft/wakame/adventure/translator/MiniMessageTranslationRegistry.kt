@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.adventure.translator
 
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.*
 import net.kyori.adventure.text.minimessage.*

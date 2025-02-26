@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.StatisticsConstants
@@ -9,8 +8,11 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.tracks.*
+import cc.mewcraft.wakame.util.data.removeAll
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable
+import net.minecraft.nbt.CompoundTag
+import java.util.Collections.emptyMap
 
 interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
 
@@ -61,7 +63,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
          */
         fun of(nbt: CompoundTag): ItemTracks {
             val builder = builder()
-            for (tagKey in nbt.keySet()) {
+            for (tagKey in nbt.allKeys) {
                 val tag = nbt.get(tagKey) as? CompoundTag ?: continue
                 when (tagKey) {
                     StatisticsConstants.ENTITY_KILLS -> {
@@ -164,13 +166,13 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         override val id: String,
     ) : ItemComponentType<ItemTracks> {
         override fun read(holder: ItemComponentHolder): ItemTracks? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             return of(tag)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemTracks) {
-            holder.editTag { tag ->
-                tag.clear() // 总是重新写入所有数据
+            holder.editNbt { tag ->
+                tag.removeAll() // 总是重新写入所有数据
                 for ((trackType, track) in value) {
                     val tagKey = trackType.id
                     val tagValue = track.saveNbt()
@@ -180,7 +182,7 @@ interface ItemTracks : Examinable, Iterable<Map.Entry<TrackType<*>, Track>> {
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
     }
 

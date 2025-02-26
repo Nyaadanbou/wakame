@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.recipe
 
+import cc.mewcraft.wakame.ability.EmptyAbility.key
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.item.ItemSlotRegistry.size
+import cc.mewcraft.wakame.util.adventure.toNamespacedKey
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.toNamespacedKey
-import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
@@ -17,6 +19,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.Collections.emptyList
 import java.util.stream.Stream
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -50,7 +53,7 @@ class BlastingRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val blastingRecipe = BukkitBlastingRecipe(
@@ -82,7 +85,7 @@ class CampfireRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val campfireRecipe = BukkitCampfireRecipe(
@@ -114,7 +117,7 @@ class FurnaceRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val furnaceRecipe = BukkitFurnaceRecipe(
@@ -146,7 +149,7 @@ class ShapedRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val pattern: Array<String>,
-    val ingredients: Map<Char, RecipeChoice>
+    val ingredients: Map<Char, RecipeChoice>,
 ) : VanillaRecipe {
     companion object {
         const val EMPTY_INGREDIENT_CHAR = 'X'
@@ -178,7 +181,7 @@ class ShapedRecipe(
 class ShapelessRecipe(
     override val key: Key,
     override val result: RecipeResult,
-    val ingredients: List<RecipeChoice>
+    val ingredients: List<RecipeChoice>,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
@@ -270,7 +273,7 @@ class SmokingRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smokingRecipe = BukkitSmokingRecipe(
@@ -300,7 +303,7 @@ class SmokingRecipe(
 class StonecuttingRecipe(
     override val key: Key,
     override val result: RecipeResult,
-    val input: RecipeChoice
+    val input: RecipeChoice,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val stonecuttingRecipe = BukkitStonecuttingRecipe(

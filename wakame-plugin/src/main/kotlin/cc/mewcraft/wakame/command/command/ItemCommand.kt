@@ -50,7 +50,7 @@ internal object ItemCommand : KoishCommandFactory<Source> {
         val itemStackMap = recipients.associateWith { player ->
             buildList(amount) {
                 repeat(amount) {
-                    add(item.realize(player.toUser()).wrapped)
+                    add(item.realize(player.toUser()).bukkitStack)
                 }
             }
         }.mapValues { (_, items) ->

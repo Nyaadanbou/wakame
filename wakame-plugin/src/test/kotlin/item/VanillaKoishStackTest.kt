@@ -16,7 +16,7 @@ import kotlin.test.assertNotNull
 /**
  * 测试原版物品代理的 [NekoItem] 是否正常工作.
  */
-class VanillaNekoStackTest : KoinTest {
+class VanillaKoishStackTest : KoinTest {
 
     companion object {
         @JvmStatic

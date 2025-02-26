@@ -12,8 +12,8 @@ import cc.mewcraft.wakame.damage.mappings.DirectEntityTypeMappings
 import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
@@ -144,7 +144,7 @@ object DamageManager : DamageManagerApi {
                 }
 
                 val itemStack = causingEntity.inventory.itemInMainHand
-                val nekoStack = itemStack.shadowNeko(false)
+                val nekoStack = itemStack.wrap()
                 val attack = nekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
                 when (event.cause) {
                     DamageCause.ENTITY_ATTACK -> {
@@ -223,7 +223,7 @@ object DamageManager : DamageManagerApi {
 
     private fun buildArrowDamageBundleByCells(arrow: AbstractArrow): DamageBundle? {
         val itemStack = arrow.itemStack
-        val nekoStack = itemStack.shadowNeko(false) ?: return null
+        val nekoStack = itemStack.wrap() ?: return null
         if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
             return null
         }
@@ -367,7 +367,7 @@ object DamageManager : DamageManagerApi {
 
 
         val itemStack = projectile.itemStack
-        val nekoStack = itemStack.shadowNeko(false)
+        val nekoStack = itemStack.wrap()
         val cells = nekoStack?.components?.get(ItemComponentTypes.CELLS)
         if (nekoStack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
             val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())

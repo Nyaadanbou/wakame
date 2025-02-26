@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.components.cells
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
@@ -9,9 +8,10 @@ import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.IdentifierExt
+import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 
 
@@ -64,11 +64,11 @@ interface Core {
                 return EmptyCore
             }
 
-            val id = IdentifierExt.of(nbt.getString("id"))
+            val id = Identifiers.of(nbt.getString("id"))
             val core = when {
                 id == GenericKeys.EMPTY -> EmptyCore
                 id.namespace() == Namespaces.ATTRIBUTE -> AttributeCore.fromNbt(id, nbt)
-                else -> throw IllegalArgumentException("Failed to parse NBT element ${nbt.asString()}")
+                else -> throw IllegalArgumentException("Failed to parse NBT element $nbt")
             }
 
             return core
@@ -152,7 +152,7 @@ data object EmptyCore : Core {
     }
 
     override fun saveNbt(): CompoundTag =
-        CompoundTag.create()
+        CompoundTag()
 }
 
 /**
@@ -215,7 +215,7 @@ data class AttributeCore(
     override fun saveNbt(): CompoundTag {
         val attributeTag = data.saveNbt()
 
-        val baseTag = CompoundTag.create()
+        val baseTag = CompoundTag()
         baseTag.writeCoreId(id)
         baseTag.merge(attributeTag)
 

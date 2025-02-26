@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.components.tracks
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.data.CompoundTag
+import net.minecraft.nbt.CompoundTag
 
 /**
  * 跟踪物品的重铸数据 (不同于核孔里的重铸历史, 该重铸历史针对的是整个物品).

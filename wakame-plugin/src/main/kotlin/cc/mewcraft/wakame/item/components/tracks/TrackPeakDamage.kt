@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.item.components.tracks
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.data.CompoundTag
+import cc.mewcraft.wakame.util.data.keySet
 import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
+import net.minecraft.nbt.CompoundTag
+import java.util.Collections.emptyMap
 
 /**
  * 跟踪使用物品单次打出过的最高伤害.

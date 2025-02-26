@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty

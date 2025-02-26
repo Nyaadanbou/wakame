@@ -45,14 +45,14 @@ data class ItemLevel(
         override val id: String,
     ) : ItemComponentType<ItemLevel> {
         override fun read(holder: ItemComponentHolder): ItemLevel? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val raw = tag.getInt(TAG_VALUE)
                 .coerceAtLeast(minimumLevel)
             return ItemLevel(level = raw)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemLevel) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 val raw = value.level
                     .coerceAtLeast(minimumLevel)
                     .toStableShort()
@@ -61,7 +61,7 @@ data class ItemLevel(
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

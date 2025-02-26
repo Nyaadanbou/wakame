@@ -2,19 +2,12 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.EntityType
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.ManaCostComponent
-import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
-import cc.mewcraft.wakame.ecs.component.Tags
-import cc.mewcraft.wakame.ecs.component.TickResultComponent
-import cc.mewcraft.wakame.ecs.component.TriggerComponent
+import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.Key
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
+import sun.security.krb5.internal.KDCOptions.with
 
 /**
  * 技能与 ECS 系统交互的工具类.
@@ -31,7 +24,7 @@ internal class AbilityWorldInteraction {
                     return@forEach
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id
-                    abilities.add(AbilityRegistry.INSTANCES[Key(id)])
+                    abilities.add(AbilityRegistry.INSTANCES[Key.key(id)])
                 }
             }
         }
@@ -62,7 +55,7 @@ internal class AbilityWorldInteraction {
             if (entity[CastBy].entity != bukkitEntity)
                 return@editEntities
             if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
-                // 只有在 IDLE 状态下才能进行下一个状态的标记.
+            // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
             if (entity[IdentifierComponent].id != ability.key.asString())
                 return@editEntities

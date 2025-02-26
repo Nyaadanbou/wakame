@@ -7,7 +7,11 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
@@ -47,7 +51,7 @@ internal object ElementTypeRegistryLoader : RegistryConfigStorage {
 
     private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, ElementType> {
         val id = Identifiers.of(nodeKey.toString())
-        val stringId = id.asMinimalString2()
+        val stringId = id.asMinimalStringKoish()
         val integerId = node.node("binary_index").require<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())

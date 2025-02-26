@@ -8,9 +8,10 @@ import cc.mewcraft.wakame.random3.RandomSelectorContext
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.ObservableDelegates
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.random.Random

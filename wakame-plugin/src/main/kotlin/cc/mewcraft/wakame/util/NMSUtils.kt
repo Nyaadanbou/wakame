@@ -35,6 +35,7 @@ typealias MojangResourceKey<T> = ResourceKey<T>
 typealias MojangResourceLocation = ResourceLocation
 typealias MojangRegistry<T> = Registry<T>
 typealias MojangEnchantment = net.minecraft.world.item.enchantment.Enchantment
+typealias MojangStack = net.minecraft.world.item.ItemStack
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }

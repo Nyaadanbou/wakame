@@ -62,14 +62,6 @@ internal object ItemComponentTypes {
     val CRATE: ItemComponentType<ItemCrate> = ItemCrate.codec(ItemConstants.CRATE).register()
 
     /**
-     * 自定义模型数据.
-     *
-     * 对应原版组件: [`minecraft:custom_model_data`](https://minecraft.wiki/w/Data_component_format#custom_model_data)
-     */
-    @JvmField
-    val CUSTOM_MODEL_DATA: ItemComponentType<CustomModelData> = CustomModelData.codec(ItemConstants.CUSTOM_MODEL_DATA).register()
-
-    /**
      * 自定义名字.
      *
      * 对应原版组件: [`minecraft:custom_name`](https://minecraft.wiki/w/Data_component_format#custom_name)

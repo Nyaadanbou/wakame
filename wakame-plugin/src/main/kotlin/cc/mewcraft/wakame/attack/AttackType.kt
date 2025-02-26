@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.applyAttackCooldown
+import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity

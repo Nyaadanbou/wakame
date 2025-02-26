@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.getByteOrNull
+import cc.mewcraft.wakame.util.data.getByteOrNull
 import net.kyori.examination.Examinable
 
 
@@ -34,20 +34,20 @@ data class ItemRarity(
         override val id: String,
     ) : ItemComponentType<ItemRarity> {
         override fun read(holder: ItemComponentHolder): ItemRarity? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val raw = tag.getByteOrNull(TAG_VALUE)
                 ?.let { KoishRegistries.RARITY.getEntry(it.toInt()) } ?: return null
             return ItemRarity(rarity = raw)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemRarity) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 tag.putByte(TAG_VALUE, KoishRegistries.RARITY.getRawId(value.rarity.value).toByte())
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

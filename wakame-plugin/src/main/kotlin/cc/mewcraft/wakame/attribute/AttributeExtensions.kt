@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.util.toNamespacedKey
+import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import com.google.common.collect.ImmutableBiMap
 import cc.mewcraft.wakame.attribute.Attribute as NekoAttribute
 import cc.mewcraft.wakame.attribute.AttributeModifier as NekoAttributeModifier

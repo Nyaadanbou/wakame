@@ -7,8 +7,6 @@ interface Enchantable : ItemBehavior {
     private object Default : Enchantable
 
     companion object Type : ItemBehaviorType<Enchantable> {
-        override fun create(): Enchantable {
-            return Default
-        }
+        override fun create(): Enchantable = Default
     }
 }

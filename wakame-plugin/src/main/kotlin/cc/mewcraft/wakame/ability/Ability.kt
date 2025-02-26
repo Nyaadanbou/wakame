@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -61,7 +60,7 @@ interface Ability : Keyed, Examinable {
 }
 
 private data object EmptyAbility : Ability {
-    override val key: Key = Key(Namespaces.ABILITY, "empty")
+    override val key: Key = Key.key(Namespaces.ABILITY, "empty")
     override val displays: AbilityDisplay = AbilityDisplay.empty()
     override fun recordBy(input: AbilityInput) = Unit
     override fun mechanic(input: AbilityInput): AbilityMechanic = EmptyAbilityMechanic
@@ -69,7 +68,7 @@ private data object EmptyAbility : Ability {
 
 internal object AbilitySerializer : ScalarSerializer<AbilityProvider>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): AbilityProvider {
-        return AbilityProvider(Key(obj.toString()))
+        return AbilityProvider(Key.key(obj.toString()))
     }
 
     override fun serialize(item: AbilityProvider, typeSupported: Predicate<Class<*>>?): Any {

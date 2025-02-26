@@ -4,11 +4,9 @@ import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 
 interface Tool : ItemBehavior {
-    private object Default : Tool {}
+    private object Default : Tool
 
     companion object Type : ItemBehaviorType<Tool> {
-        override fun create(): Tool {
-            return Default
-        }
+        override fun create(): Tool = Default
     }
 }

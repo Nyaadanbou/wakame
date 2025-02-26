@@ -7,10 +7,10 @@ import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStati
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemStacks
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.giveItemStack
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -102,7 +102,7 @@ internal object StationResultSerializer : TypeSerializer<RecipeResult> {
  * 方便函数.
  */
 private fun ItemStack.render(): ItemStack {
-    val nekoStack = shadowNeko() ?: return this
+    val nekoStack = wrap() ?: return this
     val context = CraftingStationContext(Pos.RESULT, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
     return this

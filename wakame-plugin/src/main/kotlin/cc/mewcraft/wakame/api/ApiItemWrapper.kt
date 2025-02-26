@@ -31,7 +31,7 @@ internal class ApiItemWrapper(
 
     override fun createItemStack(amount: Int): ItemStack {
         val nekoStack = item.realize()
-        val itemStack = nekoStack.wrapped.apply { this.amount = amount }
+        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
         return itemStack
     }
 
@@ -42,7 +42,7 @@ internal class ApiItemWrapper(
         } else {
             item.realize(user)
         }
-        val itemStack = nekoStack.wrapped.apply { this.amount = amount }
+        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
         return itemStack
     }
 }

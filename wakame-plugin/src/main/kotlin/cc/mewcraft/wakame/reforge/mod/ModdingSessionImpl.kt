@@ -4,20 +4,23 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item.extension.*
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.isEmpty
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.item.isEmpty
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
@@ -26,6 +29,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
+import java.util.Collections.emptyList
+import java.util.Collections.emptySet
 import java.util.stream.Stream
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -108,7 +114,7 @@ internal class SimpleModdingSession(
 
         if (latestResult.isSuccess) {
             // 定制后的物品
-            val itemStack = latestResult.output?.itemStack
+            val itemStack = latestResult.output?.bukkitStack?.clone()
             if (itemStack == null) {
                 logger.error("Output item is null, but the player is trying to take it. This is a bug!")
                 return emptyArray()
@@ -199,7 +205,7 @@ internal class SimpleModdingSession(
 
             // logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
-            val usableInput0 = _value?.shadowNeko(true) ?: run {
+            val usableInput0 = _value?.wrap() ?: run {
                 usableInput = null
                 replaceParams = ReforgeReplaceMap.empty(thisRef)
                 executeReforge()
@@ -484,7 +490,7 @@ private object ReforgeReplace {
             }
 
             if (replaceResult.applicable) {
-                usableInput = originalInput!!.shadowNeko(true)!!
+                usableInput = originalInput!!.wrap()!!
             } else {
                 usableInput = null
             }
@@ -527,8 +533,8 @@ private object ReforgeReplace {
             // TODO 检查权限
 
             // 获取耗材中的便携核心
-            val customNekoStack = originalInput.shadowNeko(true)
-            val portableCore = customNekoStack?.portableCore ?: run {
+            val koishStack = originalInput.wrap()
+            val portableCore = koishStack?.portableCore ?: run {
                 return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
             }
 

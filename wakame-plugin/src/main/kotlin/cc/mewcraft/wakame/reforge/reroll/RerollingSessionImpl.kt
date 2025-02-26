@@ -5,17 +5,17 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.cells
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.cells
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
@@ -24,9 +24,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
+import java.util.Collections.*
 import java.util.stream.Stream
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
@@ -92,7 +92,7 @@ internal class SimpleRerollingSession(
     override fun getFinalOutputs(): Array<ItemStack> {
         val reforgeResult = latestResult
         if (reforgeResult.isSuccess) {
-            return arrayOf(reforgeResult.output.itemStack)
+            return arrayOf(reforgeResult.output.bukkitStack.clone())
         } else {
             return emptyArray()
         }
@@ -112,7 +112,7 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            usableInput = value?.shadowNeko(true)
+            usableInput = value?.wrap()
             itemRule = usableInput?.id?.let(table.itemRuleMap::get)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()

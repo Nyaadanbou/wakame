@@ -4,12 +4,14 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.entity.Player
-import org.bukkit.inventory.*
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 
 /**
@@ -114,7 +116,7 @@ import java.util.stream.Stream
         }
 
         override fun toString(): String {
-            return toSimpleString()
+            return examine(StringExaminer.simpleEscaping())
         }
     }
 
@@ -130,7 +132,7 @@ import java.util.stream.Stream
         }
 
         override fun toString(): String {
-            return toSimpleString()
+            return examine(StringExaminer.simpleEscaping())
         }
     }
 }

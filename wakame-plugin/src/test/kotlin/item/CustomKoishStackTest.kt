@@ -5,38 +5,26 @@ package item
 import assertAny
 import cc.mewcraft.wakame.attack.HandAttack
 import cc.mewcraft.wakame.attack.SpearAttack
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
-import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
-import cc.mewcraft.wakame.item.components.HideTooltip
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.components.cells.VirtualCore
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.world.TimeControl
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.test.KoinTest
 import kotlin.test.*
 
-class CustomNekoStackTest : KoinTest {
+class CustomKoishStackTest : KoinTest {
     companion object {
         @JvmStatic
         @BeforeAll

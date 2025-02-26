@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.network
 
-import cc.mewcraft.wakame.item.isNeko
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.rarity
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -19,14 +18,15 @@ import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
 import cc.mewcraft.wakame.util.connection
-import cc.mewcraft.wakame.util.coroutine.DispatcherContainer
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.serverPlayer
+import cc.mewcraft.wakame.util.coroutine.minecraft
+import cc.mewcraft.wakame.util.item.itemName
 import io.papermc.paper.adventure.PaperAdventure
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
+import net.minecraft.ChatFormatting
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.world.scores.PlayerTeam
@@ -60,8 +60,8 @@ internal object ItemEntityRenderer : PacketListener {
     @PacketHandler
     private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val oldData = event.packedItems
-        val item = runBlocking { withContext(DispatcherContainer.sync) { NMSUtils.getEntity(event.id) as? Item } }
-        if (item == null || !item.itemStack.isNeko)
+        val item = runBlocking { withContext(Dispatchers.minecraft) { NMSUtils.getEntity(event.id) as? Item } }
+        if (item == null || item.itemStack.wrap() == null)
             return
         val newData = oldData.toMutableList()
         tryAddCustomNameEntityData(item, newData)
@@ -80,8 +80,8 @@ internal object ItemEntityRenderer : PacketListener {
     }
 
     private fun tryAddGlowEffectEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
-        val nekoStack = item.itemStack.shadowNeko()!!
-        val templates = nekoStack.templates
+        val koishStack = item.itemStack.wrap()!!
+        val templates = koishStack.templates
         if (!templates.has(ItemTemplateTypes.GLOWABLE))
             return
 
@@ -91,6 +91,7 @@ internal object ItemEntityRenderer : PacketListener {
 
     private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
         val itemStack = item.itemStack
+
         // CustomName
         entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME, Optional.ofNullable(itemStack.itemName?.toNMSComponent())))
 
@@ -99,22 +100,19 @@ internal object ItemEntityRenderer : PacketListener {
     }
 
     private fun sendGlowColorPacket(player: Player, entity: Item) {
-        val nekoStack = entity.itemStack.shadowNeko() ?: return
-        val rarityColor = nekoStack.rarity.value.glowColor.takeIf { it != GlowColor.empty() } ?: return
+        val koishStack = entity.itemStack.wrap() ?: return
+        val rarityColor = koishStack.rarity.value.glowColor.takeIf { it != GlowColor.empty() } ?: return
         val teamPacket = buildCreateTeamPacket(entity, rarityColor)
         entityId2EntityUniqueId[entity.entityId] = entity.uniqueId
-        player.serverPlayer.connection.send(teamPacket)
+        player.connection.send(teamPacket)
     }
 
     private fun buildCreateTeamPacket(itemEntity: Item, color: GlowColor): ClientboundSetPlayerTeamPacket {
         val entityUniqueId = itemEntity.uniqueId
         return ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(
-            /* team = */ PlayerTeam(
-                Scoreboard(),
-                "glow_item_$entityUniqueId"
-            ).also {
-                it.color = PaperAdventure.asVanilla(color.color)
-                it.players += entityUniqueId.toString()
+            /* team = */ PlayerTeam(Scoreboard(), "glow_item_$entityUniqueId").apply {
+                this.color = PaperAdventure.asVanilla(color.color) ?: ChatFormatting.RESET
+                this.players += entityUniqueId.toString()
             },
             /* updatePlayers = */ true
         )

@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.item.behaviors
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.townflight.TownFlightManager
 import cc.mewcraft.wakame.integration.townflight.TownyNotAvailable
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent
@@ -14,9 +14,8 @@ import org.bukkit.util.Vector
 
 interface TownFlight : ItemBehavior {
     private object Default : TownFlight {
-        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            val nekoStack = itemStack.projectNeko()
-            val townFlight = nekoStack.templates.get(ItemTemplateTypes.TOWN_FLIGHT) ?: return
+        override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
+            val townFlight = koishStack.templates.get(ItemTemplateTypes.TOWN_FLIGHT) ?: return
             TownFlightManager
                 .addTempFlight(player, silent = false, seconds = townFlight.duration)
                 .onFailure { ex ->
@@ -39,8 +38,6 @@ interface TownFlight : ItemBehavior {
     }
 
     companion object Type : ItemBehaviorType<TownFlight> {
-        override fun create(): TownFlight {
-            return Default
-        }
+        override fun create(): TownFlight = Default
     }
 }

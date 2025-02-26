@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
@@ -19,6 +18,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -28,6 +28,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.orElse
@@ -307,17 +308,13 @@ private sealed class Tooltips(
         }
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("add", add),
-            ExaminableProperty.of("multiplyBase", multiplyBase),
-            ExaminableProperty.of("multiplyTotal", multiplyTotal)
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("add", add),
+        ExaminableProperty.of("multiplyBase", multiplyBase),
+        ExaminableProperty.of("multiplyTotal", multiplyTotal)
+    )
 
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    override fun toString(): String = toSimpleString()
 }
 
 /**

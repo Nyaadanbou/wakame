@@ -2,12 +2,12 @@
 
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.nbt.StringTag
-import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.ListTag
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.util.data.NbtUtils
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -38,13 +38,13 @@ data class FoodProperties(
         override fun read(holder: ItemComponentHolder): FoodProperties? {
             // 目前的逻辑: 如果物品上没有 `minecraft:food` 组件,
             // 那么就算 NBT 里有 `abilities` 列表, 依然直接返回 null
-            val craftFood = holder.item.getData(DataComponentTypes.FOOD) ?: return null
+            val craftFood = holder.bukkitStack.getData(DataComponentTypes.FOOD) ?: return null
 
             val nutrition = craftFood.nutrition()
             val saturation = craftFood.saturation()
             val canAlwaysEat = craftFood.canAlwaysEat()
 
-            val abilities = holder.getTag()?.getList(TAG_ABILITIES, TagType.STRING)?.map { Key((it as StringTag).value()) } ?: return null
+            val abilities = holder.getNbt()?.getList(TAG_ABILITIES, NbtUtils.TAG_STRING)?.map { Key.key(it.toString()) } ?: return null
 
             return FoodProperties(
                 nutrition = nutrition,
@@ -55,7 +55,7 @@ data class FoodProperties(
         }
 
         override fun write(holder: ItemComponentHolder, value: FoodProperties) {
-            holder.item.setData(
+            holder.bukkitStack.setData(
                 DataComponentTypes.FOOD,
                 PaperFoodProperties.food()
                     .nutrition(value.nutrition)
@@ -64,19 +64,15 @@ data class FoodProperties(
                     .build()
             )
 
-            holder.editTag { tag ->
-                val stringListTag = ListTag {
-                    value.abilities
-                        .map { StringTag.valueOf(it.asString()) }
-                        .forEach(::add)
-                }
-                tag.put(TAG_ABILITIES, stringListTag)
+            holder.editNbt { tag ->
+                val abilityIds = value.abilities.map { it.asString() }
+                tag.put(TAG_ABILITIES, NbtUtils.stringListTag(abilityIds))
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.unsetData(DataComponentTypes.FOOD)
-            holder.removeTag()
+            holder.bukkitStack.unsetData(DataComponentTypes.FOOD)
+            holder.removeNbt()
         }
 
         private companion object {

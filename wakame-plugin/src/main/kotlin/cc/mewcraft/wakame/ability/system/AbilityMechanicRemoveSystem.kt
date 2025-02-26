@@ -19,7 +19,7 @@ class AbilityMechanicRemoveSystem : IteratingSystem(
             // 如果技能被一个物品持有, 则进行物品技能的移除逻辑.
             val holdItem = entity[HoldBy].nekoStack
             val slot = entity[HoldBy].slot
-            if (slot.getItem(casterEntity) == holdItem.itemStack) {
+            if (slot.getItem(casterEntity) == holdItem.bukkitStack) {
                 // 如果玩家的背包里的物品是技能所对应的物品, 则不进行移除.
                 return
             }

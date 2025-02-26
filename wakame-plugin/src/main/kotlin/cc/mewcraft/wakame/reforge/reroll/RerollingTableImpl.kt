@@ -2,17 +2,18 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
+import java.util.*
 import java.util.stream.Stream
 
 /**

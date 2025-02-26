@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.applyAttackCooldown
-import cc.mewcraft.wakame.item.damageItemStack2
+import cc.mewcraft.wakame.item.extension.applyAttackCooldown
+import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.toUser
 import com.destroystokyo.paper.ParticleBuilder
@@ -32,7 +32,7 @@ import org.bukkit.inventory.EquipmentSlot
  * ```
  */
 class HammerAttack(
-    private val cancelVanillaDamage: Boolean
+    private val cancelVanillaDamage: Boolean,
 ) : AttackType {
     companion object {
         const val NAME = "hammer"

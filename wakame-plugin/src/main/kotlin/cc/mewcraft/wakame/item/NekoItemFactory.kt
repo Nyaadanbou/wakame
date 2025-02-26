@@ -102,7 +102,7 @@ object VanillaNekoItemFactory {
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
-        return SimpleNekoItem(
+        return NekoItemImpl(
             id = id,
             base = itemBase,
             slotGroup = slotGroup,
@@ -196,7 +196,7 @@ object StandardNekoItemFactory {
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
-        return SimpleNekoItem(
+        return NekoItemImpl(
             id = id,
             base = itemBase,
             slotGroup = slotGroup,

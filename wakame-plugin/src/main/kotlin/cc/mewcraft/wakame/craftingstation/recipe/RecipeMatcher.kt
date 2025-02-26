@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.util.itemNameOrType
+import cc.mewcraft.wakame.util.item.itemNameOrType
 import it.unimi.dsi.fastutil.objects.Reference2BooleanArrayMap
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player

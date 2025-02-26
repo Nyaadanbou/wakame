@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player

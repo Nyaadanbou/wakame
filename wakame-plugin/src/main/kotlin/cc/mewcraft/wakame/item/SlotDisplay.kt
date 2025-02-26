@@ -1,10 +1,17 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.extension.removeNbt
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.SlotDisplayDictData
+import cc.mewcraft.wakame.util.SlotDisplayLoreData
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.ItemLore
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.Contract
@@ -76,7 +83,7 @@ private constructor(
      * 解析得到一个 [ItemStack], 该物品堆叠已经应用了解析后的所有数据.
      */
     fun resolveToItemStack(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): ItemStack {
-        return resolveToNekoStack(dsl).itemStack
+        return resolveToNekoStack(dsl).bukkitStack.clone()
     }
 
     /**
@@ -94,19 +101,18 @@ private constructor(
          * 将此 [Resolved] 应用到 [item].
          */
         @Contract(pure = false)
-        fun applyTo(item: ItemStack): ItemStack = item.apply {
-            itemName = this@Resolved.name
-            itemLore = this@Resolved.lore
+        fun applyTo(item: ItemStack): ItemStack {
+            name?.let { item.setData(DataComponentTypes.ITEM_NAME, it) }
+            item.setData(DataComponentTypes.LORE, ItemLore.lore(lore))
+            return item
         }
     }
 }
 
 // 移除对于菜单图标无用的物品组件数据
 private fun NekoStack.reduceDataForSlotDisplay(): NekoStack {
-    unsafeEdit {
-        customData = null
-        showNothing()
-    }
+    hideAll()
+    removeNbt()
     isClientSide = false
     return this
 }
@@ -116,7 +122,7 @@ private fun NekoStack.reduceDataForSlotDisplay(): NekoStack {
  */
 fun NekoStack.applySlotDisplay(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): NekoStack {
     val archetype = prototype // SlotDisplay 存在于原型上
-    archetype.resolveSlotDisplay(dsl).applyTo(wrapped)
+    archetype.resolveSlotDisplay(dsl).applyTo(this.bukkitStack)
     return reduceDataForSlotDisplay()
 }
 

@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.text.arguments
 import cc.mewcraft.wakame.util.time.DurationFormatter
@@ -15,9 +15,8 @@ import org.bukkit.inventory.ItemStack
 
 interface WorldWeatherControl : ItemBehavior {
     private object Default : WorldWeatherControl {
-        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            val nekoStack = itemStack.projectNeko()
-            val weatherControl = nekoStack.templates.get(ItemTemplateTypes.WORLD_WEATHER_CONTROL) ?: return
+        override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
+            val weatherControl = koishStack.templates.get(ItemTemplateTypes.WORLD_WEATHER_CONTROL) ?: return
             if (!WeatherControl.isReady()) {
                 event.isCancelled = true
                 player.sendMessage(

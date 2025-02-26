@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.components.tracks
 
-import cc.mewcraft.nbt.CompoundTag
+import net.minecraft.nbt.CompoundTag
 
 /**
  * 可跟踪的信息.

@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.state.AbilityStateResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.playerAbilities
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.playerAbilities
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
@@ -56,7 +56,7 @@ internal object AbilityEntryPointHandler {
 
     fun onAttack(player: Player, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
-        itemStack?.shadowNeko(false) ?: return // 非萌芽物品应该完全不用处理吧?
+        itemStack?.wrap() ?: return // 非萌芽物品应该完全不用处理吧?
         val result = user.abilityState.addTrigger(SingleTrigger.ATTACK)
         tryApplyAbilityResult(result, event)
     }
@@ -64,11 +64,11 @@ internal object AbilityEntryPointHandler {
     fun onProjectileHit(projectile: Projectile, hitEntity: Entity?) {
         when (projectile) {
             is AbstractArrow -> {
-                val nekoStack = projectile.itemStack.shadowNeko(false) ?: return
-                val abilities = nekoStack.playerAbilities.takeUnlessEmpty() ?: return
+                val koishStack = projectile.itemStack.wrap() ?: return
+                val abilities = koishStack.playerAbilities.takeUnlessEmpty() ?: return
                 val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
                 for (ability in abilities) {
-                    ability.recordBy(CasterAdapter.adapt(projectile.shooter as Player), target, ItemSlot.imaginary() to nekoStack)
+                    ability.recordBy(CasterAdapter.adapt(projectile.shooter as Player), target, ItemSlot.imaginary() to koishStack)
                 }
             }
         }

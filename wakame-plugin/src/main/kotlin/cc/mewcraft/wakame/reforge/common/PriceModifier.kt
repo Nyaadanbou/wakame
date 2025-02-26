@@ -1,16 +1,17 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.util.item.damage
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
+import java.beans.Transient
 
 interface PriceModifier {
     val name: String
@@ -80,7 +81,7 @@ data class LevelPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
+        val nekoStack = item.wrap() ?: return .0
         val level = nekoStack.level
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(LevelBinding(level), "query")
@@ -110,7 +111,7 @@ data class RarityPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
+        val nekoStack = item.wrap() ?: return .0
         val rarity = nekoStack.rarity
         val mapped = mapping[rarity.getIdAsString()] ?: return .0
         val mocha = MochaEngine.createStandard()
@@ -139,7 +140,7 @@ data class MergingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
+        val nekoStack = item.wrap() ?: return .0
         val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(MergingBinding(value), "query")
@@ -167,7 +168,7 @@ data class ModdingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
+        val nekoStack = item.wrap() ?: return .0
         val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(ModdingBinding(value), "query")
@@ -195,7 +196,7 @@ data class RerollingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.shadowNeko() ?: return .0
+        val nekoStack = item.wrap() ?: return .0
         val value = nekoStack.reforgeHistory.modCount
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RerollingBinding(value), "query")

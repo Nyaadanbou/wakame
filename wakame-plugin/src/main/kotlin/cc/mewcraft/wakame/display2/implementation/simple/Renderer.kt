@@ -7,11 +7,13 @@ import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.isClientSide
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -60,12 +62,10 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() 
         templates.process(ItemTemplateTypes.ITEM_NAME) { data -> SimpleRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
         templates.process(ItemTemplateTypes.LORE) { data -> SimpleRenderingHandlerRegistry.LORE.process(collector, data) }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
 
-        item.unsafeEdit {
-            lore = itemLore
-            showNothing()
-        }
+        item.hideAll()
     }
 }
 

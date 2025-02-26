@@ -3,7 +3,7 @@
 
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.util.styleRecursively
+import cc.mewcraft.wakame.util.adventure.styleRecursively
 import net.kyori.adventure.extra.kotlin.plus
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.empty

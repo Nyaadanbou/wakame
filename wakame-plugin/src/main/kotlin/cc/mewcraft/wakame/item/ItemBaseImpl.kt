@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -37,7 +37,7 @@ internal class ItemBaseImpl(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }
 

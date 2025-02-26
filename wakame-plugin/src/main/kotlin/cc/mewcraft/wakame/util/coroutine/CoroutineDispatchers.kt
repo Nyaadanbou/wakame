@@ -27,7 +27,7 @@ val Dispatchers.minecraft: CoroutineDispatcher
 /**
  * Container for the dispatchers.
  */
-object DispatcherContainer {
+private object DispatcherContainer {
     /**
      * Gets the async coroutine context.
      */

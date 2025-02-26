@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import cc.mewcraft.wakame.util.itemNameOrType
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
@@ -277,13 +277,13 @@ internal class ModdingMenu(
             val outputNekoStack = reforgeResult.output ?: error("output item is null, but the result is successful. This is a bug!")
             val renderingContext = ModdingTableContext.Output(session)
             ItemRenderers.MODDING_TABLE.render(outputNekoStack, renderingContext)
-            val outputItemStack = outputNekoStack.wrapped
+            val outputItemStack = outputNekoStack.bukkitStack
 
             // 再用 SlotDisplay 处理一下
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
             val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 standard { component("item_name", outputItemStack.itemNameOrType) }
-                folded("item_lore", outputItemStack.itemLoreOrEmpty)
+                folded("item_lore", outputItemStack.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
                 folded("result_description", reforgeResult.description)
             }
@@ -339,12 +339,12 @@ internal class ModdingMenu(
         // 用定制台的渲染器重新渲染物品
         val renderingCtx = ModdingTableContext.Input(session)
         ItemRenderers.MODDING_TABLE.render(sourceItem, renderingCtx)
-        val newItemStack = sourceItem.itemStack
+        val newItemStack = sourceItem.bukkitStack.clone()
 
         // 再用 SlotDisplay 处理一下
         val resolved = table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
             standard { component("item_name", newItemStack.itemNameOrType) }
-            folded("item_lore", newItemStack.itemLoreOrEmpty)
+            folded("item_lore", newItemStack.fastLoreOrEmpty)
         }
 
         return resolved.applyTo(newItemStack)

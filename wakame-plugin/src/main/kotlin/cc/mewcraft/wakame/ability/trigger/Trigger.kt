@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.ability.trigger
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -13,6 +12,7 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import xyz.xenondevs.commons.collections.contentEquals
 import java.lang.reflect.Type
+import java.util.Collections.emptyList
 import java.util.function.Predicate
 import java.util.stream.Stream
 
@@ -44,41 +44,41 @@ enum class SingleTrigger(
      *
      * 不包括对生物的左键攻击.
      */
-    LEFT_CLICK('0', Key(Namespaces.TRIGGER, "generic/left_click")),
+    LEFT_CLICK('0', Key.key(Namespaces.TRIGGER, "generic/left_click")),
 
     /**
      * 代表玩家按下了右键, 具体上是指右键空气与方块的交互.
      *
      * 不包括对生物的右键交互.
      */
-    RIGHT_CLICK('1', Key(Namespaces.TRIGGER, "generic/right_click")),
+    RIGHT_CLICK('1', Key.key(Namespaces.TRIGGER, "generic/right_click")),
 
     /**
      * 代表玩家按下了攻击键, 具体上是指左键对生物的攻击.
      *
      * 不包括对空气与方块的交互.
      */
-    ATTACK('2', Key(Namespaces.TRIGGER, "generic/attack")),
+    ATTACK('2', Key.key(Namespaces.TRIGGER, "generic/attack")),
 
     /**
      * 代表玩家按下了跳跃键.
      */
-    JUMP('3', Key(Namespaces.TRIGGER, "generic/jump")),
+    JUMP('3', Key.key(Namespaces.TRIGGER, "generic/jump")),
 
     /**
      * 玩家进行了移动操作, 不包括跳跃.
      */
-    MOVE('4', Key(Namespaces.TRIGGER, "generic/walk")),
+    MOVE('4', Key.key(Namespaces.TRIGGER, "generic/walk")),
 
     /**
      * 代表玩家按下了潜行键.
      */
-    SNEAK('5', Key(Namespaces.TRIGGER, "generic/sneak")),
+    SNEAK('5', Key.key(Namespaces.TRIGGER, "generic/sneak")),
 
     /**
      * 代表玩家没有进行任何操作.
      */
-    NOOP(Char.MIN_VALUE, Key(Namespaces.TRIGGER, "generic/noop")),
+    NOOP(Char.MIN_VALUE, Key.key(Namespaces.TRIGGER, "generic/noop")),
     ;
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -140,7 +140,7 @@ interface SequenceTrigger : Trigger {
     private class Impl(
         override val triggers: List<SingleTrigger>,
     ) : SequenceTrigger {
-        override val key: Key = Key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
+        override val key: Key = Key.key(Namespaces.TRIGGER, "combo/${triggers.map { it.id }.joinToString("")}")
 
         override fun isStartWith(triggers: List<SingleTrigger>): Boolean {
             return this.triggers.take(triggers.size).contentEquals(triggers)
@@ -172,8 +172,8 @@ internal object AbilityTriggerSerializer : ScalarSerializer<Trigger>(typeTokenOf
         if (obj is String) {
             val triggers = AbilityRegistry.TRIGGERS
             val string = obj.lowercase()
-            val trigger = triggers.getOrNull(Key(string))
-                ?: triggers.getOrNull(Key(Namespaces.TRIGGER, string))
+            val trigger = triggers.getOrNull(Key.key(string))
+                ?: triggers.getOrNull(Key.key(Namespaces.TRIGGER, string))
                 ?: throw SerializationException("Cannot find trigger with key $obj")
             return trigger
         }

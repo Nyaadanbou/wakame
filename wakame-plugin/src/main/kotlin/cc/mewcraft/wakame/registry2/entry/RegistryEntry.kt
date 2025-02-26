@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.registry2.entry
 import cc.mewcraft.wakame.registry2.ReactiveRegistryEntry
 import cc.mewcraft.wakame.registry2.RegistryKey
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.asMinimalString2
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import com.mojang.datafixers.util.Either
 import org.jetbrains.annotations.ApiStatus
 import xyz.xenondevs.commons.provider.MutableProvider
@@ -91,7 +91,7 @@ interface RegistryEntry<T> {
      * - `"kawaii:cute"` -> `"kawaii:cute"` (存在命名空间时, 将保留完整路径)
      */
     fun getIdAsString(): String {
-        return this.getKey()?.value?.asMinimalString2() ?: "unregistered"
+        return this.getKey()?.value?.asMinimalStringKoish() ?: "unregistered"
     }
 
     fun ownerEquals(owner: RegistryEntryOwner<T>): Boolean

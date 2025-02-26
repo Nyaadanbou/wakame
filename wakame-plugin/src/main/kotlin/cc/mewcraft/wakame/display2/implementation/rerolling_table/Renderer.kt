@@ -16,10 +16,12 @@ import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.isClientSide
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -88,14 +90,12 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
             RerollingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        item.hideAll()
 
         item.erase() // 这是呈现给玩家的最后一环, 可以 erase
-
-        item.unsafeEdit {
-            lore = itemLore
-            showNothing()
-        }
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, id: String, cell: Cell, context: RerollingTableContext) {

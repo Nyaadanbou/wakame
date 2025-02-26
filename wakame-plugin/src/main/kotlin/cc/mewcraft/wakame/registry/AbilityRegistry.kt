@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
@@ -92,7 +91,7 @@ object AbilityRegistry {
                     val text = file.readText()
                     val node = loaderBuilder.buildAndLoadString(text)
 
-                    val abilityId = Key(Namespaces.ABILITY, "${namespace}/$value")
+                    val abilityId = Key.key(Namespaces.ABILITY, "${namespace}/$value")
                     val type = node.node("type").require<String>()
                     val ability = try {
                         requireNotNull(AbilityFactories[type]).create(abilityId, node)

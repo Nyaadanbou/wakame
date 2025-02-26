@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.text.arguments
 import cc.mewcraft.wakame.util.time.DurationFormatter
@@ -15,9 +15,8 @@ import org.bukkit.inventory.ItemStack
 
 interface WorldTimeControl : ItemBehavior {
     private object Default : WorldTimeControl {
-        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            val nekoStack = itemStack.projectNeko()
-            val timeControl = nekoStack.templates.get(ItemTemplateTypes.WORLD_TIME_CONTROL) ?: return
+        override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
+            val timeControl = koishStack.templates.get(ItemTemplateTypes.WORLD_TIME_CONTROL) ?: return
             if (!TimeControl.isReady()) {
                 event.isCancelled = true
                 player.sendMessage(
@@ -37,8 +36,6 @@ interface WorldTimeControl : ItemBehavior {
     }
 
     companion object Type : ItemBehaviorType<WorldTimeControl> {
-        override fun create(): WorldTimeControl {
-            return Default
-        }
+        override fun create(): WorldTimeControl = Default
     }
 }

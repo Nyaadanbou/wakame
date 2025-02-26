@@ -30,7 +30,7 @@ internal object CoreIcons {
     }
 
     fun getItemStack(core: Core): ItemStack {
-        return getNekoStack(core).wrapped
+        return getNekoStack(core).bukkitStack
     }
 
     private fun getDefaultIcon(): NekoItem {

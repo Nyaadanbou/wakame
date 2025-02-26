@@ -1,16 +1,19 @@
+@file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.damage
-import cc.mewcraft.wakame.item.isDamageable
-import cc.mewcraft.wakame.item.maxDamage
-import cc.mewcraft.wakame.item.projectNeko
+import cc.mewcraft.wakame.item.extension.damage
+import cc.mewcraft.wakame.item.extension.isDamageable
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.maxDamage
 import net.kyori.adventure.text.Component.text
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -24,59 +27,59 @@ import org.bukkit.inventory.ItemStack
 
 interface HoldLastDamage : ItemBehavior {
     private object Default : HoldLastDamage {
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
-            tryCancelEvent(itemStack, player, event)
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+            tryCancelEvent(itemStack, koishStack, player, event)
         }
 
-        override fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-            tryCancelEvent(itemStack, player, wrappedEvent.event)
+        override fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+            tryCancelEvent(itemStack, koishStack, player, wrappedEvent.event)
         }
 
-        override fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
-            tryCancelEvent(itemStack, player, event)
+        override fun handleInteractAtEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+            tryCancelEvent(itemStack, koishStack, player, event)
         }
 
-        override fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
-            tryCancelEvent(itemStack, player, event)
+        override fun handleBreakBlock(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: BlockBreakEvent) {
+            tryCancelEvent(itemStack, koishStack, player, event)
         }
 
-        override fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
-            val nekoStack = itemStack.projectNeko()
-            if (!nekoStack.isDamageable) return
+        override fun handleDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemDamageEvent) {
+            if (!koishStack.isDamageable) return
             // 物品要损坏了
             // 取消掉耐久事件, 设为 0 耐久
-            if (nekoStack.damage + event.damage >= nekoStack.maxDamage) {
+            val damage = itemStack.damage
+            val maxDamage = itemStack.maxDamage
+            if (damage + event.damage >= maxDamage) {
                 event.isCancelled = true
-                nekoStack.damage = nekoStack.maxDamage
+                koishStack.damage = maxDamage
             }
         }
 
-        override fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
+        override fun handleEquip(player: Player, itemStack: ItemStack, koishStack: NekoStack, equipped: Boolean, event: ArmorChangeEvent) {
             if (equipped) {
-                tryCancelEvent(itemStack, player, event)
+                tryCancelEvent(itemStack, koishStack, player, event)
             }
         }
 
-        override fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-            tryCancelEvent(itemStack, player, event)
+        override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
+            tryCancelEvent(itemStack, koishStack, player, event)
         }
 
-        override fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
-            tryCancelEvent(itemStack, player, event)
+        override fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
+            tryCancelEvent(itemStack, koishStack, player, event)
         }
 
-        private fun tryCancelEvent(itemStack: ItemStack, player: Player, e: Cancellable) {
-            val nekoStack = itemStack.projectNeko()
-            if (nekoStack.damage >= nekoStack.maxDamage) {
+        private fun tryCancelEvent(itemStack: ItemStack, koishStack: NekoStack, player: Player, event: Cancellable) {
+            val damage = itemStack.damage
+            val maxDamage = itemStack.maxDamage
+            if (damage >= maxDamage) {
+                event.isCancelled = true
                 player.sendMessage(text("无法使用完全损坏的物品"))
-                e.isCancelled = true
             }
         }
     }
 
     companion object Type : ItemBehaviorType<HoldLastDamage> {
-        override fun create(): HoldLastDamage {
-            return Default
-        }
+        override fun create(): HoldLastDamage = Default
     }
 }

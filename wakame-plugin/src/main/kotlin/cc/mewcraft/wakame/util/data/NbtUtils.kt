@@ -1,20 +1,10 @@
-package cc.mewcraft.wakame.util
+package cc.mewcraft.wakame.util.data
 
-import net.minecraft.nbt.ByteArrayTag
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.DoubleTag
-import net.minecraft.nbt.FloatTag
-import net.minecraft.nbt.IntArrayTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.LongArrayTag
-import net.minecraft.nbt.NumericTag
-import net.minecraft.nbt.StringTag
-import net.minecraft.nbt.Tag
-import net.minecraft.server.MinecraftServer
-import java.util.stream.Stream
-import net.minecraft.world.item.ItemStack as MojangStack
+import me.lucko.shadow.*
+import me.lucko.shadow.bukkit.BukkitShadowFactory
+import net.minecraft.nbt.*
 
-object NmsNbtUtils {
+object NbtUtils {
 
     const val TAG_END = 0
     const val TAG_BYTE = 1
@@ -31,27 +21,23 @@ object NmsNbtUtils {
     const val TAG_LONG_ARRAY = 12
     const val TAG_ANY_NUMERIC = 99
 
-    fun createDoubleList(vararg doubles: Double): ListTag {
+    fun doubleListTag(vararg doubles: Double): ListTag {
         val listTag = ListTag()
 
         doubles.forEach { listTag.add(DoubleTag.valueOf(it)) }
         return listTag
     }
 
-    fun createFloatList(vararg floats: Float): ListTag {
+    fun floatListTag(vararg floats: Float): ListTag {
         val listTag = ListTag()
         floats.forEach { listTag.add(FloatTag.valueOf(it)) }
         return listTag
     }
 
-    fun createStringList(strings: Iterable<String>): ListTag {
+    fun stringListTag(strings: Iterable<String>): ListTag {
         val listTag = ListTag()
         strings.forEach { listTag.add(StringTag.valueOf(it)) }
         return listTag
-    }
-
-    fun convertListToStream(tag: ListTag): Stream<MojangStack> {
-        return tag.stream().map { MojangStack.parseOptional(MinecraftServer.getServer().registryAccess(), it as CompoundTag) }
     }
 }
 
@@ -74,91 +60,91 @@ fun <T : Tag> CompoundTag.getOrNull(key: String): T? {
 }
 
 fun CompoundTag.getByteOrNull(key: String): Byte? {
-    if (contains(key, NmsNbtUtils.TAG_BYTE))
+    if (contains(key, NbtUtils.TAG_BYTE))
         return (get(key) as? NumericTag)?.asByte
 
     return null
 }
 
 fun CompoundTag.getShortOrNull(key: String): Short? {
-    if (contains(key, NmsNbtUtils.TAG_SHORT))
+    if (contains(key, NbtUtils.TAG_SHORT))
         return (get(key) as? NumericTag)?.asShort
 
     return null
 }
 
 fun CompoundTag.getIntOrNull(key: String): Int? {
-    if (contains(key, NmsNbtUtils.TAG_INT))
+    if (contains(key, NbtUtils.TAG_INT))
         return (get(key) as? NumericTag)?.asInt
 
     return null
 }
 
 fun CompoundTag.getLongOrNull(key: String): Long? {
-    if (contains(key, NmsNbtUtils.TAG_LONG))
+    if (contains(key, NbtUtils.TAG_LONG))
         return (get(key) as? NumericTag)?.asLong
 
     return null
 }
 
 fun CompoundTag.getFloatOrNull(key: String): Float? {
-    if (contains(key, NmsNbtUtils.TAG_FLOAT))
+    if (contains(key, NbtUtils.TAG_FLOAT))
         return (get(key) as? NumericTag)?.asFloat
 
     return null
 }
 
 fun CompoundTag.getDoubleOrNull(key: String): Double? {
-    if (contains(key, NmsNbtUtils.TAG_DOUBLE))
+    if (contains(key, NbtUtils.TAG_DOUBLE))
         return (get(key) as? NumericTag)?.asDouble
 
     return null
 }
 
 fun CompoundTag.getStringOrNull(key: String): String? {
-    if (contains(key, NmsNbtUtils.TAG_STRING))
+    if (contains(key, NbtUtils.TAG_STRING))
         return (get(key) as? StringTag)?.asString
 
     return null
 }
 
 fun CompoundTag.getByteArrayOrNull(key: String): ByteArray? {
-    if (contains(key, NmsNbtUtils.TAG_BYTE_ARRAY))
+    if (contains(key, NbtUtils.TAG_BYTE_ARRAY))
         return (get(key) as? ByteArrayTag)?.asByteArray
 
     return null
 }
 
 fun CompoundTag.getIntArrayOrNull(key: String): IntArray? {
-    if (contains(key, NmsNbtUtils.TAG_INT_ARRAY))
+    if (contains(key, NbtUtils.TAG_INT_ARRAY))
         return (get(key) as? IntArrayTag)?.asIntArray
 
     return null
 }
 
 fun CompoundTag.getLongArrayOrNull(key: String): LongArray? {
-    if (contains(key, NmsNbtUtils.TAG_LONG_ARRAY))
+    if (contains(key, NbtUtils.TAG_LONG_ARRAY))
         return (get(key) as? LongArrayTag)?.asLongArray
 
     return null
 }
 
 fun CompoundTag.getCompoundOrNull(key: String): CompoundTag? {
-    if (contains(key, NmsNbtUtils.TAG_COMPOUND))
+    if (contains(key, NbtUtils.TAG_COMPOUND))
         return get(key) as? CompoundTag
 
     return null
 }
 
 fun CompoundTag.getListOrNull(key: String): ListTag? {
-    if (contains(key, NmsNbtUtils.TAG_LIST))
+    if (contains(key, NbtUtils.TAG_LIST))
         return get(key) as? ListTag
 
     return null
 }
 
 fun CompoundTag.getListOrNull(key: String, type: Int): ListTag? {
-    if (contains(key, NmsNbtUtils.TAG_LIST)) {
+    if (contains(key, NbtUtils.TAG_LIST)) {
         val listTag = get(key) as ListTag
         if (listTag.elementType.compareTo(type) == 0) {
             return listTag
@@ -166,4 +152,51 @@ fun CompoundTag.getListOrNull(key: String, type: Int): ListTag? {
     }
 
     return null
+}
+
+fun CompoundTag.keySet(): Set<String> = allKeys
+
+fun CompoundTag.removeAll() {
+    BukkitShadowFactory.global().shadow<ShadowCompoundTag>(this).removeAll()
+}
+
+/* Kotlin-style builders */
+
+fun ListTag(block: ListTag.() -> Unit): ListTag =
+    ListTag().apply(block)
+
+fun CompoundTag(block: CompoundTag.() -> Unit): CompoundTag =
+    CompoundTag().apply(block)
+
+
+/* Private */
+
+
+@ClassTarget(CompoundTag::class)
+private interface ShadowCompoundTag : Shadow {
+
+    @Field
+    @Target("tags")
+    @ShadowingStrategy(wrapper = ForTypelessMaps::class)
+    fun tags(): MutableMap<Any?, Any?>
+
+    fun removeAll() = tags().clear()
+
+}
+
+/**
+ * A wrapper/unwrapper for a Map of Tag objects.
+ *
+ * The shadow Map is a view of its shadow target - any changes on the shadow Map
+ * will reflect on its shadow target.
+ *
+ * This shadowing strategy is only intended to expose the typeless methods of the shadow map,
+ * such as [MutableMap.clear] and [MutableMap.isEmpty].
+ */
+enum class ForTypelessMaps : ShadowingStrategy.Wrapper, ShadowingStrategy.Unwrapper {
+    INSTANCE;
+
+    override fun wrap(unwrapped: Any?, expectedType: Class<*>, shadowFactory: ShadowFactory): Map<*, *>? = unwrapped as? Map<*, *>
+    override fun unwrap(wrapped: Any?, expectedType: Class<*>, shadowFactory: ShadowFactory): Any? = throw UnsupportedOperationException()
+    override fun unwrap(wrappedClass: Class<*>?, shadowFactory: ShadowFactory): Class<*> = throw UnsupportedOperationException()
 }

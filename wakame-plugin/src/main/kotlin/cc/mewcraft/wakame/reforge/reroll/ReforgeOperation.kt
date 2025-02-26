@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.item.*
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts

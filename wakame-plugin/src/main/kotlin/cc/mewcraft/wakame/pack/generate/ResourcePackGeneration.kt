@@ -9,14 +9,13 @@ import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.ItemModelInfo
 import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
+import cc.mewcraft.wakame.util.adventure.withNamespace
+import cc.mewcraft.wakame.util.adventure.withValue
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.text.mini
-import cc.mewcraft.wakame.util.withNamespace
-import cc.mewcraft.wakame.util.withValue
 import net.kyori.adventure.key.Key
 import team.unnamed.creative.ResourcePack
-import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.item.component
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.node
+import java.util.*
 
 /**
  * 物品组件相关的注册表.
@@ -9,7 +10,6 @@ import cc.mewcraft.wakame.config.node
 internal object ItemComponentRegistry {
 
     const val CONFIG_ID = "items"
-    const val CONFIG_FILE_NAME = "$CONFIG_ID.yml"
     const val NODE_COMPONENTS = "components"
 
     /**

@@ -8,7 +8,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.getByteArrayOrNull
+import cc.mewcraft.wakame.util.data.getByteArrayOrNull
+import com.sun.org.apache.bcel.internal.util.Args.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import xyz.xenondevs.commons.collections.mapToByteArray
@@ -50,7 +51,7 @@ data class ItemKizamiz(
         override val id: String,
     ) : ItemComponentType<ItemKizamiz> {
         override fun read(holder: ItemComponentHolder): ItemKizamiz? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val kizamiSet = tag.getByteArrayOrNull(TAG_VALUE)
                 ?.mapTo(ObjectArraySet(4)) { KoishRegistries.KIZAMI.getEntryOrThrow(it.toInt()) }
                 ?: return null
@@ -59,14 +60,14 @@ data class ItemKizamiz(
 
         override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
             require(value.kizamiz.isNotEmpty()) { "The set of kizami must be not empty" }
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 val byteArray = value.kizamiz.mapToByteArray { it.value.integerId.toByte() }
                 tag.putByteArray(TAG_VALUE, byteArray)
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

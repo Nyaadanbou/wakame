@@ -1,10 +1,16 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.extension.damage
+import cc.mewcraft.wakame.item.extension.isDamageable
+import cc.mewcraft.wakame.item.extension.maxDamage
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -142,7 +148,7 @@ internal abstract class ItemSlotChangeEventListener {
         val everyItemSlot = ItemSlotRegistry.all()
         for (itemSlot in everyItemSlot) {
             val itemStack = itemSlot.getItem(player) ?: continue
-            val nekoStack = itemStack.shadowNeko()
+            val nekoStack = itemStack.wrap()
             if (test(player, itemSlot, itemStack, nekoStack)) {
                 onBegin(player)
 
@@ -170,8 +176,8 @@ internal abstract class ItemSlotChangeEventListener {
             return // will it ever happen?
         }
 
-        val oldNekoStack = oldItemStack?.shadowNeko()
-        val newNekoStack = newItemStack?.shadowNeko()
+        val oldNekoStack = oldItemStack?.wrap()
+        val newNekoStack = newItemStack?.wrap()
 
         onBegin(player)
 

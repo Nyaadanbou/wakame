@@ -29,7 +29,7 @@ import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_TILE_ENT
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_UUID
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_WORLD
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.TOOL_ITEM_STACK
-import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.world.BlockPos
 import net.minecraft.resources.ResourceLocation
 import org.bukkit.*

@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.ShownInTooltip
-import cc.mewcraft.wakame.item.component.*
-import cc.mewcraft.wakame.util.editMeta
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.DyedItemColor
 import net.kyori.examination.Examinable
 import org.bukkit.Color
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.meta.LeatherArmorMeta
 
 
 data class ItemDyeColor(
@@ -24,27 +25,16 @@ data class ItemDyeColor(
         override val id: String,
     ) : ItemComponentType<ItemDyeColor> {
         override fun read(holder: ItemComponentHolder): ItemDyeColor? {
-            val im = holder.item.itemMeta as? LeatherArmorMeta ?: return null
-            val rgb = im.color.asRGB()
-            val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_DYE)
-            return ItemDyeColor(rgb, showInTooltip)
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemDyeColor) {
-            holder.item.editMeta<LeatherArmorMeta> {
-                it.setColor(Color.fromRGB(value.rgb))
-                if (value.showInTooltip) {
-                    it.removeItemFlags(ItemFlag.HIDE_DYE)
-                } else {
-                    it.addItemFlags(ItemFlag.HIDE_DYE)
-                }
-            }
+            val paperDyedItemColor = DyedItemColor.dyedItemColor(Color.fromRGB(value.rgb), value.showInTooltip)
+            holder.bukkitStack.setData(DataComponentTypes.DYED_COLOR, paperDyedItemColor)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta<LeatherArmorMeta> {
-                it.setColor(null)
-            }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

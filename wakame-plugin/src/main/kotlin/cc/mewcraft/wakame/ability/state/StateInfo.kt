@@ -15,13 +15,14 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
+import java.util.*
 import java.util.stream.Stream
 
 /**

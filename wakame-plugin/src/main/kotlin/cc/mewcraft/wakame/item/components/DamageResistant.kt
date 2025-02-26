@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.item.ItemDeprecations
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
@@ -31,15 +32,15 @@ data class DamageResistant(
         // Paper 已经有了 Item Component API, 可以直接使用
 
         override fun read(holder: ItemComponentHolder): DamageResistant? {
-            return holder.item.getData(DataComponentTypes.DAMAGE_RESISTANT)?.types()?.let { DamageResistant(it) }
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: DamageResistant) {
-            holder.item.setData(DataComponentTypes.DAMAGE_RESISTANT, PaperDamageResistant.damageResistant(value.types))
+            holder.bukkitStack.setData(DataComponentTypes.DAMAGE_RESISTANT, PaperDamageResistant.damageResistant(value.types))
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.unsetData(DataComponentTypes.DAMAGE_RESISTANT)
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

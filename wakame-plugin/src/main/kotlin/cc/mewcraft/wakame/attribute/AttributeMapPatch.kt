@@ -8,7 +8,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.data.*
+import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
@@ -16,9 +17,10 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.nbt.BinaryTagTypes
-import net.kyori.adventure.nbt.CompoundBinaryTag
 import net.kyori.adventure.util.Codec
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.NbtAccounter
 import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.attribute.Attributable
@@ -289,7 +291,7 @@ private object AttributeMapPatchType {
                     )
                 }
 
-                val serializableInstanceListTag = ListBinaryTag {
+                val serializableInstanceListTag = ListTag {
                     serializableInstanceList.forEach { serializable ->
                         add(SerializableAttributeInstance.NBT_CODEC.encode(serializable))
                     }
@@ -297,19 +299,19 @@ private object AttributeMapPatchType {
 
                 val byteOs = FastByteArrayOutputStream()
                 val dataOs = DataOutputStream(byteOs)
-                BinaryTagTypes.LIST.write(serializableInstanceListTag, dataOs)
+                serializableInstanceListTag.write(dataOs)
 
                 return byteOs.array
             }
 
             override fun fromPrimitive(primitive: ByteArray, context: PersistentDataAdapterContext): AttributeMapPatch {
                 val inputStream = DataInputStream(FastByteArrayInputStream(primitive))
-                val listTag = BinaryTagTypes.LIST.read(inputStream)
-                require(listTag.size() != 0) { "list is empty" }
-                require(listTag.elementType() == BinaryTagTypes.COMPOUND) { "element type is not compound" }
+                val listTag = ListTag.TYPE.load(inputStream, NbtAccounter.unlimitedHeap())
+                require(listTag.size != 0) { "list is empty" }
+                require(listTag.elementType == NbtUtils.TAG_COMPOUND.toByte()) { "element type is not compound" }
                 val patch = AttributeMapPatch()
                 for (tag in listTag) {
-                    val compound = tag as CompoundBinaryTag
+                    val compound = tag as CompoundTag
                     val serializable = SerializableAttributeInstance.NBT_CODEC.decode(compound)
                     val instance = serializable.toAttributeInstance(owner) ?: continue
                     patch[instance.attribute] = instance
@@ -327,20 +329,20 @@ private class SerializableAttributeInstance(
 ) {
     companion object Constants {
         @JvmField
-        val NBT_CODEC = Codec.codec<SerializableAttributeInstance, CompoundBinaryTag, IOException, IOException>(
+        val NBT_CODEC = Codec.codec<SerializableAttributeInstance, CompoundTag, IOException, IOException>(
             /* decoder = */ { nbt ->
                 val attribute = nbt.getStringOrNull("id") ?: throw IllegalStateException("id is null")
                 val baseValue = nbt.getDoubleOrNull("base") ?: throw IllegalStateException("base is null")
-                val modifiers = nbt.getListOrNull("modifiers", BinaryTagTypes.COMPOUND)
-                    ?.map { elem -> SerializableAttributeModifier.NBT_CODEC.decode(elem as CompoundBinaryTag) }
+                val modifiers = nbt.getListOrNull("modifiers", NbtUtils.TAG_COMPOUND)
+                    ?.map { elem -> SerializableAttributeModifier.NBT_CODEC.decode(elem as CompoundTag) }
                     ?: emptyList()
                 SerializableAttributeInstance(attribute, baseValue, modifiers)
             },
             /* encoder = */ { data ->
-                CompoundBinaryTag {
+                CompoundTag {
                     putString("id", data.id)
                     putDouble("base", data.base)
-                    put("modifiers", ListBinaryTag {
+                    put("modifiers", ListTag {
                         data.modifiers.forEach { modifier ->
                             add(SerializableAttributeModifier.NBT_CODEC.encode(modifier))
                         }
@@ -369,7 +371,7 @@ private class SerializableAttributeModifier(
 ) {
     companion object {
         @JvmField
-        val NBT_CODEC = Codec.codec<SerializableAttributeModifier, CompoundBinaryTag, IOException, IOException>(
+        val NBT_CODEC = Codec.codec<SerializableAttributeModifier, CompoundTag, IOException, IOException>(
             /* decoder = */ { nbt ->
                 val id = nbt.getStringOrNull("id") ?: throw IllegalStateException("id is null")
                 val amount = nbt.getDoubleOrNull("amount") ?: throw IllegalStateException("amount is null")
@@ -377,7 +379,7 @@ private class SerializableAttributeModifier(
                 SerializableAttributeModifier(id, amount, operation)
             },
             /* encoder = */ { data ->
-                CompoundBinaryTag {
+                CompoundTag {
                     putString("id", data.id)
                     putDouble("amount", data.amount)
                     putByte("operation", data.operation)

@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.lore
+import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
@@ -21,9 +21,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.util.showAttributeModifiers
-import cc.mewcraft.wakame.util.showEnchantments
-import cc.mewcraft.wakame.util.showStoredEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -34,9 +31,7 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
+@Init(stage = InitStage.POST_WORLD)
 @Reload
 internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
     override val name = "standard"
@@ -92,30 +87,29 @@ internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>(
         }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
-        val itemLore = textAssembler.assemble(collector)
-
-        item.erase()
-
-        item.lore = run {
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(run {
             // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
             // 如果原本的 lore 为空, 则直接使用我们渲染的 lore.
             // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
 
-            val lore = item.lore
-            if (lore.isEmpty()) {
-                itemLore
+            val existingLore = item.fastLoreOrEmpty
+            if (existingLore.isEmpty()) {
+                lore
             } else {
-                itemLore + buildList {
+                buildList {
+                    addAll(existingLore)
                     add(Component.empty())
                     addAll(lore)
                 }
             }
-        }
-        with(item.wrapped) {
-            showAttributeModifiers(false)
-            showEnchantments(false)
-            showStoredEnchantments(false)
-        }
+        })
+
+        item.hideAttributeModifiers()
+        item.hideEnchantments()
+        item.hideStoredEnchantments()
+
+        item.erase()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {

@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
 
 
@@ -27,19 +30,19 @@ data class ItemCrate(
         override val id: String,
     ) : ItemComponentType<ItemCrate> {
         override fun read(holder: ItemComponentHolder): ItemCrate? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val key = tag.getString(TAG_ID)
             return ItemCrate(identity = key)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCrate) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 tag.putString(TAG_ID, value.identity)
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

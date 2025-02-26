@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.removeNBT
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -131,13 +131,11 @@ internal class ReplaceMenu(
                 folded("result_description", replaceResult.description)
             }
 
-            resolved.applyTo(
-                originalInput
-            ).edit {
-                // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
-                // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉.
-                customData = null
-            }
+            resolved.applyTo(originalInput)
+
+            // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品
+            // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉
+            originalInput.removeNBT()
 
             return originalInput
 
@@ -151,11 +149,11 @@ internal class ReplaceMenu(
 
             // 使用 SlotDisplay 再处理一遍
             val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
-                folded("item_lore", usableInput.wrapped.itemLoreOrEmpty)
+                folded("item_lore", usableInput.bukkitStack.fastLoreOrEmpty)
                 folded("result_description", replaceResult.description)
             }
 
-            return resolved.applyTo(usableInput.wrapped)
+            return resolved.applyTo(usableInput.bukkitStack)
         }
     }
 

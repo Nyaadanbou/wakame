@@ -10,9 +10,13 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAttributeModifiers
+import cc.mewcraft.wakame.item.extension.hideEnchantments
+import cc.mewcraft.wakame.item.extension.hideStoredEnchantments
+import cc.mewcraft.wakame.item.isClientSide
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -92,18 +96,16 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
 
         if (context.erase) {
             item.erase()
         }
 
-        item.unsafeEdit {
-            lore = itemLore
-            showAttributeModifiers(false)
-            showEnchantments(false)
-            showStoredEnchantments(false)
-        }
+        item.fastLore(lore)
+        item.hideAttributeModifiers()
+        item.hideEnchantments()
+        item.hideStoredEnchantments()
     }
 }
 

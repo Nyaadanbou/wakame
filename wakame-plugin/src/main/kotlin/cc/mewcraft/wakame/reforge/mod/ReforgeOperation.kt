@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.item.cells
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.cells
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import org.bukkit.entity.Player
 
 /**

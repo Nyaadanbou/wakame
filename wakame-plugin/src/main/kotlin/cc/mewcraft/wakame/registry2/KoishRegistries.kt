@@ -1,7 +1,22 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.attribute.Attribute
+import cc.mewcraft.wakame.attribute.AttributeSupplier
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.components.ItemSkin
+import cc.mewcraft.wakame.kizami.KizamiType
+import cc.mewcraft.wakame.rarity.LevelRarityMapping
+import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.world.entity.EntityTypeHolder
+
 object KoishRegistries {
-    private val ACCESS = MutableRegistryAccess()
+    private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
 
     ///
 
@@ -9,13 +24,13 @@ object KoishRegistries {
      * 机制.
      */
     @JvmField
-    val ABILITY = registerSimple(KoishRegistryKeys.ABILITY)
+    val ABILITY: WritableRegistry<Ability> = registerSimple(KoishRegistryKeys.ABILITY)
 
     /**
      * 属性.
      */
     @JvmField
-    val ATTRIBUTE = registerSimple(KoishRegistryKeys.ATTRIBUTE)
+    val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys.ATTRIBUTE)
 
     /**
      * 实体的默认属性.
@@ -29,31 +44,31 @@ object KoishRegistries {
      * in which case the enum type is not enough to express all types.
      */
     @JvmField
-    val ATTRIBUTE_SUPPLIER = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
+    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
      * 属性块的 Facade.
      */
     @JvmField
-    val ATTRIBUTE_BUNDLE_FACADE = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
+    val ATTRIBUTE_BUNDLE_FACADE: WritableRegistry<AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
 
     /**
      * 元素.
      */
     @JvmField
-    val ELEMENT = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral") // = koish:neutral
+    val ELEMENT: WritableDefaultedRegistry<ElementType> = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral") // = koish:neutral
 
     /**
      * 实体类型集合.
      */
     @JvmField
-    val ENTITY_TYPE_HOLDER = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
+    val ENTITY_TYPE_HOLDER: WritableRegistry<EntityTypeHolder> = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
 
     /**
      * 虚构的属性映射.
      */
     @JvmField
-    val IMAGINARY_ATTRIBUTE_MAP = registerSimple(KoishRegistryKeys.IMAGINARY_ATTRIBUTE_MAP)
+    val IMAGINARY_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys.IMAGINARY_ATTRIBUTE_MAP)
 
     /**
      * 标准物品类型.
@@ -61,31 +76,31 @@ object KoishRegistries {
      * 玩家可以直接获得/使用的物品类型.
      */
     @JvmField
-    val ITEM = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, "internal:unknown")
+    val ITEM: WritableDefaultedFuzzyRegistry<NekoItem> = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, "internal:unknown")
 
     /**
      * 物品皮肤.
      */
     @JvmField
-    val ITEM_SKIN = registerSimple(KoishRegistryKeys.ITEM_SKIN)
+    val ITEM_SKIN: WritableRegistry<ItemSkin> = registerSimple(KoishRegistryKeys.ITEM_SKIN)
 
     /**
      * 铭刻.
      */
     @JvmField
-    val KIZAMI = registerSimple(KoishRegistryKeys.KIZAMI)
+    val KIZAMI: WritableRegistry<KizamiType> = registerSimple(KoishRegistryKeys.KIZAMI)
 
     /**
      * 等级>稀有度映射.
      */
     @JvmField
-    val LEVEL_RARITY_MAPPING = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, "__default__") // = koish:__default__
+    val LEVEL_RARITY_MAPPING: WritableDefaultedRegistry<LevelRarityMapping> = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, "__default__") // = koish:__default__
 
     /**
      * 稀有度.
      */
     @JvmField
-    val RARITY = registerDefaulted(KoishRegistryKeys.RARITY, "common") // = koish:common
+    val RARITY: WritableDefaultedRegistry<RarityType> = registerDefaulted(KoishRegistryKeys.RARITY, "common") // = koish:common
 
     ///
 

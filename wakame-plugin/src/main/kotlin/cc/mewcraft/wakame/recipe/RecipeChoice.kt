@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.util.itemModel
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
@@ -11,6 +11,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.Collections.emptyList
 import java.util.stream.Stream
 import org.bukkit.inventory.RecipeChoice as BukkitRecipeChoice
 
@@ -35,12 +36,12 @@ data object EmptyRecipeChoice : RecipeChoice {
  * 单物品输入.
  */
 data class SingleRecipeChoice(
-    val choice: ItemX
+    val choice: ItemX,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        val itemStack = choice.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${choice.key}'")
-        itemStack.itemModel = choice.key
-        return BukkitRecipeChoice.ExactChoice(itemStack)
+        val itemstack = choice.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${choice.key}'")
+        itemstack.setData(DataComponentTypes.ITEM_MODEL, choice.key)
+        return BukkitRecipeChoice.ExactChoice(itemstack)
     }
 
 
@@ -55,14 +56,14 @@ data class SingleRecipeChoice(
  * 多物品输入.
  */
 data class MultiRecipeChoice(
-    val choices: List<ItemX>
+    val choices: List<ItemX>,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         choices.forEach {
-            val itemStack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
-            itemStack.itemModel = it.key
-            itemStacks.add(itemStack)
+            val itemstack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
+            itemstack.setData(DataComponentTypes.ITEM_MODEL, it.key)
+            itemStacks.add(itemstack)
         }
         return BukkitRecipeChoice.ExactChoice(itemStacks)
     }

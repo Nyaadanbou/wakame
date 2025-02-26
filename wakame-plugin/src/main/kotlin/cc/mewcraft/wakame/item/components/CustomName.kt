@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.ItemDeprecations
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.customName
+import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
 import net.kyori.adventure.text.Component
+import net.minecraft.core.component.DataComponents
 
 
 // 开发日记 2024/6/28
@@ -30,25 +32,21 @@ interface CustomName {
         }
     }
 
+    // 设计上 custom_name 和 item_name 都不经过发包系统处理,
+    // 因此这里有什么就读取什么. 整体上做到简单, 一致, 无例外.
     private data class Codec(
         override val id: String,
     ) : ItemComponentType<Component> {
         override fun read(holder: ItemComponentHolder): Component? {
-            // 2024/6/29
-            // 设计上 custom_name 和 item_name 都不经过发包系统处理,
-            // 因此这里有什么就读取什么. 整体上做到简单, 一致, 无例外.
-            return holder.item.customName
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: Component) {
-            // 2024/6/29
-            // 设计上 custom_name 和 item_name 都不经过发包系统处理,
-            // 因此这里有什么就写入什么. 整体上做到简单, 一致, 无例外.
-            holder.item.customName = value
+            holder.mojangStack.set(DataComponents.CUSTOM_NAME, value.toNMSComponent())
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.customName = null
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

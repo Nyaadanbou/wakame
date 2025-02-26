@@ -1,10 +1,12 @@
 package item
 
-import cc.mewcraft.wakame.item.*
+import cc.mewcraft.wakame.item.ItemSlotGroup
+import cc.mewcraft.wakame.item.NekoItem
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
+import cc.mewcraft.wakame.util.MojangStack
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
 import net.kyori.examination.string.StringExaminer
@@ -18,17 +20,13 @@ class MockNekoStack(
     override val isEmpty: Boolean
         get() = false
 
-    override var isClientSide: Boolean
-        get() = false
-        set(_) {}
-
     override val itemType: Material
         get() = throw NotImplementedError("Not implemented")
 
-    override val itemStack: ItemStack
+    override val mojangStack: MojangStack
         get() = throw NotImplementedError("Not implemented")
 
-    override val wrapped: ItemStack
+    override val bukkitStack: ItemStack
         get() = throw NotImplementedError("Not implemented")
 
     override val id: Key = prototype.id
@@ -37,17 +35,13 @@ class MockNekoStack(
 
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
 
-    override val components: ItemComponentMap = ItemComponentMaps.builder().build()
+    override val components: ItemComponentMap = ItemComponentMap.builder().build()
 
     override val templates: ItemTemplateMap = prototype.templates
 
     override val behaviors: ItemBehaviorMap = prototype.behaviors
 
-    override val unsafe: NekoStack.Unsafe
-        get() = throw NotImplementedError("Not implemented")
-
-    override fun clone(): NekoStack =
-        throw NotImplementedError("Not implemented")
+    override fun clone(): NekoStack = throw NotImplementedError("Not implemented")
 
     override fun erase() = Unit
 

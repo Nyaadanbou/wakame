@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable

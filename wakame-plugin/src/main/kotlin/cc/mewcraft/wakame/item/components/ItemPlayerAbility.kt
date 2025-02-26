@@ -6,7 +6,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.IdentifierExt
+import cc.mewcraft.wakame.util.Identifiers
+import java.util.*
 
 data class ItemPlayerAbility(
     val abilities: List<PlayerAbility>,
@@ -26,10 +27,10 @@ data class ItemPlayerAbility(
         override val id: String,
     ) : ItemComponentType<ItemPlayerAbility> {
         override fun read(holder: ItemComponentHolder): ItemPlayerAbility? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val abilities = ArrayList<PlayerAbility>(tag.size())
-            for (stringId in tag.keySet()) {
-                val id = IdentifierExt.of(stringId)
+            for (stringId in tag.allKeys) {
+                val id = Identifiers.of(stringId)
                 val ability = PlayerAbility(id, tag)
                 abilities += ability
             }
@@ -37,18 +38,18 @@ data class ItemPlayerAbility(
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemPlayerAbility) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 val abilities = value.abilities
                 for (ability in abilities) {
                     val id = ability.id.toString()
-                    val nbt = ability.serializeAsTag()
+                    val nbt = ability.saveNbt()
                     tag.put(id, nbt)
                 }
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
     }
 

@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
@@ -15,7 +15,13 @@ import cc.mewcraft.wakame.reforge.recycle.SimpleRecyclingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 import cc.mewcraft.wakame.reforge.repair.SimpleRepairingSession
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.decorate
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.itemName
+import cc.mewcraft.wakame.util.item.itemNameOrType
+import cc.mewcraft.wakame.util.item.maxDamage
+import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.unregisterEvents
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.Component.translatable
 import net.kyori.adventure.text.TranslationArgument
@@ -374,7 +380,7 @@ internal class BlacksmithMenu(
                         folded("item_list") {
                             for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
                                 val itemName = item.itemNameOrType
-                                val itemLevel = item.shadowNeko()?.level?.let(::text)
+                                val itemLevel = item.wrap()?.level?.let(::text)
                                 if (itemLevel != null) {
                                     resolve("with_level") {
                                         component("item_name", itemName)

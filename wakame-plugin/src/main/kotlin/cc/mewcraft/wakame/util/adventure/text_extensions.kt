@@ -1,8 +1,10 @@
-package cc.mewcraft.wakame.util
+package cc.mewcraft.wakame.util.adventure
 
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.*
+import net.kyori.adventure.text.format.Style
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 
 val Component.plain: String

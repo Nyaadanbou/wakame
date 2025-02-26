@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.attribute.bundle
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
@@ -9,10 +8,10 @@ import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.getIntOrNull
+import cc.mewcraft.wakame.util.data.getIntOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 
 /**
@@ -208,7 +207,7 @@ internal data class ConstantAttributeBundleS(
                 other.operation == operation
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         writeQuality(quality)
@@ -238,7 +237,7 @@ internal data class ConstantAttributeBundleR(
                 other.operation == operation
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
@@ -270,7 +269,7 @@ internal data class ConstantAttributeBundleSE(
                 other.element == element
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
         writeElement(element)
@@ -304,7 +303,7 @@ internal data class ConstantAttributeBundleRE(
                 && other.element == element
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
         writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
         writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)

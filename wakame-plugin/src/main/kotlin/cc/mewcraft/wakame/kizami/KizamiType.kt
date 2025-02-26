@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
@@ -12,6 +12,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.Collections.emptyMap
 import java.util.stream.Stream
 
 class KizamiType internal constructor(

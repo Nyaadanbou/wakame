@@ -4,12 +4,12 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.EquipmentSlotGroup
@@ -18,6 +18,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.*
 import java.util.stream.Stream
 
 
@@ -76,7 +77,7 @@ enum class VanillaItemSlot(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }
 
@@ -109,7 +110,7 @@ data class CustomItemSlot(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }
 

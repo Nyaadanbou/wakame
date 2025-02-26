@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.adventure.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.key.Key
@@ -16,6 +16,7 @@ import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import java.util.Collections.emptyList
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
 

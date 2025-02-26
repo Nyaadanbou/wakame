@@ -10,17 +10,19 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.isClientSide
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.adventure.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -122,14 +124,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             }
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        item.hideAll()
 
         item.erase()
-
-        item.unsafeEdit {
-            lore = itemLore
-            showNothing()
-        }
     }
 }
 

@@ -4,9 +4,10 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import java.util.*
 
 /**
  * 虚拟容器菜单的通用设置.

@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.item.components.tracks
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.util.CompoundTag
+import cc.mewcraft.wakame.util.data.CompoundTag
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
+import net.minecraft.nbt.CompoundTag
+import java.util.Collections.emptyMap
 
 // 开发日记 2024/7/5
 // 用 Int 储存击杀数, 最多可以存 2^31-1
@@ -31,7 +32,7 @@ class TrackEntityKills(
 
         fun fromNbt(nbt: CompoundTag): TrackEntityKills {
             val map = if (nbt.size() < 8) Object2IntArrayMap<Key>() else Object2IntOpenHashMap()
-            for (tagKey in nbt.keySet()) {
+            for (tagKey in nbt.allKeys) {
                 val entityKey = Key.key(tagKey).takeIf { entityKeyLookup.validate(it) } ?: continue // 直接跳过无效的 key
                 val kills = nbt.getInt(tagKey)
                 map[entityKey] = kills

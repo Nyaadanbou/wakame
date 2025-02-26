@@ -16,8 +16,8 @@ import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.event
-import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.toJsonString
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
+import cc.mewcraft.wakame.util.item.toJsonString
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.*
@@ -81,8 +81,8 @@ object ItemListener {
             val previous = event.previous?.takeUnlessEmpty()
             val current = event.current?.takeUnlessEmpty()
 
-            previous?.shadowNeko()?.handleEquip(player, previous, false, event)
-            current?.shadowNeko()?.handleEquip(player, current, true, event)
+            previous?.wrap()?.let { it.handleEquip(player, previous, it, false, event) }
+            current?.wrap()?.let { it.handleEquip(player, current, it, true, event) }
         }
 
         event<WrappedPlayerInteractEvent>(EventPriority.NORMAL) { wrappedEvent ->
@@ -90,30 +90,30 @@ object ItemListener {
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
             val location = event.clickedBlock?.location ?: player.location
             if (!ProtectionManager.canUseItem(player, itemStack, location)) return@event
 
             // 该事件比较特殊, 无论是否被“取消”, 总是传递给物品行为
-            nekoStack.handleInteract(event.player, itemStack, event.action, wrappedEvent)
+            koishStack.handleInteract(event.player, itemStack, koishStack, event.action, wrappedEvent)
         }
 
         event<PlayerInteractAtEntityEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.player.inventory.itemInMainHand.takeUnlessEmpty()
-            val nekoStack = itemStack?.shadowNeko() ?: return@event
+            val koishStack = itemStack?.wrap() ?: return@event
 
-            nekoStack.handleInteractAtEntity(event.player, itemStack, event.rightClicked, event)
+            koishStack.handleInteractAtEntity(event.player, itemStack, koishStack, event.rightClicked, event)
         }
 
         event<NekoEntityDamageEvent> { event ->
             val player = event.damageSource.causingEntity as? Player ?: return@event
             if (!player.isHandleableByKoish) return@event
             val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleAttackEntity(player, itemStack, event.damagee, event)
+            koishStack.handleAttackEntity(player, itemStack, koishStack, event.damagee, event)
         }
 
         event<ProjectileLaunchEvent>(EventPriority.HIGHEST, true) { event ->
@@ -123,7 +123,7 @@ object ItemListener {
             val player = Bukkit.getPlayer(ownerUniqueId) ?: return@event
             if (!player.isHandleableByKoish) return@event
 
-            itemStack.shadowNeko()?.handleItemProjectileLaunch(player, itemStack, projectile, event)
+            itemStack.wrap()?.let { it.handleItemProjectileLaunch(player, itemStack, it, projectile, event) }
         }
 
         event<ProjectileHitEvent>(EventPriority.HIGHEST, true) { event ->
@@ -133,34 +133,34 @@ object ItemListener {
             val player = Bukkit.getPlayer(ownerUniqueId) ?: return@event
             if (!player.isHandleableByKoish) return@event
 
-            itemStack.shadowNeko()?.handleItemProjectileHit(player, itemStack, projectile, event)
+            itemStack.wrap()?.let { it.handleItemProjectileHit(player, itemStack, it, projectile, event) }
         }
 
         event<BlockBreakEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleBreakBlock(player, itemStack, event)
+            koishStack.handleBreakBlock(player, itemStack, koishStack, event)
         }
 
         event<PlayerItemDamageEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleDamage(player, itemStack, event)
+            koishStack.handleDamage(player, itemStack, koishStack, event)
         }
 
         event<PlayerItemBreakEvent>(EventPriority.HIGH) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.brokenItem.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleBreak(player, itemStack, event)
+            koishStack.handleBreak(player, itemStack, koishStack, event)
         }
 
         event<InventoryClickEvent>(EventPriority.HIGH, true) { event ->
@@ -169,11 +169,11 @@ object ItemListener {
             val clickedItem = event.currentItem
             val cursorItem = event.cursor.takeUnlessEmpty()
 
-            clickedItem?.shadowNeko()?.handleInventoryClick(player, clickedItem, event)
-            cursorItem?.shadowNeko()?.handleInventoryClickOnCursor(player, cursorItem, event)
+            clickedItem?.wrap()?.let { it.handleInventoryClick(player, clickedItem, it, event) }
+            cursorItem?.wrap()?.let { it.handleInventoryClickOnCursor(player, cursorItem, it, event) }
             if (event.click == ClickType.NUMBER_KEY) {
                 val hotbarItem = player.inventory.getItem(event.hotbarButton)
-                hotbarItem?.shadowNeko()?.handleInventoryHotbarSwap(player, hotbarItem, event)
+                hotbarItem?.wrap()?.let { it.handleInventoryHotbarSwap(player, hotbarItem, it, event) }
             }
         }
 
@@ -181,27 +181,27 @@ object ItemListener {
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleRelease(player, itemStack, event)
+            koishStack.handleRelease(player, itemStack, koishStack, event)
         }
 
         event<PlayerItemConsumeEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleConsume(player, itemStack, event)
+            koishStack.handleConsume(player, itemStack, koishStack, event)
         }
 
         event<PlayerAbilityPrepareCastEvent>(EventPriority.HIGHEST, true) { event ->
             val player = event.caster
             if (!player.isHandleableByKoish) return@event
             val itemStack = event.item ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
+            val koishStack = itemStack.wrap() ?: return@event
 
-            nekoStack.handleAbilityPrepareCast(player, itemStack, event.ability, event)
+            koishStack.handleAbilityPrepareCast(player, itemStack, koishStack, event.ability, event)
         }
     }
 
@@ -211,8 +211,8 @@ object ItemListener {
             val player = event.player
             if (!player.isHandleableByKoish) return@event
             val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-            val nekoStack = itemStack.shadowNeko() ?: return@event
-            if (!nekoStack.slotGroup.test(slot)) return@event
+            val koishStack = itemStack.wrap() ?: return@event
+            if (!koishStack.slotGroup.test(slot)) return@event
 
             when (event.action) {
                 Action.LEFT_CLICK_BLOCK -> AbilityEntryPointHandler.onLeftClickBlock(player, event)

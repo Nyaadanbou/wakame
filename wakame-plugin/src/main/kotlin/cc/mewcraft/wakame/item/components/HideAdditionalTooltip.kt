@@ -1,9 +1,12 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
-import org.bukkit.inventory.ItemFlag
 
 
 interface HideAdditionalTooltip : Examinable {
@@ -31,23 +34,15 @@ interface HideAdditionalTooltip : Examinable {
         override val id: String,
     ) : ItemComponentType<HideAdditionalTooltip> {
         override fun read(holder: ItemComponentHolder): HideAdditionalTooltip? {
-            val im = holder.item.itemMeta ?: return null
-            if (im.hasItemFlag(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)) {
-                return Value
-            }
-            return null
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta {
-                it.removeItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
-            }
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: HideAdditionalTooltip) {
-            holder.item.editMeta {
-                it.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP)
-            }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

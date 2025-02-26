@@ -14,12 +14,12 @@ const val KOISH_NAMESPACE = "koish"
  */
 typealias Identifier = Key
 
-typealias Identifiers = IdentifierExt
+typealias Identifiers = IdentifierTools
 
 /**
  * 包含 [Identifier] 的静态函数.
  */
-object IdentifierExt {
+object IdentifierTools {
 
     @JvmField
     val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::toString)

@@ -4,26 +4,19 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.network.event.PacketEvent
+import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.PacketHandler
-import cc.mewcraft.wakame.network.event.PacketListener
-import cc.mewcraft.wakame.network.event.PlayerPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetContentPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
-import cc.mewcraft.wakame.network.event.registerPacketListener
-import cc.mewcraft.wakame.network.event.unregisterPacketListener
+import cc.mewcraft.wakame.network.event.clientbound.*
+import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.item.fastUpdate
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import org.bukkit.GameMode
 import kotlin.jvm.optionals.getOrNull
@@ -31,11 +24,12 @@ import kotlin.jvm.optionals.getOrNull
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer")
 
 /**
- * 修改 [org.bukkit.inventory.ItemStack].
+ * 修改 [net.minecraft.world.item.ItemStack].
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object ItemStackRenderer : PacketListener {
-    private const val PROCESSED_KEY = "processed"
+
+    private const val PROCESSED_FIELD = "processed"
 
     @InitFun
     private fun init() {
@@ -49,16 +43,13 @@ internal object ItemStackRenderer : PacketListener {
 
     @PacketHandler
     private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
-        if (isCreative(event))
-            return
+        if (isCreative(event)) return
         event.item.modify(event)
     }
 
     @PacketHandler
     private fun handleSetEquipment(event: ClientboundSetEquipmentPacketEvent) {
-        if (isCreative(event))
-            return
-
+        if (isCreative(event)) return
         for (equipment in event.slots) {
             equipment.second.modify(event)
         }
@@ -74,8 +65,7 @@ internal object ItemStackRenderer : PacketListener {
 
     @PacketHandler
     private fun handleMerchantOffers(event: ClientboundMerchantOffersPacketEvent) {
-        if (isCreative(event))
-            return
+        if (isCreative(event)) return
         for (offer in event.offers) {
             offer.itemCostA.itemStack.modify(event)
             offer.itemCostB.getOrNull()?.itemStack?.modify(event)
@@ -87,9 +77,7 @@ internal object ItemStackRenderer : PacketListener {
     private fun handleEntityData(event: ClientboundSetEntityDataPacketEvent) {
         for (metadata in event.packedItems) {
             val value = metadata.value
-            if (value !is ItemStack) {
-                continue
-            }
+            if (value !is MojangStack) continue
             value.modify(event)
         }
     }
@@ -108,24 +96,27 @@ internal object ItemStackRenderer : PacketListener {
         return event.player.gameMode == GameMode.CREATIVE
     }
 
-    /**
-     * @return 如果物品发生了变化则修改 [PacketEvent.changed]
-     */
-    private fun ItemStack.modify(event: PacketEvent<*>) {
-        var changed: Boolean
+    private const val PDC_FIELD = "PublicBukkitValues"
+    private fun MojangStack.modify(event: PacketEvent<*>) {
+        var changed = false
 
         // 移除任意物品的 PDC
-        changed = get(DataComponents.CUSTOM_DATA)?.update { it.remove("PublicBukkitValues") } != null
+        get(DataComponents.CUSTOM_DATA)?.update { nbt ->
+            if (nbt.contains(PDC_FIELD)) {
+                changed = true
+            }
+            nbt.remove(PDC_FIELD)
+        }
 
-        val nekoStack = asBukkitMirror().shadowNeko(false)
-        if (nekoStack != null) {
+        val koishStack = wrap()
+        if (koishStack != null) {
             try {
-                ItemRenderers.STANDARD.render(nekoStack)
+                ItemRenderers.STANDARD.render(koishStack)
                 processed = true
                 changed = true
             } catch (e: Throwable) {
                 if (LOGGING) {
-                    LOGGER.error("An error occurred while rendering network item: ${nekoStack.id}", e)
+                    LOGGER.error("An error occurred while rendering network item: ${koishStack.id}", e)
                 }
             }
         }
@@ -133,19 +124,21 @@ internal object ItemStackRenderer : PacketListener {
         event.changed = changed
     }
 
-    private var ItemStack.processed: Boolean
-        get() = get(DataComponents.CUSTOM_DATA)?.contains(PROCESSED_KEY) == true
+    private var MojangStack.processed: Boolean
+        get() = get(DataComponents.CUSTOM_DATA)?.contains(PROCESSED_FIELD) == true
         set(value) {
-            if (value) {
-                val customData = getOrDefault(DataComponents.CUSTOM_DATA, CustomData.of(CompoundTag()))
-                val newCustomData = customData.update { it.put(PROCESSED_KEY, ByteTag.valueOf(true)) }
-                set(DataComponents.CUSTOM_DATA, newCustomData)
-            } else {
-                val customData = get(DataComponents.CUSTOM_DATA)
-                if (customData != null) {
-                    val newCustomData = customData.update { it.remove(PROCESSED_KEY) }
-                    set(DataComponents.CUSTOM_DATA, newCustomData)
+            fastUpdate(
+                type = DataComponents.CUSTOM_DATA,
+                default = { CustomData.of(CompoundTag()) },
+                applier = { customData ->
+                    customData.update { nbt ->
+                        if (value) {
+                            nbt.put(PROCESSED_FIELD, ByteTag.ZERO)
+                        } else {
+                            nbt.remove(PROCESSED_FIELD)
+                        }
+                    }
                 }
-            }
+            )
         }
 }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.item.cells
+import cc.mewcraft.wakame.item.extension.cells
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType

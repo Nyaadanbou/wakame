@@ -3,10 +3,11 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.KoishStackImplementations
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.util.coroutine.minecraft
-import cc.mewcraft.wakame.util.takeUnlessEmpty
-import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
+import cc.mewcraft.wakame.util.item.unwrapToMojang
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
@@ -49,8 +50,8 @@ internal object DebugCommand : KoishCommandFactory<Source> {
 
     private fun handleInspectNbt(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
-        val nbtOrNull = sender.inventory.itemInMainHand.unsafeNekooTagOrNull
-        sender.sendPlainMessage("NBT: " + nbtOrNull?.asString()?.prettifyJson())
+        val nbtOrNull = KoishStackImplementations.getNbt(sender.inventory.itemInMainHand.unwrapToMojang())
+        sender.sendPlainMessage("NBT: " + nbtOrNull?.asString?.prettifyJson())
     }
 
     private fun handleChangeVariant(context: CommandContext<Source>) {
@@ -62,7 +63,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             return
         }
 
-        val nekoStack = itemInMainHand.shadowNeko(false)
+        val nekoStack = itemInMainHand.wrap()
         if (nekoStack == null) {
             sender.sendPlainMessage("Item is not a legal wakame item")
             return

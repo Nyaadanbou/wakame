@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import net.kyori.examination.Examinable
 
 
@@ -25,23 +28,15 @@ interface HideTooltip : Examinable {
         override val id: String,
     ) : ItemComponentType<HideTooltip> {
         override fun read(holder: ItemComponentHolder): HideTooltip? {
-            val im = holder.item.itemMeta ?: return null
-            if (im.isHideTooltip) {
-                return Value
-            }
-            return null
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: HideTooltip) {
-            holder.item.editMeta {
-                it.isHideTooltip = true
-            }
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta {
-                it.isHideTooltip = false
-            }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

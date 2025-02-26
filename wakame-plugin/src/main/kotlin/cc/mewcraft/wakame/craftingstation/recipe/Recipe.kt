@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -14,6 +14,7 @@ import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.Collections.emptyList
 import java.util.stream.Stream
 
 /**
