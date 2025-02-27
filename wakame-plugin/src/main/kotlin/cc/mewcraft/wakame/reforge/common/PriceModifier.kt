@@ -11,7 +11,6 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
-import java.beans.Transient
 
 interface PriceModifier {
     val name: String

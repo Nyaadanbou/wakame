@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.extension.portableCore
 import cc.mewcraft.wakame.item.extension.rarity
 import cc.mewcraft.wakame.item.extension.reforgeHistory
-import cc.mewcraft.wakame.item.template.EmptyItemGenerationTrigger.level
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry

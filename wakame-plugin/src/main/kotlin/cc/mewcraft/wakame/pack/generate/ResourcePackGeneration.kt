@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.text.mini
 import net.kyori.adventure.key.Key
 import team.unnamed.creative.ResourcePack
+import team.unnamed.creative.base.Readable
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta

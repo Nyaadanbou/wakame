@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.util.data
 
 import me.lucko.shadow.*
+import me.lucko.shadow.Target
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import net.minecraft.nbt.*
 

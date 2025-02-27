@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.ability.EmptyAbility.key
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.item.ItemSlotRegistry.size
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
