@@ -34,7 +34,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:0.6")
+            from("cc.mewcraft.gradle:catalog:0.7-SNAPSHOT")
         }
     }
 }
@@ -43,8 +43,6 @@ rootProject.name = "wakame"
 
 include(":wakame-api")
 include(":wakame-common")
-include(":koish-features:koish-feature-enchantment-flan")
-include(":koish-features:koish-feature-enchantment-nyaa")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-chestsort")
 include(":wakame-hooks:wakame-hook-economy")

@@ -3,8 +3,13 @@
 # Gradle plugins
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.10.1"
-nyaadanbou-conventions = "1.1"
+nyaadanbou-conventions = "1.2"
 paperweight = "1.7.7"
+blossom = "2.1.0"
+
+# Gradle plugin deps
+docker-java = "3.4.1"
+apache-commons-compress = "1.27.1"
 
 # Shaded deps
 koin = "4.0.0"
@@ -18,6 +23,7 @@ mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
 shadow-nbt = "1.21.3-SNAPSHOT"
+shadow-bukkit = "1.21.3-SNAPSHOT"
 
 # Plugin deps
 helper = "6.0.0"
@@ -38,6 +44,10 @@ townyflight = "1.13.0"
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version.ref = "nyaadanbou-conventions" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
+
+# Gradle plugin deps
+docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }
+apache-commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "apache-commons-compress" }
 
 # Shaded deps
 # 这些依赖属于插件本身, 将打包进插件的 jar
@@ -67,6 +77,7 @@ mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
 mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
 
 # Plugin deps
 # 这些依赖属于插件, 无论是自研的还是第三方的
@@ -81,3 +92,7 @@ vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
+
+[plugins]
+
+blossom = { id = "net.kyori.blossom", version.ref = "blossom" }

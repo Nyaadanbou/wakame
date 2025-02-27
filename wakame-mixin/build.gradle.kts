@@ -1,8 +1,10 @@
 plugins {
     id("nyaadanbou-conventions.repositories")
-    id("nyaadanbou-conventions.copy-jar")
+    id("cc.mewcraft.build-copy")
+    id("cc.mewcraft.docker-copy")
     id("wakame-conventions.kotlin")
     id("io.papermc.paperweight.userdev")
+    alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.wakame"
@@ -23,19 +25,28 @@ dependencies {
     // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
     implementation(project(":wakame-api")) // 提供运行时依赖
     implementation(project(":wakame-common")) // 同上
-    implementation(local.shadow.nbt)
 }
 
-tasks {
-    processResources {
-        expand(project.properties)
-    }
-    copyJar {
-        environment = "paperMixin"
-        jarFileName = "wakame-${project.version}.jar"
+sourceSets {
+    main {
+        blossom {
+            resources {
+                property("version", project.version.toString())
+            }
+        }
     }
 }
 
-paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+buildCopy {
+    fileName = "wakame-${project.version}.jar"
+    archiveTask = "shadowJar"
+}
+
+dockerCopy {
+    containerId = "aether-minecraft-1"
+    containerPath = "/minecraft/game1/gradle"
+    fileMode = 0b110_100_100
+    userId = 999
+    groupId = 999
+    archiveTask = "shadowJar"
 }

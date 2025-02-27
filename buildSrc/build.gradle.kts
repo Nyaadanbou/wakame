@@ -13,10 +13,25 @@ repositories {
     }
 }
 
+gradlePlugin {
+    plugins {
+        create("build-copy") {
+            id = "cc.mewcraft.build-copy"
+            implementationClass = "BuildCopyPlugin"
+        }
+        create("docker-copy") {
+            id = "cc.mewcraft.docker-copy"
+            implementationClass = "DockerCopyPlugin"
+        }
+    }
+}
+
 dependencies {
     implementation(local.plugin.nyaadanbou.conventions)
     implementation(local.plugin.kotlin.jvm)
     implementation(local.plugin.paperweight.userdev)
+    implementation(local.docker.java)
+    implementation(local.apache.commons.compress)
     implementation(libs.shadow)
     implementation(libs.indra.common)
 }

@@ -13,7 +13,7 @@ version = "0.0.1-SNAPSHOT"
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnly(local.shadow.nbt)
+    compileOnlyApi(local.shadow.bukkit)
 }
 
 publishing {
