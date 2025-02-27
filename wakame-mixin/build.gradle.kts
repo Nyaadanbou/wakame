@@ -25,6 +25,7 @@ dependencies {
     // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
     implementation(project(":wakame-api")) // 提供运行时依赖
     implementation(project(":wakame-common")) // 同上
+    implementation(local.shadow.bukkit)
 }
 
 sourceSets {
@@ -44,7 +45,7 @@ buildCopy {
 
 dockerCopy {
     containerId = "aether-minecraft-1"
-    containerPath = "/minecraft/game1/gradle"
+    containerPath = "/minecraft/game1/mods/"
     fileMode = 0b110_100_100
     userId = 999
     groupId = 999

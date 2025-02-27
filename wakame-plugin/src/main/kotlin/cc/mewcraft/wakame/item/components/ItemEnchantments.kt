@@ -29,7 +29,8 @@ data class ItemEnchantments(
         override val id: String,
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
-            ItemDeprecations.usePaperOrNms()
+            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS) ?: return null
+            return ItemEnchantments(enchantments.enchantments(), enchantments.showInTooltip())
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemEnchantments) {
@@ -48,7 +49,8 @@ data class ItemEnchantments(
         override val id: String,
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
-            ItemDeprecations.usePaperOrNms()
+            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS) ?: return null
+            return ItemEnchantments(enchantments.enchantments(), enchantments.showInTooltip())
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemEnchantments) {

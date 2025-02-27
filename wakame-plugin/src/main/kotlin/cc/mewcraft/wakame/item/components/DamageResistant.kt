@@ -32,11 +32,13 @@ data class DamageResistant(
         // Paper 已经有了 Item Component API, 可以直接使用
 
         override fun read(holder: ItemComponentHolder): DamageResistant? {
-            ItemDeprecations.usePaperOrNms()
+            val paperDamageResistant = holder.bukkitStack.getData(DataComponentTypes.DAMAGE_RESISTANT) ?: return null
+            return DamageResistant(paperDamageResistant.types())
         }
 
         override fun write(holder: ItemComponentHolder, value: DamageResistant) {
-            holder.bukkitStack.setData(DataComponentTypes.DAMAGE_RESISTANT, PaperDamageResistant.damageResistant(value.types))
+            val paperDamageResistant = PaperDamageResistant.damageResistant(value.types)
+            holder.bukkitStack.setData(DataComponentTypes.DAMAGE_RESISTANT, paperDamageResistant)
         }
 
         override fun remove(holder: ItemComponentHolder) {

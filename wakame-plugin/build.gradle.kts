@@ -113,7 +113,7 @@ buildCopy {
 
 dockerCopy {
     containerId = "aether-minecraft-1"
-    containerPath = "/minecraft/game1/gradle/"
+    containerPath = "/minecraft/game1/plugins/"
     fileMode = 0b110_100_100
     userId = 999
     groupId = 999
