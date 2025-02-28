@@ -204,6 +204,8 @@ private class SelfHostService(
     // 当前生成好的资源包
     private var builtResourcePack: BuiltResourcePack? = buildResourcePack()
 
+    private var isStarted: Boolean = false
+
     // 负责监听文件变动
     private val watchServiceListener: WatchServiceListener = WatchServiceListener.create()
 
@@ -273,23 +275,33 @@ private class SelfHostService(
     override fun start() {
         LOGGER.info("Starting resource pack http server. Port: $port")
 
-        watchServiceListener.listenToFile(
-            KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-        ) { event ->
-            if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-                LOGGER.info("Resource pack file changed. Reloading resource pack...")
-                builtResourcePack = buildResourcePack()
-                LOGGER.info("Resource pack reloaded.")
+        try {
+            watchServiceListener.listenToFile(
+                KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+            ) { event ->
+                if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                    LOGGER.info("Resource pack file changed. Reloading resource pack...")
+                    builtResourcePack = buildResourcePack()
+                    LOGGER.info("Resource pack reloaded.")
+                }
             }
+        } catch (e: Exception) {
+            LOGGER.error("Failed to listen to resource pack file change. Is the resource pack generated correctly?", e)
+            return
         }
 
         httpServer.start()
+        isStarted = true
     }
 
     override fun stop() {
+        if (!isStarted) {
+            return
+        }
         LOGGER.info("Stopping resource pack http server at port $port")
         watchServiceListener.close()
-        httpServer.stop(10)
+        httpServer.stop(0)
+        isStarted = false
     }
 
     override fun sendPack(player: Player) {
