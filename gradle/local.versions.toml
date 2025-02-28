@@ -3,7 +3,9 @@
 # Gradle plugins
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.10.1"
-nyaadanbou-conventions = "1.2"
+libraries-repository = "0.0.1-snapshot"
+copy-jar-build = "0.0.1-snapshot"
+copy-jar-docker = "0.0.1-snapshot"
 paperweight = "1.7.7"
 blossom = "2.1.0"
 
@@ -42,7 +44,9 @@ townyflight = "1.13.0"
 # Gradle plugins
 
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version.ref = "nyaadanbou-conventions" }
+plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
+plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
+plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 
 # Gradle plugin deps

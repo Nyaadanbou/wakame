@@ -1,6 +1,6 @@
 plugins {
-    id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.java")
+    id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }
 
@@ -14,12 +14,7 @@ dependencies {
 
 publishing {
     repositories {
-        maven("https://repo.mewcraft.cc/private") {
-            credentials {
-                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-            }
-        }
+        nyaadanbouPrivate()
     }
     publications {
         create<MavenPublication>("maven") {

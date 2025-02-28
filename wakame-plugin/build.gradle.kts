@@ -1,8 +1,8 @@
 plugins {
-    id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.kotlin")
-    id("cc.mewcraft.build-copy")
-    id("cc.mewcraft.docker-copy")
+    id("cc.mewcraft.libraries-repository")
+    id("cc.mewcraft.copy-jar-build")
+    id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
     alias(local.plugins.blossom)
 }
@@ -10,6 +10,11 @@ plugins {
 group = "cc.mewcraft.wakame"
 version = "0.0.1-snapshot"
 description = "The core plugin of Nyaadanbou"
+
+repositories {
+    nyaadanbouReleases()
+    nyaadanbouPrivate()
+}
 
 dependencies {
     // internal
@@ -28,10 +33,9 @@ dependencies {
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnlyApi(platform(local.koin.bom))
-    compileOnlyApi(local.koin.core)
     implementation(platform(local.koin.bom))
     implementation(local.koin.core)
+    compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供
     implementation(local.commons.collections)
     implementation(local.commons.gson)
     implementation(local.commons.provider)
@@ -43,7 +47,6 @@ dependencies {
     implementation(libs.mocha)
     implementation(local.snakeyaml.engine)
     implementation(platform(libs.bom.adventure))
-    compileOnlyApi(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))

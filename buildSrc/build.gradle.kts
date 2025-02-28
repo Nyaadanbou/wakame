@@ -3,35 +3,18 @@ plugins {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     gradlePluginPortal()
-    maven("https://repo.mewcraft.cc/private") {
-        credentials {
-            username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-            password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-        }
-    }
-}
-
-gradlePlugin {
-    plugins {
-        create("build-copy") {
-            id = "cc.mewcraft.build-copy"
-            implementationClass = "BuildCopyPlugin"
-        }
-        create("docker-copy") {
-            id = "cc.mewcraft.docker-copy"
-            implementationClass = "DockerCopyPlugin"
-        }
-    }
+    nyaadanbouPrivate()
 }
 
 dependencies {
-    implementation(local.plugin.nyaadanbou.conventions)
     implementation(local.plugin.kotlin.jvm)
+    implementation(local.plugin.libraries.repository)
+    implementation(local.plugin.copy.jar.build)
+    implementation(local.plugin.copy.jar.docker)
     implementation(local.plugin.paperweight.userdev)
-    implementation(local.docker.java)
-    implementation(local.apache.commons.compress)
     implementation(libs.shadow)
     implementation(libs.indra.common)
 }

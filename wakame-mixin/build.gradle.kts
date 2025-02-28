@@ -1,8 +1,8 @@
 plugins {
-    id("nyaadanbou-conventions.repositories")
-    id("cc.mewcraft.build-copy")
-    id("cc.mewcraft.docker-copy")
     id("wakame-conventions.kotlin")
+    id("cc.mewcraft.libraries-repository")
+    id("cc.mewcraft.copy-jar-build")
+    id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
     alias(local.plugins.blossom)
 }
@@ -10,6 +10,10 @@ plugins {
 group = "cc.mewcraft.wakame"
 version = "0.0.1-snapshot"
 description = "The mixin part"
+
+repositories {
+    nyaadanbouReleases()
+}
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
