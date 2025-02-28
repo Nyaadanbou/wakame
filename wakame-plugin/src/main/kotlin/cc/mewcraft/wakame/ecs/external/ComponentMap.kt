@@ -9,6 +9,7 @@ import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
 import com.github.quillraven.fleks.World
 
+// TODO: 改名成 ComponentBridge
 class ComponentMap internal constructor(
     world: World,
     val entity: Entity,
