@@ -109,7 +109,7 @@ internal class CraftingPreviewMenu(
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
+            if (!getGui().hasNextPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
             }
             return settings.getSlotDisplay("next_page").resolveToItemWrapper()

@@ -35,7 +35,8 @@ class ItemCatalogMainMenu(
         private val INSTANCES: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
     }
 
-    private val settings = CatalogManager.itemCatalogMainMenuSettings
+    private val settings
+        get() = CatalogManager.itemCatalogMainMenuSettings
 
     /**
      * 菜单的 [Gui].
@@ -55,7 +56,9 @@ class ItemCatalogMainMenu(
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // 对 CategoryItem 进行缓存
         builder.setContent(KoishRegistries.ITEM_CATEGORY.ids.map { categoryId ->
-            INSTANCES.getOrPut(categoryId) { CategoryItem(KoishRegistries.ITEM_CATEGORY.getOrThrow(categoryId)) }
+            INSTANCES.getOrPut(categoryId) {
+                CategoryItem(KoishRegistries.ITEM_CATEGORY.getOrThrow(categoryId))
+            }
         }.toList())
     }
 
@@ -85,25 +88,31 @@ class ItemCatalogMainMenu(
     }
 
     /**
-     * 上一页的图标.
+     * `上一页` 的图标.
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasPreviousPage()) {
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
     /**
-     * 下一页的图标.
+     * `下一页` 的图标.
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasNextPage()) {
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 
     /**
-     * **搜索** 的图标.
+     * `搜索` 的图标.
      */
     inner class SearchItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
@@ -116,18 +125,21 @@ class ItemCatalogMainMenu(
     }
 
     /**
-     * **类别** 的图标.
-     * 点击后打开一个特定的类别菜单.
+     * `类别` 的图标. 点击后打开一个特定的类别菜单.
      */
     inner class CategoryItem(
         private val category: Category,
     ) : AbstractItem() {
+
+        private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
+
         override fun getItemProvider(): ItemProvider {
-            return SlotDisplay.get(category.icon).resolveToItemWrapper()
+            return itemProvider
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             ItemCategoryMenu(category, this@ItemCatalogMainMenu, viewer).open()
         }
+
     }
 }
