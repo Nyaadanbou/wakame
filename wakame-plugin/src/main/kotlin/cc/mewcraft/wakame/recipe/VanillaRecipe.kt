@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
@@ -12,7 +13,6 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Bukkit
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
@@ -30,9 +30,11 @@ import org.bukkit.inventory.SmokingRecipe as BukkitSmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 
 /**
- * 合成配方.
- * 是对Bukkit的合成配方的包装.
+ * 合成配方 (对 Bukkit 的合成配方的包装).
  */
+// TODO 重命名为 MinecraftRecipe?
+//  原因: Vanilla 一词的意思是未经修改的内容. 而 Minecraft 早在 1.16 开始就引入了数据包, 支持数据驱动添加新的游戏内容,
+//  因此用 Vanilla 来描述这里所指的配方并不准确. 使用 Minecraft 来描述更加合适 - 强调其来自于这个游戏本身所创造的东西.
 sealed interface VanillaRecipe : Keyed, Examinable {
     val result: RecipeResult
 
@@ -515,8 +517,8 @@ enum class RecipeType(
 }
 
 private fun ConfigurationNode.getRecipeKey(): Key {
-    return this.hint(VanillaRecipeSerializer.HINT_NODE) ?: throw SerializationException(
-        "The hint node for recipe key is not present"
+    return this.hint(RepresentationHints.MINECRAFT_RECIPE_ID) ?: throw SerializationException(
+        "The hint ${RepresentationHints.MINECRAFT_RECIPE_ID.identifier()} is not present"
     )
 }
 
@@ -527,19 +529,19 @@ internal class RecipeTypeBridge<T : VanillaRecipe>(
     val typeToken: TypeToken<T>,
     val serializer: TypeSerializer<T>,
 ) {
-    constructor(typeToken: TypeToken<T>, serializer: (Type, ConfigurationNode) -> T) : this(typeToken, object : TypeSerializer<T> {
-        override fun deserialize(type: Type, node: ConfigurationNode): T {
-            return serializer(type, node)
-        }
-    })
+    constructor(
+        typeToken: TypeToken<T>,
+        serializer: (Type, ConfigurationNode) -> T,
+    ) : this(
+        typeToken,
+        TypeSerializer<T> { type, node -> serializer(type, node) }
+    )
 }
 
 /**
  * [VanillaRecipe] 的序列化器.
  */
 internal object VanillaRecipeSerializer : TypeSerializer<VanillaRecipe> {
-    val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
-
     /**
      * ## Node structure
      * ```yaml

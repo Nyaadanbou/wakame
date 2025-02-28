@@ -5,13 +5,12 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -32,27 +31,27 @@ data class Category(
  */
 internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
 
-    val HINT_NODE: RepresentationHint<Identifier> = RepresentationHint.of("id", typeTokenOf<Identifier>())
-
     override fun deserialize(type: Type, node: ConfigurationNode): Category {
-        val id = node.hint(HINT_NODE) ?: throw SerializationException(
-            "The hint node for category id is not present"
+        val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(
+            "The hint node ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
         )
 
-        val icon = node.node("icon").krequire<Key>()
-        val settings = node.node("menu_settings").krequire<BasicMenuSettings>()
+        val icon = node.node("icon").require<Key>()
+        val settings = node.node("menu_settings").require<BasicMenuSettings>()
 
-        val itemUids = node.node("items").getList<String>(emptyList())
-        val list: MutableList<ItemX> = mutableListOf()
-        for (uid in itemUids) {
-            val itemX = ItemXFactoryRegistry[uid]
-            if (itemX == null) {
-                LOGGER.warn("Cannot deserialize string '$uid' into ItemX. Skip add it to category: '$id'")
+        // val itemUids = node.node("items").getList<ItemX>(emptyList())
+        // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
+        val itemIds = node.node("items").getList<String>(emptyList())
+        val itemList = mutableListOf<ItemX>()
+        for (uid in itemIds) {
+            val item = ItemXFactoryRegistry[uid]
+            if (item == null) {
+                LOGGER.warn("Cannot deserialize string '$uid' into ItemX, skipped adding it to category: '$id'")
                 continue
             }
-            list.add(itemX)
+            itemList.add(item)
         }
-        return Category(id, icon, settings, list)
+        return Category(id, icon, settings, itemList)
     }
 
 }

@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
 import java.io.File
 
@@ -15,7 +16,6 @@ import java.io.File
 @Init(stage = InitStage.POST_WORLD)
 @Reload
 object CategoryRegistryDataLoader : RegistryConfigStorage {
-    const val DIR_PATH: String = "catalog/item/category/"
 
     @InitFun
     fun init() {
@@ -30,17 +30,18 @@ object CategoryRegistryDataLoader : RegistryConfigStorage {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, Category) -> Unit) {
-        val dir = getFileInConfigDirectory(DIR_PATH)
+        val dir = getFileInConfigDirectory("catalog/item/category/")
         for (file in dir.walk().drop(1).filter(File::isFile)) {
             try {
                 val id = Identifiers.of(file.nameWithoutExtension)
-                val rootNode = buildYamlConfigLoader {
+                val loader = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
                         register<Category>(CategorySerializer)
                     }
-                }.buildAndLoadString(file.readText())
-                rootNode.hint(CategorySerializer.HINT_NODE, id)
+                }
+                val rootNode = loader.buildAndLoadString(file.readText())
+                rootNode.hint(RepresentationHints.CATAGORY_ID, id)
                 val category = rootNode.require<Category>()
                 registryAction(id, category)
                 LOGGER.info("Registered item catalog category: $id")

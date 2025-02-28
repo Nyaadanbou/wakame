@@ -14,15 +14,15 @@ object ItemXFactoryRegistry {
     }
 
     operator fun get(plugin: String, identifier: String): ItemX? {
-        val builder = factoryMap[plugin] ?: return null
-        return builder.create(plugin, identifier)
+        val factory = factoryMap[plugin] ?: return null
+        return factory.create(plugin, identifier)
     }
 
     operator fun get(itemStack: ItemStack): ItemX? {
         if (itemStack.isEmpty)
             return null
-        for (builder in factoryList) {
-            val itemX = builder.create(itemStack) ?: continue
+        for (factory in factoryList) {
+            val itemX = factory.create(itemStack) ?: continue
             return itemX
         }
         return null

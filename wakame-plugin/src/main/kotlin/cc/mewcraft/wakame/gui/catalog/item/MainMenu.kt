@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.catalog.CatalogManager
 import cc.mewcraft.wakame.catalog.item.Category
+import cc.mewcraft.wakame.catalog.item.ItemCatalogInitializer
+import cc.mewcraft.wakame.catalog.item.ItemCatalogManager
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
@@ -23,40 +24,38 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 物品图鉴主菜单.
  * 展示所有的物品类别.
  */
-class ItemCatalogMainMenu(
+class MainMenu(
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-) {
+) : ItemCatalogMenu {
 
     companion object {
-        private val INSTANCES: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
+        private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
     }
 
-    private val settings
-        get() = CatalogManager.itemCatalogMainMenuSettings
+    private val settings = ItemCatalogInitializer.getMenuSettings("main")
 
     /**
      * 菜单的 [Gui].
      *
-     * - `x`: background
+     * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page
      * - `s`: search
-     * - `.`: category
+     * - `x`: category
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('x', BackgroundItem())
+        builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('s', SearchItem())
-        builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        // 对 CategoryItem 进行缓存
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.setContent(KoishRegistries.ITEM_CATEGORY.ids.map { categoryId ->
-            INSTANCES.getOrPut(categoryId) {
+            CATALOG_ITEM_POOL.getOrPut(categoryId) {
                 CategoryItem(KoishRegistries.ITEM_CATEGORY.getOrThrow(categoryId))
             }
         }.toList())
@@ -70,7 +69,8 @@ class ItemCatalogMainMenu(
         setTitle(settings.title)
     }
 
-    fun open() {
+    override fun open() {
+        ItemCatalogManager.newMenuStack(viewer, this@MainMenu)
         primaryWindow.open(viewer)
     }
 
@@ -138,7 +138,9 @@ class ItemCatalogMainMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            ItemCategoryMenu(category, this@ItemCatalogMainMenu, viewer).open()
+            val categoryMenu = CategoryMenu(category, viewer)
+            ItemCatalogManager.getMenuStack(viewer).addFirst(categoryMenu)
+            categoryMenu.open()
         }
 
     }

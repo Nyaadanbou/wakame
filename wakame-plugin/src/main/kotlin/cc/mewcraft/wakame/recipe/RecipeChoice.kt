@@ -11,13 +11,12 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.Collections.emptyList
 import java.util.stream.Stream
 import org.bukkit.inventory.RecipeChoice as BukkitRecipeChoice
 
 /**
  * 合成配方的输入.
- * 表现为合成输入gui中一格的物品.
+ * 表现为合成输入 GUI 中一格的物品.
  */
 sealed interface RecipeChoice : Examinable {
     fun toBukkitRecipeChoice(): BukkitRecipeChoice
@@ -36,17 +35,17 @@ data object EmptyRecipeChoice : RecipeChoice {
  * 单物品输入.
  */
 data class SingleRecipeChoice(
-    val choice: ItemX,
+    val item: ItemX,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        val itemstack = choice.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${choice.key}'")
-        itemstack.setData(DataComponentTypes.ITEM_MODEL, choice.key)
+        val itemstack = item.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${item.key}'")
+        itemstack.setData(DataComponentTypes.ITEM_MODEL, item.key)
         return BukkitRecipeChoice.ExactChoice(itemstack)
     }
 
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("choice", choice),
+        ExaminableProperty.of("item", item),
     )
 
     override fun toString(): String = toSimpleString()
@@ -56,11 +55,11 @@ data class SingleRecipeChoice(
  * 多物品输入.
  */
 data class MultiRecipeChoice(
-    val choices: List<ItemX>,
+    val items: List<ItemX>,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemStacks: MutableList<ItemStack> = mutableListOf()
-        choices.forEach {
+        items.forEach {
             val itemstack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
             itemstack.setData(DataComponentTypes.ITEM_MODEL, it.key)
             itemStacks.add(itemstack)
@@ -69,7 +68,7 @@ data class MultiRecipeChoice(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("choices", choices),
+        ExaminableProperty.of("items", items),
     )
 
     override fun toString(): String = toSimpleString()

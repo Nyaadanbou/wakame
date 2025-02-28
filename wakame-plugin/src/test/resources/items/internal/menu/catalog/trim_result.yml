@@ -1,0 +1,5 @@
+base: iron_chestplate
+trim:
+  pattern: minecraft:coast
+  material: minecraft:gold
+menu_icon_name: "<!i><gold>带纹饰的盔甲"

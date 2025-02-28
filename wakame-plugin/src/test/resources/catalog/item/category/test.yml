@@ -1,0 +1,32 @@
+# 该类别的图标
+icon: "internal:menu/catalog/category/test"
+# 该类别的菜单布局
+menu_settings:
+  title: "❊ 测试"
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # b: back
+  # x: item
+  structure:
+    - ". . . . . . . . ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - "< . . . b . . . >"
+  icons:
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    back: "internal:menu/common/back"
+items:
+  - minecraft:cake
+  - minecraft:cooked_beef
+  - minecraft:iron_ingot
+  - minecraft:netherite_upgrade_smithing_template
+  - minecraft:ward_armor_trim_smithing_template
+  - minecraft:silence_armor_trim_smithing_template
+  - minecraft:light_gray_dye
+  - minecraft:diorite_stairs
+  - minecraft:polished_diorite_stairs

@@ -71,6 +71,7 @@ object TranslatableMessages {
     val MSG_REROLLING_COST_EMPTY = create("msg_rerolling_cost_empty")
     val MSG_REROLLING_COST_SIMPLE = create("msg_rerolling_cost_simple")
     val MSG_BLACKSMITH_TOTAL_WORTH = create("msg_blacksmith_total_worth")
+    val MSG_CATALOG_MENU_DEQUE_LIMIT = create("msg_catalog_menu_deque_limit")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

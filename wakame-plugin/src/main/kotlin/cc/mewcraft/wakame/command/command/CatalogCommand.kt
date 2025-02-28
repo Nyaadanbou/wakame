@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMainMenu
+import cc.mewcraft.wakame.gui.catalog.item.MainMenu
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -34,7 +34,7 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
             return
         }
 
-        val menu = ItemCatalogMainMenu(viewer)
+        val menu = MainMenu(viewer)
         withContext(Dispatchers.minecraft) { menu.open() }
     }
 

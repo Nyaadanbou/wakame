@@ -28,16 +28,12 @@ object MapEventBus {
     /**
      * 扩展函数: 便捷注册.
      */
-    inline fun <reified T : Any> subscribe(noinline listener: (T) -> Unit) {
-        subscribe(T::class, listener)
-    }
+    inline fun <reified T : Any> subscribe(noinline listener: (T) -> Unit) = subscribe(T::class, listener)
 
     /**
      * 扩展函数: 便捷取消订阅.
      */
-    inline fun <reified T : Any> unsubscribe(noinline listener: (T) -> Unit) {
-        unsubscribe(T::class, listener)
-    }
+    inline fun <reified T : Any> unsubscribe(noinline listener: (T) -> Unit) = unsubscribe(T::class, listener)
 
     /**
      * 发布一个事件, 通知所有监听器.

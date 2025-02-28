@@ -1,21 +1,7 @@
 package recipe
 
 import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.recipe.BlastingRecipe
-import cc.mewcraft.wakame.recipe.CampfireRecipe
-import cc.mewcraft.wakame.recipe.EmptyRecipeChoice
-import cc.mewcraft.wakame.recipe.EmptyRecipeResult
-import cc.mewcraft.wakame.recipe.FurnaceRecipe
-import cc.mewcraft.wakame.recipe.MultiRecipeChoice
-import cc.mewcraft.wakame.recipe.ShapedRecipe
-import cc.mewcraft.wakame.recipe.ShapelessRecipe
-import cc.mewcraft.wakame.recipe.SingleRecipeChoice
-import cc.mewcraft.wakame.recipe.SingleRecipeResult
-import cc.mewcraft.wakame.recipe.SmithingTransformRecipe
-import cc.mewcraft.wakame.recipe.SmithingTrimRecipe
-import cc.mewcraft.wakame.recipe.SmokingRecipe
-import cc.mewcraft.wakame.recipe.StonecuttingRecipe
-import cc.mewcraft.wakame.recipe.VanillaRecipeRegistry
+import cc.mewcraft.wakame.recipe.*
 import core.ItemXMock
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
@@ -26,14 +12,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
 import testEnv
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class VanillaRecipeSerializationTest : KoinTest {
     companion object {
@@ -47,7 +26,7 @@ class VanillaRecipeSerializationTest : KoinTest {
             }
 
             ItemXBootstrap.init()
-            VanillaRecipeRegistry.loadDataIntoRegistry()
+            MinecraftRecipeRegistryDataLoader.load()
         }
 
         @JvmStatic
@@ -74,7 +53,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `blasting recipe serialization`() {
         key = Key.key("test:blasting")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<BlastingRecipe>(recipe)
 
@@ -100,7 +79,7 @@ class VanillaRecipeSerializationTest : KoinTest {
                 ItemXMock("minecraft:red_stained_glass"),
                 ItemXMock("minecraft:black_stained_glass")
             ),
-            actual = input.choices
+            actual = input.items
         )
 
         val cookingTime = recipe.cookingTime
@@ -111,7 +90,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:quartz"), result.result)
+        assertEquals(ItemXMock("minecraft:quartz"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -119,13 +98,13 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `campfire recipe serialization`() {
         key = Key.key("test:campfire")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<CampfireRecipe>(recipe)
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:poisonous_potato"), input.choice)
+        assertEquals(ItemXMock("minecraft:poisonous_potato"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(1, cookingTime)
@@ -135,7 +114,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:diamond"), result.result)
+        assertEquals(ItemXMock("minecraft:diamond"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -143,13 +122,13 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `furnace recipe serialization`() {
         key = Key.key("test:furnace")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<FurnaceRecipe>(recipe)
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:gravel"), input.choice)
+        assertEquals(ItemXMock("minecraft:gravel"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(200, cookingTime)
@@ -159,7 +138,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:sand"), result.result)
+        assertEquals(ItemXMock("minecraft:sand"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -167,7 +146,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `shaped recipe serialization`() {
         key = Key.key("test:shaped")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapedRecipe>(recipe)
 
@@ -190,13 +169,13 @@ class VanillaRecipeSerializationTest : KoinTest {
             listOf(
                 ItemXMock("minecraft:gold_block"),
                 ItemXMock("minecraft:diamond_block")
-            ), recipeChoiceA.choices
+            ), recipeChoiceA.items
         )
-        assertEquals(ItemXMock("minecraft:apple"), recipeChoiceB.choice)
+        assertEquals(ItemXMock("minecraft:apple"), recipeChoiceB.item)
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:enchanted_golden_apple"), result.result)
+        assertEquals(ItemXMock("minecraft:enchanted_golden_apple"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -204,7 +183,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `shapeless recipe serialization`() {
         key = Key.key("test:shapeless")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
@@ -220,12 +199,12 @@ class VanillaRecipeSerializationTest : KoinTest {
         )
         assertEquals(4, ingredients
             .filterIsInstance<SingleRecipeChoice>()
-            .count { it.choice == ItemXMock("minecraft:poppy") }
+            .count { it.item == ItemXMock("minecraft:poppy") }
         )
         assertEquals(1, ingredients
             .filterIsInstance<MultiRecipeChoice>()
             .count {
-                it.choices == listOf(
+                it.items == listOf(
                     ItemXMock("minecraft:red_dye"),
                     ItemXMock("minecraft:pink_dye")
                 )
@@ -233,7 +212,7 @@ class VanillaRecipeSerializationTest : KoinTest {
         )
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:rose_bush"), result.result)
+        assertEquals(ItemXMock("minecraft:rose_bush"), result.item)
         assertEquals(2, result.amount)
     }
 
@@ -241,7 +220,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smithing transform recipe serialization`() {
         key = Key.key("test:smithing_transform")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTransformRecipe>(recipe)
 
@@ -251,12 +230,12 @@ class VanillaRecipeSerializationTest : KoinTest {
             listOf(
                 ItemXMock("minecraft:cobblestone"),
                 ItemXMock("minecraft:stone"),
-            ), base.choices
+            ), base.items
         )
 
         val addition = recipe.addition
         assertIs<SingleRecipeChoice>(addition)
-        assertEquals(ItemXMock("minecraft:ender_pearl"), addition.choice)
+        assertEquals(ItemXMock("minecraft:ender_pearl"), addition.item)
 
         val template = recipe.template
         assertIs<EmptyRecipeChoice>(template)
@@ -265,7 +244,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:end_stone"), result.result)
+        assertEquals(ItemXMock("minecraft:end_stone"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -273,13 +252,13 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smithing trim recipe serialization`() {
         key = Key.key("test:smithing_trim")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTrimRecipe>(recipe)
 
         val base = recipe.base
         assertIs<SingleRecipeChoice>(base)
-        assertEquals(ItemXMock("wakame:armor/bronze_helmet"), base.choice)
+        assertEquals(ItemXMock("wakame:armor/bronze_helmet"), base.item)
 
         val addition = recipe.addition
         assertIs<MultiRecipeChoice>(addition)
@@ -295,7 +274,7 @@ class VanillaRecipeSerializationTest : KoinTest {
                 ItemXMock("minecraft:netherite_ingot"),
                 ItemXMock("minecraft:quartz"),
                 ItemXMock("minecraft:redstone")
-            ), addition.choices
+            ), addition.items
         )
 
         val template = recipe.template
@@ -320,7 +299,7 @@ class VanillaRecipeSerializationTest : KoinTest {
                 ItemXMock("minecraft:wild_armor_trim_smithing_template"),
                 ItemXMock("minecraft:bolt_armor_trim_smithing_template"),
                 ItemXMock("minecraft:flow_armor_trim_smithing_template")
-            ), template.choices
+            ), template.items
         )
 
 
@@ -332,13 +311,13 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smoking recipe serialization`() {
         key = Key.key("test:smoking")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmokingRecipe>(recipe)
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:cobblestone"), input.choice)
+        assertEquals(ItemXMock("minecraft:cobblestone"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(100, cookingTime)
@@ -348,7 +327,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:netherrack"), result.result)
+        assertEquals(ItemXMock("minecraft:netherrack"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -356,7 +335,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `stonecutting recipe serialization`() {
         key = Key.key("test:stonecutting")
 
-        val recipe = VanillaRecipeRegistry.RAW[key]
+        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<StonecuttingRecipe>(recipe)
 
@@ -375,12 +354,12 @@ class VanillaRecipeSerializationTest : KoinTest {
                 ItemXMock("minecraft:bamboo_planks"),
                 ItemXMock("minecraft:crimson_planks"),
                 ItemXMock("minecraft:warped_planks")
-            ), input.choices
+            ), input.items
         )
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:stick"), result.result)
+        assertEquals(ItemXMock("minecraft:stick"), result.item)
         assertEquals(2, result.amount)
     }
 }
