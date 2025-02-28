@@ -28,10 +28,10 @@ listing_layout:
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
-    listing: "internal:menu/crafting/listing"
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/common/default/prev_page"
+    next_page: "internal:menu/common/default/next_page"
+    listing: "internal:menu/crafting_station/default/listing"
 
 # 合成站 preview 菜单的布局
 # 该菜单显示单个合成配方的详细信息
@@ -57,10 +57,10 @@ preview_layout:
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    back: "internal:menu/common/back"
-    background: "internal:menu/common/background"
-    next_page: "internal:menu/common/next_page"
-    prev_page: "internal:menu/common/prev_page"
-    choice: "internal:menu/crafting/choice"
-    craft: "internal:menu/crafting/craft"
-    result: "internal:menu/crafting/result"
+    back: "internal:menu/common/default/back"
+    background: "internal:menu/common/default/background"
+    next_page: "internal:menu/common/default/next_page"
+    prev_page: "internal:menu/common/default/prev_page"
+    choice: "internal:menu/crafting_station/default/choice"
+    craft: "internal:menu/crafting_station/default/craft"
+    result: "internal:menu/crafting_station/default/result"
