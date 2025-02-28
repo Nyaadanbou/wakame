@@ -1,0 +1,16 @@
+# 营火配方, 参考: https://minecraft.wiki/w/Recipe#campfire_cooking
+type: campfire
+
+# 输入
+input: minecraft:poisonous_potato
+
+# 烧炼时间
+cooking_time: 1
+
+# 该配方产生的经验值
+exp: 1000
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:diamond
+  amount: 1

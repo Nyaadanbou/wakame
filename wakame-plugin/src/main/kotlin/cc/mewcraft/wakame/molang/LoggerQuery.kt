@@ -1,15 +1,12 @@
 package cc.mewcraft.wakame.molang
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import cc.mewcraft.wakame.LOGGER
 import team.unnamed.mocha.runtime.binding.Binding
 
 @Binding(
     value = ["logger", "log"],
 )
-object LoggerQuery : KoinComponent {
-    private val logger: Logger by inject()
+object LoggerQuery {
 
     /**
      * logger.info('Hello, World!')
@@ -17,7 +14,7 @@ object LoggerQuery : KoinComponent {
     @Binding("info")
     @JvmStatic
     fun info(str: String) {
-        logger.info(str)
+        LOGGER.info(str)
     }
 
     /**
@@ -26,7 +23,7 @@ object LoggerQuery : KoinComponent {
     @Binding("warn")
     @JvmStatic
     fun warn(str: String) {
-        logger.warn(str)
+        LOGGER.warn(str)
     }
 
     /**
@@ -35,6 +32,6 @@ object LoggerQuery : KoinComponent {
     @Binding("error")
     @JvmStatic
     fun error(str: String) {
-        logger.error(str)
+        LOGGER.error(str)
     }
 }

@@ -1,28 +1,28 @@
 package cc.mewcraft.wakame.reforge.repair
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.reforge.common.PriceInstance
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
-import cc.mewcraft.wakame.util.damage
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.isDamageable
-import cc.mewcraft.wakame.util.isDamaged
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.isDamageable
+import cc.mewcraft.wakame.util.item.isDamaged
+import cc.mewcraft.wakame.util.item.itemName
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
+import java.util.*
 
 internal class SimpleRepairingSession(
     override val table: RepairingTable,
     override val viewer: Player,
-) : RepairingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
+) : RepairingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.RECYCLING_LOG_PREFIX)
 
     // 储存了当前所有的 claim.
     // 这里的 index 就是它显示在修理菜单里的位置 (display slot).
@@ -31,7 +31,7 @@ internal class SimpleRepairingSession(
     private fun getItemKey(item: ItemStack): Key {
         // 先尝试获取萌芽系统里的物品 id,
         // 如果没有的话就返回原版物品 id
-        return item.shadowNeko()?.id ?: item.type.key
+        return item.wrap()?.id ?: item.type.key
     }
 
     private fun getItemPrice(item: ItemStack?): PriceInstance? {

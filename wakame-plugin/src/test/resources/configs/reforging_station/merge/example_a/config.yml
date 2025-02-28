@@ -1,0 +1,64 @@
+primary_menu_settings:
+  title: "合并工作台: example_a"
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". a . b . . . c ."
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/background"
+    output_ok: "internal:menu/merging/output_ok"
+    output_empty: "internal:menu/merging/output_empty"
+    output_failure: "internal:menu/merging/output_failure"
+    output_insufficient_resource: "internal:menu/merging/output_insufficient_resource"
+
+input_level_limit: 30
+
+output_level_limit: 60
+
+output_penalty_limit: 3
+
+rarity_number_mapping:
+  common: 1.0
+  uncommon: 1.5
+  rare: 2.0
+  epic: 2.5
+  ancient: 3.0
+
+value_merge_method:
+  add_value:
+    base: "( query.value_1() + query.value_2() ) * 0.9"
+    spread: 0.2
+    min: -0.2
+    max: +0.7
+  add_multiplied_base:
+    base: "( query.value_1() + query.value_2() ) * 0.9"
+    spread: 0.2
+    min: -0.2
+    max: +0.7
+  add_multiplied_total:
+    base: "( query.value_1() + query.value_2() ) * 0.9"
+    spread: 0.2
+    min: -0.2
+    max: +0.7
+
+level_merge_method: "math.max( query.level_1(), query.level_2() )"
+
+penalty_merge_method: "query.penalty_1() + query.penalty_2() + 1"
+
+total_cost: "200.0 + 100.0 * ( query.penalty_1() + query.penalty_2() )"
+
+accepted_cores:
+  - type: attribute:mana_regeneration
+    element: ~
+    operation: add
+  - type: attribute:mana_regeneration
+    element: ~
+    operation: multiply_base
+  - type: attribute:mana_regeneration
+    element: ~
+    operation: multiply_total
+  - type: attribute:attack_damage_rate
+    element: fire
+    operation: add

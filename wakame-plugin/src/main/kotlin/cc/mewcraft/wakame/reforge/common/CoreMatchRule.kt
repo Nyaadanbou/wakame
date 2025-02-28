@@ -1,20 +1,16 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isEmpty
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.javaTypeOf
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
@@ -105,12 +101,6 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 
-            Namespaces.ABILITY -> {
-                val trigger = node.node("trigger").krequire<Trigger>()
-                val variant = node.node("variant").get<TriggerVariant>(TriggerVariant.any())
-                return CoreMatchRuleAbility(pattern, trigger, variant)
-            }
-
             else -> {
                 throw SerializationException(typeNode, javaTypeOf<String>(), "unsupported namespace: '$namespace'")
             }
@@ -186,7 +176,7 @@ private class CoreMatchRuleAttribute(
             return false
         }
 
-        val attribute = core.attribute
+        val attribute = core.data
         if (operation != null && attribute.operation != operation) {
             return false
         }
@@ -203,41 +193,6 @@ private class CoreMatchRuleAttribute(
         ExaminableProperty.of("priority", priority),
         ExaminableProperty.of("operation", operation),
         ExaminableProperty.of("element", element),
-    )
-
-    override fun toString(): String = toSimpleString()
-}
-
-/**
- * 用于测试技能核心.
- */
-private class CoreMatchRuleAbility(
-    override val path: Pattern,
-    val trigger: Trigger,
-    val variant: TriggerVariant,
-) : CoreMatchRule {
-    override val priority: Int = 2
-
-    override fun test(core: Core): Boolean {
-        if (core !is AbilityCore) {
-            return false
-        }
-
-        val matcher = path.matcher(core.id.value())
-        if (!matcher.matches()) {
-            return false
-        }
-
-        val ability = core.ability
-
-        return trigger == ability.trigger && variant == ability.variant
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("path", path),
-        ExaminableProperty.of("priority", priority),
-        ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("variant", variant),
     )
 
     override fun toString(): String = toSimpleString()

@@ -1,10 +1,14 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.ShownInTooltip
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.examination.Examinable
-import org.bukkit.inventory.ItemFlag
+import io.papermc.paper.datacomponent.item.Unbreakable as PaperUnbreakable
 
 // 开发日记 2024/6/27
 // 之所以写这个组件是因为想验证一下
@@ -41,26 +45,17 @@ interface Unbreakable : Examinable, ShownInTooltip {
         override val id: String,
     ) : ItemComponentType<Unbreakable> {
         override fun read(holder: ItemComponentHolder): Unbreakable? {
-            val itemMeta = holder.item.itemMeta ?: return null
-            if (!itemMeta.isUnbreakable) {
-                return null
-            }
-            return Value(!itemMeta.hasItemFlag(ItemFlag.HIDE_UNBREAKABLE))
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: Unbreakable) {
-            holder.item.editMeta {
-                it.isUnbreakable = true
-                if (value.showInTooltip) {
-                    it.removeItemFlags(ItemFlag.HIDE_UNBREAKABLE)
-                } else {
-                    it.addItemFlags(ItemFlag.HIDE_UNBREAKABLE)
-                }
-            }
+            val showInTooltip = value.showInTooltip
+            val paperUnbreakable = PaperUnbreakable.unbreakable(showInTooltip)
+            holder.bukkitStack.setData(DataComponentTypes.UNBREAKABLE, paperUnbreakable)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta { it.isUnbreakable = false }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

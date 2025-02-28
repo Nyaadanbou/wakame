@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
@@ -103,6 +103,6 @@ abstract class ItemXAbstract(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }

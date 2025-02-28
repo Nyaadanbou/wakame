@@ -1,0 +1,27 @@
+# 不要修改!
+version: 1
+
+# id: `durability`
+durability:
+  namespace: durability
+  # 可用标签
+  # <damage> 当前损耗
+  # <max_damage> 最大损耗
+  # <durability> 剩余耐久 (等价于 <max_damage> 与 <damage> 的差)
+  tooltip:
+    - "<!i><gray>[</gray> <white><durability></white> <gray>/</gray> <white><max_damage></white> <gray>耐久度</gray> <gray>]</gray>"
+
+# id: `repair_cost`
+repair_cost:
+  namespace: repair_cost
+  # 可用标签
+  # <value> 修理的花费
+  tooltip:
+    - "<!i><red>修理花费"
+    - "<!i><white>-</white> <gray>硬币:</gray> <yellow><value:'zh-CN':'#'>"
+
+# id: `repair_usage`
+repair_usage:
+  namespace: repair_usage
+  tooltip:
+    - "<!i><green>点击以修理"

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
@@ -16,14 +15,13 @@ import org.bukkit.inventory.ItemStack
  * 临时实现, 用来获取一些“随机”的物品类型作为菜单图标.
  */
 internal object CoreIcons {
-    private const val ICON_ID_PREFIX = "internal:reforge/core_icon"
+    private const val ICON_ID_PREFIX = "internal:menu/core_icon"
     private const val DEFAULT_ICON_ID = "$ICON_ID_PREFIX/default"
 
     fun getNekoStack(core: Core): NekoStack {
         val coreId = core.id.value() // 核心 id, 但去掉 namespace
         val item = when (core) {
             is AttributeCore -> KoishRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
-            is AbilityCore -> KoishRegistries.ITEM["$ICON_ID_PREFIX/ability/$coreId"]
             is EmptyCore -> KoishRegistries.ITEM["$ICON_ID_PREFIX/empty"]
             else -> KoishRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
@@ -32,7 +30,7 @@ internal object CoreIcons {
     }
 
     fun getItemStack(core: Core): ItemStack {
-        return getNekoStack(core).wrapped
+        return getNekoStack(core).bukkitStack
     }
 
     private fun getDefaultIcon(): NekoItem {

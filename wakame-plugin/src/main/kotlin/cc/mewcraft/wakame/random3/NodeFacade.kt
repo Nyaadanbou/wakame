@@ -1,26 +1,24 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.javaTypeOf
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
 
 /**
  * 封装了类型 [T] 所需要的所有 [Node] 相关的实现.
  *
  * **注意!** 该实现使用了独立的 config loader, 因此需要单独指定 [serializers].
  */
-abstract class NodeFacade<T> : KoinComponent {
+abstract class NodeFacade<T> {
     /**
      * 指向存放 [NodeRepository.Entry] 的数据文件夹.
      *
@@ -136,10 +134,13 @@ abstract class NodeFacade<T> : KoinComponent {
     }
 
     private fun getEntryRef(file: File): String {
-        val base = pluginDataDir.resolve(dataDir.toFile())
-        return file.toRelativeString(base)
+        val base = KoishDataPaths.CONFIGS
+            .resolve(dataDir)
+            .toFile()
+        return file.toPath()
+            .relativeTo(base.toPath())
+            .invariantSeparatorsPathString
             .substringBeforeLast(".") // 去除文件扩展名
-            .replace("\\", "/") // Windows OS 用的是 "\" 而不是 "/"
     }
 
     private fun validateEntryRef(entryRef: String) {
@@ -147,13 +148,12 @@ abstract class NodeFacade<T> : KoinComponent {
             throw IllegalArgumentException("The filename '$entryRef' is not valid to be an entry reference. Valid filename pattern: [a-z0-9/._-]+")
         }
         if (repository.hasEntry(entryRef)) {
-            logger.warn("The entry with name '$entryRef' already exists")
+            LOGGER.warn("The entry with name '$entryRef' already exists")
         }
     }
 
     private fun forEachEntryFile(block: (File) -> Unit) {
-        val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
-        val entriesDataDir = pluginDataDir.resolve(dataDir.toFile())
+        val entriesDataDir = KoishDataPaths.CONFIGS.resolve(dataDir).toFile()
         entriesDataDir
             .walk()
             .drop(1) // exclude the directory itself
@@ -161,6 +161,4 @@ abstract class NodeFacade<T> : KoinComponent {
             .forEach(block)
     }
 
-    private val logger: Logger by inject()
-    private val pluginDataDir by inject<File>(named(PLUGIN_DATA_DIR))
 }

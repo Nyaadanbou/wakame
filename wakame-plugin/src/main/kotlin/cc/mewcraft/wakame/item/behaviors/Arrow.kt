@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.behaviors
 
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import org.bukkit.entity.*
 import org.bukkit.event.entity.ProjectileHitEvent
@@ -22,12 +22,11 @@ interface Arrow : ItemBehavior {
          * 箭矢着火时间
          * 发光时间
          */
-        override fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) {
+        override fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileLaunchEvent) {
             if (projectile !is AbstractArrow) return
             if (projectile is Trident) return
 
-            val nekoStack = itemStack.projectNeko(false)
-            val itemArrow = nekoStack.templates.get(ItemTemplateTypes.ARROW) ?: return
+            val itemArrow = koishStack.templates.get(ItemTemplateTypes.ARROW) ?: return
             projectile.pierceLevel = itemArrow.pierceLevel
             projectile.pickupStatus = itemArrow.pickupStatus
             projectile.fireTicks = itemArrow.fireTicks
@@ -43,21 +42,18 @@ interface Arrow : ItemBehavior {
          * 命中着火时间
          * 命中冰冻时间
          */
-        override fun handleItemProjectileHit(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) {
+        override fun handleItemProjectileHit(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileHitEvent) {
             val hitEntity = event.hitEntity ?: return
             if (projectile !is AbstractArrow) return
             if (projectile is Trident) return
 
-            val nekoStack = itemStack.projectNeko(false)
-            val itemArrow = nekoStack.templates.get(ItemTemplateTypes.ARROW) ?: return
+            val itemArrow = koishStack.templates.get(ItemTemplateTypes.ARROW) ?: return
             if (hitEntity.fireTicks < itemArrow.hitFireTicks) hitEntity.fireTicks = itemArrow.hitFireTicks
             if (hitEntity.freezeTicks < itemArrow.hitFrozenTicks) hitEntity.freezeTicks = itemArrow.hitFrozenTicks
         }
     }
 
     companion object Type : ItemBehaviorType<Arrow> {
-        override fun create(): Arrow {
-            return Default
-        }
+        override fun create(): Arrow = Default
     }
 }

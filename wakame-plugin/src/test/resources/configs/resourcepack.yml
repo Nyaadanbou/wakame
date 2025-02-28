@@ -1,0 +1,12 @@
+generation:
+  description: Koish
+  format: 42
+  min: 42
+  max: 42
+  merge_packs: [ ]
+
+service:
+  type: none
+
+publisher:
+  type: none

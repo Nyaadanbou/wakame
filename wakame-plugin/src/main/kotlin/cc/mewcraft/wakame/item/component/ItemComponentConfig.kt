@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.item.component
 
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import net.kyori.adventure.text.Component
-import org.koin.core.component.KoinComponent
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -12,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap
 internal class ItemComponentConfig
 private constructor(
     private val id: String,
-) : KoinComponent {
+) {
 
     companion object {
-        private val OBJECT_POOL = ConcurrentHashMap<String, ItemComponentConfig>()
+        private val INSTANCES = ConcurrentHashMap<String, ItemComponentConfig>()
 
         /**
          * 获取指定 [id] 对应的 [ItemComponentConfig] 实例.
@@ -26,22 +27,22 @@ private constructor(
          * @param id 该组件在配置文件中的路径
          */
         fun provide(id: String): ItemComponentConfig {
-            return OBJECT_POOL.computeIfAbsent(id, ::ItemComponentConfig)
+            return INSTANCES.computeIfAbsent(id, ::ItemComponentConfig)
         }
     }
 
     /**
      * 根配置文件.
      */
-    val provider by lazy { ItemComponentRegistry.CONFIG.node(id) }
+    val rootNode = ItemComponentRegistry.CONFIG.node(id)
 
     /**
      * 该组件是否启用? (具体的作用之后再逐渐完善)
      */
-    val enabled by provider.entry<Boolean>("enabled")
+    val enabled by rootNode.entry<Boolean>("enabled")
 
     /**
      * 该组件的显示名字.
      */
-    val displayName by provider.entry<Component>("display_name")
+    val displayName by rootNode.entry<Component>("display_name")
 }

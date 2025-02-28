@@ -2,29 +2,31 @@ package cc.mewcraft.wakame.api.block;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
 @SuppressWarnings("unused")
+@NullMarked
 public interface BlockManager {
 
     /**
-     * Checks if there is a {@link NekoBlockState} at that location.
+     * Checks if there is a {@link KoishBlockState} at that location.
      *
      * @param location the location to check
-     * @return if there is a {@link NekoBlockState} at that location
+     * @return if there is a {@link KoishBlockState} at that location
      */
-    boolean hasBlock(@NotNull Location location);
+    boolean hasBlock(Location location);
 
     /**
-     * Gets the {@link NekoBlockState} at that location.
+     * Gets the {@link KoishBlockState} at that location.
      *
      * @param location the location of the block
-     * @return the Neko block state or null if there isn't one at that location
+     * @return the Koish block state or null if there isn't one at that location
      */
-    @Nullable NekoBlockState getBlock(@NotNull Location location);
+    @Nullable
+    KoishBlockState getBlock(Location location);
 
     /**
      * Places the block at that location.
@@ -32,7 +34,7 @@ public interface BlockManager {
      * @param location the location where the block should be placed
      * @param block    the type of the block
      */
-    default void placeBlock(@NotNull Location location, @NotNull NekoBlock block) {
+    default void placeBlock(Location location, KoishBlock block) {
         placeBlock(location, block, null);
     }
 
@@ -43,7 +45,7 @@ public interface BlockManager {
      * @param block    the type of the block
      * @param source   the source of this block placement. Could be a player, tile-entity or similar
      */
-    default void placeBlock(@NotNull Location location, @NotNull NekoBlock block, @Nullable Object source) {
+    default void placeBlock(Location location, KoishBlock block, @Nullable Object source) {
         placeBlock(location, block, source, true);
     }
 
@@ -55,68 +57,69 @@ public interface BlockManager {
      * @param source    the source of this block placement. Could be a player, tile-entity or similar
      * @param playSound if block breaking sounds should be placed
      */
-    void placeBlock(@NotNull Location location, @NotNull NekoBlock block, @Nullable Object source, boolean playSound);
+    void placeBlock(Location location, KoishBlock block, @Nullable Object source, boolean playSound);
 
     /**
-     * Gets the drops of the Neko block at that location or null if there is no Neko block there.
+     * Gets the drops of the Koish block at that location or null if there is no Koish block there.
      *
-     * @param location the location of the Neko block
-     * @return the list of drops or null if there is no block from Neko at that location
+     * @param location the location of the Koish block
+     * @return the list of drops or null if there is no block from Koish at that location
      */
-    default @Nullable List<@NotNull ItemStack> getDrops(@NotNull Location location) {
+    default @Nullable List<ItemStack> getDrops(Location location) {
         return getDrops(location, null);
     }
 
     /**
-     * Gets the drops of the Neko block at that location as if it was mined with the given tool
-     * or null if there is no Neko block there.
+     * Gets the drops of the Koish block at that location as if it was mined with the given tool
+     * or null if there is no Koish block there.
      *
-     * @param location the location of the Neko block
+     * @param location the location of the Koish block
      * @param tool     the tool that should be used
-     * @return the list of drops or null if there is no block from Neko at that location
+     * @return the list of drops or null if there is no block from Koish at that location
      */
-    default @Nullable List<@NotNull ItemStack> getDrops(@NotNull Location location, @Nullable ItemStack tool) {
+    default @Nullable List<ItemStack> getDrops(Location location, @Nullable ItemStack tool) {
         return getDrops(location, null, tool);
     }
 
     /**
-     * Gets the drops of the Neko block at that location as if it was mined by source with the
-     * given tool or null if there is no Neko block there.
+     * Gets the drops of the Koish block at that location as if it was mined by source with the
+     * given tool or null if there is no Koish block there.
      *
-     * @param location the location of the Neko block
+     * @param location the location of the Koish block
      * @param source   the source of this action. Could be a player, tile-entity or similar
      * @param tool     the tool that should be used
-     * @return the list of drops or null if there is no block from Neko at that location
+     * @return the list of drops or null if there is no block from Koish at that location
      */
-    @Nullable List<@NotNull ItemStack> getDrops(@NotNull Location location, @Nullable Object source, @Nullable ItemStack tool);
+    @Nullable
+    List<ItemStack> getDrops(Location location, @Nullable Object source, @Nullable ItemStack tool);
 
     /**
-     * Removes the Neko block at that location.
+     * Removes the Koish block at that location.
      *
      * @param location the location of the block to remove
-     * @return if there was a Neko block at that location and the removal was successful
+     * @return if there was a Koish block at that location and the removal was successful
      */
-    default boolean removeBlock(@NotNull Location location) {
+    default boolean removeBlock(Location location) {
         return removeBlock(location, null);
     }
 
     /**
-     * Removes the Neko block at that location as if it was destroyed by source.
+     * Removes the Koish block at that location as if it was destroyed by source.
      *
      * @param location the location of the block to remove
      * @param source   the source of the block removal
-     * @return if there was a Neko block at that location and the removal was successful
+     * @return if there was a Koish block at that location and the removal was successful
      */
-    boolean removeBlock(@NotNull Location location, @Nullable Object source);
+    boolean removeBlock(Location location, @Nullable Object source);
 
     /**
-     * Removes the Neko block at that location as if it was destroyed by source.
+     * Removes the Koish block at that location as if it was destroyed by source.
      *
      * @param location     the location of the block to remove
      * @param source       the source of the block removal
      * @param breakEffects if block breaking effects should be played
-     * @return if there was a Neko block at that location and the removal was successful
+     * @return if there was a Koish block at that location and the removal was successful
      */
-    boolean removeBlock(@NotNull Location location, @Nullable Object source, boolean breakEffects);
+    boolean removeBlock(Location location, @Nullable Object source, boolean breakEffects);
 
 }

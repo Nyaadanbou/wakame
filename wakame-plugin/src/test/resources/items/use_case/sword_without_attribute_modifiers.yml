@@ -1,3 +1,0 @@
-# Use case: 一把没有攻击力的钻石剑
-
-base: diamond_sword[!attribute_modifiers]

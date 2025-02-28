@@ -4,22 +4,23 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.intellij.lang.annotations.Pattern
 import xyz.xenondevs.commons.provider.Provider
-import xyz.xenondevs.commons.provider.immutable.orElse
+import xyz.xenondevs.commons.provider.orElse
 import java.util.stream.Stream
 
 internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
 
-internal val GLOBAL_ATTRIBUTE_CONFIG by lazy { Configs.YAML[AttributeBundleFacadeRegistryConfigStorage.FILE_PATH] }
+internal val GLOBAL_ATTRIBUTE_CONFIG = Configs[AttributeBundleFacadeRegistryLoader.CONFIG_ID]
 
 /**
  * An attribute type with a numerical default value.

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.ability.PlayerAbility
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemConstants
@@ -11,16 +9,18 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isVirtual
-import cc.mewcraft.wakame.util.withValue
+import cc.mewcraft.wakame.util.adventure.withValue
+import cc.mewcraft.wakame.util.data.removeAll
 import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.examination.Examinable
+import java.util.*
+import java.util.Collections.emptyMap
 
 
 interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
@@ -32,16 +32,16 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         private val config: ItemComponentConfig = ItemComponentConfig.provide(ItemConstants.CELLS)
 
         /**
-         * 构建一个 [ItemCells] 的实例.
+         * 构建一个空的 [ItemCells] 的实例.
          */
-        fun of(): ItemCells {
+        fun empty(): ItemCells {
             return Value(emptyMap())
         }
 
         /**
          * 构建一个 [ItemCells] 的实例, 初始值为给定的参数
          */
-        fun of(cells: Map<String, Cell>): ItemCells {
+        fun fromMap(cells: Map<String, Cell>): ItemCells {
             return Value(cells)
         }
 
@@ -114,11 +114,6 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
      * 获取所有核孔上的 [AttributeModifier].
      */
     fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier>
-
-    /**
-     * 获取所有核孔上的 [PlayerAbility].
-     */
-    fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility>
 
     /**
      * 忽略数值的前提下, 判断是否包含指定的核心.
@@ -220,8 +215,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override fun collectAttributeModifiers(context: NekoStack, slot: ItemSlot): Multimap<Attribute, AttributeModifier> {
             val ret = ImmutableListMultimap.builder<Attribute, AttributeModifier>()
             for ((id, cell) in this) {
-                val core = cell.getCore() as? AttributeCore ?: continue
-                val attribute = core.attribute
+                val core = cell.core as? AttributeCore ?: continue
+                val attribute = core.data
                 val sourceId = context.id.withValue { "$it/${slot.slotIndex}/$id" }
                 val attributeModifiers = attribute.createAttributeModifiers(sourceId)
                 ret.putAll(attributeModifiers.entries)
@@ -229,27 +224,8 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
             return ret.build()
         }
 
-        override fun collectAbilityModifiers(context: NekoStack, slot: ItemSlot): Collection<PlayerAbility> {
-            val ret = ArrayList<PlayerAbility>()
-            for ((_, cell) in this) {
-                val core = cell.getCore() as? AbilityCore ?: continue
-                val ability = core.ability
-
-                val abilityVariant = ability.variant
-                if (abilityVariant == TriggerVariant.any()) {
-                    ret.add(ability)
-                    continue
-                }
-                if (abilityVariant.id != context.variant) {
-                    continue
-                }
-                ret.add(ability)
-            }
-            return ret
-        }
-
         override fun containSimilarCore(core: Core): Boolean {
-            return cells.values.any { cell -> cell.getCore().similarTo(core) }
+            return cells.values.any { cell -> cell.core.similarTo(core) }
         }
 
         override fun iterator(): Iterator<Map.Entry<String, Cell>> {
@@ -268,14 +244,14 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         override val id: String,
     ) : ItemComponentType<ItemCells> {
         override fun read(holder: ItemComponentHolder): ItemCells? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
 
             // 优化: 核孔绝大部分情况都是遍历, 而很少查询, 因此用 ArrayMap 更好
             val cells = Object2ObjectArrayMap<String, Cell>(tag.size())
 
-            for (id in tag.keySet()) {
+            for (id in tag.allKeys) {
                 val nbt = tag.getCompound(id)
-                val cell = Cell.of(id, nbt)
+                val cell = Cell.fromNbt(id, nbt)
                 cells.put(id, cell)
             }
 
@@ -283,21 +259,21 @@ interface ItemCells : Examinable, Iterable<Map.Entry<String, Cell>> {
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemCells) {
-            holder.editTag { tag ->
-                tag.clear() // 总是重新写入全部数据
+            holder.editNbt { tag ->
+                tag.removeAll() // 总是重新写入全部数据
 
                 for ((id, cell) in value) {
-                    if (cell.getCore().isVirtual) {
+                    if (cell.core.isVirtual) {
                         continue // 拥有虚拟核心的核孔不应该写入物品
                     }
 
-                    tag.put(id, cell.serializeAsTag())
+                    tag.put(id, cell.saveNbt())
                 }
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
     }
 }

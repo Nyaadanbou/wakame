@@ -5,17 +5,14 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven("https://repo.mewcraft.cc/private") {
-        credentials {
-            username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-            password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-        }
-    }
+    nyaadanbouPrivate()
 }
 
 dependencies {
-    implementation(local.plugin.nyaadanbou.conventions)
     implementation(local.plugin.kotlin.jvm)
+    implementation(local.plugin.libraries.repository)
+    implementation(local.plugin.copy.jar.build)
+    implementation(local.plugin.copy.jar.docker)
     implementation(local.plugin.paperweight.userdev)
     implementation(libs.shadow)
     implementation(libs.indra.common)

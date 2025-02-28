@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.util.Key
+import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
+import net.kyori.adventure.key.Key
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
@@ -39,7 +39,7 @@ class AbilityParser<C : Any> : AggregateParser<C, Ability> {
     override fun mapper(): AggregateResultMapper<C, Ability> {
         return AggregateResultMapper agg@{ commandContext, aggregateCommandContext ->
             val path = aggregateCommandContext.get<String>("path")
-            val ability = AbilityRegistry.INSTANCES.getOrNull(Key(Namespaces.ABILITY, path))
+            val ability = AbilityRegistry.INSTANCES.getOrNull(Key.key(Namespaces.ABILITY, path))
             if (ability == null) {
                 ArgumentParseResult.failureFuture(AbilityParseException(commandContext))
             } else {

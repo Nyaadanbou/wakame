@@ -2,10 +2,9 @@ package attribute
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.attributeModule
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import io.mockk.mockk
@@ -39,15 +38,14 @@ class DefaultAttributeSerializationTest : KoinTest {
                 // dependencies
                 modules(
                     adventureModule(),
-                    attributeModule(),
                     registryModule(),
                 )
             }
 
-            ElementRegistryConfigStorage.init()
+            ElementTypeRegistryLoader.init()
             Attributes.init()
-            AttributeBundleFacadeRegistryConfigStorage.init()
-            AttributeSupplierRegistryConfigStorage.init()
+            AttributeBundleFacadeRegistryLoader.init()
+            AttributeSupplierRegistryLoader.init()
         }
 
         @JvmStatic

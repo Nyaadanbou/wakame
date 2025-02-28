@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
@@ -12,7 +12,7 @@ internal object PotionEffectSerializer : TypeSerializer<PotionEffect?> {
         if (node.raw() == null)
             return null
 
-        val effectType = node.node("type").krequire<PotionEffectType>()
+        val effectType = node.node("type").require<PotionEffectType>()
         val duration = node.node("duration").getInt(1)
         val amplifier = node.node("amplifier").getInt(0)
         val ambient = node.node("ambient").getBoolean(false)

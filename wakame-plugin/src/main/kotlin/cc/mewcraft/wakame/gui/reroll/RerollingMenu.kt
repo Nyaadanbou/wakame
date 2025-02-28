@@ -1,20 +1,19 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.reforgeHistory
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import cc.mewcraft.wakame.util.itemNameOrType
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
 import xyz.xenondevs.invui.gui.structure.Markers
@@ -32,14 +31,14 @@ import kotlin.properties.Delegates
 internal class RerollingMenu(
     val table: RerollingTable,
     val viewer: Player,
-) : Listener, KoinComponent {
+) : Listener {
 
     /**
      * 给玩家显示 GUI.
      */
     fun open() {
         primaryWindow.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_REROLLING_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_REROLLING_MENU)
     }
 
     /**
@@ -98,7 +97,7 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 inputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -143,13 +142,13 @@ internal class RerollingMenu(
         when {
             // 玩家尝试交换 outputSlot 里面的物品:
             event.isSwap -> {
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 
             // 玩家尝试把物品放进 outputSlot:
             event.isAdd -> {
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
                 event.isCancelled = true
             }
 
@@ -231,7 +230,7 @@ internal class RerollingMenu(
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
             // 输入的[原始物品]
-            val previewItem = session.originalInput?.shadowNeko(true) ?: error("result is successful but the input item is null - this is a bug!")
+            val previewItem = session.originalInput?.wrap() ?: error("result is successful but the input item is null - this is a bug!")
 
             // 单独把 ReforgeHistory 赋值给[预览物品],
             // 这样玩家就可以知道物品重铸后的次数是多少.
@@ -241,13 +240,13 @@ internal class RerollingMenu(
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
-                standard { component("item_name", previewItem.wrapped.itemNameOrType) }
-                folded("item_lore", previewItem.wrapped.itemLoreOrEmpty)
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+                standard { component("item_name", previewItem.bukkitStack.itemNameOrType) }
+                folded("item_lore", previewItem.bukkitStack.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
-            }.applyNameAndLoreTo(
-                previewItem.wrapped
-            )
+            }
+
+            slotDisplayResolved.applyTo(previewItem.bukkitStack)
         } else {
             // 如果不可重造:
 
@@ -283,7 +282,7 @@ internal class RerollingMenu(
 
         val renderingCtx = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
         ItemRenderers.REROLLING_TABLE.render(sourceItem, renderingCtx)
-        val newItemStack = sourceItem.itemStack
+        val newItemStack = sourceItem.bukkitStack.clone()
 
         return newItemStack
     }

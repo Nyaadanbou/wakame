@@ -1,0 +1,98 @@
+# id: <有效的属性 id>
+cells/attributes/in:
+  namespace: attribute
+  diff_formats:
+    changeable: { }
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: <有效的属性 id>
+cells/attributes/out:
+  namespace: attribute
+  diff_formats:
+    changeable: { }
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: `cells/empty`
+cells/empty/in:
+  namespace: stash
+  tooltip: "[ Empty Slot ]"
+  diff_formats:
+    changeable: { }
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
+
+# id: `cells/empty`
+cells/empty/out:
+  namespace: stash
+  tooltip: "[ Empty Slot ]"
+  diff_formats:
+    changeable: { }
+    unchangeable: { }
+    has_input: { }
+    has_no_input: { }
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  tooltip: "Custom Name: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  tooltip:
+    merged: "Element: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  tooltip: "Item Name: <value>"
+
+# id: `level`
+level:
+  namespace: general
+  tooltip: "Level: <value>"
+
+# id: `rarity`
+rarity:
+  namespace: general
+  simple: "Rarity: <rarity_display_name>"
+  complex: "Rarity: <rarity_display_name> [<reforge_mod_count>]"
+
+# id: `reforge_cost`
+reforge_cost:
+  namespace: reforge
+
+# id: `replace_input`
+replace_input:
+  namespace: reforge

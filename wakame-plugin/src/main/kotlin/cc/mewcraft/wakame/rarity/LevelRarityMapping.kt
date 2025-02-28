@@ -1,15 +1,16 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry
 import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry.Companion.build
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RangeParser
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.random.RandomSelector
+import cc.mewcraft.wakame.util.require
 import com.google.common.collect.ImmutableRangeMap
 import com.google.common.collect.RangeMap
-import me.lucko.helper.random.RandomSelector
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
@@ -125,7 +126,7 @@ internal object LevelRarityMappingSerializer : TypeSerializer<LevelRarityMapping
     override fun deserialize(type: Type, node: ConfigurationNode): LevelRarityMapping {
         val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelRarityMapping.Entry>()
         for ((_, node1) in node.childrenMap()) {
-            val levelNode = node1.node("level").krequire<String>()
+            val levelNode = node1.node("level").require<String>()
             val weightNode = node1.node("weight").takeIf { it.isMap }
                 ?: throw SerializationException("`weight` node must be a map")
 
@@ -135,7 +136,7 @@ internal object LevelRarityMappingSerializer : TypeSerializer<LevelRarityMapping
                 for ((nodeKey2, node2) in weightNode.childrenMap()) {
                     val rarityTypeId = Identifiers.of(nodeKey2.toString())
                     val rarityType = KoishRegistries.RARITY.createEntry(rarityTypeId)
-                    val rarityWeight = node2.krequire<Double>()
+                    val rarityWeight = node2.require<Double>()
                     weight[rarityType] = rarityWeight
                 }
             }

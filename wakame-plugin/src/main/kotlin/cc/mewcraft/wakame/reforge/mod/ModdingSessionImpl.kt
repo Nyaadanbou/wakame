@@ -1,41 +1,41 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.cells
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
-import cc.mewcraft.wakame.item.elements
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.*
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.isEmpty
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.item.isEmpty
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
+import java.util.Collections.emptyList
+import java.util.Collections.emptySet
 import java.util.stream.Stream
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -46,8 +46,8 @@ import kotlin.reflect.KProperty
 internal class SimpleModdingSession(
     override val table: ModdingTable,
     override val viewer: Player,
-) : ModdingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
+) : ModdingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MODDING_LOG_PREFIX)
 
     // 初始为 null
     override var originalInput: ItemStack? by OriginalInputDelegate(null)
@@ -87,7 +87,7 @@ internal class SimpleModdingSession(
             ReforgeOperation(this)
         } catch (e: Exception) {
             logger.error("An error occurred while executing reforge operation", e)
-            ReforgeResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+            ReforgeResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -114,7 +114,7 @@ internal class SimpleModdingSession(
 
         if (latestResult.isSuccess) {
             // 定制后的物品
-            val itemStack = latestResult.output?.itemStack
+            val itemStack = latestResult.output?.bukkitStack?.clone()
             if (itemStack == null) {
                 logger.error("Output item is null, but the player is trying to take it. This is a bug!")
                 return emptyArray()
@@ -205,7 +205,7 @@ internal class SimpleModdingSession(
 
             // logger.info("Session's input item updated: ${old?.type} -> ${value?.type}")
 
-            val usableInput0 = _value?.shadowNeko(true) ?: run {
+            val usableInput0 = _value?.wrap() ?: run {
                 usableInput = null
                 replaceParams = ReforgeReplaceMap.empty(thisRef)
                 executeReforge()
@@ -299,7 +299,7 @@ internal object ReforgeResult {
      * 成功的结果: 成功定制物品.
      */
     fun success(viewer: Player, outputItem: NekoStack, cost: ModdingSession.ReforgeCost): ModdingSession.ReforgeResult {
-        return Success(viewer, outputItem, listOf(MessageConstants.MSG_MODDING_RESULT_SUCCESS.translate(viewer)), cost)
+        return Success(viewer, outputItem, listOf(TranslatableMessages.MSG_MODDING_RESULT_SUCCESS.translate(viewer)), cost)
     }
 
     private abstract class Base : ModdingSession.ReforgeResult {
@@ -315,14 +315,14 @@ internal object ReforgeResult {
 
     private class Error(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
         override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack? = null
     }
 
     private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_RESULT_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MODDING_RESULT_EMPTY.translate(viewer))
         override val reforgeCost: ModdingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack? = null
     }
@@ -357,7 +357,7 @@ internal object ReforgeCost {
     private class Empty(viewer: Player) : ModdingSession.ReforgeCost {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_COST_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MODDING_COST_EMPTY.translate(viewer))
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain)
         )
@@ -375,7 +375,7 @@ internal object ReforgeCost {
         }
 
         override val description: List<Component> = listOf(
-            MessageConstants.MSG_MODDING_COST_SIMPLE.arguments(
+            TranslatableMessages.MSG_MODDING_COST_SIMPLE.arguments(
                 TranslationArgument.numeric(currencyAmount.toInt() + 1) // +1 使边界情况看起来合理
             ).translate(viewer)
         )
@@ -413,7 +413,7 @@ private object ReforgeReplace {
     private class Unchangeable(
         override val session: SimpleModdingSession,
         override val cell: Cell,
-    ) : ModdingSession.Replace, KoinComponent {
+    ) : ModdingSession.Replace {
         override val changeable: Boolean
             get() = false
 
@@ -438,13 +438,13 @@ private object ReforgeReplace {
         override val augment: PortableCore? = null
 
         // 永远返回同样的结果: 核孔无法修改
-        override var latestResult = ReforgeReplaceResult.failure(session.viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_UNCHANGEABLE)
+        override var latestResult = ReforgeReplaceResult.failure(session.viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_UNCHANGEABLE)
 
         override fun getIngredientLevel(): Int = 0
         override fun getIngredientRarityNumber(): Double = .0
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("id", cell.getId()),
+            ExaminableProperty.of("id", cell.id),
         )
 
         override fun toString(): String = toSimpleString()
@@ -466,7 +466,7 @@ private object ReforgeReplace {
         override val session: SimpleModdingSession,
         override val cell: Cell,
         override val cellRule: CellRule,
-    ) : ModdingSession.Replace, KoinComponent {
+    ) : ModdingSession.Replace {
         override val total: MochaFunction = cellRule.currencyCost.total.compile(session, this)
 
         override var originalInput: ItemStack? by OriginalInputDelegate(null)
@@ -490,7 +490,7 @@ private object ReforgeReplace {
             }
 
             if (replaceResult.applicable) {
-                usableInput = originalInput!!.shadowNeko(true)!!
+                usableInput = originalInput!!.wrap()!!
             } else {
                 usableInput = null
             }
@@ -522,65 +522,65 @@ private object ReforgeReplace {
             // 如果源物品为空, 则返回内部错误
             val usableInput = session.usableInput ?: run {
                 session.logger.error("Usable input is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
             }
 
             val itemRule = session.itemRule ?: run {
                 session.logger.error("Item rule is null, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
             }
 
             // TODO 检查权限
 
             // 获取耗材中的便携核心
-            val customNekoStack = originalInput.shadowNeko(true)
-            val portableCore = customNekoStack?.portableCore ?: run {
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
+            val koishStack = originalInput.wrap()
+            val portableCore = koishStack?.portableCore ?: run {
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_NOT_PORTABLE_CORE)
             }
 
             // 获取源物品上的核孔
             val inputCells = usableInput.cells ?: run {
                 session.logger.error("Usable input has no cells, but an item is being replaced. This is a bug!")
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
             }
 
             // 源物品的核孔上 必须没有与便携核心相似的核心
-            val inputCellsExcludingThis = inputCells.filter2 { it.getId() != cell.getId() }
+            val inputCellsExcludingThis = inputCells.filter2 { it.id != cell.id }
             if (inputCellsExcludingThis.containSimilarCore(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
             }
 
             if (
                 session.replaceParams
-                    .filter { it.key != cell.getId() } // 排除掉当前的核孔
+                    .filter { it.key != cell.id } // 排除掉当前的核孔
                     .any { it.value.usableInput?.portableCore?.wrapped?.similarTo(portableCore.wrapped) == true }
             ) {
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_INPUT)
             }
 
             // 便携式核心的类型 必须符合定制规则
             if (!cellRule.acceptableCores.test(portableCore.wrapped)) {
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
             if (cellRule.requireElementMatch) {
                 val elementsOnInput = usableInput.elements
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
-                val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.attribute?.element
+                val elementOnIngredient = (portableCore.wrapped as? AttributeCore)?.data?.element
                 if (elementOnIngredient != null && elementOnIngredient !in elementsOnInput) {
-                    return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
+                    return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_CORE_ELEMENT_INCOMPATIBLE_WITH_TARGET)
                 }
             }
 
             // 被定制物品上储存的历史定制次数 必须小于等于定制规则
             val modCount = usableInput.reforgeHistory.modCount
             if (modCount >= itemRule.modLimit) {
-                return ReforgeReplaceResult.failure(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT)
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_TARGET_REACH_MOD_COUNT_LIMIT)
             }
 
             // 全部检查通过!
-            return ReforgeReplaceResult.success(viewer, MessageConstants.MSG_MODDING_REPLACE_RESULT_SUCCESS)
+            return ReforgeReplaceResult.success(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_SUCCESS)
         }
 
         override fun getIngredientLevel(): Int {
@@ -592,7 +592,7 @@ private object ReforgeReplace {
         }
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-            ExaminableProperty.of("id", cell.getId()),
+            ExaminableProperty.of("id", cell.id),
         )
 
         override fun toString(): String = toSimpleString()
@@ -634,7 +634,7 @@ private object ReforgeReplaceResult {
 
     private class Empty(viewer: Player) : Base() {
         override val applicable: Boolean = false // 空气无法参与定制, 需要额外逻辑判断
-        override val description: List<Component> = listOf(MessageConstants.MSG_MODDING_REPLACE_RESULT_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MODDING_REPLACE_RESULT_EMPTY.translate(viewer))
     }
 
     private class Simple(
@@ -675,7 +675,7 @@ private object ReforgeReplaceMap {
         override fun get(id: String): ModdingSession.Replace {
             // 始终返回一个 unchangeable replace.
             return store.getOrPut(id) {
-                val dummyCell = Cell.of(id) // it should never be accessed
+                val dummyCell = Cell(id) // it should never be accessed
                 ReforgeReplace.unchangeable(session, dummyCell)
             }
         }
@@ -700,7 +700,7 @@ private object ReforgeReplaceMap {
 
         override fun get(id: String): ModdingSession.Replace {
             // the dummy cell should never be accessed
-            return data.getOrPut(id) { ReforgeReplace.unchangeable(session, Cell.of(id)) }
+            return data.getOrPut(id) { ReforgeReplace.unchangeable(session, Cell(id)) }
         }
 
         override fun contains(id: String): Boolean {

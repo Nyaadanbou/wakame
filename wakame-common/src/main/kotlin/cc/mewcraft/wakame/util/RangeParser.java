@@ -2,11 +2,12 @@ package cc.mewcraft.wakame.util;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@NullMarked
 public class RangeParser {
     private static final Pattern INTERVAL_PATTERN = Pattern.compile("([\\[(])(-?∞?\\d*)(?:,|\\.\\.)(-?∞?\\d*)([])])");
 
@@ -16,7 +17,7 @@ public class RangeParser {
      * @param notation The range notation to parse
      * @throws IllegalArgumentException if the interval is not in the defined notation format.
      */
-    public static Range<Integer> parseIntRange(@NonNull String notation) {
+    public static Range<Integer> parseIntRange(String notation) {
         Matcher matcher = INTERVAL_PATTERN.matcher(notation);
         if (matcher.matches()) {
             Integer lowerBoundEndpoint = Ints.tryParse(matcher.group(2));

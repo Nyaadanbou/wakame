@@ -1,7 +1,0 @@
-menu_icon_name: "<item_name>"
-menu_icon_lore:
-  - "{item_lore}"
-  - ""
-  - "{cost_description}"
-  - ""
-  - "<aqua>点击确认重造物品"

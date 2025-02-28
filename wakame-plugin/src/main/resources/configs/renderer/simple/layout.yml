@@ -1,0 +1,6 @@
+# 不要修改!
+version: 1
+
+primary:
+  - (fixed:general)
+  - general:lore

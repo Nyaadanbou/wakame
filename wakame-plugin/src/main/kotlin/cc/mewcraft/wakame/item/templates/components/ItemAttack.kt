@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.attack.AttackTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -31,13 +33,13 @@ data class ItemAttack(
         override val type: TypeToken<ItemAttack> = typeTokenOf()
 
         override fun decode(node: ConfigurationNode): ItemAttack {
-            val attackType = node.krequire<AttackType>()
+            val attackType = node.require<AttackType>()
             return ItemAttack(attackType)
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
-                .kregister(AttackTypeSerializer)
+                .register<AttackType>(AttackTypeSerializer)
                 .build()
         }
     }

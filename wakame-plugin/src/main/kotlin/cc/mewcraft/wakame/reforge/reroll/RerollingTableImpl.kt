@@ -2,17 +2,18 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
+import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -38,11 +39,11 @@ internal object WtfRerollingTable : RerollingTable {
             "background" to Key.key("internal:menu/common/default/background"),
             "prev_page" to Key.key("internal:menu/common/default/prev_page"),
             "next_page" to Key.key("internal:menu/common/default/next_page"),
-            "compatibility_view" to Key.key("internal:menu/rerolling/default/compatibility_view"),
-            "output_ok_confirmed" to Key.key("internal:menu/rerolling/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling/default/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/rerolling/default/output_empty"),
-            "output_failure" to Key.key("internal:menu/rerolling/default/output_failure"),
+            "compatibility_view" to Key.key("internal:menu/rerolling_table/default/compatibility_view"),
+            "output_ok_confirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/rerolling_table/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/rerolling_table/default/output_failure"),
         )
     )
 
@@ -51,9 +52,9 @@ internal object WtfRerollingTable : RerollingTable {
         structure = arrayOf("a", "b"),
         icons = hashMapOf(
             "error" to Key.key("internal:menu/common/default/error"),
-            "core_view" to Key.key("internal:menu/rerolling/default/core_view"),
-            "core_selected" to Key.key("internal:menu/rerolling/default/core_selected"),
-            "core_unselected" to Key.key("internal:menu/rerolling/default/core_unselected"),
+            "core_view" to Key.key("internal:menu/rerolling_table/default/core_view"),
+            "core_selected" to Key.key("internal:menu/rerolling_table/default/core_selected"),
+            "core_unselected" to Key.key("internal:menu/rerolling_table/default/core_unselected"),
         )
     )
 

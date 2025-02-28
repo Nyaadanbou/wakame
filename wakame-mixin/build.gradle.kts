@@ -1,18 +1,24 @@
 plugins {
-    id("nyaadanbou-conventions.repositories")
-    id("nyaadanbou-conventions.copy-jar")
     id("wakame-conventions.kotlin")
+    id("cc.mewcraft.libraries-repository")
+    id("cc.mewcraft.copy-jar-build")
+    id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
+    alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0.0"
+version = "0.0.1-snapshot"
 description = "The mixin part"
+
+repositories {
+    nyaadanbouReleases()
+}
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
 
-    remapper("net.fabricmc", "tiny-remapper", "0.10.1", classifier = "fat")
+    remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
 
     compileOnly(local.ignite)
     compileOnly(local.mixin)
@@ -23,19 +29,29 @@ dependencies {
     // 可以直接被服务端 (nms) 和 *任意插件* 直接访问.
     implementation(project(":wakame-api")) // 提供运行时依赖
     implementation(project(":wakame-common")) // 同上
-    implementation(local.shadow.nbt)
+    implementation(local.shadow.bukkit)
 }
 
-tasks {
-    processResources {
-        expand(project.properties)
-    }
-    copyJar {
-        environment = "paperMixin"
-        jarFileName = "wakame-${project.version}.jar"
+sourceSets {
+    main {
+        blossom {
+            resources {
+                property("version", project.version.toString())
+            }
+        }
     }
 }
 
-paperweight {
-    reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
+buildCopy {
+    fileName = "wakame-${project.version}.jar"
+    archiveTask = "shadowJar"
+}
+
+dockerCopy {
+    containerId = "aether-minecraft-1"
+    containerPath = "/minecraft/game1/mods/"
+    fileMode = 0b110_100_100
+    userId = 999
+    groupId = 999
+    archiveTask = "shadowJar"
 }

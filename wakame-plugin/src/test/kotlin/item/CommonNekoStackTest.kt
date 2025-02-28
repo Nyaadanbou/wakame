@@ -1,46 +1,37 @@
 package item
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.damage.damageModule
-import cc.mewcraft.wakame.element.ElementRegistryConfigStorage
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryConfigStorage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
+import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryLoader
+import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.itemModule
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
+import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
+import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
 import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
-import nbt.CommonNBT
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
-import org.koin.core.qualifier.named
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.inject
 import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import testEnv
-import java.io.File
 import java.nio.file.Path
 import kotlin.test.fail
 
@@ -52,28 +43,22 @@ object CommonNekoStackTest {
                 // environment
                 testEnv(),
 
-                // this module
-                itemModule(),
-
                 // dependencies
                 adventureModule(),
-                damageModule(),
                 registryModule(),
                 abilityModule(),
                 worldModule(),
             )
         }
 
-        CommonNBT.mockStatic()
-
         // 按依赖顺序, 初始化注册表
-        ElementRegistryConfigStorage.init()
-        AttributeBundleFacadeRegistryConfigStorage.init()
+        ElementTypeRegistryLoader.init()
+        AttributeBundleFacadeRegistryLoader.init()
         AbilityRegistry.init()
-        KizamiRegistryConfigStorage.init()
-        RarityRegistryConfigStorage.init()
-        LevelRarityMappingRegistryConfigStorage.init()
-        EntityTypeHolderRegistryConfigStorage.init()
+        KizamiTypeRegistryLoader.init()
+        RarityTypeRegistryLoader.init()
+        LevelRarityMappingRegistryLoader.init()
+        EntityTypeHolderRegistryLoader.init()
 
         // 初始化所有 random3.Node 相关的实现
         ElementSampleNodeFacade.init()
@@ -83,15 +68,14 @@ object CommonNekoStackTest {
     }
 
     fun afterAll() {
-        CommonNBT.unmockStatic()
         stopKoin()
     }
 }
 
 fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, ConfigurationNode> {
-    val pluginDataDir = get<File>(named(PLUGIN_DATA_DIR))
-    val itemsDir = pluginDataDir.resolve("items")
-    val namespaceDir = itemsDir.resolve(namespace)
+    val configsDir = get<Path>(InjectionQualifier.CONFIGS_FOLDER).toFile()
+    val dataDir = configsDir.resolve("item")
+    val namespaceDir = dataDir.resolve(namespace)
     val itemFile = namespaceDir.resolve("$path.yml")
     if (!itemFile.exists()) {
         fail("File not found: $namespace:$path")
@@ -101,7 +85,7 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
     val relPath = itemFile.toPath()
     val loader = buildYamlConfigLoader {
         withDefaults()
-        serializers { registerAll(ItemRegistryConfigStorage.SERIALIZERS) }
+        serializers { registerAll(ItemTypeRegistryLoader.SERIALIZERS) }
     }
     val rootNode = loader.buildAndLoadString(itemFile.readText())
     return Triple(key, relPath, rootNode)

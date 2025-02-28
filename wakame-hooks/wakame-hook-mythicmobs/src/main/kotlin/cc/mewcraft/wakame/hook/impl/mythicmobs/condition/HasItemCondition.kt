@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.api.NekooProvider
+import cc.mewcraft.wakame.api.Koish
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.adapters.AbstractLocation
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -64,13 +64,11 @@ class HasItemCondition(
         var count = 0
         val contents = inventory.contents
 
-        val nekooApi = NekooProvider.get()
-
         for (itemStack in contents) {
             if (itemStack == null || itemStack.isEmpty) {
                 continue
             }
-            val nekoItem = nekooApi.itemRegistry.getOrNull(itemStack)
+            val nekoItem = Koish.get().itemRegistry.getOrNull(itemStack)
             if (nekoItem?.id == itemKey) {
                 count += itemStack.amount
             }

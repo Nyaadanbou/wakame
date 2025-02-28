@@ -1,63 +1,35 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.NEKO
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
-import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.bukkit.Server
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import cc.mewcraft.wakame.KOISH_SCOPE
+import cc.mewcraft.wakame.Koish
+import cc.mewcraft.wakame.util.concurrent.isServerThread
+import cc.mewcraft.wakame.util.coroutine.async
+import cc.mewcraft.wakame.util.coroutine.minecraft
+import kotlinx.coroutines.*
 
-enum class ThreadType : KoinComponent {
+// 截止 2025/1/27, 如果要在任意地方启动一个协程, 比较好的做法
+// 应该是使用 KOISH_SCOPE#launch 来启动一个协程, 而不是
+// 使用这里的 ThreadType.
+
+enum class ThreadType {
     SYNC,
     ASYNC,
-    DISPATCHERS_ASYNC,
     REMAIN,
     ;
 
-    private val server: Server by inject()
-
-    suspend fun <T> switchContext(block: suspend () -> T): T {
-        if (!NEKO.isEnabled) {
-            return block()
-        }
-        if (this == REMAIN) {
-            return block()
-        }
-
-        return withContext(
-            when (this) {
-                SYNC -> NEKO.minecraftDispatcher
-                ASYNC -> NEKO.asyncDispatcher
-                DISPATCHERS_ASYNC -> Dispatchers.IO
-                else -> throw IllegalStateException("Unknown thread type: $this")
-            }
-        ) {
-            block()
-        }
-    }
-
-    fun launch(block: suspend () -> Unit): Job {
-        if (!NEKO.isEnabled) {
-            runBlocking {
-                block()
-            }
+    fun launch(block: suspend CoroutineScope.() -> Unit): Job {
+        if (!Koish.isEnabled) {
+            runBlocking { block() }
             return Job()
         }
 
-        return NEKO.launch(
-            when (this) {
-                SYNC -> NEKO.minecraftDispatcher
-                ASYNC -> NEKO.asyncDispatcher
-                DISPATCHERS_ASYNC -> Dispatchers.IO
-                REMAIN -> if (server.isPrimaryThread) NEKO.minecraftDispatcher else NEKO.asyncDispatcher
-            }
-        ) {
-            block()
-        }
+        return KOISH_SCOPE.launch(
+            context = when (this) {
+                SYNC -> Dispatchers.minecraft
+                ASYNC -> Dispatchers.async
+                REMAIN -> if (isServerThread) Dispatchers.minecraft else Dispatchers.async
+            },
+            block = block
+        )
     }
 }

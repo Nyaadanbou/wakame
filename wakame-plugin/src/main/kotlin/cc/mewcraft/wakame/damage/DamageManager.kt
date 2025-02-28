@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
@@ -11,28 +12,18 @@ import cc.mewcraft.wakame.damage.mappings.DirectEntityTypeMappings
 import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
+import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
 import java.time.Duration
-import java.util.UUID
+import java.util.*
 
 /**
  * @see DamageManagerApi.hurt
@@ -42,10 +33,9 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
 }
 
 /**
- * 包含伤害系统的主要逻辑和状态, 属于伤害系统的代码入口.
+ * 包含伤害系统的核心逻辑和状态.
  */
-object DamageManager : DamageManagerApi, KoinComponent {
-    private val logger: Logger = get()
+object DamageManager : DamageManagerApi {
 
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
@@ -68,7 +58,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
      * 能够造成伤害的弹射物类型.
      * 伤害系统会处理这些弹射物.
      */
-    val DAMAGE_PROJECTILE_TYPES = listOf(
+    private val DAMAGE_PROJECTILE_TYPES: List<EntityType> = listOf(
         EntityType.ARROW,
         EntityType.BREEZE_WIND_CHARGE,
 //        EntityType.DRAGON_FIREBALL,
@@ -91,7 +81,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
      * 作为直接实体时, 能够造成伤害的实体类型.
      * 伤害系统会处理这些实体.
      */
-    val DAMAGE_DIRECT_ENTITY_TYPES = DAMAGE_PROJECTILE_TYPES + listOf(
+    private val DAMAGE_DIRECT_ENTITY_TYPES = DAMAGE_PROJECTILE_TYPES + listOf(
         EntityType.TNT,
         EntityType.END_CRYSTAL,
         EntityType.AREA_EFFECT_CLOUD,
@@ -101,7 +91,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
      * 需要记录的弹射物.
      * 伤害系统会在这些弹射物生成时就记录伤害元数据.
      */
-    val MARK_PROJECTILE_TYPES = listOf(
+    private val MARK_PROJECTILE_TYPES: List<EntityType> = listOf(
         EntityType.ARROW,
         EntityType.SPECTRAL_ARROW,
         EntityType.TRIDENT,
@@ -154,7 +144,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
                 }
 
                 val itemStack = causingEntity.inventory.itemInMainHand
-                val nekoStack = itemStack.shadowNeko(false)
+                val nekoStack = itemStack.wrap()
                 val attack = nekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
                 when (event.cause) {
                     DamageCause.ENTITY_ATTACK -> {
@@ -202,11 +192,11 @@ object DamageManager : DamageManagerApi, KoinComponent {
                 if (directEntity.type == EntityType.TNT || directEntity.type == EntityType.END_CRYSTAL) {
                     return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
                 }
-                val mapping = EntityAttackMappings.find(causingEntity, event)
+                val mapping = EntityAttackMappings.get(causingEntity, event)
                 if (mapping == null) {
                     // 配置文件未指定该情景下生物的伤害映射
                     // 返回默认元素、无防御穿透、无暴击、原版伤害值
-                    logger.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config! Use default damage metadata.")
+                    LOGGER.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config! Use default damage metadata.")
                     return EntityDamageMetadata(
                         damageBundle = damageBundle {
                             default {
@@ -233,20 +223,21 @@ object DamageManager : DamageManagerApi, KoinComponent {
 
     private fun buildArrowDamageBundleByCells(arrow: AbstractArrow): DamageBundle? {
         val itemStack = arrow.itemStack
-        val nekoStack = itemStack.shadowNeko(false) ?: return null
+        val nekoStack = itemStack.wrap() ?: return null
         if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) {
             return null
         }
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return null
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val attributeMapSnapshot = ImaginaryAttributeMaps.ARROW.getSnapshot()
+        val arrowImaginaryAttributeMap by ImaginaryAttributeMaps.ARROW
+        val attributeMapSnapshot = arrowImaginaryAttributeMap.getSnapshot()
         attributeModifiers.forEach { attribute, modifier ->
             attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
         }
         return damageBundle(attributeMapSnapshot) { every { standard() } }
     }
 
-    private val arrowTypes = listOf<EntityType>(EntityType.ARROW, EntityType.SPECTRAL_ARROW)
+    private val ARROW_TYPES: List<EntityType> = listOf(EntityType.ARROW, EntityType.SPECTRAL_ARROW)
 
     /**
      * 无来源实体时直接伤害实体的伤害元数据
@@ -255,19 +246,19 @@ object DamageManager : DamageManagerApi, KoinComponent {
      */
     private fun buildDirectEntityDamageMetadataByDefault(directEntity: Entity, event: EntityDamageEvent, forPlayer: Boolean): DamageMetadata {
         val entityType = directEntity.type
-        if (entityType in arrowTypes) {
+        if (entityType in ARROW_TYPES) {
             val damageBundle = buildArrowDamageBundleByCells(directEntity as AbstractArrow)
             if (damageBundle != null) {
                 return VanillaDamageMetadata(damageBundle)
             }
         }
         val damageMapping = if (forPlayer) {
-            DirectEntityTypeMappings.byPlayerEvent(entityType, event)
+            DirectEntityTypeMappings.getForPlayer(entityType, event)
         } else {
-            DirectEntityTypeMappings.byNoCausingEvent(entityType, event)
+            DirectEntityTypeMappings.getForNoCausing(entityType, event)
         }
         if (damageMapping == null) {
-            logger.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not config ! Use default damage metadata.")
+            LOGGER.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not defined in the configs! Fallback to default damage metadata.")
             return VanillaDamageMetadata(event.damage)
         }
         return damageMapping.builder.build(event)
@@ -275,7 +266,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
 
     private fun warnAndDefaultReturn(event: EntityDamageEvent): DamageMetadata {
         val damageSource = event.damageSource
-        logger.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
+        LOGGER.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
         return VanillaDamageMetadata(event.damage)
     }
 
@@ -288,7 +279,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
             }
 
             is LivingEntity -> {
-                EntityDefenseMetadata(AttributeMapAccess.get(damagee).getOrElse {
+                EntityDefenseMetadata(AttributeMapAccess.instance().get(damagee).getOrElse {
                     error("Failed to generate defense metadata because the entity does not have an attribute map.")
                 })
             }
@@ -376,7 +367,7 @@ object DamageManager : DamageManagerApi, KoinComponent {
 
 
         val itemStack = projectile.itemStack
-        val nekoStack = itemStack.shadowNeko(false)
+        val nekoStack = itemStack.wrap()
         val cells = nekoStack?.components?.get(ItemComponentTypes.CELLS)
         if (nekoStack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
             val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())

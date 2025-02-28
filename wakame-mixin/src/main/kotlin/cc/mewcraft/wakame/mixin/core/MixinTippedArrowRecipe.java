@@ -8,7 +8,7 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.TippedArrowRecipe;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -24,7 +24,7 @@ public abstract class MixinTippedArrowRecipe extends CustomRecipe {
      */
     @Override
     @Overwrite
-    public boolean matches(CraftingInput input, @NotNull Level world) {
+    public boolean matches(CraftingInput input, @NonNull Level world) {
         if (input.width() == 3 && input.height() == 3) {
             for (int i = 0; i < input.height(); i++) {
                 for (int j = 0; j < input.width(); j++) {

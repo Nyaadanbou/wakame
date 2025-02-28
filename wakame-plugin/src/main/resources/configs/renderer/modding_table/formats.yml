@@ -1,0 +1,147 @@
+# 不要修改!
+version: 1
+
+# id: <有效的属性 id>
+cells/attributes/in:
+  namespace: attribute
+  # 用于区分核孔是否 要将定制,可被定制,... 的一些渲染格式
+  diff_formats:
+    # 可被定制的核孔
+    changeable: {}
+    # 不可被定制的核孔
+    unchangeable:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
+    # 选择要定制的核孔
+    has_input:
+      prefix: "<dark_gray>[<red>将被修改</red>] "
+    # 未选择要定制的核孔
+    has_no_input:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: <有效的属性 id>
+cells/attributes/out:
+  namespace: attribute
+  diff_formats:
+    changeable: {}
+    unchangeable:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
+    has_input:
+      prefix: "<dark_gray>[<green>将被修改</green>] "
+    has_no_input:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: `cells/empty`
+cells/empty/in:
+  namespace: stash
+  tooltip: "<!i><gray>[ 空核孔 ]"
+  diff_formats:
+    changeable: {}
+    unchangeable:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
+    has_input:
+      prefix: "<dark_gray>[<red>将被修改</red>] "
+    has_no_input:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
+
+# id: `cells/empty`
+cells/empty/out:
+  namespace: stash
+  tooltip: "<!i><gray>[ 空核孔 ]"
+  diff_formats:
+    changeable: {}
+    unchangeable:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<gray>不可修改</gray>] "
+    has_input:
+      prefix: "<dark_gray>[<green>将被修改</green>] "
+    has_no_input:
+      style: "<!i><dark_gray>"
+      prefix: "<dark_gray>[<yellow>保持原样</yellow>] "
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<!i><gray>定制名: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "<!i><gray>主要元素: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<!i><gray>物品名: <value>"
+
+# id: `level`
+level:
+  namespace: general
+  # 可用标签
+  # <value> 等级值
+  tooltip: "<!i><yellow>lv. <value>"
+
+# id: `rarity`
+rarity:
+  namespace: general
+  # 可用标签
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "<!i><rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "<!i><rarity_display_name><white>[<reforge_mod_count>]"
+
+# id: `reforge_cost`
+reforge_cost:
+  namespace: reforge
+  tooltip:
+    item:
+      - "<!i><gray>物品花费:"
+      - "  <white><item> × <amount>"
+    currency:
+      - "<!i><gray>货币花费:"
+      - "  <yellow><amount> <currency:'zh-CN':'#'>"
+
+# id: `replace_input`
+replace_input:
+  namespace: reforge

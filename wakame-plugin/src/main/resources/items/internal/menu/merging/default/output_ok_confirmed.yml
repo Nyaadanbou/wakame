@@ -1,7 +1,0 @@
-menu_icon_name: "OUTPUT_OK_CONFIRMED"
-menu_icon_lore:
-  - "{item_lore}"
-  - ""
-  - "{type_description}"
-  - "{cost_description}"
-  - "{result_description}"

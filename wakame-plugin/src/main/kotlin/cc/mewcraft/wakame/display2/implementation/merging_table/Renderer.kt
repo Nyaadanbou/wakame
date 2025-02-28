@@ -2,34 +2,25 @@ package cc.mewcraft.wakame.display2.implementation.merging_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
+import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.extension.resetMinecraftData
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.merge.MergingSession
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import io.papermc.paper.datacomponent.DataComponentTypes
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -55,12 +46,12 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
 
     @InitFun
     private fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     private fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
@@ -72,7 +63,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
     override fun render(item: NekoStack, context: MergingTableContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -95,20 +86,18 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
             }
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        // 本 ItemRenderer 专门渲染放在菜单里面的物品,
+        // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
+        // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
+        // 我们在这里统一清除掉这个组件.
+        item.resetMinecraftData(DataComponentTypes.CUSTOM_NAME)
+
+        item.hideAll()
 
         item.erase()
-
-        item.unsafeEdit {
-            // 本 ItemRenderer 专门渲染放在菜单里面的物品,
-            // 而这些物品有些时候会被玩家(用铁砧)修改 `minecraft:custom_name`
-            // 导致在菜单里显示的是玩家自己设置的(奇葩)名字.
-            // 我们在这里统一清除掉这个组件.
-            customName = null
-
-            lore = itemLore
-            showNothing()
-        }
     }
 }
 

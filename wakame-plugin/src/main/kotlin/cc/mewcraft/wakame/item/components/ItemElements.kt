@@ -8,8 +8,9 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.getByteArrayOrNull
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.data.getByteArrayOrNull
+import com.sun.org.apache.bcel.internal.util.Args.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -62,7 +63,7 @@ data class ItemElements(
     ) : ItemComponentType<ItemElements> {
 
         override fun read(holder: ItemComponentHolder): ItemElements? {
-            val elementSet = holder.getTag()
+            val elementSet = holder.getNbt()
                 ?.getByteArrayOrNull(TAG_VALUE)
                 ?.mapTo(ObjectArraySet(4)) { KoishRegistries.ELEMENT.getEntryOrThrow(it.toInt()) }
                 ?: return null
@@ -71,14 +72,14 @@ data class ItemElements(
 
         override fun write(holder: ItemComponentHolder, value: ItemElements) {
             require(value.elements.isNotEmpty()) { "The set of elements must not be empty" }
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 val integerIdByteArray = value.elements.mapToByteArray { KoishRegistries.ELEMENT.getRawIdOrThrow(it.value).toByte() }
                 tag.putByteArray(TAG_VALUE, integerIdByteArray)
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

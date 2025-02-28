@@ -6,11 +6,11 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import cc.mewcraft.wakame.util.itemNameOrType
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.itemNameOrType
+import cc.mewcraft.wakame.util.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
@@ -19,6 +19,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
+import kotlin.collections.set
 
 /**
  * 合成站的一项输入要求.
@@ -113,13 +114,13 @@ internal data class ItemChoice(
         itemStack.render()
 
         // 解析展示用的物品堆叠信息
-        val resolution = settings.getSlotDisplay("choice").resolveEverything {
+        val slotDisplayResolved = settings.getSlotDisplay("choice").resolveEverything {
             standard { component("item_name", itemStack.itemNameOrType) }
-            folded("item_lore", itemStack.itemLoreOrEmpty)
+            folded("item_lore", itemStack.fastLoreOrEmpty)
         }
 
         // 应用解析结果
-        return resolution.applyNameAndLoreTo(itemStack)
+        return slotDisplayResolved.applyTo(itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -179,17 +180,17 @@ internal data class ExpChoice(
  */
 internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val choiceType = node.node("type").krequire<String>()
+        val choiceType = node.node("type").require<String>()
         when (choiceType) {
             ItemChoice.TYPE -> {
-                val item = node.node("id").krequire<ItemX>()
+                val item = node.node("id").require<ItemX>()
                 val amount = node.node("amount").getInt(1)
                 require(amount > 0) { "Item amount must more than 0" }
                 return ItemChoice(item, amount)
             }
 
             ExpChoice.TYPE -> {
-                val amount = node.node("amount").krequire<Int>()
+                val amount = node.node("amount").require<Int>()
                 require(amount > 0) { "Exp amount must more than 0" }
                 return ExpChoice(amount)
             }
@@ -205,7 +206,7 @@ internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
  * 方便函数.
  */
 private fun ItemStack.render(): ItemStack {
-    val nekoStack = shadowNeko() ?: return this
+    val nekoStack = wrap() ?: return this
     val context = CraftingStationContext(Pos.CHOICE, erase = true)
     ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
     return this

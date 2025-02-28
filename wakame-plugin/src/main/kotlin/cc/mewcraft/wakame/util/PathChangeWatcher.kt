@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.util
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import cc.mewcraft.wakame.LOGGER
 import java.io.IOException
 import java.nio.file.*
 import java.util.concurrent.Executor
@@ -35,7 +33,7 @@ class PathChangeWatcher(
         try {
             watchService?.close()
         } catch (e: IOException) {
-            PathWatcherSupport.LOGGER.error("Error closing watch service", e)
+            LOGGER.error("Error closing watch service", e)
         }
         isStarted = false
     }
@@ -50,16 +48,16 @@ class PathChangeWatcher(
                     StandardWatchEventKinds.ENTRY_MODIFY
                 )
 
-                PathWatcherSupport.LOGGER.info("Watching directory $directory...")
+                LOGGER.info("Watching directory $directory...")
 
                 while (!isStopped.get()) {
                     val watchKey = try {
                         ws.take()
                     } catch (ex: InterruptedException) {
-                        PathWatcherSupport.LOGGER.error("Failed to watch $directory, watch service interrupted", ex)
+                        LOGGER.error("Failed to watch $directory, watch service interrupted", ex)
                         return
                     } catch (ex: ClosedWatchServiceException) {
-                        PathWatcherSupport.LOGGER.info("Watch service closed, stopping watcher for $directory")
+                        LOGGER.info("Watch service closed, stopping watcher for $directory")
                         return
                     }
 
@@ -70,10 +68,10 @@ class PathChangeWatcher(
                         val fileName = event.context() as Path
                         val resolvedPath: Path = directory.resolve(fileName)
 
-                        PathWatcherSupport.LOGGER.info("$kind: $context")
+                        LOGGER.info("$kind: $context")
 
                         if (resolvedPath == specificFile) {
-                            PathWatcherSupport.LOGGER.info("检测到特定文件的事件 (" + kind.name() + "), 执行特定逻辑...");
+                            LOGGER.info("检测到特定文件的事件 (" + kind.name() + "), 执行特定逻辑...");
                             onFileChange.invoke(this)
                         }
                     }
@@ -85,11 +83,7 @@ class PathChangeWatcher(
                 }
             }
         } catch (e: IOException) {
-            PathWatcherSupport.LOGGER.error("Failed to watch $directory", e)
+            LOGGER.error("Failed to watch $directory", e)
         }
     }
-}
-
-private object PathWatcherSupport : KoinComponent {
-    val LOGGER: Logger by inject()
 }

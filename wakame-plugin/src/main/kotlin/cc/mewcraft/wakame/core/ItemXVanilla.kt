@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.core
 
-import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
+import cc.mewcraft.wakame.item.KoishStackImplementations
+import cc.mewcraft.wakame.util.item.unwrapToMojang
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -24,7 +25,7 @@ class ItemXVanilla(
         // 在 wakame 这个体系下, 物品没有萌芽标签则认为是原版物品.
         // 这样的判断比 ItemStack#hasItemMeta 更能准确反应现实情况,
         // 例如: 一个拥有附魔的原版(套皮)物品也可以被正确的认为是原版物品.
-        return itemStack.unsafeNekooTagOrNull == null &&
+        return KoishStackImplementations.getNbt(itemStack.unwrapToMojang()) == null &&
                 itemStack.type == Material.matchMaterial(identifier, false)
     }
 

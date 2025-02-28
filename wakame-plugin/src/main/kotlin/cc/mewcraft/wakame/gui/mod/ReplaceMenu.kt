@@ -1,17 +1,16 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.reforge.common.CoreIcons
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.util.edit
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.removeNBT
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent
@@ -27,7 +26,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem
 internal class ReplaceMenu(
     val parent: ModdingMenu,
     val replace: ModdingSession.Replace,
-) : KoinComponent {
+) {
 
     private val viewer: Player = parent.viewer
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
@@ -63,7 +62,7 @@ internal class ReplaceMenu(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             // 玩家尝试向 inputSlot 中添加物品:
@@ -128,15 +127,15 @@ internal class ReplaceMenu(
         if (usableInput == null) {
             // 耗材不可用于定制:
 
-            parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_unusable").resolveEverything {
                 folded("result_description", replaceResult.description)
-            }.applyNameAndLoreTo(
-                originalInput
-            ).edit {
-                // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品.
-                // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉.
-                customData = null
             }
+
+            resolved.applyTo(originalInput)
+
+            // originalInput 虽然无法定制, 但可能是一个合法的萌芽物品
+            // 为了避免被发包系统接管, 我们直接把 `custom_data` 删掉
+            originalInput.removeNBT()
 
             return originalInput
 
@@ -149,12 +148,12 @@ internal class ReplaceMenu(
             ItemRenderers.MODDING_TABLE.render(usableInput, context)
 
             // 使用 SlotDisplay 再处理一遍
-            return parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
-                folded("item_lore", usableInput.wrapped.itemLoreOrEmpty)
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
+                folded("item_lore", usableInput.bukkitStack.fastLoreOrEmpty)
                 folded("result_description", replaceResult.description)
-            }.applyNameAndLoreTo(
-                usableInput.wrapped
-            )
+            }
+
+            return resolved.applyTo(usableInput.bukkitStack)
         }
     }
 
@@ -166,14 +165,13 @@ internal class ReplaceMenu(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val core = replace.cell.getCore()
+            val core = replace.cell.core
             val icon = CoreIcons.getItemStack(core)
-
-            parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
+            val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
                 standard { component("core_name", core.displayName) }
                 folded("core_description", core.description)
-            }.applyNameAndLoreTo(icon)
-
+            }
+            resolved.applyTo(icon)
             return ItemWrapper(icon)
         }
 

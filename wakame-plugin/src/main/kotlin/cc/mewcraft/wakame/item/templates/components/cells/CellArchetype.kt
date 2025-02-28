@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CellArchetypeSerializer.HINT_NODE_SELECTORS
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.random3.GroupSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.RepresentationHint
@@ -78,7 +78,7 @@ internal object CellArchetypeSerializer : TypeSerializer<CellArchetype> {
                 ?.also { groupNode -> groupNode.hint(GroupSerializer.HINT_NODE_SHARED_POOLS, selectors.node("${path}_pools")) }
         }
 
-        val core = node.find("core")?.krequire<Group<CoreArchetype, ItemGenerationContext>>() ?: Group.empty()
+        val core = node.find("core")?.require<Group<CoreArchetype, ItemGenerationContext>>() ?: Group.empty()
         val cell = SimpleCellArchetype(core)
 
         return cell

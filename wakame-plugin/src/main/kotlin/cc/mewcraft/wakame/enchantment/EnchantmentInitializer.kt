@@ -2,18 +2,13 @@
 
 package cc.mewcraft.wakame.enchantment
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.DefaultItemSlotRegistry
+import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.VanillaItemSlot
 
-@Init(
-    stage = InitStage.POST_WORLD
-)
+//@Init(stage = InitStage.POST_WORLD)
 internal object EnchantmentInitializer {
 
-    @InitFun
+    //@InitFun
     fun init() {
         // 魔咒唯一直接依赖的实例就是 Element 实例,
         // 并且 Element 是在 pre-world 就初始化了,
@@ -34,6 +29,6 @@ internal object EnchantmentInitializer {
             .flatMap { it.handle.activeSlotGroups }
             .flatMap { VanillaItemSlot.fromEquipmentSlotGroup(it) }
             .distinct()
-            .forEach { DefaultItemSlotRegistry.register(it) }
+            .forEach { ItemSlotRegistry.register(it) }
     }
 }

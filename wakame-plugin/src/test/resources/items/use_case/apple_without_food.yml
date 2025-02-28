@@ -1,3 +1,0 @@
-# Use case: 一个不能吃的苹果
-
-base: golden_apple[!food]

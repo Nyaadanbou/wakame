@@ -10,8 +10,6 @@ interface Chargeable : ItemBehavior {
     private object Default : Chargeable
 
     companion object Type : ItemBehaviorType<Chargeable> {
-        override fun create(): Chargeable {
-            return Default
-        }
+        override fun create(): Chargeable = Default
     }
 }

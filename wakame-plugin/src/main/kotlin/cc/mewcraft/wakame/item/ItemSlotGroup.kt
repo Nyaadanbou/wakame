@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import it.unimi.dsi.fastutil.objects.ReferenceSets
 import net.kyori.adventure.key.Key
@@ -24,7 +24,7 @@ object ItemSlotGroupSerializer : TypeSerializer<ItemSlotGroup> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): ItemSlotGroup {
         if (node.rawScalar() != null) {
-            val single = node.krequire<ItemSlot>()
+            val single = node.require<ItemSlot>()
             return SimpleItemSlotGroup(ReferenceSets.singleton(single))
         }
 

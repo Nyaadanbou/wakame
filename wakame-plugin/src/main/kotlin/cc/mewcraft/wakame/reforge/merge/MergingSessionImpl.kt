@@ -1,21 +1,22 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.portableCore
-import cc.mewcraft.wakame.item.rarity
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.extension.portableCore
+import cc.mewcraft.wakame.item.extension.rarity
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
@@ -23,10 +24,9 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
 import java.util.stream.Stream
 import kotlin.properties.Delegates
 
@@ -35,8 +35,8 @@ internal class SimpleMergingSession(
     override val table: MergingTable,
     inputItem1: NekoStack? = null,
     inputItem2: NekoStack? = null,
-) : MergingSession, KoinComponent {
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
+) : MergingSession {
+    private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
     override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem1)
     override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem2)
@@ -57,7 +57,7 @@ internal class SimpleMergingSession(
         val item = when (slot) {
             InputSlot.INPUT1 -> inputItem1
             InputSlot.INPUT2 -> inputItem2
-        }?.itemStack
+        }?.bukkitStack?.clone()
 
         if (item != null) {
             try {
@@ -77,7 +77,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
     override fun getFinalOutputs(): Array<ItemStack> {
         if (latestResult.isSuccess) {
-            return arrayOf(latestResult.output.itemStack)
+            return arrayOf(latestResult.output.bukkitStack.clone())
         } else {
             return emptyArray()
         }
@@ -107,7 +107,7 @@ internal class SimpleMergingSession(
             MergeOperation(this)
         } catch (e: Exception) {
             logger.error("An unknown error occurred while merging. This is a bug!", e)
-            ReforgeResult.failure(viewer, MessageConstants.MSG_ERR_INTERNAL_ERROR)
+            ReforgeResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
         }
     }
 
@@ -134,7 +134,7 @@ internal class SimpleMergingSession(
     @Suppress("UNCHECKED_CAST")
     private fun getValue(inputItem: NekoStack?): Double {
         val core = inputItem?.portableCore?.wrapped as? AttributeCore ?: return .0
-        val scalar = core.attribute as? AttributeBundleTrait.Scalar<Double>
+        val scalar = core.data as? AttributeBundleTrait.Scalar<Double>
         return scalar?.value ?: .0
     }
 
@@ -178,7 +178,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(player: Player): MergingSession.ReforgeResult {
-        return Simple(false, MessageConstants.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
+        return Simple(false, TranslatableMessages.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
     }
 
     /**
@@ -192,7 +192,7 @@ internal object ReforgeResult {
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
     fun success(player: Player, item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
-        return Simple(true, MessageConstants.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
+        return Simple(true, TranslatableMessages.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
     }
 
     private class Simple(
@@ -251,28 +251,28 @@ internal object ReforgeType {
     private data class Empty(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_EMPTY.translate(viewer))
     }
 
     private data class Failure(val viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation
             get() = throw IllegalStateException("this type is not supposed to be used.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_FAILURE.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_FAILURE.translate(viewer))
     }
 
     private class Success0(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_0.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_0.translate(viewer))
     }
 
     private class Success1(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_BASE
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_1.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_1.translate(viewer))
     }
 
     private class Success2(viewer: Player) : Base() {
         override val operation: AttributeModifier.Operation = AttributeModifier.Operation.MULTIPLY_TOTAL
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_TYPE_SUCCESS_2.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_TYPE_SUCCESS_2.translate(viewer))
     }
 }
 
@@ -306,13 +306,13 @@ internal object ReforgeCost {
     private class Zero(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_ZERO.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_ZERO.translate(viewer))
     }
 
     private class Failure(viewer: Player) : Base() {
         override fun take(viewer: Player): Unit = throw IllegalStateException("this cost is not supposed to be taken.")
         override fun test(viewer: Player): Boolean = throw IllegalStateException("this cost is not supposed to be tested.")
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_EMPTY.translate(viewer))
     }
 
     private data class Success(
@@ -327,6 +327,6 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_MERGING_COST_SUCCESS.arguments(TranslationArgument.numeric(amount)).translate(viewer))
     }
 }

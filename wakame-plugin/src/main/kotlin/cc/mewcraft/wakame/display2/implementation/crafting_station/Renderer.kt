@@ -2,38 +2,26 @@ package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.FoodProperties
 import cc.mewcraft.wakame.item.components.ItemEnchantments
 import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAttributeModifiers
+import cc.mewcraft.wakame.item.extension.hideEnchantments
+import cc.mewcraft.wakame.item.extension.hideStoredEnchantments
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.DamageResistant
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
-import cc.mewcraft.wakame.item.templates.components.ItemCells
-import cc.mewcraft.wakame.item.templates.components.ItemCrate
-import cc.mewcraft.wakame.item.templates.components.ItemElements
-import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
-import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.item.templates.components.*
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -70,12 +58,12 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
 
     @InitFun
     private fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     private fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
@@ -87,7 +75,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
     override fun render(item: NekoStack, context: CraftingStationContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -108,18 +96,16 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.PORTABLE_CORE) { data -> CraftingStationRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
 
         if (context.erase) {
             item.erase()
         }
 
-        item.unsafeEdit {
-            lore = itemLore
-            showAttributeModifiers(false)
-            showEnchantments(false)
-            showStoredEnchantments(false)
-        }
+        item.hideAttributeModifiers()
+        item.hideEnchantments()
+        item.hideStoredEnchantments()
     }
 }
 

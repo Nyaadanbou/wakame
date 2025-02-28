@@ -1,0 +1,49 @@
+# 不要修改!
+version: 1
+
+primary:
+  - general:level
+  - attribute:entity_interaction_range
+  - attribute:block_interaction_range
+  - attribute:hammer_damage_range
+  - attribute:hammer_damage_ratio
+  - attribute:sweeping_damage_ratio
+  - attribute:attack_knockback
+  - attribute:knockback_resistance
+
+  - (fixed:attribute)<st><dark_gray>             </dark_gray></st>
+  - attribute:universal_attack_damage
+  - attribute:universal_defense
+  - attribute:attack_damage
+  - attribute:max_health
+  - attribute:defense
+
+  - (fixed:attribute)<st><dark_gray>             </dark_gray></st>
+  - attribute:universal_defense_penetration
+  - attribute:universal_defense_penetration_rate
+  - attribute:attack_damage_rate
+  - attribute:defense_penetration
+  - attribute:incoming_damage_rate
+  - attribute:max_mana
+  - attribute:lifesteal
+  - attribute:manasteal
+  - attribute:max_absorption
+  - attribute:attack_effect_chance
+  - attribute:critical_strike_chance
+  - attribute:critical_strike_power
+  - attribute:negative_critical_strike_power
+  - attribute:none_critical_strike_power
+  - attribute:mana_consumption_rate
+  - attribute:mining_efficiency
+  - attribute:movement_speed
+  - attribute:water_movement_efficiency
+  - attribute:safe_fall_distance
+  - attribute:scale
+  - attribute:step_height
+  - attribute:health_regeneration
+  - attribute:mana_regeneration
+  - stash:cells/empty
+
+  - (fixed:general)<st><dark_gray>             </dark_gray></st>
+  - general:elements
+  - general:rarity

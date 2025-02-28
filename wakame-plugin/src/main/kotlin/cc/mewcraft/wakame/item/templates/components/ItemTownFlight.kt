@@ -2,12 +2,8 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
@@ -40,9 +36,9 @@ data class ItemTownFlight(
         override val type: TypeToken<ItemTownFlight> = typeTokenOf()
 
         override fun decode(node: ConfigurationNode): ItemTownFlight {
-            val duration = node.node("duration").krequire<Long>()
+            val duration = node.node("duration").require<Long>()
             val rocketOnConsume = node.node("rocket_on_consume").getBoolean(false)
-            val rocketForce = node.node("rocket_force").krequire<Double>()
+            val rocketForce = node.node("rocket_force").require<Double>()
             return ItemTownFlight(duration, rocketOnConsume, rocketForce)
         }
     }

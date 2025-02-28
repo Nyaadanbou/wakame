@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation.entries
+import cc.mewcraft.wakame.util.StringIdentifiable
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
 import net.kyori.adventure.key.Key
 
@@ -17,27 +17,25 @@ data class AttributeModifier(
     enum class Operation(
         val id: Int,
         val key: String,
-    ) {
+    ) : StringIdentifiable {
         ADD(0, "add"),
         MULTIPLY_BASE(1, "multiply_base"),
         MULTIPLY_TOTAL(2, "multiply_total");
 
-        val binary: Byte = id.toByte()
+        override val stringId: String = this.key
 
         companion object {
+
             private val BY_NAME: Map<String, Operation> = mapOf(
                 ADD.key to ADD,
                 MULTIPLY_BASE.key to MULTIPLY_BASE,
                 MULTIPLY_TOTAL.key to MULTIPLY_TOTAL
             ).let(::Object2ReferenceArrayMap)
 
-            fun byId(id: Int): Operation? {
-                return entries.getOrNull(id)
-            }
+            fun byId(id: Int): Operation? = entries.getOrNull(id)
 
-            fun byName(key: String): Operation? {
-                return BY_NAME[key]
-            }
+            fun byName(key: String): Operation? = BY_NAME[key]
+
         }
     }
 

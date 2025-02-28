@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.adventure.translator
 
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.*
 import net.kyori.adventure.text.minimessage.*
@@ -17,6 +17,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Stream
 
 interface MiniMessageTranslationRegistry : Translator {
+
+    companion object {
+        fun create(name: Key, miniMessage: MiniMessage): MiniMessageTranslationRegistry {
+            return MiniMessageTranslationRegistryImpl(name, miniMessage)
+        }
+    }
+
     /**
      * Register a translation for a key.
      */
@@ -74,12 +81,6 @@ interface MiniMessageTranslationRegistry : Translator {
     }
 
     fun unregisterAll()
-
-    companion object {
-        fun create(name: Key, miniMessage: MiniMessage): MiniMessageTranslationRegistry {
-            return MiniMessageTranslationRegistryImpl(name, miniMessage)
-        }
-    }
 }
 
 private class MiniMessageTranslationRegistryImpl(

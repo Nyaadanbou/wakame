@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.crate.Crate
-import cc.mewcraft.wakame.item.component.ItemComponentMaps
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationContexts
-import cc.mewcraft.wakame.item.template.ItemGenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.component.ItemComponentMap
+import cc.mewcraft.wakame.item.extension.makeItemModelKey
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.util.item.unwrapToMojang
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
@@ -54,23 +50,21 @@ interface NekoItemRealizer {
 }
 
 internal object VanillaNekoItemRealizer : NekoItemRealizer {
-    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryNekoStack {
+    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryKoishStack {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem, crate: Crate): ImaginaryNekoStack {
+    override fun realize(prototype: NekoItem, crate: Crate): ImaginaryKoishStack {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem, context: ItemGenerationContext): ImaginaryNekoStack {
+    override fun realize(prototype: NekoItem, context: ItemGenerationContext): ImaginaryKoishStack {
         return realize(prototype)
     }
 
-    override fun realize(prototype: NekoItem): ImaginaryNekoStack {
-        // 没 trigger 的 ctx
+    override fun realize(prototype: NekoItem): ImaginaryKoishStack {
         val context = ItemGenerationContexts.create(ItemGenerationTriggers.empty(), prototype.id, 0)
-        // 获取 物品组件 的构建器
-        val builder = ItemComponentMaps.builder()
+        val builder = ItemComponentMap.builder()
 
         fun <T, S : ItemTemplate<T>> generate(type: ItemTemplateType<S>) {
             val template = prototype.templates.get(type) ?: return
@@ -96,9 +90,9 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CELLS)
 
         val components = builder.build()
-        val nekoStack = ImaginaryNekoStack(
+        val nekoStack = ImaginaryKoishStack(
             prototype = prototype,
-            components = ItemComponentMaps.unmodifiable(components)
+            components = ItemComponentMap.immutable(components)
         )
 
         return nekoStack
@@ -138,19 +132,19 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
      */
     private fun realizeByContext(prototype: NekoItem, context: ItemGenerationContext): NekoStack {
         // 创建空的萌芽物品
-        val nekoStack = prototype.base.createNekoStack()
-        // 获取萌芽物品的底层 ItemStack
-        val itemStack = nekoStack.wrapped
+        val itemstack = prototype.base.createItemStack().unwrapToMojang()
+        if (itemstack.isEmpty) {
+            error("The item base cannot be empty")
+        }
+        val koishstack = CustomKoishStack(itemstack)
 
         // 设置物品的 id 和 variant
-        NekoStackImplementations.setId(itemStack, prototype.id)
-        NekoStackImplementations.setVariant(itemStack, 0)
-        NekoStackImplementations.setItemModel(itemStack, prototype.modelKey)
+        KoishStackImplementations.setId(itemstack, prototype.id)
+        KoishStackImplementations.setVariant(itemstack, 0)
+        KoishStackImplementations.setItemModel(itemstack, prototype.makeItemModelKey())
 
-        // 获取 物品组件 的容器
-        val components = nekoStack.components
-        // 获取 物品组件模板 的容器
-        val templates = nekoStack.templates
+        val components = koishstack.components
+        val templates = koishstack.templates
 
         fun <T, S : ItemTemplate<T>> generate(type: ItemTemplateType<S>) {
             val template = templates.get(type) ?: return
@@ -166,9 +160,7 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
 
         generate(ItemTemplateTypes.CASTABLE)
         generate(ItemTemplateTypes.GLOWABLE)
-
         generate(ItemTemplateTypes.ARROW)
-
         generate(ItemTemplateTypes.LEVEL)
         generate(ItemTemplateTypes.RARITY)
         generate(ItemTemplateTypes.ELEMENTS)
@@ -176,7 +168,6 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.CUSTOM_NAME)
         generate(ItemTemplateTypes.ITEM_NAME)
         generate(ItemTemplateTypes.LORE)
-
         generate(ItemTemplateTypes.ATTACK)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
@@ -194,11 +185,10 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.DAMAGE)
         generate(ItemTemplateTypes.TOOL)
         generate(ItemTemplateTypes.FOOD)
-
         generate(ItemTemplateTypes.PORTABLE_CORE)
-        generate(ItemTemplateTypes.CELLS) // 核孔最复杂, 并且依赖部分组件, 因此放在最后
+        generate(ItemTemplateTypes.CELLS)
         generate(ItemTemplateTypes.CRATE)
 
-        return nekoStack
+        return koishstack
     }
 }

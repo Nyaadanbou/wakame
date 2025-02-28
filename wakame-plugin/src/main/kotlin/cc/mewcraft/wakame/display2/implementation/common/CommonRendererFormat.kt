@@ -1,27 +1,22 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.adventure.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import it.unimi.dsi.fastutil.objects.ObjectImmutableList
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import org.bukkit.enchantments.Enchantment
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import xyz.xenondevs.commons.collections.takeUnlessEmpty
+import java.util.Collections.emptyList
 
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormat 实现 */
 
@@ -64,10 +59,6 @@ internal data class ExtraLoreRendererFormat(
         val header: List<String> = listOf(),
         val bottom: List<String> = listOf(),
     )
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
 }
 
 /**
@@ -122,10 +113,6 @@ internal data class RarityRendererFormat(
                 )
             )
         )
-    }
-
-    companion object {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 

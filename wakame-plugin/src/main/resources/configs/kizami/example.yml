@@ -1,0 +1,32 @@
+# FIXME 移除 binary_index, 持久化直接储存字符串 id
+# 该铭刻的持久化的数字 id
+binary_index: 127
+
+# 该铭刻的展示名字
+display_name: "<green>庇护"
+
+# 该铭刻的展示风格
+styles: "<green>"
+
+# 该铭刻提供的效果
+#
+# 该 node 的 value 是一个 map, 其中
+# map key 类型为 int, 是本铭刻在玩家身上的数量,
+# map value 类型为 list, 是本铭刻数量对应的效果.
+#
+# 下面这个例子中:
+# 拥有 1 个铭刻提供 +5 universal_defense,
+# 拥有 2 个铭刻提供 +10 universal_defense,
+# 拥有 3 个铭刻提供 +15 universal_defense 和 +0.1 knockback_resistance
+# 拥有 4 个铭刻提供 +20 universal_defense 和 +0.2 knockback_resistance
+effects:
+  1:
+    - { type: "attribute_modifier", id: "universal_defense", operation: add, value: 5 }
+  2:
+    - { type: "attribute_modifier", id: "universal_defense", operation: add, value: 10 }
+  3:
+    - { type: "attribute_modifier", id: "universal_defense", operation: add, value: 15 }
+    - { type: "attribute_modifier", id: "knockback_resistance", operation: add, value: 0.1 }
+  4:
+    - { type: "attribute_modifier", id: "universal_defense", operation: add, value: 20 }
+    - { type: "attribute_modifier", id: "knockback_resistance", operation: add, value: 0.2 }

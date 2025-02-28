@@ -1,0 +1,11 @@
+# 不要修改!
+version: 1
+
+primary:
+  - general:level
+  - (fixed:reforge)<st><dark_gray>             </dark_gray></st>
+  - reforge:merge_input
+  - reforge:merge_output
+  - (fixed:general)<st><dark_gray>             </dark_gray></st>
+  - general:elements
+  - general:rarity

@@ -1,6 +1,6 @@
 plugins {
-    id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.kotlin")
+    id("cc.mewcraft.libraries-repository")
     id("io.papermc.paperweight.userdev")
 }
 

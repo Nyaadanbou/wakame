@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateBridge
 import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.text.Component
@@ -48,7 +48,7 @@ data class ItemName(
                 return ItemName(plainName = scalar, fancyName = scalar)
             } else {
                 // some other format
-                val plain = node.node("plain").krequire<String>()
+                val plain = node.node("plain").require<String>()
                 val fancy = node.node("fancy").string ?: plain
                 return ItemName(plainName = plain, fancyName = fancy)
             }

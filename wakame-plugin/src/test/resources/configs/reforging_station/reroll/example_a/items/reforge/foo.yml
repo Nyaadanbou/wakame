@@ -1,0 +1,12 @@
+mod_limit: 8
+
+cells:
+
+  a:
+    currency_cost: "100.0 * query.mod_count()"
+
+  b:
+    currency_cost: "150.0 * query.mod_count()"
+
+  c:
+    currency_cost: "200.0 * query.mod_count()"

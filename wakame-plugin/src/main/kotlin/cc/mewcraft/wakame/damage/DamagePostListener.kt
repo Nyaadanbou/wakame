@@ -4,28 +4,32 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.util.event
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 
 /**
  * 监听萌芽伤害事件, 使其遵循保护系统的规则.
  */
-object DamagePostListener : Listener {
+@Init(
+    stage = InitStage.POST_WORLD,
+)
+internal object DamagePostListener {
 
-    @EventHandler(
-        ignoreCancelled = true,
-        priority = EventPriority.HIGHEST
-    )
-    fun on(event: NekoEntityDamageEvent) {
-        val damager = event.damageSource.causingEntity as? Player ?: return
-        val damagee = event.damagee as? LivingEntity ?: return
+    @InitFun
+    fun init() {
+        event<NekoEntityDamageEvent>(EventPriority.HIGHEST, true) {
+            val damager = it.damageSource.causingEntity as? Player ?: return@event
+            val damagee = it.damagee as? LivingEntity ?: return@event
 
-        event.isCancelled = !ProtectionManager.canHurtEntity(damager, damagee, null)
+            it.isCancelled = !ProtectionManager.canHurtEntity(damager, damagee, null)
+        }
     }
 
 }

@@ -1,32 +1,20 @@
 package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.Node
-import cc.mewcraft.wakame.random3.NodeContainer
-import cc.mewcraft.wakame.random3.NodeFacadeSupport
-import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.random3.Pool
-import cc.mewcraft.wakame.random3.PoolSerializer
-import cc.mewcraft.wakame.random3.Sample
-import cc.mewcraft.wakame.random3.SampleNodeFacade
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.random3.*
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
@@ -67,13 +55,13 @@ data class ItemElements(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemElements {
-            return ItemElements(node.krequire<Pool<RegistryEntry<ElementType>, ItemGenerationContext>>())
+            return ItemElements(node.require<Pool<RegistryEntry<ElementType>, ItemGenerationContext>>())
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
-                .kregister(ElementPoolSerializer)
-                .kregister(FilterSerializer) // 凡是随机池都要用到筛选器
+                .register<Pool<RegistryEntry<ElementType>, ItemGenerationContext>>(ElementPoolSerializer)
+                .register<Filter<ItemGenerationContext>>(FilterSerializer) // 凡是随机池都要用到筛选器
                 .build()
         }
     }
@@ -87,9 +75,9 @@ data class ItemElements(
 )
 @Reload
 internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<ElementType>, ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/elements")
+    override val dataDir: Path = Path("random/item_element/")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
-        .kregister(FilterSerializer)
+        .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()
     override val repository: NodeRepository<Sample<RegistryEntry<ElementType>, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<RegistryEntry<ElementType>> = typeTokenOf()
@@ -106,7 +94,7 @@ internal object ElementSampleNodeFacade : SampleNodeFacade<RegistryEntry<Element
     }
 
     override fun decodeSampleData(node: ConfigurationNode): RegistryEntry<ElementType> {
-        return node.node("type").krequire<RegistryEntry<ElementType>>()
+        return node.node("type").require<RegistryEntry<ElementType>>()
     }
 
     override fun intrinsicFilters(value: RegistryEntry<ElementType>): Collection<Filter<ItemGenerationContext>> {

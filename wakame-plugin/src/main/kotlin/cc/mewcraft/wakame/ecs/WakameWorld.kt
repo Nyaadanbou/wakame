@@ -1,29 +1,32 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.WakamePlugin
+import cc.mewcraft.wakame.ability.system.AbilityBukkitEntityMetadataSystem
+import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
+import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
+import cc.mewcraft.wakame.ecs.WakameWorld.componentMap
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.ecs.system.*
-import cc.mewcraft.wakame.ability.system.AbilityBukkitEntityMetadataSystem
-import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
-import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
-import com.github.quillraven.fleks.*
+import cc.mewcraft.wakame.ecs.system.InitSystem
+import cc.mewcraft.wakame.ecs.system.MechanicSystem
+import cc.mewcraft.wakame.ecs.system.ParticleSystem
+import cc.mewcraft.wakame.ecs.system.RemoveSystem
+import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
+import cc.mewcraft.wakame.ecs.system.TickCountSystem
+import cc.mewcraft.wakame.ecs.system.TickResultSystem
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityCreateContext
+import com.github.quillraven.fleks.EntityUpdateContext
+import com.github.quillraven.fleks.Family
+import com.github.quillraven.fleks.World
+import com.github.quillraven.fleks.configureWorld
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
 
-class WakameWorld(
-    private val plugin: WakamePlugin,
-) {
-    companion object : KoinComponent {
-        private val logger: Logger by inject()
-    }
+object WakameWorld {
 
     /**
      * 缓存了单个 tick 内的 [ComponentMap], 每次更新会进行清除.
@@ -33,12 +36,6 @@ class WakameWorld(
     private val componentMapCache: Object2ObjectOpenHashMap<Entity, ComponentMap> = Object2ObjectOpenHashMap()
 
     val instance: World = configureWorld {
-
-        injectables {
-            add(plugin)
-            add(logger)
-            add(this@WakameWorld)
-        }
 
         systems {
             // 关于顺序: 删除系统优先于一切系统.

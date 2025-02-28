@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.template
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream

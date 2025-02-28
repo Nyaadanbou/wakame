@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.component.Remove
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -9,6 +10,6 @@ class RemoveSystem : IteratingSystem(
     family = family { all(Remove) }
 ) {
     override fun onTickEntity(entity: Entity) {
-        entity.remove()
+        entity.remove().also { LOGGER.info("Entity $entity removed") }
     }
 }

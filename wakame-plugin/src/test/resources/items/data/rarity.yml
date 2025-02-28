@@ -1,6 +1,0 @@
-base: bedrock
-
-# 稀有度
-# 如果写 "mapping:<唯一标识>"，则根据唯一标识对应的映射生成
-# 如果写 "rarity:<稀有度名>"，则始终以这里指定的稀有度生成
-rarity: mapping:demo_1

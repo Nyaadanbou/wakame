@@ -1,36 +1,36 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.pack.generate.ResourcePackCustomModelGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
 import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackModelSortGeneration
-import cc.mewcraft.wakame.pack.generate.ResourcePackRegistryModelGeneration
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
-import org.koin.core.qualifier.named
 import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.ResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
-import xyz.xenondevs.commons.provider.immutable.orElse
-import java.io.File
+import xyz.xenondevs.commons.provider.orElse
+
+internal val RESOURCE_PACK_CONFIG = Configs["resourcepack"]
 
 internal class ResourcePackManager(
     private val packReader: ResourcePackReader<FileTreeReader>,
     private val packWriter: ResourcePackWriter<FileTreeWriter>,
 ) {
-    private val pluginDataDirectory: File by Injector.inject(named(PLUGIN_DATA_DIR))
     private val generationSettings: ResourcePackGenerationSettings = ResourcePackGenerationSettings()
 
     /**
@@ -38,11 +38,11 @@ internal class ResourcePackManager(
      *
      * @return 包含生成是否成功的结果
      */
-    fun generate() {
-        val tempDir = pluginDataDirectory.resolve("temp").apply { mkdirs() }
+    suspend fun generate() {
+        val tempDir = KoishDataPaths.ROOT.resolve(".temp").toFile().apply { mkdirs() }
         try {
-            val resourcePackFile = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
-            val resourcePackDirectory = pluginDataDirectory.resolve(GENERATED_RESOURCE_PACK_DIR)
+            val resourcePackFile = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toFile()
+            val resourcePackDirectory = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_DIR).toFile()
 
             resourcePackFile.delete()
             resourcePackDirectory.deleteRecursively()
@@ -67,10 +67,8 @@ internal class ResourcePackManager(
             val generations: List<ResourcePackGeneration> = listOf(
                 ResourcePackMetaGeneration(context),
                 ResourcePackIconGeneration(context),
-                ResourcePackRegistryModelGeneration(context),
                 ResourcePackCustomModelGeneration(context),
                 ResourcePackMergePackGeneration(context, packReader),
-                ResourcePackModelSortGeneration(context)
             )
 
             try {

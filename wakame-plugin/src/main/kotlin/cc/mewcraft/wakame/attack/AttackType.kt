@@ -1,20 +1,18 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.applyAttackCooldown
+import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerItemDamageEvent
-import org.koin.core.component.get
-import org.slf4j.Logger
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
@@ -73,8 +71,6 @@ data object HandAttack : AttackType
  * [AttackType] 的序列化器.
  */
 internal object AttackTypeSerializer : TypeSerializer<AttackType> {
-    private val LOGGER: Logger = Injector.get()
-
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): AttackType {
         return HandAttack // 默认的攻击类型
     }

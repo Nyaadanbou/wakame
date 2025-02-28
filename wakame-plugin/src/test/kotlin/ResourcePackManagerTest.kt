@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
 import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -44,7 +45,7 @@ class ResourcePackManagerTest : KoinTest {
     }
 
     @Test
-    fun `test generate pack`() {
+    fun `test generate pack`() = runTest {
         // Create mocks
         val mockResourceReader = mockk<ResourcePackReader<FileTreeReader>>()
         val mockResourceWriter = mockk<ResourcePackWriter<FileTreeWriter>>()

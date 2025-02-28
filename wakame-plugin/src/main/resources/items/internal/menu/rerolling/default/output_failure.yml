@@ -1,4 +1,0 @@
-base: barrier
-menu_icon_name: "OUTPUT_FAILURE"
-menu_icon_lore:
-  - "{failure_reason}"

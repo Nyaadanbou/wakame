@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.ability.character
 
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Location
@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference
 import java.util.stream.Stream
 
 class BukkitLocationTarget(
-    override val bukkitLocation: Location
+    override val bukkitLocation: Location,
 ) : Target.Location, Examinable {
     override fun <T : Target> value(clazz: Class<T>): T? {
         return when (clazz) {
@@ -36,7 +36,7 @@ class BukkitLocationTarget(
 }
 
 class BukkitLivingEntityTarget(
-    bukkitEntity: LivingEntity
+    bukkitEntity: LivingEntity,
 ) : Target.LivingEntity, Examinable {
     private val weakBukkitEntity: WeakReference<LivingEntity> = WeakReference(bukkitEntity)
 

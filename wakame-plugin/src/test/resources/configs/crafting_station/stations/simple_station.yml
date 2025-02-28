@@ -1,0 +1,38 @@
+type: simple
+
+recipes:
+  - test:raw_bronze
+  - test:amethyst_dust
+
+listing_layout:
+  title: "Listing"
+  structure:
+    - "x x x x x x x x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x < x x x > x x"
+  icons:
+    background: "internal:menu/common/background"
+    prev_page: "internal:menu/common/prev_page"
+    next_page: "internal:menu/common/next_page"
+    listing: "internal:menu/crafting/listing"
+
+preview_layout:
+  title: "Preview"
+  structure:
+    - "x x x x x x x x x"
+    - "x i i i i x x x x"
+    - "x i i i i x x o x"
+    - "x i i i i x x x x"
+    - "x < x x > x x c x"
+    - "x x x x b x x x x"
+  icons:
+    back: "internal:menu/common/back"
+    background: "internal:menu/common/background"
+    next_page: "internal:menu/common/next_page"
+    prev_page: "internal:menu/common/prev_page"
+    choice: "internal:menu/crafting/choice"
+    craft: "internal:menu/crafting/craft"
+    result: "internal:menu/crafting/result"

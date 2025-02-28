@@ -1,22 +1,15 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
-import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
-import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
-import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.reforge.common.*
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.collections.associateNotNull
 import java.io.File
@@ -26,29 +19,31 @@ import java.lang.reflect.Type
  * [ModdingTable] 的序列化器.
  */
 internal object ModdingTableSerializer {
-    private const val ROOT_DIR_NAME = "mod"
-
-    private val MODDING_DIR by lazy { Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(Reforge.ROOT_DIR_NAME).resolve(ROOT_DIR_NAME) }
+    private const val ROOT_DIR = "mod"
 
     /**
      * 从配置文件夹中加载所有的定制台.
      */
     fun loadAll(): Map<String, ModdingTable> {
-        val map = MODDING_DIR
-            .walk().maxDepth(1)
+        val dataDir = KoishDataPaths.CONFIGS
+            .resolve(ReforgingStationConstants.DATA_DIR)
+            .resolve(ROOT_DIR)
+            .toFile()
+        val result = dataDir
+            .walk()
+            .maxDepth(1)
             .drop(1)
             .filter { it.isDirectory }
-            .mapNotNull {
+            .mapNotNull { f ->
                 try {
-                    val table = load(it)
-                    it.name to table
+                    f.name to load(dataDir, f)
                 } catch (e: Exception) {
-                    LOGGER.error("Can't load modding table: '${it.relativeTo(MODDING_DIR)}'", e)
+                    LOGGER.error("Can't load modding table: '${f.relativeTo(dataDir)}'. Skipped.", e)
                     return@mapNotNull null
                 }
             }
-            .associate { it }
-        return map
+            .toMap()
+        return result
     }
 
     /**
@@ -71,7 +66,7 @@ internal object ModdingTableSerializer {
      * @return 读取的 [ModdingTable]
      * @throws IllegalArgumentException 如果 [tableDir] 不是文件夹
      */
-    fun load(tableDir: File): ModdingTable {
+    fun load(rootDir: File, tableDir: File): ModdingTable {
         require(tableDir.isDirectory) { "Not a directory: '$tableDir'" }
 
         val tableMainConfigFile = tableDir.resolve("config.yml")
@@ -81,18 +76,18 @@ internal object ModdingTableSerializer {
         val tableMainConfigNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                kregister(TableCurrencyCost)
-                kregister(RarityNumberMappingSerializer)
+                register(TableCurrencyCost)
+                register(RarityNumberMappingSerializer)
             }
         }.buildAndLoadString(tableMainConfigFile.readText())
 
         // 解析主要配置
         val id = tableDir.name
-        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
-        val replaceMenuSettings = tableMainConfigNode.node("replace_menu_settings").krequire<BasicMenuSettings>()
-        val reforgeCountAddMethod = tableMainConfigNode.node("reforge_count_add_method").krequire<ModdingTable.ReforgeCountAddMethod>()
-        val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").krequire<RarityNumberMapping>()
-        val currencyCost = tableMainConfigNode.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>>()
+        val primaryMenuSettings = tableMainConfigNode.node("primary_menu_settings").require<BasicMenuSettings>()
+        val replaceMenuSettings = tableMainConfigNode.node("replace_menu_settings").require<BasicMenuSettings>()
+        val reforgeCountAddMethod = tableMainConfigNode.node("reforge_count_add_method").require<ModdingTable.ReforgeCountAddMethod>()
+        val rarityNumberMapping = tableMainConfigNode.node("rarity_number_mapping").require<RarityNumberMapping>()
+        val currencyCost = tableMainConfigNode.node("currency_cost").require<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>>()
 
         // 解析物品规则
         val itemRuleMap = NamespacedFileTreeWalker(tableItemsDirectory, "yml", true)
@@ -104,22 +99,22 @@ internal object ModdingTableSerializer {
                     val itemNode = buildYamlConfigLoader {
                         withDefaults()
                         serializers {
-                            kregister(CellRule)
-                            kregister(CellCurrencyCost)
-                            kregister(CoreMatchRuleSerializer)
-                            kregister(CoreMatchRuleContainerSerializer)
+                            register<ModdingTable.CellRule>(CellRule)
+                            register<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>(CellCurrencyCost)
+                            register<CoreMatchRule>(CoreMatchRuleSerializer)
+                            register<CoreMatchRuleContainer>(CoreMatchRuleContainerSerializer)
                         }
                     }.buildAndLoadString(fileText)
 
                     val modLimit = itemNode.node("mod_limit").getInt(0)
                     // configurate 返回的是 LinkedHashMap, 保留了顺序
-                    val cellRuleMapData = itemNode.node("cells").krequire<Map<String, ModdingTable.CellRule>>()
+                    val cellRuleMapData = itemNode.node("cells").require<Map<String, ModdingTable.CellRule>>()
                     val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
                     val itemRule = SimpleModdingTable.ItemRule(itemId, modLimit, cellRuleMap)
 
                     itemId to itemRule
                 } catch (e: Exception) {
-                    LOGGER.error("Can't load item rule: '${file.relativeTo(MODDING_DIR)}'", e)
+                    LOGGER.error("Can't load item rule: '${file.relativeTo(rootDir)}'", e)
                     return@associateNotNull null
                 }
             }
@@ -139,7 +134,7 @@ internal object ModdingTableSerializer {
 
     private object TableCurrencyCost : TypeSerializer<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction> {
-            val code = node.krequire<String>()
+            val code = node.require<String>()
             val function = SimpleModdingTable.TableTotalFunction(code)
             return SimpleModdingTable.TableCurrencyCost(function)
         }
@@ -147,7 +142,7 @@ internal object ModdingTableSerializer {
 
     private object CellCurrencyCost : TypeSerializer<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
-            val code = node.krequire<String>()
+            val code = node.require<String>()
             val function = SimpleModdingTable.CellTotalFunction(code)
             return SimpleModdingTable.CellCurrencyCost(function)
         }
@@ -155,10 +150,10 @@ internal object ModdingTableSerializer {
 
     private object CellRule : TypeSerializer<ModdingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CellRule {
-            val currencyCost = node.node("currency_cost").krequire<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>()
+            val currencyCost = node.node("currency_cost").require<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>()
             val requireElementMatch = node.node("require_element_match").getBoolean(false)
             val permission = node.node("permission").string
-            val acceptedCores = node.node("accepted_cores").krequire<CoreMatchRuleContainer>()
+            val acceptedCores = node.node("accepted_cores").require<CoreMatchRuleContainer>()
             return SimpleModdingTable.CellRule(
                 currencyCost = currencyCost,
                 requireElementMatch = requireElementMatch,

@@ -13,12 +13,12 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  * 用于生成 [AttributeCore] 的 [DerivedIndex].
  */
 internal fun AttributeCore.computeIndex(namespace: String): DerivedIndex {
-    val attribute = attribute
     val indexId = buildString {
-        append(attribute.id)
+        val data2 = data
+        append(data2.id)
         append('.')
-        append(attribute.operation.key)
-        attribute.element?.let {
+        append(data2.operation.key)
+        data2.element?.let {
             append('.')
             append(it.getIdAsString())
         }

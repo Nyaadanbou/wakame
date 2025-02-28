@@ -1,37 +1,30 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.runTask
+import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.util.*
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.qualifier.named
-import java.io.File
+import kotlin.collections.set
 
 @Init(
     stage = InitStage.POST_WORLD
 )
 @Reload(
     runAfter = [
-        ItemRegistryConfigStorage::class, // deps: 需要直接的数据
+        ItemTypeRegistryLoader::class, // deps: 需要直接的数据
     ],
 )
 object VanillaRecipeRegistry {
-    private const val RECIPE_DIR_PATH = "recipes"
 
     @VisibleForTesting
     val RAW: MutableMap<Key, VanillaRecipe> = mutableMapOf()
@@ -70,7 +63,7 @@ object VanillaRecipeRegistry {
     fun loadDataIntoRegistry() {
         RAW.clear()
 
-        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        val recipeDir = KoishDataPaths.CONFIGS.resolve(VanillaRecipeConstants.DATA_DIR).toFile()
         for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()
@@ -79,17 +72,17 @@ object VanillaRecipeRegistry {
                 val recipeNode = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
-                        kregister(VanillaRecipeSerializer)
-                        kregister(RecipeChoiceSerializer)
-                        kregister(RecipeResultSerializer)
-                        kregister(ItemXSerializer)
+                        register<VanillaRecipe>(VanillaRecipeSerializer)
+                        register<RecipeChoice>(RecipeChoiceSerializer)
+                        register<RecipeResult>(RecipeResultSerializer)
+                        register(ItemXSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
                 // 注入 key 节点
                 recipeNode.hint(VanillaRecipeSerializer.HINT_NODE, key)
                 // 反序列化 Recipe
-                val vanillaRecipe = recipeNode.krequire<VanillaRecipe>()
+                val vanillaRecipe = recipeNode.require<VanillaRecipe>()
                 // 添加进临时注册表
                 RAW[key] = vanillaRecipe
 

@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.util.krequire
-import cc.mewcraft.wakame.util.toNamespacedKey
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toNamespacedKey
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
@@ -17,6 +17,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.Collections.emptyList
 import java.util.stream.Stream
 import org.bukkit.inventory.BlastingRecipe as BukkitBlastingRecipe
 import org.bukkit.inventory.CampfireRecipe as BukkitCampfireRecipe
@@ -50,7 +51,7 @@ class BlastingRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val blastingRecipe = BukkitBlastingRecipe(
@@ -82,7 +83,7 @@ class CampfireRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val campfireRecipe = BukkitCampfireRecipe(
@@ -114,7 +115,7 @@ class FurnaceRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val furnaceRecipe = BukkitFurnaceRecipe(
@@ -146,7 +147,7 @@ class ShapedRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val pattern: Array<String>,
-    val ingredients: Map<Char, RecipeChoice>
+    val ingredients: Map<Char, RecipeChoice>,
 ) : VanillaRecipe {
     companion object {
         const val EMPTY_INGREDIENT_CHAR = 'X'
@@ -178,7 +179,7 @@ class ShapedRecipe(
 class ShapelessRecipe(
     override val key: Key,
     override val result: RecipeResult,
-    val ingredients: List<RecipeChoice>
+    val ingredients: List<RecipeChoice>,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
@@ -270,7 +271,7 @@ class SmokingRecipe(
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
-    val exp: Float
+    val exp: Float,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smokingRecipe = BukkitSmokingRecipe(
@@ -300,7 +301,7 @@ class SmokingRecipe(
 class StonecuttingRecipe(
     override val key: Key,
     override val result: RecipeResult,
-    val input: RecipeChoice
+    val input: RecipeChoice,
 ) : VanillaRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val stonecuttingRecipe = BukkitStonecuttingRecipe(
@@ -324,11 +325,11 @@ enum class RecipeType(
     private val bridge: RecipeTypeBridge<*>,
 ) {
     BLASTING(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val input = node.node("input").krequire<RecipeChoice>()
+        val input = node.node("input").require<RecipeChoice>()
         val cookingTime = node.node("cooking_time").getInt(100)
         val exp = node.node("exp").getFloat(0F)
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         BlastingRecipe(
@@ -340,11 +341,11 @@ enum class RecipeType(
         )
     }),
     CAMPFIRE(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val input = node.node("input").krequire<RecipeChoice>()
+        val input = node.node("input").require<RecipeChoice>()
         val cookingTime = node.node("cooking_time").getInt(100)
         val exp = node.node("exp").getFloat(0F)
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         CampfireRecipe(
@@ -356,11 +357,11 @@ enum class RecipeType(
         )
     }),
     FURNACE(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val input = node.node("input").krequire<RecipeChoice>()
+        val input = node.node("input").require<RecipeChoice>()
         val cookingTime = node.node("cooking_time").getInt(200)
         val exp = node.node("exp").getFloat(0F)
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         FurnaceRecipe(
@@ -388,7 +389,7 @@ enum class RecipeType(
                 nodeKey.toString().toCharArray().firstOrNull() ?: throw SerializationException("Can't read the ingredient key")
             }
             .mapValues { (_, mapChild) ->
-                mapChild.krequire<RecipeChoice>()
+                mapChild.require<RecipeChoice>()
             }
 
         //判断特殊字符是否被误用
@@ -404,7 +405,7 @@ enum class RecipeType(
             throw SerializationException("The keys [${missingIngredientKeys.joinToString(prefix = "'", postfix = "'")}] are specified in the pattern but not present in the ingredients")
         }
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         ShapedRecipe(
@@ -418,7 +419,7 @@ enum class RecipeType(
         val ingredients = node.node("ingredients")
             .childrenMap()
             .mapValues { (_, mapChild) ->
-                mapChild.krequire<RecipeChoice>()
+                mapChild.require<RecipeChoice>()
             }
             .values
             .toList()
@@ -428,7 +429,7 @@ enum class RecipeType(
             }
 
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         ShapelessRecipe(
@@ -438,7 +439,7 @@ enum class RecipeType(
         )
     }),
     SMITHING_TRANSFORM(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val base = node.node("base").krequire<RecipeChoice>()
+        val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
 
@@ -447,7 +448,7 @@ enum class RecipeType(
             "Addition and template cannot be empty at the same time"
         }
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         SmithingTransformRecipe(
@@ -459,7 +460,7 @@ enum class RecipeType(
         )
     }),
     SMITHING_TRIM(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val base = node.node("base").krequire<RecipeChoice>()
+        val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
 
@@ -478,11 +479,11 @@ enum class RecipeType(
         )
     }),
     SMOKING(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val input = node.node("input").krequire<RecipeChoice>()
+        val input = node.node("input").require<RecipeChoice>()
         val cookingTime = node.node("cooking_time").getInt(100)
         val exp = node.node("exp").getFloat(0F)
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         SmokingRecipe(
@@ -494,9 +495,9 @@ enum class RecipeType(
         )
     }),
     STONECUTTING(RecipeTypeBridge(typeTokenOf()) { _, node ->
-        val input = node.node("input").krequire<RecipeChoice>()
+        val input = node.node("input").require<RecipeChoice>()
 
-        val result = node.node("result").krequire<RecipeResult>()
+        val result = node.node("result").require<RecipeResult>()
         val key = node.getRecipeKey()
 
         StonecuttingRecipe(
@@ -547,7 +548,7 @@ internal object VanillaRecipeSerializer : TypeSerializer<VanillaRecipe> {
      * ```
      */
     override fun deserialize(type: Type, node: ConfigurationNode): VanillaRecipe {
-        val recipeType = node.node("type").krequire<RecipeType>()
+        val recipeType = node.node("type").require<RecipeType>()
         val recipe = recipeType.deserialize(node)
         return recipe
     }

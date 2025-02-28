@@ -8,17 +8,13 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryType
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 @Hook(plugins = ["ChestSort"])
-object ChestSortHook : KoinComponent, Listener {
+object ChestSortHook : Listener {
 
     init {
         registerEvents()
     }
-
-    private val itemSlotRegistry: ItemSlotRegistry by inject()
 
     @EventHandler(ignoreCancelled = true)
     fun on(event: ChestSortEvent) {
@@ -26,7 +22,7 @@ object ChestSortHook : KoinComponent, Listener {
         if (inventory.type == InventoryType.PLAYER) {
             inventory.holder as? Player ?: return
 
-            val slots = itemSlotRegistry.custom()
+            val slots = ItemSlotRegistry.custom()
             for (slot in slots) {
                 // 不整理饰品栏位
                 event.setUnmovable(slot.slotIndex)

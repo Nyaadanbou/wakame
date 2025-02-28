@@ -3,17 +3,22 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.item.VanillaItemSlot.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
+import net.kyori.examination.string.StringExaminer
 import org.bukkit.entity.Player
-import org.bukkit.inventory.*
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
+import java.util.*
 import java.util.stream.Stream
 
 
@@ -72,7 +77,7 @@ enum class VanillaItemSlot(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }
 
@@ -105,7 +110,7 @@ data class CustomItemSlot(
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return examine(StringExaminer.simpleEscaping())
     }
 }
 
@@ -118,7 +123,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
     }
 
     override fun deserialize(type: Type, node: ConfigurationNode): ItemSlot {
-        val rawString = node.krequire<String>()
+        val rawString = node.require<String>()
 
         val key = try {
             Key.key(rawString)
@@ -137,7 +142,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
             CustomItemSlot.NAMESPACE -> {
                 val slotIndex = keyValue.toIntOrNull() ?: throw SerializationException(node, type, "Invalid input for ItemSlot: '$rawString'")
 
-                val alreadyRegistered = DefaultItemSlotRegistry.get(slotIndex)
+                val alreadyRegistered = ItemSlotRegistry.get(slotIndex)
                 if (alreadyRegistered != null) {
                     return alreadyRegistered
                 }
@@ -160,7 +165,7 @@ object ItemSlotSerializer : TypeSerializer<ItemSlot> {
         }
 
         // 每序列化一个 ItemSlot, 都尝试加进注册表
-        DefaultItemSlotRegistry.register(itemSlot)
+        ItemSlotRegistry.register(itemSlot)
 
         return itemSlot
     }

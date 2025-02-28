@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.adventure.key.Keyed
  * 使用 [AttributeProvider] 来获取实例.
  */
 interface Attribute : Keyed {
+
     /**
      * 本属性的唯一标识.
      */
@@ -35,4 +36,5 @@ interface Attribute : Keyed {
      * @return 清理好的数值
      */
     fun sanitizeValue(value: Double): Double
+
 }

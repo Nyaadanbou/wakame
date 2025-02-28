@@ -1,0 +1,9 @@
+__default__:
+  any:
+    level: "[0,)"
+    weight:
+      common: 10.0
+      uncommon: 5.0
+      rare: 4.0
+      epic: 3.0
+      ancient: 2.0

@@ -6,38 +6,26 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.cores.AbilityCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.item.templates.components.cells.cores.VirtualCoreArchetype
-import cc.mewcraft.wakame.item.templates.filters.AbilityFilter
 import cc.mewcraft.wakame.item.templates.filters.AttributeFilter
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.random3.GroupSerializer
-import cc.mewcraft.wakame.random3.Node
-import cc.mewcraft.wakame.random3.NodeContainer
-import cc.mewcraft.wakame.random3.NodeFacadeSupport
-import cc.mewcraft.wakame.random3.NodeRepository
-import cc.mewcraft.wakame.random3.Pool
-import cc.mewcraft.wakame.random3.PoolSerializer
-import cc.mewcraft.wakame.random3.Sample
-import cc.mewcraft.wakame.random3.SampleNodeFacade
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.random3.*
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
-import net.kyori.examination.Examinable
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -49,7 +37,7 @@ import kotlin.io.path.Path
 /**
  * 代表一个 [核心][Core] 的模板.
  */
-interface CoreArchetype : Examinable {
+interface CoreArchetype {
     /**
      * 核心的唯一标识. 主要用于序列化实现.
      *
@@ -75,7 +63,7 @@ interface CoreArchetype : Examinable {
  */
 internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreArchetype {
-        val type1 = node.node("type").krequire<Key>()
+        val type1 = node.node("type").require<Key>()
         val core = when {
             type1 == GenericKeys.NOOP -> {
                 VirtualCoreArchetype
@@ -88,11 +76,6 @@ internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
             type1.namespace() == Namespaces.ATTRIBUTE -> {
                 val attributeId = type1
                 AttributeCoreArchetype(attributeId, node)
-            }
-
-            type1.namespace() == Namespaces.ABILITY -> {
-                val abilityId = type1
-                AbilityCoreArchetype(abilityId, node)
             }
 
             // 大概是配置文件写错了
@@ -174,7 +157,7 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
     override val filterNodeFacade = ItemFilterNodeFacade
 
     override fun poolConstructor(node: ConfigurationNode): Pool<CoreArchetype, ItemGenerationContext> {
-        return node.krequire<Pool<CoreArchetype, ItemGenerationContext>>()
+        return node.require<Pool<CoreArchetype, ItemGenerationContext>>()
     }
 }
 
@@ -184,16 +167,16 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据, 必须指定依赖
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须指定依赖
     ],
 )
 @Reload
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
-    override val dataDir: Path = Path("random/items/cores")
+    override val dataDir: Path = Path("random/item_core")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
         .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
-        .kregister(CoreArchetypeSerializer)
-        .kregister(FilterSerializer)
+        .register<CoreArchetype>(CoreArchetypeSerializer)
+        .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()
     override val repository: NodeRepository<Sample<CoreArchetype, ItemGenerationContext>> = NodeRepository()
     override val sampleDataType: TypeToken<CoreArchetype> = typeTokenOf()
@@ -226,16 +209,8 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
             // key, operation and element in the selection context.
             is AttributeCoreArchetype -> {
                 val attributeId = value.id.value()
-                val attribute = value.attribute
+                val attribute = value.data
                 AttributeFilter(true, attributeId, attribute.operation, attribute.element)
-            }
-
-            // By design, a ability is considered generated
-            // if there is already a ability with the same key
-            // in the selection context, ignoring the trigger.
-            is AbilityCoreArchetype -> {
-                val abilityId = value.id
-                AbilityFilter(true, abilityId)
             }
 
             // Throw if we see an unknown schema core type
@@ -247,7 +222,7 @@ internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, 
     }
 
     override fun decodeSampleData(node: ConfigurationNode): CoreArchetype {
-        return node.krequire<CoreArchetype>()
+        return node.require<CoreArchetype>()
     }
 
 }

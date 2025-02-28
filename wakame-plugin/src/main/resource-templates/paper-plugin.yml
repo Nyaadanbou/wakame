@@ -1,0 +1,38 @@
+name: Wakame
+version: "{{ version }}"
+main: cc.mewcraft.wakame.Koish
+bootstrapper: cc.mewcraft.wakame.KoishBootstrapper
+loader: cc.mewcraft.wakame.KoishLoader
+description: "{{ description }}"
+api-version: 1.21
+author: Nailm
+load: STARTUP
+dependencies:
+  server:
+    AdventureLevel:
+      required: false
+      load: BEFORE
+    ChestSort:
+      required: false
+      load: OMIT
+    Economy:
+      required: false
+      load: OMIT
+    LuckPerms:
+      required: false
+      load: OMIT
+    MythicMobs:
+      required: false
+      load: OMIT
+    Towny:
+      required: false
+      load: OMIT
+    TownyFlight:
+      required: false
+      load: OMIT
+    Vault:
+      required: false
+      load: OMIT
+    WorldGuard:
+      required: false
+      load: OMIT

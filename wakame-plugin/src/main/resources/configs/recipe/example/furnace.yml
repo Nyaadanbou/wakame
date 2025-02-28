@@ -1,0 +1,16 @@
+# 熔炉配方, 参考: https://minecraft.wiki/w/Recipe#smelting
+type: furnace
+
+# 输入
+input: minecraft:gravel
+
+# 烧炼时间
+cooking_time: 1
+
+# 该配方产生的经验值
+exp: 1000
+
+# 该配方输出的单个物品堆叠
+result:
+  item: minecraft:sand
+  amount: 1

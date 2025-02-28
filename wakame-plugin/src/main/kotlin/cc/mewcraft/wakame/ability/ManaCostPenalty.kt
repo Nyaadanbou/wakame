@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability
 
-import me.lucko.helper.cooldown.Cooldown
+import cc.mewcraft.wakame.util.cooldown.Cooldown
 
 data class ManaCostPenalty(
     val cooldown: Cooldown = Cooldown.ofTicks(60),

@@ -5,12 +5,13 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.ConfigurationNode
@@ -19,7 +20,6 @@ import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
-import org.spongepowered.configurate.serialize.TypeSerializer
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
 import kotlin.math.absoluteValue
@@ -273,7 +273,7 @@ data class AttributeDamageMetadataBuilder(
         val damager = event.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null"
         )
-        val attributeMap = AttributeMapAccess.get(damager).getOrElse {
+        val attributeMap = AttributeMapAccess.instance().get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
         }
         val damageTags = damageTags.build()
@@ -328,7 +328,6 @@ data class DirectCriticalStrikeMetadataBuilder(
     }
 }
 
-////// Molang
 @ConfigSerializable
 data class MolangDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
@@ -408,6 +407,8 @@ data class MolangCriticalStrikeMetadataBuilder(
 //</editor-fold>
 
 internal object DamageMetadataBuilderSerializer : TypeSerializer<DamageMetadataBuilder<*>> {
+
+    // FIXME 使用 DispatchingTypeSerializer 替代该实现
     private val TYPE_MAPPING: Map<String, KType> = mapOf(
         "direct" to typeOf<DirectDamageMetadataBuilder>(),
         "vanilla" to typeOf<VanillaDamageMetadataBuilder>(),
@@ -416,12 +417,9 @@ internal object DamageMetadataBuilderSerializer : TypeSerializer<DamageMetadataB
     )
 
     override fun deserialize(type: Type, node: ConfigurationNode): DamageMetadataBuilder<*> {
-        val key = node.node("type").getString("null")
-        val kType = TYPE_MAPPING[key] ?: throw SerializationException("Unknown damage metadata builder type: '$key'")
-        return node.krequire(kType)
+        val dataTypeId = node.node("type").getString("null")
+        val dataType = TYPE_MAPPING[dataTypeId] ?: throw SerializationException("Unknown damage metadata builder type: '$dataTypeId'")
+        return node.require(dataType)
     }
 
-    override fun serialize(type: Type, obj: DamageMetadataBuilder<*>?, node: ConfigurationNode) {
-        throw UnsupportedOperationException()
-    }
 }

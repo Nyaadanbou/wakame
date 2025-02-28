@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.SimpleRegistry
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
@@ -40,7 +40,7 @@ class KizamiEffectType<T : KizamiEffect>(val type: TypeToken<T>) {
 /**
  * 铭刻效果类型的注册表.
  */
-object KizamiEffectTypes {
+internal object KizamiEffectTypes {
     val PLAYER_ABILITY = register<KizamiEffectPlayerAbility>("player_ability")
     val ATTRIBUTE_MODIFIER = register<KizamiEffectAttributeModifier>("attribute_modifier")
 
@@ -52,7 +52,7 @@ object KizamiEffectTypes {
 /**
  * 铭刻效果：玩家技能.
  */
-class KizamiEffectPlayerAbility(
+internal class KizamiEffectPlayerAbility(
     private val ability: PlayerAbility,
 ) : KizamiEffect {
     override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
@@ -67,7 +67,7 @@ class KizamiEffectPlayerAbility(
 
     companion object {
         val SERIALIZER = TypeSerializer<KizamiEffectPlayerAbility> { type, node ->
-            val id = node.node("id").krequire<Key>()
+            val id = node.node("id").require<Key>()
             val ability = PlayerAbility(id, node)
 
             KizamiEffectPlayerAbility(ability)
@@ -78,7 +78,7 @@ class KizamiEffectPlayerAbility(
 /**
  * 铭刻效果：属性修饰器.
  */
-class KizamiEffectAttributeModifier(
+internal class KizamiEffectAttributeModifier(
     private val modifiers: Map<Attribute, AttributeModifier>,
 ) : KizamiEffect {
     override val type: KizamiEffectType<*> = KizamiEffectTypes.ATTRIBUTE_MODIFIER
@@ -97,7 +97,7 @@ class KizamiEffectAttributeModifier(
 
     companion object {
         val SERIALIZER = TypeSerializer<KizamiEffectAttributeModifier> { type, node ->
-            val id = node.node("id").krequire<String>()
+            val id = node.node("id").require<String>()
             val attribute = ConstantAttributeBundle(id, node)
             val kizamiId = node.hint(RepresentationHints.KIZAMI_ID)
                 ?: throw SerializationException(node, type, "No such hint '${RepresentationHints.KIZAMI_ID}' in node '$node'")

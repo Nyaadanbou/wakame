@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.api
 
-import cc.mewcraft.wakame.api.block.NekoBlock
+import cc.mewcraft.wakame.api.block.KoishBlock
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.user.toUser
@@ -8,7 +8,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import cc.mewcraft.wakame.api.item.NekoItem as INekoItem
+import cc.mewcraft.wakame.api.item.KoishItem as INekoItem
 
 internal class ApiItemWrapper(
     private val item: NekoItem,
@@ -17,7 +17,7 @@ internal class ApiItemWrapper(
         return item.id
     }
 
-    override fun getBlock(): NekoBlock? {
+    override fun getBlock(): KoishBlock? {
         TODO("Not yet implemented")
     }
 
@@ -31,7 +31,7 @@ internal class ApiItemWrapper(
 
     override fun createItemStack(amount: Int): ItemStack {
         val nekoStack = item.realize()
-        val itemStack = nekoStack.wrapped.apply { this.amount = amount }
+        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
         return itemStack
     }
 
@@ -42,7 +42,7 @@ internal class ApiItemWrapper(
         } else {
             item.realize(user)
         }
-        val itemStack = nekoStack.wrapped.apply { this.amount = amount }
+        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
         return itemStack
     }
 }

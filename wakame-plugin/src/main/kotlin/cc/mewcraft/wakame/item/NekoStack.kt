@@ -1,16 +1,15 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.nbt.CompoundTag
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.event.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.component.ItemComponentMaps
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.util.MojangStack
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -47,7 +46,6 @@ interface NekoStack : Examinable {
      * 包含了获取特殊 [NekoStack] 实例的函数.
      */
     companion object {
-        const val CLIENT_SIDE_KEY = "client_side"
 
         /**
          * 获取一个空的 [NekoStack], 底层为 `minecraft:air`.
@@ -68,31 +66,21 @@ interface NekoStack : Examinable {
     val isEmpty: Boolean
 
     /**
-     * 记录了该物品的样子是否仅存在于客户端.
-     *
-     * 如果为 `true`, 法宝渲染系统将修改此物品.
-     * 如果为 `false`, 发包渲染系统将不会修改此物品.
-     */
-    var isClientSide: Boolean
-
-    /**
      * 获取底层物品的类型.
      */
     val itemType: Material
 
     /**
-     * 获取底层 [ItemStack] 的克隆.
+     * 获取底层的 [MojangStack] 直接实例.
+     * 任何对该对象的修改都会直接影响到物品本身的状态.
      */
-    @get:Contract(" -> new")
-    val itemStack: ItemStack
+    val mojangStack: MojangStack
 
     /**
-     * 获取底层 [ItemStack] 的直接引用.
+     * 获取底层的 [ItemStack] 直接实例.
      * 任何对该对象的修改都会直接影响到物品本身的状态.
-     * 除非你很清楚这么做的所有后果, 否则不要使用这个.
      */
-    @get:Contract(" -> this")
-    val wrapped: ItemStack
+    val bukkitStack: ItemStack
 
     /**
      * The namespaced identifier of this item.
@@ -133,95 +121,76 @@ interface NekoStack : Examinable {
     val behaviors: ItemBehaviorMap
 
     /**
-     * 不安全的操作. 使用前请先阅读文档.
-     */
-    val unsafe: Unsafe
-
-    /**
      * 返回一个克隆.
      */
     fun clone(): NekoStack
 
     /**
-     * Removes all the custom tags about `wakame` from the item.
-     *
-     * This will make the item a vanilla item, where [ItemStack.isNeko] returns `false`.
+     * Removes all Koish data from the item.
      */
     fun erase()
 
     //<editor-fold desc="Fast access to call ItemBehavior functions">
-    fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        behaviors.forEach { it.handleInteract(player, itemStack, action, wrappedEvent) }
+    fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        behaviors.forEach { it.handleInteract(player, itemStack, koishStack, action, wrappedEvent) }
     }
 
-    fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
-        behaviors.forEach { it.handleInteractAtEntity(player, itemStack, clicked, event) }
+    fun handleInteractAtEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, clicked: Entity, event: PlayerInteractAtEntityEvent) {
+        behaviors.forEach { it.handleInteractAtEntity(player, itemStack, koishStack, clicked, event) }
     }
 
-    fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
-        behaviors.forEach { it.handleAttackEntity(player, itemStack, damagee, event) }
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        behaviors.forEach { it.handleAttackEntity(player, itemStack, koishStack, damagee, event) }
     }
 
-    fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) {
-        behaviors.forEach { it.handleItemProjectileLaunch(player, itemStack, projectile, event) }
+    fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileLaunchEvent) {
+        behaviors.forEach { it.handleItemProjectileLaunch(player, itemStack, koishStack, projectile, event) }
     }
 
-    fun handleItemProjectileHit(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) {
-        behaviors.forEach { it.handleItemProjectileHit(player, itemStack, projectile, event) }
+    fun handleItemProjectileHit(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileHitEvent) {
+        behaviors.forEach { it.handleItemProjectileHit(player, itemStack, koishStack, projectile, event) }
     }
 
-    fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) {
-        behaviors.forEach { it.handleBreakBlock(player, itemStack, event) }
+    fun handleBreakBlock(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: BlockBreakEvent) {
+        behaviors.forEach { it.handleBreakBlock(player, itemStack, koishStack, event) }
     }
 
-    fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) {
-        behaviors.forEach { it.handleDamage(player, itemStack, event) }
+    fun handleDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemDamageEvent) {
+        behaviors.forEach { it.handleDamage(player, itemStack, koishStack, event) }
     }
 
-    fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) {
-        behaviors.forEach { it.handleBreak(player, itemStack, event) }
+    fun handleBreak(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemBreakEvent) {
+        behaviors.forEach { it.handleBreak(player, itemStack, koishStack, event) }
     }
 
-    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
-        behaviors.forEach { it.handleEquip(player, itemStack, equipped, event) }
+    fun handleEquip(player: Player, itemStack: ItemStack, koishStack: NekoStack, equipped: Boolean, event: ArmorChangeEvent) {
+        behaviors.forEach { it.handleEquip(player, itemStack, koishStack, equipped, event) }
     }
 
-    fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        behaviors.forEach { it.handleInventoryClick(player, itemStack, event) }
+    fun handleInventoryClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryClick(player, itemStack, koishStack, event) }
     }
 
-    fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack, event) }
+    fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryClickOnCursor(player, itemStack, koishStack, event) }
     }
 
-    fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) {
-        behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack, event) }
+    fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: InventoryClickEvent) {
+        behaviors.forEach { it.handleInventoryHotbarSwap(player, itemStack, koishStack, event) }
     }
 
-    fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) {
-        behaviors.forEach { it.handleRelease(player, itemStack, event) }
+    fun handleRelease(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerStopUsingItemEvent) {
+        behaviors.forEach { it.handleRelease(player, itemStack, koishStack, event) }
     }
 
-    fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) {
-        behaviors.forEach { it.handleConsume(player, itemStack, event) }
+    fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
+        behaviors.forEach { it.handleConsume(player, itemStack, koishStack, event) }
     }
 
-    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
-        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, ability, event) }
+    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
+        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, koishStack, ability, event) }
     }
     //</editor-fold>
-
-    /**
-     * 封装了一些“不安全”的操作.
-     */
-    interface Unsafe {
-        /**
-         * 获取该 [NekoStack] 的 `wakame` NBT 标签.
-         *
-         * 这是 `wakame` NBT 的直接引用, 任何对该对象的修改都会直接影响到物品本身的 NBT 数据.
-         */
-        val nekooTag: CompoundTag
-    }
 }
 
 /**
@@ -310,23 +279,15 @@ object NekoStackDelegates {
     //</editor-fold>
 }
 
-
-/* Internals */
-
-
-private object EmptyNekoStack : NekoStack {
+internal object EmptyNekoStack : NekoStack {
     override val isEmpty: Boolean = true
-
-    override var isClientSide: Boolean
-        get() = false // 空物品不应该渲染
-        set(_) {}
 
     override val itemType: Material = Material.AIR
 
-    override val itemStack: ItemStack
-        get() = ItemStack.empty()
+    override val mojangStack: MojangStack
+        get() = MojangStack.EMPTY
 
-    override val wrapped: ItemStack
+    override val bukkitStack: ItemStack
         get() = ItemStack.empty()
 
     override val id: Key = GenericKeys.EMPTY
@@ -339,24 +300,13 @@ private object EmptyNekoStack : NekoStack {
 
     override val slotGroup: ItemSlotGroup = prototype.slotGroup
 
-    override val components: ItemComponentMap = ItemComponentMaps.empty()
+    override val components: ItemComponentMap = ItemComponentMap.empty()
 
     override val templates: ItemTemplateMap = prototype.templates
 
     override val behaviors: ItemBehaviorMap = prototype.behaviors
 
-    override val unsafe: NekoStack.Unsafe = Unsafe
+    override fun clone(): NekoStack = this
 
-    override fun clone(): NekoStack {
-        return this
-    }
-
-    override fun erase() {
-        // do nothing
-    }
-
-    object Unsafe : NekoStack.Unsafe {
-        override val nekooTag: CompoundTag
-            get() = CompoundTag.create()
-    }
+    override fun erase() = Unit
 }

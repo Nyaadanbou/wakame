@@ -43,19 +43,19 @@ data class ReforgeHistory(
         }
 
         override fun read(holder: ItemComponentHolder): ReforgeHistory? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val modCount = tag.getInt(TAG_MOD_COUNT)
             return ReforgeHistory(modCount)
         }
 
         override fun write(holder: ItemComponentHolder, value: ReforgeHistory) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 tag.putInt(TAG_MOD_COUNT, value.modCount)
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
     }
 }

@@ -1,0 +1,48 @@
+# 基础价值
+min_base: 100.0
+max_base: 150.0
+
+# 下面全都是对基础价值 (base) 的修饰符
+modifiers:
+
+  # 物品损耗
+  damage:
+    operation: "add_value"
+    expression: "-1.0 * query.value"
+
+  # 物品等级
+  level:
+    # 可用类型:
+    # - add_value
+    # - add_multiplied_base
+    # - add_multiplied_total
+    operation: "add_value"
+    # Molang 表达式
+    expression: "1.0 * query.value"
+
+  # 物品稀有度
+  rarity:
+    operation: "add_value"
+    expression: "1.0 * query.value"
+    mapping:
+      common: 0.0
+      uncommon: 1.0
+      rare: 2.0
+      epic: 3.0
+      legendary: 4.0
+      ancient: 5.0
+
+  # 合并惩罚
+  merge_penalty:
+    operation: "add_value"
+    expression: "1.0 * query.value"
+
+  # 定制惩罚
+  mod_penalty:
+    operation: "add_value"
+    expression: "1.0 * query.value"
+
+  # 重造惩罚
+  reroll_penalty:
+    operation: "add_value"
+    expression: "1.0 * query.value"

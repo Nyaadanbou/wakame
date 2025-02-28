@@ -1,21 +1,20 @@
 package cc.mewcraft.wakame.gui.merge
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.shadowNeko
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
 import cc.mewcraft.wakame.reforge.merge.SimpleMergingSession
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.inventory.VirtualInventory
@@ -27,14 +26,14 @@ import kotlin.properties.Delegates
 internal class MergingMenu(
     val table: MergingTable,
     val viewer: Player,
-) : KoinComponent {
+) {
 
     /**
      * 给玩家展示合并台.
      */
     fun open() {
         primaryWindow.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_MERGING_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_MERGING_MENU)
     }
 
     /**
@@ -47,7 +46,7 @@ internal class MergingMenu(
      */
     private val session: MergingSession = SimpleMergingSession(viewer, table)
 
-    private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MERGE)
+    private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
     private val inputSlot1: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 3
@@ -106,13 +105,13 @@ internal class MergingMenu(
         when {
             e.isSwap -> {
                 e.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             e.isAdd -> {
-                val added = newItem?.shadowNeko(true) ?: run {
+                val added = newItem?.wrap() ?: run {
                     e.isCancelled = true
-                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_AUGMENT_CORE)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_AUGMENT_CORE)
                     return
                 }
 
@@ -164,7 +163,7 @@ internal class MergingMenu(
         when {
             e.isSwap || e.isAdd -> {
                 e.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             e.isRemove -> {
@@ -218,7 +217,7 @@ internal class MergingMenu(
     private fun renderInputSlot(source: NekoStack): ItemStack {
         val context = MergingTableContext.MergeInputSlot(session)
         ItemRenderers.MERGING_TABLE.render(source, context)
-        return source.itemStack
+        return source.bukkitStack.clone()
     }
 
     /**
@@ -245,14 +244,14 @@ internal class MergingMenu(
             ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val resolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
-                folded("item_lore", output.wrapped.itemLoreOrEmpty)
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+                folded("item_lore", output.bukkitStack.fastLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
                 folded("result_description", result.description)
             }
 
-            return resolution.applyNameAndLoreTo(output.wrapped)
+            return slotDisplayResolved.applyTo(output.bukkitStack)
         } else {
             return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.

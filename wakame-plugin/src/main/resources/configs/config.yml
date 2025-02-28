@@ -1,0 +1,43 @@
+# 不要修改!
+version: 1
+
+# Koish 所使用的经济系统
+# 可用选项:
+#   economy: Economy 插件的账户余额
+#   vanilla: Minecraft 的原版经验等级
+#   zero: 无经济系统 (永远为 0)
+economy_provider: vanilla
+
+# Koish 如何计算玩家的等级
+# 可用选项:
+#   adventure: AdventureLevel 插件的冒险等级
+#   vanilla: Minecraft 的原版经验等级
+#   zero: 无等级 (永远为 0)
+player_level_provider: vanilla
+
+# 只有物品的所有者可以拾起死亡掉落的物品
+only_owner_can_pickup_death_drops: false
+
+# 要求玩家必须在潜行状态下才能够破坏盔甲架
+require_sneaking_to_break_armor_stand: false
+
+# 世界时间控制器的全局最小使用间隔 (刻)
+world_time_control_use_interval_ticks: 12000
+
+# 世界天气控制器的全局最小使用间隔 (刻)
+world_weather_control_use_interval_ticks: 12000
+
+# 关于调试模式
+debug:
+  # 调试模式信息记录控制
+  logging:
+    # 记录 Initializer
+    initializer: false
+    # 记录 Reloader
+    reloader: false
+    # 记录 DamageListener
+    damage: false
+    # 记录 Registry
+    registry: false
+    # 记录 ItemStackRenderer
+    renderer: false

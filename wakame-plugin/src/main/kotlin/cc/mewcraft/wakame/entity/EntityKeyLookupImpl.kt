@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookup.get
+import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookupDictionary.get
 import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
@@ -18,7 +18,7 @@ internal class EntityKeyLookupImpl(
         }
 
         // fallback
-        return MinecraftEntityKeyLookup.get(entity)
+        return MinecraftEntityKeyLookupDictionary.get(entity)
     }
 
     override fun validate(key: Key): Boolean {
@@ -34,7 +34,7 @@ internal class EntityKeyLookupImpl(
  * So, you should call other implementation first, and this implementation
  * should always be the last to be called.
  */
-private object MinecraftEntityKeyLookup : EntityKeyLookup.Dictionary {
+private object MinecraftEntityKeyLookupDictionary : EntityKeyLookup.Dictionary {
     override fun get(entity: Entity): Key =
         entity.type.key
 

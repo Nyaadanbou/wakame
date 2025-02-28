@@ -1,0 +1,127 @@
+base: bedrock
+
+# 包含大部分可能出现的核心
+# 用于检查核心能否正常加载
+cells:
+  buckets:
+    foo:
+      core: "all_possible_cores"
+  selectors:
+    core_groups:
+      all_possible_cores:
+        noop:
+          # 无操作核心 (没有核心, 也没有核孔)
+          - type: generic:noop
+            weight: 1
+        empty:
+          # 空核心 (没有核心, 但有核孔)
+          - type: generic:empty
+            weight: 1
+        all_attributes:
+          # 攻击力
+          - type: attribute:attack_damage
+            operation: add
+            element: neutral
+            lower: 20
+            upper: 30
+            weight: 1
+          # 百分比伤害
+          - type: attribute:attack_damage_rate
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 元素叠加
+          - type: attribute:attack_effect_chance
+            value: 0.01
+            weight: 1
+          # 方块交互范围
+          - type: attribute:block_interaction_range
+            value: 4.5
+            weight: 1
+          # 暴击概率
+          - type: attribute:critical_strike_chance
+            value: 0.01
+            weight: 1
+          # 暴击伤害
+          - type: attribute:critical_strike_power
+            value: 1.0
+            weight: 1
+          # 防御
+          - type: attribute:defense
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 防御穿透
+          - type: attribute:defense_penetration
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 防御穿透率
+          - type: attribute:defense_penetration_rate
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 实体交互距离
+          - type: attribute:entity_interaction_range
+            value: 0.0
+            weight: 1
+          # 生命恢复
+          - type: attribute:health_regeneration
+            value: 1.0
+            weight: 1
+          # 承伤百分比
+          - type: attribute:incoming_damage_rate
+            element: neutral
+            value: 0.0
+            weight: 1
+          # 生命汲取
+          - type: attribute:lifesteal
+            value: 0.0
+            weight: 1
+          # 魔法消耗百分比
+          - type: attribute:mana_consumption_rate
+            value: 1.0
+            weight: 1
+          # 魔法恢复
+          - type: attribute:mana_regeneration
+            value: 1.0
+            weight: 1
+          # 魔法汲取
+          - type: attribute:manasteal
+            value: 0.0
+            weight: 1
+          # 最大伤害吸收
+          - type: attribute:max_absorption
+            value: 0.0
+            weight: 1
+          # 最大生命值
+          - type: attribute:max_health
+            value: 30.0
+            weight: 1
+          # 最大魔法值
+          - type: attribute:max_mana
+            value: 100.0
+            weight: 1
+          # 移动速度
+          - type: attribute:movement_speed
+            value: 0.1
+            weight: 1
+          # 通用元素攻击力
+          - type: attribute:universal_attack_damage
+            operation: add
+            element: neutral
+            lower: 20
+            upper: 30
+            weight: 1
+          # 通用元素防御
+          - type: attribute:universal_defense
+            value: 0.0
+            weight: 1
+          # 通用元素防御穿透
+          - type: attribute:universal_defense_penetration
+            value: 0.0
+            weight: 1
+          # 通用元素防御穿透率
+          - type: attribute:universal_defense_penetration_rate
+            value: 0.0
+            weight: 1

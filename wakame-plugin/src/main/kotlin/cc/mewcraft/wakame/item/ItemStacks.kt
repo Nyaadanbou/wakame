@@ -1,21 +1,23 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.item.extension.setNbt
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.CompoundTag
+import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
+import java.util.*
 
 /**
  * 关于 [ItemStack] 的全局函数/变量.
  */
-@Init(
-    stage = InitStage.PRE_WORLD,
-)
+@Init(stage = InitStage.PRE_WORLD)
 object ItemStacks {
-    private const val DEFAULT_UNKNOWN_ITEM_CACHE_ID = "__default__"
-    private const val UNKNOWN_ITEM_TRACE_FIELD = "trace"
-    private val UNKNOWN_ITEM_STACK_CACHE: HashMap<String, ItemStack> = HashMap()
+
+    private const val DEFAULT_ID = "__default__"
+    private const val TRACE_FIELD = "trace"
+
+    private val CACHE: HashMap<String, ItemStack> = HashMap()
 
     /**
      * 返回一个用于表示未知的 [ItemStack].
@@ -31,7 +33,7 @@ object ItemStacks {
      * @return 表示未知物品的 [ItemStack]
      */
     fun createUnknown(trace: String? = null): ItemStack {
-        return UNKNOWN_ITEM_STACK_CACHE.getOrPut(trace ?: DEFAULT_UNKNOWN_ITEM_CACHE_ID) {
+        return CACHE.getOrPut(trace ?: DEFAULT_ID) {
             // 从注册表获取“未知物品”的原型
             val entry = KoishRegistries.ITEM.getDefaultEntry()
             val item = entry.value
@@ -39,14 +41,12 @@ object ItemStacks {
 
             // 写入字符串标记, 方便开发人员识别
             if (trace != null) {
-                stack.unsafeEdit {
-                    customData = CompoundTag {
-                        putString(UNKNOWN_ITEM_TRACE_FIELD, trace)
-                    }
-                }
+                stack.setNbt(CompoundTag().apply {
+                    putString(TRACE_FIELD, trace)
+                })
             }
 
-            return@getOrPut stack.wrapped
+            return@getOrPut stack.bukkitStack
         }.clone() // 始终返回克隆
     }
 }

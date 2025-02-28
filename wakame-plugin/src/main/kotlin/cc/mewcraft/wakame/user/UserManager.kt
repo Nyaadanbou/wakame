@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.user
 import java.util.UUID
 
 interface UserManager<P> {
+
     /**
      * 获取一个玩家的 [User] 实例.
      *
@@ -18,4 +19,5 @@ interface UserManager<P> {
      * @return 玩家的 [User] 实例
      */
     fun getUser(player: P): User<P>
+
 }

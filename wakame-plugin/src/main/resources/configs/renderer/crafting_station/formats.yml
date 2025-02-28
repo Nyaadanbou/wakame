@@ -1,0 +1,114 @@
+# 不要修改!
+version: 1
+
+# id: `attack_speed`
+attack_speed:
+  namespace: topmost
+  tooltip:
+    # 可用标签
+    # <value> 攻击速度值
+    line: "<!i><white>攻击速度: <value>"
+    # 数值对应的描述
+    level:
+      0: "<color:#ff8882>很慢"
+      1: "<color:#ff8882>较慢"
+      2: "<color:#fffd80>普通"
+      3: "<color:#91ffa9>较快"
+      4: "<color:#91ffa9>很快"
+
+# id: `cells`
+cells:
+  namespace: general
+  # 可用标签
+  # <min> 最小核孔数量
+  # <max> 最大核孔数量
+  tooltip: "<!i><gray>核孔数量: <white><min> <gray>-</gray> <max>"
+
+# id: `crate`
+crate:
+  namespace: special
+  # 可用标签
+  # <id> 盲盒的标识
+  # <name> 盲盒的名字
+  tooltip: "<!i><gray>战利品箱: <white><name>(<id>)"
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<!i><gray>定制名: <reset><value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  # 元素种类是随机的, 因此需要将所有可能的结果都显示出来.
+  #
+  # 可用标签
+  # <count> 元素数量
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "<!i><gray>潜在元素[<count>]: <white><merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `enchantments`
+enchantments:
+  namespace: enchantments
+  # 可用标签
+  # <name> 魔咒的名字
+  # <level> 魔咒的等级
+  tooltip: "<gray><name> ???"
+
+# id: `damage_resistant`
+damage_resistant:
+  namespace: vanilla
+  tooltip: "<!i><blue>伤害免疫"
+
+# id: `food`
+food:
+  namespace: vanilla
+  # 可用标签
+  # <nutrition> 食物增加的饥饿值
+  # <saturation> 食物增加的饱和度
+  # <eat_seconds> 食用所需要的时间
+  tooltip:
+    - "<!i><blue>饥饿值 +<nutrition>"
+    - "<!i><blue>饱和度 +<saturation>"
+    - "<!i><blue>食用时间: <eat_seconds>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<!i><gray>物品名: <white><value>"
+
+# id: `kizamiz`
+kizamiz:
+  namespace: general
+  # 铭刻种类是随机的, 因此需要将所有可能的结果都显示出来.
+  #
+  # 可用标签
+  # <count> 铭刻数量
+  # <merged> 多个铭刻合并后的文本
+  # <single> 单个铭刻
+  tooltip:
+    merged: "<!i><gray>潜在铭刻[<count>]: <white><merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `lore`
+lore:
+  namespace: general
+  # 可用标签
+  # <line> 描述内容
+  tooltip:
+    line: "<dark_gray><line>"
+    header: []
+    bottom: []
+
+# id: `portable_core`
+portable_core:
+  namespace: special

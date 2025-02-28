@@ -1,0 +1,531 @@
+__default__:
+  quality:
+    l3: "<red>***</red>"
+    l2: "<red>**</red>"
+    l1: "<red>*</red>"
+    mu: ""
+    u1: "<green>*</green>"
+    u2: "<green>**</green>"
+    u3: "<green>***</green>"
+
+attack_damage:
+  display_name: "Attack Damage"
+  tooltips:
+    add: "Attack Damage <min:#;-.> ⎓ <max:#;-.><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    neutral:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    fire:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    water:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    wind:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    earth:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    thunder:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+
+attack_damage_rate:
+  display_name: "Attack Damage Rate"
+  tooltips:
+    add: "Attack Damage <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    neutral:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    fire:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    water:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    wind:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    earth:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    thunder:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+
+attack_effect_chance:
+  display_name: "Attack Effect Chance"
+  tooltips:
+    add: "Attack Effect Chance <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .01
+    min: .0
+    max: 1.0
+
+attack_knockback:
+  display_name: "Attack Knockback"
+  tooltips:
+    add: "Attack Knockback <value:+#.#;-.><quality>"
+    multiply_base: "Attack Knockback <value:+#%;-.%><quality>"
+    multiply_total: "Attack Knockback ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 5.0
+
+block_interaction_range:
+  display_name: "Block Interaction Range"
+  tooltips:
+    add: "Block Interaction Range <value:+#.#;-.><quality>"
+    multiply_base: "Block Interaction Range <value:+#%;-.%><quality>"
+    multiply_total: "Block Interaction Range ×<value:+#%;-.%><quality>"
+  values:
+    default: 4.5
+    min: 1.0
+    max: 64.0
+
+critical_strike_chance:
+  display_name: "Critical Strike Chance"
+  tooltips:
+    add: "Critical Strike Chance <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: -1.0
+    max: 1.0
+
+critical_strike_power:
+  display_name: "Critical Strike Power"
+  tooltips:
+    add: "Critical Strike Power <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 1.0
+    max: 16384.0
+
+defense:
+  display_name: "Defense"
+  tooltips:
+    add: "Defense <value:+#;-.><quality>"
+    multiply_base: "Defense <value:+#%;-.%><quality>"
+    multiply_total: "Defense ×<value:+#%;-.%><quality>"
+  values:
+    neutral:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    fire:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    water:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    wind:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    earth:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    thunder:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+
+defense_penetration:
+  display_name: "Defense Penetration"
+  tooltips:
+    add: "Defense Penetration <value:+#;-.><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    neutral:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    fire:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    water:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    wind:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    earth:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+    thunder:
+      default: .0
+      min: -16384.0
+      max: 16384.0
+
+defense_penetration_rate:
+  display_name: "Defense Penetration Rate"
+  tooltips:
+    add: "Defense Penetration Rate <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    neutral:
+      default: .0
+      min: 0.0
+      max: 1.0
+    fire:
+      default: .0
+      min: 0.0
+      max: 1.0
+    water:
+      default: .0
+      min: 0.0
+      max: 1.0
+    wind:
+      default: .0
+      min: 0.0
+      max: 1.0
+    earth:
+      default: .0
+      min: 0.0
+      max: 1.0
+    thunder:
+      default: .0
+      min: 0.0
+      max: 1.0
+
+entity_interaction_range:
+  display_name: "Entity Interaction Range"
+  tooltips:
+    add: "Entity Interaction Range <value:+#.#;-.><quality>"
+    multiply_base: "Entity Interaction Range <value:+#%;-.%><quality>"
+    multiply_total: "Entity Interaction Range ×<value:+#%;-.%><quality>"
+  values:
+    default: 3.0
+    min: 1.0
+    max: 64.0
+
+hammer_damage_range:
+  display_name: "Hammer Damage Range"
+  tooltips:
+    add: "Hammer Damage Range <value:+#.#;-.><quality>"
+    multiply_base: "Hammer Damage Range <value:+#%;-.%><quality>"
+    multiply_total: "Hammer Damage Range ×<value:+#%;-.%><quality>"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 64.0
+
+hammer_damage_ratio:
+  display_name: "Hammer Damage Ratio"
+  tooltips:
+    add: "Hammer Damage Ratio <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 0.0
+    min: 0.0
+    max: 1.0
+
+health_regeneration:
+  display_name: "Health Regeneration"
+  tooltips:
+    add: "Health Regeneration <value:+#;-.><quality>"
+    multiply_base: "Health Regeneration <value:+#%;-.%><quality>"
+    multiply_total: "Health Regeneration ×<value:+#%;-.%><quality>"
+  values:
+    default: 1.0
+    min: .0
+    max: 5.0
+
+incoming_damage_rate:
+  display_name: "Incoming Damage Rate"
+  tooltips:
+    add: "Incoming Damage Rate <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    neutral:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    fire:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    water:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    wind:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    earth:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+    thunder:
+      default: 1.0
+      min: -1.0
+      max: 16384.0
+
+knockback_resistance:
+  display_name: "Knockback Resistance"
+  tooltips:
+    add: "Knockback Resistance <value:+#;-.><quality>"
+    multiply_base: "Knockback Resistance <value:+#%;-.%><quality>"
+    multiply_total: "Knockback Resistance ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 1.0
+
+lifesteal:
+  display_name: "Lifesteal"
+  tooltips:
+    add: "Lifesteal <value:+#;-.><quality>"
+    multiply_base: "Lifesteal <value:+#%;-.%><quality>"
+    multiply_total: "Lifesteal ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 16384.0
+
+mana_consumption_rate:
+  display_name: "Mana Consumption Rate"
+  tooltips:
+    add: "Mana Consumption Rate <value:+#%;-.%>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0
+    min: .0
+    max: 5.0
+
+mana_regeneration:
+  display_name: "Mana Regeneration"
+  tooltips:
+    add: "Mana Regeneration <value:+#;-.><quality>"
+    multiply_base: "Mana Regeneration <value:+#%;-.%><quality>"
+    multiply_total: "Mana Regeneration ×<value:+#%;-.%><quality>"
+  values:
+    default: 1.0
+    min: .0
+    max: 16384.0
+
+manasteal:
+  display_name: "Manasteal"
+  tooltips:
+    add: "Manasteal <value:+#;-.><quality>"
+    multiply_base: "Manasteal <value:+#%;-.%><quality>"
+    multiply_total: "Manasteal ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 64.0
+
+max_absorption:
+  display_name: "Max Absorption"
+  tooltips:
+    add: "Max Absorption <value:+#;-.><quality>"
+    multiply_base: "Max Absorption <value:+#%;-.%><quality>"
+    multiply_total: "Max Absorption ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 2048.0
+
+max_health:
+  display_name: "Max Health"
+  tooltips:
+    add: "Max Health <value:+#;-.><quality>"
+    multiply_base: "Max Health <value:+#%;-.%><quality>"
+    multiply_total: "Max Health ×<value:+#%;-.%><quality>"
+  values:
+    default: 30.0
+    min: 1.0
+    max: 16384.0
+
+max_mana:
+  display_name: "Max Mana"
+  tooltips:
+    add: "Max Mana <value:+#;-.><quality>"
+    multiply_base: "Max Mana <value:+#%;-.%><quality>"
+    multiply_total: "Max Mana ×<value:+#%;-.%><quality>"
+  values:
+    default: 100.0
+    min: .0
+    max: 16384.0
+
+mining_efficiency:
+  display_name: "Mining Efficiency"
+  tooltips:
+    add: "Mining Efficiency <value:+#;-.><quality>"
+    multiply_base: "Mining Efficiency <value:+#%;-.%><quality>"
+    multiply_total: "Mining Efficiency ×<value:+#%;-.%><quality>"
+  values:
+    default: .0
+    min: .0
+    max: 1024.0
+
+movement_speed:
+  display_name: "Movement Speed"
+  tooltips:
+    add: "Movement Speed <value:+#.#;-.><quality>"
+    multiply_base: "Movement Speed <value:+#%;-.%><quality>"
+    multiply_total: "Movement Speed ×<value:+#%;-.%><quality>"
+  values:
+    default: 0.1
+    min: -1.0
+    max: 4.0
+
+negative_critical_strike_power:
+  display_name: "Negative Critical Strike Power"
+  tooltips:
+    add: "Negative Critical Strike Power <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 0.0
+    max: 1.0
+
+none_critical_strike_power:
+  display_name: "None Critical Strike Power"
+  tooltips:
+    add: "None Critical Strike Power <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 1.0
+    min: 0.0
+    max: 1.0
+
+safe_fall_distance:
+  display_name: "Safe Fall Distance"
+  tooltips:
+    add: "Safe Fall Distance <value:+#.#;-.><quality>"
+    multiply_base: "Safe Fall Distance <value:+#%;-.%><quality>"
+    multiply_total: "Safe Fall Distance ×<value:+#%;-.%><quality>"
+  values:
+    default: 3.0
+    min: -1024.0
+    max: 1024.0
+
+scale:
+  display_name: "Scale"
+  tooltips:
+    add: "Scale <value:+#.#;-.><quality>"
+    multiply_base: "Scale <value:+#%;-.%><quality>"
+    multiply_total: "Scale ×<value:+#%;-.%><quality>"
+  values:
+    default: 1.0
+    min: 0.0625
+    max: 16.0
+
+step_height:
+  display_name: "Step Height"
+  tooltips:
+    add: "Step Height <value:+#.#;-.><quality>"
+    multiply_base: "Step Height <value:+#%;-.%><quality>"
+    multiply_total: "Step Height ×<value:+#%;-.%><quality>"
+  values:
+    default: 0.6
+    min: .0
+    max: 10.0
+
+sweeping_damage_ratio:
+  display_name: "Sweeping Damage Ratio"
+  tooltips:
+    add: "Sweeping Damage Ratio <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: 0.1
+    min: 0.0
+    max: 1.0
+
+universal_attack_damage:
+  display_name: "Universal Attack Damage"
+  tooltips:
+    add: "Universal Attack Damage <min:#;-.> ⎓ <max:#;-.><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: -16384.0
+    max: 16384.0
+
+universal_defense:
+  display_name: "Universal Defense"
+  tooltips:
+    add: "Universal Defense <value:+#;-.><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: 0.0
+    max: 16384.0
+
+universal_defense_penetration:
+  display_name: "Universal Defense Penetration"
+  tooltips:
+    add: "Universal Defense Penetration <value:+#;-.><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: -16384.0
+    max: 16384.0
+
+universal_defense_penetration_rate:
+  display_name: "Universal Defense Penetration Rate"
+  tooltips:
+    add: "Universal Defense Penetration Rate <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: 0.0
+    max: 1.0
+
+water_movement_efficiency:
+  display_name: "Water Movement Efficiency"
+  tooltips:
+    add: "Water Movement Efficiency <value:+#%;-.%><quality>"
+    multiply_base: "DO_NOT_USE"
+    multiply_total: "DO_NOT_USE"
+  values:
+    default: .0
+    min: .0
+    max: 1.0

@@ -1,16 +1,14 @@
 package cc.mewcraft.wakame.ability.state
 
+import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toSimpleString
-import me.lucko.helper.cooldown.Cooldown
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.cooldown.Cooldown
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.Server
 import org.bukkit.entity.Player
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.*
 import java.util.stream.Stream
 import kotlin.properties.ReadWriteProperty
@@ -42,9 +40,7 @@ fun AbilityState(user: User<Player>): AbilityState<Player> {
 class PlayerAbilityState(
     private val uniqueId: UUID,
 ) : AbilityState<Player>, Examinable {
-    companion object : KoinComponent {
-        private val server: Server by inject()
-
+    companion object {
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
     }
@@ -52,7 +48,7 @@ class PlayerAbilityState(
     private val cooldown: Cooldown = Cooldown.ofTicks(2)
 
     private val player: Player
-        get() = requireNotNull(server.getPlayer(uniqueId))
+        get() = requireNotNull(SERVER.getPlayer(uniqueId))
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
@@ -86,7 +82,7 @@ class PlayerAbilityState(
 }
 
 private class AbilityStateProvider(
-    private val initializer: () -> StateInfo
+    private val initializer: () -> StateInfo,
 ) : ReadWriteProperty<Any, StateInfo> {
     private var stateInfo: StateInfo? = null
 

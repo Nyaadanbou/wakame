@@ -2,37 +2,32 @@ package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -61,12 +56,12 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
 
     @InitFun
     fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
@@ -78,7 +73,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
     override fun render(item: NekoStack, context: RerollingTableContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -95,24 +90,21 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
             RerollingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        item.hideAll()
 
         item.erase() // 这是呈现给玩家的最后一环, 可以 erase
-
-        item.unsafeEdit {
-            lore = itemLore
-            showNothing()
-        }
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, id: String, cell: Cell, context: RerollingTableContext) {
-        val core = cell.getCore()
+        val core = cell.core
         val slot = context.slot
         when (slot) {
             RerollingTableContext.Slot.INPUT -> {
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_IN.process(collector, id, core, context)
-                    is AbilityCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ABILITY_IN.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, core, context)
                 }
             }
@@ -120,7 +112,6 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
             RerollingTableContext.Slot.OUTPUT -> {
                 when (core) {
                     is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_OUT.process(collector, id, core, context)
-                    is AbilityCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ABILITY_OUT.process(collector, id, core, context)
                     is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, core, context)
                 }
             }
@@ -140,18 +131,6 @@ internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistr
     @JvmField
     val CELLULAR_ATTRIBUTE_OUT: RenderingHandler3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
         configure3("cells/attributes/out") { id, core, context, format ->
-            format.render(id, core, context)
-        }
-
-    @JvmField
-    val CELLULAR_ABILITY_IN: RenderingHandler3<String, AbilityCore, RerollingTableContext, CellularAbilityRendererFormat> =
-        configure3("cells/abilities/in") { id, core, context, format ->
-            format.render(id, core, context)
-        }
-
-    @JvmField
-    val CELLULAR_ABILITY_OUT: RenderingHandler3<String, AbilityCore, RerollingTableContext, CellularAbilityRendererFormat> =
-        configure3("cells/abilities/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 

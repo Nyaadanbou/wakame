@@ -1,13 +1,11 @@
 package cc.mewcraft.wakame.molang
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import me.lucko.helper.function.Numbers
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
-import kotlin.jvm.optionals.getOrNull
 
 /**
  * 表示一个可以被 [MochaEngine] 解析的东西.
@@ -38,7 +36,7 @@ interface Evaluable<T : Any> {
 internal object EvaluableSerializer : TypeSerializer<Evaluable<*>> {
     override fun deserialize(type: Type, node: ConfigurationNode): Evaluable<*> {
         val string = node.get<String>()
-        val evalNumber = string?.let { Numbers.parse(it).getOrNull() }
+        val evalNumber = string?.toDoubleOrNull()
         if (evalNumber != null)
             return Evaluable.parseNumber(evalNumber)
 

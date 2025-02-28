@@ -3,39 +3,26 @@ package cc.mewcraft.wakame.display2.implementation.modding_table
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.HardcodedRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.extension.fastLore
+import cc.mewcraft.wakame.item.extension.hideAll
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.item.unsafeEdit
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.removeItalic
+import cc.mewcraft.wakame.util.adventure.removeItalic
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import java.nio.file.Path
 
@@ -75,12 +62,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
     @InitFun
     private fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     private fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
@@ -92,7 +79,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
     override fun render(item: NekoStack, context: ModdingTableContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -111,20 +98,18 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
 
         if (context is ModdingTableContext.Input) {
             components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.getId(), core, context)
-                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_IN.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.getId(), context)
+                for ((_, cell) in data) when (val core = cell.core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.id, context)
                 }
             }
         }
 
         if (context is ModdingTableContext.Output) {
             components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.getCore()) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.getId(), core, context)
-                    is AbilityCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ABILITY_OUT.process(collector, cell.getId(), core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.getId(), context)
+                for ((_, cell) in data) when (val core = cell.core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.id, context)
                 }
             }
 
@@ -139,14 +124,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
             }
         }
 
-        val itemLore = textAssembler.assemble(collector)
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        item.hideAll()
 
         item.erase()
-
-        item.unsafeEdit {
-            lore = itemLore
-            showNothing()
-        }
     }
 }
 
@@ -164,16 +147,6 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     @JvmField
     val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
         format.render(id, attribute, context)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY_IN: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/in") { id, ability, context, format ->
-        format.render(id, ability, context)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY_OUT: RenderingHandler3<String, AbilityCore, ModdingTableContext, CellularAbilityRendererFormat> = configure3("cells/abilities/out") { id, ability, context, format ->
-        format.render(id, ability, context)
     }
 
     @JvmField

@@ -1,36 +1,42 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.event.NekoCommandReloadEvent
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
-import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.koin.core.component.KoinComponent
+import org.bukkit.event.player.PlayerJoinEvent
 
 @Init(
     stage = InitStage.POST_WORLD,
 )
-internal object ResourcePackLifecycle : KoinComponent {
-    @InitFun
-    private fun init() {
-        runTask { ResourcePackServiceProvider.get().start() }
-    }
-}
+@Reload
+internal object ResourcePackLifecycle {
 
-/**
- * 负责在插件重载时, 重新配置资源包相关的系统.
- */
-internal class ResourcePackLifecycleListener : Listener {
-    @EventHandler
-    fun onCommandReload(e: NekoCommandReloadEvent) {
+    @InitFun
+    fun init() {
+        runTask { ResourcePackServiceProvider.get().start() }
+
+        // 在玩家加入服务器时发送资源包.
+        event<PlayerJoinEvent> { event ->
+            val player = event.player
+            val service = ResourcePackServiceProvider.get()
+
+            service.sendPack(player)
+        }
+    }
+
+    @ReloadFun
+    fun reload() {
         // 重新配置 资源包分发系统
-        val service = ResourcePackServiceProvider.loadAndSet()
+        val service = ResourcePackServiceProvider.set()
         service.start()
 
         // 重新配置 资源包发布系统
         val publisher = ResourcePackPublisherProvider.loadAndSet()
         publisher.cleanup()
     }
+
 }

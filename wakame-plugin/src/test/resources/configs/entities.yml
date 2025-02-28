@@ -1,0 +1,70 @@
+entity_attributes:
+
+  minecraft:living:
+    parent: ~
+    values:
+      defense: 1.0 # 所有元素的 defense 属性都为 1.0
+      max_mana: 100.0
+
+  minecraft:mob:
+    parent: minecraft:living
+    values: { } # 属性值 map 可以为空
+
+  minecraft:monster:
+    parent: minecraft:mob
+    values:
+      defense:
+        neutral: .0 # 重写 neutral 元素的 defense 属性; 其他元素的 defense 属性依然继承 parent
+
+  minecraft:player:
+    parent: minecraft:living
+    values:
+      attack_damage: default # 采用全局默认值
+      attack_effect_chance: default
+      block_interaction_range: default
+      critical_strike_chance: default
+      critical_strike_power: default
+      defense_penetration: default
+      entity_interaction_range: default
+      health_regeneration: default
+      lifesteal: default
+      manasteal: default
+      mana_consumption_rate: default
+      mana_regeneration: default
+      max_absorption: default
+      max_health: default
+      max_mana: 200.0
+      movement_speed: default
+
+  minecraft:skeleton:
+    parent: minecraft:monster
+    values:
+      max_health: 60.0
+      attack_damage:
+        neutral: 5.0 # attack_damage 是由两个属性组成的 (min 和 max). 这里指定的值将同时指定 min 和 max
+
+  minecraft:spider:
+    parent: minecraft:monster
+    values:
+      max_health: 40.0
+      defense:
+        neutral: 2.0
+
+  minecraft:zombie:
+    parent: minecraft:monster
+    values:
+      max_health: 20.0
+      max_mana: 80.0 # 重写
+      defense:
+        neutral: 4.0
+
+entity_type_holders:
+
+  demo_bosses_1:
+    - minecraft:ender_dragon
+    - minecraft:wither
+
+  demo_bosses_2:
+    - mythicmobs:soul_knight
+    - mythicmobs:nature_golem
+

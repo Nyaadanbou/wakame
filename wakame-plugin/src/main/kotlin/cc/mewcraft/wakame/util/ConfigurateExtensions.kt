@@ -120,6 +120,7 @@ internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfig
 /**
  * Creates a basic builder of configuration loader.
  */
+@Deprecated("Deprecated")
 internal fun buildYamlLoader(
     builder: TypeSerializerCollection.Builder.() -> Unit = {},
 ): YamlConfigurationLoader.Builder {
@@ -132,41 +133,35 @@ internal fun buildYamlLoader(
         }
 }
 
-/**
- * @see TypeSerializerCollection.Builder.register
- */
-internal inline fun <reified T> TypeSerializerCollection.Builder.kregister(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder {
-    return this.register({ javaTypeOf<T>() == it }, serializer)
-}
+internal inline fun <reified T> TypeSerializerCollection.Builder.register(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
+    this.register({ javaTypeOf<T>() == it }, serializer)
+
+@Deprecated("Deprecated", replaceWith = ReplaceWith("this.register(serializer)"))
+internal inline fun <reified T> TypeSerializerCollection.Builder.kregister(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
+    this.register(serializer)
 
 
 // Node extensions
 
 
-/**
- * @see ConfigurationNode.require
- */
-internal inline fun <reified T> ConfigurationNode.krequire(): T {
-    return this.krequire(typeOf<T>())
-}
+internal inline fun <reified T> ConfigurationNode.require(): T =
+    this.require(typeOf<T>())
 
-/**
- * @see ConfigurationNode.require
- */
-internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T {
-    val ret = this.get(clazz) ?: throw NoSuchElementException(
-        "Can't parse value of type '${clazz}' at '[${path().joinToString()}]'"
-    )
-    return ret
-}
+internal fun <T : Any> ConfigurationNode.require(clazz: KClass<T>): T =
+    this.get(clazz) ?: throw NoSuchElementException("Can't parse value of type '${clazz}' at '[${path().joinToString()}]'")
 
-/**
- * @see ConfigurationNode.require
- */
-internal fun <T> ConfigurationNode.krequire(type: KType): T {
-    val ret = this.get(type) ?: throw NoSuchElementException(
-        "Can't parse value of type '${type}' at '[${path().joinToString()}]'"
-    )
-    @Suppress("UNCHECKED_CAST")
-    return ret as T
-}
+internal fun <T> ConfigurationNode.require(type: KType): T =
+    this.get(type) as T ?: throw NoSuchElementException("Can't parse value of type '${type}' at '[${path().joinToString()}]'")
+
+@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>()"))
+internal inline fun <reified T> ConfigurationNode.krequire(): T =
+    this.require(typeOf<T>())
+
+@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>(clazz)"))
+internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T =
+    this.require(clazz)
+
+@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>(type)"))
+internal fun <T> ConfigurationNode.krequire(type: KType): T =
+    this.require(type)
+

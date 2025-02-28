@@ -1,13 +1,8 @@
 package cc.mewcraft.wakame.display2.implementation.merging_table
 
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.util.plain
+import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.format.Style

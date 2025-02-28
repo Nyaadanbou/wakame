@@ -1,16 +1,15 @@
 package cc.mewcraft.wakame.integration.permission
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.initializer2.Dispatcher
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.HooksLoader
+import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
-import org.slf4j.Logger
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 // private data class PermissionArgs(val world: World, val player: OfflinePlayer, val permission: String)
@@ -25,19 +24,17 @@ import java.util.concurrent.CompletableFuture
  */
 @Init(
     stage = InitStage.POST_WORLD,
-    dispatcher = Dispatcher.ASYNC,
+    dispatcher = LifecycleDispatcher.ASYNC,
     runAfter = [HooksLoader::class]
 )
 object PermissionManager {
 
     internal val integrations = ArrayList<PermissionIntegration>()
 
-    private val logger: Logger = Injector.get()
-
     @InitFun
     private fun init() {
         if (integrations.size > 1) {
-            logger.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nekoo will use the first one")
+            LOGGER.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nekoo will use the first one")
         }
     }
 

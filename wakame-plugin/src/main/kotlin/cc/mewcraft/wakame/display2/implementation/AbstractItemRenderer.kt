@@ -3,27 +3,16 @@
  */
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.display2.IndexedDataRenderer
-import cc.mewcraft.wakame.display2.IndexedDataRenderer2
-import cc.mewcraft.wakame.display2.IndexedDataRenderer3
-import cc.mewcraft.wakame.display2.IndexedDataRenderer4
-import cc.mewcraft.wakame.display2.IndexedDataRenderer5
-import cc.mewcraft.wakame.display2.IndexedDataRenderer6
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.ItemRenderer
-import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.qualifier.named
 import xyz.xenondevs.commons.provider.Provider
-import java.nio.file.Path
+import xyz.xenondevs.commons.provider.requireNotNull
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
@@ -72,16 +61,11 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
     }
 
     @VisibleForTesting
-    fun initialize0() {
-        val renderersDirectory = Injector.get<Path>(named(PLUGIN_DATA_DIR)).resolve("renderers")
-        val formatPath = renderersDirectory.resolve(name).resolve(FORMAT_FILE_NAME)
-        val layoutPath = renderersDirectory.resolve(name).resolve(LAYOUT_FILE_NAME)
+    fun loadDataFromConfigs() {
+        val renderersDirectory = KoishDataPaths.CONFIGS.resolve(ItemRendererConstants.DATA_DIR)
+        val formatPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.FORMAT_FILE_NAME)
+        val layoutPath = renderersDirectory.resolve(name).resolve(ItemRendererConstants.LAYOUT_FILE_NAME)
         initialize(formatPath, layoutPath)
-    }
-
-    companion object {
-        const val LAYOUT_FILE_NAME = "layout.yml"
-        const val FORMAT_FILE_NAME = "formats.yml"
     }
 }
 
@@ -132,11 +116,11 @@ internal abstract class RenderingHandlerRegistry(
 
     private inline fun <reified F : RendererFormat> provideParams(id: String): HandlerParams<F> {
         val format = try {
-            renderer.formats.registerRendererFormat<F>(id)
-            renderer.formats.getRendererFormatProvider<F>(id)
+            renderer.formats.addRendererFormat<F>(id)
+            renderer.formats.getRendererFormat<F>(id)
         } catch (e: Exception) {
             throw ExceptionInInitializerError(e)
-        }
+        }.requireNotNull()
 
         return HandlerParams(format)
     }
@@ -145,11 +129,6 @@ internal abstract class RenderingHandlerRegistry(
     protected data class HandlerParams<F : RendererFormat>(
         val format: Provider<F>,
     )
-
-    protected companion object {
-        @JvmField
-        val MM: MiniMessage = Injector.get()
-    }
 }
 
 /* RenderingHandler: 渲染的一部分 */

@@ -1,20 +1,19 @@
 package cc.mewcraft.wakame.gui.mod
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.modding_table.ModdingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
 import cc.mewcraft.wakame.reforge.mod.ModdingTable
 import cc.mewcraft.wakame.reforge.mod.SimpleModdingSession
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.itemLoreOrEmpty
-import cc.mewcraft.wakame.util.itemNameOrType
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.itemNameOrType
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.ScrollGui
@@ -50,14 +49,14 @@ import kotlin.properties.Delegates
 internal class ModdingMenu(
     val table: ModdingTable,
     val viewer: Player,
-) : KoinComponent {
+) {
 
     /**
      * 向玩家展示定制台菜单.
      */
     fun open() {
         primaryWindow.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_MODDING_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_MODDING_MENU)
     }
 
     /**
@@ -76,7 +75,7 @@ internal class ModdingMenu(
     /**
      * 本菜单的日志记录器, 自带前缀.
      */
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.MOD)
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MODDING_LOG_PREFIX)
 
     private val inputSlot: VirtualInventory = VirtualInventory(intArrayOf(1)).apply {
         guiPriority = 10
@@ -133,7 +132,7 @@ internal class ModdingMenu(
             // 玩家尝试交换 inputSlot 中的物品:
             event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             // 玩家尝试把物品放入 inputSlot:
@@ -186,7 +185,7 @@ internal class ModdingMenu(
             // 玩家向 outputSlot 中添加物品:
             event.isAdd || event.isSwap -> {
                 event.isCancelled = true
-                viewer.sendMessage(MessageConstants.MSG_ERR_CANCELLED)
+                viewer.sendMessage(TranslatableMessages.MSG_ERR_CANCELLED)
             }
 
             // 玩家从 outputSlot 中取出物品:
@@ -278,18 +277,18 @@ internal class ModdingMenu(
             val outputNekoStack = reforgeResult.output ?: error("output item is null, but the result is successful. This is a bug!")
             val renderingContext = ModdingTableContext.Output(session)
             ItemRenderers.MODDING_TABLE.render(outputNekoStack, renderingContext)
-            val outputItemStack = outputNekoStack.wrapped
+            val outputItemStack = outputNekoStack.bukkitStack
 
             // 再用 SlotDisplay 处理一下
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val iconResolution = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
                 standard { component("item_name", outputItemStack.itemNameOrType) }
-                folded("item_lore", outputItemStack.itemLoreOrEmpty)
+                folded("item_lore", outputItemStack.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
                 folded("result_description", reforgeResult.description)
             }
 
-            iconResolution.applyNameAndLoreTo(outputItemStack)
+            slotDisplayResolved.applyTo(outputItemStack)
         } else {
             // 定制失败了:
 
@@ -340,15 +339,15 @@ internal class ModdingMenu(
         // 用定制台的渲染器重新渲染物品
         val renderingCtx = ModdingTableContext.Input(session)
         ItemRenderers.MODDING_TABLE.render(sourceItem, renderingCtx)
-        val newItemStack = sourceItem.itemStack
+        val newItemStack = sourceItem.bukkitStack.clone()
 
         // 再用 SlotDisplay 处理一下
-        table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
+        val resolved = table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {
             standard { component("item_name", newItemStack.itemNameOrType) }
-            folded("item_lore", newItemStack.itemLoreOrEmpty)
-        }.applyNameAndLoreTo(newItemStack)
+            folded("item_lore", newItemStack.fastLoreOrEmpty)
+        }
 
-        return newItemStack
+        return resolved.applyTo(newItemStack)
     }
 
     private fun setInputSlot(stack: ItemStack?) {

@@ -1,10 +1,18 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.set.RegistrySet
 import net.kyori.adventure.util.TriState
 import net.kyori.examination.Examinable
 import org.bukkit.Material
+import io.papermc.paper.datacomponent.item.Tool as PaperTool
 
 data class Tool(
     val defaultMiningSpeed: Float,
@@ -33,27 +41,28 @@ data class Tool(
         override val id: String,
     ) : ItemComponentType<Tool> {
         override fun read(holder: ItemComponentHolder): Tool? {
-            val craftTool = holder.item.itemMeta?.tool ?: return null
-            val defaultMiningSpeed = craftTool.defaultMiningSpeed
-            val damagePerBlock = craftTool.damagePerBlock
-            val rules = craftTool.rules.mapNotNull { craftRule -> Rule(craftRule.blocks, craftRule.speed, TriState.byBoolean(craftRule.isCorrectForDrops)) }
-            return Tool(
-                defaultMiningSpeed = defaultMiningSpeed,
-                damagePerBlock = damagePerBlock,
-                rules = rules
-            )
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: Tool) {
-            val craftTool = holder.item.itemMeta?.tool ?: return
-            craftTool.defaultMiningSpeed = value.defaultMiningSpeed
-            craftTool.damagePerBlock = value.damagePerBlock
-            // craftTool.rules = ... // FIXME 支持向物品写入 Rules
-            holder.item.itemMeta?.setTool(craftTool)
+            val defaultMiningSpeed = value.defaultMiningSpeed
+            val damagePerBlock = value.damagePerBlock
+            val rules = value.rules
+            val paperRules = rules.map { rule ->
+                val blocks = RegistrySet.keySetFromValues(RegistryKey.BLOCK, rule.blockTypes.mapNotNull(Material::asBlockType))
+                val speed = rule.speed
+                val correctForDrops = rule.correctForDrops
+                PaperTool.rule(blocks, speed, correctForDrops)
+            }
+            val paperTool = PaperTool.tool()
+                .defaultMiningSpeed(defaultMiningSpeed)
+                .damagePerBlock(damagePerBlock)
+                .addRules(paperRules)
+            holder.bukkitStack.setData(DataComponentTypes.TOOL, paperTool)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.itemMeta?.setTool(null)
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

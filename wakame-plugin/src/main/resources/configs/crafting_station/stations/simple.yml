@@ -1,0 +1,66 @@
+# 合成站的类型
+# 暂无实际作用
+type: simple
+
+# 出现在该合成站里的配方列表
+# 确保这些配方都已在 recipes/ 目录下注册
+recipes:
+  - example:bronze_ingot
+
+# 合成站 listing 菜单的布局
+# 该菜单显示所有可以合成的物品, 也是玩家刚打开合成站看到的样子
+listing_layout:
+
+  title: "示例合成站"
+
+  # x: background
+  # .: recipe
+  # <: prev_page
+  # >: next_page
+  structure:
+    - "x x x x x x x x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x . . . . . x x"
+    - "x x < x x x > x x"
+
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
+  icons:
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/common/default/prev_page"
+    next_page: "internal:menu/common/default/next_page"
+    listing: "internal:menu/crafting_station/default/listing"
+
+# 合成站 preview 菜单的布局
+# 该菜单显示单个合成配方的详细信息
+preview_layout:
+
+  title: "合成预览"
+
+  # x: background
+  # i: input/choice
+  # o: output/result
+  # <: prev_page
+  # >: next_page
+  # c: craft
+  # b: back
+  structure:
+    - "x x x x x x x x x"
+    - "x i i i i x x x x"
+    - "x i i i i x x o x"
+    - "x i i i i x x x x"
+    - "x < x x > x x c x"
+    - "x x x x b x x x x"
+
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
+  icons:
+    back: "internal:menu/common/default/back"
+    background: "internal:menu/common/default/background"
+    next_page: "internal:menu/common/default/next_page"
+    prev_page: "internal:menu/common/default/prev_page"
+    choice: "internal:menu/crafting_station/default/choice"
+    craft: "internal:menu/crafting_station/default/craft"
+    result: "internal:menu/crafting_station/default/result"

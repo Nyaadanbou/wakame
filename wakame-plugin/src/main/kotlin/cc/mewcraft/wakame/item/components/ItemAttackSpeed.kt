@@ -1,7 +1,10 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import net.kyori.examination.Examinable
 
@@ -27,19 +30,19 @@ data class ItemAttackSpeed(
         override val id: String,
     ) : ItemComponentType<ItemAttackSpeed> {
         override fun read(holder: ItemComponentHolder): ItemAttackSpeed? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val level = tag.getByte(TAG_KEY)
             return ItemAttackSpeed(AttackSpeedLevel.entries[level.toInt()])
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemAttackSpeed) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 tag.putByte(TAG_KEY, value.level.ordinal.toByte())
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         companion object {

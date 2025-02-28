@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -61,7 +61,7 @@ abstract class SampleNodeFacade<V, C : RandomSelectorContext> : NodeFacade<Sampl
 
     final override fun decodeNodeData(node: ConfigurationNode): Sample<V, C> {
         val data = decodeSampleData(node)
-        val weight = node.node("weight").krequire<Double>()
+        val weight = node.node("weight").require<Double>()
         val filters = NodeContainer(filterNodeFacade.repository) {
             // 添加内在过滤器
             val intrinsics = intrinsicFilters(data)

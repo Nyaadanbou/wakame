@@ -1,0 +1,24 @@
+# 不要修改!
+version: 1
+
+primary:
+  - topmost:attack_speed
+
+  - (fixed:general)<st><dark_gray>             </dark_gray></st>
+  - general:cells
+  - general:elements
+  - general:kizamiz
+
+  - (fixed:special)<st><dark_gray>             </dark_gray></st>
+  - special:crate
+  - special:portable_core
+
+  - (fixed:enchantments)<st><dark_gray>             </dark_gray></st>
+  - enchantments:enchantments
+
+  - (fixed:vanilla)<st><dark_gray>             </dark_gray></st>
+  - vanilla:damage_resistant
+  - vanilla:food
+
+  - (fixed:general)<st><dark_gray>             </dark_gray></st>
+  - general:lore

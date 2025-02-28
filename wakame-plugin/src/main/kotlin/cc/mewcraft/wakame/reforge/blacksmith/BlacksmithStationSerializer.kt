@@ -1,25 +1,22 @@
 package cc.mewcraft.wakame.reforge.blacksmith
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.reforge.common.Reforge
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.krequire
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
-import java.io.File
+import cc.mewcraft.wakame.util.require
 
 internal object BlacksmithStationSerializer {
-    private const val ROOT_DIR_NAME = "blacksmith"
-    private val LOGGER: Logger = Injector.get()
+    private const val DATA_DIR = "blacksmith"
 
     fun loadAllStations(): Map<String, BlacksmithStation> {
-        val blacksmithDirectory = Injector.get<File>(named(PLUGIN_DATA_DIR))
-            .resolve(Reforge.ROOT_DIR_NAME)
-            .resolve(ROOT_DIR_NAME)
+        val blacksmithDirectory = KoishDataPaths.CONFIGS
+            .resolve(ReforgingStationConstants.DATA_DIR)
+            .resolve(DATA_DIR)
+            .toFile()
 
         val yamlLoader = buildYamlConfigLoader {
             withDefaults()
@@ -33,11 +30,11 @@ internal object BlacksmithStationSerializer {
                 val id = f.nameWithoutExtension.lowercase()
 
                 val rootNode = yamlLoader.buildAndLoadString(f.readText())
-                val repairId = rootNode.node("repair").krequire<String>()
-                val recycleId = rootNode.node("recycle").krequire<String>()
-                val primaryMenuSettings = rootNode.node("primary_menu_settings").krequire<BasicMenuSettings>()
-                val recyclingMenuSettings = rootNode.node("recycling_menu_settings").krequire<BasicMenuSettings>()
-                val repairingMenuSettings = rootNode.node("repairing_menu_settings").krequire<BasicMenuSettings>()
+                val repairId = rootNode.node("repair").require<String>()
+                val recycleId = rootNode.node("recycle").require<String>()
+                val primaryMenuSettings = rootNode.node("primary_menu_settings").require<BasicMenuSettings>()
+                val recyclingMenuSettings = rootNode.node("recycling_menu_settings").require<BasicMenuSettings>()
+                val repairingMenuSettings = rootNode.node("repairing_menu_settings").require<BasicMenuSettings>()
 
                 val repairingTable = RepairingTableRegistry.getTable(repairId) ?: run {
                     LOGGER.warn("Unknown repairing table: $repairId")

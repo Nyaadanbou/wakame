@@ -1,0 +1,148 @@
+components:
+
+  arrow:
+    enabled: true
+    display_name: "Arrow"
+
+  attack_speed:
+    enabled: true
+    display_name: "Attack Speed"
+
+  attribute_modifiers:
+    enabled: true
+    display_name: "Attribute Modifiers"
+
+  can_break:
+    enabled: true
+    display_name: "Can Break"
+
+  can_place_on:
+    enabled: true
+    display_name: "Can Place On"
+
+  castable:
+    enabled: true
+    display_name: "Castable"
+
+  cells:
+    enabled: true
+    display_name: "Cells"
+    virtual_core:
+      display_name: "Virtual Core"
+      description: [ ]
+    empty_core:
+      display_name: "Empty Core"
+      description: [ ]
+
+  crate:
+    enabled: true
+    display_name: "Crate"
+
+  custom_model_data:
+    enabled: true
+    display_name: "Custom Model Data"
+
+  custom_name:
+    enabled: true
+    display_name: "Custom Name"
+
+  damage:
+    enabled: true
+    display_name: "Damage"
+
+  dyed_color:
+    enabled: true
+    display_name: "Dyed Color"
+
+  elements:
+    enabled: true
+    display_name: "Elements"
+
+  enchantments:
+    enabled: true
+    display_name: "Enchantments"
+
+  damage_resistant:
+    enabled: true
+    display_name: "Damage Resistant"
+
+  food:
+    enabled: true
+    display_name: "Food"
+
+  glowable:
+    enabled: true
+    display_name: "Glowable"
+
+  hide_tooltip:
+    enabled: true
+    display_name: "Hide Tooltip"
+
+  hide_additional_tooltip:
+    enabled: true
+    display_name: "Hide Additional Tooltip"
+
+  item_name:
+    enabled: true
+    display_name: "Item Name"
+
+  kizamiz:
+    enabled: true
+    display_name: "Kizamiz"
+
+  level:
+    enabled: true
+    display_name: "Level"
+    minimum_level: 1
+
+  lore:
+    enabled: true
+    display_name: "Lore"
+
+  max_damage:
+    enabled: true
+    display_name: "Max Damage"
+
+  player_ability:
+    enabled: true
+    display_name: "Player Ability"
+
+  portable_core:
+    enabled: true
+    display_name: "Portable Core"
+
+  rarity:
+    enabled: true
+    display_name: "Rarity"
+
+  reforge_history:
+    enabled: true
+    display_name: "Reforge History"
+
+  skin:
+    enabled: true
+    display_name: "Skin"
+
+  skin_owner:
+    enabled: true
+    display_name: "Skin Owner"
+
+  stored_enchantments:
+    enabled: true
+    display_name: "Stored Enchantments"
+
+  tool:
+    enabled: true
+    display_name: "Tool"
+
+  tracks:
+    enabled: true
+    display_name: "Tracks"
+
+  trim:
+    enabled: true
+    display_name: "Trim"
+
+  unbreakable:
+    enabled: true
+    display_name: "Unbreakable"

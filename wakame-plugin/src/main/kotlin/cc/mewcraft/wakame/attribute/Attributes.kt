@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
@@ -233,7 +233,7 @@ private class SimpleAttributeGetter(
         // bundle id -> set <element attribute>
         private val BUNDLE_ID_TO_ATTRIBUTE_SET: HashMap<String, HashSet<ElementAttribute>> = HashMap()
 
-        // 所有已知的 ElementAttribute 的 simleId
+        // 所有已知的 ElementAttribute 的 simpleId
         val simpleIds: Set<String>
             get() = SIMPLE_ID_TO_ATTRIBUTE.keys
 

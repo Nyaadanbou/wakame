@@ -1,0 +1,16 @@
+primary:
+  - (fixed:general)
+  - general:level
+  - general:rarity
+  - general:elements
+
+  - (fixed:attribute)
+  - attribute:attack_damage
+  - attribute:defense
+  - attribute:max_health
+  - attribute:movement_speed
+  - stash:cells/empty
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:custom_name

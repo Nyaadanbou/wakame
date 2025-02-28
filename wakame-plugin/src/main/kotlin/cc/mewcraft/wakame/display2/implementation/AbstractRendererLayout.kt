@@ -1,18 +1,9 @@
 package cc.mewcraft.wakame.display2.implementation
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.argument.StringArgumentQueue
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.DerivedOrdinal
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererLayout
-import cc.mewcraft.wakame.display2.SimpleTextMeta
-import cc.mewcraft.wakame.display2.SourceIndex
-import cc.mewcraft.wakame.display2.SourceOrdinal
-import cc.mewcraft.wakame.display2.StaticIndexedText
-import cc.mewcraft.wakame.display2.StaticTextMeta
-import cc.mewcraft.wakame.display2.TextMeta
+import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -20,7 +11,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.kotlin.extensions.getList
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -37,8 +27,6 @@ internal abstract class AbstractRendererLayout(
 
     override val staticIndexedTextList: ArrayList<IndexedText> = ArrayList()
     override val defaultIndexedTextList: ArrayList<IndexedText> = ArrayList()
-
-    protected val mm = Injector.get<MiniMessage>()
 
     // derived index (key) -> ordinal (int)
     private val indexedTextOrdinalMap = Object2IntOpenHashMap<DerivedIndex>().apply { defaultReturnValue(-1) }
@@ -192,7 +180,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun createTextMeta0(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): TextMeta? {
-        val factory = renderer.formats.textMetaFactoryRegistry.getApplicableFactory(sourceIndex)
+        val factory = renderer.formats.textMetaFactoryRegistry.getMatchedFactory(sourceIndex)
         if (factory == null) {
             LOGGER.warn("Can't find a valid TextMetaFactory for source index '$sourceIndex'")
             return null
@@ -210,7 +198,7 @@ internal abstract class AbstractRendererLayout(
     }
 
     private fun deserializeToComponents(text: String): List<Component> {
-        return text.split("\\r").map(mm::deserialize)
+        return text.split("\\r").map(MM::deserialize)
     }
 
     override fun getOrdinal(index: DerivedIndex): DerivedOrdinal {

@@ -1,23 +1,22 @@
 package cc.mewcraft.wakame.ability.factory.implement
 
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.AbilityMechanic
 import cc.mewcraft.wakame.ability.AbilityProvider
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.factory.AbilityFactory
-import cc.mewcraft.wakame.ability.AbilityMechanic
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.data.TickResult
+import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
@@ -53,7 +52,7 @@ interface Dash : Ability {
 
     companion object Factory : AbilityFactory<Dash> {
         override fun create(key: Key, config: ConfigurationNode): Dash {
-            val stepDistance = config.node("step_distance").krequire<Double>()
+            val stepDistance = config.node("step_distance").require<Double>()
             val duration = config.node("duration").get<Long>() ?: 50
             val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
             val hitEffect = config.node("hit_effects").get<List<AbilityProvider>>() ?: emptyList()
@@ -81,7 +80,7 @@ private class DashAbilityMechanic(
     private val ability: Dash,
 ) : AbilityMechanic() {
 
-    companion object : KoinComponent {
+    companion object {
         /**
          * 在 Dash 开始前的准备时间
          */

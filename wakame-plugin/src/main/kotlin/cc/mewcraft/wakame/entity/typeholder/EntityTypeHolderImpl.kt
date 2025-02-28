@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity
 internal data class EntityTypeHolderImpl(
     override val keySet: Set<Key>,
 ) : EntityTypeHolder {
-    private val entityKeyLookup: EntityKeyLookup by Injector.inject()
+    private val entityKeyLookup: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
 
     override fun contains(obj: Entity): Boolean {
         return entityKeyLookup.get(obj) in keySet

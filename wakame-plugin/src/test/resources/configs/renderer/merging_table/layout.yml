@@ -1,0 +1,16 @@
+# 一般来说, 合成站中的物品不需要显示所有的信息.
+# 一些过于复杂或随机的信息不会显示在合成站菜单中.
+
+primary:
+  - (fixed:reforge)
+  - reforge:merge_input
+  - reforge:merge_output
+
+  - (fixed:general)
+  - general:level
+  - general:rarity
+  - general:elements
+
+  - (fixed:vanilla)
+  - vanilla:item_name
+  - vanilla:custom_name

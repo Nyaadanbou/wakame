@@ -1,0 +1,77 @@
+# id: `attack_speed`
+attack_speed:
+  namespace: topmost
+  tooltip:
+    line: "Attack Speed: <value>"
+    level:
+      0: "0"
+      1: "1"
+      2: "2"
+      3: "3"
+      4: "4"
+
+# id: `cells`
+cells:
+  namespace: general
+  tooltip: "Cells: <min> - <max>"
+
+# id: `crate`
+crate:
+  namespace: special
+  tooltip: "Crate: <name>(<id>)"
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  tooltip: "Custom Name: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  tooltip:
+    merged: "Elements(<count>): <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `enchantments`
+enchantments:
+  namespace: vanilla
+  tooltip: "<name> <level>"
+
+# id: `damage_resistant`
+damage_resistant:
+  namespace: vanilla
+  tooltip: "Damage Resistant"
+
+# id: `food`
+food:
+  namespace: vanilla
+  tooltip:
+    - "Nutrition: <nutrition>"
+    - "Saturation: <saturation>"
+    - "Eat Seconds: <eat_seconds>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  tooltip: "<value>"
+
+# id: `kizamiz`
+kizamiz:
+  namespace: general
+  tooltip:
+    merged: "Kizamiz(<count>): <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `lore`
+lore:
+  namespace: general
+  tooltip:
+    line: "<line>"
+    header: [ ]
+    bottom: [ ]
+
+# id: `portable_core`
+portable_core:
+  namespace: special

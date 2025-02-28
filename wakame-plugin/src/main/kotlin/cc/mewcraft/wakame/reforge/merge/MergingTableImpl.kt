@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.reforge.merge
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component.text
 import net.kyori.examination.ExaminableProperty
@@ -31,11 +31,11 @@ internal object WtfMergingTable : MergingTable {
         ),
         icons = hashMapOf(
             "background" to Key.key("internal:menu/common/default/background"),
-            "output_ok_confirmed" to Key.key("internal:menu/merging/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/merging/default/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/merging/default/output_empty"),
-            "output_failure" to Key.key("internal:menu/merging/default/output_failure"),
-            "output_insufficient_resource" to Key.key("internal:menu/merging/default/output_insufficient_resource"),
+            "output_ok_confirmed" to Key.key("internal:menu/merging_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/merging_table/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/merging_table/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/merging_table/default/output_failure"),
+            "output_insufficient_resource" to Key.key("internal:menu/merging_table/default/output_insufficient_resource"),
         )
     )
 

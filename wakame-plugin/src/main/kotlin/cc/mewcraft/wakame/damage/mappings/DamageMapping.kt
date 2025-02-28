@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.damage.mappings
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -41,9 +41,9 @@ internal object DamageMappingSerializer : TypeSerializer<DamageMapping> {
         val predicates = node.node("predicates").childrenMap()
             // 顺序在这里有作用
             .map { (_, mapValue) ->
-                mapValue.krequire<DamagePredicate>()
+                mapValue.require<DamagePredicate>()
             }
-        val builder = node.node("damage_metadata").krequire<DamageMetadataBuilder<*>>()
+        val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
         return DamageMapping(predicates, builder)
     }
 }

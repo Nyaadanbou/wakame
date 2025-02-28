@@ -1,6 +1,0 @@
-base: bedrock
-
-# 皮革的颜色. 对应原版组件: https://minecraft.wiki/w/Data_component_format#dyed_color
-dyed_color:
-  show_in_tooltip: false
-  rgb: 0xffffff

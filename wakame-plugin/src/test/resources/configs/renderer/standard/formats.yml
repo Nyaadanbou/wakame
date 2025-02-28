@@ -1,0 +1,118 @@
+# dev: 每个一级节点在代码里是一个 RendererFormat 对象
+#  一级节点本身的 key 将成为 RendererFormat#id
+#  一级节点的内容将成为 RendererFormat 的 property
+
+# id: `arrow`
+arrow:
+  namespace: ammo
+  tooltip:
+    - "Pierce Level: <pierce_level>"
+    - "Fire Ticks: <fire_ticks>"
+    - "Hit Fire Ticks: <hit_frozen_ticks>"
+    - "Hit Frozen Ticks: <hit_frozen_ticks>"
+    - "Glow Ticks: <glow_ticks>"
+
+# id: `attack_speed`
+attack_speed:
+  namespace: topmost
+  tooltip:
+    line: "Attack Speed: <value>"
+    level:
+      0: "0"
+      1: "1"
+      2: "2"
+      3: "3"
+      4: "4"
+
+# id: <有效的属性 id>
+cells/attributes:
+  namespace: attribute
+  ordinal:
+    element:
+      - neutral
+      - fire
+      - water
+      - wind
+      - earth
+      - thunder
+    operation:
+      - add
+      - multiply_base
+      - multiply_total
+
+# id: `cells/empty`
+cells/empty:
+  namespace: stash
+  tooltip:
+    - "[ Empty Slot ]"
+
+# id: `crate`
+crate:
+  namespace: special
+  tooltip: "盲盒: <name>(<id>)"
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  tooltip: "Custom Name: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  tooltip:
+    merged: "Element: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `enchantments`
+enchantments:
+  namespace: vanilla
+
+# id: `damage_resistant`
+damage_resistant:
+  namespace: vanilla
+  tooltip: "Damage Resistant"
+
+# id: `food`
+food:
+  namespace: vanilla
+  tooltip:
+    - "Nutrition: <nutrition>"
+    - "Saturation: <saturation>"
+    - "Eat Seconds: <eat_seconds>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  tooltip: "Item Name: <value>"
+
+# id: `kizamiz`
+kizamiz:
+  namespace: general
+  tooltip:
+    merged: "Kizami: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `level`
+level:
+  namespace: general
+  tooltip: "Level: <value>"
+
+# id: `lore`
+lore:
+  namespace: general
+  tooltip:
+    line: "<line>"
+    header: [ ]
+    bottom: [ ]
+
+# id: `portable_core`
+portable_core:
+  namespace: special
+
+# id: `rarity`
+rarity:
+  namespace: general
+  simple: "Rarity: <rarity_display_name>"
+  complex: "Rarity: <rarity_display_name> [<reforge_mod_count>]"

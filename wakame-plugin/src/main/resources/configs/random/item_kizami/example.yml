@@ -1,0 +1,3 @@
+nodes:
+  - type: "example"
+    weight: 5

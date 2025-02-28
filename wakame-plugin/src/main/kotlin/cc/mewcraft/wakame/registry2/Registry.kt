@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.core.Keyable
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.registry2.entry.RegistryEntryOwner
-import cc.mewcraft.wakame.util.DataResults
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.Keyable
 import cc.mewcraft.wakame.util.collection.IndexedIterable
+import cc.mewcraft.wakame.util.dfu.DataResults
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.DynamicOps
@@ -82,7 +82,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     private val referenceEntryCodec: Codec<RegistryEntry.Reference<T>>
         get() = Identifiers.CODEC.comapFlatMap(
             // 如果该 id 已经存在一个 entry, 那么直接返回已存在的, 否则就尝试创建一个 intrusive entry
-            { id -> this.getEntry(id)?.let(DataResult<RegistryEntry.Reference<T>>::success) ?: DataResult.success(this.createEntry(id)) },
+            { id -> this.getEntry(id)?.let { DataResult.success(it) } ?: DataResult.success(this.createEntry(id)) },
             { entry -> entry.getKey().value }
         )
 
@@ -128,12 +128,15 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
      * 创建一个侵入式的 [RegistryEntry.Reference] 实例并返回.
      *
      * ### 注意事项
-     * 实现上并不会始终创建一个侵入式的 [RegistryEntry.Reference] 实例.
+     * 实现上并不会**始终**创建一个侵入式的 [RegistryEntry.Reference] 实例.
      * 如果注册表里已经存在对应的数据, 那么将直接返回已存在的 [RegistryEntry].
-     * 多次以相同的 [id] 调用该函数将返回同一个 [RegistryEntry.Reference] 实例.
+     * 多次以相同 [id] 调用该函数将返回同一个 [RegistryEntry.Reference] 实例.
      *
      * ### 设计哲学
-     * 该函数是为了解决必须手动指定注册表之间所有依赖的问题, 设计大概是这样的:
+     * 该函数为了解决: 必须手动指定注册表之间所有依赖的问题,
+     * 即使注册表之间依赖的东西仅仅是一个数据的键名 ([id]).
+     *
+     * 设计大概是这样的:
      *
      * 外部可以使用该函数“声明”*现在或将来*需要一个键名为 [id] 的数据的 [RegistryEntry].
      * 由于是 [RegistryEntry] 所以外部可以选择仅仅把引用存起来, 或者如果需要转换数据的话

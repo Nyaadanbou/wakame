@@ -1,21 +1,25 @@
 package cc.mewcraft.wakame.user
 
-import com.github.benmanes.caffeine.cache.*
-import org.bukkit.Server
+import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.util.event
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.RemovalCause
 import org.bukkit.entity.Player
-import org.bukkit.event.*
+import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import java.util.UUID
+import java.util.*
 
-class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
-    private val server: Server by inject()
-
+@Init(
+    stage = InitStage.POST_WORLD,
+)
+internal object PaperUserManager : UserManager<Player> {
     // holds the live data of users
     private val userRepository: Cache<Player, User<Player>> = Caffeine.newBuilder()
-        .weakKeys()
         .removalListener<Player, User<Player>> { _, value, cause: RemovalCause ->
             if (cause.wasEvicted()) {
                 value!!.cleanup()
@@ -23,43 +27,45 @@ class PaperUserManager : Listener, KoinComponent, UserManager<Player> {
         }
         .build()
 
-    @EventHandler(
-        // 尽可能早的创建 User 对象, 以便其他系统使用
-        priority = EventPriority.LOWEST
-    )
-    private fun onJoin(e: PlayerJoinEvent) {
-        val player = e.player
+    @InitFun
+    fun init() {
 
-        // load or create user data
-        loadUser(player)
+        // 监听 PlayerJoinEvent, 初始化 User 对象
+        event<PlayerJoinEvent>(
+            priority = EventPriority.LOWEST, // 尽可能早的创建 User 对象, 以便其他系统使用
+        ) { event ->
+            val player = event.player
 
-        // set health scale to 20.0
-        player.healthScale = 20.0
-    }
+            // 初始化 User 对象
+            loadUser(player)
 
-    @EventHandler(
-        // 尽可能晚的移除 User 对象, 以便其他系统使用
-        priority = EventPriority.MONITOR
-    )
-    private fun onQuit(e: PlayerQuitEvent) {
-        val player = e.player
+            // Koish 系统下玩家的最大生命值可以超过 20f,
+            // 设置 healthScale 为 20f 避免红星占用过多屏幕
+            // 但这也要求需要在其他地方显示玩家的当前/最大生命值
+            player.healthScale = 20.0
+        }
 
-        // clean up user data
-        unloadUser(player)
+        // 监听 PlayerQuitEvent, 移除 User 对象
+        event<PlayerQuitEvent>(
+            priority = EventPriority.MONITOR, // 尽可能晚的移除 User 对象, 以便其他系统使用
+        ) { event ->
+            val player = event.player
+
+            // 移除 User 对象
+            unloadUser(player)
+        }
     }
 
     private fun loadUser(player: Player): User<Player> {
-        // cache user data
-        return userRepository.get(player) { k -> PaperUser(k) }
+        return userRepository.get(player, ::PaperUser)
     }
 
     private fun unloadUser(player: Player) {
-        // clean up user data
         userRepository.invalidate(player)
     }
 
     override fun getUser(uniqueId: UUID): User<Player> {
-        return getUser(requireNotNull(server.getPlayer(uniqueId)) { "player '$uniqueId' is not online" })
+        return getUser(requireNotNull(SERVER.getPlayer(uniqueId)) { "player '$uniqueId' is not online" })
     }
 
     override fun getUser(player: Player): User<Player> {

@@ -1,0 +1,60 @@
+# 不要修改!
+version: 1
+
+# 在这里设置资源包的生成细节
+generation:
+  # 描述
+  description: Koish!
+  # 版本号
+  # 参考: https://minecraft.wiki/w/Pack_format#List_of_resource_pack_formats
+  format: 42
+  # 兼容的最低版本
+  min: 42
+  # 兼容的最高版本
+  max: 42
+  # 需要合并的资源包路径 (文件夹或 zip 文件), 相对于 plugins/ 目录
+  merge_packs:
+    - "ModelEngine/resource pack"
+
+# 在这里设置资源包的分发方式
+# 当玩家进入服务器时自动向玩家分发资源包
+# 如果你已经有其他系统提供资源包的分发功能, 请关闭此功能以避免冲突
+service:
+  # 使用什么分发方式?
+  # 根据 type 的不同, 其余剩下的配置项也将不同:
+  # none - 不进行分发资源包的操作
+  # self_host - 将启动一个内置的 HTTP 服务器, 用于分发资源包给玩家
+  # only_url - 仅向玩家发送资源包的下载地址, 但不提供下载资源包的功能
+  type: none
+  # 如果 type 为 none, 没有配置项可用.
+  # 如果 type 为 self_host, 以下配置项可用:
+  # ```yaml
+  # required: false
+  # prompt: "萌芽资源包"
+  # host: "localhost"
+  # port: 7270
+  # ```
+  # 如果 type 为 only_url, 以下配置项可用:
+  # ```yaml
+  # required: false
+  # prompt: "萌芽资源包"
+  # download_url: "http://resourcepack:12345/pack.zip"
+  # ```
+
+# 在这里设置资源包的发布
+# 与资源包分发不同, 这个功能是将资源包上传到指定的远端储存
+# 例如, 你可以将资源包上传到 GitHub 仓库, 以此来托管资源包
+publisher:
+  # 使用什么方式发布?
+  # 可用类型: none, github
+  type: none
+  # 当 type 为 none 时: 没有额外的配置项.
+  # 当 type 为 github 时:
+  # ```yaml
+  # username: "g2213swo" # Github 的用户名
+  # token: "" # Github 的令牌
+  # repo: "Nyaadanbou/rprelay" # Github 的仓库路径
+  # branch: "main" # 仓库的分支
+  # path: "pack" # 仓库的资源包存储路径
+  # commit_message: "Auto upload resource pack" # 提交信息
+  # ```

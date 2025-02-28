@@ -4,43 +4,46 @@ import cc.mewcraft.wakame.api.tileentity.TileEntity;
 import org.bukkit.block.Block;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 
 /**
  * Called when a {@link TileEntity} breaks a block.
  */
+@NullMarked
 public class TileEntityBreakBlockEvent extends TileEntityEvent {
 
-    private static final @NotNull HandlerList HANDLERS = new HandlerList();
+    private static final HandlerList HANDLERS = new HandlerList();
 
-    public static @NotNull HandlerList getHandlerList() {
+    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 
-    private final @NotNull Block block;
-    private final @NotNull List<@NotNull ItemStack> drops;
+    private final Block block;
+    private final List<ItemStack> drops;
 
-    public TileEntityBreakBlockEvent(@NotNull TileEntity tileEntity, @NotNull Block block, @NotNull List<ItemStack> drops) {
+    public TileEntityBreakBlockEvent(TileEntity tileEntity, Block block, List<ItemStack> drops) {
         super(tileEntity);
         this.block = block;
         this.drops = drops;
     }
 
-    public @NotNull Block getBlock() {
+    public Block getBlock() {
         return block;
     }
 
-    public @NotNull List<@NotNull ItemStack> getDrops() {
+    public List<ItemStack> getDrops() {
         return drops;
     }
 
-    @Override public @NotNull HandlerList getHandlers() {
+    @Override
+    public HandlerList getHandlers() {
         return HANDLERS;
     }
 
-    @Override public @NotNull String toString() {
+    @Override
+    public String toString() {
         return "TileEntityBreakBlockEvent{" + "block=" + block + ", drops=" + drops + ", tileEntity=" + getTileEntity() + '}';
     }
 

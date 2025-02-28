@@ -1,17 +1,33 @@
 [versions]
 
-kotlin = "2.0.21"
-kotlinx-coroutines-core = "1.9.0"
-koin = "4.0.0"
-commons = "1.17"
-fleks = "2.10"
-shadow-nbt = "1.21.3-SNAPSHOT"
+# Gradle plugins
+kotlin = "2.1.0"
+kotlinx-coroutines = "1.10.1"
+libraries-repository = "0.0.1-snapshot"
+copy-jar-build = "0.0.1-snapshot"
+copy-jar-docker = "0.0.1-snapshot"
+paperweight = "1.7.7"
+blossom = "2.1.0"
 
-ignite = "1.1.0"
-mixin = "0.8.6"
-mixin-extras = "0.3.6"
-paperweight = "1.7.5"
+# Gradle plugin deps
+docker-java = "3.4.1"
+apache-commons-compress = "1.27.1"
+
+# Shaded deps
+koin = "4.0.0"
+commons = "1.24"
+fleks = "2.10"
+snakeyaml-engine = "2.8"
+
+# Server deps
 paper = "1.21.3-R0.1-SNAPSHOT"
+mixin = "0.8.7"
+mixin-extras = "0.4.1"
+ignite = "1.1.0"
+shadow-nbt = "1.21.3-SNAPSHOT"
+shadow-bukkit = "1.21.3-SNAPSHOT"
+
+# Plugin deps
 helper = "6.0.0"
 adventurelevel = "2.0.0"
 mythicmobs = "5.8.0-SNAPSHOT"
@@ -20,21 +36,26 @@ chestsort = "13.0.0-SNAPSHOT"
 vault = "1.7"
 luckperms = "5.4"
 towny = "0.100.4.0"
+worldguard = "7.0.7"
+townyflight = "1.13.0"
 
 [libraries]
 
 # Gradle plugins
 
-plugin-nyaadanbou-conventions = { group = "cc.mewcraft.gradle", name = "conventions", version = "1.0" }
 plugin-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-repository-plugin", version.ref = "libraries-repository" }
+plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
+plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
 
-# Shaded dependencies
+# Gradle plugin deps
+docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }
+apache-commons-compress = { group = "org.apache.commons", name = "commons-compress", version.ref = "apache-commons-compress" }
 
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
-ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
-mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
-mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
+# Shaded deps
+# 这些依赖属于插件本身, 将打包进插件的 jar
+
 koin-bom = { group = "io.insert-koin", name = "koin-bom", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core" }
 koin-core-coroutines = { group = "io.insert-koin", name = "koin-core-coroutines" }
@@ -46,22 +67,36 @@ commons-guava = { group = "xyz.xenondevs.commons", name = "commons-guava", versi
 commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider", version.ref = "commons" }
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
-
-# Server dependencies
-
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
+snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 
-# Plugin dependencies
+# Server deps
+# 这些依赖属于服务端核心, 由服务端的 classloader 加载
+
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-debug = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-debug", version.ref = "kotlinx-coroutines" }
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+mixin = { group = "org.spongepowered", name = "mixin", version.ref = "mixin" }
+mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", version.ref = "mixin-extras" }
+ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
+shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
+shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
+
+# Plugin deps
+# 这些依赖属于插件, 无论是自研的还是第三方的
 
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
 economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
 chestsort = { group = "de.jeff_media", name = "ChestSortAPI", version.ref = "chestsort" }
-worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version = "7.0.7" }
+worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard" }
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
-townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version = "1.13.0" }
+townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
+
+[plugins]
+
+blossom = { id = "net.kyori.blossom", version.ref = "blossom" }

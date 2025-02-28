@@ -1,0 +1,60 @@
+# 不要修改!
+version: 1
+
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:custom_name`
+  tooltip: "<!i><value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  # 可用标签
+  # <merged> 多个元素合并后的文本
+  # <single> 单个元素
+  tooltip:
+    merged: "<!i><gray>主要元素: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  # 可用标签
+  # <value> 物品的 `minecraft:item_name`
+  tooltip: "<!i><value>"
+
+# id: `level`
+level:
+  namespace: general
+  # 可用标签
+  # <value> 等级值
+  tooltip: "<!i><yellow>lv. <value>"
+
+# id: `merge_input`
+merge_input:
+  namespace: reforge
+
+# id: `merge_output`
+merge_output:
+  namespace: reforge
+  # 输出的属性值的渲染格式
+  # 这里将沿用属性本身的描述, 但支持对数值部分进行混淆
+  attribute_format:
+    style: "<!i><white>"
+    pattern: "[+-]?\\d+(\\.\\d+)?%?(\\*+)?"
+    replacement: "<i><dark_gray>???"
+
+# id: `rarity`
+rarity:
+  namespace: general
+  # 可用标签
+  # <rarity_display_name> 稀有度的名字
+  # <reforge_mod_count> 被重铸的次数
+  # 重铸次数为零的格式
+  simple: "<!i><rarity_display_name>"
+  # 重铸次数不为零的格式
+  complex: "<!i><rarity_display_name><white>[<reforge_mod_count>]"
+

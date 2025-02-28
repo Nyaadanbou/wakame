@@ -1,9 +1,14 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.component.*
+import cc.mewcraft.wakame.item.ItemDeprecations
+import cc.mewcraft.wakame.item.component.ItemComponentBridge
+import cc.mewcraft.wakame.item.component.ItemComponentConfig
+import cc.mewcraft.wakame.item.component.ItemComponentHolder
+import cc.mewcraft.wakame.item.component.ItemComponentType
+import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.examination.Examinable
-import org.bukkit.inventory.ItemFlag
+import io.papermc.paper.datacomponent.item.ItemAdventurePredicate as PaperItemAdventurePredicate
 
 
 data class ItemAdventurePredicate(
@@ -31,25 +36,17 @@ data class ItemAdventurePredicate(
         }
 
         override fun read(holder: ItemComponentHolder): ItemAdventurePredicate? {
-            val im = holder.item.itemMeta ?: return null
-            val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_DESTROYS)
-            return ItemAdventurePredicate(showInTooltip)
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemAdventurePredicate) {
-            holder.item.editMeta { im ->
-                if (value.showInTooltip) {
-                    im.removeItemFlags(ItemFlag.HIDE_DESTROYS)
-                } else {
-                    im.addItemFlags(ItemFlag.HIDE_DESTROYS)
-                }
-            }
+            val showInTooltip = value.showInTooltip
+            val paperItemAdventurePredicate = PaperItemAdventurePredicate.itemAdventurePredicate().showInTooltip(showInTooltip)
+            holder.bukkitStack.setData(DataComponentTypes.CAN_BREAK, paperItemAdventurePredicate)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta { im ->
-                im.removeItemFlags(ItemFlag.HIDE_DESTROYS)
-            }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 
@@ -64,25 +61,17 @@ data class ItemAdventurePredicate(
         }
 
         override fun read(holder: ItemComponentHolder): ItemAdventurePredicate? {
-            val im = holder.item.itemMeta ?: return null
-            val showInTooltip = !im.hasItemFlag(ItemFlag.HIDE_PLACED_ON)
-            return ItemAdventurePredicate(showInTooltip)
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemAdventurePredicate) {
-            holder.item.editMeta { im ->
-                if (value.showInTooltip) {
-                    im.removeItemFlags(ItemFlag.HIDE_PLACED_ON)
-                } else {
-                    im.addItemFlags(ItemFlag.HIDE_PLACED_ON)
-                }
-            }
+            val showInTooltip = value.showInTooltip
+            val paperItemAdventurePredicate = PaperItemAdventurePredicate.itemAdventurePredicate().showInTooltip(showInTooltip)
+            holder.bukkitStack.setData(DataComponentTypes.CAN_PLACE_ON, paperItemAdventurePredicate)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.item.editMeta { im ->
-                im.removeItemFlags(ItemFlag.HIDE_PLACED_ON)
-            }
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

@@ -1,9 +1,12 @@
 package cc.mewcraft.wakame.item.components.tracks
 
-import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.BinarySerializable
+import net.minecraft.nbt.CompoundTag
 
 /**
- * 代表一个可跟踪的信息.
+ * 可跟踪的信息.
  */
-interface Track : BinarySerializable<CompoundTag>
+interface Track {
+
+    fun saveNbt(): CompoundTag
+
+}

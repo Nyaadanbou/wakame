@@ -1,0 +1,35 @@
+repair: example_a
+recycle: example_a
+
+primary_menu_settings:
+  title: "DO_NOT_USE"
+  structure:
+    - ". . . . . . . . ."
+    - ". . * * * * * * *"
+    - "s . * * * * * * *"
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/background"
+    select_repairing: "internal:menu/blacksmith/select_repairing"
+    select_recycling: "internal:menu/blacksmith/select_recycling"
+
+repairing_menu_settings:
+  title: "修复台: example_a"
+  structure:
+    - "i i i i i . ."
+    - "* * * * * . ."
+  icons:
+    background: "internal:menu/common/background"
+    background2: "internal:menu/blacksmith/background2"
+
+recycling_menu_settings:
+  title: "回收站: example_a"
+  structure:
+    - "i i i i i . ."
+    - "i i i i i . x"
+  icons:
+    background: "internal:menu/common/background"
+    recycle_when_empty: "internal:menu/blacksmith/recycle_when_empty"
+    recycle_when_error: "internal:menu/blacksmith/recycle_when_error"
+    recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
+    recycle_when_unconfirmed: "internal:menu/blacksmith/recycle_when_unconfirmed"

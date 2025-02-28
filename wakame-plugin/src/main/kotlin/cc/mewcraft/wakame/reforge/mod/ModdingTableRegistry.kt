@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 
 /**
  * 定制台的注册表.
@@ -41,6 +41,7 @@ object ModdingTableRegistry {
 
     private fun load() {
         tables.clear()
+
         val tables = ModdingTableSerializer.loadAll()
         this.tables.putAll(tables)
         this.tables.put("wtf", WtfModdingTable)

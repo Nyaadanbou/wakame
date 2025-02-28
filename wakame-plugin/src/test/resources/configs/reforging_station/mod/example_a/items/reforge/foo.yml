@@ -1,0 +1,18 @@
+mod_limit: 8
+
+cells:
+
+  a:
+    currency_cost: "100 + query.joined_item_level() * 10 + query.source_item_mod_count() * 10"
+    require_element_match: true
+    permission: wtf
+    accepted_cores:
+      - type: attribute:attack_damage_rate
+        element: ~
+        operation: add
+
+  b:
+    currency_cost: "100 + query.joined_item_level() * 10"
+    require_element_match: true
+    permission: ~
+    accepted_cores: [ ]

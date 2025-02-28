@@ -1,22 +1,21 @@
 package cc.mewcraft.wakame.ability
 
+import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.util.Key
+import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
+import sun.security.krb5.internal.KDCOptions.with
 
 /**
  * 技能与 ECS 系统交互的工具类.
  */
-internal class AbilityWorldInteraction(
-    private val world: WakameWorld,
-) {
+internal class AbilityWorldInteraction {
     fun getMechanicsBy(bukkitEntity: Entity, trigger: Trigger): List<Ability> {
         val abilities = mutableListOf<Ability>()
-        with(world.instance) {
+        with(WakameWorld.instance) {
             forEach { entity ->
                 val family = family { all(EntityType.ABILITY, CastBy, TriggerComponent, IdentifierComponent) }
                 if (!family.contains(entity))
@@ -25,7 +24,7 @@ internal class AbilityWorldInteraction(
                     return@forEach
                 if (entity[TriggerComponent].trigger == trigger) {
                     val id = entity[IdentifierComponent].id
-                    abilities.add(AbilityRegistry.INSTANCES[Key(id)])
+                    abilities.add(AbilityRegistry.INSTANCES[Key.key(id)])
                 }
             }
         }
@@ -35,7 +34,7 @@ internal class AbilityWorldInteraction(
 
     fun getAllActiveAbilityTriggers(bukkitEntity: Entity): Set<Trigger> {
         val triggers = mutableSetOf<Trigger>()
-        with(world.instance) {
+        with(WakameWorld.instance) {
             forEach { entity ->
                 val family = family { all(EntityType.ABILITY, CastBy, TriggerComponent) }
                 if (!family.contains(entity))
@@ -50,13 +49,13 @@ internal class AbilityWorldInteraction(
     }
 
     fun setNextState(bukkitEntity: Entity, ability: Ability) {
-        world.editEntities(
+        WakameWorld.editEntities(
             family = { family { all(EntityType.ABILITY, IdentifierComponent, CastBy, StatePhaseComponent, TickResultComponent) } }
         ) { entity ->
             if (entity[CastBy].entity != bukkitEntity)
                 return@editEntities
             if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
-                // 只有在 IDLE 状态下才能进行下一个状态的标记.
+            // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
             if (entity[IdentifierComponent].id != ability.key.asString())
                 return@editEntities
@@ -65,7 +64,7 @@ internal class AbilityWorldInteraction(
     }
 
     fun setCostPenalty(bukkitEntity: Entity, abilityId: String, penalty: ManaCostPenalty) {
-        world.editEntities(
+        WakameWorld.editEntities(
             family = { family { all(EntityType.ABILITY, IdentifierComponent, CastBy, MochaEngineComponent) } }
         ) { entity ->
             if (entity[CastBy].entity != bukkitEntity)

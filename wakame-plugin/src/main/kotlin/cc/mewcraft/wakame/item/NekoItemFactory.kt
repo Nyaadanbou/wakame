@@ -1,5 +1,3 @@
-@file:Suppress("DuplicatedCode")
-
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.Util
@@ -12,7 +10,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.contains
 
@@ -24,8 +22,8 @@ object NekoItemFactory {
 object VanillaNekoItemFactory {
     operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
         // read basic data
-        val itemBase = rootNode.node("base").krequire<ItemBase>()
-        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
+        val itemBase = rootNode.node("base").require<ItemBase>()
+        val slotGroup = rootNode.node("slot").require<ItemSlotGroup>()
 
         // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {
@@ -41,20 +39,13 @@ object VanillaNekoItemFactory {
             tryAdd("arrow", ItemBehaviorTypes.ARROW)
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
-            // tryAdd("chargeable", ItemBehaviorTypes.CHARGEABLE)
-            // tryAdd("enchantable", ItemBehaviorTypes.ENCHANTABLE)
-            // tryAdd("food", ItemBehaviorTypes.FOOD)
-            // tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("town_flight", ItemBehaviorTypes.TOWN_FLIGHT)
-            // tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
-            // tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
             tryAdd("world_time_control", ItemBehaviorTypes.WORLD_TIME_CONTROL)
             tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
 
         // read item templates
         val templateMap = ItemTemplateMap.build {
-            @Suppress("UNCHECKED_CAST")
             fun <T : ItemTemplate<*>> tryAdd(
                 path: String,
                 type: ItemTemplateType<T>,
@@ -99,10 +90,9 @@ object VanillaNekoItemFactory {
             tryAdd("level", ItemTemplateTypes.LEVEL, Validator.restricted { cfg -> cfg.isConstant }) // LEVEL 必须使用固定值
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE, Validator.unsupported())
+            tryAdd("player_ability", ItemTemplateTypes.PLAYER_ABILITY)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE, Validator.unsupported())
             tryAdd("rarity", ItemTemplateTypes.RARITY, Validator.restricted { cfg -> cfg.isStatic }) // RARITY 必须使用固定值
-            // tryAdd("skin", ItemTemplateTypes.SKIN)
-            // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS, Validator.unsupported())
             tryAdd("tool", ItemTemplateTypes.TOOL, Validator.unsupported())
             tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
@@ -112,7 +102,7 @@ object VanillaNekoItemFactory {
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
-        return SimpleNekoItem(
+        return NekoItemImpl(
             id = id,
             base = itemBase,
             slotGroup = slotGroup,
@@ -133,8 +123,8 @@ object StandardNekoItemFactory {
      */
     operator fun invoke(id: Identifier, rootNode: ConfigurationNode): NekoItem {
         // read basic data
-        val itemBase = rootNode.node("base").krequire<ItemBase>()
-        val slotGroup = rootNode.node("slot").krequire<ItemSlotGroup>()
+        val itemBase = rootNode.node("base").require<ItemBase>()
+        val slotGroup = rootNode.node("slot").require<ItemSlotGroup>()
 
         // read item behaviors
         val behaviorMap = ItemBehaviorMap.build {
@@ -191,13 +181,12 @@ object StandardNekoItemFactory {
             tryAdd("level", ItemTemplateTypes.LEVEL)
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE)
-            tryAdd("menu_icon_dict", ItemTemplateTypes.MENU_ICON_DICT)
-            tryAdd("menu_icon_lore", ItemTemplateTypes.MENU_ICON_LORE)
-            tryAdd("menu_icon_name", ItemTemplateTypes.MENU_ICON_NAME)
+            tryAdd("slot_display_dict", ItemTemplateTypes.SLOT_DISPLAY_DICT)
+            tryAdd("slot_display_lore", ItemTemplateTypes.SLOT_DISPLAY_LORE)
+            tryAdd("slot_display_name", ItemTemplateTypes.SLOT_DISPLAY_NAME)
+            tryAdd("player_ability", ItemTemplateTypes.PLAYER_ABILITY)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
-            // tryAdd("skin", ItemTemplateTypes.SKIN)
-            // tryAdd("skin_owner", ItemTemplateTypes.SKIN_OWNER)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS)
             tryAdd("tool", ItemTemplateTypes.TOOL)
             tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
@@ -207,7 +196,7 @@ object StandardNekoItemFactory {
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
 
-        return SimpleNekoItem(
+        return NekoItemImpl(
             id = id,
             base = itemBase,
             slotGroup = slotGroup,
@@ -224,7 +213,6 @@ internal class UnsupportedItemTemplateException(override val message: String?, o
 
 private sealed interface Validator<T> {
 
-    @Suppress("UNCHECKED_CAST")
     companion object {
         fun <T> none(): Validator<T> = None as Validator<T>
         fun <T> unsupported(): Validator<T> = Unsupported as Validator<T>
@@ -233,11 +221,11 @@ private sealed interface Validator<T> {
 
     fun validate(context: ValidatorContext<T>)
 
-    object None : Validator<Nothing> {
+    data object None : Validator<Nothing> {
         override fun validate(context: ValidatorContext<Nothing>) = Unit
     }
 
-    object Unsupported : Validator<Nothing> {
+    data object Unsupported : Validator<Nothing> {
         override fun validate(context: ValidatorContext<Nothing>) {
             throw UnsupportedItemTemplateException("Adding unsupported config '${context.type.id}' to item type '${context.item}''")
         }

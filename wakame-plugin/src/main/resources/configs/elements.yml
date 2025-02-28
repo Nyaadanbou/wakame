@@ -1,0 +1,44 @@
+# 不要修改!
+version: 1
+
+# FIXME 移除 binary_index, 持久化直接储存 id
+
+# 每个元素的具体定义
+elements:
+
+  # 默认元素
+  # 当游戏尝试寻找一个元素但不存在时将使用该元素
+  # id 为 "neutral" 的元素将自动作为默认元素
+  #
+  # 默认元素有如下特殊要求:
+  # - 禁止修改这里的节点 `binary_index`
+  # - 禁止修改这里的字段 "neutral"
+  neutral:
+    binary_index: 0
+    display_name: "<color:#faff69>中立"
+    styles: "<color:#faff69>"
+
+  fire:
+    binary_index: 1
+    display_name: "<color:#ff4419>火"
+    styles: "<color:#ff4419>"
+
+  water:
+    binary_index: 2
+    display_name: "<color:#33f1ff>水"
+    styles: "<color:#33f1ff>"
+
+  wind:
+    binary_index: 3
+    display_name: "<color:#24ffa0>风"
+    styles: "<color:#24ffa0>"
+
+  earth:
+    binary_index: 4
+    display_name: "<color:#ffbb1c>土"
+    styles: "<color:#ffbb1c>"
+
+  thunder:
+    binary_index: 5
+    display_name: "<color:#cf70cd>雷"
+    styles: "<color:#cf70cd>"

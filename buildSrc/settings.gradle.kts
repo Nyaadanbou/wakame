@@ -1,15 +1,8 @@
-@file:Suppress("UnstableApiUsage")
+plugins {
+    id("nyaadanbou-repository") // 根目录的 settings.gradle.kts 已经声明过, 所以这里必须省略 version
+}
 
 dependencyResolutionManagement {
-    repositories {
-        maven("https://repo.mewcraft.cc/releases")
-        maven("https://repo.mewcraft.cc/private") {
-            credentials {
-                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-            }
-        }
-    }
     versionCatalogs {
         create("local") {
             from(files("../gradle/local.versions.toml"))
@@ -17,7 +10,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:0.5")
+            from("cc.mewcraft.gradle:catalog:0.7-SNAPSHOT")
         }
     }
 }

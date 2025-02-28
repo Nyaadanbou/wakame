@@ -1,0 +1,96 @@
+# 主要的菜单的设置
+primary_menu_settings:
+
+  # 菜单的标题
+  title: "定制台: example"
+
+  # .: 背景
+  # <: 上一页
+  # >: 下一页
+  # i: 输入
+  # o: 输出
+  # x: 子菜单
+  structure:
+    - ". . . . . . . . ."
+    - ". . x x x x x . ."
+    - ". < x x x x x > ."
+    - ". . . . . . . . ."
+    - ". . i . . . o . ."
+    - ". . . . . . . . ."
+
+  # error: 错误
+  # background: 背景
+  # prev_page: 上一页
+  # next_page: 下一页
+  # compatibility_view: 兼容性视图 (查看可以重造出什么样的核心)
+  # output_ok_confirmed: 输出
+  # output_ok_unconfirmed: 输出
+  # output_empty: 输出
+  # output_failed: 输出
+  icons:
+    error: "internal:menu/common/default/error"
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/common/default/prev_page"
+    next_page: "internal:menu/common/default/next_page"
+    compatibility_view: "internal:menu/rerolling/default/compatibility_view"
+    output_ok_confirmed: "internal:menu/rerolling/default/output_ok_confirmed"
+    output_ok_unconfirmed: "internal:menu/rerolling/default/output_ok_unconfirmed"
+    output_empty: "internal:menu/rerolling/default/output_empty"
+    output_failure: "internal:menu/rerolling/default/output_failure"
+    output_insufficient_resource: "internal:menu/rerolling/default/output_insufficient_resource"
+
+# 用于选择核心的菜单的设置
+selection_menu_settings:
+
+  # 无实际作用
+  title: "DO_NOT_USE"
+
+  # a: 核心预览
+  # b: 重造操作
+  structure: [ "a", "b" ]
+
+  # error: 错误
+  # core_view: 目标核心
+  # core_selected: 已选择的核心
+  # core_unselected: 未选择的核心
+  icons:
+    error: "internal:menu/common/default/error"
+    core_view: "internal:menu/rerolling/default/core_view"
+    core_selected: "internal:menu/rerolling/default/core_selected"
+    core_unselected: "internal:menu/rerolling/default/core_unselected"
+
+# 稀有度->数值的映射表.
+# 可用于所有的自定义函数.
+rarity_number_mapping:
+  common: 1.0
+  uncommon: 1.5
+  rare: 2.0
+  epic: 3.0
+  ancient: 5.0
+
+# 在这里设置重造操作所需要的货币.
+# 数据类型: molang
+#
+# 可用上下文:
+# query.source_rarity()
+#   源物品的稀有度所映射到的数值
+# query.source_level()
+#   源物品的等级
+# query.cell_count(`type`)
+#   返回指定类型的核孔的数量
+#   你必须传入一个参数 `type`
+#   `type` = 'all' | 'selected' | 'unselected'
+#   'all' = 所有核孔
+#   'selected' = 被选中要重造的核孔
+#   'unselected' = 未被选中要重造的核孔
+# query.sum_of_cost(`type`)
+#   返回指定类型的核孔的货币花费(之和)
+#   你必须传入一个参数 `type`
+#   `type` = 'all' | 'selected' | 'unselected'
+#   'all' = 所有核孔
+#   'selected' = 被选中要重造的核孔
+#   'unselected' = 未被选中要重造的核孔
+currency_cost: >-
+  10.0 * query.source_level()
+  + query.source_rarity() * query.sum_of_cost('unselected')
+  + 100.0 * ( query.count_cell('all') - query.count_cell('selected') )

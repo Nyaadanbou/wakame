@@ -1,0 +1,2 @@
+nodes:
+  - { type: attribute:attack_damage_rate, element: neutral, value: 0.0, weight: 9999 }

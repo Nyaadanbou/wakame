@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.nbt.CompoundTag
-import cc.mewcraft.wakame.BinarySerializable
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.context.abilityInput
@@ -13,15 +10,15 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.util.CompoundTag
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.getIntOrNull
-import cc.mewcraft.wakame.util.getStringOrNull
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.data.CompoundTag
+import cc.mewcraft.wakame.util.data.getIntOrNull
+import cc.mewcraft.wakame.util.data.getStringOrNull
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.text.mini
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
+import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -92,8 +89,8 @@ fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
     val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
-    val variant = node.node("variant").krequire<TriggerVariant>()
-    val manaCost = node.node("mana_cost").krequire<Evaluable<*>>()
+    val variant = node.node("variant").require<TriggerVariant>()
+    val manaCost = node.node("mana_cost").require<Evaluable<*>>()
     return SimplePlayerAbility(id, trigger, variant, manaCost)
 }
 
@@ -108,7 +105,8 @@ fun PlayerAbility(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
-interface PlayerAbility : BinarySerializable<CompoundTag> {
+// TODO 改成 class, 不要 interface - 此处接口没有实际作用
+interface PlayerAbility {
     /**
      * 技能的唯一标识.
      */
@@ -159,7 +157,7 @@ interface PlayerAbility : BinarySerializable<CompoundTag> {
      *
      * 请注意本序列化不包含 [id].
      */
-    override fun serializeAsTag(): CompoundTag
+    fun saveNbt(): CompoundTag
 }
 
 /**
@@ -174,9 +172,9 @@ internal data class SimplePlayerAbility(
     override val instance: Ability
         get() = AbilityRegistry.INSTANCES[id]
     override val displayName: Component
-        get() = instance.displays.name.let(MM::deserialize)
+        get() = instance.displays.name.mini
     override val description: List<Component>
-        get() = instance.displays.tooltips.map(MM::deserialize)
+        get() = instance.displays.tooltips.mini
 
     override fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val input = abilityInput(caster) {
@@ -188,14 +186,10 @@ internal data class SimplePlayerAbility(
         instance.recordBy(input)
     }
 
-    override fun serializeAsTag(): CompoundTag = CompoundTag {
+    override fun saveNbt(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
         writeEvaluable(manaCost)
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 
@@ -228,7 +222,7 @@ private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
 private fun CompoundTag.readTrigger(): Trigger {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { AbilityRegistry.TRIGGERS[Key(it)] } ?: SingleTrigger.NOOP
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { AbilityRegistry.TRIGGERS[Key.key(it)] } ?: SingleTrigger.NOOP
 }
 
 private fun CompoundTag.readVariant(): TriggerVariant {

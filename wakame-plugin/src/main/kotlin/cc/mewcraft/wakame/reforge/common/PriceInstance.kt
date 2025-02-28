@@ -1,12 +1,13 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
 import xyz.xenondevs.commons.collections.enumMap
-import java.util.EnumMap
+import java.util.*
+import java.util.Collections.emptyMap
 import java.util.stream.Stream
 
 /**

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
@@ -7,9 +8,8 @@ import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.util.toStableShort
 import net.kyori.examination.Examinable
-import xyz.xenondevs.commons.provider.immutable.orElse
-import xyz.xenondevs.commons.provider.immutable.require
-
+import xyz.xenondevs.commons.provider.orElse
+import xyz.xenondevs.commons.provider.require
 
 data class ItemLevel(
     /**
@@ -27,7 +27,10 @@ data class ItemLevel(
         /**
          * 最小的物品等级.
          */
-        val minimumLevel: Int by config.provider.entry<Int>("minimum_level").orElse(1).require({ it >= 0 }, { "minimum_level must be greater than or equal to 0" })
+        val minimumLevel: Int by config.rootNode
+            .entry<Int>("minimum_level")
+            .orElse(1)
+            .require({ it >= 0 }, { "minimum_level must be greater than or equal to 0" })
 
         override fun codec(id: String): ItemComponentType<ItemLevel> {
             return Codec(id)
@@ -42,14 +45,14 @@ data class ItemLevel(
         override val id: String,
     ) : ItemComponentType<ItemLevel> {
         override fun read(holder: ItemComponentHolder): ItemLevel? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
             val raw = tag.getInt(TAG_VALUE)
                 .coerceAtLeast(minimumLevel)
             return ItemLevel(level = raw)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemLevel) {
-            holder.editTag { tag ->
+            holder.editNbt { tag ->
                 val raw = value.level
                     .coerceAtLeast(minimumLevel)
                     .toStableShort()
@@ -58,7 +61,7 @@ data class ItemLevel(
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         private companion object {

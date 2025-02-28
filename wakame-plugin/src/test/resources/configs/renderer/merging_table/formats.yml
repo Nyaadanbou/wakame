@@ -1,0 +1,40 @@
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  tooltip: "Custom Name: <value>"
+
+# id: `elements`
+elements:
+  namespace: general
+  tooltip:
+    merged: "Elements: <merged>"
+    single: "<single>"
+    separator: ", "
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  tooltip: "Item Name: <value>"
+
+# id: `level`
+level:
+  namespace: general
+  tooltip: "Level: <value>"
+
+# id: `merge_input`
+merge_input:
+  namespace: reforge
+
+# id: `merge_output`
+merge_output:
+  namespace: reforge
+  attribute_format:
+    style: "<gray>"
+    pattern: "[+-]?\\d+(\\.\\d+)?%?(\\*+)?"
+    replacement: "???"
+
+# id: `rarity`
+rarity:
+  namespace: general
+  simple: "Rarity: <rarity_display_name>"
+  complex: "Rarity: <rarity_display_name> [<reforge_mod_count>]"

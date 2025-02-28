@@ -2,15 +2,10 @@
 
 package cc.mewcraft.wakame.util
 
+import io.netty.buffer.Unpooled
 import net.kyori.adventure.key.Key
-import net.minecraft.core.DefaultedRegistry
-import net.minecraft.core.Holder
-import net.minecraft.core.HolderGetter
-import net.minecraft.core.MappedRegistry
-import net.minecraft.core.RegistrationInfo
-import net.minecraft.core.Registry
-import net.minecraft.core.RegistryAccess
-import net.minecraft.core.WritableRegistry
+import net.minecraft.core.*
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
 import net.minecraft.resources.ResourceKey
@@ -26,16 +21,21 @@ import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.craftbukkit.CraftServer
 import org.bukkit.craftbukkit.CraftWorld
+import org.bukkit.craftbukkit.enchantments.CraftEnchantment
 import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.craftbukkit.util.CraftMagicNumbers
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
-import java.util.Optional
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 typealias MojangUnit = net.minecraft.util.Unit
 typealias MojangResourceKey<T> = ResourceKey<T>
 typealias MojangResourceLocation = ResourceLocation
 typealias MojangRegistry<T> = Registry<T>
+typealias MojangEnchantment = net.minecraft.world.item.enchantment.Enchantment
+typealias MojangStack = net.minecraft.world.item.ItemStack
 
 val MINECRAFT_SERVER: DedicatedServer by lazy { (Bukkit.getServer() as CraftServer).server }
 val REGISTRY_ACCESS: RegistryAccess by lazy { MINECRAFT_SERVER.registryAccess() }
@@ -61,6 +61,9 @@ val Player.connection: ServerGamePacketListenerImpl
 
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
+
+val Enchantment.handle: MojangEnchantment
+    get() = (this as CraftEnchantment).handle
 
 fun Key.toResourceLocation(): ResourceLocation =
     ResourceLocation.fromNamespaceAndPath(namespace(), value())
@@ -281,4 +284,35 @@ fun Packet<*>.sendTo(vararg players: Player) {
 
 fun Packet<*>.sendTo(players: Iterable<Player>) {
     players.forEach { it.send(this) }
+}
+
+fun RegistryFriendlyByteBuf(): RegistryFriendlyByteBuf =
+    RegistryFriendlyByteBuf(Unpooled.buffer(), REGISTRY_ACCESS)
+
+fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
+    val nonNullList: NonNullList<E>
+    if (default == null) {
+        nonNullList = NonNullList.createWithCapacity(list.size)
+        nonNullList.addAll(list)
+    } else {
+        nonNullList = NonNullList.withSize(list.size, default)
+        list.forEachIndexed { index, e -> nonNullList[index] = e }
+    }
+
+    return nonNullList
+}
+
+object NMSUtils {
+    fun getEntity(entityId: Int, world: World? = null): Entity? {
+        if (world != null) {
+            return world.serverLevel.getEntity(entityId)?.bukkitEntity
+        }
+        for (world in Bukkit.getWorlds()) {
+            val entity = world.serverLevel.getEntity(entityId)?.bukkitEntity
+            if (entity != null) {
+                return entity
+            }
+        }
+        return null
+    }
 }

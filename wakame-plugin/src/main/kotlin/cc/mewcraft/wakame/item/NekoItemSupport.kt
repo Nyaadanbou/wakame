@@ -1,26 +1,28 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.unsafeNekooTagOrNull
+import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.item.unwrapToMojang
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 
 val ItemStack?.nekoItem: NekoItem?
-    get() = this?.unsafeNekooTagOrNull?.let(NekoStackImplementations::getArchetypeOrNull)
+    get() = this?.unwrapToMojang().koishItem
+val MojangStack?.koishItem: NekoItem?
+    get() = this?.let(KoishStackImplementations::getArchetype)
 
 /**
  * 一个标准的 [NekoItem].
  */
-internal class SimpleNekoItem(
+internal class NekoItemImpl(
     override val id: Key,
     override val base: ItemBase,
     override val slotGroup: ItemSlotGroup,
@@ -37,8 +39,7 @@ internal class SimpleNekoItem(
                 // 如果模板里没有指定名字, 则使用 base 的 type
                 return Component.translatable(base.type)
             }
-            val miniMessage = Injector.get<MiniMessage>()
-            return miniMessage.deserialize(archetype.plainName)
+            return MM.deserialize(archetype.plainName)
         }
 
     override val plainName: String

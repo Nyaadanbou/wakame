@@ -2,13 +2,9 @@ package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationResult
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateBridge
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
 import cc.mewcraft.wakame.world.WeatherControlActionSerializer
@@ -38,13 +34,13 @@ data class WorldWeatherControl(
         override val type: TypeToken<WorldWeatherControl> = typeTokenOf()
 
         override fun decode(node: ConfigurationNode): WorldWeatherControl {
-            val actions = node.krequire<List<WeatherControl.Action>>()
+            val actions = node.require<List<WeatherControl.Action>>()
             return WorldWeatherControl(actions)
         }
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder().apply {
-                kregister(WeatherControlActionSerializer)
+                register<WeatherControl.Action>(WeatherControlActionSerializer)
             }.build()
         }
     }

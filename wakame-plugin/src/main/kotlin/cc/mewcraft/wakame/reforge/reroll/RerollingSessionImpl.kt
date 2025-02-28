@@ -1,31 +1,33 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.cells
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.cells
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.random3.Group
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.adventure.plain
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.plain
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslationArgument
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
+import java.util.*
+import java.util.Collections.*
 import java.util.stream.Stream
+import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -33,8 +35,8 @@ import kotlin.reflect.KProperty
 internal class SimpleRerollingSession(
     override val table: RerollingTable,
     override val viewer: Player,
-) : RerollingSession, KoinComponent {
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
+) : RerollingSession {
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.REROLLING_LOG_PREFIX)
 
     override val total: MochaFunction = table.currencyCost.compile(this)
 
@@ -90,7 +92,7 @@ internal class SimpleRerollingSession(
     override fun getFinalOutputs(): Array<ItemStack> {
         val reforgeResult = latestResult
         if (reforgeResult.isSuccess) {
-            return arrayOf(reforgeResult.output.itemStack)
+            return arrayOf(reforgeResult.output.bukkitStack.clone())
         } else {
             return emptyArray()
         }
@@ -110,7 +112,7 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            usableInput = value?.shadowNeko(true)
+            usableInput = value?.wrap()
             itemRule = usableInput?.id?.let(table.itemRuleMap::get)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
@@ -161,7 +163,7 @@ internal object ReforgeResult {
      * 成功结果; 用于表示重造已准备就绪.
      */
     fun success(viewer: Player, item: NekoStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
-        return Simple(true, MessageConstants.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
+        return Simple(true, TranslatableMessages.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
     }
 
     private abstract class Base : RerollingSession.ReforgeResult {
@@ -178,14 +180,14 @@ internal object ReforgeResult {
     // FIXME data class
     private class Error(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
 
     private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty(viewer)
         override val output: NekoStack = NekoStack.empty()
     }
@@ -254,13 +256,13 @@ internal object ReforgeCost {
     private class Error(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = false
-        override val description: List<Component> = listOf(MessageConstants.MSG_ERR_INTERNAL_ERROR.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
     }
 
     private class Empty(viewer: Player) : Base() {
         override fun take(viewer: Player) = Unit
         override fun test(viewer: Player): Boolean = true
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_EMPTY.translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_COST_EMPTY.translate(viewer))
     }
 
     private class Simple(viewer: Player, val amount: Double) : RerollingSession.ReforgeCost {
@@ -272,7 +274,7 @@ internal object ReforgeCost {
             return EconomyManager.has(viewer.uniqueId, amount).getOrDefault(false)
         }
 
-        override val description: List<Component> = listOf(MessageConstants.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))
+        override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_COST_SIMPLE.arguments(TranslationArgument.numeric(amount)).translate(viewer))
 
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("description", description.plain),
@@ -324,8 +326,8 @@ internal object Selection {
         override val id: String,
         override val rule: RerollingTable.CellRule,
         override val template: Group<CoreArchetype, ItemGenerationContext>,
-    ) : RerollingSession.Selection, KoinComponent {
-        // private val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.REROLL)
+    ) : RerollingSession.Selection {
+        // private val logger: Logger = LOGGER.decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
         override val changeable: Boolean = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
@@ -347,7 +349,7 @@ internal object Selection {
     }
 }
 
-internal object SelectionMap : KoinComponent {
+internal object SelectionMap {
     /**
      * 创建一个空的 [SelectionMap].
      */
@@ -441,7 +443,7 @@ internal object SelectionMap : KoinComponent {
     private class Simple(
         override val session: RerollingSession,
         private val data: LinkedHashMap<String, RerollingSession.Selection>,
-    ) : RerollingSession.SelectionMap, KoinComponent {
+    ) : RerollingSession.SelectionMap {
 
         override val size: Int
             get() = data.size

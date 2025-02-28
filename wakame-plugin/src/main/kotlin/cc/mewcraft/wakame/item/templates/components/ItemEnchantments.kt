@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.item.templates.components
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.ShownInTooltip
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.components.ShownInTooltip
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -61,7 +63,7 @@ data class ItemEnchantments(
                     }
                 }
                 .mapValues { (_, node) ->
-                    node.krequire<Int>()
+                    node.require<Int>()
                 }
             val showInTooltip = node.node("show_in_tooltip").getBoolean(true)
 

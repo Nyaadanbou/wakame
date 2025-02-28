@@ -1,0 +1,9 @@
+# 不要修改!
+version: 1
+
+primary:
+  - durability:durability
+  - (fixed)<st><dark_gray>             </dark_gray></st>
+  - repair_cost:repair_cost
+  - (fixed)<st><dark_gray>             </dark_gray></st>
+  - repair_usage:repair_usage

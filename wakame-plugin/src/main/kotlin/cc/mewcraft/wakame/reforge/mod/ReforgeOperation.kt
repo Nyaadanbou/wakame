@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
-import cc.mewcraft.wakame.item.cells
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.item.extension.cells
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import org.bukkit.entity.Player
 
 /**
@@ -47,37 +47,37 @@ private constructor(
         // 如果源物品不存在, 则返回空
         val usableInput = usableInput ?: run {
             logger.info("Skipped reforge as source item is not legit")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_NON_LEGIT_SOURCE_ITEM)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NON_LEGIT_SOURCE_ITEM)
         }
 
         val itemRule = session.itemRule ?: run {
             logger.info("Skipped reforge as the item rule is null")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_ITEM_RULE_NOT_FOUND)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_ITEM_RULE_NOT_FOUND)
         }
 
         // 把经过修改的核孔筛选出来
         val changedReplaceParams = replaceParams.filter { (_, repl) -> repl.originalInput != null }
         if (changedReplaceParams.isEmpty()) {
             logger.info("Skipped reforge as all replaces are not applicable")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_ALL_CORES_NOT_APPLICABLE)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_ALL_CORES_NOT_APPLICABLE)
         }
 
         // 检查经过修改的核孔中是否存在无效的耗材
         if (changedReplaceParams.any { (_, repl) -> !repl.latestResult.applicable }) {
             logger.info("Skipped reforge as some replaces are not applicable!")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_SOME_CORE_NOT_APPLICABLE)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_SOME_CORE_NOT_APPLICABLE)
         }
 
         // 检查经过修改的核孔中是否存在惩罚值过高
         if (changedReplaceParams.any { (_, repl) -> (repl.usableInput?.reforgeHistory?.modCount ?: 0) >= itemRule.modLimit }) {
             logger.info("Skipped reforge as mod count exceeds mod limit")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_REACHING_MOD_COUNT_LIMIT)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_REACHING_MOD_COUNT_LIMIT)
         }
 
         // 如果源物品不合法, 则返回失败
         val builder = usableInput.cells?.builder() ?: run {
             logger.info("No cells found in source item")
-            return ReforgeResult.failure(viewer, MessageConstants.MSG_MODDING_RESULT_FAILURE_FOR_NO_CELLS_FOUND_IN_SOURCE_ITEM)
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NO_CELLS_FOUND_IN_SOURCE_ITEM)
         }
 
         for ((id, replace) in changedReplaceParams) {
@@ -95,7 +95,7 @@ private constructor(
             val wrappedCore = portableCore.wrapped
 
             builder.modify(id) { cell ->
-                cell.setCore(wrappedCore)
+                cell.copy(core = wrappedCore)
             }
         }
 

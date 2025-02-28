@@ -2,20 +2,16 @@ package cc.mewcraft.wakame.display2.implementation.repairing_table
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.isClientSide
-import cc.mewcraft.wakame.util.itemLore
-import cc.mewcraft.wakame.util.showNothing
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.util.item.fastLore
+import cc.mewcraft.wakame.util.item.hideAll
+import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
@@ -42,12 +38,12 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
 
     @InitFun
     private fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     private fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(formatPath: Path, layoutPath: Path) {
@@ -59,20 +55,17 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
     override fun render(item: ItemStack, context: RepairingTableItemRendererContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
-        // 渲染 `minecraft:item_name`
-        // 不做处理
-
-        // 渲染 `minecraft:lore`
         val collector = ReferenceOpenHashSet<IndexedText>()
         RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_COST.process(collector, context)
         RepairingTableRenderingHandlerRegistry.REPAIR_USAGE.process(collector, context)
-        item.itemLore = textAssembler.assemble(collector)
 
-        // 渲染其他可见部分
-        item.showNothing()
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
+
+        item.hideAll()
     }
 }
 

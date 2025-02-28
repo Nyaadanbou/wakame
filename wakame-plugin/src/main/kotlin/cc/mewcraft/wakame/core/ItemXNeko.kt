@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.core
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.nekoItem
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.key.Key
@@ -34,9 +34,9 @@ class ItemXNeko(
                 // 随机种子始终为 0
                 seed = 0
             )
-            return archetype.realize(context).wrapped
+            return archetype.realize(context).bukkitStack
         } else {
-            return archetype.realize(player.toUser()).wrapped
+            return archetype.realize(player.toUser()).bukkitStack
         }
     }
 
@@ -62,7 +62,7 @@ object ItemXFactoryNeko : ItemXFactory {
     override val loaded: Boolean = true
 
     override fun create(itemStack: ItemStack): ItemXNeko? {
-        val nekoStack = itemStack.shadowNeko(true) ?: return null
+        val nekoStack = itemStack.wrap() ?: return null
         val nekoStackId = nekoStack.id
         val transformed = "${nekoStackId.namespace()}/${nekoStackId.value()}"
         return ItemXNeko(transformed)

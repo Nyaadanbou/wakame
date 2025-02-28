@@ -1,0 +1,6 @@
+base: 10.0
+
+modifiers:
+  damage:
+    operation: "add_value"
+    expression: "1.0 * query.value"

@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.nbt.TagType
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.CoreFactory
+import cc.mewcraft.wakame.util.data.NbtUtils
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 
@@ -46,27 +45,27 @@ data class PortableCore(
 
     private data class Codec(override val id: String) : ItemComponentType<PortableCore> {
         override fun read(holder: ItemComponentHolder): PortableCore? {
-            val tag = holder.getTag() ?: return null
+            val tag = holder.getNbt() ?: return null
 
             // fix data
-            if (tag.contains(TAG_CORE, TagType.COMPOUND)) {
+            if (tag.contains(TAG_CORE, NbtUtils.TAG_COMPOUND)) {
                 val old = tag.getCompound(TAG_CORE)
                 tag.remove(TAG_CORE)
                 tag.merge(old)
             }
 
-            val core = CoreFactory.deserialize(tag)
+            val core = Core.fromNbt(tag)
             return PortableCore(core)
         }
 
         override fun write(holder: ItemComponentHolder, value: PortableCore) {
-            holder.editTag { tag ->
-                tag.merge(value.wrapped.serializeAsTag())
+            holder.editNbt { tag ->
+                tag.merge(value.wrapped.saveNbt())
             }
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            holder.removeTag()
+            holder.removeNbt()
         }
 
         companion object {

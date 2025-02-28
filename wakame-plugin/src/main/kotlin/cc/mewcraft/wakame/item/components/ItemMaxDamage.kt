@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.components
 
 import cc.mewcraft.wakame.item.ItemConstants
+import cc.mewcraft.wakame.item.ItemDeprecations
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.util.maxDamage
-import cc.mewcraft.wakame.util.unsetDamageable
 import net.kyori.examination.Examinable
+import net.minecraft.core.component.DataComponents
 
 
 interface ItemMaxDamage : Examinable {
@@ -26,18 +26,15 @@ interface ItemMaxDamage : Examinable {
         override val id: String,
     ) : ItemComponentType<Int> {
         override fun read(holder: ItemComponentHolder): Int {
-            return holder.item.maxDamage
+            ItemDeprecations.usePaperOrNms()
         }
 
         override fun write(holder: ItemComponentHolder, value: Int) {
-            holder.item.maxDamage = value
+            holder.mojangStack.set(DataComponents.MAX_DAMAGE, value)
         }
 
         override fun remove(holder: ItemComponentHolder) {
-            // 移除 `max_damage` 物品组件, 相当于让物品变得不可损耗.
-            // TODO 依赖nms直接移除
-            val item = holder.item
-            item.unsetDamageable()
+            ItemDeprecations.usePaperOrNms()
         }
     }
 }

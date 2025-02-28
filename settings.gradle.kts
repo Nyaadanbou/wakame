@@ -1,32 +1,16 @@
-@file:Suppress("UnstableApiUsage")
-
 pluginManagement {
     repositories {
+        mavenLocal() // 为了导入 "nyaadanbou-repositories"
         gradlePluginPortal()
-        maven("https://repo.mewcraft.cc/releases")
-        maven("https://repo.mewcraft.cc/private") {
-            credentials {
-                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-            }
-        }
     }
 }
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+    id("nyaadanbou-repository") version "0.0.1-snapshot"
 }
 
 dependencyResolutionManagement {
-    repositories {
-        maven("https://repo.mewcraft.cc/releases")
-        maven("https://repo.mewcraft.cc/private") {
-            credentials {
-                username = providers.gradleProperty("nyaadanbou.mavenUsername").orNull
-                password = providers.gradleProperty("nyaadanbou.mavenPassword").orNull
-            }
-        }
-    }
     versionCatalogs {
         create("local") {
             from(files("gradle/local.versions.toml"))
@@ -34,7 +18,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:0.5")
+            from("cc.mewcraft.gradle:catalog:0.7-SNAPSHOT")
         }
     }
 }

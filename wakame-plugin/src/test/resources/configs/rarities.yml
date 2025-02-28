@@ -1,0 +1,26 @@
+rarities:
+  common:
+    binary_index: 0
+    display_name: "Common"
+    styles: "<white>"
+    glow_color: WHITE
+  uncommon:
+    binary_index: 1
+    display_name: "Uncommon"
+    styles: "<green>"
+    glow_color: GREEN
+  rare:
+    binary_index: 2
+    display_name: "Rare"
+    styles: "<aqua>"
+    glow_color: AQUA
+  epic:
+    binary_index: 3
+    display_name: "Epic"
+    styles: "<dark_purple>"
+    glow_color: DARK_PURPLE
+  ancient:
+    binary_index: 4
+    display_name: "Ancient"
+    styles: "<gold>"
+    glow_color: GOLD

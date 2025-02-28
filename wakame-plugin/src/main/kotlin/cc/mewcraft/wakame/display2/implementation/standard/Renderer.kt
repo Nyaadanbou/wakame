@@ -2,46 +2,25 @@ package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
-import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
-import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.display2.implementation.*
+import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.FoodProperties
-import cc.mewcraft.wakame.item.components.ItemAttackSpeed
-import cc.mewcraft.wakame.item.components.ItemCrate
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemEnchantments
-import cc.mewcraft.wakame.item.components.ItemKizamiz
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
+import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item.extension.*
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
 import cc.mewcraft.wakame.item.templates.components.ItemArrow
 import cc.mewcraft.wakame.item.templates.components.ItemName
-import cc.mewcraft.wakame.packet.PacketNekoStack
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -52,13 +31,9 @@ internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : 
 
 internal class StandardRendererLayout(renderer: StandardItemRenderer) : AbstractRendererLayout(renderer)
 
-internal data object StandardContext // 等之后需要的时候, 改成 class 即可
-
-@Init(
-    stage = InitStage.POST_WORLD
-)
+@Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, StandardContext>() {
+internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
@@ -66,12 +41,12 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
     @InitFun
     fun init() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     @ReloadFun
     fun reload() {
-        initialize0()
+        loadDataFromConfigs()
     }
 
     override fun initialize(
@@ -83,9 +58,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: PacketNekoStack, context: StandardContext?) {
-        requireNotNull(context) { "context" }
-
+    override fun render(item: NekoStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
         val templates = item.templates
@@ -98,7 +71,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
 
         val components = item.components
         components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.getCore()) }
+        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.core) }
         components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
         components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
         components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
@@ -114,34 +87,34 @@ internal object StandardItemRenderer : AbstractItemRenderer<PacketNekoStack, Sta
         }
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
-        val itemLore = textAssembler.assemble(collector)
-
-        item.erase()
-
-        item.lore = run {
+        val lore = textAssembler.assemble(collector)
+        item.fastLore(run {
             // 尝试在物品原本的 lore 的第一行插入我们渲染的 lore.
             // 如果原本的 lore 为空, 则直接使用我们渲染的 lore.
             // 如果原本的 lore 不为空, 则在渲染的 lore 和原本的 lore 之间插入一个空行.
 
-            val lore = item.lore
-            if (lore.isNullOrEmpty()) {
-                itemLore
+            val existingLore = item.fastLoreOrEmpty
+            if (existingLore.isEmpty()) {
+                lore
             } else {
-                itemLore + buildList {
+                buildList {
+                    addAll(existingLore)
                     add(Component.empty())
                     addAll(lore)
                 }
             }
-        }
-        item.showAttributeModifiers(false)
-        item.showEnchantments(false)
-        item.showStoredEnchantments(false)
+        })
+
+        item.hideAttributeModifiers()
+        item.hideEnchantments()
+        item.hideStoredEnchantments()
+
+        item.erase()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
             is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
-            is AbilityCore -> StandardRenderingHandlerRegistry.CELLULAR_ABILITY.process(collector, core)
             is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
         }
     }
@@ -166,11 +139,6 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val CELLULAR_ATTRIBUTE: RenderingHandler<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
-        format.render(data)
-    }
-
-    @JvmField
-    val CELLULAR_ABILITY: RenderingHandler<AbilityCore, CellularAbilityRendererFormat> = configure("cells/abilities") { data, format ->
         format.render(data)
     }
 

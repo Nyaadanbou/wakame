@@ -1,3 +1,0 @@
-# 没有任何信息的图标 (因为用了 hide_tooltip).
-
-base: black_stained_glass_pane[hide_tooltip={}]

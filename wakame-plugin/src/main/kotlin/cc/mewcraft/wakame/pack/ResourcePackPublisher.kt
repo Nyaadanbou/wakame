@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.github.GithubRepoManager
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.koin.core.qualifier.named
-import org.slf4j.Logger
-import java.io.File
 
 /**
  * 负责将资源包推送到指定的位置, 比如 Github 仓库.
@@ -101,15 +99,14 @@ private data class GithubPublisher(
     private val remotePath: String,
     private val branch: String,
     private val commitMessage: String,
-) : ResourcePackPublisher, KoinComponent {
-    private val logger: Logger by inject()
-    private val pluginDataDir: File by inject(named(PLUGIN_DATA_DIR))
+) : ResourcePackPublisher {
 
     override fun publish(): Boolean {
-        logger.info("Publishing resource pack to Github (repo: $repo, branch: $branch, path: $remotePath)")
+        LOGGER.info("Publishing resource pack to Github (repo: $repo, branch: $branch, path: $remotePath)")
+        val dataFolder = KoishDataPaths.ROOT.toFile()
         val manager = GithubRepoManager(
-            localRepoPath = pluginDataDir.resolve("cache").resolve("repo"),
-            resourcePackDirPath = pluginDataDir.resolve(GENERATED_RESOURCE_PACK_DIR),
+            localRepoPath = dataFolder.resolve(".cache/repo"),
+            resourcePackDirPath = dataFolder.resolve(GENERATED_RESOURCE_PACK_DIR),
             username = username,
             token = token,
             repo = repo,
@@ -120,7 +117,7 @@ private data class GithubPublisher(
 
         manager.publishPack()
             .onFailure {
-                logger.error("Failed to publish resource pack to Github", it)
+                LOGGER.error("Failed to publish resource pack to Github", it)
                 return false
             }
 
@@ -128,6 +125,6 @@ private data class GithubPublisher(
     }
 
     override fun cleanup() {
-        logger.info("Cleaning up Github publisher")
+        LOGGER.info("Cleaning up Github publisher")
     }
 }

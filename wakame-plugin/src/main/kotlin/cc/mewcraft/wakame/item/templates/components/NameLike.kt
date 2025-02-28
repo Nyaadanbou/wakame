@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.item.component.ItemComponentInjections
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationResult
 import cc.mewcraft.wakame.item.template.ItemTemplate
@@ -34,7 +34,7 @@ abstract class NameLike : ItemTemplate<Component> {
             }
         }.build()
 
-        val itemName = ItemComponentInjections.mm.deserialize(fancyName, resolver)
+        val itemName = MM.deserialize(fancyName, resolver)
 
         return ItemGenerationResult.of(itemName)
     }

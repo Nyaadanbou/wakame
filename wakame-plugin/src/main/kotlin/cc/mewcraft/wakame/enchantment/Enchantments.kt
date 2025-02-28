@@ -7,6 +7,7 @@
 
 package cc.mewcraft.wakame.enchantment
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
 import io.papermc.paper.enchantments.EnchantmentRarity
 import io.papermc.paper.registry.RegistryAccess
@@ -22,10 +23,9 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.enchantments.EnchantmentTarget
 import org.bukkit.entity.EntityCategory
 import org.bukkit.entity.EntityType
-import org.bukkit.inventory.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
-import org.slf4j.Logger
+import org.bukkit.inventory.EquipmentSlotGroup
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemType
 
 /**
  * 本单例包含了所有 *新增加的* / *修改过的* / *移除掉的* [Enchantment] 实例.
@@ -33,7 +33,7 @@ import org.slf4j.Logger
  * 本单例存在的目的是为了方便获取由数据包移除,修改,新增的魔咒.
  * 本质上本单例只是省去了调用 [RegistryAccess] 的繁琐操作.
  */
-/* public */ object Enchantments : KoinComponent {
+/* public */ object Enchantments {
 
     /* 新增加的魔咒 */
     val AGILITY = getCustom("agility")
@@ -99,13 +99,13 @@ import org.slf4j.Logger
         val registry = try {
             RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
         } catch (e: Exception) {
-            get<Logger>().error("Can't get enchantment registry, returning empty for '$key'", e)
+            LOGGER.error("Can't get enchantment registry, returning empty for '$key'", e)
             return EmptyEnchantment
         }
 
         val enchantment = registry.get(key)
         if (enchantment == null) {
-            get<Logger>().error("Can't find enchantment '$key', returning empty")
+            LOGGER.error("Can't find enchantment '$key', returning empty")
             return EmptyEnchantment
         }
 

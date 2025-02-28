@@ -1,32 +1,30 @@
 package cc.mewcraft.wakame.registry
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.factory.AbilityFactories
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
-import cc.mewcraft.wakame.util.Key
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.adventure.key.Key
 import org.koin.core.qualifier.named
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
-import java.io.File
 
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
     ]
 )
 @Reload
@@ -73,7 +71,7 @@ object AbilityRegistry {
     private fun loadConfiguration() {
         INSTANCES.clear()
 
-        val dataDirectory = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(ABILITY_PROTO_CONFIG_DIR)
+        val dataDirectory = KoishDataPaths.CONFIGS.resolve(ABILITY_PROTO_CONFIG_DIR).toFile()
         val namespaceDirs = dataDirectory.walk().maxDepth(1)
             .drop(1) // exclude the `dataDirectory` itself
             .filter { it.isDirectory }
@@ -93,8 +91,8 @@ object AbilityRegistry {
                     val text = file.readText()
                     val node = loaderBuilder.buildAndLoadString(text)
 
-                    val abilityId = Key(Namespaces.ABILITY, "${namespace}/$value")
-                    val type = node.node("type").krequire<String>()
+                    val abilityId = Key.key(Namespaces.ABILITY, "${namespace}/$value")
+                    val type = node.node("type").require<String>()
                     val ability = try {
                         requireNotNull(AbilityFactories[type]).create(abilityId, node)
                     } catch (t: Throwable) {

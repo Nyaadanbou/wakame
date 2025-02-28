@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import java.util.*
 import java.util.stream.Stream
 
 // 开发日记: 2024/6/24 小米

@@ -5,13 +5,12 @@ package cc.mewcraft.wakame
  */
 object SharedConstants {
     const val PLUGIN_NAME = "wakame"
-    const val PLUGIN_NAME_2 = "koish"
-    const val ROOT_NBT_NAME = "wakame"
 
     /**
      * 检查 JVM 是否在 IDE 中运行.
      */
-    val IS_RUNNING_IN_IDE = listOf(
+    @JvmStatic
+    val isRunningInIde = listOf(
         "org.junit.Test", // JUnit 4
         "org.junit.jupiter.api.Test" // JUnit 5
     ).map {

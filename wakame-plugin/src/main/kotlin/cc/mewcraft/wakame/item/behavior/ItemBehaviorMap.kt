@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import java.util.Collections.emptyList
 import java.util.stream.Stream
 
 interface ItemBehaviorMap : Iterable<ItemBehavior>, Examinable {

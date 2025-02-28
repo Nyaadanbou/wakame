@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.integration
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.NEKO
+import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.integration.economy.EconomyType
@@ -18,17 +16,18 @@ import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.integration.townflight.TownFlightIntegration
 import cc.mewcraft.wakame.integration.townflight.TownFlightManager
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.data.JarUtils
-import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.bukkit.Bukkit
 import org.objectweb.asm.Type
-import org.slf4j.Logger
 import kotlin.reflect.KClass
 
 @Init(
-    stage = InitStage.POST_WORLD
+    stage = InitStage.POST_WORLD,
 )
 internal object HooksLoader {
 
@@ -53,7 +52,7 @@ internal object HooksLoader {
     @Suppress("UNCHECKED_CAST")
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            NEKO.nekooJar,
+            KOISH_JAR.toFile(),
             listOf(Hook::class), emptyList(),
             "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
@@ -65,26 +64,23 @@ internal object HooksLoader {
                 val loadListener = annotation["loadListener"] as? Type
 
                 if (plugins.isEmpty()) {
-                    throw IllegalStateException("hook annotation on $className does not specify any plugins")
+                    throw IllegalStateException("Hook annotation on $className does not specify any plugins")
                 }
 
                 if (shouldLoadHook(plugins, unless, requireAll)) {
                     loadHook(className.replace('/', '.'), loadListener)
 
-                    // 记录加载的钩子
-                    Injector.get<ComponentLogger>().info(text {
-                        content("Hook ${className.substringAfterLast('/')} loaded"); color(NamedTextColor.AQUA)
-                    })
+                    LOGGER.info(Component.text("Hook ${className.substringAfterLast('/')} loaded").color(NamedTextColor.AQUA))
                 }
             } catch (t: Throwable) {
-                Injector.get<Logger>().error("Failed to load hook $className", t)
+                LOGGER.error("Failed to load hook $className", t)
             }
         }
     }
 
     private fun shouldLoadHook(plugins: List<String>, unless: List<String>, requireAll: Boolean): Boolean {
         if (plugins.isEmpty())
-            throw IllegalStateException("no plugins specified")
+            throw IllegalStateException("No plugins specified")
 
         val pluginManager = Bukkit.getPluginManager()
 
@@ -99,7 +95,7 @@ internal object HooksLoader {
         if (loadListener != null) {
             @Suppress("UNCHECKED_CAST")
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
-                ?: throw IllegalStateException("the LoadListener $loadListener is not an object class")
+                ?: throw IllegalStateException("The LoadListener $loadListener is not an object class")
 
             if (!obj.loaded.get()) { // blocking call
                 return
@@ -108,7 +104,7 @@ internal object HooksLoader {
 
         val hookClass = Class.forName(className).kotlin
         val hookInstance = hookClass.objectInstance
-            ?: throw IllegalStateException("hook $hookClass is not an object class")
+            ?: throw IllegalStateException("Hook $hookClass is not an object class")
 
         useHook(hookInstance)
     }

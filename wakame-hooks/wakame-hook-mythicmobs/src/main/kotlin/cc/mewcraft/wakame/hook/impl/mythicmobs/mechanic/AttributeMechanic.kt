@@ -6,11 +6,7 @@ import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
-import io.lumine.mythic.api.skills.INoTargetSkill
-import io.lumine.mythic.api.skills.ITargetedEntitySkill
-import io.lumine.mythic.api.skills.SkillMetadata
-import io.lumine.mythic.api.skills.SkillResult
-import io.lumine.mythic.api.skills.ThreadSafetyLevel
+import io.lumine.mythic.api.skills.*
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt
 import io.lumine.mythic.bukkit.utils.Schedulers
@@ -32,12 +28,12 @@ class AttributeMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.get(parsed) }
+        ?.let { parsed -> AttributeProvider.instance().get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster?.entity?.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.instance().get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS
@@ -45,7 +41,7 @@ class AttributeMechanic(
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.instance().get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.ERROR
         setBaseValueAndScheduleReset(attributeInstance, amount[data], duration[data])
         return SkillResult.SUCCESS

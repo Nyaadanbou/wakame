@@ -1,23 +1,26 @@
-import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
-import net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder
-
 plugins {
-    id("nyaadanbou-conventions.repositories")
-    id("nyaadanbou-conventions.copy-jar")
     id("wakame-conventions.kotlin")
+    id("cc.mewcraft.libraries-repository")
+    id("cc.mewcraft.copy-jar-build")
+    id("cc.mewcraft.copy-jar-docker")
     id("io.papermc.paperweight.userdev")
-    alias(libs.plugins.pluginyml.paper)
+    alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.wakame"
-version = "1.0.0-SNAPSHOT"
+version = "0.0.1-snapshot"
 description = "The core plugin of Nyaadanbou"
+
+repositories {
+    nyaadanbouReleases()
+    nyaadanbouPrivate()
+}
 
 dependencies {
     // internal
     compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnlyApi(project(":wakame-common")) // 同上
+    compileOnly(project(":wakame-mixin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
@@ -30,20 +33,20 @@ dependencies {
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnlyApi(platform(local.koin.bom))
-    compileOnlyApi(local.koin.core)
     implementation(platform(local.koin.bom))
     implementation(local.koin.core)
+    compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供
     implementation(local.commons.collections)
+    implementation(local.commons.gson)
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
+    implementation(local.commons.tuple)
     implementation(local.fleks) {
         exclude("org.jetbrains")
     }
     implementation(libs.mocha)
-    compileOnlyApi(local.shadow.nbt) // 运行时由 wakame-mixin 提供
+    implementation(local.snakeyaml.engine)
     implementation(platform(libs.bom.adventure))
-    compileOnlyApi(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.caffeine))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
@@ -52,19 +55,12 @@ dependencies {
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
     implementation(platform(libs.bom.cloud.kotlin))
-    implementation(platform(libs.bom.hephaestus)) {
-        exclude("com.google.code.gson")
-        exclude("net.kyori")
-        exclude("org.jetbrains")
-    }
-    implementation(platform(libs.bom.invui)) {
+    compileOnly(platform(libs.bom.invui)) { // 由自定义的 classloader 加载
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
-    implementation(platform(libs.bom.packetevents.spigot))
 
     // other plugins (hard dependencies)
-    compileOnlyApi(local.helper)
     compileOnly(local.adventurelevel)
 
     // test
@@ -72,23 +68,11 @@ dependencies {
     testImplementation(project(":wakame-common"))
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
-    testImplementation(local.helper)
-    testImplementation(local.shadow.nbt)
     testImplementation(local.koin.test.junit5)
 }
 
 tasks {
-    // test {
-    //     forkEvery = 1 // 给每个 Test 开一个新的 JVM 进程
-    // }
     shadowJar {
-        // invui 的 nms 模块只能在 spigot-mapping 下运行,
-        // 因此必须告知服务端我们用的是 spigot-mapping,
-        // 这样才能触发 paper 的 remapping 机制.
-        manifest {
-            attributes["paperweight-mappings-namespace"] = "spigot"
-        }
-
         val shadedPattern = "cc.mewcraft.wakame.external."
         relocate("com.github.benmanes.caffeine.cache", shadedPattern + "caffeine")
         relocate("org.koin", shadedPattern + "koin")
@@ -112,73 +96,29 @@ tasks {
         // relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
         // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
     }
+}
 
-    // invui 依然使用 spigot-mapping; 我们必须暂时基于 spigot-mapping 构建 JAR
-    assemble {
-        dependsOn(reobfJar)
-    }
-
-    paperweight {
-        reobfArtifactConfiguration = ReobfArtifactConfiguration.REOBF_PRODUCTION
-    }
-
-    copyJar {
-        environment = "paper"
-        jarTaskName = "reobfJar"
-        jarFileName = "wakame-${project.version}.jar"
+sourceSets {
+    main {
+        blossom {
+            resources {
+                property("version", project.version.toString())
+                property("description", project.description)
+            }
+        }
     }
 }
 
-paper {
-    main = "cc.mewcraft.wakame.WakamePlugin"
-    // loader = "cc.mewcraft.wakame.loader.WakameLoader"
-    // bootstrapper = "cc.mewcraft.wakame.loader.WakameBootstrapper"
-    name = "Wakame"
-    version = "${project.version}"
-    description = project.description
-    apiVersion = "1.21"
-    author = "Nailm"
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
-    serverDependencies {
-        register("helper") {
-            required = true
-            load = RelativeLoadOrder.BEFORE
-        }
-        register("AdventureLevel") {
-            required = false
-            load = RelativeLoadOrder.BEFORE
-        }
-        register("ChestSort") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("Economy") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("LuckPerms") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("MythicMobs") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("Towny") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("TownyFlight") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("Vault") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-        register("WorldGuard") {
-            required = false
-            load = RelativeLoadOrder.OMIT
-        }
-    }
+buildCopy {
+    fileName = "wakame-${project.version}.jar"
+    archiveTask = "shadowJar"
+}
+
+dockerCopy {
+    containerId = "aether-minecraft-1"
+    containerPath = "/minecraft/game1/plugins/"
+    fileMode = 0b110_100_100
+    userId = 999
+    groupId = 999
+    archiveTask = "shadowJar"
 }

@@ -1,17 +1,11 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.display2.*
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.component
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -63,10 +57,6 @@ internal data class SingleValueRendererFormat(
     fun render(vararg resolver: TagResolver): IndexedText {
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip, *resolver)))
     }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
 }
 
 /**
@@ -98,10 +88,6 @@ internal data class ListValueRendererFormat(
 
     fun render(vararg resolver: TagResolver): IndexedText {
         return SimpleIndexedText(index, tooltip.map { MM.deserialize(it, *resolver) })
-    }
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
     }
 }
 
@@ -166,8 +152,4 @@ internal data class AggregateValueRendererFormat(
         val separator: String,
         val merged: String,
     )
-
-    companion object Shared {
-        private val MM = Injector.get<MiniMessage>()
-    }
 }

@@ -1,12 +1,11 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
@@ -14,14 +13,12 @@ import java.util.function.Predicate
 
 internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
-        val miniMessage = Injector.get<MiniMessage>()
         val message = obj.toString().replace("§", "")
-        return miniMessage.deserialize(message)
+        return MM.deserialize(message)
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {
-        val miniMessage = Injector.get<MiniMessage>()
-        return miniMessage.serialize(item)
+        return MM.serialize(item)
     }
 }
 
@@ -31,9 +28,8 @@ internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
     }
 
     override fun serialize(item: Style, typeSupported: Predicate<Class<*>>?): Any {
-        val miniMessage = Injector.get<MiniMessage>()
         val component = Component.text().style(item).build()
-        return miniMessage.serialize(component)
+        return MM.serialize(component)
     }
 }
 
@@ -57,8 +53,7 @@ internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleB
     }
 
     override fun serialize(item: Array<StyleBuilderApplicable>, typeSupported: Predicate<Class<*>>?): Any {
-        val miniMessage = Injector.get<MiniMessage>()
         val component = Component.text().style { builder -> item.forEach(builder::apply) }.build()
-        return miniMessage.serialize(component)
+        return MM.serialize(component)
     }
 }

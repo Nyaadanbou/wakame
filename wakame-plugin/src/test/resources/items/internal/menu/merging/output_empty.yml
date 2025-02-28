@@ -1,4 +1,0 @@
-base: barrier
-menu_icon_name: "<white>结果: 无输出"
-menu_icon_lore:
-  - "<dark_gray>这里将输出合并后的核心."

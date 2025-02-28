@@ -5,8 +5,8 @@
 
 package cc.mewcraft.wakame.context.param
 
-import cc.mewcraft.wakame.api.block.NekoBlock
-import cc.mewcraft.wakame.api.block.NekoBlockState
+import cc.mewcraft.wakame.api.block.KoishBlock
+import cc.mewcraft.wakame.api.block.KoishBlockState
 import cc.mewcraft.wakame.api.tileentity.TileEntity
 import cc.mewcraft.wakame.context.intention.DefaultContextIntentions.BlockBreak
 import cc.mewcraft.wakame.context.intention.DefaultContextIntentions.BlockInteract
@@ -29,14 +29,10 @@ import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_TILE_ENT
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_UUID
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.SOURCE_WORLD
 import cc.mewcraft.wakame.context.param.DefaultContextParamTypes.TOOL_ITEM_STACK
-import cc.mewcraft.wakame.util.takeUnlessEmpty
+import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.world.BlockPos
 import net.minecraft.resources.ResourceLocation
-import org.bukkit.GameMode
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.OfflinePlayer
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
@@ -44,7 +40,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
-import java.util.UUID
+import java.util.*
 
 object DefaultContextParamTypes {
 
@@ -107,8 +103,8 @@ object DefaultContextParamTypes {
      * - [BLOCK_STATE_NEKO]
      * - [BLOCK_TYPE]
      */
-    val BLOCK_TYPE_NEKO: ContextParamType<NekoBlock> =
-        ContextParamType.builder<NekoBlock>("block_type_neko")
+    val BLOCK_TYPE_NEKO: ContextParamType<KoishBlock> =
+        ContextParamType.builder<KoishBlock>("block_type_neko")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             // FIXME
             // .autofilledBy(::BLOCK_TYPE) { NekoRegistries.BLOCK[it] }
@@ -131,8 +127,8 @@ object DefaultContextParamTypes {
      * Autofills:
      * - [BLOCK_TYPE_NEKO]
      */
-    val BLOCK_STATE_NEKO: ContextParamType<NekoBlockState> =
-        ContextParamType.builder<NekoBlockState>("block_state_neko")
+    val BLOCK_STATE_NEKO: ContextParamType<KoishBlockState> =
+        ContextParamType.builder<KoishBlockState>("block_state_neko")
             .optionalIn(BlockPlace, BlockBreak, BlockInteract)
             // FIXME
             // .autofilledBy(::BLOCK_TYPE_NEKO) { it.defaultBlockState }

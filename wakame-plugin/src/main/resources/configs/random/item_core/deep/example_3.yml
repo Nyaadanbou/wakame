@@ -1,0 +1,9 @@
+nodes:
+  - type: "attribute:block_interaction_range"
+    value: 8.0
+    weight: 1
+  - type: "attribute:entity_interaction_range"
+    value: 8.0
+    weight: 1
+  - type: "generic:empty"
+    weight: 3

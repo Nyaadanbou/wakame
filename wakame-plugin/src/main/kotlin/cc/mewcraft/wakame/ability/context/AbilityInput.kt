@@ -1,24 +1,19 @@
 package cc.mewcraft.wakame.ability.context
 
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.MochaEngineComponent
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.ManaCostComponent
-import cc.mewcraft.wakame.ecs.component.TargetComponent
-import cc.mewcraft.wakame.ecs.component.TriggerComponent
-import cc.mewcraft.wakame.ecs.external.ComponentMap
-import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
@@ -147,7 +142,7 @@ private class SimpleAbilityInput(
 }
 
 private class ComponentMapAbilityInput(
-    private val componentMap: ComponentMap
+    private val componentMap: ComponentMap,
 ) : AbilityInput, Examinable {
     override val castBy: Caster
         get() = requireNotNull(componentMap[CastBy]?.caster) { "Caster not found in componentMap" }

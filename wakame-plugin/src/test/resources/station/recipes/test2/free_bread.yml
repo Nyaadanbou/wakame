@@ -1,7 +1,0 @@
-input:
-  - type: item
-    id: minecraft:wheat
-    amount: 1
-output:
-  item: minecraft:bread
-  amount: 1

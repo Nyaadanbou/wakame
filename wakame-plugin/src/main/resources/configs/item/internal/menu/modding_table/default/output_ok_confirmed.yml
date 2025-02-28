@@ -1,0 +1,10 @@
+# 额外占位符
+# <item_name>
+slot_display_name: "<item_name>"
+
+# 额外占位符
+# {item_lore}
+slot_display_lore:
+  - "{item_lore}"
+  - ""
+  - "<!i><aqua>再次点击取出物品"

@@ -1,0 +1,19 @@
+base: bedrock
+
+# 假设物品等级为 10
+# 引用了全局的数据.
+cells:
+  buckets:
+    foo_a:
+      core: "a"
+    foo_b:
+      core: "b"
+  selectors:
+    core_pools: { }
+    core_groups:
+      a:
+        qwe:
+          - type: "global:foo/example" # 命名空间为 global, 代表引用全局样本
+      b:
+        zxc:
+          - type: "global:bar/example"

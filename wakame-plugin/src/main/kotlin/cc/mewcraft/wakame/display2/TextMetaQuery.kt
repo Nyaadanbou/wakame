@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.display2
 
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import cc.mewcraft.wakame.LOGGER
 
 /**
  * 用于查询 [DerivedIndex] 所对应的:
@@ -13,8 +11,7 @@ import org.slf4j.Logger
 class TextMetaQuery(
     private val ordinalMap: Map<DerivedIndex, DerivedOrdinal>,
     private val metadataMap: Map<DerivedIndex, TextMeta>,
-) : KoinComponent {
-    private val logger: Logger by inject()
+) {
 
     /**
      * 获取指定的 [tooltipIdx] 对应的*位置顺序*.
@@ -25,7 +22,7 @@ class TextMetaQuery(
     fun getOrdinal(tooltipIdx: DerivedIndex): DerivedOrdinal? {
         return ordinalMap[tooltipIdx].also { ordinal ->
             if (ordinal == null) {
-                logger.warn("No ordinal found for tooltip index '$tooltipIdx'")
+                LOGGER.warn("No ordinal found for tooltip index '$tooltipIdx'")
             }
         }
     }
@@ -39,7 +36,7 @@ class TextMetaQuery(
         @Suppress("UNCHECKED_CAST")
         return (metadataMap[tooltipIdx] as T?).also { metadata ->
             if (metadata == null) {
-                logger.warn("No metadata found for tooltip index '$tooltipIdx'")
+                LOGGER.warn("No metadata found for tooltip index '$tooltipIdx'")
             }
         }
     }

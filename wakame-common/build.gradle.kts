@@ -2,8 +2,8 @@
 // 该项目是所有其他项目 (mixin, plugin, ...) 的共同依赖.
 
 plugins {
-    id("nyaadanbou-conventions.repositories")
     id("wakame-conventions.kotlin")
+    id("cc.mewcraft.libraries-repository")
     id("io.papermc.paperweight.userdev")
     `maven-publish`
 }
@@ -11,9 +11,13 @@ plugins {
 group = "cc.mewcraft.wakame"
 version = "0.0.1-SNAPSHOT"
 
+repositories {
+    nyaadanbouReleases()
+}
+
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnly(local.shadow.nbt)
+    compileOnly(local.shadow.bukkit)
 }
 
 publishing {

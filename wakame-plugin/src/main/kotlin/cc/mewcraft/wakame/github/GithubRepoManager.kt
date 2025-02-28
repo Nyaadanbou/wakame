@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.github
 
+import cc.mewcraft.wakame.LOGGER
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.PullResult
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.lib.RepositoryState
-import org.eclipse.jgit.transport.*
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.slf4j.Logger
+import org.eclipse.jgit.transport.PushResult
+import org.eclipse.jgit.transport.RemoteRefUpdate
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.File
 
 
@@ -21,8 +21,7 @@ class GithubRepoManager(
     private val remotePath: String,
     private val commitMessage: String,
 ) {
-    companion object : KoinComponent {
-        private val logger: Logger by inject()
+    companion object {
 
         /**
          * 分析 PullResult 的状态
@@ -127,9 +126,9 @@ class GithubRepoManager(
 
             // 检查仓库状态
             if (repo.repositoryState != RepositoryState.SAFE) {
-                logger.error("Repository is in an invalid state: ${repo.repositoryState}")
+                LOGGER.error("Repository is in an invalid state: ${repo.repositoryState}")
                 if (repo.repositoryState == RepositoryState.MERGING_RESOLVED) {
-                    logger.info("Committing resolved merge...")
+                    LOGGER.info("Committing resolved merge...")
                     git.commit().setMessage("Merge resolved").call()
                 } else {
                     return Result.failure(
@@ -158,7 +157,7 @@ class GithubRepoManager(
 
             // 提交更改
             val commit = git.commit().setMessage(commitMessage).call()
-            logger.info("Committed with ID: ${commit.id}")
+            LOGGER.info("Committed with ID: ${commit.id}")
 
             // 推送到远程 git 仓库
             val pushResults = git.push()
@@ -170,19 +169,18 @@ class GithubRepoManager(
             }
 
         } catch (e: GitAPIException) {
-            logger.error("Git API Exception occurred", e)
+            LOGGER.error("Git API Exception occurred", e)
             e.cause?.let { cause ->
-                logger.error("Cause: ", cause)
+                LOGGER.error("Cause: ", cause)
             }
             return Result.failure(e)
         } catch (e: Exception) {
-            logger.error("Unexpected exception", e)
+            LOGGER.error("Unexpected exception", e)
             return Result.failure(e)
         }
 
         return Result.success(Unit)
     }
-
 
 
 }

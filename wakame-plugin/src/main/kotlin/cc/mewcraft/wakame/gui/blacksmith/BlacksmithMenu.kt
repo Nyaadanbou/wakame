@@ -1,24 +1,25 @@
 package cc.mewcraft.wakame.gui.blacksmith
 
-import cc.mewcraft.wakame.adventure.translator.MessageConstants
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.repairing_table.RepairingTableItemRendererContext
-import cc.mewcraft.wakame.item.level
-import cc.mewcraft.wakame.item.shadowNeko
+import cc.mewcraft.wakame.item.extension.level
+import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStation
-import cc.mewcraft.wakame.reforge.common.ReforgeLoggerPrefix
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.recycle.RecyclingSession
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStation
 import cc.mewcraft.wakame.reforge.recycle.SimpleRecyclingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingSession
 import cc.mewcraft.wakame.reforge.repair.RepairingTable
 import cc.mewcraft.wakame.reforge.repair.SimpleRepairingSession
-import cc.mewcraft.wakame.util.damage
 import cc.mewcraft.wakame.util.decorate
-import cc.mewcraft.wakame.util.itemName
-import cc.mewcraft.wakame.util.itemNameOrType
-import cc.mewcraft.wakame.util.maxDamage
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.itemName
+import cc.mewcraft.wakame.util.item.itemNameOrType
+import cc.mewcraft.wakame.util.item.maxDamage
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
 import net.kyori.adventure.text.Component.text
@@ -33,8 +34,6 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent
 import org.bukkit.inventory.PlayerInventory
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
 import org.slf4j.Logger
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.TabGui
@@ -52,11 +51,11 @@ import xyz.xenondevs.invui.window.type.context.setTitle
 internal class BlacksmithMenu(
     val station: BlacksmithStation,
     val viewer: Player,
-) : KoinComponent, Listener {
+) : Listener {
 
     fun open() {
         window2.open()
-        viewer.sendMessage(MessageConstants.MSG_OPENED_BLACKSMITH_MENU)
+        viewer.sendMessage(TranslatableMessages.MSG_OPENED_BLACKSMITH_MENU)
     }
 
     val recyclingStation: RecyclingStation
@@ -67,7 +66,7 @@ internal class BlacksmithMenu(
     val recyclingSession: RecyclingSession = SimpleRecyclingSession(recyclingStation, viewer, station.recyclingInventorySize)
     val repairingSession: RepairingSession = SimpleRepairingSession(repairingTable, viewer)
 
-    val logger: Logger = get<Logger>().decorate(prefix = ReforgeLoggerPrefix.RECYCLE)
+    val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.RECYCLING_LOG_PREFIX)
 
     var confirmed: Boolean = false
 
@@ -102,8 +101,8 @@ internal class BlacksmithMenu(
                 // 如果未能成功加入回收列表, 则向玩家发送失败信息.
                 // 本次交互后, 整个菜单里的物品也不需要发生变化.
                 when (claimResult.reason) {
-                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(MessageConstants.MSG_ERR_FULL_RECYCLING_STASH_LIST)
-                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(MessageConstants.MSG_ERR_UNSUPPORTED_RECYCLING_ITEM_TYPE)
+                    RecyclingSession.ClaimResult.Failure.Reason.TOO_MANY_CLAIMS -> viewer.sendMessage(TranslatableMessages.MSG_ERR_FULL_RECYCLING_STASH_LIST)
+                    RecyclingSession.ClaimResult.Failure.Reason.UNSUPPORTED_ITEM -> viewer.sendMessage(TranslatableMessages.MSG_ERR_UNSUPPORTED_RECYCLING_ITEM_TYPE)
                 }
                 event.result = Event.Result.DENY
                 return
@@ -255,7 +254,7 @@ internal class BlacksmithMenu(
 
                     // 发送消息
                     viewer.sendMessage(
-                        MessageConstants.MSG_SPENT_X_REPAIRING_ITEM.arguments(
+                        TranslatableMessages.MSG_SPENT_X_REPAIRING_ITEM.arguments(
                             TranslationArgument.numeric(claim.repairCost.value),
                             TranslationArgument.component(claim.originalItem.itemName ?: translatable(claim.originalItem))
                         )
@@ -268,7 +267,7 @@ internal class BlacksmithMenu(
                     syncRepairingInventory()
 
                 } else {
-                    viewer.sendMessage(MessageConstants.MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_ENOUGH_MONEY_TO_REPAIR_ITEM)
                 }
             }
         }
@@ -372,7 +371,7 @@ internal class BlacksmithMenu(
                     station.recyclingMenuSettings.getSlotDisplay(slotDisplayId).resolveToItemWrapper {
                         standard {
                             component(
-                                "total_worth", MessageConstants.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
+                                "total_worth", TranslatableMessages.MSG_BLACKSMITH_TOTAL_WORTH.arguments(
                                     TranslationArgument.numeric(purchaseResult.minPrice),
                                     TranslationArgument.numeric(purchaseResult.maxPrice)
                                 ).translate(viewer)
@@ -381,7 +380,7 @@ internal class BlacksmithMenu(
                         folded("item_list") {
                             for (item in recyclingSession.getAllClaims().map { claim -> claim.originalItem }) {
                                 val itemName = item.itemNameOrType
-                                val itemLevel = item.shadowNeko()?.level?.let(::text)
+                                val itemLevel = item.wrap()?.level?.let(::text)
                                 if (itemLevel != null) {
                                     resolve("with_level") {
                                         component("item_name", itemName)
@@ -422,13 +421,13 @@ internal class BlacksmithMenu(
 
                 is RecyclingSession.PurchaseResult.Failure -> {
                     // 如果购买失败, 则向玩家发送失败信息.
-                    viewer.sendMessage(MessageConstants.MSG_ERR_INTERNAL_ERROR)
+                    viewer.sendMessage(TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
                 }
 
                 is RecyclingSession.PurchaseResult.Success -> {
                     // 如果购买成功, 则向玩家发送成功信息.
                     viewer.sendMessage(
-                        MessageConstants.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
+                        TranslatableMessages.MSG_SOLD_ITEMS_FOR_X_COINS.arguments(
                             TranslationArgument.numeric(purchaseResult.fixPrice)
                         )
                     )

@@ -1,0 +1,17 @@
+# id: `custom_name`
+custom_name:
+  namespace: vanilla
+  tooltip: "Custom Name: <value>"
+
+# id: `item_name`
+item_name:
+  namespace: vanilla
+  tooltip: "Item Name: <value>"
+
+# id: `lore`
+lore:
+  namespace: general
+  tooltip:
+    line: "<line>"
+    header: [ ]
+    bottom: [ ]

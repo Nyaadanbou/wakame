@@ -1,17 +1,18 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.reforgeHistory
+import cc.mewcraft.wakame.item.extension.reforgeHistory
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
-import cc.mewcraft.wakame.util.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
+import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -34,23 +35,23 @@ internal object WtfModdingTable : ModdingTable {
             "background" to Key.key("internal:menu/common/default/background"),
             "prev_page" to Key.key("internal:menu/common/default/prev_page"),
             "next_page" to Key.key("internal:menu/common/default/next_page"),
-            "input_ok" to Key.key("internal:menu/modding/default/input_ok"),
-            "input_empty" to Key.key("internal:menu/modding/default/input_empty"),
-            "output_ok_confirmed" to Key.key("internal:menu/modding/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/modding/default/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/modding/default/output_empty"),
-            "output_failure" to Key.key("internal:menu/modding/default/output_failure"),
-            "output_insufficient_resource" to Key.key("internal:menu/modding/default/output_insufficient_resource"),
+            "input_ok" to Key.key("internal:menu/modding_table/default/input_ok"),
+            "input_empty" to Key.key("internal:menu/modding_table/default/input_empty"),
+            "output_ok_confirmed" to Key.key("internal:menu/modding_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Key.key("internal:menu/modding_table/default/output_ok_unconfirmed"),
+            "output_empty" to Key.key("internal:menu/modding_table/default/output_empty"),
+            "output_failure" to Key.key("internal:menu/modding_table/default/output_failure"),
+            "output_insufficient_resource" to Key.key("internal:menu/modding_table/default/output_insufficient_resource"),
         )
     )
     override val replaceMenuSettings: BasicMenuSettings = BasicMenuSettings(
         title = Component.text("DO_NOT_USE"),
         structure = arrayOf("a * b"),
         icons = hashMapOf(
-            "compatibility_view" to Key.key("internal:menu/modding/default/compatibility_view"),
-            "core_view" to Key.key("internal:menu/modding/default/core_view"),
-            "core_unusable" to Key.key("internal:menu/modding/default/core_unusable"),
-            "core_usable" to Key.key("internal:menu/modding/default/core_usable"),
+            "compatibility_view" to Key.key("internal:menu/modding_table/default/compatibility_view"),
+            "core_view" to Key.key("internal:menu/modding_table/default/core_view"),
+            "core_unusable" to Key.key("internal:menu/modding_table/default/core_unusable"),
+            "core_usable" to Key.key("internal:menu/modding_table/default/core_usable"),
         )
     )
 

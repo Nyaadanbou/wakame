@@ -1,37 +1,33 @@
 package cc.mewcraft.wakame.craftingstation
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
-import cc.mewcraft.wakame.item.ItemRegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
+import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.kregister
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
-import org.koin.core.qualifier.named
-import java.io.File
 
 @Init(
     stage = InitStage.POST_WORLD,
 )
 @Reload(
-    runAfter = [ItemRegistryConfigStorage::class],
+    runAfter = [ItemTypeRegistryLoader::class],
 )
 internal object CraftingStationRecipeRegistry {
-    private const val RECIPE_DIR_PATH = "station/recipes"
 
     @VisibleForTesting
     val raw: MutableMap<Key, Recipe> = mutableMapOf()
@@ -58,7 +54,10 @@ internal object CraftingStationRecipeRegistry {
     fun loadDataIntoRegistry() {
         raw.clear()
 
-        val recipeDir = Injector.get<File>(named(PLUGIN_DATA_DIR)).resolve(RECIPE_DIR_PATH)
+        val recipeDir = KoishDataPaths.CONFIGS
+            .resolve(CraftingStationConstants.DATA_DIR)
+            .resolve("recipes")
+            .toFile()
         for ((file, namespace, path) in NamespacedFileTreeWalker(recipeDir, "yml", true)) {
             try {
                 val fileText = file.readText()
@@ -67,17 +66,17 @@ internal object CraftingStationRecipeRegistry {
                 val recipeNode = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
-                        kregister(StationRecipeSerializer)
-                        kregister(StationChoiceSerializer)
-                        kregister(StationResultSerializer)
-                        kregister(ItemXSerializer)
+                        register(StationRecipeSerializer)
+                        register(StationChoiceSerializer)
+                        register(StationResultSerializer)
+                        register(ItemXSerializer)
                     }
                 }.buildAndLoadString(fileText)
 
                 // 注入 key 节点
                 recipeNode.hint(StationRecipeSerializer.HINT_NODE, key)
                 // 反序列化 Recipe
-                val recipe = recipeNode.krequire<Recipe>()
+                val recipe = recipeNode.require<Recipe>()
                 // 添加进临时注册表
                 raw[key] = recipe
 
