@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXFactoryRegistry
+import cc.mewcraft.wakame.core.ItemXNoOp
 import cc.mewcraft.wakame.core.ItemXVanilla
 import org.bukkit.inventory.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
@@ -47,9 +48,10 @@ internal fun convertToBukkitRecipeAdapter(recipe: BukkitRecipe): BukkitRecipeAda
 abstract class CookingRecipeAdapter(
     bukkitRecipe: CookingRecipe<*>,
 ) : BukkitRecipeAdapter(bukkitRecipe) {
+    override val sortId: String = bukkitRecipe.key.value()
 
-    // 对应原版该类型配方对 RecipeChoice 存储格式
-    // 意在缓存各个 RecipeChoice 转化为 List<ItemX> 的结果
+    // 对应原版该类型配方对RecipeChoice存储格式
+    // 意在缓存各个RecipeChoice转化为List<ItemX>的结果
     val inputItems: List<ItemX> = convertChoiceToItemXList(bukkitRecipe.inputChoice)
 
     // 缓存配方的输出转化为 ItemX 的结果
@@ -86,6 +88,7 @@ class ShapedRecipeAdapter(
     val outputItem: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
     override val type = CatalogRecipeType.SHAPED_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
     override val inputs: Set<ItemX> = inputItems.values.flatten().toSet()
 }
 
@@ -96,6 +99,7 @@ class ShapelessRecipeAdapter(
     val outputItems: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
     override val type = CatalogRecipeType.SHAPELESS_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
     override val inputs: Set<ItemX> = inputItems.flatten().toSet()
 }
 
@@ -108,6 +112,7 @@ class SmithingTransformRecipeAdapter(
     val outputItemX: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
     override val type = CatalogRecipeType.SMITHING_TRANSFORM_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
     override val inputs: Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
 }
 
@@ -119,13 +124,20 @@ class SmithingTrimRecipeAdapter(
     val additionItems: List<ItemX> = convertChoiceToItemXList(bukkitRecipe.addition)
 
     override val type = CatalogRecipeType.SMITHING_TRIM_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
     override val inputs: Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
+
+    // 锻造台纹饰配方没有输出, 返回一个占位物品作为节点
+    override fun getLookupOutputs(): Set<ItemX> {
+        return setOf(ItemXNoOp)
+    }
 }
 
 class SmokingRecipeAdapter(
     bukkitRecipe: SmokingRecipe,
 ) : CookingRecipeAdapter(bukkitRecipe) {
     override val type = CatalogRecipeType.SMOKING_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
 }
 
 class StonecuttingRecipeAdapter(
@@ -135,6 +147,7 @@ class StonecuttingRecipeAdapter(
     val outputItem: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
     override val type = CatalogRecipeType.STONECUTTING_RECIPE
+    override val sortId: String = bukkitRecipe.key.value()
     override val inputs: Set<ItemX> = inputItems.toSet()
 }
 

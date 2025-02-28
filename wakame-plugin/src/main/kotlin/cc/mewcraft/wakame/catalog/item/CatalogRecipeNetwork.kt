@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.catalog.item
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -26,6 +27,7 @@ object CatalogRecipeNetwork {
     }
 
     private fun buildNetWork(): Network<ItemX, CatalogRecipeEdge> {
+        LOGGER.info("Building catalog recipe network")
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
         // 平行边: 淡灰色染料无序合成配方(白色染料+灰色染料->淡灰色染料*2 白色染料*2+黑色染料->灰色染料*3)
@@ -41,10 +43,11 @@ object CatalogRecipeNetwork {
             val catalogRecipe = convertToBukkitRecipeAdapter(bukkitRecipe)
                 ?: continue
 
-            // 当配方输入和输出均非空时才会添加节点和边
-            // TODO 锻造台纹饰配方本身空输出, 需要添加一个占位物品作为节点
-            if (catalogRecipe.getLookupInputs().isEmpty() || catalogRecipe.getLookupOutputs().isEmpty())
+            // 当配方输入和输出均非空时才会添加节点和边, 正常情况下不应该出现
+            if (catalogRecipe.getLookupInputs().isEmpty() || catalogRecipe.getLookupOutputs().isEmpty()) {
+                LOGGER.error("Recipe type '${bukkitRecipe::class}' has no input or output!")
                 continue
+            }
 
             for (inputNode in catalogRecipe.getLookupInputs()) {
                 for (outputNode in catalogRecipe.getLookupOutputs()) {
@@ -65,7 +68,7 @@ object CatalogRecipeNetwork {
      */
     fun getSource(node: ItemX): Set<CatalogRecipe> {
         if (!network.nodes().contains(node)) return emptySet()
-        return network.inEdges(node).map { it.catalogRecipe }.toSet()
+        return network.inEdges(node).map(CatalogRecipeEdge::catalogRecipe).toSet()
     }
 
     /**
@@ -73,7 +76,7 @@ object CatalogRecipeNetwork {
      */
     fun getUsage(node: ItemX): Set<CatalogRecipe> {
         if (!network.nodes().contains(node)) return emptySet()
-        return network.outEdges(node).map { it.catalogRecipe }.toSet()
+        return network.outEdges(node).map(CatalogRecipeEdge::catalogRecipe).toSet()
     }
 
     /**

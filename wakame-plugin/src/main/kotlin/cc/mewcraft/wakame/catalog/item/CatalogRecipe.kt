@@ -12,14 +12,19 @@ interface CatalogRecipe {
     val type: CatalogRecipeType
 
     /**
-     * 获取配方输入物品展平去重后的 [ItemX] 集合.
-     * 用于检索时作为索引.
+     * 配方排序时使用的id.
+     */
+    val sortId: String
+
+    /**
+     * 获取配方输入物品展平去重后的物品集合.
+     * 用于检索时作为节点.
      */
     fun getLookupInputs(): Set<ItemX>
 
     /**
-     * 获取配方输出物品展平去重后的 [ItemX] 集合.
-     * 用于检索时作为索引.
+     * 获取配方输出物品展平去重后的物品集合.
+     * 用于检索时作为节点.
      */
     fun getLookupOutputs(): Set<ItemX>
 

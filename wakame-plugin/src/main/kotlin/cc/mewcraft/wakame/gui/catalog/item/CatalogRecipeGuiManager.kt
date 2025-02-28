@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.catalog.item.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.catalog.item.menu.PagedCatalogRecipesMenu
-import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -37,7 +36,7 @@ internal object CatalogRecipeGuiManager {
     private val GUI_CREATORS: HashMap<Class<out CatalogRecipe>, (CatalogRecipe) -> Gui> = HashMap()
 
     /**
-     * [CatalogRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的将被排在前面.
+     * [CatalogRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
      */
     private val GUI_PRIORITIES: HashMap<Class<out CatalogRecipe>, Int> = HashMap()
 
@@ -81,17 +80,21 @@ internal object CatalogRecipeGuiManager {
     /**
      * 根据 [ItemX] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
      */
-    fun getCatalogRecipeGuis(item: ItemX, state: LookupState): List<CatalogRecipeGui> = CACHED_GUIS.getOrPut(LookupKey(item, state)) {
-        val catalogRecipes = when (state) {
-            LookupState.SOURCE -> CatalogRecipeNetwork.getSource(item)
-            LookupState.USAGE -> CatalogRecipeNetwork.getUsage(item)
-        }
-        // 基于类型排序
-        catalogRecipes.sortedBy {
-            GUI_PRIORITIES[it::class.java] ?: Int.MAX_VALUE
-        }.mapNotNull {
-            val gui = buildGui(it) ?: return@mapNotNull null
-            CatalogRecipeGui(it.type, gui)
+    fun getCatalogRecipeGuis(itemX: ItemX, lookupState: LookupState): List<CatalogRecipeGui> {
+        return CACHED_GUIS.getOrPut(LookupKey(itemX, lookupState)) {
+            val catalogRecipes = when (lookupState) {
+                LookupState.SOURCE -> CatalogRecipeNetwork.getSource(itemX)
+                LookupState.USAGE -> CatalogRecipeNetwork.getUsage(itemX)
+            }
+            // 基于类型排序
+            catalogRecipes.sortedWith(
+                compareBy<CatalogRecipe> {
+                    GUI_PRIORITIES.getOrDefault(it::class.java, Int.MAX_VALUE)
+                }.thenBy(CatalogRecipe::sortId)
+            ).mapNotNull {
+                val gui = buildGui(it) ?: return@mapNotNull null
+                CatalogRecipeGui(it.type, gui)
+            }
         }
     }
 
@@ -142,13 +145,10 @@ internal object CatalogRecipeGuiManager {
         builder.setContent(chars.map {
             if (it == ' ') return@map SimpleItem(ItemStack.empty())
             val items = adapter.inputItems[it] as List<ItemX>
-            return@map if (items.isEmpty()) {
-                SimpleItem(ItemStack.empty())
-            } else {
-                DisplayItem(items)
-            }
+            return@map DisplayItem(items)
         })
     }
+
 
     /**
      * 创建无序合成配方 [Gui] 的方法.
@@ -303,10 +303,8 @@ private class NextItem(
  * 直接点击 = 查找该物品的获取方式.
  * Shift 点击 = 查找该物品的用途.
  */
-@Suppress("FunctionName")
 private fun DisplayItem(items: List<ItemX>, amount: Int = 1): AbstractItem {
-    if (items.isEmpty())
-        return SimpleItem(ItemStacks.createUnknown("Recipe input is empty"))
+    if (items.isEmpty()) return SimpleItem(ItemStack.empty())
     return if (items.size == 1) {
         DisplayItem(items.first(), amount)
     } else {
