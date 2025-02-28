@@ -29,7 +29,8 @@ data class ItemEnchantments(
         override val id: String,
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
-            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS) ?: return null
+            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS)!!
+            if (enchantments.enchantments().isEmpty()) return null
             return ItemEnchantments(enchantments.enchantments(), enchantments.showInTooltip())
         }
 
@@ -49,7 +50,8 @@ data class ItemEnchantments(
         override val id: String,
     ) : ItemComponentType<ItemEnchantments> {
         override fun read(holder: ItemComponentHolder): ItemEnchantments? {
-            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS) ?: return null
+            val enchantments = holder.bukkitStack.getData(DataComponentTypes.ENCHANTMENTS)!!
+            if (enchantments.enchantments().isEmpty()) return null
             return ItemEnchantments(enchantments.enchantments(), enchantments.showInTooltip())
         }
 

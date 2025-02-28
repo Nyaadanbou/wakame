@@ -13,7 +13,9 @@ import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.PacketHandler
 import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.item.editNbt
 import cc.mewcraft.wakame.util.item.fastUpdate
+import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
@@ -97,26 +99,27 @@ internal object ItemStackRenderer : PacketListener {
     }
 
     private const val PDC_FIELD = "PublicBukkitValues"
+
     private fun MojangStack.modify(event: PacketEvent<*>) {
         var changed = false
 
         // 移除任意物品的 PDC
-        get(DataComponents.CUSTOM_DATA)?.update { nbt ->
+        editNbt { nbt ->
             if (nbt.contains(PDC_FIELD)) {
                 changed = true
+                processed = true
             }
             nbt.remove(PDC_FIELD)
         }
 
         val koishStack = wrap()
-        if (koishStack != null) {
+        if (koishStack != null && isNetworkRewrite) {
             try {
                 ItemRenderers.STANDARD.render(koishStack)
-                processed = true
                 changed = true
             } catch (e: Throwable) {
                 if (LOGGING) {
-                    LOGGER.error("An error occurred while rendering network item: ${koishStack.id}", e)
+                    LOGGER.error("An error occurred while rewrite network item: ${koishStack.id}", e)
                 }
             }
         }

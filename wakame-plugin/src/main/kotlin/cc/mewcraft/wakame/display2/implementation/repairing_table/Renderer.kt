@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.hideAll
-import cc.mewcraft.wakame.util.item.isClientSide
+import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
@@ -55,7 +55,7 @@ internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, Rep
     override fun render(item: ItemStack, context: RepairingTableItemRendererContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
         RepairingTableRenderingHandlerRegistry.DURABILITY.process(collector, context)

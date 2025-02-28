@@ -11,7 +11,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.data.getCompoundOrNull
 import cc.mewcraft.wakame.util.data.getOrPut
@@ -28,23 +29,17 @@ import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 import kotlin.collections.set
 
-fun ItemStack.wrap(excludeVanilla: Boolean = false): NekoStack? = unwrapToMojang().wrap(excludeVanilla)
-fun MojangStack.wrapOrThrow(excludeVanilla: Boolean = false): NekoStack = wrap(excludeVanilla) ?: error("The ItemStack cannot be wrapped to NekoStack")
-fun MojangStack.wrap(excludeVanilla: Boolean = false): NekoStack? = KoishStackImplementations.wrap(this, excludeVanilla)
+fun ItemStack.wrap(includeProxies: Boolean = true): NekoStack? = unwrapToMojang().wrap(includeProxies)
+fun MojangStack.wrapOrThrow(includeProxies: Boolean = true): NekoStack = wrap(includeProxies) ?: error("The ItemStack cannot be wrapped to NekoStack")
+fun MojangStack.wrap(includeProxies: Boolean = true): NekoStack? = KoishStackImplementations.wrap(this, includeProxies)
 
 /**
- * 记录了该物品的样子是否仅存在于客户端.
- *
- * 如果为 `true`, 网络渲染系统将修改此物品.
- * 如果为 `false`, 网络渲染系统将不会修改此物品.
+ * 检查该物品堆叠是否在网络发包时重写.
  */
-var NekoStack.isClientSide: Boolean
-    get() = when (this) {
-        is CustomKoishStack, is VanillaKoishStack -> KoishStackImplementations.isClientSide(mojangStack)
-        else -> false
-    }
+var NekoStack.isNetworkRewrite: Boolean
+    get() = if (this is CustomKoishStack || this is VanillaKoishStack) KoishStackImplementations.isNetworkRewrite(mojangStack) else false
     set(value) {
-        if (this is CustomKoishStack || this is VanillaKoishStack) KoishStackImplementations.setClientSide(mojangStack, value)
+        if (this is CustomKoishStack || this is VanillaKoishStack) KoishStackImplementations.setNetworkRewrite(mojangStack, value)
     }
 
 /**
@@ -295,12 +290,12 @@ internal object KoishStackImplementations {
     private const val ID_FIELD = "id"
     private const val VARIANT_FIELD = "sid"
 
-    fun isClientSide(itemstack: MojangStack): Boolean {
-        return itemstack.isClientSide
+    fun isNetworkRewrite(itemstack: MojangStack): Boolean {
+        return itemstack.isNetworkRewrite
     }
 
-    fun setClientSide(itemstack: MojangStack, clientSide: Boolean) {
-        itemstack.isClientSide = clientSide
+    fun setNetworkRewrite(itemstack: MojangStack, networkRewrite: Boolean) {
+        itemstack.isNetworkRewrite = networkRewrite
     }
 
     fun getItemStack(itemstack: MojangStack): ItemStack {
@@ -373,7 +368,7 @@ internal object KoishStackImplementations {
         itemstack.editNbt { tag -> tag.remove(KOISH_FIELD) }
     }
 
-    fun wrap(itemstack: MojangStack, excludeVanilla: Boolean = false): NekoStack? {
+    fun wrap(itemstack: MojangStack, includeProxies: Boolean = true): NekoStack? {
         val koishCompound = getNbt(itemstack)
         if (koishCompound != null) {
             if (getArchetype(itemstack) != null) {
@@ -387,7 +382,7 @@ internal object KoishStackImplementations {
                 return null
             }
         } else {
-            if (excludeVanilla) return null
+            if (!includeProxies) return null
             // 如果没有萌芽 NBT, 并且没有对应的物品模板, 则看该物品是否存在一个原版物品的萌芽投影
             val imaginary = ImaginaryKoishStackRegistry.get(CraftItemType.minecraftToBukkit(itemstack.item))
             if (imaginary == null) return null

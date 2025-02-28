@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item.components.*
 import cc.mewcraft.wakame.item.extension.fastLore
 import cc.mewcraft.wakame.item.extension.hideAll
 import cc.mewcraft.wakame.item.extension.resetMinecraftData
-import cc.mewcraft.wakame.item.isClientSide
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -63,7 +63,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
     override fun render(item: NekoStack, context: MergingTableContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 

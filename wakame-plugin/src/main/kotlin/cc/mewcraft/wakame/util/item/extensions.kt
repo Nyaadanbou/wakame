@@ -83,15 +83,15 @@ val ItemStack.nbtCopy: CompoundTag? get() = unwrapToMojang().nbtCopy
 val ItemStack.nbt: CompoundTag? get() = unwrapToMojang().nbt
 
 fun ItemStack.setNBT(nbt: CompoundTag) = unwrapToMojang().setNbt(nbt)
-fun ItemStack.editNbt(createIfNotExist: Boolean = true, applier: (CompoundTag) -> Unit) = unwrapToMojang().editNbt(createIfNotExist, applier)
+fun ItemStack.editNbt(create: Boolean = true, applier: (CompoundTag) -> Unit) = unwrapToMojang().editNbt(create, applier)
 fun ItemStack.removeNBT() = unwrapToMojang().removeNbt()
 
 
 // 网络数据包相关
 
-var ItemStack.isClientSide: Boolean
-    get() = unwrapToMojang().isClientSide
-    set(value) = whenNotEmpty { unwrapToMojang().isClientSide = value }
+var ItemStack.isNetworkRewrite: Boolean
+    get() = unwrapToMojang().isNetworkRewrite
+    set(value) = whenNotEmpty { unwrapToMojang().isNetworkRewrite = value }
 
 
 // 用于将数据隐藏于 ItemStack 的提示框
@@ -151,11 +151,15 @@ fun MojangStack.lore(lore: List<Component>) = whenNotEmpty { set(DataComponents.
 val MojangStack.nbtCopy: CompoundTag? get() = get(DataComponents.CUSTOM_DATA)?.copyTag()
 
 @Deprecated("Do not make any changes to the returned NBT element", ReplaceWith("nbt"))
-val MojangStack.nbt: CompoundTag? get() = whenNotEmptyReturn { get(DataComponents.CUSTOM_DATA)?.unsafe }
+val MojangStack.nbt: CompoundTag? get() = get(DataComponents.CUSTOM_DATA)?.unsafe
 fun MojangStack.setNbt(nbt: CompoundTag) = whenNotEmpty { set(DataComponents.CUSTOM_DATA, CustomData.of(nbt)) }
-fun MojangStack.editNbt(createIfNotExist: Boolean = true, applier: (CompoundTag) -> Unit) = whenNotEmpty {
-    val nbt = nbtCopy ?: if (createIfNotExist) CompoundTag() else return
+fun MojangStack.editNbt(create: Boolean = true, applier: (CompoundTag) -> Unit) = whenNotEmpty {
+    val nbt = nbtCopy ?: if (create) CompoundTag() else return
     applier(nbt)
+    if (nbt.isEmpty) {
+        remove(DataComponents.CUSTOM_DATA)
+        return
+    }
     setNbt(nbt)
 }
 
@@ -168,12 +172,19 @@ fun <T : Any> MojangStack.fastUpdate(type: DataComponentType<T>, default: () -> 
 fun <T : Any, U : Any> MojangStack.fastUpdate(type: DataComponentType<T>, default: () -> T, change: U, applier: (T, U) -> T): T? =
     whenNotEmptyReturn { set(type, applier(get(type) ?: default(), change)) }
 
-private const val CLIENT_SIDE_FIELD = "client_side"
+private const val BYPASS_NETWORK_REWRITE_FIELD = "bypass_network_rewrite"
 
 /**
- * 检查物品堆叠是否应该被网络渲染系统接管.
- * `true` 表示应该. `false` 表示不应该.
+ * 检查物品堆叠是否应该在网络发包时重写.
  */
-var MojangStack.isClientSide: Boolean
-    get() = nbt?.contains(CLIENT_SIDE_FIELD) == true
-    set(value) = editNbt { nbt -> if (value) nbt.remove(CLIENT_SIDE_FIELD) else nbt.put(CLIENT_SIDE_FIELD, ByteTag.ZERO) }
+var MojangStack.isNetworkRewrite: Boolean
+    // 大部分情况都需要重写, 因此实现上用“不包含”来表示“要重写”
+    get() {
+        val nbt = nbt
+        if (nbt == null) return true
+        return !nbt.contains(BYPASS_NETWORK_REWRITE_FIELD)
+    }
+    set(value) = editNbt { nbt ->
+        if (value) nbt.remove(BYPASS_NETWORK_REWRITE_FIELD)
+        else nbt.put(BYPASS_NETWORK_REWRITE_FIELD, ByteTag.ZERO)
+    }

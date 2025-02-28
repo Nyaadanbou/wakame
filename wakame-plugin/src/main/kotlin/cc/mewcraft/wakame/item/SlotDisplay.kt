@@ -113,7 +113,7 @@ private constructor(
 private fun NekoStack.reduceDataForSlotDisplay(): NekoStack {
     hideAll()
     removeNbt()
-    isClientSide = false
+    isNetworkRewrite = false
     return this
 }
 

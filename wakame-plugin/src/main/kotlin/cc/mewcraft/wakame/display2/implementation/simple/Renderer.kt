@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererForm
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.fastLore
 import cc.mewcraft.wakame.item.extension.hideAll
-import cc.mewcraft.wakame.item.isClientSide
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ExtraLore
@@ -53,7 +53,7 @@ internal object SimpleItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() 
     }
 
     override fun render(item: NekoStack, context: Nothing?) {
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 

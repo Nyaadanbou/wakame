@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.item.extension.fastLore
 import cc.mewcraft.wakame.item.extension.hideAttributeModifiers
 import cc.mewcraft.wakame.item.extension.hideEnchantments
 import cc.mewcraft.wakame.item.extension.hideStoredEnchantments
-import cc.mewcraft.wakame.item.isClientSide
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.*
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -75,7 +75,7 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
     override fun render(item: NekoStack, context: CraftingStationContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
@@ -97,12 +97,12 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<NekoStack, Cr
         components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
 
         val lore = textAssembler.assemble(collector)
+        item.fastLore(lore)
 
         if (context.erase) {
             item.erase()
         }
 
-        item.fastLore(lore)
         item.hideAttributeModifiers()
         item.hideEnchantments()
         item.hideStoredEnchantments()

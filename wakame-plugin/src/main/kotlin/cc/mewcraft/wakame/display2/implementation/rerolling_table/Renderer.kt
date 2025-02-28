@@ -18,7 +18,7 @@ import cc.mewcraft.wakame.item.components.cells.Cell
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.extension.fastLore
 import cc.mewcraft.wakame.item.extension.hideAll
-import cc.mewcraft.wakame.item.isClientSide
+import cc.mewcraft.wakame.item.isNetworkRewrite
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.CustomName
 import cc.mewcraft.wakame.item.templates.components.ItemName
@@ -73,7 +73,7 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<NekoStack, Rer
     override fun render(item: NekoStack, context: RerollingTableContext?) {
         requireNotNull(context) { "context" }
 
-        item.isClientSide = false
+        item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
