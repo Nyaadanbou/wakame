@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.catalog.item.Category
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -83,6 +84,12 @@ object KoishRegistries {
      */
     @JvmField
     val ITEM_SKIN: WritableRegistry<ItemSkin> = registerSimple(KoishRegistryKeys.ITEM_SKIN)
+
+    /**
+     * 物品图鉴中物品的类别.
+     */
+    @JvmField
+    val ITEM_CATEGORY: WritableRegistry<Category> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
 
     /**
      * 铭刻.

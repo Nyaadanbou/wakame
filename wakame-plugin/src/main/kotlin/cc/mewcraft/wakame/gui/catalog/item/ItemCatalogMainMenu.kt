@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.catalog.CatalogManager
 import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.CategoryRegistry
-import cc.mewcraft.wakame.gui.BasicMenuSettings.SlotDisplay
+import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.ReloadableProperty
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -30,6 +30,11 @@ class ItemCatalogMainMenu(
      */
     val viewer: Player,
 ) {
+
+    companion object {
+        private val INSTANCES: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
+    }
+
     private val settings = CatalogManager.itemCatalogMainMenuSettings
 
     /**
@@ -48,8 +53,10 @@ class ItemCatalogMainMenu(
         builder.addIngredient('>', NextItem())
         builder.addIngredient('s', SearchItem())
         builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        // TODO 类别的图标可以缓存，重载才需要变化
-        builder.setContent(CategoryRegistry.getCategoryMap().values.map { category -> CategoryItem(category) })
+        // 对 CategoryItem 进行缓存
+        builder.setContent(KoishRegistries.ITEM_CATEGORY.ids.map { categoryId ->
+            INSTANCES.getOrPut(categoryId) { CategoryItem(KoishRegistries.ITEM_CATEGORY.getOrThrow(categoryId)) }
+        }.toList())
     }
 
     /**
@@ -104,7 +111,7 @@ class ItemCatalogMainMenu(
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            //TODO 物品搜索功能
+            // TODO 物品搜索功能
         }
     }
 
@@ -113,15 +120,10 @@ class ItemCatalogMainMenu(
      * 点击后打开一个特定的类别菜单.
      */
     inner class CategoryItem(
-        private val category: Category
+        private val category: Category,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val itemId = category.icon
-            val itemEntry = KoishRegistries.ITEM.getEntry(itemId) ?: run {
-                LOGGER.warn("Menu icon of category '${category.id}' with item ID '$itemId' not found in the item registry, using default icon")
-                KoishRegistries.ITEM.getDefaultEntry()
-            }
-            return SlotDisplay(itemEntry).resolveToItemWrapper()
+            return SlotDisplay.get(category.icon).resolveToItemWrapper()
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {

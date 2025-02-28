@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.catalog.item.Category
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -48,6 +49,9 @@ object KoishRegistryKeys {
 
     @JvmField
     val ITEM_SKIN = createRegistryKey<ItemSkin>("item_skin")
+
+    @JvmField
+    val ITEM_CATEGORY = createRegistryKey<Category>("item_category")
 
     @JvmField
     val KIZAMI = createRegistryKey<KizamiType>("kizami")

@@ -2,14 +2,7 @@
 
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.command.command.AbilityCommand
-import cc.mewcraft.wakame.command.command.AttributeCommand
-import cc.mewcraft.wakame.command.command.CraftCommand
-import cc.mewcraft.wakame.command.command.DebugCommand
-import cc.mewcraft.wakame.command.command.ItemCommand
-import cc.mewcraft.wakame.command.command.PluginCommand
-import cc.mewcraft.wakame.command.command.ReforgeCommand
-import cc.mewcraft.wakame.command.command.ResourcepackCommand
+import cc.mewcraft.wakame.command.command.*
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -38,6 +31,7 @@ internal object KoishCommandManager {
             // Register commands
             command(AbilityCommand)
             command(AttributeCommand)
+            command(CatalogCommand)
             command(CraftCommand)
             command(DebugCommand)
             command(ItemCommand)
