@@ -21,7 +21,7 @@ import java.util.Collections.emptySet
 import kotlin.reflect.KProperty
 
 
-// 用于直接操作物品堆叠上的原版数据
+// 用于直接操作物品堆叠上的原版数据 (Paper DataComponent API)
 
 fun <T : Any> NekoStack.getMinecraftData(type: DataComponentType.Valued<T>): T? = this.bukkitStack.getData(type)
 fun <T : Any> NekoStack.getMinecraftDataOrDefault(type: DataComponentType.Valued<T>, fallback: T): T = this.bukkitStack.getDataOrDefault(type, fallback)!!
