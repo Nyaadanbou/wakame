@@ -26,19 +26,25 @@ object CatalogRecipeNetwork {
     }
 
     private fun buildNetWork(): Network<ItemX, CatalogRecipeEdge> {
-        // 自指和平行边都是需要的, 举例说明:
-        // 自指: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
+        // 自循环和平行边都是需要的, 举例说明:
+        // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
         // 平行边: 淡灰色染料无序合成配方(白色染料+灰色染料->淡灰色染料*2 白色染料*2+黑色染料->灰色染料*3)
-        val network: MutableNetwork<ItemX, CatalogRecipeEdge> = NetworkBuilder.directed().allowsSelfLoops(true).allowsParallelEdges(true).build()
+        val network: MutableNetwork<ItemX, CatalogRecipeEdge> = NetworkBuilder
+            .directed()
+            .allowsSelfLoops(true)
+            .allowsParallelEdges(true)
+            .build()
 
         // 原版配方
         for (bukkitRecipe in Bukkit.recipeIterator()) {
             // 为空意味着是图鉴无法显示的原版特殊配方, 直接跳过
-            val catalogRecipe = convertToBukkitRecipeAdapter(bukkitRecipe) ?: continue
+            val catalogRecipe = convertToBukkitRecipeAdapter(bukkitRecipe)
+                ?: continue
 
             // 当配方输入和输出均非空时才会添加节点和边
             // TODO 锻造台纹饰配方本身空输出, 需要添加一个占位物品作为节点
-            if (catalogRecipe.getLookupInputs().isEmpty() || catalogRecipe.getLookupOutputs().isEmpty()) continue
+            if (catalogRecipe.getLookupInputs().isEmpty() || catalogRecipe.getLookupOutputs().isEmpty())
+                continue
 
             for (inputNode in catalogRecipe.getLookupInputs()) {
                 for (outputNode in catalogRecipe.getLookupOutputs()) {

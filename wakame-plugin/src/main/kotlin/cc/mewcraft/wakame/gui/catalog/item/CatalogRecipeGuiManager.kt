@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.gui.catalog.item.CatalogRecipeGuiManager.getCatalogRecipeGuis
 import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
@@ -31,13 +32,18 @@ import java.text.DecimalFormat
  *
  * 设计这个单例是为了前后端代码分离.
  */
-internal object CatalogRecipeGuis {
+internal object CatalogRecipeGuiManager {
 
     private val GUI_CREATORS: HashMap<Class<out CatalogRecipe>, (CatalogRecipe) -> Gui> = HashMap()
 
-    private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> Gui) {
-        GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
-    }
+    /**
+     * [CatalogRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的将被排在前面.
+     */
+    private val GUI_PRIORITIES: HashMap<Class<out CatalogRecipe>, Int> = HashMap()
+
+    private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(128) }
+
+    private data class LookupKey(val item: ItemX, val state: LookupState)
 
     init {
         registerGuiCreator<BlastingRecipeAdapter>(::createCookingRecipeGui)
@@ -51,17 +57,42 @@ internal object CatalogRecipeGuis {
         registerGuiCreator<StonecuttingRecipeAdapter>(::createStonecuttingRecipeGui)
     }
 
-    private val CACHED_GUIS: HashMap<LookupKey, List<Gui>> by ReloadableProperty { HashMap(128) }
+    init {
+        // TODO 支持配置文件载入优先级
+        registerGuiPriority<BlastingRecipeAdapter>(500)
+        registerGuiPriority<CampfireRecipeAdapter>(600)
+        registerGuiPriority<FurnaceRecipeAdapter>(300)
+        registerGuiPriority<ShapedRecipeAdapter>(100)
+        registerGuiPriority<ShapelessRecipeAdapter>(200)
+        registerGuiPriority<SmithingTransformRecipeAdapter>(700)
+        registerGuiPriority<SmithingTrimRecipeAdapter>(800)
+        registerGuiPriority<SmokingRecipeAdapter>(400)
+        registerGuiPriority<StonecuttingRecipeAdapter>(900)
+    }
+
+    private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> Gui) {
+        GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
+    }
+
+    private inline fun <reified T : CatalogRecipe> registerGuiPriority(priority: Int) {
+        GUI_PRIORITIES[T::class.java] = priority
+    }
 
     /**
-     * 根据 [ItemX] 和 [LookupState] 创建图鉴中配方展示的 [Gui] 列表.
+     * 根据 [ItemX] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
      */
-    fun createGuis(item: ItemX, state: LookupState): List<Gui> = CACHED_GUIS.getOrPut(LookupKey(item, state)) {
+    fun getCatalogRecipeGuis(item: ItemX, state: LookupState): List<CatalogRecipeGui> = CACHED_GUIS.getOrPut(LookupKey(item, state)) {
         val catalogRecipes = when (state) {
             LookupState.SOURCE -> CatalogRecipeNetwork.getSource(item)
             LookupState.USAGE -> CatalogRecipeNetwork.getUsage(item)
         }
-        catalogRecipes.mapNotNull(::createGui)
+        // 基于类型排序
+        catalogRecipes.sortedBy {
+            GUI_PRIORITIES[it::class.java] ?: Int.MAX_VALUE
+        }.mapNotNull {
+            val gui = buildGui(it) ?: return@mapNotNull null
+            CatalogRecipeGui(it.type, gui)
+        }
     }
 
     /**
@@ -69,7 +100,7 @@ internal object CatalogRecipeGuis {
      *
      * 返回 `null` 意味着 [CatalogRecipe] 可被图鉴检索, 但代码没有指定对应 [Gui] 创建方法.
      */
-    private fun createGui(recipe: CatalogRecipe): Gui? = GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
+    private fun buildGui(recipe: CatalogRecipe): Gui? = GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
         if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
     }
 
@@ -265,10 +296,12 @@ private class NextItem(
 
 /**
  * `配方展示物品` 的图标.
- * 输入物品有单个物品和多个物品循环两种情况.
- * 输出物品只有单个物品的情况.
- * 直接点击查找该物品的获取方式.
- * shift点击查找该物品的用途.
+ *
+ * 输入物品: 单个物品和多个物品循环.
+ * 输出物品: 单个物品.
+ *
+ * 直接点击 = 查找该物品的获取方式.
+ * Shift 点击 = 查找该物品的用途.
  */
 @Suppress("FunctionName")
 private fun DisplayItem(items: List<ItemX>, amount: Int = 1): AbstractItem {
@@ -376,21 +409,14 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
         return
 
     // 要打开的菜单列表为空，则不打开
-    val catalogRecipeGuis = CatalogRecipeGuis.createGuis(item, lookupState)
-    if (catalogRecipeGuis.isEmpty()) return
+    val catalogRecipeGuis = getCatalogRecipeGuis(item, lookupState)
+    if (catalogRecipeGuis.isEmpty())
+        return
 
     val pagedCatalogRecipesMenu = PagedCatalogRecipesMenu(item, lookupState, player, catalogRecipeGuis)
     menuStack.addFirst(pagedCatalogRecipesMenu)
     pagedCatalogRecipesMenu.open()
 }
-
-/**
- * 缓存检索信息所用的唯一标识符.
- */
-internal data class LookupKey(
-    val item: ItemX,
-    val state: LookupState,
-)
 
 internal enum class LookupState {
     /**
@@ -403,3 +429,11 @@ internal enum class LookupState {
      */
     USAGE
 }
+
+/**
+ * 封装了 [CatalogRecipeType] 和对应的 [Gui].
+ */
+internal data class CatalogRecipeGui(
+    val type: CatalogRecipeType,
+    val gui: Gui,
+)

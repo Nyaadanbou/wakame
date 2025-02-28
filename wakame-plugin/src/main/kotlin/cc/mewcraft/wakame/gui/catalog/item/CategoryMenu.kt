@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.gui.catalog.item
 import cc.mewcraft.wakame.catalog.item.Category
 import cc.mewcraft.wakame.catalog.item.ItemCatalogManager
 import cc.mewcraft.wakame.core.ItemX
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -58,13 +59,14 @@ class CategoryMenu(
     /**
      * 菜单的 [Window].
      */
-    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
+    private val primaryWindow: Window = Window.single().apply {
         setGui(primaryGui)
+        setViewer(viewer)
         setTitle(settings.title)
-    }
+    }.build()
 
     override fun open() {
-        primaryWindow.open(viewer)
+        primaryWindow.open()
     }
 
     /**
@@ -79,14 +81,32 @@ class CategoryMenu(
      * 上一页的图标.
      */
     inner class PrevItem : PageItem(false) {
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider = settings.getSlotDisplay("prev_page").resolveToItemWrapper()
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasPreviousPage())
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(primaryGui.currentPage + 1))
+                    component("total_page", Component.text(primaryGui.pageAmount))
+                }
+            }
+        }
     }
 
     /**
      * 下一页的图标.
      */
     inner class NextItem : PageItem(true) {
-        override fun getItemProvider(gui: PagedGui<*>): ItemProvider = settings.getSlotDisplay("next_page").resolveToItemWrapper()
+        override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
+            if (!getGui().hasNextPage())
+                return settings.getSlotDisplay("background").resolveToItemWrapper()
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(primaryGui.currentPage + 1))
+                    component("total_page", Component.text(primaryGui.pageAmount))
+                }
+            }
+        }
     }
 
     /**
@@ -114,16 +134,16 @@ class CategoryMenu(
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
             // 类别菜单无需判定是否套娃, 因为肯定是第一次对配方进行索引
-            val lookupState = when (clickType) {
+            val state = when (clickType) {
                 ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
                 ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
                 else -> return
             }
-            // 要打开的菜单列表为空, 则不打开
-            val catalogRecipeGuis = CatalogRecipeGuis.createGuis(item, lookupState)
-            if (catalogRecipeGuis.isEmpty()) return
+            // 要打开的菜单列表为空，则不打开
+            val guis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, state)
+            if (guis.isEmpty()) return
 
-            val pagedCatalogRecipesMenu = PagedCatalogRecipesMenu(item, lookupState, player, catalogRecipeGuis)
+            val pagedCatalogRecipesMenu = PagedCatalogRecipesMenu(item, state, player, guis)
             ItemCatalogManager.getMenuStack(player).addFirst(pagedCatalogRecipesMenu)
             pagedCatalogRecipesMenu.open()
         }

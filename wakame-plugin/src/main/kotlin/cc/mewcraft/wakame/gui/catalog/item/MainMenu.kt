@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.ReloadableProperty
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -64,14 +65,15 @@ class MainMenu(
     /**
      * 菜单的 [Window].
      */
-    private val primaryWindow: Window.Builder.Normal.Single = Window.single().apply {
+    private val primaryWindow: Window = Window.single().apply {
         setGui(primaryGui)
+        setViewer(viewer)
         setTitle(settings.title)
-    }
+    }.build()
 
     override fun open() {
         ItemCatalogManager.newMenuStack(viewer, this@MainMenu)
-        primaryWindow.open(viewer)
+        primaryWindow.open()
     }
 
     /**
@@ -92,10 +94,14 @@ class MainMenu(
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
+            if (!getGui().hasPreviousPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(primaryGui.currentPage + 1))
+                    component("total_page", Component.text(primaryGui.pageAmount))
+                }
             }
-            return settings.getSlotDisplay("prev_page").resolveToItemWrapper()
         }
     }
 
@@ -104,10 +110,14 @@ class MainMenu(
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasNextPage()) {
+            if (!getGui().hasNextPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            return settings.getSlotDisplay("next_page").resolveToItemWrapper {
+                standard {
+                    component("current_page", Component.text(primaryGui.currentPage + 1))
+                    component("total_page", Component.text(primaryGui.pageAmount))
+                }
             }
-            return settings.getSlotDisplay("next_page").resolveToItemWrapper()
         }
     }
 
@@ -144,4 +154,5 @@ class MainMenu(
         }
 
     }
+
 }

@@ -18,8 +18,8 @@ main:
     - "< . . . s . . . >"
   icons:
     background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
+    prev_page: "internal:menu/catalog/prev_page"
+    next_page: "internal:menu/catalog/next_page"
     search: "internal:menu/catalog/search"
 
 # 分页图鉴配方菜单布局
@@ -40,8 +40,8 @@ paged_catalog_recipes:
     - "< . . . b . . . >"
   icons:
     background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
+    prev_page: "internal:menu/catalog/prev_page"
+    next_page: "internal:menu/catalog/next_page"
     back: "internal:menu/common/back"
 
 # 各配方菜单布局

@@ -17,8 +17,8 @@ menu_settings:
     - "< . . . b . . . >"
   icons:
     background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
+    prev_page: "internal:menu/catalog/prev_page"
+    next_page: "internal:menu/catalog/next_page"
     back: "internal:menu/common/back"
 items:
   - minecraft:cake
