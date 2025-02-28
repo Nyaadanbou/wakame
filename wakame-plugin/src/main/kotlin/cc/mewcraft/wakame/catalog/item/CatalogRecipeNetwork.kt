@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.catalog.item.recipe.convertToBukkitRecipeAdapter
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.Network
@@ -18,7 +20,7 @@ object CatalogRecipeNetwork {
 
     @InitFun
     private fun init() {
-        // 监听原版配方注册完成事件, 重建网络
+        // 当原版配方注册完成时 -> 重建网络
         MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> { rebuildNetwork() }
     }
 
@@ -36,31 +38,53 @@ object CatalogRecipeNetwork {
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
             .build()
+        // 将要放入网络中的配方
+        val catalogRecipes: MutableSet<CatalogRecipe> = mutableSetOf()
 
         // 原版配方
         for (bukkitRecipe in Bukkit.recipeIterator()) {
             // 为空意味着是图鉴无法显示的原版特殊配方, 直接跳过
-            val catalogRecipe = convertToBukkitRecipeAdapter(bukkitRecipe)
+            val bukkitRecipeAdapter = convertToBukkitRecipeAdapter(bukkitRecipe)
                 ?: continue
 
-            // 当配方输入和输出均非空时才会添加节点和边, 正常情况下不应该出现
-            if (catalogRecipe.getLookupInputs().isEmpty() || catalogRecipe.getLookupOutputs().isEmpty()) {
-                LOGGER.error("Recipe type '${bukkitRecipe::class}' has no input or output!")
-                continue
-            }
+            addRecipeToNetwork(
+                network, bukkitRecipeAdapter,
+                "Bukkit recipe type '${bukkitRecipe::class.simpleName}' doesn't have input or output!"
+            )
+        }
 
-            for (inputNode in catalogRecipe.getLookupInputs()) {
-                for (outputNode in catalogRecipe.getLookupOutputs()) {
-                    network.addNode(inputNode)
-                    network.addNode(outputNode)
-                    network.addEdge(inputNode, outputNode, CatalogRecipeEdge(catalogRecipe))
-                }
-            }
+        // 战利品表配方
+        for (lootTableRecipe in KoishRegistries.LOOT_TABLE_RECIPE) {
+            addRecipeToNetwork(
+                network, lootTableRecipe,
+                "Loot table recipe with path '${lootTableRecipe.lootTablePath}' doesn't have input or output!"
+            )
         }
 
         // TODO 工作站配方
 
         return network
+    }
+
+    /**
+     * 方便函数.
+     */
+    private fun addRecipeToNetwork(network: MutableNetwork<ItemX, CatalogRecipeEdge>, catalogRecipe: CatalogRecipe, msg: String) {
+        // 当配方输入和输出均非空时才会添加节点和边, 正常情况下不应该出现
+        val lookupInputs = catalogRecipe.getLookupInputs()
+        val lookupOutputs = catalogRecipe.getLookupOutputs()
+        if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
+            LOGGER.error(msg)
+            return
+        }
+
+        for (inputNode in lookupInputs) {
+            for (outputNode in lookupOutputs) {
+                network.addNode(inputNode)
+                network.addNode(outputNode)
+                network.addEdge(inputNode, outputNode, CatalogRecipeEdge(catalogRecipe))
+            }
+        }
     }
 
     /**

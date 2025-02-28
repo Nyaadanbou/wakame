@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.catalog.item.menu
 
 import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.ItemCatalogInitializer
+import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
 import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
 import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.item.SlotDisplay
@@ -38,7 +38,7 @@ internal class MainMenu(
         private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
     }
 
-    private val settings = ItemCatalogInitializer.getMenuSettings("main")
+    private val settings = ItemCatalogMenuSettings.getMenuSettings("main")
 
     /**
      * 菜单的 [Gui].

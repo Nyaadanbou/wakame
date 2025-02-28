@@ -1,0 +1,34 @@
+title:
+  "^minecraft:chests/.*": "箱子战利品"
+menu_settings: # 此处引用 menu_settings.yml 中预设的菜单布局
+  "^minecraft:chests/.*": loot_table_recipe_chest
+icon:
+  "^minecraft:chests/abandoned_mineshaft$": internal:menu/catalog/loot_table/chests/abandoned_mineshaft
+  "^minecraft:chests/buried_treasure$": internal:menu/catalog/loot_table/chests/buried_treasure
+  "^minecraft:chests/desert_pyramid$": internal:menu/catalog/loot_table/chests/desert_pyramid
+  "^minecraft:chests/end_city_treasure$": internal:menu/catalog/loot_table/chests/end_city_treasure
+  "^minecraft:chests/igloo_chest$": internal:menu/catalog/loot_table/chests/igloo_chest
+  "^minecraft:chests/jungle_temple$": internal:menu/catalog/loot_table/chests/jungle_temple
+  "^minecraft:chests/jungle_temple_dispenser$": internal:menu/catalog/loot_table/chests/jungle_temple_dispenser
+  "^minecraft:chests/nether_bridge$": internal:menu/catalog/loot_table/chests/nether_bridge
+  "^minecraft:chests/pillager_outpost$": internal:menu/catalog/loot_table/chests/pillager_outpost
+  "^minecraft:chests/bastion_treasure$": internal:menu/catalog/loot_table/chests/bastion_treasure
+  "^minecraft:chests/bastion_other$": internal:menu/catalog/loot_table/chests/bastion_other
+  "^minecraft:chests/bastion_bridge$": internal:menu/catalog/loot_table/chests/bastion_bridge
+  "^minecraft:chests/bastion_hoglin_stable$": internal:menu/catalog/loot_table/chests/bastion_hoglin_stable
+  "^minecraft:chests/ancient_city$": internal:menu/catalog/loot_table/chests/ancient_city
+  "^minecraft:chests/ancient_city_ice_box$": internal:menu/catalog/loot_table/chests/ancient_city_ice_box
+  "^minecraft:chests/ruined_portal$": internal:menu/catalog/loot_table/chests/ruined_portal
+  "^minecraft:chests/trial_chambers/reward$": internal:menu/catalog/loot_table/chests/trial_chambers/reward
+  "^minecraft:chests/trial_chambers/reward_common$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_common
+  "^minecraft:chests/trial_chambers/reward_rare$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_rare
+  "^minecraft:chests/trial_chambers/reward_unique$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_unique
+  "^minecraft:chests/trial_chambers/reward_ominous$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_ominous
+  "^minecraft:chests/trial_chambers/reward_ominous_common$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_ominous_common
+  "^minecraft:chests/trial_chambers/reward_ominous_rare$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_ominous_rare
+  "^minecraft:chests/trial_chambers/reward_ominous_unique$": internal:menu/catalog/loot_table/chests/trial_chambers/reward_ominous_unique
+  "^minecraft:chests/trial_chambers/supply$": internal:menu/catalog/loot_table/chests/trial_chambers/supply
+  "^minecraft:chests/trial_chambers/corridor$": internal:menu/catalog/loot_table/chests/trial_chambers/corridor
+  "^minecraft:chests/trial_chambers/intersection$": internal:menu/catalog/loot_table/chests/trial_chambers/intersection
+  "^minecraft:chests/trial_chambers/intersection_barrel$": internal:menu/catalog/loot_table/chests/trial_chambers/intersection_barrel
+  "^minecraft:chests/trial_chambers/entrance$": internal:menu/catalog/loot_table/chests/trial_chambers/entrance

@@ -1,5 +1,7 @@
-package cc.mewcraft.wakame.catalog.item
+package cc.mewcraft.wakame.catalog.item.recipe
 
+import cc.mewcraft.wakame.catalog.item.CatalogRecipe
+import cc.mewcraft.wakame.catalog.item.CatalogRecipeType
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import cc.mewcraft.wakame.core.ItemXNoOp
@@ -11,15 +13,12 @@ abstract class BukkitRecipeAdapter(
     private val recipe: BukkitRecipe,
 ) : CatalogRecipe {
 
-    fun <T : BukkitRecipe> recipe(): T = recipe as T
-
-    // 缓存搜索时使用的索引, 即去重展开后的 ItemX 集合
-    abstract val inputs: Set<ItemX>
-
     private val outputs: Set<ItemX> = setOfNotNull(ItemXFactoryRegistry[recipe.result])
 
-    override fun getLookupInputs(): Set<ItemX> = inputs
     override fun getLookupOutputs(): Set<ItemX> = outputs
+
+    fun <T : BukkitRecipe> recipe(): T = recipe as T
+
 }
 
 /**
@@ -50,6 +49,9 @@ abstract class CookingRecipeAdapter(
 ) : BukkitRecipeAdapter(bukkitRecipe) {
     override val sortId: String = bukkitRecipe.key.value()
 
+    val cookingTime = bukkitRecipe.cookingTime
+    val experience = bukkitRecipe.experience
+
     // 对应原版该类型配方对RecipeChoice存储格式
     // 意在缓存各个RecipeChoice转化为List<ItemX>的结果
     val inputItems: List<ItemX> = convertChoiceToItemXList(bukkitRecipe.inputChoice)
@@ -58,8 +60,9 @@ abstract class CookingRecipeAdapter(
     // TODO 通过改进 ItemX 使得这里不用强转非空
     val outputItems: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
-    // 意在缓存 getInputs() 函数拿到的值
-    override val inputs: Set<ItemX> = inputItems.toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return inputItems.toSet()
+    }
 }
 
 
@@ -84,12 +87,15 @@ class FurnaceRecipeAdapter(
 class ShapedRecipeAdapter(
     bukkitRecipe: ShapedRecipe,
 ) : BukkitRecipeAdapter(bukkitRecipe) {
+    val shape: Array<out String> = bukkitRecipe.shape
     val inputItems: Map<Char, List<ItemX>> = bukkitRecipe.choiceMap.mapValues { convertChoiceToItemXList(it.value) }
     val outputItem: ItemX = ItemXFactoryRegistry[bukkitRecipe.result]!!
 
     override val type = CatalogRecipeType.SHAPED_RECIPE
     override val sortId: String = bukkitRecipe.key.value()
-    override val inputs: Set<ItemX> = inputItems.values.flatten().toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return inputItems.values.flatten().toSet()
+    }
 }
 
 class ShapelessRecipeAdapter(
@@ -100,7 +106,9 @@ class ShapelessRecipeAdapter(
 
     override val type = CatalogRecipeType.SHAPELESS_RECIPE
     override val sortId: String = bukkitRecipe.key.value()
-    override val inputs: Set<ItemX> = inputItems.flatten().toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return inputItems.flatten().toSet()
+    }
 }
 
 class SmithingTransformRecipeAdapter(
@@ -113,7 +121,9 @@ class SmithingTransformRecipeAdapter(
 
     override val type = CatalogRecipeType.SMITHING_TRANSFORM_RECIPE
     override val sortId: String = bukkitRecipe.key.value()
-    override val inputs: Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return (baseItems + templateItems + additionItems).toSet()
+    }
 }
 
 class SmithingTrimRecipeAdapter(
@@ -125,7 +135,9 @@ class SmithingTrimRecipeAdapter(
 
     override val type = CatalogRecipeType.SMITHING_TRIM_RECIPE
     override val sortId: String = bukkitRecipe.key.value()
-    override val inputs: Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return (baseItems + templateItems + additionItems).toSet()
+    }
 
     // 锻造台纹饰配方没有输出, 返回一个占位物品作为节点
     override fun getLookupOutputs(): Set<ItemX> {
@@ -148,7 +160,9 @@ class StonecuttingRecipeAdapter(
 
     override val type = CatalogRecipeType.STONECUTTING_RECIPE
     override val sortId: String = bukkitRecipe.key.value()
-    override val inputs: Set<ItemX> = inputItems.toSet()
+    override fun getLookupInputs(): Set<ItemX> {
+        return inputItems.toSet()
+    }
 }
 
 /**
@@ -157,7 +171,7 @@ class StonecuttingRecipeAdapter(
 private fun convertChoiceToItemXList(choice: RecipeChoice?): List<ItemX> {
     return when (choice) {
         is RecipeChoice.ExactChoice -> choice.choices.mapNotNull { ItemXFactoryRegistry[it] }
-        is RecipeChoice.MaterialChoice -> choice.choices.map { ItemXVanilla(it.toString().lowercase()) }
+        is RecipeChoice.MaterialChoice -> choice.choices.map { ItemXVanilla(it.name.lowercase()) }
         else -> emptyList()
     }
 }

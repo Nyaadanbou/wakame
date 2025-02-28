@@ -15,7 +15,7 @@ import java.io.File
 
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-object CategoryRegistryDataLoader : RegistryConfigStorage {
+internal object CategoryRegistryDataLoader : RegistryConfigStorage {
 
     @InitFun
     fun init() {

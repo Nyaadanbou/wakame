@@ -41,6 +41,10 @@ public class LootKoishItem extends LootPoolSingletonContainer {
         this.id = id;
     }
 
+    public ResourceLocation getId() {
+        return id;
+    }
+
     @Override
     public LootPoolEntryType getType() {
         return LootPoolEntriesPatch.KOISH_ITEM;
@@ -88,4 +92,5 @@ public class LootKoishItem extends LootPoolSingletonContainer {
 
         return null;
     }
+
 }

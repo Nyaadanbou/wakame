@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.catalog.item.Category
+import cc.mewcraft.wakame.catalog.item.recipe.LootTableRecipe
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -102,6 +103,12 @@ object KoishRegistries {
      */
     @JvmField
     val LEVEL_RARITY_MAPPING: WritableDefaultedRegistry<LevelRarityMapping> = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, "__default__") // = koish:__default__
+
+    /**
+     * 物品图鉴中的战利品表配方.
+     */
+    @JvmField
+    val LOOT_TABLE_RECIPE: WritableRegistry<LootTableRecipe> = registerSimple(KoishRegistryKeys.LOOT_TABLE_RECIPE)
 
     /**
      * 稀有度.

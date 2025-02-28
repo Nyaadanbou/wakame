@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.gui.catalog.item.menu
 
-import cc.mewcraft.wakame.catalog.item.ItemCatalogInitializer
+import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.catalog.item.CatalogRecipeGui
 import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
@@ -43,7 +43,7 @@ internal class PagedCatalogRecipesMenu(
     val catalogRecipeGuis: List<CatalogRecipeGui>,
 ) : ItemCatalogMenu {
 
-    private val settings = ItemCatalogInitializer.getMenuSettings("paged_catalog_recipes")
+    private val settings = ItemCatalogMenuSettings.getMenuSettings("paged_catalog_recipes")
 
     /**
      * 菜单的 [Gui].
@@ -145,6 +145,6 @@ internal class PagedCatalogRecipesMenu(
      * 方便函数.
      */
     private fun getCatalogRecipeTitle(catalogRecipeGui: CatalogRecipeGui): AdventureComponentWrapper {
-        return AdventureComponentWrapper(ItemCatalogInitializer.getMenuSettings(catalogRecipeGui.type.toString().lowercase()).title)
+        return AdventureComponentWrapper(ItemCatalogMenuSettings.getMenuSettings(catalogRecipeGui.type.toString().lowercase()).title)
     }
 }

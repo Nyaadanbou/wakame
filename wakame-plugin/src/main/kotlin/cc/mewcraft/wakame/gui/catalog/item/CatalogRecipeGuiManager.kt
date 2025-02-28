@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.catalog.item.*
+import cc.mewcraft.wakame.catalog.item.CatalogRecipe
+import cc.mewcraft.wakame.catalog.item.CatalogRecipeNetwork
+import cc.mewcraft.wakame.catalog.item.CatalogRecipeType
+import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
+import cc.mewcraft.wakame.catalog.item.recipe.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.catalog.item.menu.PagedCatalogRecipesMenu
@@ -54,6 +58,7 @@ internal object CatalogRecipeGuiManager {
         registerGuiCreator<SmithingTrimRecipeAdapter>(::createSmithingTrimRecipeGui)
         registerGuiCreator<SmokingRecipeAdapter>(::createCookingRecipeGui)
         registerGuiCreator<StonecuttingRecipeAdapter>(::createStonecuttingRecipeGui)
+        registerGuiCreator<LootTableRecipe>(::createLootTableRecipeGui)
     }
 
     init {
@@ -86,11 +91,10 @@ internal object CatalogRecipeGuiManager {
                 LookupState.SOURCE -> CatalogRecipeNetwork.getSource(itemX)
                 LookupState.USAGE -> CatalogRecipeNetwork.getUsage(itemX)
             }
-            // 基于类型排序
+            // 先基于类型优先级排序
+            // 再基于唯一标识按字典序排序
             catalogRecipes.sortedWith(
-                compareBy<CatalogRecipe> {
-                    GUI_PRIORITIES.getOrDefault(it::class.java, Int.MAX_VALUE)
-                }.thenBy(CatalogRecipe::sortId)
+                compareBy<CatalogRecipe> { it.type.sortPriority }.thenBy { it.sortId }
             ).mapNotNull {
                 val gui = buildGui(it) ?: return@mapNotNull null
                 CatalogRecipeGui(it.type, gui)
@@ -207,11 +211,26 @@ internal object CatalogRecipeGuiManager {
         builder.addIngredient('o', DisplayItem(adapter.outputItem, recipe.result.amount))
     }
 
+    private fun createLootTableRecipeGui(recipe: LootTableRecipe): Gui {
+        return PagedGui.items { builder ->
+            val settings = recipe.catalogMenuSettings
+
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('<', PrevItem(settings))
+            builder.addIngredient('>', NextItem(settings))
+            builder.addIngredient('i', DisplayItem(recipe.catalogIcon))
+            builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+
+            builder.setContent(recipe.lootItemXs.map(::DisplayItem))
+        }
+    }
+
     /**
      * 方便函数.
      */
     private fun getMenuSettings(adapter: BukkitRecipeAdapter): BasicMenuSettings {
-        return ItemCatalogInitializer.getMenuSettings(adapter.type.name.lowercase())
+        return ItemCatalogMenuSettings.getMenuSettings(adapter.type.name.lowercase())
     }
 }
 
