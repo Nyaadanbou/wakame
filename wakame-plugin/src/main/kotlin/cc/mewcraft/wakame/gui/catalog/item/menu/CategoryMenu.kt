@@ -1,65 +1,61 @@
-package cc.mewcraft.wakame.gui.catalog.item
+package cc.mewcraft.wakame.gui.catalog.item.menu
 
-import cc.mewcraft.wakame.catalog.item.ItemCatalogInitializer
-import cc.mewcraft.wakame.catalog.item.ItemCatalogManager
+import cc.mewcraft.wakame.catalog.item.Category
 import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.gui.catalog.item.CatalogRecipeGuiManager
+import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
+import cc.mewcraft.wakame.gui.catalog.item.LookupState
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
+import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
+import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
- * 聚焦于一个物品, 展示其来源/用途的菜单.
+ * 类别菜单.
+ * 展示某类别的所有物品.
  */
-internal class PagedCatalogRecipesMenu(
+internal class CategoryMenu(
     /**
-     * 该菜单聚焦的物品.
+     * 该菜单展示的 [Category].
      */
-    val item: ItemX,
-
-    /**
-     * 该菜单的检索状态.
-     */
-    val lookupState: LookupState,
+    val category: Category,
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-
-    /**
-     * 该菜单中的各页配方 [Gui].
-     */
-    val catalogRecipeGuis: List<CatalogRecipeGui>,
 ) : ItemCatalogMenu {
-
-    private val settings = ItemCatalogInitializer.getMenuSettings("paged_catalog_recipes")
+    private val settings = category.menuSettings
 
     /**
      * 菜单的 [Gui].
      *
-     * - `x`: catalog_recipe_gui
      * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page
      * - `b`: back
+     * - `x`: display
      */
-    private val primaryGui: PagedGui<Gui> = PagedGui.guis { builder ->
+    private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('b', BackItem())
-        builder.setContent(catalogRecipeGuis.map { it.gui })
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        // TODO 可以缓存, 只有重载时会变化
+        // 类别菜单所展示的物品
+        builder.setContent(category.items.map { itemX -> DisplayItem(itemX) })
     }
 
     /**
@@ -68,7 +64,7 @@ internal class PagedCatalogRecipesMenu(
     private val primaryWindow: Window = Window.single().apply {
         setGui(primaryGui)
         setViewer(viewer)
-        setTitle(getCatalogRecipeTitle(catalogRecipeGuis.first()))
+        setTitle(settings.title)
     }.build()
 
     override fun open() {
@@ -76,7 +72,7 @@ internal class PagedCatalogRecipesMenu(
     }
 
     /**
-     * **背景** 占位的图标.
+     * 背景占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
@@ -84,13 +80,12 @@ internal class PagedCatalogRecipesMenu(
     }
 
     /**
-     * **上一页** 的图标.
+     * 上一页的图标.
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage()) {
+            if (!getGui().hasPreviousPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
-            }
             return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
@@ -98,34 +93,21 @@ internal class PagedCatalogRecipesMenu(
                 }
             }
         }
-
-        // 刷新菜单标题
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            super.handleClick(clickType, player, event)
-            primaryWindow.changeTitle(getCatalogRecipeTitle(catalogRecipeGuis[primaryGui.currentPage]))
-        }
     }
 
     /**
-     * **下一页** 的图标.
+     * 下一页的图标.
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasNextPage()) {
+            if (!getGui().hasNextPage())
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
-            }
             return settings.getSlotDisplay("next_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
                     component("total_page", Component.text(primaryGui.pageAmount))
                 }
             }
-        }
-
-        // 刷新菜单标题
-        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            super.handleClick(clickType, player, event)
-            primaryWindow.changeTitle(getCatalogRecipeTitle(catalogRecipeGuis[primaryGui.currentPage]))
         }
     }
 
@@ -135,16 +117,33 @@ internal class PagedCatalogRecipesMenu(
     inner class BackItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            val menuStack = ItemCatalogManager.getMenuStack(viewer)
-            menuStack.removeFirst()
-            menuStack.first.open()
+            ItemCatalogMenuStack.pop(player)
         }
     }
 
     /**
-     * 方便函数.
+     * **展示物品** 的图标.
      */
-    private fun getCatalogRecipeTitle(catalogRecipeGui: CatalogRecipeGui): AdventureComponentWrapper {
-        return AdventureComponentWrapper(ItemCatalogInitializer.getMenuSettings(catalogRecipeGui.type.toString().lowercase()).title)
+    inner class DisplayItem(
+        val item: ItemX,
+    ) : AbstractItem() {
+        override fun getItemProvider(): ItemProvider {
+            // TODO 渲染
+            return ItemWrapper(item.createItemStack())
+        }
+
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            // 类别菜单无需判定是否套娃, 因为肯定是第一次对配方进行索引
+            val state = when (clickType) {
+                ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
+                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
+                else -> return
+            }
+            // 要打开的菜单Gui列表为空，则不打开
+            val guis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, state)
+            if (guis.isEmpty()) return
+
+            ItemCatalogMenuStack.push(viewer, PagedCatalogRecipesMenu(item, state, viewer, guis))
+        }
     }
 }

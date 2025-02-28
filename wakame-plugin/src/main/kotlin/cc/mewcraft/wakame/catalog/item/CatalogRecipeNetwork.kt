@@ -64,6 +64,7 @@ object CatalogRecipeNetwork {
      * 获取特定物品的所有获取方式 (来源).
      */
     fun getSource(node: ItemX): Set<CatalogRecipe> {
+        if (!network.nodes().contains(node)) return emptySet()
         return network.inEdges(node).map { it.catalogRecipe }.toSet()
     }
 
@@ -71,6 +72,7 @@ object CatalogRecipeNetwork {
      * 获取特定物品的所有可参与制作 (用途).
      */
     fun getUsage(node: ItemX): Set<CatalogRecipe> {
+        if (!network.nodes().contains(node)) return emptySet()
         return network.outEdges(node).map { it.catalogRecipe }.toSet()
     }
 

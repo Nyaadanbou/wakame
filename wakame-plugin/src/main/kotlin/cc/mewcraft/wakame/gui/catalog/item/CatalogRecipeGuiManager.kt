@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.gui.catalog.item.CatalogRecipeGuiManager.getCatalogRecipeGuis
+import cc.mewcraft.wakame.gui.catalog.item.menu.PagedCatalogRecipesMenu
 import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
@@ -395,27 +395,27 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
         ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
         else -> return
     }
-    val menuStack = ItemCatalogManager.getMenuStack(player)
-    val currentMenu = menuStack.first
+    val menuList = ItemCatalogMenuStack.get(player)
 
     // 图鉴菜单队列过长时, 不再打开新的
-    if (menuStack.size > 50) {
+    if (menuList.size > 50) {
         player.sendMessage(TranslatableMessages.MSG_CATALOG_MENU_DEQUE_LIMIT)
         return
     }
 
     // 要打开的菜单和当前菜单一模一样, 不再打开新的
-    if (currentMenu is PagedCatalogRecipesMenu && currentMenu.item == item && currentMenu.lookupState == lookupState)
-        return
+    if (menuList.isNotEmpty()) {
+        val currentMenu = menuList.first()
+        if (currentMenu is PagedCatalogRecipesMenu && currentMenu.item == item && currentMenu.lookupState == lookupState)
+            return
+    }
 
-    // 要打开的菜单列表为空，则不打开
-    val catalogRecipeGuis = getCatalogRecipeGuis(item, lookupState)
+    // 要打开的菜单Gui列表为空，则不打开
+    val catalogRecipeGuis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, lookupState)
     if (catalogRecipeGuis.isEmpty())
         return
 
-    val pagedCatalogRecipesMenu = PagedCatalogRecipesMenu(item, lookupState, player, catalogRecipeGuis)
-    menuStack.addFirst(pagedCatalogRecipesMenu)
-    pagedCatalogRecipesMenu.open()
+    ItemCatalogMenuStack.push(player, PagedCatalogRecipesMenu(item, lookupState, player, catalogRecipeGuis))
 }
 
 internal enum class LookupState {

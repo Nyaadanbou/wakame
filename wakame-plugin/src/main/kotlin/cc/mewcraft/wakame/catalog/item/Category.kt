@@ -11,20 +11,21 @@ import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * 指导书中展示的一个物品类别.
+ * 物品图鉴中展示的一个物品类别.
  */
 data class Category(
     val id: Identifier,
     val icon: Key,
     val menuSettings: BasicMenuSettings,
+    val permission: String?,
     val items: List<ItemX>,
-) {
-}
+)
 
 /**
  * [Category] 的序列化器.
@@ -33,11 +34,12 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
 
     override fun deserialize(type: Type, node: ConfigurationNode): Category {
         val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(
-            "The hint node ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
+            "The hint ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
         )
 
         val icon = node.node("icon").require<Key>()
         val settings = node.node("menu_settings").require<BasicMenuSettings>()
+        val permission = node.get<String>("permission")
 
         // val itemUids = node.node("items").getList<ItemX>(emptyList())
         // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
@@ -51,7 +53,7 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
             }
             itemList.add(item)
         }
-        return Category(id, icon, settings, itemList)
+        return Category(id, icon, settings, permission, itemList)
     }
 
 }

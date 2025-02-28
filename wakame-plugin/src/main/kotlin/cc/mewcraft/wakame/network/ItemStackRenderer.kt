@@ -31,8 +31,6 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer"
 @Init(stage = InitStage.POST_WORLD)
 internal object ItemStackRenderer : PacketListener {
 
-    private const val PROCESSED_FIELD = "processed"
-
     @InitFun
     private fun init() {
         registerPacketListener()
@@ -126,6 +124,8 @@ internal object ItemStackRenderer : PacketListener {
 
         event.changed = changed
     }
+
+    private const val PROCESSED_FIELD = "processed"
 
     private var MojangStack.processed: Boolean
         get() = get(DataComponents.CUSTOM_DATA)?.contains(PROCESSED_FIELD) == true

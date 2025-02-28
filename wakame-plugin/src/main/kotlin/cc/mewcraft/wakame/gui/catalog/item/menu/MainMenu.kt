@@ -1,8 +1,13 @@
-package cc.mewcraft.wakame.gui.catalog.item
+package cc.mewcraft.wakame.gui.catalog.item.menu
 
 import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.ItemCatalogManager
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.catalog.item.ItemCatalogInitializer
+import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
+import cc.mewcraft.wakame.integration.permission.PermissionManager
+import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -12,28 +17,28 @@ import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
 import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
-import xyz.xenondevs.invui.item.ItemWrapper
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
 import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
- * 类别菜单.
- * 展示某类别的所有物品.
+ * 物品图鉴主菜单.
+ * 展示所有的物品类别.
  */
-class CategoryMenu(
-    /**
-     * 该菜单展示的 [Category].
-     */
-    val category: Category,
+internal class MainMenu(
 
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
 ) : ItemCatalogMenu {
-    private val settings = category.menuSettings
+
+    companion object {
+        private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
+    }
+
+    private val settings = ItemCatalogInitializer.getMenuSettings("main")
 
     /**
      * 菜单的 [Gui].
@@ -41,19 +46,24 @@ class CategoryMenu(
      * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page
-     * - `b`: back
-     * - `x`: display
+     * - `s`: search
+     * - `x`: category
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('b', BackItem())
+        builder.addIngredient('s', SearchItem())
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        // TODO 可以缓存, 只有重载时会变化
-        // 类别菜单所展示的物品
-        builder.setContent(category.items.map { itemX -> DisplayItem(itemX) })
+        // 对 CategoryItem 进行缓存
+        // TODO 权限检查代码美化
+        builder.setContent(KoishRegistries.ITEM_CATEGORY.valueSequence.filter { category ->
+            if (category.permission == null) return@filter true
+            PermissionManager.hasPermission(viewer.world, viewer.uniqueId, category.permission).get()
+        }.map { category ->
+            CATALOG_ITEM_POOL.getOrPut(category.id) { CategoryItem(category) }
+        }.toList())
     }
 
     /**
@@ -73,12 +83,15 @@ class CategoryMenu(
      * 背景占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("background").resolveToItemWrapper()
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
     }
 
     /**
-     * 上一页的图标.
+     * `上一页` 的图标.
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
@@ -94,7 +107,7 @@ class CategoryMenu(
     }
 
     /**
-     * 下一页的图标.
+     * `下一页` 的图标.
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
@@ -110,42 +123,35 @@ class CategoryMenu(
     }
 
     /**
-     * **返回** 的图标.
+     * `搜索` 的图标.
      */
-    inner class BackItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
+    inner class SearchItem : AbstractItem() {
+        override fun getItemProvider(): ItemProvider {
+            return settings.getSlotDisplay("search").resolveToItemWrapper()
+        }
+
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            val menuStack = ItemCatalogManager.getMenuStack(viewer)
-            menuStack.removeFirst()
-            menuStack.first.open()
+            // TODO 物品搜索功能
         }
     }
 
     /**
-     * **展示物品** 的图标.
+     * `类别` 的图标. 点击后打开一个特定的类别菜单.
      */
-    inner class DisplayItem(
-        val item: ItemX,
+    inner class CategoryItem(
+        private val category: Category,
     ) : AbstractItem() {
+
+        private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
+
         override fun getItemProvider(): ItemProvider {
-            // TODO 渲染
-            return ItemWrapper(item.createItemStack())
+            return itemProvider
         }
 
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // 类别菜单无需判定是否套娃, 因为肯定是第一次对配方进行索引
-            val state = when (clickType) {
-                ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
-                ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
-                else -> return
-            }
-            // 要打开的菜单列表为空，则不打开
-            val guis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, state)
-            if (guis.isEmpty()) return
-
-            val pagedCatalogRecipesMenu = PagedCatalogRecipesMenu(item, state, player, guis)
-            ItemCatalogManager.getMenuStack(player).addFirst(pagedCatalogRecipesMenu)
-            pagedCatalogRecipesMenu.open()
+            ItemCatalogMenuStack.push(viewer, CategoryMenu(category, viewer))
         }
+
     }
+
 }
