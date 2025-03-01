@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.abilityInput
@@ -9,8 +8,6 @@ import cc.mewcraft.wakame.item.VanillaItemSlot
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.FoodProperties
-import cc.mewcraft.wakame.item.projectNeko
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemConsumeEvent

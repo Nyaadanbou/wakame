@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.util.require

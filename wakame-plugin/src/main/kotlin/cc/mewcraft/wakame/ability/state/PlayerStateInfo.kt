@@ -1,11 +1,7 @@
 package cc.mewcraft.wakame.ability.state
 
-import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.event.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
-import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
 import cc.mewcraft.wakame.ability.abilityWorldInteraction
@@ -15,8 +11,8 @@ import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.event.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.event.Events
@@ -25,7 +21,6 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import java.lang.ref.WeakReference
-import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -62,7 +57,6 @@ class PlayerStateInfo(
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
 
         private val stateDisplay: StateDisplay<Player> by Injector.inject()
-        private val abilityWorldInteraction: AbilityWorldInteraction by Injector.inject()
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)

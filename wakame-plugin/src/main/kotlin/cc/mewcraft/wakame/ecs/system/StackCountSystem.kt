@@ -7,11 +7,8 @@ import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
-import com.github.quillraven.fleks.World.Companion.inject
 
-class StackCountSystem(
-    private val wakameWorld: WakameWorld = inject(),
-) : IteratingSystem(
+class StackCountSystem : IteratingSystem(
     family = family { all(StackCountComponent, TickCountComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
@@ -20,14 +17,14 @@ class StackCountSystem(
 
         // 如果 stackCount 小于等于 0，移除实体
         if (stackCountComponent.count <= 0) {
-            wakameWorld.removeEntity(entity)
+            WakameWorld.removeEntity(entity)
             return
         }
 
         // 如果 tickCount 达到设置好的时间, 移除异常效果.
         if (tickCountComponent.tick >= stackCountComponent.disappearTick) {
             LOGGER.info("在 $entity 上的元素效果已失效.")
-            wakameWorld.removeEntity(entity)
+            WakameWorld.removeEntity(entity)
         }
     }
 }

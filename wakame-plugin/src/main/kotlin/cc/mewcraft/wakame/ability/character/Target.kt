@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.character
 
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.toSimpleString
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Location

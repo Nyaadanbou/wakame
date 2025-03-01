@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
-import org.bukkit.entity.Player
 
 class AbilityMechanicRemoveSystem : IteratingSystem(
     family = family { all(CastBy, Tags.READY_TO_REMOVE) }

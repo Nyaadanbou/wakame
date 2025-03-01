@@ -1,7 +1,7 @@
 package item
 
-import cc.mewcraft.wakame.PLUGIN_DATA_DIR
-import cc.mewcraft.wakame.ability.AbilityRegistryConfigStorage
+import cc.mewcraft.wakame.InjectionQualifier
+import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.itemModule
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationResult
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
@@ -22,10 +21,9 @@ import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.ability.AbilityRegistryConfigStorage
-import cc.mewcraft.wakame.kizami.KizamiRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryConfigStorage
-import cc.mewcraft.wakame.rarity.RarityRegistryConfigStorage
+import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
+import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
+import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
@@ -60,7 +58,7 @@ object CommonNekoStackTest {
         // 按依赖顺序, 初始化注册表
         ElementTypeRegistryLoader.init()
         AttributeBundleFacadeRegistryLoader.init()
-        AbilityRegistryConfigStorage.init()
+        AbilityRegistryLoader.init()
         KizamiTypeRegistryLoader.init()
         RarityTypeRegistryLoader.init()
         LevelRarityMappingRegistryLoader.init()

@@ -8,18 +8,15 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.AbilityParser
-import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
-import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.location.LocationParser
 import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
 import org.incendo.cloud.bukkit.parser.selector.SinglePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.description.Description
 import org.incendo.cloud.paper.util.sender.Source
-import kotlin.jvm.optionals.getOrNull
 
 internal object AbilityCommand : KoishCommandFactory<Source> {
 
@@ -40,12 +37,12 @@ internal object AbilityCommand : KoishCommandFactory<Source> {
     }
 
     private fun handleCastAbilityAtTarget(context: CommandContext<Source>) {
-        val casterPlayer = context.optional<SinglePlayerSelector>("caster").getOrNull()?.single() ?: context.sender() as? Player ?: return
-        val targetEntity = context.flags().get<SingleEntitySelector>("target_entity")?.single() as? LivingEntity
-        val targetLocation = context.flags().get<Location>("target_location")
-        val target = targetEntity?.let { TargetAdapter.adapt(it) } ?: targetLocation?.let { TargetAdapter.adapt(it) }
         val ability = context.get<Ability>("ability")
-        val input = abilityInput(CasterAdapter.adapt(casterPlayer)) { target?.let { target(it) } }
+        val casterPlayer = context.sender() as? Player
+        val targetEntity = context.get<SingleEntitySelector>("target").single() as? LivingEntity ?: return
+        val target = targetEntity.let { TargetAdapter.adapt(it) }
+        val caster = casterPlayer?.let { CasterAdapter.adapt(it) }
+        val input = abilityInput(target) { castBy(caster) }
         ability.recordBy(input)
     }
 

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
@@ -13,13 +12,10 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.util.toSimpleString
-import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.stream.Stream
@@ -45,10 +41,6 @@ abstract class Ability(
     final override val key: Key,
     config: ConfigurationNode,
 ) : Keyed, Examinable {
-    companion object : KoinComponent {
-        private val wakameWorld: WakameWorld by inject()
-    }
-
     /**
      * The display infos of this ability.
      */
@@ -58,7 +50,7 @@ abstract class Ability(
      * 添加一个 [Ability] 状态.
      */
     private fun addMechanic(input: AbilityInput) {
-        wakameWorld.createEntity(key.asString()) {
+        WakameWorld.createEntity(key.asString()) {
             it += AbilityComponent(
                 manaCost = input.manaCost,
                 penalty = ManaCostPenalty(),

@@ -12,11 +12,11 @@ import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.SpiralPath
 import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.util.event.Events
+import cc.mewcraft.wakame.util.event.Subscription
 import cc.mewcraft.wakame.util.krequire
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.math.Position
-import me.lucko.helper.Events
-import me.lucko.helper.event.Subscription
 import net.kyori.adventure.key.Key
 import org.bukkit.Particle
 import org.bukkit.entity.Player

@@ -9,6 +9,4 @@ import org.koin.dsl.module
 
 fun abilityModule(): Module = module {
     singleOf(::PlayerStateDisplay) bind StateDisplay::class
-
-    singleOf(::AbilityEventHandler)
 }

@@ -5,14 +5,14 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryConfigStorage
-import cc.mewcraft.wakame.initializer2.Init
-import cc.mewcraft.wakame.initializer2.InitFun
-import cc.mewcraft.wakame.initializer2.InitStage
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.lifecycle.initializer.Init
+import cc.mewcraft.wakame.lifecycle.initializer.InitFun
+import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.reloader.Reload
+import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
-import cc.mewcraft.wakame.reloader.Reload
-import cc.mewcraft.wakame.reloader.ReloadFun
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -21,23 +21,15 @@ import cc.mewcraft.wakame.util.krequire
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryConfigStorage::class, // deps: 需要直接的数据
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
     ]
 )
 @Reload
-object AbilityRegistryConfigStorage : RegistryConfigStorage {
+object AbilityRegistryLoader : RegistryConfigStorage {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
      */
     const val DIR_PATH: String = "ability/"
-
-    // TODO 有这么几类东西需要分别放入不同的注册表:
-    // AbilityArchetype
-    // Ability
-    // Trigger
-    // PlayerAbility (仅在配置文件中, 不会被直接放进注册表?
-
-    // TODO 由于已经在新分支上动了部分底层代码, 等这个 PR 合并后再写技能的
 
     @InitFun
     fun init() {

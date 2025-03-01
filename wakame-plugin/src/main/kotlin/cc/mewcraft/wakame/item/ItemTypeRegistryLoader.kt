@@ -2,14 +2,13 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.AbilityRegistryConfigStorage
+import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
@@ -28,12 +27,12 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AbilityRegistryConfigStorage::class,
+        AbilityRegistryLoader::class,
     ]
 )
 @Reload(
     runAfter = [
-        AbilityRegistryConfigStorage::class,
+        AbilityRegistryLoader::class,
     ]
 )
 object ItemTypeRegistryLoader : RegistryConfigStorage {

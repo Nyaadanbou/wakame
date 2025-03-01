@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 internal inline fun <T> abilityWorldInteraction(block: AbilityWorldInteraction.() -> T): T {
     return AbilityWorldInteraction.block()
@@ -25,8 +24,6 @@ internal annotation class AbilityWorldInteractionDsl
  */
 @AbilityWorldInteractionDsl
 internal object AbilityWorldInteraction : KoinComponent {
-    private val wakameWorld: WakameWorld by inject()
-
     fun Player.getAbilityBy(trigger: Trigger): List<Ability> {
         val abilities = mutableListOf<Ability>()
         FamilyDefinitions.ABILITY.forEach { entity ->
@@ -56,7 +53,7 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setNextState(ability: Ability) {
-        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setNextState)
                 return@editEntities
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
@@ -69,7 +66,7 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setCostPenalty(abilityId: String, penalty: ManaCostPenalty) {
-        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setCostPenalty)
                 return@editEntities
             if (entity[IdentifierComponent].id != abilityId)
@@ -79,10 +76,10 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.cleanupAbility() {
-        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@cleanupAbility)
                 return@editEntities
-            wakameWorld.removeEntity(entity)
+            WakameWorld.removeEntity(entity)
         }
     }
 }

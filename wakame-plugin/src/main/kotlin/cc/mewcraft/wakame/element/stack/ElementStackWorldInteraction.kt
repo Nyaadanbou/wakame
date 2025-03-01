@@ -12,8 +12,6 @@ import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.LivingEntity
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 internal inline fun <T> elementStackWorldInteraction(block: ElementStackWorldInteraction.() -> T): T {
     return ElementStackWorldInteraction.block()
@@ -23,12 +21,11 @@ internal inline fun <T> elementStackWorldInteraction(block: ElementStackWorldInt
 internal annotation class ElementStackWorldInteractionDsl
 
 @ElementStackWorldInteractionDsl
-object ElementStackWorldInteraction : KoinComponent {
-    private val wakameWorld: WakameWorld by inject()
+object ElementStackWorldInteraction {
 
     fun putElementStackIntoWorld(element: RegistryEntry<out Element>, count: Int, target: Target, caster: Caster?) {
         require(count > 0) { "Count must be greater than 0" }
-        wakameWorld.createEntity(element.getIdAsString()) {
+        WakameWorld.createEntity(element.getIdAsString()) {
             caster?.let { c -> it += CastBy(c) }
             it += TargetTo(target)
             it += ElementComponent(element)

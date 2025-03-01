@@ -1,15 +1,11 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.state.AbilityStateResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.shadowNeko
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Entity

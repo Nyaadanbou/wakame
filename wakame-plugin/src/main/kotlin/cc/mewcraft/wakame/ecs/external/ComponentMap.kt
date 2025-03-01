@@ -7,7 +7,6 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityTag
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
-import com.github.quillraven.fleks.World
 
 // TODO: 改名成 ComponentBridge
 @JvmInline
@@ -29,11 +28,11 @@ value class ComponentMap(
     val tags: List<UniqueId<out Any>>
         get() = WakameWorld.world().snapshotOf(entity).tags
 
-    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T? = with(wakameWorld.world()) {
+    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T? = with(WakameWorld.world()) {
         return entity.getOrNull(type)
     }
 
-    operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(wakameWorld.world()) {
+    operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(WakameWorld.world()) {
         return entity.contains(uniqueId)
     }
 

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.RendererFormat
@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
 import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
 import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
 import cc.mewcraft.wakame.display2.implementation.common.computeIndex
-import cc.mewcraft.wakame.item.components.cells.AbilityCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel

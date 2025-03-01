@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.ability.state.display
 
-import cc.mewcraft.wakame.ability.AbilitySerializer
-import cc.mewcraft.wakame.ability.display.AbilityDisplaySerializer
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerSerializer
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
@@ -39,11 +36,8 @@ internal object AbilityConfigBootstrap {
         Configs.registerSerializer(
             "ability",
             TypeSerializerCollection.builder()
-                .register(AbilitySerializer)
                 .register(CombinedAudienceMessageSerializer)
                 .register(AudienceMessageGroupSerializer)
-                .register(AbilityDisplaySerializer)
-                .register(AbilityTriggerSerializer)
                 .build()
         )
     }

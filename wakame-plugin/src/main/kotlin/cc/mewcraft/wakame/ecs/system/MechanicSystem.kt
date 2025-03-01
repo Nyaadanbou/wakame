@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
