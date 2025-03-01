@@ -145,6 +145,6 @@ internal class PagedCatalogRecipesMenu(
      * 方便函数.
      */
     private fun getCatalogRecipeTitle(catalogRecipeGui: CatalogRecipeGui): AdventureComponentWrapper {
-        return AdventureComponentWrapper(ItemCatalogMenuSettings.getMenuSettings(catalogRecipeGui.type.toString().lowercase()).title)
+        return AdventureComponentWrapper(catalogRecipeGui.title)
     }
 }

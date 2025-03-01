@@ -4,12 +4,12 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.CatalogRecipe
 import cc.mewcraft.wakame.catalog.item.CatalogRecipeNetwork
-import cc.mewcraft.wakame.catalog.item.CatalogRecipeType
 import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
 import cc.mewcraft.wakame.catalog.item.recipe.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.gui.catalog.item.menu.PagedCatalogRecipesMenu
+import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -37,7 +37,7 @@ import java.text.DecimalFormat
  */
 internal object CatalogRecipeGuiManager {
 
-    private val GUI_CREATORS: HashMap<Class<out CatalogRecipe>, (CatalogRecipe) -> Gui> = HashMap()
+    private val GUI_CREATORS: HashMap<Class<out CatalogRecipe>, (CatalogRecipe) -> CatalogRecipeGui> = HashMap()
 
     /**
      * [CatalogRecipe] 的 [Gui] 在图鉴展示时的优先级, 数字小的类型将被排在前面.
@@ -74,7 +74,7 @@ internal object CatalogRecipeGuiManager {
         registerGuiPriority<StonecuttingRecipeAdapter>(900)
     }
 
-    private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> Gui) {
+    private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
         GUI_CREATORS[T::class.java] = { recipe -> factory(recipe as T) }
     }
 
@@ -95,142 +95,150 @@ internal object CatalogRecipeGuiManager {
             // 再基于唯一标识按字典序排序
             catalogRecipes.sortedWith(
                 compareBy<CatalogRecipe> { it.type.sortPriority }.thenBy { it.sortId }
-            ).mapNotNull {
-                val gui = buildGui(it) ?: return@mapNotNull null
-                CatalogRecipeGui(it.type, gui)
+            ).mapNotNull { catalogRecipe ->
+                buildGui(catalogRecipe) ?: return@mapNotNull null
             }
         }
     }
 
     /**
-     * 创建 [CatalogRecipe] 在图鉴中展示的 [Gui].
+     * 创建 [CatalogRecipe] 在图鉴中展示的 [CatalogRecipeGui].
      *
-     * 返回 `null` 意味着 [CatalogRecipe] 可被图鉴检索, 但代码没有指定对应 [Gui] 创建方法.
+     * 返回 `null` 意味着 [CatalogRecipe] 可被图鉴检索, 但代码没有指定对应 [CatalogRecipeGui] 创建方法.
      */
-    private fun buildGui(recipe: CatalogRecipe): Gui? = GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
+    private fun buildGui(recipe: CatalogRecipe): CatalogRecipeGui? = GUI_CREATORS[recipe::class.java]?.invoke(recipe).also {
         if (it == null) LOGGER.warn("No gui creator for ${recipe::class.java}")
     }
 
     /**
-     * 创建烧制配方 [Gui] 的方法.
+     * 创建烧制配方 [CatalogRecipeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
-    private fun createCookingRecipeGui(adapter: CookingRecipeAdapter): Gui = Gui.normal { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-        val recipe: CookingRecipe<*> = adapter.recipe()
-
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('!', CookingInfoItem(settings, recipe.cookingTime, recipe.experience))
-        builder.addIngredient('f', FuelItem(settings))
-        builder.addIngredient('i', DisplayItem(adapter.inputItems))
-        builder.addIngredient('o', DisplayItem(adapter.outputItems, recipe.result.amount))
+    private fun createCookingRecipeGui(adapter: CookingRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = Gui.normal { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('!', CookingInfoItem(settings, adapter.cookingTime, adapter.experience))
+            builder.addIngredient('f', FuelItem(settings))
+            builder.addIngredient('i', DisplayItem(adapter.inputItems))
+            builder.addIngredient('o', DisplayItem(adapter.outputItems, adapter.recipe<CookingRecipe<*>>().result.amount))
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
     /**
-     * 创建有序合成配方 [Gui] 的方法.
+     * 创建有序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapedRecipeGui(adapter: ShapedRecipeAdapter): Gui = PagedGui.items { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-        val recipe: ShapedRecipe = adapter.recipe()
+    private fun createShapedRecipeGui(adapter: ShapedRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            builder.addIngredient('o', DisplayItem(adapter.outputItem, adapter.recipe<ShapedRecipe>().result.amount))
 
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        builder.addIngredient('o', DisplayItem(adapter.outputItem, recipe.result.amount))
-
-        // 凑出 9 个格子里的字符, 排成一个字符串后打散
-        val chars = recipe.shape.map { it.padEnd(3, ' ') }
-            .let { it + List(3 - it.size) { "   " } }
-            .joinToString("")
-            .toCharArray()
-
-        // 转化为图标物品并放入 GUI
-        builder.setContent(chars.map {
-            if (it == ' ') return@map SimpleItem(ItemStack.empty())
-            val items = adapter.inputItems[it] as List<ItemX>
-            return@map DisplayItem(items)
-        })
+            // 凑出9个格子里的字符, 排成一个字符串后打散
+            val chars = adapter.shape.map { it.padEnd(3, ' ') }
+                .let { it + List(3 - it.size) { "   " } }
+                .joinToString("")
+                .toCharArray()
+            // 转化为图标物品并放入gui
+            builder.setContent(chars.map {
+                if (it == ' ') return@map SimpleItem(ItemStack.empty())
+                val itemXs = adapter.inputItems[it] as List<ItemX>
+                return@map DisplayItem(itemXs)
+            })
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
 
     /**
-     * 创建无序合成配方 [Gui] 的方法.
+     * 创建无序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapelessRecipeGui(adapter: ShapelessRecipeAdapter): Gui = PagedGui.items { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-        val recipe: ShapelessRecipe = adapter.recipe()
+    private fun createShapelessRecipeGui(adapter: ShapelessRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+            builder.addIngredient('o', DisplayItem(adapter.outputItems, adapter.recipe<ShapelessRecipe>().result.amount))
 
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        builder.addIngredient('o', DisplayItem(adapter.outputItems, recipe.result.amount))
-        builder.setContent(adapter.inputItems.map { DisplayItem(it) })
+            builder.setContent(adapter.inputItems.map { DisplayItem(it) })
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
     /**
-     * 创建锻造台转化配方 [Gui] 的方法.
+     * 创建锻造台转化配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTransformRecipeGui(adapter: SmithingTransformRecipeAdapter): Gui = PagedGui.items { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-        val recipe: SmithingRecipe = adapter.recipe()
-
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('b', DisplayItem(adapter.baseItems))
-        builder.addIngredient('t', DisplayItem(adapter.templateItems))
-        builder.addIngredient('a', DisplayItem(adapter.additionItems))
-        builder.addIngredient('o', DisplayItem(adapter.outputItemX, recipe.result.amount))
+    private fun createSmithingTransformRecipeGui(adapter: SmithingTransformRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('b', DisplayItem(adapter.baseItems))
+            builder.addIngredient('t', DisplayItem(adapter.templateItems))
+            builder.addIngredient('a', DisplayItem(adapter.additionItems))
+            builder.addIngredient('o', DisplayItem(adapter.outputItemX, adapter.recipe<SmithingRecipe>().result.amount))
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
     /**
-     * 创建锻造台纹饰配方 [Gui] 的方法.
+     * 创建锻造台纹饰配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTrimRecipeGui(adapter: SmithingTrimRecipeAdapter): Gui = PagedGui.items { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('b', DisplayItem(adapter.baseItems))
-        builder.addIngredient('t', DisplayItem(adapter.templateItems))
-        builder.addIngredient('a', DisplayItem(adapter.additionItems))
-        // 锻造台纹饰配方的输出槽显示一个固定物品
-        builder.addIngredient('r', TrimResultItem(settings))
+    private fun createSmithingTrimRecipeGui(adapter: SmithingTrimRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('b', DisplayItem(adapter.baseItems))
+            builder.addIngredient('t', DisplayItem(adapter.templateItems))
+            builder.addIngredient('a', DisplayItem(adapter.additionItems))
+            // 锻造台纹饰配方的输出槽显示一个固定物品
+            builder.addIngredient('r', TrimResultItem(settings))
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
     /**
-     * 创建切石机配方 [Gui] 的方法.
+     * 创建切石机配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createStonecuttingRecipeGui(adapter: StonecuttingRecipeAdapter): Gui = PagedGui.items { builder ->
-        val settings: BasicMenuSettings = getMenuSettings(adapter)
-        val recipe: StonecuttingRecipe = adapter.recipe()
-
-        builder.setStructure(*settings.structure)
-        builder.addIngredient('.', BackgroundItem(settings))
-        builder.addIngredient('i', DisplayItem(adapter.inputItems))
-        builder.addIngredient('o', DisplayItem(adapter.outputItem, recipe.result.amount))
+    private fun createStonecuttingRecipeGui(adapter: StonecuttingRecipeAdapter): CatalogRecipeGui {
+        val settings = getSettings(adapter)
+        val gui = PagedGui.items { builder ->
+            builder.setStructure(*settings.structure)
+            builder.addIngredient('.', BackgroundItem(settings))
+            builder.addIngredient('i', DisplayItem(adapter.inputItems))
+            builder.addIngredient('o', DisplayItem(adapter.outputItem, adapter.recipe<StonecuttingRecipe>().result.amount))
+        }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
-    private fun createLootTableRecipeGui(recipe: LootTableRecipe): Gui {
-        return PagedGui.items { builder ->
-            val settings = recipe.catalogMenuSettings
-
+    /**
+     * 创建战利品表配方 [CatalogRecipeGui] 的方法.
+     */
+    private fun createLootTableRecipeGui(recipe: LootTableRecipe): CatalogRecipeGui {
+        val settings = recipe.catalogMenuSettings
+        val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('<', PrevItem(settings))
             builder.addIngredient('>', NextItem(settings))
-            builder.addIngredient('i', DisplayItem(recipe.catalogIcon))
+            builder.addIngredient('i', LootItem(recipe))
             builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-
-            builder.setContent(recipe.lootItemXs.map(::DisplayItem))
+            builder.setContent(recipe.lootItems.map(::DisplayItem))
         }
+        return CatalogRecipeGui(settings.title, gui)
     }
 
     /**
      * 方便函数.
      */
-    private fun getMenuSettings(adapter: BukkitRecipeAdapter): BasicMenuSettings {
-        return ItemCatalogMenuSettings.getMenuSettings(adapter.type.name.lowercase())
+    private fun getSettings(adapter: BukkitRecipeAdapter): BasicMenuSettings {
+        return ItemCatalogMenuSettings.getMenuSettings(adapter.type.name)
     }
 }
 
@@ -283,6 +291,17 @@ private class TrimResultItem(
 ) : AbstractItem() {
     override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("trim_result").resolveToItemWrapper()
     override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
+}
+
+/**
+ * **战利品表占位输入** 的图标.
+ */
+class LootItem(
+    private val lootTableRecipe: LootTableRecipe,
+) : AbstractItem() {
+    private val itemProvider: ItemProvider = SlotDisplay.get(lootTableRecipe.catalogIcon).resolveToItemWrapper()
+    override fun getItemProvider(): ItemProvider = itemProvider
+    override fun handleClick(p0: ClickType, p1: Player, p2: InventoryClickEvent) = Unit
 }
 
 /**
@@ -448,9 +467,9 @@ internal enum class LookupState {
 }
 
 /**
- * 封装了 [CatalogRecipeType] 和对应的 [Gui].
+ * 封装了标题和对应的 [Gui].
  */
 internal data class CatalogRecipeGui(
-    val type: CatalogRecipeType,
+    val title: Component,
     val gui: Gui,
 )

@@ -10,9 +10,10 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.mixin.support.LootKoishItem
 import cc.mewcraft.wakame.shadow.loot.*
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
+import cc.mewcraft.wakame.util.shadow
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.key.Key
 import kotlin.jvm.optionals.getOrNull
 
 
@@ -29,22 +30,17 @@ data class LootTableRecipe(
      * 战利品表在数据包中对应的路径.
      * 以此作为战利品表的唯一标识.
      */
-    val lootTablePath: String,
+    val lootTableId: String,
 
     /**
-     * nms中的战利品表实例.
+     * Minecraft 的战利品表实例.
      */
     val lootTable: MojangLootTable,
 
     /**
      * 该配方在图鉴中展示时输入物品位置展示的图标.
      */
-    val catalogIcon: ItemX,
-
-    /**
-     * 该配方在图鉴中展示时的标题.
-     */
-    val catalogTitle: Component,
+    val catalogIcon: Key,
 
     /**
      * 该配方在图鉴中展示时的菜单布局.
@@ -53,51 +49,51 @@ data class LootTableRecipe(
 ) : CatalogRecipe {
 
     override val type = CatalogRecipeType.LOOT_TABLE_RECIPE
-    override val sortId = lootTablePath
+    override val sortId
+        get() = lootTableId
 
-    val lootItemXs: List<ItemX> = expandLootTable(lootTable).distinct().sortedBy(ItemX::identifier)
+    val lootItems: List<ItemX> = flattenLootTable(lootTable).distinct().sortedBy(ItemX::identifier)
 
     override fun getLookupInputs(): Set<ItemX> {
         return setOf(ItemXNoOp)
     }
 
     override fun getLookupOutputs(): Set<ItemX> {
-        return lootItemXs.toSet()
+        return lootItems.toSet()
     }
 
-    private fun expandLootTable(lootTable: MojangLootTable): List<ItemX> {
+    private fun flattenLootTable(lootTable: MojangLootTable): List<ItemX> {
         val pools = BukkitShadowFactory.global().shadow<ShadowLootTable>(lootTable).pools
         return pools.flatMap { pool ->
-            BukkitShadowFactory.global().shadow<ShadowLootPool>(pool).entries.flatMap { lootPoolEntryContainer ->
-                expandLootPoolEntryContainer(lootPoolEntryContainer)
-            }
+            val entries = pool.shadow<ShadowLootPool>().entries
+            entries.flatMap(::flattenLootPoolEntryContainer)
         }
     }
 
-    private fun expandLootPoolEntryContainer(lootPoolEntryContainer: MojangLootPoolEntryContainer): List<ItemX> {
+    private fun flattenLootPoolEntryContainer(lootPoolEntryContainer: MojangLootPoolEntryContainer): List<ItemX> {
         when (lootPoolEntryContainer) {
             is MojangCompositeEntryBase -> {
-                val children = BukkitShadowFactory.global().shadow<ShadowCompositeEntryBase>(lootPoolEntryContainer).children
-                return children.flatMap(::expandLootPoolEntryContainer)
+                val children = lootPoolEntryContainer.shadow<ShadowCompositeEntryBase>().children
+                return children.flatMap(::flattenLootPoolEntryContainer)
             }
 
             is MojangLootItem -> {
-                val holder = BukkitShadowFactory.global().shadow<ShadowLootItem>(lootPoolEntryContainer).item
+                val holder = lootPoolEntryContainer.shadow<ShadowLootItem>().item
                 val resourceKey = holder.unwrapKey().getOrNull() ?: return emptyList()
-                return listOf(ItemXVanilla(resourceKey.location().toString()))
+                return listOf(ItemXVanilla(resourceKey.location().path))
             }
 
             // TODO 战利品表本身可能会存在循环引用导致堆栈溢出
             is MojangNestedLootTable -> {
-                val nestedLootTable = BukkitShadowFactory.global().shadow<ShadowNestedLootTable>(lootPoolEntryContainer).contents.map(
+                val nestedLootTable = lootPoolEntryContainer.shadow<ShadowNestedLootTable>().contents.map(
                     { resourceKey -> MINECRAFT_SERVER.reloadableRegistries().getLootTable(resourceKey) },
-                    { table -> table }
+                    { it }
                 )
-                return expandLootTable(nestedLootTable)
+                return flattenLootTable(nestedLootTable)
             }
 
             is MojangTagEntry -> {
-                val tagKey = BukkitShadowFactory.global().shadow<ShadowTagEntry>(lootPoolEntryContainer).tag
+                val tagKey = lootPoolEntryContainer.shadow<ShadowTagEntry>().tag
                 return MojangBuiltInRegistries.ITEM.getTagOrEmpty(tagKey).mapNotNull { holder ->
                     val resourceKey = holder.unwrapKey().getOrNull() ?: return@mapNotNull null
                     ItemXVanilla(resourceKey.location().toString())

@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
+import com.google.common.graph.ImmutableNetwork
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.Network
 import com.google.common.graph.NetworkBuilder
@@ -16,7 +17,8 @@ import org.bukkit.Bukkit
 
 @Init(stage = InitStage.POST_WORLD)
 object CatalogRecipeNetwork {
-    private lateinit var network: Network<ItemX, CatalogRecipeEdge>
+
+    private lateinit var network: ImmutableNetwork<ItemX, CatalogRecipeEdge>
 
     @InitFun
     private fun init() {
@@ -28,7 +30,7 @@ object CatalogRecipeNetwork {
         network = buildNetWork()
     }
 
-    private fun buildNetWork(): Network<ItemX, CatalogRecipeEdge> {
+    private fun buildNetWork(): ImmutableNetwork<ItemX, CatalogRecipeEdge> {
         LOGGER.info("Building catalog recipe network")
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
@@ -38,8 +40,6 @@ object CatalogRecipeNetwork {
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
             .build()
-        // 将要放入网络中的配方
-        val catalogRecipes: MutableSet<CatalogRecipe> = mutableSetOf()
 
         // 原版配方
         for (bukkitRecipe in Bukkit.recipeIterator()) {
@@ -49,7 +49,7 @@ object CatalogRecipeNetwork {
 
             addRecipeToNetwork(
                 network, bukkitRecipeAdapter,
-                "Bukkit recipe type '${bukkitRecipe::class.simpleName}' doesn't have input or output!"
+                "Recipe type '${bukkitRecipe::class}' has no input or output"
             )
         }
 
@@ -57,24 +57,28 @@ object CatalogRecipeNetwork {
         for (lootTableRecipe in KoishRegistries.LOOT_TABLE_RECIPE) {
             addRecipeToNetwork(
                 network, lootTableRecipe,
-                "Loot table recipe with path '${lootTableRecipe.lootTablePath}' doesn't have input or output!"
+                "Loot table recipe '${lootTableRecipe.lootTableId}' has no input or output"
             )
         }
 
         // TODO 工作站配方
 
-        return network
+        return ImmutableNetwork.copyOf(network)
     }
 
     /**
      * 方便函数.
      */
-    private fun addRecipeToNetwork(network: MutableNetwork<ItemX, CatalogRecipeEdge>, catalogRecipe: CatalogRecipe, msg: String) {
+    private fun addRecipeToNetwork(
+        network: MutableNetwork<ItemX, CatalogRecipeEdge>,
+        catalogRecipe: CatalogRecipe,
+        errorMessage: String,
+    ) {
         // 当配方输入和输出均非空时才会添加节点和边, 正常情况下不应该出现
         val lookupInputs = catalogRecipe.getLookupInputs()
         val lookupOutputs = catalogRecipe.getLookupOutputs()
         if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
-            LOGGER.error(msg)
+            LOGGER.error(errorMessage)
             return
         }
 
