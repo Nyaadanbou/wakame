@@ -29,23 +29,11 @@ import java.util.*
 import java.util.stream.Stream
 
 /**
- * 代表了一个玩家技能状态的信息.
- */
-sealed interface StateInfo : Examinable {
-    /**
-     * 添加一个 [SingleTrigger],
-     */
-    fun addTrigger(trigger: SingleTrigger): AbilityStateResult
-
-    fun cleanup()
-}
-
-/**
  * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
  */
 class PlayerStateInfo(
     player: Player,
-) : StateInfo {
+) : Examinable {
     private val weakPlayer: WeakReference<Player> = WeakReference(player)
 
     internal val player: Player
@@ -78,13 +66,12 @@ class PlayerStateInfo(
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
-    private val mechanicName = "IdleResetMechanic-${player.uniqueId}"
-
     private val manaCostPenalties: MutableMap<String, ManaCostPenalty> = HashMap()
 
-    private val idleResetMechanic: Mechanic = PlayerStateInfoMechanic(this)
+    private val mechanicName = "PlayerStateInfoResetMechanic-${player.uniqueId}"
+    private val resetMechanic: Mechanic = PlayerStateInfoResetMechanic(this)
 
-    override fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
+    fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
         // Sequence trigger abilities
@@ -146,7 +133,7 @@ class PlayerStateInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
-            WakameWorld.createMechanic(mechanicName) { idleResetMechanic }
+            WakameWorld.addMechanic(mechanicName, resetMechanic)
             val completeSequence = currentSequence.readAll()
             stateDisplay.displayProgress(completeSequence, player)
 
@@ -177,7 +164,7 @@ class PlayerStateInfo(
         currentSequence.clear()
     }
 
-    override fun cleanup() = abilityWorldInteraction {
+    fun cleanup() = abilityWorldInteraction {
         player.cleanupAbility()
         manaNoEnoughSubscription.close()
         manaCostSubscription.close()

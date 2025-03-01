@@ -1,8 +1,12 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
@@ -25,20 +29,15 @@ internal object AbilityWorldInteraction : KoinComponent {
 
     fun Player.getAbilityBy(trigger: Trigger): List<Ability> {
         val abilities = mutableListOf<Ability>()
-        with(WakameWorld.world()) {
-            forEach { entity ->
-                val family = family { all(EntityType.ABILITY, CastBy, StatePhaseComponent, TriggerComponent, IdentifierComponent) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[CastBy].entity != this@getAbilityBy)
-                    return@forEach
-                if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
-                    // 只有在 IDLE 状态下才能进行下一个状态的标记.
-                    return@forEach
-                if (entity[TriggerComponent].trigger == trigger) {
-                    val id = entity[IdentifierComponent].id
-                    abilities.add(KoishRegistries.ABILITY.getOrThrow(id))
-                }
+        FamilyDefinitions.ABILITY.forEach { entity ->
+            if (entity[CastBy].caster.entity != this@getAbilityBy)
+                return@forEach
+            if (entity[AbilityComponent].phase != StatePhase.IDLE)
+                // 只有在 IDLE 状态下才能进行下一个状态的标记.
+                return@forEach
+            if (entity[AbilityComponent].trigger == trigger) {
+                val id = entity[IdentifierComponent].id
+                abilities.add(KoishRegistries.ABILITY.getOrThrow(id))
             }
         }
 
@@ -47,28 +46,21 @@ internal object AbilityWorldInteraction : KoinComponent {
 
     fun Player.getAllActiveAbilityTriggers(): Set<Trigger> {
         val triggers = mutableSetOf<Trigger>()
-        with(WakameWorld.world()) {
-            forEach { entity ->
-                val family = family { all(EntityType.ABILITY, CastBy, TriggerComponent) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[CastBy].entity != this@getAllActiveAbilityTriggers)
-                    return@forEach
-                triggers.add(entity[TriggerComponent].trigger)
-            }
+        FamilyDefinitions.ABILITY.forEach { entity ->
+            if (entity[CastBy].caster.entity != this@getAllActiveAbilityTriggers)
+                return@forEach
+            entity[AbilityComponent].trigger?.let { triggers.add(it) }
         }
 
         return triggers
     }
 
     fun Player.setNextState(ability: Ability) {
-        WakameWorld.editEntities(
-            family = { family { all(EntityType.ABILITY, IdentifierComponent, CastBy, StatePhaseComponent, TickResultComponent) } }
-        ) { entity ->
-            if (entity[CastBy].entity != this@setNextState)
+        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+            if (entity[CastBy].caster.entity != this@setNextState)
                 return@editEntities
-            if (entity[StatePhaseComponent].phase != StatePhase.IDLE)
-            // 只有在 IDLE 状态下才能进行下一个状态的标记.
+            if (entity[AbilityComponent].phase != StatePhase.IDLE)
+                // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
             if (entity[IdentifierComponent].id != ability.key.asString())
                 return@editEntities
@@ -77,22 +69,18 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setCostPenalty(abilityId: String, penalty: ManaCostPenalty) {
-        WakameWorld.editEntities(
-            family = { family { all(EntityType.ABILITY, IdentifierComponent, CastBy, MochaEngineComponent) } }
-        ) { entity ->
-            if (entity[CastBy].entity != this@setCostPenalty)
+        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+            if (entity[CastBy].caster.entity != this@setCostPenalty)
                 return@editEntities
             if (entity[IdentifierComponent].id != abilityId)
                 return@editEntities
-            entity[ManaCostComponent].penalty = penalty
+            entity[AbilityComponent].penalty = penalty
         }
     }
 
     fun Player.cleanupAbility() {
-        wakameWorld.editEntities(
-            family = { family { all(EntityType.ABILITY, CastBy) } }
-        ) { entity ->
-            if (entity[CastBy].entity != this@cleanupAbility)
+        wakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+            if (entity[CastBy].caster.entity != this@cleanupAbility)
                 return@editEntities
             wakameWorld.removeEntity(entity)
         }

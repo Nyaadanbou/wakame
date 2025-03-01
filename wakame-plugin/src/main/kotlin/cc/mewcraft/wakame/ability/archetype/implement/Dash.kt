@@ -67,7 +67,7 @@ private class DashAbilityMechanic(
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = componentMap.castByEntity()
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
@@ -117,8 +117,8 @@ private class DashAbilityMechanic(
                 continue
 
             for (ability in dash.hitEffects) {
-                val input = abilityInput(CasterAdapter.adapt(casterEntity)) {
-                    target(TargetAdapter.adapt(entity))
+                val input = abilityInput(TargetAdapter.adapt(entity)) {
+                    castBy(CasterAdapter.adapt(casterEntity))
                 }
                 ability.recordBy(input)
             }

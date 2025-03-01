@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ability.archetype
 
+import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ecs.component.*
@@ -19,24 +20,20 @@ internal inline fun <T> abilitySupport(run: AbilitySupport.() -> T): T = Ability
  */
 @AbilitySupportDsl
 internal object AbilitySupport {
-    fun ComponentMap.castByEntity(): LivingEntity {
-        return this[CastBy]?.entity as? LivingEntity ?: error("No entity found in CastBy component")
+    fun ComponentMap.castBy(): Caster? {
+        return this[CastBy]?.caster
+    }
+
+    fun ComponentMap.castByEntity(): LivingEntity? {
+        return this[CastBy]?.caster?.entity as? LivingEntity
     }
 
     fun ComponentMap.targetTo(): Target {
         return this[TargetTo]?.target ?: error("No entity found in TargetTo component")
     }
 
-    fun ComponentMap.targetToLocation(): Location {
-        return targetTo().bukkitLocation
-    }
-
-    fun ComponentMap.targetToEntity(): LivingEntity {
-        return targetTo().bukkitEntity ?: error("No entity found in TargetTo component")
-    }
-
     fun ComponentMap.evaluate(evaluable: Evaluable<*>): Double {
-        val engine = this[MochaEngineComponent]?.mochaEngine
+        val engine = this[AbilityComponent]?.mochaEngine
         return if (engine != null) {
             evaluable.evaluate(engine)
         } else {

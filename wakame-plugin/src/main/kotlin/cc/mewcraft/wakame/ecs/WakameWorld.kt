@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.EntityType
+import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
@@ -37,34 +37,51 @@ import cc.mewcraft.wakame.ecs.system.StackCountSystem
 import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.ecs.system.TickResultSystem
-import cc.mewcraft.wakame.element.effect.IgniteSystem
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
 import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.Family
 import com.github.quillraven.fleks.World
 import com.github.quillraven.fleks.configureWorld
-import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
+import me.lucko.helper.metadata.Metadata
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.slf4j.Logger
 
 object WakameWorld {
 
-    /**
-     * 缓存了单个 tick 内的 [ComponentMap], 每次更新会进行清除.
-     *
-     * 目的是为了在一个 tick 多次调用 [componentMap] 能速度变快.
-     */
-    private val componentMapCache: Object2ObjectOpenHashMap<Entity, ComponentMap> = Object2ObjectOpenHashMap()
-
     private val instance: World = configureWorld {
+
+        injectables {
+            add(plugin)
+            add(logger)
+            add(this@WakameWorld)
+        }
+
+        families {
+            onAdd(FamilyDefinitions.ABILITY) { entity ->
+                val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
+                val metadataMap = Metadata.provide(bukkitEntity)
+                metadataMap.put(MetadataKeys.ABILITY, ComponentMap(entity))
+            }
+            onRemove(FamilyDefinitions.ABILITY) { entity ->
+                val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
+                Metadata.provide(bukkitEntity).remove(MetadataKeys.ABILITY)
+            }
+            onAdd(FamilyDefinitions.ELEMENT_STACK) { entity ->
+                val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
+                val metadataMap = Metadata.provide(bukkitEntity)
+                metadataMap.put(MetadataKeys.ELEMENT_STACK, ComponentMap(entity))
+            }
+            onRemove(FamilyDefinitions.ELEMENT_STACK) { entity ->
+                val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
+                Metadata.provide(bukkitEntity).remove(MetadataKeys.ELEMENT_STACK)
+            }
+        }
 
         systems {
             // 关于顺序: 删除系统优先于一切系统.
             add(RemoveSystem())
-
-            // 同步 ComponentMap 给外部
-
-            add(AbilityBukkitEntityMetadataSystem())
 
             // 根据标记与组件进行交互的系统
 
@@ -79,7 +96,6 @@ object WakameWorld {
 
             add(StatePhaseSystem())
             add(StackCountSystem())
-            add(IgniteSystem())
             add(AbilityMechanicRemoveSystem())
             add(TickResultSystem())
 
@@ -91,10 +107,10 @@ object WakameWorld {
         }
     }
 
+    private val mechanicFamily: Family = instance.family { all(IdentifierComponent, MechanicComponent) }
 
     internal fun tick() {
         with(instance) {
-            componentMapCache.clear()
             update(1f)
         }
     }
@@ -110,20 +126,19 @@ object WakameWorld {
         }
     }
 
-    internal fun createMechanic(identifier: String, replace: Boolean = true, mechanicProvider: () -> Mechanic) {
+    internal fun addMechanic(identifier: String, mechanic: Mechanic, replace: Boolean = true) {
         with(instance) {
             val identifierFamily = family { all(IdentifierComponent, MechanicComponent) }
             val entityToModify = identifierFamily.firstOrNull { it[IdentifierComponent].id == identifier }
             if (entityToModify != null) {
                 if (replace) {
-                    entityToModify[MechanicComponent].mechanic = mechanicProvider()
+                    entityToModify[MechanicComponent].mechanic = mechanic
                 }
                 return
             }
             createEntity(identifier) {
-                it += EntityType.MECHANIC
                 it += Tags.DISPOSABLE
-                it += MechanicComponent(mechanicProvider())
+                it += MechanicComponent(mechanic)
                 it += TickCountComponent()
             }
         }
@@ -131,15 +146,12 @@ object WakameWorld {
 
     internal fun removeMechanic(identifier: String) {
         with(instance) {
-            val identifierFamily = family { all(IdentifierComponent, EntityType.MECHANIC) }
-            val entityToRemove = identifierFamily
+            val entityToRemove = mechanicFamily
                 .firstOrNull { it[IdentifierComponent].id == identifier }
             if (entityToRemove == null) {
                 error("Tried to remove mechanic that does not exist: $identifier")
             }
-            entityToRemove.configure {
-                it += Remove
-            }
+            removeEntity(entityToRemove)
         }
     }
 
@@ -152,10 +164,8 @@ object WakameWorld {
         }
     }
 
-    internal inline fun editEntities(family: World.() -> Family, noinline configuration: EntityUpdateContext.(Entity) -> Unit) {
+    internal fun editEntities(family: Family, configuration: EntityUpdateContext.(Entity) -> Unit) {
         with(instance) {
-            val family = family()
-
             family.forEach {
                 it.configure(configuration)
             }
@@ -169,9 +179,5 @@ object WakameWorld {
             }
             entity.configure { it += Remove }
         }
-    }
-
-    fun componentMap(entity: Entity): ComponentMap {
-        return this.componentMapCache.computeIfAbsent(entity, Object2ObjectFunction { ComponentMap(entity) })
     }
 }

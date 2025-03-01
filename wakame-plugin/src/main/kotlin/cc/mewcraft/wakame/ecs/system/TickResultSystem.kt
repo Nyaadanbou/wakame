@@ -18,7 +18,7 @@ class TickResultSystem : IteratingSystem(
 
         when (tickResult) {
             TickResult.INTERRUPT -> {
-                WakameWorld.removeEntity(entity).also { LOGGER.warn("ECS entity ${world.snapshotOf(entity)} Interrupt.") }
+                WakameWorld.removeEntity(entity).also { LOGGER.error("ECS entity ${world.snapshotOf(entity)} interrupt.") }
                 return
             }
 

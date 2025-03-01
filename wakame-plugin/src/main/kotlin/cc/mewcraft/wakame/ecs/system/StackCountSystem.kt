@@ -25,7 +25,7 @@ class StackCountSystem(
         }
 
         // 如果 tickCount 达到设置好的时间, 移除异常效果.
-        if (tickCountComponent.tick >= 500) {
+        if (tickCountComponent.tick >= stackCountComponent.disappearTick) {
             LOGGER.info("在 $entity 上的元素效果已失效.")
             wakameWorld.removeEntity(entity)
         }

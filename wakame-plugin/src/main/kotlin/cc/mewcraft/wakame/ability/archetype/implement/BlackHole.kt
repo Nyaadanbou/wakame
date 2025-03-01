@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.FixedPath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
@@ -18,6 +17,7 @@ import cc.mewcraft.wakame.util.krequire
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
 import org.bukkit.Color
+import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.LivingEntity
@@ -51,23 +51,26 @@ private class BlackHole(
 private class BlackHoleAbilityMechanic(
     private val blackHole: BlackHole,
 ) : ActiveAbilityMechanic() {
+    private var holeLocation: Location? = null
     private var blockFace: BlockFace = BlockFace.UP
 
     override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
         val entity = componentMap.castByEntity()
 
         // 设置技能选定的位置
-        val rayTranceResult = entity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
-        val targetLocation = rayTranceResult.hitPosition.toLocation(entity.world)
-        rayTranceResult.hitBlockFace?.let { blockFace = it }
-        componentMap += TargetTo(targetLocation.toTarget())
+        if (entity != null) {
+            val rayTranceResult = entity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
+            val targetLocation = rayTranceResult.hitPosition.toLocation(entity.world)
+            rayTranceResult.hitBlockFace?.let { blockFace = it }
+            holeLocation = targetLocation
+        }
 
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
         val caster = componentMap.castByEntity()
-        val targetLocation = componentMap.targetToLocation()
+        val targetLocation = holeLocation ?: return TickResult.RESET_STATE
         val radius = componentMap.evaluate(blackHole.radius)
         val damage = componentMap.evaluate(blackHole.damage)
 
@@ -134,6 +137,7 @@ private class BlackHoleAbilityMechanic(
 
     override fun tickReset(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         blockFace = BlockFace.UP
+        holeLocation = null
         componentMap -= ParticleEffectComponent
         return TickResult.NEXT_STATE_NO_CONSUME
     }

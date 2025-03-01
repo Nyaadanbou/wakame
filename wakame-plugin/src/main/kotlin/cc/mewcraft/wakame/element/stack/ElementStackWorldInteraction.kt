@@ -1,11 +1,11 @@
-package cc.mewcraft.wakame.element.effect
+package cc.mewcraft.wakame.element.stack
 
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
+import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ElementComponent
-import cc.mewcraft.wakame.ecs.component.EntityType
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -29,7 +29,6 @@ object ElementStackWorldInteraction : KoinComponent {
     fun putElementStackIntoWorld(element: RegistryEntry<out Element>, count: Int, target: Target, caster: Caster?) {
         require(count > 0) { "Count must be greater than 0" }
         wakameWorld.createEntity(element.getIdAsString()) {
-            it += EntityType.ELEMENT_STACK
             caster?.let { c -> it += CastBy(c) }
             it += TargetTo(target)
             it += ElementComponent(element)
@@ -40,35 +39,25 @@ object ElementStackWorldInteraction : KoinComponent {
 
     fun LivingEntity.containsElementStack(element: RegistryEntry<out Element>): Boolean {
         var contains = false
-        with(wakameWorld.world()) {
-            forEach { entity ->
-                val family = family { all(EntityType.ELEMENT_STACK, ElementComponent, TargetTo) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[ElementComponent].element != element)
-                    return@forEach
-                if (entity[TargetTo].target.bukkitEntity != this@containsElementStack)
-                    return@forEach
-                contains = true
-            }
+        FamilyDefinitions.ELEMENT_STACK.forEach { entity ->
+            if (entity[ElementComponent].element != element)
+                return@forEach
+            if (entity[TargetTo].target.bukkitEntity != this@containsElementStack)
+                return@forEach
+            contains = true
         }
         return contains
     }
 
     fun LivingEntity.addElementStack(element: RegistryEntry<out Element>, count: Int) {
-        with(wakameWorld.world()) {
-            forEach { entity ->
-                val family = family { all(EntityType.ELEMENT_STACK, StackCountComponent, TargetTo, ElementComponent, TickCountComponent) }
-                if (!family.contains(entity))
-                    return@forEach
-                if (entity[ElementComponent].element != element)
-                    return@forEach
-                if (entity[TargetTo].target.bukkitEntity != this@addElementStack)
-                    return@forEach
-                entity[StackCountComponent].count += count
-                entity[TickCountComponent].tick = .0
+        FamilyDefinitions.ELEMENT_STACK.forEach { entity ->
+            if (entity[ElementComponent].element != element)
                 return@forEach
-            }
+            if (entity[TargetTo].target.bukkitEntity != this@addElementStack)
+                return@forEach
+            entity[StackCountComponent].count += count
+            entity[TickCountComponent].tick = .0
+            return@forEach
         }
     }
 }

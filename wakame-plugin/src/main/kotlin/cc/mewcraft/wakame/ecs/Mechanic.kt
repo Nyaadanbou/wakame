@@ -25,15 +25,3 @@ interface Mechanic {
      */
     fun onDisable(componentMap: ComponentMap) = Unit
 }
-
-fun Mechanic(
-    onEnable: (ComponentMap) -> Unit = {},
-    tick: (deltaTime: Double, tickCount: Double, ComponentMap) -> TickResult,
-    onDisable: (ComponentMap) -> Unit = {},
-): Mechanic {
-    return object : Mechanic {
-        override fun onEnable(componentMap: ComponentMap) = onEnable(componentMap)
-        override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = tick(deltaTime, tickCount, componentMap)
-        override fun onDisable(componentMap: ComponentMap) = onDisable(componentMap)
-    }
-}

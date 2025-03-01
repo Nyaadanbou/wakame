@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.PlayerAbility
-import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.attribute.AttributeInstance
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.enchantment2.getEffects
@@ -206,6 +205,6 @@ internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
     }
 
     private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
-        ability.recordBy(CasterAdapter.adapt(player), null, holdBy)
+        ability.recordBy(player, null, holdBy)
     }
 }

@@ -29,14 +29,13 @@ value class ComponentMap(
     val tags: List<UniqueId<out Any>>
         get() = WakameWorld.world().snapshotOf(entity).tags
 
-    operator fun <T : Component<out Any>> get(type: ComponentType<T>): T? {
-        @Suppress("UNCHECKED_CAST")
-        return componentsMap[type] as? T
+    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T? = with(wakameWorld.world()) {
+        return entity.getOrNull(type)
     }
 
-    operator fun contains(type: ComponentType<out Any>): Boolean = componentsMap.containsKey(type)
-
-    operator fun contains(tag: EntityTags): Boolean = tags.contains(tag)
+    operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(wakameWorld.world()) {
+        return entity.contains(uniqueId)
+    }
 
     internal inline operator fun <reified T : Component<T>> plusAssign(component: T) {
         WakameWorld.editEntity(entity) {

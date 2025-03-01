@@ -60,7 +60,7 @@ private class BlinkAbilityMechanic(
         val entity = componentMap.castByEntity()
 
         // 如果玩家面前方块过近, 无法传送
-        if (entity.getTargetBlockExact(3) != null) {
+        if (entity?.getTargetBlockExact(3) != null) {
             entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
             return@abilitySupport TickResult.RESET_STATE
         }
@@ -68,7 +68,7 @@ private class BlinkAbilityMechanic(
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity()
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
         val location = entity.location.clone()
 
         // 计算目标位置
@@ -119,7 +119,7 @@ private class BlinkAbilityMechanic(
     }
 
     override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity()
+        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         if (!isTeleported) {
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }

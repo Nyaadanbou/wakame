@@ -23,8 +23,8 @@ interface Food : ItemBehavior {
             val foodProperties = koishStack.components.get(ItemComponentTypes.FOOD) ?: return
             val abilities = foodProperties.abilities.map { KoishRegistries.ABILITY.getOrThrow(it) }
             for (ability in abilities) {
-                val input = abilityInput(CasterAdapter.adapt(player)) {
-                    target(TargetAdapter.adapt(player))
+                val input = abilityInput(TargetAdapter.adapt(player)) {
+                    castBy(CasterAdapter.adapt(player))
                     holdBy(VanillaItemSlot.fromEquipmentSlot(event.hand)!! to koishStack)
                 }
                 ability.recordBy(input)

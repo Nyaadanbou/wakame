@@ -6,7 +6,12 @@ import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.TargetTo
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.util.toSimpleString
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -54,18 +59,19 @@ abstract class Ability(
      */
     private fun addMechanic(input: AbilityInput) {
         wakameWorld.createEntity(key.asString()) {
-            it += EntityType.ABILITY
+            it += AbilityComponent(
+                manaCost = input.manaCost,
+                penalty = ManaCostPenalty(),
+                phase = StatePhase.IDLE,
+                trigger = input.trigger,
+                mochaEngine = input.mochaEngine
+            )
             it += Tags.DISPOSABLE
-            it += CastBy(input.castBy)
-            it += TargetTo(input.target)
+            input.castBy?.let { castBy -> it += CastBy(castBy) }
+            it += TargetTo(input.targetTo)
             HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
             input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
-            it += ManaCostComponent(input.manaCost)
-            it += MechanicComponent(mechanic(input))
-            it += StatePhaseComponent(StatePhase.IDLE)
             it += TickCountComponent(.0)
-            input.trigger?.let { trigger -> it += TriggerComponent(trigger) }
-            it += MochaEngineComponent(input.mochaEngine)
         }
     }
 

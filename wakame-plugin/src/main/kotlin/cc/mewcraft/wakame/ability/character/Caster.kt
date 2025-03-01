@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ability.character
 
 import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -38,6 +39,9 @@ object CasterAdapter {
         return SimpleCaster(entity)
     }
 }
+
+val Caster.user: User<*>?
+    get() = player?.toUser()
 
 /* Implementations */
 

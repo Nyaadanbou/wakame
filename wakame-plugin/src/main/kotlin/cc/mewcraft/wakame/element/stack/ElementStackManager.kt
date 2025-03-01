@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.element.effect
+package cc.mewcraft.wakame.element.stack
 
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
@@ -7,12 +7,12 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.LivingEntity
 
-fun LivingEntity.applyElementEffect(
+fun LivingEntity.applyElementStack(
     element: RegistryEntry<out Element>,
     count: Int,
     caster: Caster? = null,
 ) {
-    ElementEffectManager.applyElementEffect(element, count, TargetAdapter.adapt(this), caster)
+    ElementStackManager.applyElementStack(element, count, TargetAdapter.adapt(this), caster)
 }
 
 /**
@@ -29,16 +29,16 @@ fun LivingEntity.applyElementEffect(
  * 但当玩家对生物施加了第 2 层火元素效果, 那么该生物就会走路带火焰. 即使在 5 秒内再次应用火元素效果, 层数也不会增加,
  * 最后所有火元素层数清空, 该生物会停止走路带火焰.
  */
-object ElementEffectManager {
+object ElementStackManager {
     /**
-     * 对一个目标实体应用元素效果.
+     * 对一个目标实体应用元素层数.
      *
      * @param victim 目标实体
      * @param element 元素效果的元素
      * @param count 应用层数
      * @param caster 造成伤害的实体, 如果为空则表示无造成伤害实体.
      */
-    fun applyElementEffect(element: RegistryEntry<out Element>, count: Int, victim: Target, caster: Caster?) = elementStackWorldInteraction {
+    fun applyElementStack(element: RegistryEntry<out Element>, count: Int, victim: Target, caster: Caster?) = elementStackWorldInteraction {
         val entity = victim.bukkitEntity ?: return@elementStackWorldInteraction
         if (entity.containsElementStack(element)) {
             entity.addElementStack(element, count)

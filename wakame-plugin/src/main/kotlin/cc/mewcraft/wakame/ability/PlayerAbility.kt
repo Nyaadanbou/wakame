@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.character.Caster
+import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.Target
+import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
@@ -17,6 +18,8 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.entity.Player
 import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
@@ -144,7 +147,7 @@ interface PlayerAbility {
     /**
      * 使用 [caster] 记录技能的信息到 ECS 中.
      */
-    fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?)
+    fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?)
 
     /**
      * 将此对象序列化为 NBT, 拥有以下结构:
@@ -175,12 +178,13 @@ internal data class SimplePlayerAbility(
     override val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    override fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
-        val input = abilityInput(caster) {
+    override fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
+        val target = target ?: TargetAdapter.adapt(caster)
+        val input = abilityInput(target) {
+            castBy(CasterAdapter.adapt(caster))
             trigger(trigger)
             manaCost(manaCost)
             holdBy(holdBy)
-            target?.let { target(it) }
         }
         instance.recordBy(input)
     }

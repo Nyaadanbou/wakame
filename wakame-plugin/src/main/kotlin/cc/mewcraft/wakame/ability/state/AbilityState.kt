@@ -52,7 +52,7 @@ class PlayerAbilityState(
     override val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: StateInfo by AbilityStateProvider { PlayerStateInfo(player) }
+    private var stateInfo: PlayerStateInfo by AbilityStateProvider { PlayerStateInfo(player) }
 
     override fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
@@ -81,15 +81,15 @@ class PlayerAbilityState(
 }
 
 private class AbilityStateProvider(
-    private val initializer: () -> StateInfo,
-) : ReadWriteProperty<Any, StateInfo> {
-    private var stateInfo: StateInfo? = null
+    private val initializer: () -> PlayerStateInfo
+) : ReadWriteProperty<Any, PlayerStateInfo> {
+    private var stateInfo: PlayerStateInfo? = null
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): StateInfo {
+    override fun getValue(thisRef: Any, property: KProperty<*>): PlayerStateInfo {
         return stateInfo ?: initializer().also { stateInfo = it }
     }
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: StateInfo) {
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: PlayerStateInfo) {
         stateInfo = value
     }
 }

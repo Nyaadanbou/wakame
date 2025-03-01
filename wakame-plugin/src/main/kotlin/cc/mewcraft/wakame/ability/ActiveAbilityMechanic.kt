@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.StatePhaseComponent
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -49,7 +49,7 @@ abstract class ActiveAbilityMechanic : Mechanic {
 
     final override fun tick(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
         try {
-            val state = componentMap[StatePhaseComponent]
+            val state = componentMap[AbilityComponent]
             if (state == null) {
                 throw IllegalStateException("技能实体缺少 StatePhaseComponent 组件")
             }
@@ -67,5 +67,3 @@ abstract class ActiveAbilityMechanic : Mechanic {
         }
     }
 }
-
-data object EmptyAbilityMechanic : ActiveAbilityMechanic()

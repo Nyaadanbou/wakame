@@ -6,6 +6,7 @@ import com.github.quillraven.fleks.ComponentType
 data class StackCountComponent(
     var count: Int = 1,
     var maxCount: Int = 10,
+    var disappearTick: Int = 500,
 ) : Component<StackCountComponent> {
 
     override fun type(): ComponentType<StackCountComponent> = StackCountComponent

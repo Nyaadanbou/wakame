@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
@@ -14,7 +14,7 @@ class MechanicSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tick = entity[TickCountComponent].tick
         val result = entity[MechanicComponent].mechanic
-        val componentMap = WakameWorld.componentMap(entity)
+        val componentMap = ComponentMap(entity)
 
         val tickResult = result.tick(deltaTime.toDouble(), tick, componentMap)
 

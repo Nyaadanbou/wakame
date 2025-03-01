@@ -6,7 +6,7 @@ import com.github.quillraven.fleks.entityTagOf
 enum class Tags : EntityTags by entityTagOf() {
     /**
      * 代表此实体是一个临时实体,
-     * 代表一个 entity 会在 [TickResultComponent.result] 是 [cc.mewcraft.wakame.ecs.data.TickResult.ALL_DONE] 时被销毁.
+     * 一个拥有此 tag 的 entity 会在 [TickResultComponent.result] 是 [cc.mewcraft.wakame.ecs.data.TickResult.ALL_DONE] 时被销毁.
      * 此标记由外部系统添加. 不会被移除.
      */
     DISPOSABLE,

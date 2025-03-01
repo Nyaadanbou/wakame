@@ -2,16 +2,16 @@ package cc.mewcraft.wakame.ability.context
 
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
-import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.external.ComponentMap
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.molang.MoLangSupport
-import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -26,22 +26,17 @@ interface AbilityInput {
     /**
      * 这次技能的施法者 [Caster].
      */
-    val castBy: Caster
+    val castBy: Caster?
 
     /**
      * 此次技能的目标 [Target], 默认为 [castBy] 本身.
      */
-    val target: Target
+    val targetTo: Target
 
     /**
      * 此次技能的触发器 [Trigger], null 表示没有触发器.
      */
     val trigger: Trigger?
-
-    /**
-     * 如果 [castBy] 可以转变成一个 [User], 则返回它的 [User] 实例.
-     */
-    val user: User<*>?
 
     /**
      * 此次技能的施法物品 [NekoStack], null 表示没有施法物品.
@@ -66,8 +61,8 @@ interface AbilityInput {
 @DslMarker
 annotation class AbilityInputMarker
 
-fun abilityInput(caster: Caster, initializer: AbilityInputDSL.() -> Unit): AbilityInput {
-    return AbilityInputDSL(caster).apply(initializer).build()
+fun abilityInput(target: Target, initializer: AbilityInputDSL.() -> Unit): AbilityInput {
+    return AbilityInputDSL(target).apply(initializer).build()
 }
 
 fun abilityInput(componentMap: ComponentMap): AbilityInput {
@@ -76,21 +71,21 @@ fun abilityInput(componentMap: ComponentMap): AbilityInput {
 
 @AbilityInputMarker
 class AbilityInputDSL(
-    private val castBy: Caster,
+    private var targetTo: Target,
 ) {
-    private var target: Target = TargetAdapter.adapt(castBy)
+    private var castBy: Caster? = null
     private var trigger: Trigger? = null
     private var holdBy: Pair<ItemSlot, NekoStack>? = null
     private var manaCost: Evaluable<*> = Evaluable.parseNumber(0)
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
-    fun trigger(trigger: Trigger?): AbilityInputDSL {
-        this.trigger = trigger
+    fun castBy(castBy: Caster?): AbilityInputDSL {
+        this.castBy = castBy
         return this
     }
 
-    fun target(target: Target): AbilityInputDSL {
-        this.target = target
+    fun trigger(trigger: Trigger?): AbilityInputDSL {
+        this.trigger = trigger
         return this
     }
 
@@ -111,7 +106,7 @@ class AbilityInputDSL(
 
     fun build(): AbilityInput = SimpleAbilityInput(
         castBy = castBy,
-        target = target,
+        targetTo = this@AbilityInputDSL.targetTo,
         trigger = trigger,
         holdBy = holdBy,
         manaCost = manaCost,
@@ -122,24 +117,18 @@ class AbilityInputDSL(
 /* Implementations */
 
 private class SimpleAbilityInput(
-    override val castBy: Caster,
-    override val target: Target,
+    override val castBy: Caster?,
+    override val targetTo: Target,
     override val trigger: Trigger?,
     override val holdBy: Pair<ItemSlot, NekoStack>?,
     override val manaCost: Evaluable<*>,
     override val mochaEngine: MochaEngine<*>,
 ) : AbilityInput, Examinable {
 
-    /**
-     * 如果 [castBy] 可以转变成一个 [User], 则返回它的 [User] 实例.
-     */
-    override val user: User<*>?
-        get() = castBy.player?.toUser()
-
     override fun toBuilder(): AbilityInputDSL {
-        return AbilityInputDSL(castBy)
+        return AbilityInputDSL(targetTo)
+            .castBy(castBy)
             .trigger(trigger)
-            .target(target)
             .holdBy(holdBy)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
@@ -148,7 +137,7 @@ private class SimpleAbilityInput(
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("castBy", castBy),
-        ExaminableProperty.of("target", target),
+        ExaminableProperty.of("target", targetTo),
         ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("holdBy", holdBy),
         ExaminableProperty.of("manaCost", manaCost),
@@ -160,17 +149,16 @@ private class SimpleAbilityInput(
     }
 }
 
-private class ComponentMapAbilityInput(
+@JvmInline
+private value class ComponentMapAbilityInput(
     private val componentMap: ComponentMap,
 ) : AbilityInput, Examinable {
-    override val castBy: Caster
-        get() = requireNotNull(componentMap[CastBy]?.caster) { "Caster not found in componentMap" }
-    override val target: Target
+    override val castBy: Caster?
+        get() = componentMap[CastBy]?.caster
+    override val targetTo: Target
         get() = requireNotNull(componentMap[TargetTo]?.target) { "Target not found in componentMap" }
     override val trigger: Trigger?
-        get() = requireNotNull(componentMap[TriggerComponent]?.trigger) { "Trigger not found in componentMap" }
-    override val user: User<*>?
-        get() = castBy.player?.toUser()
+        get() = requireNotNull(componentMap[AbilityComponent]?.trigger) { "Trigger not found in componentMap" }
     override val holdBy: Pair<ItemSlot, NekoStack>?
         get() {
             val slot = componentMap[HoldBy]?.slot ?: return null
@@ -178,14 +166,14 @@ private class ComponentMapAbilityInput(
             return slot to nekoStack
         }
     override val manaCost: Evaluable<*>
-        get() = requireNotNull(componentMap[ManaCostComponent]?.expression) { "ManaCost not found in componentMap" }
+        get() = requireNotNull(componentMap[AbilityComponent]?.manaCost) { "ManaCost not found in componentMap" }
     override val mochaEngine: MochaEngine<*>
-        get() = requireNotNull(componentMap[MochaEngineComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
+        get() = requireNotNull(componentMap[AbilityComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
 
     override fun toBuilder(): AbilityInputDSL {
-        return AbilityInputDSL(castBy)
+        return AbilityInputDSL(targetTo)
+            .castBy(castBy)
             .trigger(trigger)
-            .target(target)
             .holdBy(holdBy)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
@@ -194,7 +182,7 @@ private class ComponentMapAbilityInput(
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("castBy", castBy),
-        ExaminableProperty.of("target", target),
+        ExaminableProperty.of("target", targetTo),
         ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("holdBy", holdBy),
         ExaminableProperty.of("manaCost", manaCost),
@@ -203,16 +191,5 @@ private class ComponentMapAbilityInput(
 
     override fun toString(): String {
         return toSimpleString()
-    }
-
-    override fun hashCode(): Int {
-        return componentMap.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ComponentMapAbilityInput) return false
-
-        return componentMap == other.componentMap
     }
 }
