@@ -2,4 +2,4 @@
 menu_settings:
   "^minecraft:chests/desert_pyramid$": loot_table_recipe_chest
 icon:
-  "^minecraft:chests/desert_pyramid$": internal:menu/catalog/loot_table/chests/desert_pyramid
+  "^minecraft:chests/desert_pyramid$": internal:menu/catalog/default/loot_table/chests/desert_pyramid

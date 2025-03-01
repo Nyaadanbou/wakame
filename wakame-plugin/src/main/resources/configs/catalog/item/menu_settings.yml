@@ -17,10 +17,10 @@ main:
     - ". x x x x x x x ."
     - "< . . . s . . . >"
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/catalog/prev_page"
-    next_page: "internal:menu/catalog/next_page"
-    search: "internal:menu/catalog/search"
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"
+    search: "internal:menu/catalog/default/search"
 
 # 分页图鉴配方菜单布局
 # 展示一系列配方的菜单
@@ -39,10 +39,10 @@ paged_catalog_recipes:
     - "x x x x x x x x x"
     - "< . . . b . . . >"
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/catalog/prev_page"
-    next_page: "internal:menu/catalog/next_page"
-    back: "internal:menu/common/back"
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"
+    back: "internal:menu/common/default/back"
 
 # 各配方菜单布局
 # structure要与上面设置的x区域的格子面积相等
@@ -63,9 +63,9 @@ blasting_recipe:
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    cooking_info: "internal:menu/catalog/cooking_info"
-    fuel: "internal:menu/catalog/fuel"
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
 
 # 营火配方
 campfire_recipe:
@@ -81,9 +81,9 @@ campfire_recipe:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    cooking_info: "internal:menu/catalog/cooking_info"
-    fuel: "internal:menu/catalog/fuel"
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
 
 # 熔炉配方
 furnace_recipe:
@@ -100,9 +100,9 @@ furnace_recipe:
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    cooking_info: "internal:menu/catalog/cooking_info"
-    fuel: "internal:menu/catalog/fuel"
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
 
 # 有序合成配方
 shaped_recipe:
@@ -117,7 +117,7 @@ shaped_recipe:
     - ". i i i . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
+    background: "internal:menu/common/default/background"
 
 # 无序合成配方
 shapeless_recipe:
@@ -132,7 +132,7 @@ shapeless_recipe:
     - ". i i i . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
+    background: "internal:menu/common/default/background"
 
 # 锻造台转化配方
 smithing_transform_recipe:
@@ -149,7 +149,7 @@ smithing_transform_recipe:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
+    background: "internal:menu/common/default/background"
 
 # 锻造台纹饰配方
 smithing_trim_recipe:
@@ -166,8 +166,8 @@ smithing_trim_recipe:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    trim_result: "internal:menu/catalog/trim_result"
+    background: "internal:menu/common/default/background"
+    trim_result: "internal:menu/catalog/default/trim_result"
 
 # 烟熏炉配方
 smoking_recipe:
@@ -184,9 +184,9 @@ smoking_recipe:
     - ". . f . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    cooking_info: "internal:menu/catalog/cooking_info"
-    fuel: "internal:menu/catalog/fuel"
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
 
 # 切石机配方
 stonecutting_recipe:
@@ -201,7 +201,7 @@ stonecutting_recipe:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
+    background: "internal:menu/common/default/background"
 
 # 战利品表配方-箱子
 loot_table_recipe_chest:
@@ -218,6 +218,6 @@ loot_table_recipe_chest:
     - ". . . o o o o o ."
     - ". . . < . . . > ."
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/catalog/prev_page"
-    next_page: "internal:menu/catalog/next_page"
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"

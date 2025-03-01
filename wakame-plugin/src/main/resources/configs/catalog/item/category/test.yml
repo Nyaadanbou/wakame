@@ -1,5 +1,5 @@
 # 该类别的图标
-icon: "internal:menu/catalog/category/test"
+icon: "internal:menu/catalog/default/category/test"
 # 在物品图鉴主菜单中查看该类别所需的权限
 # 移除该节点则无需权限
 permission: "koish.catalog.item"
@@ -20,9 +20,9 @@ menu_settings:
     - "< . . . b . . . >"
   icons:
     background: "internal:menu/common/background"
-    prev_page: "internal:menu/catalog/prev_page"
-    next_page: "internal:menu/catalog/next_page"
-    back: "internal:menu/common/back"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"
+    back: "internal:menu/common/default/back"
 items:
   - minecraft:cake
   - minecraft:cooked_beef

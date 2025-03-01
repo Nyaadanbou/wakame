@@ -3,6 +3,6 @@ base: paper
 # <cooking_time>
 # <exp>
 # 这些占位符写在name或者lore里均有效
-menu_icon_name: "<!i><gold>烧炼耗时:</gold> <white><cooking_time></white> <gold>秒</gold>"
-menu_icon_lore:
+slot_display_name: "<!i><gold>烧炼耗时:</gold> <white><cooking_time></white> <gold>秒</gold>"
+slot_display_lore:
   - "<!i><gold>烧炼经验:</gold> <white><exp></white>"

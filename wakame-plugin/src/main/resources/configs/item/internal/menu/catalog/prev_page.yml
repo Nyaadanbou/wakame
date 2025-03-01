@@ -1,4 +1,0 @@
-base: arrow
-menu_icon_name: "上一页 (<current_page>/<total_page>)"
-menu_icon_lore:
-  - "<!i><dark_gray>点击查看上一页"
