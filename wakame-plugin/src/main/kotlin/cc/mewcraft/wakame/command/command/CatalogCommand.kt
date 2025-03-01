@@ -22,16 +22,7 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
 
     override fun KoishCommandFactory.Builder<Source>.createCommands() {
 
-        // /<root> catalog item [player]
-        buildAndAdd {
-            permission(CommandPermissions.CATALOG_ITEM)
-            literal("catalog")
-            literal("item")
-            optional("player", SinglePlayerSelectorParser.singlePlayerSelectorParser())
-            koishHandler(handler = ::handleOpenMainCatalog)
-        }
-
-        // /<root> catalog item [player] <category>
+        // /<root> catalog item [player] [category]
         buildAndAdd {
             permission(CommandPermissions.CATALOG_ITEM)
             literal("catalog")
@@ -43,28 +34,20 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
 
     }
 
-    private suspend fun handleOpenMainCatalog(ctx: CommandContext<Source>) {
-        val sender = ctx.sender().source()
-        val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
-        val viewer = player?.single() ?: (sender as? Player) ?: run {
-            sender.sendPlainMessage("Player not found!")
-            return
-        }
-
-        val menu = MainMenu(viewer)
-        withContext(Dispatchers.minecraft) { menu.open() }
-    }
-
     private suspend fun handleOpenPartCatalog(ctx: CommandContext<Source>) {
         val sender = ctx.sender().source()
-        val category = ctx.get<Category>("category")
         val player = ctx.optional<SinglePlayerSelector>("player").getOrNull()
-        val viewer = player?.single() ?: (sender as? Player) ?: run {
-            sender.sendPlainMessage("Player not found!")
-            return
-        }
+        val category = ctx.optional<Category>("category").getOrNull()
+        val viewer = player?.single() ?: (sender as? Player) ?: run { sender.sendPlainMessage("Player not found!"); return }
 
-        withContext(Dispatchers.minecraft) { ItemCatalogMenuStack.rewrite(viewer, MainMenu(viewer), CategoryMenu(category, viewer)) }
+        if (category == null) {
+            val menu = MainMenu(viewer)
+            withContext(Dispatchers.minecraft) { menu.open() }
+        } else {
+            val mainMenu = MainMenu(viewer)
+            val categoryMenu = CategoryMenu(category, viewer)
+            withContext(Dispatchers.minecraft) { ItemCatalogMenuStack.rewrite(viewer, mainMenu, categoryMenu) }
+        }
     }
 
 }
