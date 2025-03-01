@@ -38,8 +38,8 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
         )
 
         val icon = node.node("icon").require<Key>()
+        val permission = node.node("permission").get<String>()
         val settings = node.node("menu_settings").require<BasicMenuSettings>()
-        val permission = node.get<String>("permission")
 
         // val itemUids = node.node("items").getList<ItemX>(emptyList())
         // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
