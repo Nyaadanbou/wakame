@@ -15,8 +15,9 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 
 @Init(
     stage = InitStage.PRE_WORLD,
@@ -50,37 +51,22 @@ object AbilityRegistryLoader : RegistryConfigStorage {
 
     private fun applyAbilityDataToRegistry(registryAction: (Identifier, Ability) -> Unit) {
         AbilityArchetypes // 初始化技能原型
+        val loader = buildYamlConfigLoader { withDefaults() }
 
-        val dataDirectory = getFileInConfigDirectory(DIR_PATH)
-        val namespaceDirs = dataDirectory.walk().maxDepth(1)
-            .drop(1) // exclude the `dataDirectory` itself
-            .filter { it.isDirectory }
-            .toList()
+        for ((file, _, path) in NamespacedFileTreeWalker(getFileInConfigDirectory(DIR_PATH), fileExtension = "yml", includeFullPath = true, includeNamespacePath = true)) {
+            val rootNode = loader.buildAndLoadString(file.readText())
 
-        val loaderBuilder = buildYamlConfigLoader { withDefaults() }
+            val abilityId = Identifiers.of(path)
+            val archetype = rootNode.node("type").require<AbilityArchetype>()
+            try {
+                val ability = archetype.create(abilityId, rootNode)
+                registryAction(abilityId, ability)
+            } catch (t: Throwable) {
+                LOGGER.warn("Failed to load ability: '$abilityId', Path: '${file.path}'", t)
+                continue
+            }
 
-        // then walk each file, i.e., each ability
-        for (namespaceDir in namespaceDirs) {
-            namespaceDir.walk().maxDepth(1)
-                .drop(1) // exclude the `namespaceDir` itself
-                .filter { it.isFile }
-                .forEach { file ->
-                    val value = file.nameWithoutExtension
-
-                    val text = file.readText()
-                    val node = loaderBuilder.buildAndLoadString(text)
-
-                    val abilityId = Identifiers.of(value)
-                    val archetype = node.node("type").krequire<AbilityArchetype>()
-                    val ability = try {
-                        archetype.create(abilityId, node)
-                    } catch (t: Throwable) {
-                        LOGGER.warn("Failed to load ability: '$abilityId', Path: '${file.path}'", t)
-                        return@forEach
-                    }
-
-                    registryAction(abilityId, ability)
-                }
+            LOGGER.info("Loaded ability: '$abilityId'")
         }
     }
 }

@@ -49,10 +49,6 @@ val Caster.user: User<*>?
 private value class SimpleCaster(
     override val entity: BukkitEntity,
 ) : Caster, Examinable {
-    init {
-        require(entity !is BukkitPlayer) { "EntityCaster should not be a player." }
-    }
-
     override val uniqueId: UUID
         get() = entity.uniqueId
 
