@@ -1,8 +1,8 @@
-package cc.mewcraft.wakame.catalog.item.init
+package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.catalog.item.recipe.LootTableRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.catalog.item.recipe.MojangLootTable
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -28,13 +28,13 @@ import kotlin.streams.asSequence
 
 @Init(
     stage = InitStage.POST_WORLD,
-    runAfter = [ItemCatalogMenuSettings::class] // 要等预设菜单布局载入好
+    runAfter = [CatalogItemMenuSettings::class] // 要等预设菜单布局载入好
 )
 @Reload
-object LootTableRecipeRegistryDataLoader : RegistryConfigStorage {
+internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage {
 
     // 默认的战利品表数量庞大, 使用较大的容量以减少哈希冲突
-    private val MINECRAFT_LOOT_TABLES: HashMap<String, MojangLootTable> = HashMap(2048)
+    private val MINECRAFT_LOOT_TABLE_MAP: HashMap<String, MojangLootTable> = HashMap(2048)
 
     @InitFun
     private fun init() {
@@ -54,13 +54,13 @@ object LootTableRecipeRegistryDataLoader : RegistryConfigStorage {
     private fun reloadMinecraftLootTables() {
         val lookupProvider: HolderLookup.Provider = MINECRAFT_SERVER.reloadableRegistries().lookup() as HolderLookup.Provider
         val lootTableRegistryLookup: HolderLookup.RegistryLookup<MojangLootTable> = lookupProvider.lookupOrThrow(Registries.LOOT_TABLE)
-        MINECRAFT_LOOT_TABLES.clear()
-        MINECRAFT_LOOT_TABLES.putAll(lootTableRegistryLookup.listElements().asSequence().associate { holder ->
+        MINECRAFT_LOOT_TABLE_MAP.clear()
+        MINECRAFT_LOOT_TABLE_MAP.putAll(lootTableRegistryLookup.listElements().asSequence().associate { holder ->
             holder.key().location().toString() to holder.value()
         })
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, LootTableRecipe) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemLootTableRecipe) -> Unit) {
         val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/loot_table")
 
         // 所有要在图鉴中展示的战利品表的路径
@@ -82,7 +82,7 @@ object LootTableRecipeRegistryDataLoader : RegistryConfigStorage {
 
                     for ((nodeKey, node) in rootNode.node("menu_settings").childrenMap()) {
                         val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
-                        MINECRAFT_LOOT_TABLES.filter { (key, _) ->
+                        MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
                             key.matches(regex)
                         }.forEach { (key, _) ->
                             lootTableIds.add(key)
@@ -92,7 +92,7 @@ object LootTableRecipeRegistryDataLoader : RegistryConfigStorage {
 
                     for ((nodeKey, node) in rootNode.node("icon").childrenMap()) {
                         val regex = regexCache.computeIfAbsent(nodeKey.toString(), ::Regex)
-                        MINECRAFT_LOOT_TABLES.filter { (key, _) ->
+                        MINECRAFT_LOOT_TABLE_MAP.filter { (key, _) ->
                             key.matches(regex)
                         }.forEach { (key, _) ->
                             lootTableIds.add(key)
@@ -107,14 +107,14 @@ object LootTableRecipeRegistryDataLoader : RegistryConfigStorage {
         // 根据对应的菜单布局和图标, 注册战利品表配方
         lootTableIds.forEach { lootTableId ->
             val icon = lootTableIdToIconId[lootTableId] ?: KoishRegistries.ITEM.defaultId
-            val menuSettings = lootTableIdToMenuId[lootTableId]?.let(ItemCatalogMenuSettings::getMenuSettings)
+            val menuSettings = lootTableIdToMenuId[lootTableId]?.let(CatalogItemMenuSettings::getMenuSettings)
                 ?: BasicMenuSettings(Component.text("Untitled"), emptyArray(), hashMapOf())
 
             registryAction(
                 Identifier.key(lootTableId),
-                LootTableRecipe(
+                CatalogItemLootTableRecipe(
                     lootTableId = lootTableId,
-                    lootTable = MINECRAFT_LOOT_TABLES[lootTableId]!!,
+                    lootTable = MINECRAFT_LOOT_TABLE_MAP[lootTableId]!!,
                     catalogIcon = icon,
                     catalogMenuSettings = menuSettings
                 )

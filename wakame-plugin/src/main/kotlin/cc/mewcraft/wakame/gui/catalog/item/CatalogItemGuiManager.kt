@@ -2,13 +2,11 @@ package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.catalog.item.CatalogRecipe
-import cc.mewcraft.wakame.catalog.item.CatalogRecipeNetwork
-import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
+import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
 import cc.mewcraft.wakame.catalog.item.recipe.*
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.gui.catalog.item.menu.PagedCatalogRecipesMenu
 import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
@@ -44,34 +42,34 @@ internal object CatalogRecipeGuiManager {
      */
     private val GUI_PRIORITIES: HashMap<Class<out CatalogRecipe>, Int> = HashMap()
 
-    private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(128) }
+    private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(1024) }
 
     private data class LookupKey(val item: ItemX, val state: LookupState)
 
     init {
-        registerGuiCreator<BlastingRecipeAdapter>(::createCookingRecipeGui)
-        registerGuiCreator<CampfireRecipeAdapter>(::createCookingRecipeGui)
-        registerGuiCreator<FurnaceRecipeAdapter>(::createCookingRecipeGui)
-        registerGuiCreator<ShapedRecipeAdapter>(::createShapedRecipeGui)
-        registerGuiCreator<ShapelessRecipeAdapter>(::createShapelessRecipeGui)
-        registerGuiCreator<SmithingTransformRecipeAdapter>(::createSmithingTransformRecipeGui)
-        registerGuiCreator<SmithingTrimRecipeAdapter>(::createSmithingTrimRecipeGui)
-        registerGuiCreator<SmokingRecipeAdapter>(::createCookingRecipeGui)
-        registerGuiCreator<StonecuttingRecipeAdapter>(::createStonecuttingRecipeGui)
-        registerGuiCreator<LootTableRecipe>(::createLootTableRecipeGui)
+        registerGuiCreator<CatalogBlastingRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogCampfireRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogFurnaceRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogShapedRecipe>(::createShapedRecipeGui)
+        registerGuiCreator<CatalogShapelessRecipe>(::createShapelessRecipeGui)
+        registerGuiCreator<CatalogSmithingTransformRecipe>(::createSmithingTransformRecipeGui)
+        registerGuiCreator<CatalogSmithingTrimRecipe>(::createSmithingTrimRecipeGui)
+        registerGuiCreator<CatalogSmokingRecipe>(::createCookingRecipeGui)
+        registerGuiCreator<CatalogStonecuttingRecipe>(::createStonecuttingRecipeGui)
+        registerGuiCreator<CatalogItemLootTableRecipe>(::createLootTableRecipeGui)
     }
 
     init {
         // TODO 支持配置文件载入优先级
-        registerGuiPriority<BlastingRecipeAdapter>(500)
-        registerGuiPriority<CampfireRecipeAdapter>(600)
-        registerGuiPriority<FurnaceRecipeAdapter>(300)
-        registerGuiPriority<ShapedRecipeAdapter>(100)
-        registerGuiPriority<ShapelessRecipeAdapter>(200)
-        registerGuiPriority<SmithingTransformRecipeAdapter>(700)
-        registerGuiPriority<SmithingTrimRecipeAdapter>(800)
-        registerGuiPriority<SmokingRecipeAdapter>(400)
-        registerGuiPriority<StonecuttingRecipeAdapter>(900)
+        registerGuiPriority<CatalogBlastingRecipe>(500)
+        registerGuiPriority<CatalogCampfireRecipe>(600)
+        registerGuiPriority<CatalogFurnaceRecipe>(300)
+        registerGuiPriority<CatalogShapedRecipe>(100)
+        registerGuiPriority<CatalogShapelessRecipe>(200)
+        registerGuiPriority<CatalogSmithingTransformRecipe>(700)
+        registerGuiPriority<CatalogSmithingTrimRecipe>(800)
+        registerGuiPriority<CatalogSmokingRecipe>(400)
+        registerGuiPriority<CatalogStonecuttingRecipe>(900)
     }
 
     private inline fun <reified T : CatalogRecipe> registerGuiCreator(noinline factory: (T) -> CatalogRecipeGui) {
@@ -85,11 +83,11 @@ internal object CatalogRecipeGuiManager {
     /**
      * 根据 [ItemX] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
      */
-    fun getCatalogRecipeGuis(itemX: ItemX, lookupState: LookupState): List<CatalogRecipeGui> {
-        return CACHED_GUIS.getOrPut(LookupKey(itemX, lookupState)) {
-            val catalogRecipes = when (lookupState) {
-                LookupState.SOURCE -> CatalogRecipeNetwork.getSource(itemX)
-                LookupState.USAGE -> CatalogRecipeNetwork.getUsage(itemX)
+    fun getGui(item: ItemX, state: LookupState): List<CatalogRecipeGui> {
+        return CACHED_GUIS.getOrPut(LookupKey(item, state)) {
+            val catalogRecipes = when (state) {
+                LookupState.SOURCE -> CatalogItemRecipeNetwork.getSource(item)
+                LookupState.USAGE -> CatalogItemRecipeNetwork.getUsage(item)
             }
             // 先基于类型优先级排序
             // 再基于唯一标识按字典序排序
@@ -111,18 +109,24 @@ internal object CatalogRecipeGuiManager {
     }
 
     /**
+     * 方便函数.
+     */
+    private val CatalogStandardRecipe.menuSettings: BasicMenuSettings
+        get() = CatalogItemMenuSettings.getMenuSettings(this.type.name)
+
+    /**
      * 创建烧制配方 [CatalogRecipeGui] 的方法.
      * 烧制配方包括: 熔炉, 高炉, 烟熏炉, 营火配方.
      */
-    private fun createCookingRecipeGui(adapter: CookingRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createCookingRecipeGui(catalogRecipe: CatalogCookingRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = Gui.normal { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('!', CookingInfoItem(settings, adapter.cookingTime, adapter.experience))
+            builder.addIngredient('!', CookingInfoItem(settings, catalogRecipe.cookingTime, catalogRecipe.experience))
             builder.addIngredient('f', FuelItem(settings))
-            builder.addIngredient('i', DisplayItem(adapter.inputItems))
-            builder.addIngredient('o', DisplayItem(adapter.outputItems, adapter.recipe<CookingRecipe<*>>().result.amount))
+            builder.addIngredient('i', DisplayItem(catalogRecipe.inputItems))
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItems, catalogRecipe.recipe<CookingRecipe<*>>().result.amount))
         }
         return CatalogRecipeGui(settings.title, gui)
     }
@@ -130,23 +134,23 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建有序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapedRecipeGui(adapter: ShapedRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createShapedRecipeGui(catalogRecipe: CatalogShapedRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.addIngredient('o', DisplayItem(adapter.outputItem, adapter.recipe<ShapedRecipe>().result.amount))
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItem, catalogRecipe.recipe<ShapedRecipe>().result.amount))
 
             // 凑出9个格子里的字符, 排成一个字符串后打散
-            val chars = adapter.shape.map { it.padEnd(3, ' ') }
+            val chars = catalogRecipe.shape.map { it.padEnd(3, ' ') }
                 .let { it + List(3 - it.size) { "   " } }
                 .joinToString("")
                 .toCharArray()
             // 转化为图标物品并放入gui
             builder.setContent(chars.map {
                 if (it == ' ') return@map SimpleItem(ItemStack.empty())
-                val itemXs = adapter.inputItems[it] as List<ItemX>
+                val itemXs = catalogRecipe.inputItems[it] as List<ItemX>
                 return@map DisplayItem(itemXs)
             })
         }
@@ -157,15 +161,14 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建无序合成配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createShapelessRecipeGui(adapter: ShapelessRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createShapelessRecipeGui(catalogRecipe: CatalogShapelessRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('i', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.addIngredient('o', DisplayItem(adapter.outputItems, adapter.recipe<ShapelessRecipe>().result.amount))
-
-            builder.setContent(adapter.inputItems.map { DisplayItem(it) })
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItems, catalogRecipe.recipe<ShapelessRecipe>().result.amount))
+            builder.setContent(catalogRecipe.inputItems.map { DisplayItem(it) })
         }
         return CatalogRecipeGui(settings.title, gui)
     }
@@ -173,15 +176,15 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台转化配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTransformRecipeGui(adapter: SmithingTransformRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createSmithingTransformRecipeGui(catalogRecipe: CatalogSmithingTransformRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('b', DisplayItem(adapter.baseItems))
-            builder.addIngredient('t', DisplayItem(adapter.templateItems))
-            builder.addIngredient('a', DisplayItem(adapter.additionItems))
-            builder.addIngredient('o', DisplayItem(adapter.outputItemX, adapter.recipe<SmithingRecipe>().result.amount))
+            builder.addIngredient('b', DisplayItem(catalogRecipe.baseItems))
+            builder.addIngredient('t', DisplayItem(catalogRecipe.templateItems))
+            builder.addIngredient('a', DisplayItem(catalogRecipe.additionItems))
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItemX, catalogRecipe.recipe<SmithingRecipe>().result.amount))
         }
         return CatalogRecipeGui(settings.title, gui)
     }
@@ -189,14 +192,14 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建锻造台纹饰配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createSmithingTrimRecipeGui(adapter: SmithingTrimRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createSmithingTrimRecipeGui(catalogRecipe: CatalogSmithingTrimRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('b', DisplayItem(adapter.baseItems))
-            builder.addIngredient('t', DisplayItem(adapter.templateItems))
-            builder.addIngredient('a', DisplayItem(adapter.additionItems))
+            builder.addIngredient('b', DisplayItem(catalogRecipe.baseItems))
+            builder.addIngredient('t', DisplayItem(catalogRecipe.templateItems))
+            builder.addIngredient('a', DisplayItem(catalogRecipe.additionItems))
             // 锻造台纹饰配方的输出槽显示一个固定物品
             builder.addIngredient('r', TrimResultItem(settings))
         }
@@ -206,13 +209,13 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建切石机配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createStonecuttingRecipeGui(adapter: StonecuttingRecipeAdapter): CatalogRecipeGui {
-        val settings = getSettings(adapter)
+    private fun createStonecuttingRecipeGui(catalogRecipe: CatalogStonecuttingRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.menuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
-            builder.addIngredient('i', DisplayItem(adapter.inputItems))
-            builder.addIngredient('o', DisplayItem(adapter.outputItem, adapter.recipe<StonecuttingRecipe>().result.amount))
+            builder.addIngredient('i', DisplayItem(catalogRecipe.inputItems))
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItem, catalogRecipe.recipe<StonecuttingRecipe>().result.amount))
         }
         return CatalogRecipeGui(settings.title, gui)
     }
@@ -220,26 +223,20 @@ internal object CatalogRecipeGuiManager {
     /**
      * 创建战利品表配方 [CatalogRecipeGui] 的方法.
      */
-    private fun createLootTableRecipeGui(recipe: LootTableRecipe): CatalogRecipeGui {
-        val settings = recipe.catalogMenuSettings
+    private fun createLootTableRecipeGui(catalogRecipe: CatalogItemLootTableRecipe): CatalogRecipeGui {
+        val settings = catalogRecipe.catalogMenuSettings
         val gui = PagedGui.items { builder ->
             builder.setStructure(*settings.structure)
             builder.addIngredient('.', BackgroundItem(settings))
             builder.addIngredient('<', PrevItem(settings))
             builder.addIngredient('>', NextItem(settings))
-            builder.addIngredient('i', LootItem(recipe))
+            builder.addIngredient('i', LootItem(catalogRecipe))
             builder.addIngredient('o', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-            builder.setContent(recipe.lootItems.map(::DisplayItem))
+            builder.setContent(catalogRecipe.lootItems.map(::DisplayItem))
         }
         return CatalogRecipeGui(settings.title, gui)
     }
 
-    /**
-     * 方便函数.
-     */
-    private fun getSettings(adapter: BukkitRecipeAdapter): BasicMenuSettings {
-        return ItemCatalogMenuSettings.getMenuSettings(adapter.type.name)
-    }
 }
 
 /**
@@ -297,7 +294,7 @@ private class TrimResultItem(
  * **战利品表占位输入** 的图标.
  */
 class LootItem(
-    private val lootTableRecipe: LootTableRecipe,
+    private val lootTableRecipe: CatalogItemLootTableRecipe,
 ) : AbstractItem() {
     private val itemProvider: ItemProvider = SlotDisplay.get(lootTableRecipe.catalogIcon).resolveToItemWrapper()
     override fun getItemProvider(): ItemProvider = itemProvider
@@ -431,7 +428,7 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
         ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
         else -> return
     }
-    val menuList = ItemCatalogMenuStack.get(player)
+    val menuList = CatalogItemMenuStacks.get(player)
 
     // 图鉴菜单队列过长时, 不再打开新的
     if (menuList.size > 50) {
@@ -442,16 +439,16 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
     // 要打开的菜单和当前菜单一模一样, 不再打开新的
     if (menuList.isNotEmpty()) {
         val currentMenu = menuList.first()
-        if (currentMenu is PagedCatalogRecipesMenu && currentMenu.item == item && currentMenu.lookupState == lookupState)
+        if (currentMenu is CatalogItemFocusMenu && currentMenu.item == item && currentMenu.state == lookupState)
             return
     }
 
     // 要打开的菜单Gui列表为空，则不打开
-    val catalogRecipeGuis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, lookupState)
+    val catalogRecipeGuis = CatalogRecipeGuiManager.getGui(item, lookupState)
     if (catalogRecipeGuis.isEmpty())
         return
 
-    ItemCatalogMenuStack.push(player, PagedCatalogRecipesMenu(item, lookupState, player, catalogRecipeGuis))
+    CatalogItemMenuStacks.push(player, CatalogItemFocusMenu(item, lookupState, player, catalogRecipeGuis))
 }
 
 internal enum class LookupState {

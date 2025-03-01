@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.catalog.item
+package cc.mewcraft.wakame.catalog.item.recipe
 
 import cc.mewcraft.wakame.core.ItemX
 import xyz.xenondevs.invui.gui.Gui

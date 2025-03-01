@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.catalog.item.init
+package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
@@ -18,12 +18,12 @@ import kotlin.io.path.readText
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object ItemCatalogMenuSettings {
+internal object CatalogItemMenuSettings {
 
-    private val idToMenuSettings: HashMap<String, BasicMenuSettings> = HashMap()
+    private val MENU_SETTING_MAP: HashMap<String, BasicMenuSettings> = HashMap()
 
     fun getMenuSettings(configKey: String): BasicMenuSettings {
-        return idToMenuSettings[configKey] ?: run {
+        return MENU_SETTING_MAP[configKey] ?: run {
             LOGGER.warn("Menu settings '$configKey' not found, using default")
             BasicMenuSettings(Component.text("Menu settings '$configKey' not found"), arrayOf(), hashMapOf())
         }
@@ -42,8 +42,8 @@ internal object ItemCatalogMenuSettings {
     private fun loadMenuSettings() {
         val loader = buildYamlConfigLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(KoishDataPaths.CONFIGS.resolve("catalog/item/menu_settings.yml").readText())
-        idToMenuSettings.clear()
-        idToMenuSettings.putAll(
+        MENU_SETTING_MAP.clear()
+        MENU_SETTING_MAP.putAll(
             rootNode.childrenMap()
                 .mapKeys { (nodeKey, _) -> nodeKey.toString() }
                 .mapValues { (_, mapChild) -> mapChild.require<BasicMenuSettings>() }

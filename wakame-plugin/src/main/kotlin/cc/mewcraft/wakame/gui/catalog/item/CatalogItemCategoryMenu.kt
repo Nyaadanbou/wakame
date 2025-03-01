@@ -1,10 +1,7 @@
-package cc.mewcraft.wakame.gui.catalog.item.menu
+package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.catalog.item.Category
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.gui.catalog.item.CatalogRecipeGuiManager
-import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
-import cc.mewcraft.wakame.gui.catalog.item.LookupState
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -24,17 +21,16 @@ import xyz.xenondevs.invui.window.type.context.setTitle
  * 类别菜单.
  * 展示某类别的所有物品.
  */
-internal class CategoryMenu(
+internal class CatalogItemCategoryMenu(
     /**
-     * 该菜单展示的 [Category].
+     * 该菜单展示的 [CatalogItemCategory].
      */
-    val category: Category,
-
+    val category: CatalogItemCategory,
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-) : ItemCatalogMenu {
+) : CatalogItemMenu {
     private val settings = category.menuSettings
 
     /**
@@ -117,7 +113,7 @@ internal class CategoryMenu(
     inner class BackItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            ItemCatalogMenuStack.pop(player)
+            CatalogItemMenuStacks.pop(player)
         }
     }
 
@@ -140,10 +136,10 @@ internal class CategoryMenu(
                 else -> return
             }
             // 要打开的菜单Gui列表为空，则不打开
-            val guis = CatalogRecipeGuiManager.getCatalogRecipeGuis(item, state)
+            val guis = CatalogRecipeGuiManager.getGui(item, state)
             if (guis.isEmpty()) return
 
-            ItemCatalogMenuStack.push(viewer, PagedCatalogRecipesMenu(item, state, viewer, guis))
+            CatalogItemMenuStacks.push(viewer, CatalogItemFocusMenu(item, state, viewer, guis))
         }
     }
 }

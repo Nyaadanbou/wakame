@@ -15,7 +15,7 @@ import java.io.File
 
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object CategoryRegistryDataLoader : RegistryConfigStorage {
+internal object CatalogItemCategoryRegistryLoader : RegistryConfigStorage {
 
     @InitFun
     fun init() {
@@ -29,7 +29,7 @@ internal object CategoryRegistryDataLoader : RegistryConfigStorage {
         applyDataToRegistry(KoishRegistries.ITEM_CATEGORY::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, Category) -> Unit) {
+    private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemCategory) -> Unit) {
         val dir = getFileInConfigDirectory("catalog/item/category/")
         for (file in dir.walk().drop(1).filter(File::isFile)) {
             try {
@@ -37,12 +37,12 @@ internal object CategoryRegistryDataLoader : RegistryConfigStorage {
                 val loader = buildYamlConfigLoader {
                     withDefaults()
                     serializers {
-                        register<Category>(CategorySerializer)
+                        register<CatalogItemCategory>(CategorySerializer)
                     }
                 }
                 val rootNode = loader.buildAndLoadString(file.readText())
                 rootNode.hint(RepresentationHints.CATAGORY_ID, id)
-                val category = rootNode.require<Category>()
+                val category = rootNode.require<CatalogItemCategory>()
                 registryAction(id, category)
                 LOGGER.info("Registered item catalog category: $id")
             } catch (e: Throwable) {

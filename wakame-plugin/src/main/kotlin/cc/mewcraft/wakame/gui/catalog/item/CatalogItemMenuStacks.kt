@@ -1,21 +1,20 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.gui.catalog.item.menu.ItemCatalogMenu
 import org.bukkit.entity.Player
 import xyz.xenondevs.invui.window.WindowManager
 import java.util.*
 import kotlin.collections.ArrayDeque
 
-object ItemCatalogMenuStack {
+object CatalogItemMenuStacks {
 
-    private val menuStackMap: HashMap<UUID, ArrayDeque<ItemCatalogMenu>> = HashMap()
+    private val menuStackMap: HashMap<UUID, ArrayDeque<CatalogItemMenu>> = HashMap()
 
     /**
      * 获取 [player] 的菜单队列.
      *
      * 如果玩家没有栈, 会先创建一个空栈然后返回.
      */
-    fun get(player: Player): List<ItemCatalogMenu> {
+    fun get(player: Player): List<CatalogItemMenu> {
         return menuStackMap.getOrPut(player.uniqueId, ::ArrayDeque)
     }
 
@@ -24,7 +23,7 @@ object ItemCatalogMenuStack {
      *
      * 此函数会将菜单放置在栈的顶部.
      */
-    fun push(player: Player, menu: ItemCatalogMenu) {
+    fun push(player: Player, menu: CatalogItemMenu) {
         menuStackMap.getOrPut(player.uniqueId, ::ArrayDeque).addLast(menu)
         menu.open()
     }
@@ -35,7 +34,7 @@ object ItemCatalogMenuStack {
      * 此函数会移除位于栈顶部的菜单.
      */
     fun pop(player: Player) {
-        val stack: ArrayDeque<ItemCatalogMenu> = menuStackMap.getOrPut(player.uniqueId, ::ArrayDeque)
+        val stack: ArrayDeque<CatalogItemMenu> = menuStackMap.getOrPut(player.uniqueId, ::ArrayDeque)
 
         // 如果栈已经空了, 则仅关闭当前菜单
         if (stack.isEmpty()) {
@@ -60,7 +59,7 @@ object ItemCatalogMenuStack {
      *
      * 索引较小的菜单更靠近栈的底部, 反之索引较大的菜单更靠近栈的顶部.
      */
-    fun rewrite(player: Player, vararg menus: ItemCatalogMenu) {
+    fun rewrite(player: Player, vararg menus: CatalogItemMenu) {
         if (menus.isEmpty()) return
         menuStackMap[player.uniqueId] = ArrayDeque(menus.toList())
         menus.last().open()

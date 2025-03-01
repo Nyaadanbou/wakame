@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
-import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.recipe.LootTableRecipe
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -52,7 +52,7 @@ object KoishRegistryKeys {
     val ITEM_SKIN = createRegistryKey<ItemSkin>("item_skin")
 
     @JvmField
-    val ITEM_CATEGORY = createRegistryKey<Category>("item_category")
+    val ITEM_CATEGORY = createRegistryKey<CatalogItemCategory>("item_category")
 
     @JvmField
     val KIZAMI = createRegistryKey<KizamiType>("kizami")
@@ -61,7 +61,7 @@ object KoishRegistryKeys {
     val LEVEL_RARITY_MAPPING = createRegistryKey<LevelRarityMapping>("level_rarity_mapping")
 
     @JvmField
-    val LOOT_TABLE_RECIPE = createRegistryKey<LootTableRecipe>("loot_table_recipe")
+    val LOOT_TABLE_RECIPE = createRegistryKey<CatalogItemLootTableRecipe>("loot_table_recipe")
 
     @JvmField
     val RARITY = createRegistryKey<RarityType>("rarity")

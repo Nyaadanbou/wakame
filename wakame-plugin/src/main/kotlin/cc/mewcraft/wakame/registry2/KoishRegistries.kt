@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
-import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.recipe.LootTableRecipe
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
@@ -90,7 +90,7 @@ object KoishRegistries {
      * 物品图鉴中物品的类别.
      */
     @JvmField
-    val ITEM_CATEGORY: WritableRegistry<Category> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
+    val ITEM_CATEGORY: WritableRegistry<CatalogItemCategory> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
 
     /**
      * 铭刻.
@@ -108,7 +108,7 @@ object KoishRegistries {
      * 物品图鉴中的战利品表配方.
      */
     @JvmField
-    val LOOT_TABLE_RECIPE: WritableRegistry<LootTableRecipe> = registerSimple(KoishRegistryKeys.LOOT_TABLE_RECIPE)
+    val LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableRecipe> = registerSimple(KoishRegistryKeys.LOOT_TABLE_RECIPE)
 
     /**
      * 稀有度.

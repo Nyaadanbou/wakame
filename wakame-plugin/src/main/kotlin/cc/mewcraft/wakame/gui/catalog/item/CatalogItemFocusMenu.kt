@@ -1,13 +1,7 @@
-package cc.mewcraft.wakame.gui.catalog.item.menu
+package cc.mewcraft.wakame.gui.catalog.item
 
-import cc.mewcraft.wakame.catalog.item.Category
-import cc.mewcraft.wakame.catalog.item.init.ItemCatalogMenuSettings
-import cc.mewcraft.wakame.gui.catalog.item.ItemCatalogMenuStack
-import cc.mewcraft.wakame.integration.permission.PermissionManager
-import cc.mewcraft.wakame.item.SlotDisplay
-import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.ReloadableProperty
+import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
+import cc.mewcraft.wakame.core.ItemX
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -15,55 +9,54 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import xyz.xenondevs.invui.gui.Gui
 import xyz.xenondevs.invui.gui.PagedGui
 import xyz.xenondevs.invui.gui.structure.Markers
-import xyz.xenondevs.invui.item.Item
 import xyz.xenondevs.invui.item.ItemProvider
 import xyz.xenondevs.invui.item.impl.AbstractItem
 import xyz.xenondevs.invui.item.impl.controlitem.PageItem
 import xyz.xenondevs.invui.window.Window
+import xyz.xenondevs.invui.window.changeTitle
 import xyz.xenondevs.invui.window.type.context.setTitle
 
 /**
- * 物品图鉴主菜单.
- * 展示所有的物品类别.
+ * 聚焦于一个物品, 展示其来源/用途的菜单.
  */
-internal class MainMenu(
-
+internal class CatalogItemFocusMenu(
+    /**
+     * 该菜单聚焦的物品.
+     */
+    val item: ItemX,
+    /**
+     * 该菜单的检索状态.
+     */
+    val state: LookupState,
     /**
      * 该菜单的用户, 也就是正在查看该菜单的玩家.
      */
     val viewer: Player,
-) : ItemCatalogMenu {
+    /**
+     * 该菜单中的各页配方 [Gui].
+     */
+    val guis: List<CatalogRecipeGui>,
+) : CatalogItemMenu {
 
-    companion object {
-        private val CATALOG_ITEM_POOL: HashMap<Identifier, CategoryItem> by ReloadableProperty { HashMap(32) }
-    }
-
-    private val settings = ItemCatalogMenuSettings.getMenuSettings("main")
+    private val settings = CatalogItemMenuSettings.getMenuSettings("paged_catalog_recipes")
 
     /**
      * 菜单的 [Gui].
      *
+     * - `x`: catalog_recipe_gui
      * - `.`: background
      * - `<`: prev_page
      * - `>`: next_page
-     * - `s`: search
-     * - `x`: category
+     * - `b`: back
      */
-    private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
+    private val primaryGui: PagedGui<Gui> = PagedGui.guis { builder ->
         builder.setStructure(*settings.structure)
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('s', SearchItem())
-        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
-        // 对 CategoryItem 进行缓存
-        // TODO 权限检查代码美化
-        builder.setContent(KoishRegistries.ITEM_CATEGORY.valueSequence.filter { category ->
-            if (category.permission == null) return@filter true
-            PermissionManager.hasPermission(viewer.world, viewer.uniqueId, category.permission).get()
-        }.map { category ->
-            CATALOG_ITEM_POOL.getOrPut(category.id) { CategoryItem(category) }
-        }.toList())
+        builder.addIngredient('b', BackItem())
+        builder.setContent(guis.map { it.gui })
     }
 
     /**
@@ -72,7 +65,7 @@ internal class MainMenu(
     private val primaryWindow: Window = Window.single().apply {
         setGui(primaryGui)
         setViewer(viewer)
-        setTitle(settings.title)
+        setTitle(guis.first().title)
     }.build()
 
     override fun open() {
@@ -80,23 +73,21 @@ internal class MainMenu(
     }
 
     /**
-     * 背景占位的图标.
+     * **背景** 占位的图标.
      */
     inner class BackgroundItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("background").resolveToItemWrapper()
-        }
-
+        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("background").resolveToItemWrapper()
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) = Unit
     }
 
     /**
-     * `上一页` 的图标.
+     * **上一页** 的图标.
      */
     inner class PrevItem : PageItem(false) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasPreviousPage())
+            if (!getGui().hasPreviousPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("prev_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
@@ -104,15 +95,22 @@ internal class MainMenu(
                 }
             }
         }
+
+        // 刷新菜单标题
+        override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
+            super.handleClick(clickType, player, event)
+            primaryWindow.changeTitle(guis[primaryGui.currentPage].title)
+        }
     }
 
     /**
-     * `下一页` 的图标.
+     * **下一页** 的图标.
      */
     inner class NextItem : PageItem(true) {
         override fun getItemProvider(gui: PagedGui<*>): ItemProvider {
-            if (!getGui().hasNextPage())
+            if (!getGui().hasNextPage()) {
                 return settings.getSlotDisplay("background").resolveToItemWrapper()
+            }
             return settings.getSlotDisplay("next_page").resolveToItemWrapper {
                 standard {
                     component("current_page", Component.text(primaryGui.currentPage + 1))
@@ -120,38 +118,22 @@ internal class MainMenu(
                 }
             }
         }
-    }
 
-    /**
-     * `搜索` 的图标.
-     */
-    inner class SearchItem : AbstractItem() {
-        override fun getItemProvider(): ItemProvider {
-            return settings.getSlotDisplay("search").resolveToItemWrapper()
-        }
-
+        // 刷新菜单标题
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            // TODO 物品搜索功能
+            super.handleClick(clickType, player, event)
+            primaryWindow.changeTitle(guis[primaryGui.currentPage].title)
         }
     }
 
     /**
-     * `类别` 的图标. 点击后打开一个特定的类别菜单.
+     * **返回** 的图标.
      */
-    inner class CategoryItem(
-        private val category: Category,
-    ) : AbstractItem() {
-
-        private val itemProvider: ItemProvider = SlotDisplay.get(category.icon).resolveToItemWrapper()
-
-        override fun getItemProvider(): ItemProvider {
-            return itemProvider
-        }
-
+    inner class BackItem : AbstractItem() {
+        override fun getItemProvider(): ItemProvider = settings.getSlotDisplay("back").resolveToItemWrapper()
         override fun handleClick(clickType: ClickType, player: Player, event: InventoryClickEvent) {
-            ItemCatalogMenuStack.push(viewer, CategoryMenu(category, viewer))
+            CatalogItemMenuStacks.pop(player)
         }
-
     }
 
 }

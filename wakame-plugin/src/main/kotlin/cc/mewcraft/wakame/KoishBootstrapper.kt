@@ -44,7 +44,7 @@ lateinit var KOISH_JAR: Path private set
 internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
 @get:JvmName("getLogger")
-val LOGGER: ComponentLogger by KoishLoggerHolder
+val LOGGER: ComponentLogger by KoishLoggerProvider
 
 internal class KoishBootstrapper : PluginBootstrap {
     init {
@@ -66,7 +66,7 @@ internal class KoishBootstrapper : PluginBootstrap {
         }
 
         LIFECYCLE_MANAGER = context.lifecycleManager
-        KoishLoggerHolder.set(context.logger)
+        KoishLoggerProvider.set(context.logger)
         KOISH_NAME = context.pluginMeta.name
         KOISH_VERSION = Version(context.pluginMeta.version)
         KOISH_JAR = context.pluginSource
@@ -123,7 +123,7 @@ internal class KoishBootstrapper : PluginBootstrap {
     }
 }
 
-private object KoishLoggerHolder {
+private object KoishLoggerProvider {
     private var LOGGER: ComponentLogger? = null
 
     init {

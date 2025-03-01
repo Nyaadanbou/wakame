@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.catalog.item.Category
+import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -14,18 +14,18 @@ import org.incendo.cloud.parser.ArgumentParser
 import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
-internal class ItemCatalogCategoryParser<C : Any> : ArgumentParser<C, Category>, BlockingSuggestionProvider.Strings<C> {
+internal class ItemCatalogCategoryParser<C : Any> : ArgumentParser<C, CatalogItemCategory>, BlockingSuggestionProvider.Strings<C> {
     companion object Factory {
-        fun <C : Any> categoryParser(): ParserDescriptor<C, Category> {
-            return ParserDescriptor.of(ItemCatalogCategoryParser(), typeTokenOf<Category>())
+        fun <C : Any> categoryParser(): ParserDescriptor<C, CatalogItemCategory> {
+            return ParserDescriptor.of(ItemCatalogCategoryParser(), typeTokenOf<CatalogItemCategory>())
         }
 
-        fun <C : Any> categoryComponent(): CommandComponent.Builder<C, Category> {
-            return CommandComponent.builder<C, Category?>().parser(categoryParser())
+        fun <C : Any> categoryComponent(): CommandComponent.Builder<C, CatalogItemCategory> {
+            return CommandComponent.builder<C, CatalogItemCategory?>().parser(categoryParser())
         }
     }
 
-    override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<Category> {
+    override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<CatalogItemCategory> {
         val peekStr = commandInput.peekString()
         if (peekStr !in KoishRegistries.ITEM_CATEGORY.ids.map(Identifier::value)) {
             return ArgumentParseResult.failure(ItemCatalogCategoryParseException(commandContext))

@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.catalog.item.CatalogRecipe
-import cc.mewcraft.wakame.catalog.item.CatalogRecipeType
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXNeko
 import cc.mewcraft.wakame.core.ItemXNoOp
@@ -25,7 +23,7 @@ typealias MojangNestedLootTable = net.minecraft.world.level.storage.loot.entries
 typealias MojangTagEntry = net.minecraft.world.level.storage.loot.entries.TagEntry
 typealias MojangBuiltInRegistries = net.minecraft.core.registries.BuiltInRegistries
 
-data class LootTableRecipe(
+data class CatalogItemLootTableRecipe(
     /**
      * 战利品表在数据包中对应的路径.
      * 以此作为战利品表的唯一标识.

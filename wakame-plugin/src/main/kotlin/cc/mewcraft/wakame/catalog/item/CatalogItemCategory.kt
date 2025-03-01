@@ -19,7 +19,7 @@ import java.lang.reflect.Type
 /**
  * 物品图鉴中展示的一个物品类别.
  */
-data class Category(
+data class CatalogItemCategory(
     val id: Identifier,
     val icon: Key,
     val menuSettings: BasicMenuSettings,
@@ -28,11 +28,11 @@ data class Category(
 )
 
 /**
- * [Category] 的序列化器.
+ * [CatalogItemCategory] 的序列化器.
  */
-internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
+internal object CategorySerializer : TypeSerializer<CatalogItemCategory>, KoinComponent {
 
-    override fun deserialize(type: Type, node: ConfigurationNode): Category {
+    override fun deserialize(type: Type, node: ConfigurationNode): CatalogItemCategory {
         val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(
             "The hint ${RepresentationHints.CATAGORY_ID.identifier()} is not present"
         )
@@ -53,7 +53,7 @@ internal object CategorySerializer : TypeSerializer<Category>, KoinComponent {
             }
             itemList.add(item)
         }
-        return Category(id, icon, settings, permission, itemList)
+        return CatalogItemCategory(id, icon, settings, permission, itemList)
     }
 
 }
