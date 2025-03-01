@@ -280,7 +280,6 @@ internal object ImaginaryKoishStackRegistry {
 
 }
 
-
 /**
  * Common implementations related to [NekoStack].
  */
@@ -382,8 +381,8 @@ internal object KoishStackImplementations {
                 return null
             }
         } else {
-            if (!includeProxies) return null
             // 如果没有萌芽 NBT, 并且没有对应的物品模板, 则看该物品是否存在一个原版物品的萌芽投影
+            if (!includeProxies) return null
             val imaginary = ImaginaryKoishStackRegistry.get(CraftItemType.minecraftToBukkit(itemstack.item))
             if (imaginary == null) return null
             return VanillaKoishStack(imaginary, itemstack)
@@ -401,14 +400,14 @@ internal object KoishStackImplementations {
     }
 
     /**
-     * 返回值只允许读, 如直接修改将破坏物品组件系统的契约.
+     * 返回值只允许读, 如直接修改将破坏 NMS Data Component 关于不可变性的契约.
      */
     fun getNbt(itemstack: MojangStack): CompoundTag? {
         return itemstack.nbt?.getCompoundOrNull(KOISH_FIELD)
     }
 
     /**
-     * 返回值只允许读, 如直接修改将破坏物品组件系统的契约.
+     * 返回值只允许读, 如直接修改将破坏 NMS Data Component 关于不可变性的契约.
      */
     fun getNbtOrThrow(itemstack: MojangStack): CompoundTag {
         return getNbt(itemstack) ?: error("Cannot find NBT compound '$KOISH_FIELD' on item")

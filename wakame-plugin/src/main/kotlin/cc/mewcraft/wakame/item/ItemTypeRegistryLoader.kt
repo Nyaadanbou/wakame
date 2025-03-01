@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -35,7 +36,6 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
     ]
 )
 object ItemTypeRegistryLoader : RegistryConfigStorage {
-    const val DIR_PATH = "item/"
 
     /**
      * 命名空间 `minecraft` 下的物品仅用于实现原版套皮物品,
@@ -80,7 +80,7 @@ object ItemTypeRegistryLoader : RegistryConfigStorage {
             }
         }
 
-        for ((file, namespace, path) in NamespacedFileTreeWalker(getFileInConfigDirectory(DIR_PATH), fileExtension = "yml", includeFullPath = true)) {
+        for ((file, namespace, path) in NamespacedFileTreeWalker(getFileInConfigDirectory("item/"), fileExtension = "yml", includeFullPath = true)) {
             val rootNode = loader.buildAndLoadString(file.readText())
             val id = Identifier.key(namespace, path)
             try {
@@ -91,6 +91,7 @@ object ItemTypeRegistryLoader : RegistryConfigStorage {
                 }
                 registryAction(id, item)
             } catch (e: Exception) {
+                LOGGER.error("An error occurred while loading file: {}", file.path)
                 Util.pauseInIde(e)
             }
         }

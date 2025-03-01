@@ -18,7 +18,7 @@ class ItemXVanilla(
     }
 
     override fun createItemStack(amount: Int, player: Player?): ItemStack? {
-        return Material.matchMaterial(identifier, false)?.let(::ItemStack)
+        return Material.matchMaterial(identifier, false)?.let { mat -> ItemStack(mat, amount) }
     }
 
     override fun matches(itemStack: ItemStack): Boolean {

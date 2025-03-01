@@ -37,7 +37,7 @@ internal class CraftingStationMenu(
      * 该菜单的布局
      */
     private val settings: BasicMenuSettings
-        get() = station.primaryLayout
+        get() = station.primaryMenuSettings
 
     /**
      * 合成站的会话.
@@ -49,17 +49,17 @@ internal class CraftingStationMenu(
     /**
      * 合成站菜单的 [Gui].
      *
-     * - `x`: background
-     * - `.`: recipe
+     * - `.`: background
+     * - `x`: recipe
      * - `<`: prev_page
      * - `>`: next_page
      */
     private val primaryGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('x', BackgroundItem())
+        builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
-        builder.addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
+        builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
     }
 
     /**

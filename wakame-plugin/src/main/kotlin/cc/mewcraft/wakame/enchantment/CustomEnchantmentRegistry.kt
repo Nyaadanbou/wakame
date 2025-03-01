@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.enchantment
 
 import cc.mewcraft.wakame.enchantment.CustomEnchantmentRegistry.get
 import cc.mewcraft.wakame.enchantment.wrapper.implementation.*
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.enchantments.Enchantment
@@ -57,28 +58,15 @@ private object CustomEnchantmentInternals {
         register(Cleave())
         register(DeepSearch())
         register(Disarray())
-        register(ElementDamage("earth"))
-        register(ElementPenetration("earth"))
-        register(ElementProtection("earth"))
-        register(ElementDamage("fire"))
-        register(ElementPenetration("fire"))
-        register(ElementProtection("fire"))
-        register(ElementDamage("neutral"))
-        register(ElementPenetration("neutral"))
-        register(ElementProtection("neutral"))
-        register(ElementDamage("thunder"))
-        register(ElementPenetration("thunder"))
-        register(ElementProtection("thunder"))
-        register(ElementDamage("water"))
-        register(ElementPenetration("water"))
-        register(ElementProtection("water"))
-        register(ElementDamage("wind"))
-        register(ElementPenetration("wind"))
-        register(ElementProtection("wind"))
         register(Pinpoint())
         register(Quake())
         register(Smite())
         register(SweepingEdge())
         register(Vitality())
+        for (elementType in KoishRegistries.ELEMENT) {
+            register(ElementDamage(elementType.stringId))
+            register(ElementPenetration(elementType.stringId))
+            register(ElementProtection(elementType.stringId))
+        }
     }
 }

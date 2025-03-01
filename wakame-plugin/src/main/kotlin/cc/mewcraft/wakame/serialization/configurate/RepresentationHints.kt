@@ -11,13 +11,19 @@ import kotlin.reflect.KClass
 object RepresentationHints {
 
     @JvmField
-    val KIZAMI_ID = of("kizami_id", Identifier::class)
+    val KIZAMI_ID = create<Identifier>("kizami_id")
 
-    fun <T : Any> of(key: String, type: KClass<T>): RepresentationHint<T> {
+    @JvmField
+    val CATAGORY_ID = create<Identifier>("category_id")
+
+    @JvmField
+    val MINECRAFT_RECIPE_ID = create<Identifier>("minecraft_recipe_id")
+
+    private fun <T : Any> create(key: String, type: KClass<T>): RepresentationHint<T> {
         return RepresentationHint.of(key, type.java)
     }
 
-    inline fun <reified T : Any> of(key: String): RepresentationHint<T> {
+    private inline fun <reified T : Any> create(key: String): RepresentationHint<T> {
         return RepresentationHint.of(key, typeTokenOf())
     }
 }

@@ -17,7 +17,7 @@ import java.util.stream.Stream
  * 合成配方的输出.
  * 表现为合成输出gui中一格的物品.
  */
-interface RecipeResult : Examinable {
+sealed interface RecipeResult : Examinable {
     fun toBukkitItemStack(): ItemStack
 }
 
@@ -26,7 +26,7 @@ interface RecipeResult : Examinable {
  * 正常配方必然存在输出.
  * 此单例仅作特殊用途.
  */
-object EmptyRecipeResult : RecipeResult {
+data object EmptyRecipeResult : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
         return ItemStack(Material.AIR)
     }
@@ -36,18 +36,18 @@ object EmptyRecipeResult : RecipeResult {
  * 单物品输出.
  */
 data class SingleRecipeResult(
-    val result: ItemX,
+    val item: ItemX,
     val amount: Int,
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
-        val itemstack = result.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${result.key}'")
-        itemstack.setData(DataComponentTypes.ITEM_MODEL, result.key)
+        val itemstack = item.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${item.key}'")
+        itemstack.setData(DataComponentTypes.ITEM_MODEL, item.key)
         itemstack.amount = amount
         return itemstack
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("result", result),
+        ExaminableProperty.of("item", item),
         ExaminableProperty.of("amount", amount),
     )
 

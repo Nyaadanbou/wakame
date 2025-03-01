@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.core
 
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -70,6 +71,51 @@ sealed interface ItemX : Keyed, Examinable {
      * 该物品的展示名字. 字符串为 MiniMessage string, 用作展示给玩家.
      */
     fun displayName(): String
+}
+
+/**
+ * 无操作的 [ItemX].
+ * 仅用于占位.
+ */
+object ItemXNoOp : ItemX {
+    override val plugin: String = "internal"
+    override val identifier: String = "noop"
+    override fun valid(): Boolean {
+        throwUoe()
+    }
+
+    override fun matches(itemStack: ItemStack): Boolean {
+        throwUoe()
+    }
+
+    override fun createItemStack(amount: Int, player: Player?): ItemStack? {
+        throwUoe()
+    }
+
+    override fun displayName(): String {
+        throwUoe()
+    }
+
+    private fun throwUoe(): Nothing = throw UnsupportedOperationException("This class does not support this operation")
+
+    override val key: Key = Key.key(plugin, identifier)
+
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("plugin", plugin),
+        ExaminableProperty.of("identifier", identifier),
+    )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other)
+            return true
+        return other is ItemX &&
+                plugin == other.plugin &&
+                identifier == other.identifier
+    }
+
+    override fun hashCode(): Int = plugin.hashCode() + 31 * identifier.hashCode()
+
+    override fun toString(): String = toSimpleString()
 }
 
 /**

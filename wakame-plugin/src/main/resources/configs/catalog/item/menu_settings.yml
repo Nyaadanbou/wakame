@@ -1,0 +1,223 @@
+# 物品图鉴各菜单布局设置
+
+# 主菜单布局
+# 展示所有类别的菜单
+main:
+  title: "物品图鉴"
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # s: search
+  # x: category
+  structure:
+    - ". . . . . . . . ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - ". x x x x x x x ."
+    - "< . . . s . . . >"
+  icons:
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"
+    search: "internal:menu/catalog/default/search"
+
+# 分页图鉴配方菜单布局
+# 展示一系列配方的菜单
+paged_catalog_recipes:
+  title: "写什么都无所谓, 标题取决于具体的配方菜单"
+  # x: catalog_recipe_gui
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # b: back
+  structure:
+    - "x x x x x x x x x"
+    - "x x x x x x x x x"
+    - "x x x x x x x x x"
+    - "x x x x x x x x x"
+    - "x x x x x x x x x"
+    - "< . . . b . . . >"
+  icons:
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"
+    back: "internal:menu/common/default/back"
+
+# 各配方菜单布局
+# structure要与上面设置的x区域的格子面积相等
+# 否则将导致显示不全
+
+# 高炉配方
+blasting_recipe:
+  title: "高炉烧炼"
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ."
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
+
+# 营火配方
+campfire_recipe:
+  title: "营火烧炼"
+  # .: background
+  # i: input
+  # o: output
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ."
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
+
+# 熔炉配方
+furnace_recipe:
+  title: "熔炉烧炼"
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ."
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
+
+# 有序合成配方
+shaped_recipe:
+  title: "工作台有序合成"
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+
+# 无序合成配方
+shapeless_recipe:
+  title: "工作台无序合成"
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+
+# 锻造台转化配方
+smithing_transform_recipe:
+  title: "锻造台"
+  # .: background
+  # b: input(base)
+  # t: input(template)
+  # a: input(addition)
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". t b a . . o . ."
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+
+# 锻造台纹饰配方
+smithing_trim_recipe:
+  title: "锻造台"
+  # .: background
+  # b: input(base)
+  # t: input(template)
+  # a: input(addition)
+  # r: trim_result
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". t b a . . r . ."
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+    trim_result: "internal:menu/catalog/default/trim_result"
+
+# 烟熏炉配方
+smoking_recipe:
+  title: "烟熏炉烧炼"
+  # .: background
+  # i: input
+  # o: output
+  # f: fuel
+  # !: cooking_info
+  structure:
+    - ". . . . . . . . ."
+    - ". . i . . . . . ."
+    - ". . ! . . . o . ."
+    - ". . f . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+    cooking_info: "internal:menu/catalog/default/cooking_info"
+    fuel: "internal:menu/catalog/default/fuel"
+
+# 切石机配方
+stonecutting_recipe:
+  title: "切石机"
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+    - ". . i . . . o . ."
+    - ". . . . . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/default/background"
+
+# 战利品表配方-箱子
+loot_table_recipe_chest:
+  title: "获取箱子中的战利品"
+  # .: background
+  # <: prev_page
+  # >: next_page
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". . . o o o o o ."
+    - ". i . o o o o o ."
+    - ". . . o o o o o ."
+    - ". . . < . . . > ."
+  icons:
+    background: "internal:menu/common/default/background"
+    prev_page: "internal:menu/catalog/default/prev_page"
+    next_page: "internal:menu/catalog/default/next_page"

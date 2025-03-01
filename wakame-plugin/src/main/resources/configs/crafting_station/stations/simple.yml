@@ -13,17 +13,17 @@ listing_layout:
 
   title: "示例合成站"
 
-  # x: background
-  # .: recipe
+  # .: background
+  # x: recipe
   # <: prev_page
   # >: next_page
   structure:
-    - "x x x x x x x x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x < x x x > x x"
+    - ". . . . . . . . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . < . . . > . ."
 
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
@@ -39,7 +39,7 @@ preview_layout:
 
   title: "合成预览"
 
-  # x: background
+  # .: background
   # i: input/choice
   # o: output/result
   # <: prev_page
@@ -47,12 +47,12 @@ preview_layout:
   # c: craft
   # b: back
   structure:
-    - "x x x x x x x x x"
-    - "x i i i i x x x x"
-    - "x i i i i x x o x"
-    - "x i i i i x x x x"
-    - "x < x x > x x c x"
-    - "x x x x b x x x x"
+    - ". . . . . . . . ."
+    - ". i i i i . . . ."
+    - ". i i i i . . o ."
+    - ". i i i i . . . ."
+    - ". < . . > . . c ."
+    - ". . . . b . . . ."
 
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
@@ -64,3 +64,20 @@ preview_layout:
     choice: "internal:menu/crafting_station/default/choice"
     craft: "internal:menu/crafting_station/default/craft"
     result: "internal:menu/crafting_station/default/result"
+
+catalog_menu_settings:
+
+  title: "面包机"
+
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+
+  icons:
+    background: "internal:menu/common/default/background"

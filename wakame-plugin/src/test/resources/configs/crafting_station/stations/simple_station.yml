@@ -1,33 +1,55 @@
 type: simple
 
+# 出现在该合成站里的配方列表
+# 确保这些配方都已在 stations/crafting/recipes/{命名空间} 目录下注册
 recipes:
   - test:raw_bronze
   - test:amethyst_dust
 
-listing_layout:
-  title: "Listing"
+
+listing_menu_settings:
+  title: "<b>示例合成站"
+
+  # .: background
+  # x: recipe
+  # <: prev_page
+  # >: next_page
   structure:
-    - "x x x x x x x x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x . . . . . x x"
-    - "x x < x x x > x x"
+    - ". . . . . . . . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . x x x x x . ."
+    - ". . < . . . > . ."
+
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
     background: "internal:menu/common/background"
     prev_page: "internal:menu/common/prev_page"
     next_page: "internal:menu/common/next_page"
     listing: "internal:menu/crafting/listing"
 
-preview_layout:
-  title: "Preview"
+preview_menu_settings:
+  title: "<b>合成预览"
+
+  # .: background
+  # i: input/choice
+  # o: output/result
+  # <: prev_page
+  # >: next_page
+  # c: craft
+  # b: back
   structure:
-    - "x x x x x x x x x"
-    - "x i i i i x x x x"
-    - "x i i i i x x o x"
-    - "x i i i i x x x x"
-    - "x < x x > x x c x"
-    - "x x x x b x x x x"
+    - ". . . . . . . . ."
+    - ". i i i i . . . ."
+    - ". i i i i . . o ."
+    - ". i i i i . . . ."
+    - ". < . . > . . c ."
+    - ". . . . b . . . ."
+
+  # 直接写物品的命名空间路径
+  # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
     back: "internal:menu/common/back"
     background: "internal:menu/common/background"
@@ -36,3 +58,17 @@ preview_layout:
     choice: "internal:menu/crafting/choice"
     craft: "internal:menu/crafting/craft"
     result: "internal:menu/crafting/result"
+
+catalog_menu_settings:
+  title: "示例合成站"
+  # .: background
+  # i: input
+  # o: output
+  structure:
+    - ". . . . . . . . ."
+    - ". i i i . . . . ."
+    - ". i i i . . o . ."
+    - ". i i i . . . . ."
+    - ". . . . . . . . ."
+  icons:
+    background: "internal:menu/common/background"
