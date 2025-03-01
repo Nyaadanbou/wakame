@@ -39,12 +39,12 @@ internal class CraftingPreviewMenu(
      * 该菜单的基本设置.
      */
     private val settings: BasicMenuSettings
-        get() = parent.station.previewLayout
+        get() = parent.station.previewMenuSettings
 
     /**
      * 合成站配方预览菜单的 [Gui].
      *
-     * - 'x': background
+     * - '.': background
      * - 'i': input/choices
      * - 'o': output/result
      * - '<': prev_page
@@ -54,7 +54,7 @@ internal class CraftingPreviewMenu(
      */
     private val previewGui: PagedGui<Item> = PagedGui.items { builder ->
         builder.setStructure(*settings.structure)
-        builder.addIngredient('x', BackgroundItem())
+        builder.addIngredient('.', BackgroundItem())
         builder.addIngredient('<', PrevItem())
         builder.addIngredient('>', NextItem())
         builder.addIngredient('c', CraftItem(recipe))

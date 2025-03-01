@@ -19,8 +19,9 @@ import java.lang.reflect.Type
  */
 internal sealed interface CraftingStation : Iterable<Recipe> {
     val id: String
-    val primaryLayout: BasicMenuSettings
-    val previewLayout: BasicMenuSettings
+    val primaryMenuSettings: BasicMenuSettings
+    val previewMenuSettings: BasicMenuSettings
+    val catalogMenuSettings: BasicMenuSettings
     fun addRecipe(recipe: Recipe): Boolean
     fun removeRecipe(key: Key): Recipe?
 }
@@ -30,13 +31,12 @@ internal sealed interface CraftingStation : Iterable<Recipe> {
  */
 internal class SimpleCraftingStation(
     override val id: String,
-    override val primaryLayout: BasicMenuSettings,
-    override val previewLayout: BasicMenuSettings,
+    override val primaryMenuSettings: BasicMenuSettings,
+    override val previewMenuSettings: BasicMenuSettings,
+    override val catalogMenuSettings: BasicMenuSettings,
 ) : CraftingStation {
     companion object {
         const val TYPE = "simple"
-        val STATION_STRUCTURE_LEGAL_CHARS = charArrayOf('x', '.', '<', '>')
-        val PREVIEW_STRUCTURE_LEGAL_CHARS = charArrayOf('x', 'i', 'o', 'c', 'b', '<', '>')
     }
 
     private val recipes: MutableMap<Key, Recipe> = mutableMapOf()
@@ -70,28 +70,13 @@ internal object StationSerializer : TypeSerializer<CraftingStation> {
         when (stationType) {
             SimpleCraftingStation.TYPE -> {
                 // 获取合成站菜单布局
-                val stationLayout = node.node("listing_layout").require<BasicMenuSettings>().apply {
-                    val illegalChars = this.structure.map { it.toCharArray() }
-                        .reduce { acc, chars -> acc + chars }
-                        .distinct()
-                        .filter { !SimpleCraftingStation.STATION_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
-                    if (illegalChars.isNotEmpty()) {
-                        throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station menu structure")
-                    }
-                }
-
+                val stationMenuSettings = node.node("listing_menu_settings").require<BasicMenuSettings>()
                 // 获取合成站预览菜单布局
-                val previewLayout = node.node("preview_layout").require<BasicMenuSettings>().apply {
-                    val illegalChars = this.structure.map { it.toCharArray() }
-                        .reduce { acc, chars -> acc + chars }
-                        .distinct()
-                        .filter { !SimpleCraftingStation.PREVIEW_STRUCTURE_LEGAL_CHARS.contains(it) && it != ' ' }
-                    if (illegalChars.isNotEmpty()) {
-                        throw SerializationException("the chars [${illegalChars.joinToString(separator = ", ", prefix = "'", postfix = "'")}] are illegal in the station preview menu structure")
-                    }
-                }
+                val previewMenuSettings = node.node("preview_menu_settings").require<BasicMenuSettings>()
+                // 获取合成站在图鉴中展示时使用的图鉴菜单布局
+                val catalogMenuSettings = node.node("catalog_menu_settings").require<BasicMenuSettings>()
 
-                val station = SimpleCraftingStation(id, stationLayout, previewLayout)
+                val station = SimpleCraftingStation(id, stationMenuSettings, previewMenuSettings, catalogMenuSettings)
 
                 // 向合成站添加配方
                 val recipeKeys = node.node("recipes").getList<Key>(emptyList())
