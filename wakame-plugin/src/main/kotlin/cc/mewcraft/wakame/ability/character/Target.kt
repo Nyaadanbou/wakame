@@ -7,12 +7,15 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.Location
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import java.lang.ref.WeakReference
+import java.util.*
 import java.util.stream.Stream
 import org.bukkit.Location as BukkitLocation
 import org.bukkit.entity.LivingEntity as BukkitLivingEntity
 
 sealed interface Target {
     val bukkitLocation: BukkitLocation
+    val uniqueId: UUID?
     val bukkitEntity: BukkitLivingEntity?
 }
 
@@ -41,6 +44,8 @@ object TargetAdapter {
 private value class BukkitLocationTarget(
     override val bukkitLocation: Location,
 ) : Target, Examinable {
+    override val uniqueId: UUID?
+        get() = null
     override val bukkitEntity: LivingEntity?
         get() = null
 
@@ -55,10 +60,13 @@ private value class BukkitLocationTarget(
     }
 }
 
-@JvmInline
-private value class BukkitLivingEntityTarget(
-    override val bukkitEntity: LivingEntity,
+private class BukkitLivingEntityTarget(
+    entity: BukkitLivingEntity
 ) : Target, Examinable {
+    private val weakEntity: WeakReference<BukkitLivingEntity> = WeakReference(entity)
+    override val uniqueId: UUID = entity.uniqueId
+    override val bukkitEntity: BukkitLivingEntity
+        get() = weakEntity.get() ?: error("LivingEntity $uniqueId not found")
     override val bukkitLocation: Location
         get() = bukkitEntity.location
 

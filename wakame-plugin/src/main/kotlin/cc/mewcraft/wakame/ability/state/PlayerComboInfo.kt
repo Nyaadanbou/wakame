@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.ability.state
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
-import cc.mewcraft.wakame.ability.abilityWorldInteraction
-import cc.mewcraft.wakame.ability.state.display.StateDisplay
+import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
+import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
@@ -24,9 +23,9 @@ import java.lang.ref.WeakReference
 import java.util.stream.Stream
 
 /**
- * 表示玩家技能状态的空闲状态(无施法), 即玩家可以使用技能.
+ * 玩家打出 Combo 的具体内部实现.
  */
-class PlayerStateInfo(
+class PlayerComboInfo(
     player: Player,
 ) : Examinable {
     private val weakPlayer: WeakReference<Player> = WeakReference(player)
@@ -38,7 +37,7 @@ class PlayerStateInfo(
         .filter { it.player == player }
         .handler { event ->
             if (event.player == player) {
-                stateDisplay.displayNoEnoughMana(player)
+                PlayerComboInfoDisplay.displayNoEnoughMana(player)
             }
         }
 
@@ -46,7 +45,7 @@ class PlayerStateInfo(
         .filter { it.player == player }
         .handler { event ->
             if (event.player == player) {
-                stateDisplay.displayManaCost(event.manaCost, player)
+                PlayerComboInfoDisplay.displayManaCost(event.manaCost, player)
             }
         }
 
@@ -55,8 +54,6 @@ class PlayerStateInfo(
 
         private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
-
-        private val stateDisplay: StateDisplay<Player> by Injector.inject()
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
@@ -65,33 +62,32 @@ class PlayerStateInfo(
     private val mechanicName = "PlayerStateInfoResetMechanic-${player.uniqueId}"
     private val resetMechanic: Mechanic = PlayerStateInfoResetMechanic(this)
 
-    fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
+    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
-        // Sequence trigger abilities
-        if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
-            val sequenceAbility = trySequenceAbility(castTrigger)
-            if (sequenceAbility != null) {
-                stateDisplay.displaySuccess(currentSequence.readAll(), player)
-                currentSequence.clear()
-                WakameWorld.removeMechanic(mechanicName)
-                markNextState(sequenceAbility)
-                return AbilityStateResult.CANCEL_EVENT
-            }
-        }
-
-        // Single trigger abilities
+        // 尝试找到使用当前触发器能够触发的技能
         val singleAbility = getAbilityByTrigger(castTrigger)
         if (singleAbility != null) {
             WakameWorld.removeMechanic(mechanicName)
             markNextState(singleAbility)
-            return AbilityStateResult.CANCEL_EVENT
+            return PlayerComboResult.CANCEL_EVENT
         }
 
-        return AbilityStateResult.SILENT_FAILURE
+        // 尝试找到使用当前 combo 能够触发的技能
+        if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
+            val sequenceAbility = trySequenceAbility(castTrigger)
+            if (sequenceAbility != null) {
+                PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
+                WakameWorld.removeMechanic(mechanicName)
+                markNextState(sequenceAbility)
+                return PlayerComboResult.CANCEL_EVENT
+            }
+        }
+
+        return PlayerComboResult.SILENT_FAILURE
     }
 
-    private fun markNextState(ability: Ability) = abilityWorldInteraction {
+    private fun markNextState(ability: Ability) = playerAbilityWorldInteraction {
         val abilityName = ability.key.asString()
         val costPenalty = penalizeManaCost(abilityName)
         player.setCostPenalty(abilityName, costPenalty)
@@ -108,7 +104,7 @@ class PlayerStateInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleTrigger): Ability? = abilityWorldInteraction {
+    private fun trySequenceAbility(trigger: SingleTrigger): Ability? = playerAbilityWorldInteraction {
         val triggerTypes = player.getAllActiveAbilityTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
@@ -129,14 +125,15 @@ class PlayerStateInfo(
             currentSequence.write(trigger)
             WakameWorld.addMechanic(mechanicName, resetMechanic)
             val completeSequence = currentSequence.readAll()
-            stateDisplay.displayProgress(completeSequence, player)
+            PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
                 val abilityOnSequence = sequence?.let { getAbilityByTrigger(it) }
+                // 如果成功，则清除当前序列
+                currentSequence.clear()
                 if (abilityOnSequence == null) {
-                    currentSequence.clear()
-                    stateDisplay.displayFailure(completeSequence, player)
+                    PlayerComboInfoDisplay.displayFailure(completeSequence, player)
                     return null
                 }
                 return abilityOnSequence
@@ -146,7 +143,7 @@ class PlayerStateInfo(
         return null
     }
 
-    private fun getAbilityByTrigger(trigger: Trigger): Ability? = abilityWorldInteraction {
+    private fun getAbilityByTrigger(trigger: Trigger): Ability? = playerAbilityWorldInteraction {
         val abilities = player.getAbilityBy(trigger)
         if (abilities.size > 1) {
             LOGGER.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
@@ -158,8 +155,7 @@ class PlayerStateInfo(
         currentSequence.clear()
     }
 
-    fun cleanup() = abilityWorldInteraction {
-        player.cleanupAbility()
+    fun cleanup() = playerAbilityWorldInteraction {
         manaNoEnoughSubscription.close()
         manaCostSubscription.close()
     }

@@ -201,7 +201,7 @@ internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
     override fun onEnd(player: Player) {
         // 清空技能状态.
         val user = player.toUser()
-        user.abilityState.reset()
+        user.combo.reset()
     }
 
     private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {

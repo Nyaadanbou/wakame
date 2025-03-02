@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.state.AbilityState
+import cc.mewcraft.wakame.ability.state.PlayerCombo
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.kizami.KizamiMap
@@ -61,9 +61,9 @@ interface User<P> {
     val resourceMap: ResourceMap
 
     /**
-     * The Ability State Manager of the player.
+     * 玩家连招的管理器.
      */
-    val abilityState: AbilityState<P>
+    val combo: PlayerCombo
 
     /**
      * The Attack Speed of the player.

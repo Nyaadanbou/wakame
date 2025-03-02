@@ -14,32 +14,9 @@ import java.util.stream.Stream
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-/**
- * 技能状态
- */
-sealed interface AbilityState<U> : Examinable {
-    val user: User<U>
-
-    /**
-     * 添加一次技能触发
-     */
-    fun addTrigger(trigger: SingleTrigger): AbilityStateResult
-
-    /**
-     * 将技能状态恢复为默认
-     */
-    fun reset()
-
-    fun cleanup()
-}
-
-fun AbilityState(user: User<Player>): AbilityState<Player> {
-    return PlayerAbilityState(user.uniqueId)
-}
-
-class PlayerAbilityState(
+class PlayerCombo(
     private val uniqueId: UUID,
-) : AbilityState<Player>, Examinable {
+) : Examinable {
     companion object {
         private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
             listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
@@ -49,24 +26,24 @@ class PlayerAbilityState(
 
     private val player: Player
         get() = requireNotNull(SERVER.getPlayer(uniqueId))
-    override val user: User<Player>
+    val user: User<Player>
         get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
-    private var stateInfo: PlayerStateInfo by AbilityStateProvider { PlayerStateInfo(player) }
+    private var comboDisplay: PlayerComboInfo by ComboDisplayProvider { PlayerComboInfo(player) }
 
-    override fun addTrigger(trigger: SingleTrigger): AbilityStateResult {
+    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
         if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
-            return AbilityStateResult.SILENT_FAILURE
+            return PlayerComboResult.SILENT_FAILURE
         }
-        return stateInfo.addTrigger(trigger)
+        return comboDisplay.addTrigger(trigger)
     }
 
-    override fun reset() {
+    fun reset() {
         cooldown.reset()
     }
 
-    override fun cleanup() {
-        stateInfo.cleanup()
+    fun cleanup() {
+        comboDisplay.cleanup()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -80,16 +57,16 @@ class PlayerAbilityState(
     }
 }
 
-private class AbilityStateProvider(
-    private val initializer: () -> PlayerStateInfo
-) : ReadWriteProperty<Any, PlayerStateInfo> {
-    private var stateInfo: PlayerStateInfo? = null
+private class ComboDisplayProvider(
+    private val initializer: () -> PlayerComboInfo
+) : ReadWriteProperty<Any, PlayerComboInfo> {
+    private var stateInfo: PlayerComboInfo? = null
 
-    override fun getValue(thisRef: Any, property: KProperty<*>): PlayerStateInfo {
+    override fun getValue(thisRef: Any, property: KProperty<*>): PlayerComboInfo {
         return stateInfo ?: initializer().also { stateInfo = it }
     }
 
-    override fun setValue(thisRef: Any, property: KProperty<*>, value: PlayerStateInfo) {
+    override fun setValue(thisRef: Any, property: KProperty<*>, value: PlayerComboInfo) {
         stateInfo = value
     }
 }

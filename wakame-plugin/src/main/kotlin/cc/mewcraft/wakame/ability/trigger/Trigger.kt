@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import xyz.xenondevs.commons.collections.contentEquals
 import java.util.stream.Stream
 
 /**
@@ -116,7 +115,12 @@ enum class SequenceTrigger(
         }
 
         fun fromSingleTriggers(triggers: List<SingleTrigger>): SequenceTrigger? {
-            return SequenceTrigger.entries.find { it.triggers.contentEquals(triggers) }
+            return entries.find { it.triggers.contentEquals(triggers) }
+        }
+
+        private fun <E> List<E>.contentEquals(other: List<E>): Boolean {
+            if (this.size != other.size) return false
+            return this.indices.all { this[it] == other[it] }
         }
     }
 }

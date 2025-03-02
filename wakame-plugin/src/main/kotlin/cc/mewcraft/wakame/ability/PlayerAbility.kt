@@ -29,22 +29,6 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-
-/**
- * 本函数用于直接构建 [PlayerAbility].
- *
- * @param id 技能的唯一标识, 也就是 [PlayerAbility.id]
- * @param trigger 触发此技能的触发器
- * @param variant 可以触发此技能的物品变体
- *
- * @return 构建的 [PlayerAbility]
- */
-fun PlayerAbility(
-    id: Key, trigger: Trigger, variant: TriggerVariant, manaCost: Evaluable<*>,
-): PlayerAbility {
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
-}
-
 /**
  * 本函数用于从 NBT 构建 [PlayerAbility].
  *
@@ -67,7 +51,7 @@ fun PlayerAbility(
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
     val manaCost = tag.readEvaluable()
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
+    return PlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -93,7 +77,7 @@ fun PlayerAbility(
     val trigger = node.node("trigger").get<Trigger>()
     val variant = node.node("variant").require<TriggerVariant>()
     val manaCost = node.node("mana_cost").require<Evaluable<*>>()
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
+    return PlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -107,78 +91,20 @@ fun PlayerAbility(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
-// TODO 改成 class, 不要 interface - 此处接口没有实际作用
-interface PlayerAbility {
-    /**
-     * 技能的唯一标识.
-     */
-    val id: Key
-
-    /**
-     * 触发此技能的触发器.
-     */
-    val trigger: Trigger?
-
-    /**
-     * 可以触发此技能的物品变体.
-     */
-    val variant: TriggerVariant
-
-    /**
-     * 获取对应的 [Ability] 实例.
-     */
+data class PlayerAbility(
+    val id: Key,
+    val trigger: Trigger?,
+    val variant: TriggerVariant,
+    val manaCost: Evaluable<*>,
+) {
     val instance: Ability
-
-    /**
-     * 技能的法力消耗.
-     */
-    val manaCost: Evaluable<*>
-
-    /**
-     * 技能的显示名称.
-     */
-    val displayName: Component
-
-    /**
-     * 技能的完整描述.
-     */
-    val description: List<Component>
-
-    /**
-     * 使用 [caster] 记录技能的信息到 ECS 中.
-     */
-    fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?)
-
-    /**
-     * 将此对象序列化为 NBT, 拥有以下结构:
-     *
-     * ```NBT
-     * string('trigger'): <trigger>
-     * int('variant'): <variant>
-     * ```
-     *
-     * 请注意本序列化不包含 [id].
-     */
-    fun saveNbt(): CompoundTag
-}
-
-/**
- * [PlayerAbility] 的标准实现.
- */
-internal data class SimplePlayerAbility(
-    override val id: Key,
-    override val trigger: Trigger?,
-    override val variant: TriggerVariant,
-    override val manaCost: Evaluable<*>,
-) : PlayerAbility {
-    override val instance: Ability
         get() = KoishRegistries.ABILITY.getOrThrow(id)
-    override val displayName: Component
+    val displayName: Component
         get() = instance.displays.name.mini
-    override val description: List<Component>
+    val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    override fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
+    fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val target = target ?: TargetAdapter.adapt(caster)
         val input = abilityInput(target) {
             castBy(CasterAdapter.adapt(caster))
@@ -189,7 +115,7 @@ internal data class SimplePlayerAbility(
         instance.recordBy(input)
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    fun saveNbt(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
         writeEvaluable(manaCost)

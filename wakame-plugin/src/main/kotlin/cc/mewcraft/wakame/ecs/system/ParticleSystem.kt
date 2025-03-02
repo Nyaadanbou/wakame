@@ -3,13 +3,12 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
 class ParticleSystem : IteratingSystem(
-    family = family { all(ParticleEffectComponent, TargetTo) }
+    family = family { all(ParticleEffectComponent) }
 ) {
     companion object {
         // 假设每个粒子路径可以分为 N 段，进度基于路径段
@@ -18,7 +17,6 @@ class ParticleSystem : IteratingSystem(
 
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]
-        val target = entity[TargetTo].target
         for (particleInfo in particleEffectComponent.particleInfos) {
             val builderProvider = particleInfo.builderProvider
             val particlePath = particleInfo.particlePath
@@ -39,7 +37,7 @@ class ParticleSystem : IteratingSystem(
                 val position = particlePath.positionAtProgress(progress)
 
                 // 使用 ParticleBuilder 生成粒子效果
-                builderProvider.invoke(position.toLocation(target.bukkitLocation.world)).spawn()
+                builderProvider.invoke(position.toLocation(particleEffectComponent.bukkitWorld)).spawn()
             }
 
             // 触发成功生成粒子效果后，减少剩余次数

@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
+import java.lang.ref.WeakReference
 import java.util.*
 import java.util.stream.Stream
 import org.bukkit.entity.Entity as BukkitEntity
@@ -45,12 +46,14 @@ val Caster.user: User<*>?
 
 /* Implementations */
 
-@JvmInline
-private value class SimpleCaster(
-    override val entity: BukkitEntity,
+private class SimpleCaster(
+    entity: BukkitEntity
 ) : Caster, Examinable {
-    override val uniqueId: UUID
-        get() = entity.uniqueId
+    private val weakEntity: WeakReference<BukkitEntity> = WeakReference(entity)
+
+    override val entity: BukkitEntity
+        get() = weakEntity.get() ?: error("Entity $uniqueId not found.")
+    override val uniqueId: UUID = entity.uniqueId
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

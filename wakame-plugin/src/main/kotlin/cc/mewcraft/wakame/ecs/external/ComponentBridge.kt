@@ -1,18 +1,21 @@
 package cc.mewcraft.wakame.ecs.external
 
 import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityTag
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 
-// TODO: 改名成 ComponentBridge
 @JvmInline
-value class ComponentMap(
+value class ComponentBridge(
     val entity: Entity,
-) {
+) : Examinable {
     /**
      * 存放所有外部组件的键值对.
      *
@@ -60,7 +63,15 @@ value class ComponentMap(
         }
     }
 
+    override fun examinableProperties(): Stream<out ExaminableProperty?> {
+        return Stream.of(
+            ExaminableProperty.of("entity", entity),
+            ExaminableProperty.of("componentsMap", componentsMap),
+            ExaminableProperty.of("tags", tags)
+        )
+    }
+
     override fun toString(): String {
-        return "ComponentMap(entity=$entity, componentsMap=$componentsMap, tags=$tags)"
+        return toSimpleString()
     }
 }

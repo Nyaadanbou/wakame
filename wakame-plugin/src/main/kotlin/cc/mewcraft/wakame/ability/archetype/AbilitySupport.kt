@@ -5,9 +5,10 @@ import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.molang.Evaluable
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.entity.LivingEntity
 
 @DslMarker
@@ -20,19 +21,19 @@ internal inline fun <T> abilitySupport(run: AbilitySupport.() -> T): T = Ability
  */
 @AbilitySupportDsl
 internal object AbilitySupport {
-    fun ComponentMap.castBy(): Caster? {
+    fun ComponentBridge.castBy(): Caster? {
         return this[CastBy]?.caster
     }
 
-    fun ComponentMap.castByEntity(): LivingEntity? {
+    fun ComponentBridge.castByEntity(): LivingEntity? {
         return this[CastBy]?.caster?.entity as? LivingEntity
     }
 
-    fun ComponentMap.targetTo(): Target {
+    fun ComponentBridge.targetTo(): Target {
         return this[TargetTo]?.target ?: error("No entity found in TargetTo component")
     }
 
-    fun ComponentMap.evaluate(evaluable: Evaluable<*>): Double {
+    fun ComponentBridge.evaluate(evaluable: Evaluable<*>): Double {
         val engine = this[AbilityComponent]?.mochaEngine
         return if (engine != null) {
             evaluable.evaluate(engine)
@@ -41,16 +42,16 @@ internal object AbilitySupport {
         }
     }
 
-    fun ComponentMap.addParticle(vararg particleInfos: ParticleInfo) {
+    fun ComponentBridge.addParticle(bukkitWorld: World, vararg particleInfos: ParticleInfo) {
         val component = this[ParticleEffectComponent]
         if (component != null) {
             component.particleInfos.addAll(particleInfos)
         } else {
-            this += ParticleEffectComponent(*particleInfos)
+            this += ParticleEffectComponent(bukkitWorld, *particleInfos)
         }
     }
 
-    private var ComponentMap.tickCount: Double
+    private var ComponentBridge.tickCount: Double
         get() = this[TickCountComponent]?.tick ?: error("No TickCountComponent found")
         set(value) {
             this[TickCountComponent]?.tick = value

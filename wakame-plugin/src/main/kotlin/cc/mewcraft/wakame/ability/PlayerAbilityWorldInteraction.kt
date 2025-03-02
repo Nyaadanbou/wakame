@@ -12,21 +12,21 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 
-internal inline fun <T> abilityWorldInteraction(block: AbilityWorldInteraction.() -> T): T {
-    return AbilityWorldInteraction.block()
+internal inline fun <T> playerAbilityWorldInteraction(block: PlayerAbilityWorldInteraction.() -> T): T {
+    return PlayerAbilityWorldInteraction.block()
 }
 
 @DslMarker
-internal annotation class AbilityWorldInteractionDsl
+internal annotation class PlayerAbilityWorldInteractionDsl
 
 /**
  * 技能与 ECS 系统交互的工具类.
  */
-@AbilityWorldInteractionDsl
-internal object AbilityWorldInteraction : KoinComponent {
+@PlayerAbilityWorldInteractionDsl
+internal object PlayerAbilityWorldInteraction : KoinComponent {
     fun Player.getAbilityBy(trigger: Trigger): List<Ability> {
         val abilities = mutableListOf<Ability>()
-        FamilyDefinitions.ABILITY.forEach { entity ->
+        FamilyDefinitions.CASTER_ABILITY.forEach { entity ->
             if (entity[CastBy].caster.entity != this@getAbilityBy)
                 return@forEach
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
@@ -43,7 +43,7 @@ internal object AbilityWorldInteraction : KoinComponent {
 
     fun Player.getAllActiveAbilityTriggers(): Set<Trigger> {
         val triggers = mutableSetOf<Trigger>()
-        FamilyDefinitions.ABILITY.forEach { entity ->
+        FamilyDefinitions.CASTER_ABILITY.forEach { entity ->
             if (entity[CastBy].caster.entity != this@getAllActiveAbilityTriggers)
                 return@forEach
             entity[AbilityComponent].trigger?.let { triggers.add(it) }
@@ -53,7 +53,7 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setNextState(ability: Ability) {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.CASTER_ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setNextState)
                 return@editEntities
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
@@ -66,7 +66,7 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setCostPenalty(abilityId: String, penalty: ManaCostPenalty) {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.CASTER_ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setCostPenalty)
                 return@editEntities
             if (entity[IdentifierComponent].id != abilityId)
@@ -76,7 +76,7 @@ internal object AbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.cleanupAbility() {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        WakameWorld.editEntities(FamilyDefinitions.CASTER_ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@cleanupAbility)
                 return@editEntities
             WakameWorld.removeEntity(entity)

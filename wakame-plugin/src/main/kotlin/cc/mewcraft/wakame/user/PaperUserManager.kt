@@ -9,9 +9,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
-import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import java.util.*
@@ -63,6 +61,8 @@ internal object PaperUserManager : UserManager<Player> {
     }
 
     private fun unloadUser(player: Player) {
+        val user = userRepository.getIfPresent(player)
+        user?.cleanup()
         userRepository.invalidate(player)
     }
 

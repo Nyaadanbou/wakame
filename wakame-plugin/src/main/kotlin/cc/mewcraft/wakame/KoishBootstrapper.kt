@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.Configs
@@ -67,7 +66,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 guiModule(),
                 packModule(),
                 registryModule(),
-                abilityModule(),
                 worldModule(),
             )
         }

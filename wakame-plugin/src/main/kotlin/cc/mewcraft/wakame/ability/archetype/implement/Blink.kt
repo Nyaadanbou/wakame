@@ -6,16 +6,14 @@ import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.abilitySupport
-import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.text.mini
 import com.destroystokyo.paper.ParticleBuilder
@@ -56,8 +54,8 @@ private class BlinkAbilityMechanic(
 
     private var isTeleported: Boolean = false
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity()
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val entity = componentBridge.castByEntity()
 
         // 如果玩家面前方块过近, 无法传送
         if (entity?.getTargetBlockExact(3) != null) {
@@ -67,8 +65,8 @@ private class BlinkAbilityMechanic(
         return@abilitySupport TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val entity = componentBridge.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
         val location = entity.location.clone()
 
         // 计算目标位置
@@ -98,7 +96,8 @@ private class BlinkAbilityMechanic(
 
         entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
 
-        componentMap.addParticle(
+        componentBridge.addParticle(
+            bukkitWorld = target.world,
             ParticleInfo(
                 builderProvider = { loc ->
                     ParticleBuilder(Particle.END_ROD)
@@ -113,13 +112,12 @@ private class BlinkAbilityMechanic(
                 )
             )
         )
-        componentMap += TargetTo(TargetAdapter.adapt(target))
 
         return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val entity = componentBridge.castByEntity() ?: return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         if (!isTeleported) {
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
@@ -131,10 +129,9 @@ private class BlinkAbilityMechanic(
         return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickReset(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickReset(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
         isTeleported = false
-        componentMap -= ParticleEffectComponent
-        componentMap -= TargetTo
+        componentBridge -= ParticleEffectComponent
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 }

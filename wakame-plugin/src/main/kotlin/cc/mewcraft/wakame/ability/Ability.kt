@@ -6,8 +6,10 @@ import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -59,7 +61,11 @@ abstract class Ability(
                 mochaEngine = input.mochaEngine
             )
             it += Tags.DISPOSABLE
-            input.castBy?.let { castBy -> it += CastBy(castBy) }
+            it += MechanicComponent(mechanic(input))
+            input.castBy?.let { castBy ->
+                it += CastBy(castBy)
+                it += BukkitBridgeComponent(castBy.entity)
+            }
             it += TargetTo(input.targetTo)
             HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
             input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }

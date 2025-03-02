@@ -2,19 +2,19 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityMechanicRemoveSystem
+import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
 import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.MechanicComponent
 import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.ecs.system.InitSystem
 import cc.mewcraft.wakame.ecs.system.MechanicSystem
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.RemoveSystem
 import cc.mewcraft.wakame.ecs.system.StackCountSystem
-import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.ecs.system.TickResultSystem
 import cc.mewcraft.wakame.util.metadata.Metadata
@@ -32,9 +32,8 @@ object WakameWorld {
     private val instance: World = configureWorld {
 
         families {
-            recordToBukkitEntity(MetadataKeys.ABILITY, FamilyDefinitions.ABILITY)
-            recordToBukkitEntity(MetadataKeys.ELEMENT_STACK, FamilyDefinitions.ELEMENT_STACK)
-            recordToBukkitEntity(MetadataKeys.MECHANIC, FamilyDefinitions.MECHANIC)
+            recordToBukkitEntity(MetadataKeys.ABILITY, FamilyDefinitions.ABILITY_BUKKIT_BRIDGE)
+            recordToBukkitEntity(MetadataKeys.ELEMENT_STACK, FamilyDefinitions.ELEMENT_STACK_BUKKIT_BRIDGE)
         }
 
         systems {
@@ -52,7 +51,7 @@ object WakameWorld {
 
             // 会改变状态的系统
 
-            add(StatePhaseSystem())
+            add(AbilityStatePhaseSystem())
             add(StackCountSystem())
             add(AbilityMechanicRemoveSystem())
             add(TickResultSystem())
@@ -65,11 +64,11 @@ object WakameWorld {
         }
     }
 
-    private fun FamilyConfiguration.recordToBukkitEntity(metadataKey: MetadataKey<ComponentMap>, family: Family) {
+    private fun FamilyConfiguration.recordToBukkitEntity(metadataKey: MetadataKey<ComponentBridge>, family: Family) {
         onAdd(family) { entity ->
             val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
             val metadataMap = Metadata.provide(bukkitEntity)
-            metadataMap.put(metadataKey, ComponentMap(entity))
+            metadataMap.put(metadataKey, ComponentBridge(entity))
         }
 
         onRemove(family) { entity ->

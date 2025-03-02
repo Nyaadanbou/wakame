@@ -11,10 +11,10 @@ import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.SpiralPath
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.math.Position
 import net.kyori.adventure.key.Key
@@ -27,7 +27,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 
 object ExtraJumpArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
-        val count = config.node("count").krequire<Int>()
+        val count = config.node("count").require<Int>()
         val jumpedMessages = config.node("jumped_messages").get<AudienceMessageGroup>() ?: AudienceMessageGroup.empty()
         return ExtraJump(key, config, count, jumpedMessages)
     }
@@ -52,9 +52,9 @@ private class ExtraJumpAbilityMechanic(
 
     private var jumpCount: Int = extraJump.count
 
-    override fun onEnable(componentMap: ComponentMap) = abilitySupport {
+    override fun onEnable(componentBridge: ComponentBridge) = abilitySupport {
         jumpSubscription = Events.subscribe(PlayerInputEvent::class.java)
-            .filter { it.player == componentMap.castByEntity() }
+            .filter { it.player == componentBridge.castByEntity() }
             .filter { jumpCount > 0 }
             .filter { it.input.isJump }
             .filter { @Suppress("DEPRECATION") !it.player.isOnGround } // Spigot 弃用此方法的原因是客户端可以通过发包来欺骗服务端, 我们这里不考虑挂端欺骗的情况.
@@ -66,14 +66,14 @@ private class ExtraJumpAbilityMechanic(
                 jumpCount--
 
                 // 播放粒子特效.
-                playParticle(player, componentMap)
+                playParticle(player, componentBridge)
 
                 // 发送跳跃消息.
                 extraJump.jumpedMessages.send(player)
             }
 
         touchGroundSubscription = Events.subscribe(PlayerMoveEvent::class.java)
-            .filter { it.player == componentMap.castByEntity() }
+            .filter { it.player == componentBridge.castByEntity() }
             .filter { @Suppress("DEPRECATION") it.player.isOnGround }
             .handler {
                 // 重置跳跃状态.
@@ -81,14 +81,15 @@ private class ExtraJumpAbilityMechanic(
             }
     }
 
-    override fun onDisable(componentMap: ComponentMap) {
+    override fun onDisable(componentBridge: ComponentBridge) {
         jumpSubscription.unregister()
         touchGroundSubscription.unregister()
     }
 
-    private fun playParticle(player: Player, componentMap: ComponentMap) = abilitySupport {
+    private fun playParticle(player: Player, componentBridge: ComponentBridge) = abilitySupport {
         // 设置粒子特效
-        componentMap.addParticle(
+        componentBridge.addParticle(
+            bukkitWorld = player.world,
             ParticleInfo(
                 builderProvider = { loc ->
                     ParticleBuilder(Particle.END_ROD)

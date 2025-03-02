@@ -11,9 +11,9 @@ import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.FixedPath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.util.krequire
+import cc.mewcraft.wakame.util.require
 import com.destroystokyo.paper.ParticleBuilder
 import net.kyori.adventure.key.Key
 import org.bukkit.Color
@@ -29,9 +29,9 @@ import org.spongepowered.configurate.ConfigurationNode
  */
 object BlackHoleArchetype : AbilityArchetype {
     override fun create(key: Key, config: ConfigurationNode): Ability {
-        val radius = config.node("radius").krequire<Evaluable<*>>()
-        val duration = config.node("duration").krequire<Evaluable<*>>()
-        val damage = config.node("damage").krequire<Evaluable<*>>()
+        val radius = config.node("radius").require<Evaluable<*>>()
+        val duration = config.node("duration").require<Evaluable<*>>()
+        val damage = config.node("damage").require<Evaluable<*>>()
         return BlackHole(key, config, radius, duration, damage)
     }
 }
@@ -54,8 +54,8 @@ private class BlackHoleAbilityMechanic(
     private var holeLocation: Location? = null
     private var blockFace: BlockFace = BlockFace.UP
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val entity = componentMap.castByEntity()
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val entity = componentBridge.castByEntity()
 
         // 设置技能选定的位置
         if (entity != null) {
@@ -68,11 +68,11 @@ private class BlackHoleAbilityMechanic(
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
-        val caster = componentMap.castByEntity()
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val caster = componentBridge.castByEntity()
         val targetLocation = holeLocation ?: return TickResult.RESET_STATE
-        val radius = componentMap.evaluate(blackHole.radius)
-        val damage = componentMap.evaluate(blackHole.damage)
+        val radius = componentBridge.evaluate(blackHole.radius)
+        val damage = componentBridge.evaluate(blackHole.damage)
 
         // 吸引周围的怪物并造成伤害
         val entities = targetLocation.getNearbyEntities(radius, radius, radius)
@@ -89,13 +89,14 @@ private class BlackHoleAbilityMechanic(
             }
         }
 
-        if (tickCount >= componentMap.evaluate(blackHole.duration)) {
+        if (tickCount >= componentBridge.evaluate(blackHole.duration)) {
             return TickResult.NEXT_STATE_NO_CONSUME
         }
 
         if (tickCount % 10 == 0.0) {
             // 每 10 tick 生成一个粒子效果
-            componentMap.addParticle(
+            componentBridge.addParticle(
+                bukkitWorld = targetLocation.world,
                 ParticleInfo(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
@@ -131,14 +132,14 @@ private class BlackHoleAbilityMechanic(
         return TickResult.CONTINUE_TICK
     }
 
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickReset(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickReset(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
         blockFace = BlockFace.UP
         holeLocation = null
-        componentMap -= ParticleEffectComponent
+        componentBridge -= ParticleEffectComponent
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 }

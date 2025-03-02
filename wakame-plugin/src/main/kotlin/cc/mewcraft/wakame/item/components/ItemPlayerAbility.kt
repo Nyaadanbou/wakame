@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.util.Identifiers
-import java.util.*
+import net.minecraft.nbt.CompoundTag
 
 data class ItemPlayerAbility(
     val abilities: List<PlayerAbility>,
@@ -31,7 +31,7 @@ data class ItemPlayerAbility(
             val abilities = ArrayList<PlayerAbility>(tag.size())
             for (stringId in tag.allKeys) {
                 val id = Identifiers.of(stringId)
-                val ability = PlayerAbility(id, tag)
+                val ability = PlayerAbility(id, tag.get(stringId) as CompoundTag)
                 abilities += ability
             }
             return ItemPlayerAbility(abilities)

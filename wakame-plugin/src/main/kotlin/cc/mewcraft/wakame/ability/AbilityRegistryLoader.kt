@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -16,7 +17,6 @@ import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
 
 @Init(
@@ -51,7 +51,7 @@ object AbilityRegistryLoader : RegistryConfigStorage {
 
     private fun applyAbilityDataToRegistry(registryAction: (Identifier, Ability) -> Unit) {
         AbilityArchetypes // 初始化技能原型
-        val loader = buildYamlConfigLoader { withDefaults() }
+        val loader = Configs.createBuilder("ability")
 
         for ((file, _, path) in NamespacedFileTreeWalker(getFileInConfigDirectory(DIR_PATH), fileExtension = "yml", includeFullPath = true, includeNamespacePath = true)) {
             val rootNode = loader.buildAndLoadString(file.readText())

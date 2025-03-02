@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
@@ -65,8 +65,8 @@ fun abilityInput(target: Target, initializer: AbilityInputDSL.() -> Unit): Abili
     return AbilityInputDSL(target).apply(initializer).build()
 }
 
-fun abilityInput(componentMap: ComponentMap): AbilityInput {
-    return ComponentMapAbilityInput(componentMap)
+fun abilityInput(componentBridge: ComponentBridge): AbilityInput {
+    return ComponentMapAbilityInput(componentBridge)
 }
 
 @AbilityInputMarker
@@ -151,24 +151,24 @@ private class SimpleAbilityInput(
 
 @JvmInline
 private value class ComponentMapAbilityInput(
-    private val componentMap: ComponentMap,
+    private val componentBridge: ComponentBridge,
 ) : AbilityInput, Examinable {
     override val castBy: Caster?
-        get() = componentMap[CastBy]?.caster
+        get() = componentBridge[CastBy]?.caster
     override val targetTo: Target
-        get() = requireNotNull(componentMap[TargetTo]?.target) { "Target not found in componentMap" }
+        get() = requireNotNull(componentBridge[TargetTo]?.target) { "Target not found in componentBridge" }
     override val trigger: Trigger?
-        get() = requireNotNull(componentMap[AbilityComponent]?.trigger) { "Trigger not found in componentMap" }
+        get() = requireNotNull(componentBridge[AbilityComponent]?.trigger) { "Trigger not found in componentBridge" }
     override val holdBy: Pair<ItemSlot, NekoStack>?
         get() {
-            val slot = componentMap[HoldBy]?.slot ?: return null
-            val nekoStack = componentMap[HoldBy]?.nekoStack ?: return null
+            val slot = componentBridge[HoldBy]?.slot ?: return null
+            val nekoStack = componentBridge[HoldBy]?.nekoStack ?: return null
             return slot to nekoStack
         }
     override val manaCost: Evaluable<*>
-        get() = requireNotNull(componentMap[AbilityComponent]?.manaCost) { "ManaCost not found in componentMap" }
+        get() = requireNotNull(componentBridge[AbilityComponent]?.manaCost) { "ManaCost not found in componentBridge" }
     override val mochaEngine: MochaEngine<*>
-        get() = requireNotNull(componentMap[AbilityComponent]?.mochaEngine) { "MochaEngine not found in componentMap" }
+        get() = requireNotNull(componentBridge[AbilityComponent]?.mochaEngine) { "MochaEngine not found in componentBridge" }
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(targetTo)

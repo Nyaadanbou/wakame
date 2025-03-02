@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentMap
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.bukkit.Material
@@ -57,16 +57,16 @@ private class DashAbilityMechanic(
         private const val STARTING_TICK: Long = 10L
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult {
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
         return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentMap: ComponentMap): TickResult = abilitySupport {
+    override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = componentMap.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
+        val entity = componentBridge.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ecs.system
+package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
@@ -17,7 +17,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import net.kyori.adventure.text.event.HoverEvent
 import org.bukkit.Bukkit
 
-class StatePhaseSystem : IteratingSystem(
+class AbilityStatePhaseSystem : IteratingSystem(
     family = family { all(AbilityComponent, IdentifierComponent, TickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
