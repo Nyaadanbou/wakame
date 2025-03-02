@@ -7,5 +7,5 @@ slot: vanilla:feet
 castable: {}
 
 player_ability:
-  - id: double_jump
+  - id: passive/double_jump
     variant: 0

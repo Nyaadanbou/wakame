@@ -7,7 +7,7 @@ slot: vanilla:mainhand
 castable: {}
 
 player_ability:
-  - id: melee/blink
+  - id: active/blink
     variant: 0
     trigger: "combo/111"
     mana_cost: 10
