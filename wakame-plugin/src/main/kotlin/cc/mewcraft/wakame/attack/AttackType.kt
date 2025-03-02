@@ -17,12 +17,12 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
 
-
 /**
  * 攻击类型.
  */
 // 其实现类先不要写成单例.
 // 未来确认是无参数的实现再写成单例.
+@Deprecated("Use WeaponType instead")
 sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].

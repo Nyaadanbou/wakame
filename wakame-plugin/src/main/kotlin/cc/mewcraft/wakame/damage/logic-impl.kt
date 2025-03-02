@@ -498,8 +498,11 @@ internal object DamageManager : DamageManagerApi {
     private fun createPlayerDirectAttackDamageMetadata(context: DamageContext): DamageMetadata? {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
         val itemstack = player.inventory.itemInMainHand.wrap() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        return attack.attackType.generateDamageMetadata(player, itemstack)
+        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK)
+        if (attack != null) return attack.attackType.generateDamageMetadata(player, itemstack)
+        val weapon = itemstack.templates.get(ItemTemplateTypes.WEAPON)
+        if (weapon != null) return weapon.weaponType.generateDamageMetadata(player, itemstack)
+        return PlayerDamageMetadata.INTRINSIC_ATTACK
     }
 
     // 可以返回 null, 意为取消本次伤害

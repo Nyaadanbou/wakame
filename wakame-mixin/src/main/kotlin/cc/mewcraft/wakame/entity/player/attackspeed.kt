@@ -77,12 +77,22 @@ sealed interface AttackCooldownContainer : EComponent<AttackCooldownContainer> {
     /**
      * “激活”指定的冷却. 如果已存在将覆盖原有的冷却状态.
      */
+    fun activate(id: Identifier, ticks: Int)
+
+    /**
+     * “激活”指定的冷却. 如果已存在将覆盖原有的冷却状态.
+     */
     fun activate(id: Identifier, entry: AttackSpeed)
 
     /**
      * 查询指定的冷却是否为“激活”状态.
      */
     fun isActive(id: Identifier): Boolean
+
+    /**
+     * 返回指定的冷却的 *未完成冷却时长* 占 *总冷却时长* 的比例.
+     */
+    fun getPercent(id: Identifier): Float
 
     /**
      * 查询离冷却变为“未激活”状态的剩余时间, 单位: tick.
@@ -107,20 +117,28 @@ private class MinecraftAttackCooldownContainer(
     private val player: Player,
 ) : AttackCooldownContainer {
 
+    override fun activate(id: Identifier, ticks: Int) {
+        player.addItemCooldown(id, ticks)
+    }
+
     override fun activate(id: Identifier, level: AttackSpeed) {
-        player.addCooldownById(id, level.cooldown)
+        activate(id, level.cooldown)
     }
 
     override fun isActive(id: Identifier): Boolean {
-        return player.isOnCooldownById(id)
+        return player.isItemCooldownActive(id)
+    }
+
+    override fun getPercent(id: Identifier): Float {
+        return player.getItemCooldownPercent(id)
     }
 
     override fun getRemainingTicks(id: Identifier): Int {
-        return player.getCooldownRemainingTicksById(id)
+        return player.getItemCooldownRemainingTicks(id)
     }
 
     override fun reset(id: Identifier) {
-        player.removeCooldownById(id)
+        player.removeItemCooldown(id)
     }
 }
 
@@ -135,12 +153,22 @@ private class StandaloneAttackCooldownContainer : AttackCooldownContainer {
      */
     private val inactiveTimestamps = Object2IntOpenHashMap<Key>()
 
+    override fun activate(id: Identifier, ticks: Int) {
+        inactiveTimestamps[id] = Bukkit.getServer().currentTick + ticks
+    }
+
     override fun activate(key: Key, level: AttackSpeed) {
-        inactiveTimestamps[key] = Bukkit.getServer().currentTick + level.cooldown
+        activate(key, level.cooldown)
     }
 
     override fun isActive(key: Key): Boolean {
         return inactiveTimestamps.getInt(key) > Bukkit.getServer().currentTick
+    }
+
+    override fun getPercent(id: Identifier): Float {
+        val remainingTicks = getRemainingTicks(id)
+        val totalCooldown = inactiveTimestamps.getInt(id) - Bukkit.getServer().currentTick + remainingTicks
+        return if (totalCooldown <= 0) 0f else remainingTicks.toFloat() / totalCooldown
     }
 
     override fun getRemainingTicks(key: Key): Int {

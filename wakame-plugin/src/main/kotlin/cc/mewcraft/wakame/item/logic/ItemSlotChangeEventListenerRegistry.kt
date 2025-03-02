@@ -24,5 +24,6 @@ internal object ItemSlotChangeEventListenerRegistry {
     fun init() {
         listeners += AttributeItemSlotChangeListener
         listeners += KizamiItemSlotChangeListener
+        listeners += WeaponItemSlotChangeListener
     }
 }

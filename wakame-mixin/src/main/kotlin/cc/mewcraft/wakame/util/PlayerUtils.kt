@@ -60,14 +60,14 @@ fun Player.removeItem(removeItems: Map<ItemRef, Int>): Map<ItemRef, Int> {
 /**
  * 获取玩家的 [id] 冷却组是否正在冷却.
  */
-fun Player.isOnCooldownById(id: Identifier): Boolean {
-    return getItemGroupCooldownPercent(id) > 0f
+fun Player.isItemCooldownActive(id: Identifier): Boolean {
+    return getItemCooldownPercent(id) > 0f
 }
 
 /**
  * 获取玩家的 [id] 冷却组的 *未完成冷却时长* 占 *总冷却时长* 的比例.
  */
-fun Player.getItemGroupCooldownPercent(id: Identifier): Float {
+fun Player.getItemCooldownPercent(id: Identifier): Float {
     val resLoc = PaperAdventure.asVanilla(id)
     val cooldownMap = serverPlayer.cooldowns
     val cooldownInst = cooldownMap.cooldowns[resLoc]
@@ -83,7 +83,7 @@ fun Player.getItemGroupCooldownPercent(id: Identifier): Float {
 /**
  * 获取玩家的 [id] 冷却组的剩余冷却时间, 单位: tick.
  */
-fun Player.getCooldownRemainingTicksById(id: Identifier): Int {
+fun Player.getItemCooldownRemainingTicks(id: Identifier): Int {
     val resLoc = PaperAdventure.asVanilla(id)
     val cooldownMap = serverPlayer.cooldowns
     val cooldownInst = cooldownMap.cooldowns[resLoc]
@@ -97,7 +97,7 @@ fun Player.getCooldownRemainingTicksById(id: Identifier): Int {
 /**
  * 使玩家的 [id] 冷却组进入冷却.
  */
-fun Player.addCooldownById(id: Identifier, ticks: Int) {
+fun Player.addItemCooldown(id: Identifier, ticks: Int) {
     val resLoc = PaperAdventure.asVanilla(id)
     this.serverPlayer.cooldowns.addCooldown(resLoc, ticks, true)
 }
@@ -105,7 +105,7 @@ fun Player.addCooldownById(id: Identifier, ticks: Int) {
 /**
  * 使玩家的 [id] 冷却组结束冷却.
  */
-fun Player.removeCooldownById(id: Identifier) {
+fun Player.removeItemCooldown(id: Identifier) {
     val resLoc = PaperAdventure.asVanilla(id)
     this.serverPlayer.cooldowns.removeCooldown(resLoc)
 }

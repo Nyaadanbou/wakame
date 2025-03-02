@@ -81,6 +81,7 @@ object ItemConstants {
     const val TRACKABLE = "tracks"
     const val TRIM = "trim"
     const val UNBREAKABLE = "unbreakable"
+    const val WEAPON = "weapon"
     const val WORLD_TIME_CONTROL = "world_time_control"
     const val WORLD_WEATHER_CONTROL = "world_weather_control"
 

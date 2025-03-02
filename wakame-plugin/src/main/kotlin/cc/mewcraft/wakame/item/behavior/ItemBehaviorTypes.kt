@@ -65,6 +65,11 @@ object ItemBehaviorTypes {
     val TRACKABLE: ItemBehaviorType<Trackable> = Trackable
 
     /**
+     * 物品作为武器的逻辑.
+     */
+    val WEAPON: ItemBehaviorType<Weapon> = Weapon
+
+    /**
      * 物品穿戴的逻辑.
      */
     val WEARABLE: ItemBehaviorType<Wearable> = Wearable

@@ -80,6 +80,7 @@ internal object VanillaNekoItemRealizer : NekoItemRealizer {
 
         generate(ItemTemplateTypes.ARROW)
         generate(ItemTemplateTypes.ATTACK)
+        generate(ItemTemplateTypes.WEAPON)
         generate(ItemTemplateTypes.ATTACK_SPEED)
 
         generate(ItemTemplateTypes.LEVEL)
@@ -169,6 +170,7 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.ITEM_NAME)
         generate(ItemTemplateTypes.LORE)
         generate(ItemTemplateTypes.ATTACK)
+        generate(ItemTemplateTypes.WEAPON)
         generate(ItemTemplateTypes.ATTACK_SPEED)
         generate(ItemTemplateTypes.ATTRIBUTE_MODIFIERS)
         generate(ItemTemplateTypes.DAMAGE_RESISTANT)

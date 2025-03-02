@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.entity.player.kizamiContainer
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.kizami2.KizamiMap
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
@@ -93,5 +94,31 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeEventListener() {
 
     private fun NekoStack.getKizamiz(): Set<RegistryEntry<Kizami>>? {
         return components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz
+    }
+}
+
+
+/**
+ * 拥有特殊效果的武器.
+ *
+ * TODO 使用 ECS 系统实现.
+ */
+internal object WeaponItemSlotChangeListener : ItemSlotChangeEventListener() {
+    override val predicates: List<(Player, ItemSlot, ItemStack, NekoStack?) -> Boolean> = listOf(
+        ::testSlot,
+        ::testLevel,
+        ::testDurability
+    )
+
+    override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
+        nekoStack ?: return
+        val weapon = nekoStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
+        weapon.weaponType.handleSlotChangePreviousItem(player, nekoStack, slot)
+    }
+
+    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
+        nekoStack ?: return
+        val weapon = nekoStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
+        weapon.weaponType.handleSlotChangeCurrentItem(player, nekoStack, slot)
     }
 }

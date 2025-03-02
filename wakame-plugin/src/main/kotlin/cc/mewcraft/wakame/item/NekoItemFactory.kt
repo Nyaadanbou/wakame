@@ -43,6 +43,7 @@ object VanillaNekoItemFactory {
             tryAdd("attack", ItemBehaviorTypes.ATTACK)
             tryAdd("castable", ItemBehaviorTypes.CASTABLE)
             tryAdd("town_flight", ItemBehaviorTypes.TOWN_FLIGHT)
+            tryAdd("weapon", ItemBehaviorTypes.WEAPON)
             tryAdd("world_time_control", ItemBehaviorTypes.WORLD_TIME_CONTROL)
             tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
         }
@@ -100,6 +101,7 @@ object VanillaNekoItemFactory {
             tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
             tryAdd("trim", ItemTemplateTypes.TRIM, Validator.unsupported())
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE, Validator.unsupported())
+            tryAdd("weapon", ItemTemplateTypes.WEAPON)
             tryAdd("world_time_control", ItemTemplateTypes.WORLD_TIME_CONTROL)
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
@@ -148,6 +150,7 @@ object StandardNekoItemFactory {
             tryAdd("tool", ItemBehaviorTypes.TOOL)
             tryAdd("town_flight", ItemBehaviorTypes.TOWN_FLIGHT)
             tryAdd("trackable", ItemBehaviorTypes.TRACKABLE)
+            tryAdd("weapon", ItemBehaviorTypes.WEAPON)
             tryAdd("wearable", ItemBehaviorTypes.WEARABLE)
             tryAdd("world_time_control", ItemBehaviorTypes.WORLD_TIME_CONTROL)
             tryAdd("world_weather_control", ItemBehaviorTypes.WORLD_WEATHER_CONTROL)
@@ -196,6 +199,7 @@ object StandardNekoItemFactory {
             tryAdd("town_flight", ItemTemplateTypes.TOWN_FLIGHT)
             tryAdd("trim", ItemTemplateTypes.TRIM)
             tryAdd("unbreakable", ItemTemplateTypes.UNBREAKABLE)
+            tryAdd("weapon", ItemTemplateTypes.WEAPON)
             tryAdd("world_time_control", ItemTemplateTypes.WORLD_TIME_CONTROL)
             tryAdd("world_weather_control", ItemTemplateTypes.WORLD_WEATHER_CONTROL)
         }
