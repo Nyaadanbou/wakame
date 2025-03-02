@@ -2,7 +2,6 @@ package item
 
 import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader
-import cc.mewcraft.wakame.ability.abilityModule
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
@@ -50,7 +49,6 @@ object CommonNekoStackTest {
                 // dependencies
                 adventureModule(),
                 registryModule(),
-                abilityModule(),
                 worldModule(),
             )
         }
