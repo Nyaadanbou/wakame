@@ -23,8 +23,10 @@ import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.world.TimeControl
 import io.papermc.paper.registry.RegistryKey
+import io.papermc.paper.registry.TypedKey
 import io.papermc.paper.registry.tag.TagKey
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.TextComponent
@@ -531,8 +533,8 @@ class CustomKoishStackTest : KoinTest {
         assertNotNull(template)
         assertFalse(template.showInTooltip)
         assertEquals(2, template.enchantments.size)
-        assertEquals(1, template.enchantments[Key.key("sharpness")])
-        assertEquals(2, template.enchantments[Key.key("knockback")])
+        assertEquals(1, template.enchantments[TypedKey.create(RegistryKey.ENCHANTMENT, Identifier.key("sharpness"))])
+        assertEquals(2, template.enchantments[TypedKey.create(RegistryKey.ENCHANTMENT, Identifier.key("knockback"))])
     }
 
     @Test
@@ -835,8 +837,8 @@ class CustomKoishStackTest : KoinTest {
         assertNotNull(template)
         assertFalse(template.showInTooltip)
         assertEquals(2, template.enchantments.size)
-        assertEquals(1, template.enchantments[Key.key("sharpness")])
-        assertEquals(2, template.enchantments[Key.key("knockback")])
+        assertEquals(1, template.enchantments[TypedKey.create(RegistryKey.ENCHANTMENT, Identifier.key("sharpness"))])
+        assertEquals(2, template.enchantments[TypedKey.create(RegistryKey.ENCHANTMENT, Identifier.key("knockback"))])
     }
 
     @Test

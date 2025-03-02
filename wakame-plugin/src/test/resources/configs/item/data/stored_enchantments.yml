@@ -4,5 +4,5 @@ base: bedrock
 stored_enchantments:
   show_in_tooltip: false
   entries:
-    sharpness: 1
-    knockback: 2
+    minecraft:sharpness: 1
+    minecraft:knockback: 2
