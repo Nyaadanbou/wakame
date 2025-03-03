@@ -41,9 +41,7 @@ fun ComponentLike.translate(viewer: Audience): Component {
 fun List<ComponentLike>.translate(locale: Locale): List<Component> = map { it.translate(locale) }
 fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.translate(viewer) }
 
-@Init(
-    stage = InitStage.PRE_WORLD,
-)
+@Init(stage = InitStage.PRE_WORLD)
 @Reload
 object GlobalTranslations : RegistryConfigStorage {
     private const val DIR_PATH = "lang/"

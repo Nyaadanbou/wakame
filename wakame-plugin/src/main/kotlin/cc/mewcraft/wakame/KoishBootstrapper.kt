@@ -7,7 +7,9 @@ import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.entity.entityModule
 import cc.mewcraft.wakame.gui.guiModule
+import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
+import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.data.Version
@@ -51,6 +53,11 @@ internal class KoishBootstrapper : PluginBootstrap {
         BOOTSTRAPPER = this
     }
 
+    // See: https://docs.papermc.io/paper/dev/getting-started/paper-plugins#bootstrapper
+    //
+    // 该函数被调用的时机非常早, 会在以下关键时机之前被调用:
+    // 1) 加载 NMS 的 classes (因此理论上可以在这里对服务端进行 patching)
+    // 2) 创建 JavaPlugin 实例 (因此可以直接返回一个 Kotlin 的 object)
     override fun bootstrap(context: BootstrapContext) {
         startKoin {
             modules(
@@ -91,17 +98,6 @@ internal class KoishBootstrapper : PluginBootstrap {
         //             "Please erase all data related to Koish and try again.")
         // }
 
-        // initialize commands
-        KoishCommandManager.bootstrap(context)
-
-        init()
-    }
-
-    override fun createPlugin(context: PluginProviderContext): JavaPlugin {
-        return Koish
-    }
-
-    private fun init() {
         try {
             if (PREVIOUS_KOISH_VERSION == null || PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
                 LegacyDataMigrator.migrate()
@@ -112,8 +108,21 @@ internal class KoishBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
 
-            Configs.extractDefaultConfig()
+            // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
+            // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
+            // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
+            // 从而导致读取配置项时找不到需要的配置项, 抛出 NPE
+            Configs.initialize()
+            LanguageExtractor.extractDefaults()
+            AssetExtractor.extractDefaults()
+
+            // 初始化所有 InitFun (PRE_WORLD)
             Initializer.start()
+
+            // 让指令注册发生在所有 PRE_WORLD 的 InitFun 之后,
+            // 这样如果之前发生了异常那么指令将不会注册,
+            // 以避免执行指令所造成的二次伤害
+            KoishCommandManager.bootstrap(context)
 
         } catch (e: Exception) {
             LOGGER.error("", e)
@@ -121,8 +130,13 @@ internal class KoishBootstrapper : PluginBootstrap {
             Runtime.getRuntime().halt(-1) // force-quit
         }
     }
+
+    override fun createPlugin(context: PluginProviderContext): JavaPlugin {
+        return Koish // 利用 Kotlin 的 object 特性来直接访问我们的 JavaPlugin 实例
+    }
 }
 
+// 为了让代码在单元测试环境里也能直接使用 LOGGER, 我们创建该容器来装载不同环境下的 Logger 实例
 private object KoishLoggerProvider {
     private var LOGGER: ComponentLogger? = null
 

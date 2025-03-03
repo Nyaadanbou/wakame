@@ -433,11 +433,11 @@ internal constructor(
 ) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
 
     @Volatile
-    var loaded = false
+    var loaded: Boolean = false
         private set
 
     @Volatile
-    var fileExisted = false
+    var fileExisted: Boolean = false
         private set
 
     init {

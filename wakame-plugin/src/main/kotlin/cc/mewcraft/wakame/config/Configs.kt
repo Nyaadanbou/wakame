@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.config
 
-import cc.mewcraft.wakame.KOISH_JAR
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.feature.Feature
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.lifecycle.reloader.InternalReload
@@ -11,7 +9,6 @@ import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGU
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
-import cc.mewcraft.wakame.util.data.useZip
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.bukkit.Bukkit
@@ -24,65 +21,41 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
 import java.nio.file.Path
-import kotlin.io.path.*
+import kotlin.io.path.exists
+import kotlin.io.path.getLastModifiedTime
 
 private val DEFAULT_CONFIG_ID = Identifier.key("koish", "config")
-private const val DEFAULT_CONFIG_PATH = "configs/config.yml" // relative to Plugin#dataFolder
 
 val MAIN_CONFIG: Provider<CommentedConfigurationNode> = Configs[DEFAULT_CONFIG_ID]
 
 /**
  * The object that manages the configuration providers.
  */
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 @InternalReload
 object Configs {
 
     private val customSerializers = HashMap<String, TypeSerializerCollection.Builder>()
-
-    private val configExtractor = ConfigExtractor(PermanentStorage.storedValue("stored_configs", ::HashMap))
     private val configProviders = HashMap<Identifier, RootConfigProvider>()
 
-    private var lastReload = -1L
+    private const val UNINITIALIZED_LAST_RELOAD = -1L
 
-    internal fun extractDefaultConfig() {
-        KOISH_JAR.useZip { zip ->
-            val from = zip.resolve(DEFAULT_CONFIG_PATH)
-            val to = KoishDataPaths.ROOT.resolve(DEFAULT_CONFIG_PATH)
-            extractConfig(from, to, DEFAULT_CONFIG_ID)
-        }
-    }
+    /**
+     * 最后一次重新加载的时间戳.
+     */
+    private var lastReload = UNINITIALIZED_LAST_RELOAD
 
-    @InitFun
-    private fun extractAllConfigs() {
-        extractConfigs("koish", KOISH_JAR, KoishDataPaths.ROOT)
-        // TODO: 提取 Feature 的配置文件
+    fun initialize() {
+        // 先提取必要的文件到插件数据目录, 否则接下来 reload 会读取到空文件
+        ConfigExtractor.extractDefaults()
 
+        // 更新一开始的特殊值为当前时间戳
         lastReload = System.currentTimeMillis()
+
+        // 重新读取已经存在的实例
         configProviders.values.asSequence()
             .filter { it.path.exists() }
-            .forEach { it.reload() } // 调用 RootConfigProvider#reload 方法
-    }
-
-    private fun extractConfigs(namespace: String, zipFile: Path, dataFolder: Path) {
-        zipFile.useZip { zip ->
-            val configsDir = zip.resolve("configs/")
-            configsDir.walk()
-                .filter { !it.isDirectory() && it.extension.equals("yml", true) }
-                .forEach { config ->
-                    val relPath = config.relativeTo(configsDir).invariantSeparatorsPathString
-                    val configId = Identifier.key(namespace, relPath.substringBeforeLast('.'))
-                    extractConfig(config, dataFolder.resolve("configs").resolve(relPath), configId)
-                }
-        }
-    }
-
-    private fun extractConfig(from: Path, to: Path, configId: Identifier) {
-        configExtractor.extract(configId, from, to)
-        val provider = configProviders.getOrPut(configId) { RootConfigProvider(to, configId) }
-        provider.reload()
+            .forEach { it.reload() }
     }
 
     private fun resolveConfigPath(configId: Identifier): Path {
@@ -99,14 +72,18 @@ object Configs {
     }
 
     internal fun reload(): List<Identifier> {
-        val reloadedConfigs = configProviders.asSequence()
+        val reloadedConfigs = configProviders
+            .asSequence()
             .filter { (_, provider) ->
+
                 // 表示文件之前存在但现在不存在了
-                (!provider.path.exists() && provider.fileExisted) ||
-                        // 表示文件存在，并且文件的最后修改时间晚于上次重新加载的时间
-                        (provider.path.exists() && (provider.path.getLastModifiedTime().toMillis() > lastReload))
-            } // 只重新加载动过的文件
-            .onEach { (_, provider) -> provider.reload() } // 调用 RootConfigProvider#reload 方法
+                val flag1 = !provider.path.exists() && provider.fileExisted
+                // 表示文件存在并且文件的最后修改时间晚于上次重新加载的时间
+                val flag2 = provider.path.exists() && (provider.path.getLastModifiedTime().toMillis() > lastReload)
+
+                flag1 || flag2
+            }
+            .onEach { (_, provider) -> provider.reload() }
             .mapTo(ArrayList()) { (id, _) -> id }
 
         lastReload = System.currentTimeMillis()
@@ -126,31 +103,44 @@ object Configs {
      *
      * @param id 配置文件的 id, 必须是 `namespace:path` 的形式. 如果省略 `namespace`, 则默认为 `koish`
      */
-    operator fun get(id: String): Provider<CommentedConfigurationNode> =
-        get(Identifiers.of(id))
+    operator fun get(id: String): Provider<CommentedConfigurationNode> {
+        return get(Identifiers.of(id))
+    }
 
     /**
      * @param feature 对应的 [Feature] (仅取其命名空间)
      * @param path 相对于 [feature] 文件夹的文件路径
      */
-    operator fun get(feature: Feature, path: String): Provider<CommentedConfigurationNode> =
-        get(Identifier.key(feature.namespace, path))
+    operator fun get(feature: Feature, path: String): Provider<CommentedConfigurationNode> {
+        return get(Identifier.key(feature.namespace, path))
+    }
 
     /**
      * @param id 配置文件的 id, 必须是 `namespace:path` 的形式
      */
-    operator fun get(id: Identifier): Provider<CommentedConfigurationNode> =
-        configProviders.getOrPut(id) { RootConfigProvider(resolveConfigPath(id), id).also { if (lastReload > -1) it.reload() } }
+    operator fun get(id: Identifier): Provider<CommentedConfigurationNode> {
+        return configProviders.getOrPut(id) {
+            RootConfigProvider(resolveConfigPath(id), id).also { provider ->
+                if (lastReload > UNINITIALIZED_LAST_RELOAD) provider.reload()
+            }
+        }
+    }
 
-    fun getOrNull(id: String): CommentedConfigurationNode? =
-        getOrNull(Identifiers.of(id))
+    fun getOrNull(id: String): CommentedConfigurationNode? {
+        return getOrNull(Identifiers.of(id))
+    }
 
-    fun getOrNull(id: Identifier): CommentedConfigurationNode? =
-        configProviders[id]?.takeIf(RootConfigProvider::loaded)?.get()
+    fun getOrNull(id: Identifier): CommentedConfigurationNode? {
+        return configProviders[id]?.takeIf(RootConfigProvider::loaded)?.get()
+    }
 
-    fun save(id: String): Unit =
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("向现有的文件写入内容永远都是一件需要小心的事情")
+    fun save(id: String) {
         save(Identifiers.of(id))
+    }
 
+    @Deprecated("向现有的文件写入内容永远都是一件需要小心的事情")
     fun save(id: Identifier) {
         val config = getOrNull(id) ?: return
         createLoader(id.namespace(), resolveConfigPath(id)).save(config)
@@ -159,20 +149,23 @@ object Configs {
     /**
      * Registers custom [serializers] for configs of [feature].
      */
-    fun registerSerializer(feature: Feature, serializers: TypeSerializerCollection) =
+    fun registerSerializer(feature: Feature, serializers: TypeSerializerCollection) {
         registerSerializer(feature.namespace, serializers)
+    }
 
     /**
      * Registers custom [serializer] for configs of [feature].
      */
-    fun <T> registerSerializer(feature: Feature, type: TypeToken<T>, serializer: TypeSerializer<T>) =
+    fun <T> registerSerializer(feature: Feature, type: TypeToken<T>, serializer: TypeSerializer<T>) {
         registerSerializer(feature.namespace, type, serializer)
+    }
 
     /**
      * Registers custom [serializer] for configs of [feature].
      */
-    inline fun <reified T> registerSerializer(feature: Feature, serializer: TypeSerializer<T>) =
+    inline fun <reified T> registerSerializer(feature: Feature, serializer: TypeSerializer<T>) {
         registerSerializer(feature, typeTokenOf(), serializer)
+    }
 
     /**
      * Registers custom [serializers] for configs of [namespace].
@@ -195,8 +188,8 @@ object Configs {
         registerSerializer(namespace, typeTokenOf(), serializer)
     }
 
-    internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder =
-        YamlConfigurationLoader.builder()
+    internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder {
+        return YamlConfigurationLoader.builder()
             .nodeStyle(NodeStyle.BLOCK)
             .indent(2)
             .defaultOptions { opts ->
@@ -205,8 +198,10 @@ object Configs {
                     customSerializers[namespace]?.build()?.let { builder.registerAll(it) }
                 }
             }
+    }
 
-    internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader =
-        createBuilder(namespace).path(path).build()
+    internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader {
+        return createBuilder(namespace).path(path).build()
+    }
 
 }

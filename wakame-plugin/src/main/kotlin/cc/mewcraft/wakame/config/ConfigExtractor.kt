@@ -1,154 +1,74 @@
 package cc.mewcraft.wakame.config
 
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.data.*
-import org.snakeyaml.engine.v2.api.DumpSettings
-import org.snakeyaml.engine.v2.api.LoadSettings
-import org.snakeyaml.engine.v2.api.YamlOutputStreamWriter
-import org.snakeyaml.engine.v2.composer.Composer
-import org.snakeyaml.engine.v2.emitter.Emitter
-import org.snakeyaml.engine.v2.nodes.Node
-import org.snakeyaml.engine.v2.nodes.ScalarNode
-import org.snakeyaml.engine.v2.nodes.SequenceNode
-import org.snakeyaml.engine.v2.parser.ParserImpl
-import org.snakeyaml.engine.v2.scanner.StreamReader
-import org.snakeyaml.engine.v2.serializer.Serializer
-import xyz.xenondevs.commons.provider.MutableProvider
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.nio.file.Path
-import kotlin.io.path.createDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.inputStream
-import kotlin.io.path.outputStream
+import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.util.data.useZip
+import kotlin.io.path.*
 
-internal class ConfigExtractor(
-    extractedConfigs: MutableProvider<Map<Identifier, String>>,
-) {
+/**
+ * 本单例负责提取默认的配置文件.
+ *
+ * 欲了解具体的行为逻辑自行查看本单例的实现, 这里不再重复.
+ */
+internal object ConfigExtractor {
 
-    private var extractedConfigs: Map<Identifier, String> by extractedConfigs
+    // 要抽取的文件, 全部位于 zip 的 /configs 之下
+    private val FILES_TO_EXTRACT: List<String> = listOf(
+        "ability.yml",
+        "attributes.yml",
+        "config.yml",
+        "elements.yml",
+        "entities.yml",
+        "items.yml",
+        "levels.yml",
+        "rarities.yml",
+        "resourcepack.yml",
+    )
 
-    fun extract(configId: Identifier, fileInZip: Path, destFile: Path) {
-        val internalCfg = loadYaml(fileInZip)
-        val extractedCfg = extractedConfigs[configId]?.let(::loadYaml)
+    // 要抽取的文件夹, 全部位于 zip 的 /configs 之下
+    private val DIRECTORIES_TO_EXTRACT: List<String> = listOf(
+        "ability/",
+        "catalog/",
+        "crafting_station/",
+        "damage/",
+        "item/",
+        "item_proxied/",
+        "kizami/",
+        "random/",
+        "recipe/",
+        "reforging_station/",
+        "renderer/",
+    )
 
-        val severCfg: Node
-        if (!destFile.exists() || extractedCfg == null) {
-            severCfg = internalCfg
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(severCfg, false)) }
-        } else {
-            severCfg = loadYaml(destFile)
-            updateExistingConfig(severCfg, extractedCfg, internalCfg)
-            extractedConfigs = extractedConfigs.toMutableMap().apply { put(configId, writeYaml(extractedCfg, false)) }
-        }
+    @OptIn(ExperimentalPathApi::class)
+    fun extractDefaults() {
+        KOISH_JAR.useZip { zip ->
+            val srcRootDir = zip.resolve("configs/")
+            val dstRootDir = KoishDataPaths.CONFIGS.also { it.createDirectories() }
 
-        writeYaml(severCfg, destFile)
-    }
+            // 先检查文件类型是否都正确
+            // 注意这里检查的是 srcRootDir 下的文件, 所以这里其实是检查程序员有没有犯错
+            require(FILES_TO_EXTRACT.all { srcRootDir.resolve(it).isRegularFile() })
+            require(DIRECTORIES_TO_EXTRACT.all { srcRootDir.resolve(it).isDirectory() })
 
-    private fun updateExistingConfig(serverCfg: Node, extractedCfg: Node, internalCfg: Node) {
-        var previousPath: List<String> = listOf("")
-        internalCfg.walk { path, internalKeyNode, internalValueNode ->
-            // for ordering, determine the entry name above (if present)
-            val aboveEntry: String =
-                if (previousPath.size >= path.size && previousPath.subList(0, path.size - 1) == path.subList(0, path.size - 1))
-                    previousPath[path.size - 1]
-                else ""
-
-            val serverKeyValueNodes = serverCfg.get(path)
-            var skipChildren = false
-            if (serverKeyValueNodes == null) {
-                // add new key
-                serverCfg.set(path, internalValueNode, aboveEntry)
-                extractedCfg.set(path, internalValueNode)
-
-                // we don't need to explore this, we just added it
-                skipChildren = true
-            } else if (internalValueNode is ScalarNode || internalValueNode is SequenceNode) {
-                // update value of scalar/sequence node (which cannot be walked down further), if unchanged by user
-                val serverValueNode = serverKeyValueNodes.second
-                val extractedValueNode = extractedCfg.get(path)?.second
-
-                // 如果内部配置中的值与服务器配置中的值不同,
-                // 但已提取配置中的值与服务器配置中的值相同,
-                // 则说明用户没有修改过这个值, 可以安全地更新为内部配置中的最新值
-                if (!internalValueNode.deepEquals(serverKeyValueNodes.second) && extractedValueNode.deepEquals(serverValueNode)) {
-                    serverCfg.set(path, internalValueNode, aboveEntry)
-                    extractedCfg.set(path, internalValueNode)
+            // 对于文件, 如果目标文件不存在, 则直接从压缩包中提取; 否则什么也不做
+            for (file in FILES_TO_EXTRACT) {
+                val srcFile = srcRootDir.resolve(file)
+                val dstFile = dstRootDir.resolve(file)
+                if (!dstFile.exists()) {
+                    srcFile.copyTo(dstFile, false)
                 }
             }
 
-            // update comments
-            serverCfg.get(path)!!.also { (serverKeyNode, serverValueNode) ->
-                serverKeyNode.blockComments = internalKeyNode.blockComments
-                serverKeyNode.inLineComments = internalKeyNode.inLineComments
-                serverKeyNode.endComments = internalKeyNode.endComments
-
-                serverValueNode.blockComments = internalValueNode.blockComments
-                serverValueNode.inLineComments = internalValueNode.inLineComments
-                serverValueNode.endComments = internalValueNode.endComments
-            }
-
-            previousPath = path
-            if (skipChildren) NodeWalkDecision.SKIP else NodeWalkDecision.CONTINUE
-        }
-
-        // remove entries that were once extracted but are no longer in the internal config
-        serverCfg.walk { path, _, _ ->
-            if (internalCfg.get(path) == null && extractedCfg.get(path) != null) {
-                serverCfg.remove(path)
-                extractedCfg.remove(path)
-            }
-            NodeWalkDecision.CONTINUE
-        }
-    }
-
-    private fun loadYaml(s: String): Node {
-        return loadYaml(s.byteInputStream())
-    }
-
-    private fun loadYaml(file: Path): Node {
-        return file.inputStream().use { inp -> loadYaml(inp) }
-    }
-
-    private fun loadYaml(inp: InputStream): Node {
-        val settings = LoadSettings.builder()
-            .setParseComments(true)
-            .build()
-        val reader = StreamReader(settings, inp.reader())
-        val parser = ParserImpl(settings, reader)
-        val composer = Composer(settings, parser)
-        return composer.singleNode.get()
-    }
-
-    private fun writeYaml(node: Node, comments: Boolean = true): String {
-        val out = ByteArrayOutputStream()
-        writeYaml(node, out, comments)
-        return out.toString(Charsets.UTF_8)
-    }
-
-    private fun writeYaml(node: Node, file: Path, comments: Boolean = true) {
-        file.parent.createDirectories()
-        file.outputStream().use { out -> writeYaml(node, out, comments) }
-    }
-
-    private fun writeYaml(node: Node, out: OutputStream, comments: Boolean = true) {
-        val settings = DumpSettings.builder()
-            .setDumpComments(comments)
-            .build()
-
-        val writer = object : YamlOutputStreamWriter(out, Charsets.UTF_8) {
-            override fun processIOException(e: IOException) {
-                throw e
+            // 对于文件夹, 如果目标文件夹不存在或者存在但为空, 则直接从压缩包中提取; 否则什么也不做
+            for (dir in DIRECTORIES_TO_EXTRACT) {
+                val srcDir = srcRootDir.resolve(dir)
+                val dstDir = dstRootDir.resolve(dir)
+                if (!dstDir.exists() || dstDir.listDirectoryEntries().isEmpty()) {
+                    srcDir.copyToRecursively(dstDir, followLinks = false, overwrite = false)
+                }
             }
         }
-        val emitter = Emitter(settings, writer)
-        val serializer = Serializer(settings, emitter)
-
-        serializer.emitStreamStart()
-        serializer.serializeDocument(node)
-        serializer.emitStreamEnd()
     }
 
 }
