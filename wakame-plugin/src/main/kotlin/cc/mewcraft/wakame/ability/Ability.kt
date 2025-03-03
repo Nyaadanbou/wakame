@@ -52,12 +52,12 @@ abstract class Ability(
      * 添加一个 [Ability] 状态.
      */
     private fun addMechanic(input: AbilityInput) {
-        WakameWorld.createEntity(key.asString()) {
+        WakameWorld.createEntity(key) {
             it += AbilityComponent(
                 manaCost = input.manaCost,
-                penalty = ManaCostPenalty(),
                 phase = StatePhase.IDLE,
                 trigger = input.trigger,
+                variant = input.variant,
                 mochaEngine = input.mochaEngine
             )
             it += Tags.DISPOSABLE

@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.command.command
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.character.CasterAdapter
+import cc.mewcraft.wakame.ability.character.EmptyCaster
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.command.CommandPermissions
@@ -41,8 +42,8 @@ internal object AbilityCommand : KoishCommandFactory<Source> {
         val casterPlayer = context.sender() as? Player
         val targetEntity = context.get<SingleEntitySelector>("target").single() as? LivingEntity ?: return
         val target = targetEntity.let { TargetAdapter.adapt(it) }
-        val caster = casterPlayer?.let { CasterAdapter.adapt(it) }
-        val input = abilityInput(target) { castBy(caster) }
+        val caster = casterPlayer?.let { CasterAdapter.adapt(it) } ?: EmptyCaster
+        val input = abilityInput(caster, target)
         ability.recordBy(input)
     }
 

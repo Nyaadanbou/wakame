@@ -106,8 +106,7 @@ data class PlayerAbility(
 
     fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val target = target ?: TargetAdapter.adapt(caster)
-        val input = abilityInput(target) {
-            castBy(CasterAdapter.adapt(caster))
+        val input = abilityInput(CasterAdapter.adapt(caster), target) {
             trigger(trigger)
             manaCost(manaCost)
             holdBy(holdBy)

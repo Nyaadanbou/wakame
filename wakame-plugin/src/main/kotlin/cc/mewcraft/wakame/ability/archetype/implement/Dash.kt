@@ -116,9 +116,7 @@ private class DashAbilityMechanic(
                 continue
 
             for (ability in dash.hitEffects) {
-                val input = abilityInput(TargetAdapter.adapt(entity)) {
-                    castBy(CasterAdapter.adapt(casterEntity))
-                }
+                val input = abilityInput(CasterAdapter.adapt(casterEntity), TargetAdapter.adapt(entity))
                 ability.recordBy(input)
             }
         }

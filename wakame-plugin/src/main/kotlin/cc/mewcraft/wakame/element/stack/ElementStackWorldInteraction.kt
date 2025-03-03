@@ -26,7 +26,7 @@ object ElementStackWorldInteraction {
 
     fun putElementStackIntoWorld(element: RegistryEntry<out Element>, count: Int, target: Target, caster: Caster?) {
         require(count > 0) { "Count must be greater than 0" }
-        WakameWorld.createEntity(element.getIdAsString()) {
+        WakameWorld.createEntity(element.getKeyOrThrow().value) {
             caster?.let { c -> it += CastBy(c) }
             it += TargetTo(target)
             target.bukkitEntity?.let { bukkitEntity -> it += BukkitBridgeComponent(bukkitEntity) }

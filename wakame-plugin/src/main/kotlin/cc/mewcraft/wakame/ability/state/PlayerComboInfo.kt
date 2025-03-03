@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ability.state
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
 import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
@@ -12,6 +11,8 @@ import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.event.Events
@@ -57,9 +58,9 @@ class PlayerComboInfo(
     }
 
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
-    private val manaCostPenalties: MutableMap<String, ManaCostPenalty> = HashMap()
+    private val manaCostPenalties: MutableMap<Identifier, ManaCostPenalty> = HashMap()
 
-    private val mechanicName = "PlayerStateInfoResetMechanic-${player.uniqueId}"
+    private val mechanicId: Identifier = Identifiers.of("player_state_info_reset_mechanic_${player.name}")
     private val resetMechanic: Mechanic = PlayerStateInfoResetMechanic(this)
 
     fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
@@ -67,8 +68,8 @@ class PlayerComboInfo(
 
         // 尝试找到使用当前触发器能够触发的技能
         val singleAbility = getAbilityByTrigger(castTrigger)
-        if (singleAbility != null) {
-            WakameWorld.removeMechanic(mechanicName)
+        if (singleAbility.isNotEmpty()) {
+            WakameWorld.removeMechanic(mechanicId)
             markNextState(singleAbility)
             return PlayerComboResult.CANCEL_EVENT
         }
@@ -78,7 +79,7 @@ class PlayerComboInfo(
             val sequenceAbility = trySequenceAbility(castTrigger)
             if (sequenceAbility != null) {
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
-                WakameWorld.removeMechanic(mechanicName)
+                WakameWorld.removeMechanic(mechanicId)
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
             }
@@ -87,14 +88,16 @@ class PlayerComboInfo(
         return PlayerComboResult.SILENT_FAILURE
     }
 
-    private fun markNextState(ability: Ability) = playerAbilityWorldInteraction {
-        val abilityName = ability.key.asString()
-        val costPenalty = penalizeManaCost(abilityName)
-        player.setCostPenalty(abilityName, costPenalty)
-        player.setNextState(ability)
+    private fun markNextState(abilities: List<Ability>) = playerAbilityWorldInteraction {
+        for (ability in abilities) {
+            val abilityKey = ability.key
+            val costPenalty = penalizeManaCost(abilityKey)
+            player.setCostPenalty(abilityKey, costPenalty)
+            player.setNextState(ability)
+        }
     }
 
-    private fun penalizeManaCost(identifier: String): ManaCostPenalty {
+    private fun penalizeManaCost(identifier: Identifier): ManaCostPenalty {
         val penalty = manaCostPenalties.getOrPut(identifier) { ManaCostPenalty() }
         if (penalty.cooldown.testSilently()) {
             penalty.penaltyCount = 1
@@ -123,7 +126,7 @@ class PlayerComboInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
-            WakameWorld.addMechanic(mechanicName, resetMechanic)
+            WakameWorld.addMechanic(mechanicId, resetMechanic)
             val completeSequence = currentSequence.readAll()
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 
@@ -143,12 +146,9 @@ class PlayerComboInfo(
         return null
     }
 
-    private fun getAbilityByTrigger(trigger: Trigger): Ability? = playerAbilityWorldInteraction {
+    private fun getAbilityByTrigger(trigger: Trigger): List<Ability> = playerAbilityWorldInteraction {
         val abilities = player.getAbilityBy(trigger)
-        if (abilities.size > 1) {
-            LOGGER.warn("Player ${player.name} has multiple abilities with the same trigger $trigger")
-        }
-        return abilities.firstOrNull()
+        return abilities
     }
 
     fun clearSequence() {

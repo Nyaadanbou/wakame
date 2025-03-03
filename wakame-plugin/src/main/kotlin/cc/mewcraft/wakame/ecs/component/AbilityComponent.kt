@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ecs.component
 
 import cc.mewcraft.wakame.ability.ManaCostPenalty
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.molang.Evaluable
 import com.github.quillraven.fleks.Component
@@ -13,6 +14,7 @@ data class AbilityComponent(
     var penalty: ManaCostPenalty = ManaCostPenalty(),
     var phase: StatePhase,
     var trigger: Trigger?,
+    var variant: TriggerVariant,
     var mochaEngine: MochaEngine<*>,
 ) : Component<AbilityComponent> {
     companion object : ComponentType<AbilityComponent>()

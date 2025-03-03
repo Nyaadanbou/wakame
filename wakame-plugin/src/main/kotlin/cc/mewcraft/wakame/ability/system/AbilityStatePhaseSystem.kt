@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.event.bukkit.AbilityStateChangeEvent
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.serverTick
 import cc.mewcraft.wakame.util.text.mini
 import com.github.quillraven.fleks.Entity
@@ -45,7 +46,7 @@ class AbilityStatePhaseSystem : IteratingSystem(
         entity.configure { it -= Tags.NEXT_STATE }
     }
 
-    private fun onStateChange(identifier: String, ability: Ability, old: StatePhase, new: StatePhase) {
+    private fun onStateChange(identifier: Identifier, ability: Ability, old: StatePhase, new: StatePhase) {
         AbilityStateChangeEvent(ability, old, new).callEvent()
         Bukkit.broadcast("技能 $identifier 状态已切换为 $new".mini.hoverEvent(HoverEvent.showText("技能状态变更: $old -> $new. Tick: $serverTick".mini)))
     }

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ability.context
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
@@ -26,7 +27,7 @@ interface AbilityInput {
     /**
      * 这次技能的施法者 [Caster].
      */
-    val castBy: Caster?
+    val castBy: Caster
 
     /**
      * 此次技能的目标 [Target], 默认为 [castBy] 本身.
@@ -37,6 +38,11 @@ interface AbilityInput {
      * 此次技能的触发器 [Trigger], null 表示没有触发器.
      */
     val trigger: Trigger?
+
+    /**
+     * 触发此技能的变体.
+     */
+    val variant: TriggerVariant
 
     /**
      * 此次技能的施法物品 [NekoStack], null 表示没有施法物品.
@@ -61,8 +67,8 @@ interface AbilityInput {
 @DslMarker
 annotation class AbilityInputMarker
 
-fun abilityInput(target: Target, initializer: AbilityInputDSL.() -> Unit): AbilityInput {
-    return AbilityInputDSL(target).apply(initializer).build()
+fun abilityInput(caster: Caster, target: Target, initializer: AbilityInputDSL.() -> Unit = {}): AbilityInput {
+    return AbilityInputDSL(caster, target).apply(initializer).build()
 }
 
 fun abilityInput(componentBridge: ComponentBridge): AbilityInput {
@@ -71,21 +77,22 @@ fun abilityInput(componentBridge: ComponentBridge): AbilityInput {
 
 @AbilityInputMarker
 class AbilityInputDSL(
-    private var targetTo: Target,
+    private val castBy: Caster,
+    private val targetTo: Target,
 ) {
-    private var castBy: Caster? = null
     private var trigger: Trigger? = null
+    private var variant: TriggerVariant = TriggerVariant.any()
     private var holdBy: Pair<ItemSlot, NekoStack>? = null
     private var manaCost: Evaluable<*> = Evaluable.parseNumber(0)
     private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
 
-    fun castBy(castBy: Caster?): AbilityInputDSL {
-        this.castBy = castBy
+    fun trigger(trigger: Trigger?): AbilityInputDSL {
+        this.trigger = trigger
         return this
     }
 
-    fun trigger(trigger: Trigger?): AbilityInputDSL {
-        this.trigger = trigger
+    fun variant(variant: TriggerVariant): AbilityInputDSL {
+        this.variant = variant
         return this
     }
 
@@ -108,6 +115,7 @@ class AbilityInputDSL(
         castBy = castBy,
         targetTo = this@AbilityInputDSL.targetTo,
         trigger = trigger,
+        variant = variant,
         holdBy = holdBy,
         manaCost = manaCost,
         mochaEngine = mochaEngine
@@ -117,17 +125,17 @@ class AbilityInputDSL(
 /* Implementations */
 
 private class SimpleAbilityInput(
-    override val castBy: Caster?,
+    override val castBy: Caster,
     override val targetTo: Target,
     override val trigger: Trigger?,
+    override val variant: TriggerVariant,
     override val holdBy: Pair<ItemSlot, NekoStack>?,
     override val manaCost: Evaluable<*>,
     override val mochaEngine: MochaEngine<*>,
 ) : AbilityInput, Examinable {
 
     override fun toBuilder(): AbilityInputDSL {
-        return AbilityInputDSL(targetTo)
-            .castBy(castBy)
+        return AbilityInputDSL(castBy, targetTo)
             .trigger(trigger)
             .holdBy(holdBy)
             .manaCost(manaCost)
@@ -153,12 +161,14 @@ private class SimpleAbilityInput(
 private value class ComponentMapAbilityInput(
     private val componentBridge: ComponentBridge,
 ) : AbilityInput, Examinable {
-    override val castBy: Caster?
-        get() = componentBridge[CastBy]?.caster
+    override val castBy: Caster
+        get() = requireNotNull(componentBridge[CastBy]?.caster)
     override val targetTo: Target
         get() = requireNotNull(componentBridge[TargetTo]?.target) { "Target not found in componentBridge" }
     override val trigger: Trigger?
         get() = requireNotNull(componentBridge[AbilityComponent]?.trigger) { "Trigger not found in componentBridge" }
+    override val variant: TriggerVariant
+        get() = requireNotNull(componentBridge[AbilityComponent]?.variant) { "TriggerVariant not found in componentBridge" }
     override val holdBy: Pair<ItemSlot, NekoStack>?
         get() {
             val slot = componentBridge[HoldBy]?.slot ?: return null
@@ -171,8 +181,7 @@ private value class ComponentMapAbilityInput(
         get() = requireNotNull(componentBridge[AbilityComponent]?.mochaEngine) { "MochaEngine not found in componentBridge" }
 
     override fun toBuilder(): AbilityInputDSL {
-        return AbilityInputDSL(targetTo)
-            .castBy(castBy)
+        return AbilityInputDSL(castBy, targetTo)
             .trigger(trigger)
             .holdBy(holdBy)
             .manaCost(manaCost)

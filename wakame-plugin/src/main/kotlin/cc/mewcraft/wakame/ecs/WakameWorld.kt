@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.ecs.system.RemoveSystem
 import cc.mewcraft.wakame.ecs.system.StackCountSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.ecs.system.TickResultSystem
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
 import com.github.quillraven.fleks.Entity
@@ -32,8 +33,8 @@ object WakameWorld {
     private val instance: World = configureWorld {
 
         families {
-            recordToBukkitEntity(MetadataKeys.ABILITY, FamilyDefinitions.ABILITY_BUKKIT_BRIDGE)
-            recordToBukkitEntity(MetadataKeys.ELEMENT_STACK, FamilyDefinitions.ELEMENT_STACK_BUKKIT_BRIDGE)
+            recordToBukkitEntity(FamilyDefinitions.ABILITY_BUKKIT_BRIDGE)
+            recordToBukkitEntity(FamilyDefinitions.ELEMENT_STACK_BUKKIT_BRIDGE)
         }
 
         systems {
@@ -64,38 +65,40 @@ object WakameWorld {
         }
     }
 
-    private fun FamilyConfiguration.recordToBukkitEntity(metadataKey: MetadataKey<ComponentBridge>, family: Family) {
+    private fun FamilyConfiguration.recordToBukkitEntity(family: Family) {
         onAdd(family) { entity ->
+            val identifier = entity[IdentifierComponent].id
             val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
             val metadataMap = Metadata.provide(bukkitEntity)
+            val metadataKey = MetadataKey.create(identifier.asString(), ComponentBridge::class.java)
             metadataMap.put(metadataKey, ComponentBridge(entity))
         }
 
         onRemove(family) { entity ->
+            val identifier = entity[IdentifierComponent].id
             val bukkitEntity = entity[BukkitBridgeComponent].bukkitEntity
             val metadataMap = Metadata.provide(bukkitEntity)
+            val metadataKey = MetadataKey.create(identifier.asString(), ComponentBridge::class.java)
             metadataMap.remove(metadataKey)
         }
     }
 
     internal fun tick() {
-        with(instance) {
-            update(1f)
-        }
+        instance.update(1f)
     }
 
     internal fun world(): World {
         return instance
     }
 
-    internal inline fun createEntity(identifier: String, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
+    internal inline fun createEntity(identifier: Identifier, configuration: EntityCreateContext.(Entity) -> Unit = {}) {
         instance.entity {
             it += IdentifierComponent(identifier)
             configuration.invoke(this, it)
         }
     }
 
-    internal fun addMechanic(identifier: String, mechanic: Mechanic, replace: Boolean = true) {
+    internal fun addMechanic(identifier: Identifier, mechanic: Mechanic, replace: Boolean = true) {
         with(instance) {
             val identifierFamily = family { all(IdentifierComponent, MechanicComponent) }
             val entityToModify = identifierFamily.firstOrNull { it[IdentifierComponent].id == identifier }
@@ -113,7 +116,7 @@ object WakameWorld {
         }
     }
 
-    internal fun removeMechanic(identifier: String) {
+    internal fun removeMechanic(identifier: Identifier) {
         with(instance) {
             val entityToRemove = FamilyDefinitions.MECHANIC
                 .firstOrNull { it[IdentifierComponent].id == identifier }

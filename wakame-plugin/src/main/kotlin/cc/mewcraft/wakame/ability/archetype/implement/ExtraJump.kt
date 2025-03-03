@@ -65,12 +65,7 @@ private class ExtraJumpAbilityMechanic(
             cooldown--
         }
         val player = componentBridge.castByEntity() as Player
-
-        if (player.currentInput.isJump) {
-            isHoldingJump = true
-        } else {
-            isHoldingJump = false
-        }
+        isHoldingJump = player.currentInput.isJump
     }
 
     override fun onEnable(componentBridge: ComponentBridge) = abilitySupport {

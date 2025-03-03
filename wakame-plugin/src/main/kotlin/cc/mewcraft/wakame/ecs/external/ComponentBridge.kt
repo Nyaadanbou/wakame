@@ -35,6 +35,10 @@ value class ComponentBridge(
         return entity.getOrNull(type)
     }
 
+    internal inline fun <reified T : Component<out Any>> getOrThrow(type: ComponentType<T>): T = with(WakameWorld.world()) {
+        return entity[type]
+    }
+
     operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(WakameWorld.world()) {
         return entity.contains(uniqueId)
     }
