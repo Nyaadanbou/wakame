@@ -19,6 +19,7 @@ import cc.mewcraft.wakame.integration.townflight.TownFlightManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.user.PlayerResourceFixExternalHandler
 import cc.mewcraft.wakame.util.data.JarUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -31,14 +32,10 @@ import kotlin.reflect.KClass
 )
 internal object HooksLoader {
 
-    /**
-     * 用户指定的玩家等级系统.
-     */
+    /** 用户指定的玩家等级系统. */
     private val selectedPlayerLevelIntegration by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
 
-    /**
-     * 用户指定的经济账户系统.
-     */
+    /** 用户指定的经济账户系统. */
     private val selectedEconomyIntegration by MAIN_CONFIG.entry<EconomyType>("economy_provider")
 
     // 部分 integration 会在 pre world 阶段加载默认(自带)的钩子,
@@ -116,6 +113,10 @@ internal object HooksLoader {
 
         if (hook is PermissionIntegration) {
             PermissionManager.integrations += hook
+        }
+
+        if (hook is PlayerResourceFixExternalHandler) {
+            PlayerResourceFixExternalHandler.CURRENT_HANDLER = hook
         }
 
         if (hook is PlayerLevelIntegration && selectedPlayerLevelIntegration == hook.type) {

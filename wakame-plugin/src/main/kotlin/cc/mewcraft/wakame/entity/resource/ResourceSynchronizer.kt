@@ -15,7 +15,7 @@ import org.bukkit.persistence.PersistentDataType
  * - [Minecraft 原版本身的问题: MC-17876](https://bugs.mojang.com/browse/MC-17876)
  * - 在服务器安装了跨服同步系统时, 玩家的资源也能够正确同步
  */
-internal object ResourceSynchronizer {
+object ResourceSynchronizer {
     private val HEALTH_KEY = NamespacedKey("koish", "player_health")
     private val MANA_KEY = NamespacedKey("koish", "player_mana")
 
