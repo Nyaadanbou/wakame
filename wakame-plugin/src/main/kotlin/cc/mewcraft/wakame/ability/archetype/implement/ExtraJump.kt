@@ -9,8 +9,8 @@ import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.data.SpiralPath
 import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
@@ -19,6 +19,7 @@ import com.destroystokyo.paper.ParticleBuilder
 import io.papermc.paper.math.Position
 import net.kyori.adventure.key.Key
 import org.bukkit.Particle
+import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -111,11 +112,10 @@ private class ExtraJumpAbilityMechanic(
                         .extra(.0)
                         .source(player)
                 },
-                particlePath = SpiralPath(
+                particlePath = CirclePath(
                     center = Position.fine(player.location.x, player.location.y, player.location.z),
                     radius = 0.5,
-                    height = 0.5,
-                    rotations = 1
+                    axis = BlockFace.UP
                 ),
                 times = 1
             )
