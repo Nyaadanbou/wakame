@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.SpiralPath
-import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentBridge
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
@@ -58,11 +57,10 @@ private class ExtraJumpAbilityMechanic(
     private var cooldown: Long = USE_COOLDOWN
     private var jumpCount: Int = extraJump.count
 
-    override fun tick(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
+    override fun passiveTick(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge) {
         if (cooldown > 0) {
             cooldown--
         }
-        return super.tick(deltaTime, tickCount, componentBridge)
     }
 
     override fun onEnable(componentBridge: ComponentBridge) = abilitySupport {
