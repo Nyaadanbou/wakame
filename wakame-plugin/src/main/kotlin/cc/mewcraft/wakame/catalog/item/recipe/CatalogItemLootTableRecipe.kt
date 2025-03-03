@@ -94,7 +94,7 @@ data class CatalogItemLootTableRecipe(
                 val tagKey = lootPoolEntryContainer.shadow<ShadowTagEntry>().tag
                 return MojangBuiltInRegistries.ITEM.getTagOrEmpty(tagKey).mapNotNull { holder ->
                     val resourceKey = holder.unwrapKey().getOrNull() ?: return@mapNotNull null
-                    ItemXVanilla(resourceKey.location().toString())
+                    ItemXVanilla(resourceKey.location().path)
                 }
             }
 
