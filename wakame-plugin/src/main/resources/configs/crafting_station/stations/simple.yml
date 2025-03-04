@@ -9,7 +9,7 @@ recipes:
 
 # 合成站 listing 菜单的布局
 # 该菜单显示所有可以合成的物品, 也是玩家刚打开合成站看到的样子
-listing_layout:
+listing_menu_settings:
 
   title: "示例合成站"
 
@@ -35,7 +35,7 @@ listing_layout:
 
 # 合成站 preview 菜单的布局
 # 该菜单显示单个合成配方的详细信息
-preview_layout:
+preview_menu_settings:
 
   title: "合成预览"
 
@@ -61,9 +61,7 @@ preview_layout:
     background: "internal:menu/common/default/background"
     next_page: "internal:menu/common/default/next_page"
     prev_page: "internal:menu/common/default/prev_page"
-    choice: "internal:menu/crafting_station/default/choice"
     craft: "internal:menu/crafting_station/default/craft"
-    result: "internal:menu/crafting_station/default/result"
 
 catalog_menu_settings:
 

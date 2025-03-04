@@ -55,9 +55,7 @@ preview_menu_settings:
     background: "internal:menu/common/background"
     next_page: "internal:menu/common/next_page"
     prev_page: "internal:menu/common/prev_page"
-    choice: "internal:menu/crafting/choice"
     craft: "internal:menu/crafting/craft"
-    result: "internal:menu/crafting/result"
 
 catalog_menu_settings:
   title: "示例合成站"
