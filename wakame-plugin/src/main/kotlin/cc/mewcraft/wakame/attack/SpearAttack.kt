@@ -159,8 +159,8 @@ data class SpearAttack(
     private fun particleLine(world: World, start: Vector3f, end: Vector3f, particleBuilder: ParticleBuilder) {
         val distance = end.distance(start)
         val num = (distance / 0.2).toInt()
-        for (i in 0..num) {
-            val t = i.toFloat() / num
+        for (i in 1..num) {
+            val t = (i - 1).toFloat() / num
             particleBuilder.location(
                 (start + ((end - start) mul t)).toLocation(world)
             ).receivers(64).spawn()
