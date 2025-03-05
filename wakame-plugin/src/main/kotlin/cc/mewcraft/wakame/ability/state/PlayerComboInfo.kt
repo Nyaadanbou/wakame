@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
 import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Mechanic
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
@@ -63,13 +62,12 @@ class PlayerComboInfo(
     private val mechanicId: Identifier = Identifiers.of("player_state_info_reset_mechanic_${player.name}")
     private val resetMechanic: Mechanic = PlayerStateInfoResetMechanic(this)
 
-    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
+    fun addTrigger(trigger: SingleTrigger): PlayerComboResult = playerAbilityWorldInteraction {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
         // 尝试找到使用当前触发器能够触发的技能
-        val singleAbility = getAbilityByTrigger(castTrigger)
+        val singleAbility = player.getAbilitiesBy(trigger)
         if (singleAbility.isNotEmpty()) {
-            WakameWorld.removeMechanic(mechanicId)
             markNextState(singleAbility)
             return PlayerComboResult.CANCEL_EVENT
         }
@@ -77,7 +75,7 @@ class PlayerComboInfo(
         // 尝试找到使用当前 combo 能够触发的技能
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
             val sequenceAbility = trySequenceAbility(castTrigger)
-            if (sequenceAbility != null) {
+            if (sequenceAbility.isNotEmpty()) {
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
                 WakameWorld.removeMechanic(mechanicId)
                 markNextState(sequenceAbility)
@@ -92,7 +90,7 @@ class PlayerComboInfo(
         for (ability in abilities) {
             val abilityKey = ability.key
             val costPenalty = penalizeManaCost(abilityKey)
-            player.setCostPenalty(abilityKey, costPenalty)
+            player.setCostPenalty(ability, costPenalty)
             player.setNextState(ability)
         }
     }
@@ -107,7 +105,7 @@ class PlayerComboInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleTrigger): Ability? = playerAbilityWorldInteraction {
+    private fun trySequenceAbility(trigger: SingleTrigger): List<Ability> = playerAbilityWorldInteraction {
         val triggerTypes = player.getAllActiveAbilityTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
@@ -132,23 +130,18 @@ class PlayerComboInfo(
 
             if (currentSequence.isFull()) {
                 val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
-                val abilityOnSequence = sequence?.let { getAbilityByTrigger(it) }
+                val abilityOnSequence = player.getAbilitiesBy(sequence)
                 // 如果成功，则清除当前序列
                 currentSequence.clear()
-                if (abilityOnSequence == null) {
+                if (abilityOnSequence.isEmpty()) {
                     PlayerComboInfoDisplay.displayFailure(completeSequence, player)
-                    return null
+                    return emptyList()
                 }
                 return abilityOnSequence
             }
         }
 
-        return null
-    }
-
-    private fun getAbilityByTrigger(trigger: Trigger): List<Ability> = playerAbilityWorldInteraction {
-        val abilities = player.getAbilityBy(trigger)
-        return abilities
+        return emptyList()
     }
 
     fun clearSequence() {

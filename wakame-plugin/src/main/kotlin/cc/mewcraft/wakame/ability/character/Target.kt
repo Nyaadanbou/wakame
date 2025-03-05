@@ -79,4 +79,17 @@ private class BukkitLivingEntityTarget(
     override fun toString(): String {
         return toSimpleString()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BukkitLivingEntityTarget) return false
+
+        if (uniqueId != other.uniqueId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return uniqueId.hashCode()
+    }
 }

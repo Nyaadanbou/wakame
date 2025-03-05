@@ -1,21 +1,15 @@
 package cc.mewcraft.wakame.ecs.component
 
+import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.util.metadata.MetadataKey
+import cc.mewcraft.wakame.util.metadata.MetadataMap
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
-import org.bukkit.entity.Display
-import org.bukkit.entity.Entity
-import org.bukkit.entity.Interaction
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 
 data class BukkitBridgeComponent(
-    val bukkitEntity: Entity
+    val metadataKey: MetadataKey<ComponentBridge>,
+    val metadataMapProvider: (ComponentBridge) -> MetadataMap,
 ) : Component<BukkitBridgeComponent> {
-    fun player(): Player = bukkitEntity as Player
-    fun living(): LivingEntity = bukkitEntity as LivingEntity
-    fun display(): Display = bukkitEntity as Display
-    fun interaction(): Interaction = bukkitEntity as Interaction
-
     companion object : ComponentType<BukkitBridgeComponent>()
 
     override fun type(): ComponentType<BukkitBridgeComponent> = BukkitBridgeComponent

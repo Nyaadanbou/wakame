@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
-class AbilityMechanicRemoveSystem : IteratingSystem(
+class AbilityRemoveSystem : IteratingSystem(
     family = family { all(AbilityComponent, Tags.READY_TO_REMOVE) }
 ) {
     override fun onTickEntity(entity: Entity) {

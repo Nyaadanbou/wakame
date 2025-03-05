@@ -114,8 +114,8 @@ enum class SequenceTrigger(
             return fromSingleTriggers(triggers.toList())
         }
 
-        fun fromSingleTriggers(triggers: List<SingleTrigger>): SequenceTrigger? {
-            return entries.find { it.triggers.contentEquals(triggers) }
+        fun fromSingleTriggers(triggers: List<SingleTrigger>): SequenceTrigger {
+            return entries.first { it.triggers.contentEquals(triggers) }
         }
 
         private fun <E> List<E>.contentEquals(other: List<E>): Boolean {

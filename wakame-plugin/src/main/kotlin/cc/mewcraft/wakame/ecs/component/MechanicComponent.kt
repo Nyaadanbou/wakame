@@ -14,12 +14,12 @@ data class MechanicComponent(
 
     override fun World.onAdd(entity: Entity) {
         val componentBridge = ComponentBridge(entity)
-        mechanic.onEnable(componentBridge)
+        mechanic.onInit(componentBridge)
     }
 
     override fun World.onRemove(entity: Entity) {
         val componentBridge = ComponentBridge(entity)
-        mechanic.onDisable(componentBridge)
+        mechanic.onDispose(componentBridge)
     }
 
     companion object : ComponentType<MechanicComponent>()

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ability.archetype
 
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.adventure.key.Keyed
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -19,7 +20,7 @@ import org.spongepowered.configurate.ConfigurationNode
  * private class DefaultMyAbility(override val myProperty: String) : Ability
  * ```
  */
-interface AbilityArchetype {
+interface AbilityArchetype : Keyed {
     /**
      * Create a new instance of the ability base on a certain ability type
      *

@@ -22,28 +22,24 @@ internal inline fun <T> abilitySupport(run: AbilitySupport.() -> T): T = Ability
 @AbilitySupportDsl
 internal object AbilitySupport {
     fun ComponentBridge.castBy(): Caster? {
-        return this[CastBy]?.caster
+        return this[CastBy].caster
     }
 
     fun ComponentBridge.castByEntity(): LivingEntity? {
-        return this[CastBy]?.caster?.entity as? LivingEntity
+        return this[CastBy].caster.entity as? LivingEntity
     }
 
     fun ComponentBridge.targetTo(): Target {
-        return this[TargetTo]?.target ?: error("No entity found in TargetTo component")
+        return this[TargetTo].target
     }
 
     fun ComponentBridge.evaluate(evaluable: Evaluable<*>): Double {
-        val engine = this[AbilityComponent]?.mochaEngine
-        return if (engine != null) {
-            evaluable.evaluate(engine)
-        } else {
-            evaluable.evaluate()
-        }
+        val engine = this[AbilityComponent].mochaEngine
+        return evaluable.evaluate(engine)
     }
 
     fun ComponentBridge.addParticle(bukkitWorld: World, vararg particleInfos: ParticleInfo) {
-        val component = this[ParticleEffectComponent]
+        val component = this.getOrNull(ParticleEffectComponent)
         if (component != null) {
             component.particleInfos.addAll(particleInfos)
         } else {
@@ -52,9 +48,9 @@ internal object AbilitySupport {
     }
 
     private var ComponentBridge.tickCount: Double
-        get() = this[TickCountComponent]?.tick ?: error("No TickCountComponent found")
+        get() = this[TickCountComponent].tick
         set(value) {
-            this[TickCountComponent]?.tick = value
+            this[TickCountComponent].tick = value
         }
 
     fun Location.toTarget(): Target {

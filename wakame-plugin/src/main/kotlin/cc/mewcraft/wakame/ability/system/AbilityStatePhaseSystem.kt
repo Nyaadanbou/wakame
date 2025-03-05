@@ -22,7 +22,7 @@ class AbilityStatePhaseSystem : IteratingSystem(
     family = family { all(AbilityComponent, IdentifierComponent, TickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
-        val id = entity[IdentifierComponent].id
+        val id = entity[AbilityComponent].abilityId
         val tickResult = entity[TickResultComponent].result
         val oldPhase = entity[AbilityComponent].phase
         val newPhase = when {

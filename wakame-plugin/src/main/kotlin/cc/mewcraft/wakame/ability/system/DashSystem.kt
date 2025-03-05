@@ -1,55 +1,29 @@
-package cc.mewcraft.wakame.ability.archetype.implement
+package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.ActiveAbilityMechanic
-import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ability.component.Dash
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ecs.Mechanic
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.TargetTo
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.ecs.external.ComponentBridge
-import cc.mewcraft.wakame.util.require
-import net.kyori.adventure.key.Key
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.IteratingSystem
+import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
+import org.bukkit.entity.Entity as BukkitEntity
 
-/**
- * 冲刺技能.
- */
-object DashArchetype : AbilityArchetype {
-    override fun create(key: Key, config: ConfigurationNode): Ability {
-        val stepDistance = config.node("step_distance").require<Double>()
-        val duration = config.node("duration").get<Long>() ?: 50
-        val canContinueAfterHit = config.node("can_continue_after_hit").get<Boolean>() ?: true
-        val hitEffect = config.node("hit_effects").get<List<Ability>>() ?: emptyList()
-        return Dash(key, config, stepDistance, duration, canContinueAfterHit, hitEffect)
-    }
-}
-
-private class Dash(
-    key: Key,
-    config: ConfigurationNode,
-    val stepDistance: Double,
-    val duration: Long,
-    val canContinueAfterHit: Boolean,
-    val hitEffects: List<Ability>,
-) : Ability(key, config) {
-    override fun mechanic(input: AbilityInput): Mechanic {
-        return DashAbilityMechanic(this)
-    }
-}
-
-private class DashAbilityMechanic(
-    private val dash: Dash,
-) : ActiveAbilityMechanic() {
-
+class DashSystem : IteratingSystem(
+    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, IdentifierComponent, Dash) }
+), ActiveAbilitySystem {
     companion object {
         /**
          * 在 Dash 开始前的准备时间
@@ -57,11 +31,20 @@ private class DashAbilityMechanic(
         private const val STARTING_TICK: Long = 10L
     }
 
+    override fun onTickEntity(entity: Entity) {
+        val tickCount = entity[TickCountComponent].tick
+        val result = tick(deltaTime.toDouble(), tickCount, ComponentBridge(entity))
+        entity.configure {
+            it += TickResultComponent(result)
+        }
+    }
+
     override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
         return TickResult.NEXT_STATE
     }
 
     override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
+        val dash = componentBridge[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
@@ -97,7 +80,7 @@ private class DashAbilityMechanic(
         // 应用速度到玩家对象上
         entity.velocity = stepVector
 
-        if (affectEntityNearby(entity)) {
+        if (affectEntityNearby(entity, componentBridge)) {
             if (!dash.canContinueAfterHit) {
                 return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
             }
@@ -106,7 +89,8 @@ private class DashAbilityMechanic(
         return@abilitySupport TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(casterEntity: Entity): Boolean {
+    private fun affectEntityNearby(casterEntity: BukkitEntity, componentBridge: ComponentBridge): Boolean {
+        val dash = componentBridge[Dash]
         val entities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (entities.isEmpty()) {
             return false

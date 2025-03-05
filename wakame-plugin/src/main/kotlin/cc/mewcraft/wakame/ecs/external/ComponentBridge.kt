@@ -31,12 +31,12 @@ value class ComponentBridge(
     val tags: List<UniqueId<out Any>>
         get() = WakameWorld.world().snapshotOf(entity).tags
 
-    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T? = with(WakameWorld.world()) {
-        return entity.getOrNull(type)
+    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T = with(WakameWorld.world()) {
+        return entity[type]
     }
 
-    internal inline fun <reified T : Component<out Any>> getOrThrow(type: ComponentType<T>): T = with(WakameWorld.world()) {
-        return entity[type]
+    internal inline fun <reified T : Component<out Any>> getOrNull(type: ComponentType<T>): T? = with(WakameWorld.world()) {
+        return entity.getOrNull(type)
     }
 
     operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(WakameWorld.world()) {

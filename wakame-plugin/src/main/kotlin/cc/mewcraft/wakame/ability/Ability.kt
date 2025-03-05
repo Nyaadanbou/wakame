@@ -1,20 +1,15 @@
 package cc.mewcraft.wakame.ability
 
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.MechanicComponent
-import cc.mewcraft.wakame.ecs.component.Tags
-import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.data.StatePhase
+import cc.mewcraft.wakame.ecs.component.WithAbility
+import cc.mewcraft.wakame.ecs.eEntityOrCreate
+import cc.mewcraft.wakame.ecs.external.AbilityEntityQuery
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityCreateContext
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -41,59 +36,30 @@ abstract class Ability(
      * [Ability] will be found by the [key].
      */
     final override val key: Key,
+    val archetype: AbilityArchetype,
     config: ConfigurationNode,
 ) : Keyed, Examinable {
+
     /**
      * The display infos of this ability.
      */
     val displays: AbilityDisplay = config.node("displays").get<AbilityDisplay>() ?: AbilityDisplay()
 
     /**
-     * 添加一个 [Ability] 状态.
-     */
-    private fun addMechanic(input: AbilityInput) {
-        WakameWorld.createEntity(key) {
-            it += AbilityComponent(
-                manaCost = input.manaCost,
-                phase = StatePhase.IDLE,
-                trigger = input.trigger,
-                variant = input.variant,
-                mochaEngine = input.mochaEngine
-            )
-            it += Tags.DISPOSABLE
-            it += MechanicComponent(mechanic(input))
-            input.castBy?.let { castBy ->
-                it += CastBy(castBy)
-                it += BukkitBridgeComponent(castBy.entity)
-            }
-            it += TargetTo(input.targetTo)
-            HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
-            input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
-            it += TickCountComponent(.0)
-        }
-    }
-
-    /**
      * 使用 [input] 记录技能的信息到 ECS 中.
-     *
-     * 具体是先调用 [mechanic], 再将返回结果添加到 ECS 中.
      */
     fun recordBy(input: AbilityInput) {
-        addMechanic(input)
+        val abilityEntity = AbilityEntityQuery.createAbilityEntity(this, input)
+        input.castBy.entity.eEntityOrCreate()[WithAbility].abilities.put(this.archetype, abilityEntity)
     }
 
     /**
-     * 返回一个技能执行的结果, 只有执行 [Mechanic] 才会真正执行技能逻辑.
-     *
-     * @see Mechanic
-     * @see ActiveAbilityMechanic
-     * @see PassiveAbilityMechanic
+     * 获取该技能的配置到 ECS 内的信息.
      */
-    abstract fun mechanic(input: AbilityInput): Mechanic
+    abstract fun configuration(): EntityCreateContext.(Entity) -> Unit
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
-            ExaminableProperty.of("key", key),
             ExaminableProperty.of("displays", displays),
         )
     }
@@ -102,14 +68,20 @@ abstract class Ability(
         return toSimpleString()
     }
 
-    override fun hashCode(): Int {
-        return key.hashCode()
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Ability) return false
 
-        return key == other.key
+        if (key != other.key) return false
+        if (archetype != other.archetype) return false
+
+        return true
     }
+
+    override fun hashCode(): Int {
+        var result = key.hashCode()
+        result = 31 * result + archetype.hashCode()
+        return result
+    }
+
 }

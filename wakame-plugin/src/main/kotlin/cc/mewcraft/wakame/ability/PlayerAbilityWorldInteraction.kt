@@ -25,7 +25,7 @@ internal annotation class PlayerAbilityWorldInteractionDsl
  */
 @PlayerAbilityWorldInteractionDsl
 internal object PlayerAbilityWorldInteraction : KoinComponent {
-    fun Player.getAbilityBy(trigger: Trigger): List<Ability> {
+    fun Player.getAbilitiesBy(trigger: Trigger): List<Ability> {
         return AbilityEntityQuery.findAllAbilities(CasterAdapter.adapt(this))
             .filter { it.trigger == trigger }
             .map { it.instance }
@@ -44,7 +44,7 @@ internal object PlayerAbilityWorldInteraction : KoinComponent {
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
                 // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@editEntities
-            if (entity[IdentifierComponent].id != ability.key)
+            if (entity[IdentifierComponent].id != ability.archetype.key)
                 return@editEntities
             entity.configure { it += Tags.NEXT_STATE }
         }
@@ -54,10 +54,10 @@ internal object PlayerAbilityWorldInteraction : KoinComponent {
         WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setCostPenalty)
                 return@editEntities
-            if (entity[IdentifierComponent].id != ability.key)
+            if (entity[IdentifierComponent].id != ability.archetype.key)
                 return@editEntities
             entity[AbilityComponent].penalty = penalty
-            }
+        }
     }
 
     fun Player.cleanupAbility() {

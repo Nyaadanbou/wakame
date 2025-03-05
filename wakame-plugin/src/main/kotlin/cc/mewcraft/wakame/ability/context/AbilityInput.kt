@@ -162,23 +162,23 @@ private value class ComponentMapAbilityInput(
     private val componentBridge: ComponentBridge,
 ) : AbilityInput, Examinable {
     override val castBy: Caster
-        get() = requireNotNull(componentBridge[CastBy]?.caster)
+        get() = componentBridge[CastBy].caster
     override val targetTo: Target
-        get() = requireNotNull(componentBridge[TargetTo]?.target) { "Target not found in componentBridge" }
+        get() = componentBridge[TargetTo].target
     override val trigger: Trigger?
-        get() = requireNotNull(componentBridge[AbilityComponent]?.trigger) { "Trigger not found in componentBridge" }
+        get() = componentBridge[AbilityComponent].trigger
     override val variant: TriggerVariant
-        get() = requireNotNull(componentBridge[AbilityComponent]?.variant) { "TriggerVariant not found in componentBridge" }
+        get() = componentBridge[AbilityComponent].variant
     override val holdBy: Pair<ItemSlot, NekoStack>?
         get() {
-            val slot = componentBridge[HoldBy]?.slot ?: return null
-            val nekoStack = componentBridge[HoldBy]?.nekoStack ?: return null
+            val slot = componentBridge.getOrNull(HoldBy)?.slot ?: return null
+            val nekoStack = componentBridge.getOrNull(HoldBy)?.nekoStack ?: return null
             return slot to nekoStack
         }
     override val manaCost: Evaluable<*>
-        get() = requireNotNull(componentBridge[AbilityComponent]?.manaCost) { "ManaCost not found in componentBridge" }
+        get() = componentBridge[AbilityComponent].manaCost
     override val mochaEngine: MochaEngine<*>
-        get() = requireNotNull(componentBridge[AbilityComponent]?.mochaEngine) { "MochaEngine not found in componentBridge" }
+        get() = componentBridge[AbilityComponent].mochaEngine
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(castBy, targetTo)

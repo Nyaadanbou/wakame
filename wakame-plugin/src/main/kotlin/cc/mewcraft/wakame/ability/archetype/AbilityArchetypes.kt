@@ -11,12 +11,12 @@ import cc.mewcraft.wakame.registry2.Registry
  * 技能工厂的集合. 用于获取用于创建技能的工厂类.
  */
 internal object AbilityArchetypes {
-    val BLACK_HOLE = register("black_hole", BlackHoleArchetype)
-    val BLINK = register("blink", BlinkArchetype)
-    val DASH = register("dash", DashArchetype)
-    val EXTRA_JUMP = register("extra_jump", ExtraJumpArchetype)
+    val BLACK_HOLE = register(BlackHoleArchetype)
+    val BLINK = register(BlinkArchetype)
+    val DASH = register(DashArchetype)
+    val EXTRA_JUMP = register(ExtraJumpArchetype)
 
-    private inline fun <reified T : AbilityArchetype> register(id: String, entry: T): T {
-        return Registry.register(KoishRegistries.ABILITY_ARCHETYPE, id, entry)
+    private inline fun <reified T : AbilityArchetype> register(entry: T): T {
+        return Registry.register(KoishRegistries.ABILITY_ARCHETYPE, entry.key, entry)
     }
 }

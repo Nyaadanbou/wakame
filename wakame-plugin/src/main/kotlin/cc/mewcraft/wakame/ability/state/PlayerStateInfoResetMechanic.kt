@@ -16,7 +16,7 @@ internal class PlayerStateInfoResetMechanic(
         return TickResult.ALL_DONE
     }
 
-    override fun onDisable(componentBridge: ComponentBridge) {
+    override fun onDispose(componentBridge: ComponentBridge) {
         stateInfo.clearSequence()
     }
 }

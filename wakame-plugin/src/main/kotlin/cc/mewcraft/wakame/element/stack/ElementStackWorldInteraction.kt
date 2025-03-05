@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ElementComponent
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
@@ -29,7 +28,6 @@ object ElementStackWorldInteraction {
         WakameWorld.createEntity(element.getKeyOrThrow().value) {
             caster?.let { c -> it += CastBy(c) }
             it += TargetTo(target)
-            target.bukkitEntity?.let { bukkitEntity -> it += BukkitBridgeComponent(bukkitEntity) }
             it += ElementComponent(element)
             it += TickCountComponent()
             it += StackCountComponent(count)
