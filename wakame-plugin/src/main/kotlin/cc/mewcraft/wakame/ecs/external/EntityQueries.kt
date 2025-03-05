@@ -104,16 +104,16 @@ object AbilityEntityQuery {
         }
     }
 
-    fun findAbilityComponentBridges(abilityId: Identifier, caster: Caster): List<ComponentBridge> {
-        val componentBridges = mutableListOf<ComponentBridge>()
+    fun findAbilityComponentBridges(abilityId: Identifier, caster: Caster): List<KoishEntity> {
+        val koishEntities = mutableListOf<KoishEntity>()
         FamilyDefinitions.ABILITY.forEach { entity ->
             if (entity[AbilityComponent].abilityId != abilityId)
                 return@forEach
             if (entity[CastBy].caster != caster)
                 return@forEach
-            componentBridges.add(ComponentBridge(entity))
+            koishEntities.add(KoishEntity(entity))
         }
-        return componentBridges
+        return koishEntities
     }
 
     fun findAbilities(abilityId: Identifier, caster: Caster): List<PlayerAbility> {
@@ -122,24 +122,24 @@ object AbilityEntityQuery {
     }
 
     fun findAllAbilities(caster: Caster): List<PlayerAbility> {
-        val componentBridges = mutableListOf<ComponentBridge>()
+        val koishEntities = mutableListOf<KoishEntity>()
         FamilyDefinitions.ABILITY.forEach { entity ->
             if (entity[CastBy].caster != caster)
                 return@forEach
-            componentBridges.add(ComponentBridge(entity))
+            koishEntities.add(KoishEntity(entity))
         }
 
-        return componentBridges.map { it.getPlayerAbility() }
+        return koishEntities.map { it.getPlayerAbility() }
     }
 
-    fun editAbilities(abilityId: Identifier, caster: Caster, block: (ComponentBridge) -> Unit) {
+    fun editAbilities(abilityId: Identifier, caster: Caster, block: (KoishEntity) -> Unit) {
         val componentBridges = findAbilityComponentBridges(abilityId, caster)
         for (bridge in componentBridges) {
             block(bridge)
         }
     }
 
-    private fun ComponentBridge.getPlayerAbility(): PlayerAbility {
+    private fun KoishEntity.getPlayerAbility(): PlayerAbility {
         val abilityComponent = get(AbilityComponent)
         return PlayerAbility(
             id = abilityComponent.abilityId,

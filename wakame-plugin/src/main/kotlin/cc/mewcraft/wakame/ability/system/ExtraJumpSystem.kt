@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.ecs.component.WithAbility
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.eEntity
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
 import com.destroystokyo.paper.ParticleBuilder
@@ -94,9 +94,9 @@ class ExtraJumpSystem : IteratingSystem(
         moveListener.unregister()
     }
 
-    private fun playParticle(player: Player, componentBridge: ComponentBridge) = abilitySupport {
+    private fun playParticle(player: Player, koishEntity: KoishEntity) = abilitySupport {
         // 设置粒子特效
-        componentBridge.addParticle(
+        koishEntity.addParticle(
             bukkitWorld = player.world,
             ParticleInfo(
                 builderProvider = { loc ->

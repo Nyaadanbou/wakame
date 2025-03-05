@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.BlockEntityQuery
 import cc.mewcraft.wakame.ecs.external.BukkitEntityEntityQuery
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.ecs.external.PlayerEntityQuery
 import cc.mewcraft.wakame.ecs.system.BlockRemoveSystem
 import cc.mewcraft.wakame.ecs.system.InitSystem
@@ -99,13 +99,13 @@ object WakameWorld {
     private fun FamilyConfiguration.recordToBukkitMetadata(family: Family) {
         onAdd(family) { entity ->
             val metadataKey = entity[BukkitBridgeComponent].metadataKey
-            val metadataMap = entity[BukkitBridgeComponent].metadataMapProvider(ComponentBridge(entity))
-            metadataMap.put(metadataKey, ComponentBridge(entity))
+            val metadataMap = entity[BukkitBridgeComponent].metadataMapProvider(KoishEntity(entity))
+            metadataMap.put(metadataKey, KoishEntity(entity))
         }
 
         onRemove(family) { entity ->
             val metadataKey = entity[BukkitBridgeComponent].metadataKey
-            val metadataMap = entity[BukkitBridgeComponent].metadataMapProvider(ComponentBridge(entity))
+            val metadataMap = entity[BukkitBridgeComponent].metadataMapProvider(KoishEntity(entity))
             metadataMap.remove(metadataKey)
         }
     }
@@ -212,12 +212,12 @@ object WakameWorld {
     }
 }
 
-fun Player.eEntity(): ComponentBridge {
+fun Player.eEntity(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     return metadataMap[MetadataKeys.PLAYER_ENTITY].get()
 }
 
-fun BukkitEntity.eEntityOrCreate(): ComponentBridge {
+fun BukkitEntity.eEntityOrCreate(): KoishEntity {
     if (this is Player) {
         return this.eEntity()
     }
@@ -228,7 +228,7 @@ fun BukkitEntity.eEntityOrCreate(): ComponentBridge {
     return metadataMap[MetadataKeys.BUKKIT_ENTITY_ENTITY].get()
 }
 
-fun BukkitEntity.eEntity(): ComponentBridge? {
+fun BukkitEntity.eEntity(): KoishEntity? {
     if (this is Player) {
         return this.eEntity()
     }
@@ -236,7 +236,7 @@ fun BukkitEntity.eEntity(): ComponentBridge? {
     return metadataMap[MetadataKeys.BUKKIT_ENTITY_ENTITY].getOrNull()
 }
 
-fun Block.eEntityOrCreate(): ComponentBridge {
+fun Block.eEntityOrCreate(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     if (!metadataMap.has(MetadataKeys.BLOCK_ENTITY)) {
         BlockEntityQuery.createBlockEntity(this)
@@ -244,7 +244,7 @@ fun Block.eEntityOrCreate(): ComponentBridge {
     return metadataMap[MetadataKeys.BLOCK_ENTITY].get()
 }
 
-fun Block.eEntity(): ComponentBridge? {
+fun Block.eEntity(): KoishEntity? {
     val metadataMap = Metadata.provide(this)
     return metadataMap[MetadataKeys.BLOCK_ENTITY].getOrNull()
 }

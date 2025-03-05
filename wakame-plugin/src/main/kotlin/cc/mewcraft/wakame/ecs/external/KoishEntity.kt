@@ -13,7 +13,7 @@ import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
 @JvmInline
-value class ComponentBridge(
+value class KoishEntity(
     val entity: Entity,
 ) : Examinable {
     /**

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.molang.Evaluable
 import org.bukkit.Location
 import org.bukkit.World
@@ -21,24 +21,24 @@ internal inline fun <T> abilitySupport(run: AbilitySupport.() -> T): T = Ability
  */
 @AbilitySupportDsl
 internal object AbilitySupport {
-    fun ComponentBridge.castBy(): Caster? {
+    fun KoishEntity.castBy(): Caster? {
         return this[CastBy].caster
     }
 
-    fun ComponentBridge.castByEntity(): LivingEntity? {
+    fun KoishEntity.castByEntity(): LivingEntity? {
         return this[CastBy].caster.entity as? LivingEntity
     }
 
-    fun ComponentBridge.targetTo(): Target {
+    fun KoishEntity.targetTo(): Target {
         return this[TargetTo].target
     }
 
-    fun ComponentBridge.evaluate(evaluable: Evaluable<*>): Double {
+    fun KoishEntity.evaluate(evaluable: Evaluable<*>): Double {
         val engine = this[AbilityComponent].mochaEngine
         return evaluable.evaluate(engine)
     }
 
-    fun ComponentBridge.addParticle(bukkitWorld: World, vararg particleInfos: ParticleInfo) {
+    fun KoishEntity.addParticle(bukkitWorld: World, vararg particleInfos: ParticleInfo) {
         val component = this.getOrNull(ParticleEffectComponent)
         if (component != null) {
             component.particleInfos.addAll(particleInfos)
@@ -47,7 +47,7 @@ internal object AbilitySupport {
         }
     }
 
-    private var ComponentBridge.tickCount: Double
+    private var KoishEntity.tickCount: Double
         get() = this[TickCountComponent].tick
         set(value) {
             this[TickCountComponent].tick = value

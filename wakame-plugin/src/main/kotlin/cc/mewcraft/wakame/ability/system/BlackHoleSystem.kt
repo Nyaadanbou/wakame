@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.FixedPath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -29,15 +29,15 @@ class BlackHoleSystem : IteratingSystem(
 ), ActiveAbilitySystem {
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
-        val result = tick(deltaTime.toDouble(), tickCount, ComponentBridge(entity))
+        val result = tick(deltaTime.toDouble(), tickCount, KoishEntity(entity))
         entity.configure {
             it += TickResultComponent(result)
         }
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
-        val entity = componentBridge.castByEntity()
-        val blackHole = componentBridge[BlackHole]
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
+        val entity = koishEntity.castByEntity()
+        val blackHole = koishEntity[BlackHole]
 
         // 设置技能选定的位置
         if (entity != null) {
@@ -50,12 +50,12 @@ class BlackHoleSystem : IteratingSystem(
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
-        val caster = componentBridge.castByEntity()
-        val blackHole = componentBridge[BlackHole]
+    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
+        val caster = koishEntity.castByEntity()
+        val blackHole = koishEntity[BlackHole]
         val targetLocation = blackHole.holeLocation ?: return TickResult.RESET_STATE
-        val radius = componentBridge.evaluate(blackHole.radius)
-        val damage = componentBridge.evaluate(blackHole.damage)
+        val radius = koishEntity.evaluate(blackHole.radius)
+        val damage = koishEntity.evaluate(blackHole.damage)
 
         // 吸引周围的怪物并造成伤害
         val entities = targetLocation.getNearbyEntities(radius, radius, radius)
@@ -72,13 +72,13 @@ class BlackHoleSystem : IteratingSystem(
             }
         }
 
-        if (tickCount >= componentBridge.evaluate(blackHole.duration)) {
+        if (tickCount >= koishEntity.evaluate(blackHole.duration)) {
             return TickResult.NEXT_STATE_NO_CONSUME
         }
 
         if (tickCount % 10 == 0.0) {
             // 每 10 tick 生成一个粒子效果
-            componentBridge.addParticle(
+            koishEntity.addParticle(
                 bukkitWorld = targetLocation.world,
                 ParticleInfo(
                     builderProvider = { loc ->
@@ -115,15 +115,15 @@ class BlackHoleSystem : IteratingSystem(
         return TickResult.CONTINUE_TICK
     }
 
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
+    override fun tickBackswing(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickReset(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
-        val blackHole = componentBridge[BlackHole]
+    override fun tickReset(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val blackHole = koishEntity[BlackHole]
         blackHole.blockFace = BlockFace.UP
         blackHole.holeLocation = null
-        componentBridge -= ParticleEffectComponent
+        koishEntity -= ParticleEffectComponent
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 }

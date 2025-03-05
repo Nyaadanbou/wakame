@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
@@ -33,23 +33,23 @@ class DashSystem : IteratingSystem(
 
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
-        val result = tick(deltaTime.toDouble(), tickCount, ComponentBridge(entity))
+        val result = tick(deltaTime.toDouble(), tickCount, KoishEntity(entity))
         entity.configure {
             it += TickResultComponent(result)
         }
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult {
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
         return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, componentBridge: ComponentBridge): TickResult = abilitySupport {
-        val dash = componentBridge[Dash]
+    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
+        val dash = koishEntity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
             return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = componentBridge.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
+        val entity = koishEntity.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
@@ -80,7 +80,7 @@ class DashSystem : IteratingSystem(
         // 应用速度到玩家对象上
         entity.velocity = stepVector
 
-        if (affectEntityNearby(entity, componentBridge)) {
+        if (affectEntityNearby(entity, koishEntity)) {
             if (!dash.canContinueAfterHit) {
                 return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
             }
@@ -89,8 +89,8 @@ class DashSystem : IteratingSystem(
         return@abilitySupport TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(casterEntity: BukkitEntity, componentBridge: ComponentBridge): Boolean {
-        val dash = componentBridge[Dash]
+    private fun affectEntityNearby(casterEntity: BukkitEntity, koishEntity: KoishEntity): Boolean {
+        val dash = koishEntity[Dash]
         val entities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (entities.isEmpty()) {
             return false

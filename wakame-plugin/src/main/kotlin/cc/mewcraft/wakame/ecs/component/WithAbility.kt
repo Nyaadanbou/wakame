@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ecs.component
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
@@ -15,8 +15,8 @@ data class WithAbility(
     val abilities: Multimap<AbilityArchetype, Entity> = HashMultimap.create(),
 ) : Component<WithAbility> {
 
-    fun abilityEntities(archetype: AbilityArchetype): Collection<ComponentBridge> {
-        return abilities[archetype].map { ComponentBridge(it) }
+    fun abilityEntities(archetype: AbilityArchetype): Collection<KoishEntity> {
+        return abilities[archetype].map { KoishEntity(it) }
     }
 
     companion object : ComponentType<WithAbility>()

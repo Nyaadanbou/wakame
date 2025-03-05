@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.WakameWorld
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
@@ -24,7 +24,7 @@ class StackCountSystem : IteratingSystem(
 
         // 如果 tickCount 达到设置好的时间, 移除异常效果.
         if (tickCountComponent.tick >= stackCountComponent.disappearTick) {
-            LOGGER.info("在 ${ComponentBridge(entity)} 上的元素效果已失效.")
+            LOGGER.info("在 ${KoishEntity(entity)} 上的元素效果已失效.")
             WakameWorld.removeEntity(entity)
         }
     }

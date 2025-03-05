@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.external.ComponentBridge
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
@@ -71,8 +71,8 @@ fun abilityInput(caster: Caster, target: Target, initializer: AbilityInputDSL.()
     return AbilityInputDSL(caster, target).apply(initializer).build()
 }
 
-fun abilityInput(componentBridge: ComponentBridge): AbilityInput {
-    return ComponentMapAbilityInput(componentBridge)
+fun abilityInput(koishEntity: KoishEntity): AbilityInput {
+    return ComponentMapAbilityInput(koishEntity)
 }
 
 @AbilityInputMarker
@@ -159,26 +159,26 @@ private class SimpleAbilityInput(
 
 @JvmInline
 private value class ComponentMapAbilityInput(
-    private val componentBridge: ComponentBridge,
+    private val koishEntity: KoishEntity,
 ) : AbilityInput, Examinable {
     override val castBy: Caster
-        get() = componentBridge[CastBy].caster
+        get() = koishEntity[CastBy].caster
     override val targetTo: Target
-        get() = componentBridge[TargetTo].target
+        get() = koishEntity[TargetTo].target
     override val trigger: Trigger?
-        get() = componentBridge[AbilityComponent].trigger
+        get() = koishEntity[AbilityComponent].trigger
     override val variant: TriggerVariant
-        get() = componentBridge[AbilityComponent].variant
+        get() = koishEntity[AbilityComponent].variant
     override val holdBy: Pair<ItemSlot, NekoStack>?
         get() {
-            val slot = componentBridge.getOrNull(HoldBy)?.slot ?: return null
-            val nekoStack = componentBridge.getOrNull(HoldBy)?.nekoStack ?: return null
+            val slot = koishEntity.getOrNull(HoldBy)?.slot ?: return null
+            val nekoStack = koishEntity.getOrNull(HoldBy)?.nekoStack ?: return null
             return slot to nekoStack
         }
     override val manaCost: Evaluable<*>
-        get() = componentBridge[AbilityComponent].manaCost
+        get() = koishEntity[AbilityComponent].manaCost
     override val mochaEngine: MochaEngine<*>
-        get() = componentBridge[AbilityComponent].mochaEngine
+        get() = koishEntity[AbilityComponent].mochaEngine
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(castBy, targetTo)
