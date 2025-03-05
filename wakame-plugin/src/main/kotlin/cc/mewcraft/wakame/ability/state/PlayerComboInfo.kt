@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.Identifier
@@ -77,7 +77,7 @@ class PlayerComboInfo(
             val sequenceAbility = trySequenceAbility(castTrigger)
             if (sequenceAbility.isNotEmpty()) {
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
-                WakameWorld.removeMechanic(mechanicId)
+                ECS.removeMechanic(mechanicId)
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
             }
@@ -124,7 +124,7 @@ class PlayerComboInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
-            WakameWorld.addMechanic(mechanicId, resetMechanic)
+            ECS.addMechanic(mechanicId, resetMechanic)
             val completeSequence = currentSequence.readAll()
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 

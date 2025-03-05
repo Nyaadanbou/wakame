@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ability
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
-import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -38,7 +38,7 @@ internal object PlayerAbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setNextState(ability: Ability) {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setNextState)
                 return@editEntities
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
@@ -51,7 +51,7 @@ internal object PlayerAbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.setCostPenalty(ability: Ability, penalty: ManaCostPenalty) {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@setCostPenalty)
                 return@editEntities
             if (entity[IdentifierComponent].id != ability.archetype.key)
@@ -61,10 +61,10 @@ internal object PlayerAbilityWorldInteraction : KoinComponent {
     }
 
     fun Player.cleanupAbility() {
-        WakameWorld.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
             if (entity[CastBy].caster.entity != this@cleanupAbility)
                 return@editEntities
-            WakameWorld.removeEntity(entity)
+            ECS.removeEntity(entity)
         }
     }
 }

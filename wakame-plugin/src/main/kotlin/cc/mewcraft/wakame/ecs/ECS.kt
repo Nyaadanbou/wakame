@@ -47,10 +47,8 @@ import org.bukkit.event.world.ChunkUnloadEvent
 import kotlin.jvm.optionals.getOrNull
 import org.bukkit.entity.Entity as BukkitEntity
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
-object WakameWorld {
+@Init(stage = InitStage.POST_WORLD)
+object ECS {
 
     private val instance: World = configureWorld {
 

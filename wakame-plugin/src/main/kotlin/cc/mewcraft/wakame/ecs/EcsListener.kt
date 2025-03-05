@@ -19,7 +19,7 @@ internal object EcsListener {
         // 那么在 tick 函数内调用 Player#setVelocity 后玩家的加速度会被服务端的内部逻辑覆盖, 导致玩家会在瞬移到空中后自由落体.
         // 解决方法: 在这里使用 ServerTickStartEvent, 让服务端内部的逻辑在 tick 函数返回之后执行.
         event<ServerTickStartEvent> {
-            WakameWorld.tick()
+            ECS.tick()
         }
     }
 

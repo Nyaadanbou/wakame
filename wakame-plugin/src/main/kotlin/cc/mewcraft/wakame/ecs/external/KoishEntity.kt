@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs.external
 
-import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
@@ -23,46 +23,46 @@ value class KoishEntity(
      * V - [Component] 实例.
      */
     val componentsMap: Map<ComponentType<out Any>, Component<out Any>>
-        get() = WakameWorld.world().snapshotOf(entity).components.associate { it.type() to it }
+        get() = ECS.world().snapshotOf(entity).components.associate { it.type() to it }
 
     /**
      * [EntityTag] 列表.
      */
     val tags: List<UniqueId<out Any>>
-        get() = WakameWorld.world().snapshotOf(entity).tags
+        get() = ECS.world().snapshotOf(entity).tags
 
-    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T = with(WakameWorld.world()) {
+    internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T = with(ECS.world()) {
         return entity[type]
     }
 
-    internal inline fun <reified T : Component<out Any>> getOrNull(type: ComponentType<T>): T? = with(WakameWorld.world()) {
+    internal inline fun <reified T : Component<out Any>> getOrNull(type: ComponentType<T>): T? = with(ECS.world()) {
         return entity.getOrNull(type)
     }
 
-    operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(WakameWorld.world()) {
+    operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(ECS.world()) {
         return entity.contains(uniqueId)
     }
 
     internal inline operator fun <reified T : Component<T>> plusAssign(component: T) {
-        WakameWorld.editEntity(entity) {
+        ECS.editEntity(entity) {
             it += component
         }
     }
 
     internal inline operator fun <reified T : Component<T>> minusAssign(type: ComponentType<T>) {
-        WakameWorld.editEntity(entity) {
+        ECS.editEntity(entity) {
             it -= type
         }
     }
 
     operator fun plusAssign(tag: EntityTags) {
-        WakameWorld.editEntity(entity) {
+        ECS.editEntity(entity) {
             it += tag
         }
     }
 
     operator fun minusAssign(tag: EntityTags) {
-        WakameWorld.editEntity(entity) {
+        ECS.editEntity(entity) {
             it -= tag
         }
     }

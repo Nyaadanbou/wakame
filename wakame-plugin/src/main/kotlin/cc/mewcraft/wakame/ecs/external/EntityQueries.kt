@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.ECS.removeEntity
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.MetadataKeys
-import cc.mewcraft.wakame.ecs.WakameWorld
-import cc.mewcraft.wakame.ecs.WakameWorld.removeEntity
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.BlockComponent
 import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
@@ -30,7 +30,7 @@ import org.bukkit.entity.Entity as BukkitEntity
 
 object PlayerEntityQuery {
     fun createPlayerEntity(player: Player) {
-        WakameWorld.createEntity {
+        ECS.createEntity {
             it += PlayerComponent(player)
             it += BukkitBridgeComponent(MetadataKeys.PLAYER_ENTITY) { componentBridge -> Metadata.provide(componentBridge[PlayerComponent].player) }
             it += WithAbility()
@@ -49,7 +49,7 @@ object BukkitEntityEntityQuery {
             PlayerEntityQuery.createPlayerEntity(bukkitEntity)
             return
         }
-        WakameWorld.createEntity {
+        ECS.createEntity {
             it += BukkitEntityComponent(bukkitEntity)
             it += BukkitBridgeComponent(MetadataKeys.BUKKIT_ENTITY_ENTITY) { componentBridge -> Metadata.provide(componentBridge[BukkitEntityComponent].bukkitEntity) }
             it += WithAbility()
@@ -68,7 +68,7 @@ object BukkitEntityEntityQuery {
 
 object BlockEntityQuery {
     fun createBlockEntity(block: Block) {
-        WakameWorld.createEntity {
+        ECS.createEntity {
             it += BlockComponent(block)
             it += BukkitBridgeComponent(MetadataKeys.BLOCK_ENTITY) { componentBridge -> Metadata.provide(componentBridge[BlockComponent].block) }
         }
@@ -85,7 +85,7 @@ object BlockEntityQuery {
  */
 object AbilityEntityQuery {
     fun createAbilityEntity(ability: Ability, input: AbilityInput): Entity {
-        return WakameWorld.createEntity(ability.archetype.key) {
+        return ECS.createEntity(ability.archetype.key) {
             it += AbilityComponent(
                 abilityId = ability.key,
                 manaCost = input.manaCost,

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ecs.WakameWorld
+import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
@@ -24,6 +24,6 @@ class AbilityRemoveSystem : IteratingSystem(
             }
         }
         // 非物品技能直接移除.
-        WakameWorld.removeEntity(entity)
+        ECS.removeEntity(entity)
     }
 }
