@@ -2,11 +2,23 @@
 
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.command.command.*
+import cc.mewcraft.wakame.command.command.AbilityCommand
+import cc.mewcraft.wakame.command.command.AttributeCommand
+import cc.mewcraft.wakame.command.command.CatalogCommand
+import cc.mewcraft.wakame.command.command.CraftCommand
+import cc.mewcraft.wakame.command.command.DebugCommand
+import cc.mewcraft.wakame.command.command.ItemCommand
+import cc.mewcraft.wakame.command.command.PluginCommand
+import cc.mewcraft.wakame.command.command.ReforgeCommand
+import cc.mewcraft.wakame.command.command.ResourcepackCommand
+import cc.mewcraft.wakame.command.parser.AbilityParser
+import cc.mewcraft.wakame.command.parser.ItemPathParser
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.util.typeTokenOf
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
+import net.minecraft.commands.arguments.ResourceLocationArgument
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.paper.PaperCommandManager
 import org.incendo.cloud.paper.util.sender.PaperSimpleSenderMapper
@@ -22,6 +34,14 @@ internal object KoishCommandManager {
         manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
             .executionCoordinator(ExecutionCoordinator.asyncCoordinator())
             .buildBootstrapped(context)
+        val brigadierManager = manager.brigadierManager()
+
+        with(brigadierManager) {
+            setNativeNumberSuggestions(true)
+
+            registerMapping(typeTokenOf<AbilityParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+            registerMapping(typeTokenOf<ItemPathParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+        }
 
         manager.apply {
             // Change default settings
