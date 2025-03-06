@@ -1,0 +1,55 @@
+# 不要修改!
+version: 1
+
+# 元素伤害倍率(或称攻击威力)乘算时机.
+# true - 防御前计算
+# false - 防御后计算
+attack_damage_rate_multiply_before_defense: false
+
+# 暴击倍率属性乘算时机.
+# true - 防御前计算
+# false - 防御后计算
+critical_strike_power_multiply_before_defense: false
+
+# 对于某一元素类型, 其最小伤害.
+least_damage: 1.0
+
+# 对于某一元素类型, 其伤害的取整模式.
+# none - 不取整
+# ceil - 向上取整
+# floor - 向下取整
+# round - 四舍五入
+rounding_mode: none
+
+# 对于某一元素类型, 其伤害的小数位数.
+# 取整模式为 none 时此配置项无实际效果.
+decimal_places: 0
+
+# 对于某一元素类型, 计算其有效防御的公式.
+#
+# 可用参数:
+# 请注意: 下列各属性均为(本元素+通用元素), 不会小于0(属性值为负时会被置零)
+# query.defense
+#   受伤者该元素的防御力属性值
+# query.defense_penetration
+#   伤害元数据中该元素的防御穿透
+# query.defense_penetration_rate
+#   伤害元数据中该元素的防御穿透率
+valid_defense_formula: "math.max(query.defense - query.defense_penetration, 0.0) * (1.0 - query.defense_penetration_rate)"
+
+# 对于某一元素类型, 计算其防御后伤害的公式.
+#
+# 可用参数:
+# query.original_damage
+#   原始伤害
+# query.valid_defense
+#   受伤者该元素的有效防御
+damage_after_defense_formula: "math.max(query.original_damage - query.valid_defense, 0.0)"
+
+# 计算拉弓力度的公式.
+#
+# 可用参数:
+# query.use_ticks
+#   玩家拉弓释放时, 累计长按使用的时间, 单位 tick
+bow_force_formula: "math.clamp((query.use_ticks * query.use_ticks / 400.0 + query.use_ticks / 10.0) / 3.0, 0.0, 1.0)"
+

@@ -3,6 +3,10 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementType
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.round
 
 /**
  * 防御元数据.
@@ -28,18 +32,67 @@ class EntityDefenseMetadata(
         // 当该元素的伤害包不存在时, 返回 0.0
         val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
 
-        // 计算防御后伤害
-        val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
-            packet.damageValue(),
-            (damageeAttributeMap.getValue(Attributes.DEFENSE.of(element)) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0),
-            packet.defensePenetration,
-            packet.defensePenetrationRate
-        )
-
-        // 依次考虑防御力、元素伤害倍率、百分比伤害修正、暴击倍率
-        val criticalStrikeMetadata = damageMetadata.criticalStrikeMetadata
+        // 该元素伤害倍率(或称攻击威力)
+        val attackDamageRate = packet.rate
+        // 暴击倍率
+        val criticalStrikePower = damageMetadata.criticalStrikeMetadata.power
+        // 受伤者防御, 不会小于0
+        val defense = (damageeAttributeMap.getValue(Attributes.DEFENSE.of(element)) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0)
+        // 受伤者承伤倍率
         val incomingDamageRate = damageeAttributeMap.getValue(Attributes.INCOMING_DAMAGE_RATE.of(element))
 
-        return (damageAfterDefense * packet.rate * incomingDamageRate * criticalStrikeMetadata.power).coerceAtLeast(if (packet.damageValue() > 0) 1.0 else 0.0)
+        // 计算原始伤害
+        var originalDamage = packet.damageValue()
+        if (DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
+            originalDamage *= attackDamageRate
+        }
+        if (DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
+            originalDamage *= criticalStrikePower
+        }
+
+        // 计算有效防御
+        val validDefense = DamageRules.calculateValidDefense(
+            defense = defense,
+            defensePenetration = packet.defensePenetration,
+            defensePenetrationRate = packet.defensePenetrationRate
+        )
+
+        // 计算防御后伤害
+        val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
+            originalDamage = originalDamage,
+            validDefense = validDefense
+        )
+
+        // 计算最终伤害
+        var finalDamage = damageAfterDefense * incomingDamageRate
+        if (!DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
+            finalDamage *= attackDamageRate
+        }
+        if (!DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
+            finalDamage *= criticalStrikePower
+        }
+        val leastDamage = if (packet.damageValue() > 0) DamageRules.LEAST_DAMAGE else 0.0
+        finalDamage.coerceAtLeast(leastDamage)
+
+        return when (DamageRules.ROUNDING_MODE) {
+            DamageRules.RoundingMode.NONE -> {
+                finalDamage
+            }
+            
+            DamageRules.RoundingMode.ROUND -> {
+                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
+                round(finalDamage * factor) / factor
+            }
+
+            DamageRules.RoundingMode.CEIL -> {
+                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
+                ceil(finalDamage * factor) / factor
+            }
+            
+            DamageRules.RoundingMode.FLOOR -> {
+                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
+                floor(finalDamage * factor) / factor
+            }
+        }
     }
 }
