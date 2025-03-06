@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.pack
 
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import net.kyori.adventure.key.Key
 
 data class ItemModelInfo(
@@ -7,6 +8,6 @@ data class ItemModelInfo(
     val base: Key,
 ) {
     fun modelKey(): Key {
-        return Key.key(RESOURCE_NAMESPACE, "item/${itemId.namespace()}/${itemId.value()}")
+        return Key.key(KOISH_NAMESPACE, "item/${itemId.namespace()}/${itemId.value()}")
     }
 }
