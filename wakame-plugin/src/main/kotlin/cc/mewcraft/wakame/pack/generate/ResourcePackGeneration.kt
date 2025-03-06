@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.pack.AssetUtils
 import cc.mewcraft.wakame.pack.ItemModelInfo
-import cc.mewcraft.wakame.pack.RESOURCE_NAMESPACE
 import cc.mewcraft.wakame.pack.VanillaResourcePack
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.adventure.withNamespace
 import cc.mewcraft.wakame.util.adventure.withValue
 import cc.mewcraft.wakame.util.readFromDirectory
@@ -121,7 +121,7 @@ internal class ResourcePackCustomModelGeneration(
          * @return 是否成功生成模型.
          */
         fun addModel(originModelKey: Key): Boolean {
-            val minecraftKey = originModelKey.withNamespace(RESOURCE_NAMESPACE) // 在真实资源包中的模型的 Key
+            val minecraftKey = originModelKey.withNamespace(KOISH_NAMESPACE) // 在真实资源包中的模型的 Key
             val modelFile = AssetUtils.getFile("models/${minecraftKey.value()}", "json")
             if (modelFile == null) {
                 // Skip vanilla models, they are already in the vanilla resource pack
@@ -194,7 +194,7 @@ internal class ResourcePackCustomModelGeneration(
         if (textureFile == null) {
             return texture
         }
-        val minecraftFormat = originTextureKey.withNamespace(RESOURCE_NAMESPACE)
+        val minecraftFormat = originTextureKey.withNamespace(KOISH_NAMESPACE)
         val textureWritable = Writable.file(textureFile)
 
         val texture = Texture.texture()

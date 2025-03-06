@@ -10,8 +10,7 @@ import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
 
-internal const val RESOURCE_NAMESPACE = "wakame"
-internal const val RESOURCE_PACK_NAME = "wakame"
+internal const val RESOURCE_PACK_NAME = "koish"
 internal const val RESOURCE_PACK_ZIP_NAME = "$RESOURCE_PACK_NAME.zip"
 internal const val RESOURCE_PACK_GENERATED_DIR = "generated"
 internal const val GENERATED_RESOURCE_PACK_DIR = "$RESOURCE_PACK_GENERATED_DIR/$RESOURCE_PACK_NAME"
