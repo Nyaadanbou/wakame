@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.component.BlackHole
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
@@ -35,27 +34,26 @@ class BlackHoleSystem : IteratingSystem(
         }
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
-        val entity = koishEntity.castByEntity()
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val entity = koishEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blackHole = koishEntity[BlackHole]
 
         // 设置技能选定的位置
-        if (entity != null) {
-            val rayTranceResult = entity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
-            val targetLocation = rayTranceResult.hitPosition.toLocation(entity.world)
-            rayTranceResult.hitBlockFace?.let { blackHole.blockFace = it }
-            blackHole.holeLocation = targetLocation
-        }
+        val rayTranceResult = entity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
+        val targetLocation = rayTranceResult.hitPosition.toLocation(entity.world)
+        rayTranceResult.hitBlockFace?.let { blackHole.blockFace = it }
+        blackHole.holeLocation = targetLocation
 
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
-        val caster = koishEntity.castByEntity()
+    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val caster = koishEntity[CastBy].entityOrPlayer()
         val blackHole = koishEntity[BlackHole]
+        val mochaEngine = koishEntity[AbilityComponent].mochaEngine
         val targetLocation = blackHole.holeLocation ?: return TickResult.RESET_STATE
-        val radius = koishEntity.evaluate(blackHole.radius)
-        val damage = koishEntity.evaluate(blackHole.damage)
+        val radius = blackHole.radius.evaluate(mochaEngine)
+        val damage = blackHole.damage.evaluate(mochaEngine)
 
         // 吸引周围的怪物并造成伤害
         val entities = targetLocation.getNearbyEntities(radius, radius, radius)
@@ -72,13 +70,13 @@ class BlackHoleSystem : IteratingSystem(
             }
         }
 
-        if (tickCount >= koishEntity.evaluate(blackHole.duration)) {
+        if (tickCount >= blackHole.duration.evaluate(mochaEngine)) {
             return TickResult.NEXT_STATE_NO_CONSUME
         }
 
         if (tickCount % 10 == 0.0) {
             // 每 10 tick 生成一个粒子效果
-            koishEntity.addParticle(
+            koishEntity += ParticleEffectComponent(
                 bukkitWorld = targetLocation.world,
                 ParticleInfo(
                     builderProvider = { loc ->

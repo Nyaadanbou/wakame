@@ -2,10 +2,18 @@ package cc.mewcraft.wakame.ability.state
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
-import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
 import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.FamilyDefinitions
+import cc.mewcraft.wakame.ecs.bridge.findAllAbilities
+import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ecs.component.CastBy
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.Identifier
@@ -72,7 +80,7 @@ class PlayerComboInfo(
         resetTask = null
     }
 
-    fun addTrigger(trigger: SingleTrigger): PlayerComboResult = playerAbilityWorldInteraction {
+    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
 
         // 尝试找到使用当前触发器能够触发的技能
@@ -96,7 +104,7 @@ class PlayerComboInfo(
         return PlayerComboResult.SILENT_FAILURE
     }
 
-    private fun markNextState(abilities: List<Ability>) = playerAbilityWorldInteraction {
+    private fun markNextState(abilities: List<Ability>) {
         for (ability in abilities) {
             val abilityKey = ability.key
             val costPenalty = penalizeManaCost(abilityKey)
@@ -115,7 +123,7 @@ class PlayerComboInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleTrigger): List<Ability> = playerAbilityWorldInteraction {
+    private fun trySequenceAbility(trigger: SingleTrigger): List<Ability> {
         val triggerTypes = player.getAllActiveAbilityTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
@@ -155,11 +163,46 @@ class PlayerComboInfo(
         return emptyList()
     }
 
+    private fun Player.getAbilitiesBy(trigger: Trigger): List<Ability> {
+        return findAllAbilities()
+            .filter { it.trigger == trigger }
+            .map { it.instance }
+    }
+
+    private fun Player.getAllActiveAbilityTriggers(): Set<Trigger> {
+        return findAllAbilities()
+            .mapNotNull { it.trigger }
+            .toSet()
+    }
+
+    private fun Player.setNextState(ability: Ability) {
+        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
+            if (entity[CastBy].entityOrPlayer() != this@setNextState)
+                return@editEntities
+            if (entity[AbilityComponent].phase != StatePhase.IDLE)
+            // 只有在 IDLE 状态下才能进行下一个状态的标记.
+                return@editEntities
+            if (entity[IdentifierComponent].id != ability.archetype.key)
+                return@editEntities
+            entity.configure { it += Tags.NEXT_STATE }
+        }
+    }
+
+    private fun Player.setCostPenalty(ability: Ability, penalty: ManaCostPenalty) {
+        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
+            if (entity[CastBy].entityOrPlayer() != this@setCostPenalty)
+                return@editEntities
+            if (entity[IdentifierComponent].id != ability.archetype.key)
+                return@editEntities
+            entity[AbilityComponent].penalty = penalty
+        }
+    }
+
     fun clearSequence() {
         currentSequence.clear()
     }
 
-    fun cleanup() = playerAbilityWorldInteraction {
+    fun cleanup() {
         manaNoEnoughSubscription.close()
         manaCostSubscription.close()
     }

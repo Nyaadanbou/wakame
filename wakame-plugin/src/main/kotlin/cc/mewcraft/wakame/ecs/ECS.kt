@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ecs
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
 import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
@@ -8,6 +9,7 @@ import cc.mewcraft.wakame.ability.system.BlinkSystem
 import cc.mewcraft.wakame.ability.system.DashSystem
 import cc.mewcraft.wakame.ability.system.ExtraJumpSystem
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.Remove
 import cc.mewcraft.wakame.ecs.system.BlockRemoveSystem
 import cc.mewcraft.wakame.ecs.system.BukkitEntityRemoveSystem
 import cc.mewcraft.wakame.ecs.system.InitSystem
@@ -75,7 +77,11 @@ object ECS {
     }
 
     internal fun tick() {
-        world.update(1f)
+        try {
+            world.update(1f)
+        } catch (e: Exception) {
+            LOGGER.error("在 ECS 更新时发生错误", e)
+        }
     }
 
     internal fun world(): World {
@@ -111,7 +117,7 @@ object ECS {
             if (!contains(entity)) {
                 error("Tried to remove entity that does not exist: $entity")
             }
-            entity.remove()
+            entity.configure { it += Remove }
         }
     }
 }

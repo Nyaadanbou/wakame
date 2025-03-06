@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.event.bukkit
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.character.Target
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack
@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 class PlayerAbilityPrepareCastEvent(
     ability: Ability,
     val caster: Player,
-    val target: Target?,
+    val target: KoishEntity?,
     val item: ItemStack?
 ) : AbilityPrepareCastEvent(ability) {
     

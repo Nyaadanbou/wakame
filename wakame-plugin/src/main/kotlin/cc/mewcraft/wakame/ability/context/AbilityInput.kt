@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.ability.context
 
-import cc.mewcraft.wakame.ability.character.Caster
-import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
@@ -25,14 +23,14 @@ import java.util.stream.Stream
 interface AbilityInput {
 
     /**
-     * 这次技能的施法者 [Caster].
+     * 这次技能的施法者.
      */
-    val castBy: Caster
+    val castBy: KoishEntity
 
     /**
-     * 此次技能的目标 [Target], 默认为 [castBy] 本身.
+     * 此次技能的目标.
      */
-    val targetTo: Target
+    val targetTo: KoishEntity
 
     /**
      * 此次技能的触发器 [Trigger], null 表示没有触发器.
@@ -67,18 +65,18 @@ interface AbilityInput {
 @DslMarker
 annotation class AbilityInputMarker
 
-fun abilityInput(caster: Caster, target: Target, initializer: AbilityInputDSL.() -> Unit = {}): AbilityInput {
+fun abilityInput(caster: KoishEntity, target: KoishEntity, initializer: AbilityInputDSL.() -> Unit = {}): AbilityInput {
     return AbilityInputDSL(caster, target).apply(initializer).build()
 }
 
-fun abilityInput(koishEntity: KoishEntity): AbilityInput {
-    return ComponentMapAbilityInput(koishEntity)
+fun abilityInput(abilityEntity: KoishEntity): AbilityInput {
+    return KoishEntityAbilityInput(abilityEntity)
 }
 
 @AbilityInputMarker
 class AbilityInputDSL(
-    private val castBy: Caster,
-    private val targetTo: Target,
+    private val castBy: KoishEntity,
+    private val targetTo: KoishEntity,
 ) {
     private var trigger: Trigger? = null
     private var variant: TriggerVariant = TriggerVariant.any()
@@ -125,8 +123,8 @@ class AbilityInputDSL(
 /* Implementations */
 
 private class SimpleAbilityInput(
-    override val castBy: Caster,
-    override val targetTo: Target,
+    override val castBy: KoishEntity,
+    override val targetTo: KoishEntity,
     override val trigger: Trigger?,
     override val variant: TriggerVariant,
     override val holdBy: Pair<ItemSlot, NekoStack>?,
@@ -158,12 +156,12 @@ private class SimpleAbilityInput(
 }
 
 @JvmInline
-private value class ComponentMapAbilityInput(
+private value class KoishEntityAbilityInput(
     private val koishEntity: KoishEntity,
 ) : AbilityInput, Examinable {
-    override val castBy: Caster
+    override val castBy: KoishEntity
         get() = koishEntity[CastBy].caster
-    override val targetTo: Target
+    override val targetTo: KoishEntity
         get() = koishEntity[TargetTo].target
     override val trigger: Trigger?
         get() = koishEntity[AbilityComponent].trigger

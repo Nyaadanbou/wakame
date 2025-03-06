@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.character.CasterAdapter
-import cc.mewcraft.wakame.ability.character.Target
-import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
+import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
@@ -104,9 +103,9 @@ data class PlayerAbility(
     val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    fun recordBy(caster: Player, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
-        val target = target ?: TargetAdapter.adapt(caster)
-        val input = abilityInput(CasterAdapter.adapt(caster), target) {
+    fun recordBy(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
+        val target = target ?: caster.toKoish()
+        val input = abilityInput(caster.toKoish(), target) {
             trigger(trigger)
             manaCost(manaCost)
             holdBy(holdBy)

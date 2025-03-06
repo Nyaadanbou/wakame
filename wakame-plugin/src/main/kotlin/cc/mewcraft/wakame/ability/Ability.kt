@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.bridge.createAbilityEntity
 import cc.mewcraft.wakame.ecs.component.WithAbility
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
@@ -12,7 +12,6 @@ import com.github.quillraven.fleks.EntityCreateContext
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.stream.Stream
@@ -49,13 +48,9 @@ abstract class Ability(
      * 使用 [input] 记录技能的信息到 ECS 中.
      */
     fun recordBy(input: AbilityInput) {
-        val abilityEntity = AbilityEntityQuery.createAbilityEntity(this, input)
-        val entity = input.castBy.entity
-        if (entity is Player) {
-            entity.toKoish()[WithAbility].abilities.put(this.archetype, abilityEntity)
-        } else {
-            entity.toKoish()[WithAbility].abilities.put(this.archetype, abilityEntity)
-        }
+        val abilityEntity = createAbilityEntity(input)
+        val entity = input.castBy
+        entity[WithAbility].abilities.put(this.archetype, abilityEntity)
     }
 
     /**

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.ecs.component
 
-import cc.mewcraft.wakame.ability.character.Target
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
 data class TargetTo(
-    var target: Target
+    var target: KoishEntity
 ) : Component<TargetTo> {
     override fun type(): ComponentType<TargetTo> = TargetTo
 

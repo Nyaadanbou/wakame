@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.ability.character.CasterAdapter
-import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.context.abilityInput
+import cc.mewcraft.wakame.ecs.bridge.toKoish
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.VanillaItemSlot
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
@@ -20,7 +19,7 @@ interface Food : ItemBehavior {
             val foodProperties = koishStack.components.get(ItemComponentTypes.FOOD) ?: return
             val abilities = foodProperties.abilities.map { KoishRegistries.ABILITY.getOrThrow(it) }
             for (ability in abilities) {
-                val input = abilityInput(CasterAdapter.adapt(player), TargetAdapter.adapt(player)) {
+                val input = abilityInput(player.toKoish(), player.toKoish()) {
                     holdBy(VanillaItemSlot.fromEquipmentSlot(event.hand)!! to koishStack)
                 }
                 ability.recordBy(input)

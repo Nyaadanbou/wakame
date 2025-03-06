@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.component.Blink
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
@@ -23,6 +22,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.math.Position
 import org.bukkit.Particle
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 class BlinkSystem : IteratingSystem(
@@ -36,19 +36,19 @@ class BlinkSystem : IteratingSystem(
         }
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
-        val entity = koishEntity.castByEntity()
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val entity = koishEntity[CastBy].entityOrPlayer() as? LivingEntity
 
         // 如果玩家面前方块过近, 无法传送
         if (entity?.getTargetBlockExact(3) != null) {
             entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
-            return@abilitySupport TickResult.RESET_STATE
+            return TickResult.RESET_STATE
         }
-        return@abilitySupport TickResult.NEXT_STATE
+        return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
-        val entity = koishEntity.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
+    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val entity = koishEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blink = koishEntity[Blink]
         val location = entity.location.clone()
 
@@ -74,12 +74,12 @@ class BlinkSystem : IteratingSystem(
         // 如果没有找到可传送的方块，那么就不传送
         if (!blink.isTeleported) {
             entity.sendMessage("无法传送至目标位置".mini)
-            return@abilitySupport TickResult.RESET_STATE
+            return TickResult.RESET_STATE
         }
 
         entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
 
-        koishEntity.addParticle(
+        koishEntity += ParticleEffectComponent(
             bukkitWorld = target.world,
             ParticleInfo(
                 builderProvider = { loc ->
@@ -96,21 +96,21 @@ class BlinkSystem : IteratingSystem(
             )
         )
 
-        return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.NEXT_STATE_NO_CONSUME
     }
 
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
-        val entity = koishEntity.castByEntity() ?: return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+    override fun tickBackswing(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+        val entity = koishEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.NEXT_STATE_NO_CONSUME
         val blink = koishEntity[Blink]
         if (!blink.isTeleported) {
-            return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.NEXT_STATE_NO_CONSUME
         }
 
         // 再给予一个向前的固定惯性
         entity.velocity = entity.location.direction.normalize()
 
         blink.teleportedMessages.send(entity)
-        return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.NEXT_STATE_NO_CONSUME
     }
 
     override fun tickReset(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {

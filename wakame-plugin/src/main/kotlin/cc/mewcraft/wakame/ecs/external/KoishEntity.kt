@@ -5,11 +5,15 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityTags
+import com.github.quillraven.fleks.Family
 import com.github.quillraven.fleks.UniqueId
 
 class KoishEntity(
     private val entity: Entity,
 ) {
+    internal fun isIn(family: Family): Boolean {
+        return family.contains(entity)
+    }
 
     internal fun invalidate() {
         ECS.removeEntity(entity)

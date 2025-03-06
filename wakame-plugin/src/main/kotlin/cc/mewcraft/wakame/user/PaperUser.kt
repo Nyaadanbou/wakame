@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
 import cc.mewcraft.wakame.ability.state.PlayerCombo
 import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.ecs.bridge.cleanupAbility
 import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
@@ -57,7 +57,7 @@ class PaperUser(
     }
 
     override fun cleanup() {
-        playerAbilityWorldInteraction { player.cleanupAbility() }
+        player.cleanupAbility()
         combo.cleanup()
     }
 

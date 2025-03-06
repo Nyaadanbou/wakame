@@ -18,5 +18,5 @@ object FamilyDefinitions {
     val BLOCK: Family = family { all(BlockComponent) }
     val BUKKIT_ENTITY: Family = family { all(BukkitEntityComponent) }
     val ELEMENT_STACK: Family = family { all(IdentifierComponent, ElementComponent, TargetTo) }
-    val PLAYER: Family = family { all(PlayerComponent, WithAbility) }
+    val PLAYER: Family = family { all(PlayerComponent, BukkitEntityComponent, WithAbility) }
 }

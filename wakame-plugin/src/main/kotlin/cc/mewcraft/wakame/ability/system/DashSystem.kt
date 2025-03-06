@@ -1,10 +1,8 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.archetype.abilitySupport
-import cc.mewcraft.wakame.ability.character.CasterAdapter
-import cc.mewcraft.wakame.ability.character.TargetAdapter
 import cc.mewcraft.wakame.ability.component.Dash
 import cc.mewcraft.wakame.ability.context.abilityInput
+import cc.mewcraft.wakame.ecs.bridge.toKoish
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -19,6 +17,7 @@ import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
 import org.bukkit.entity.Entity as BukkitEntity
 
 class DashSystem : IteratingSystem(
@@ -43,13 +42,13 @@ class DashSystem : IteratingSystem(
         return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = abilitySupport {
+    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
         val dash = koishEntity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = koishEntity.castByEntity() ?: return@abilitySupport TickResult.RESET_STATE
+        val entity = koishEntity[CastBy].entityOrPlayer()
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
@@ -65,7 +64,7 @@ class DashSystem : IteratingSystem(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.NEXT_STATE_NO_CONSUME
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -82,11 +81,11 @@ class DashSystem : IteratingSystem(
 
         if (affectEntityNearby(entity, koishEntity)) {
             if (!dash.canContinueAfterHit) {
-                return@abilitySupport TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.NEXT_STATE_NO_CONSUME
             }
         }
 
-        return@abilitySupport TickResult.CONTINUE_TICK
+        return TickResult.CONTINUE_TICK
     }
 
     private fun affectEntityNearby(casterEntity: BukkitEntity, koishEntity: KoishEntity): Boolean {
@@ -100,7 +99,19 @@ class DashSystem : IteratingSystem(
                 continue
 
             for (ability in dash.hitEffects) {
-                val input = abilityInput(CasterAdapter.adapt(casterEntity), TargetAdapter.adapt(entity))
+                val input = if (casterEntity is Player) {
+                    if (entity is Player) {
+                        abilityInput(casterEntity.toKoish(), entity.toKoish())
+                    } else {
+                        abilityInput(casterEntity.toKoish(), entity.toKoish())
+                    }
+                } else {
+                    if (entity is Player) {
+                        abilityInput(entity.toKoish(), casterEntity.toKoish())
+                    } else {
+                        abilityInput(entity.toKoish(), casterEntity.toKoish())
+                    }
+                }
                 ability.recordBy(input)
             }
         }

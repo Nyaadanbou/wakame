@@ -3,12 +3,12 @@
 package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
-import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.component.ExtraJump
 import cc.mewcraft.wakame.ecs.bridge.toKoish
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
+import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.WithAbility
@@ -39,7 +39,7 @@ class ExtraJumpSystem : IteratingSystem(
         if (extraJump.cooldown > 0) {
             extraJump.cooldown--
         }
-        val player = entity[CastBy].caster.entity as Player
+        val player = entity[CastBy].player()
         extraJump.isHoldingJump = player.currentInput.isJump
     }
 
@@ -94,9 +94,9 @@ class ExtraJumpSystem : IteratingSystem(
         moveListener.unregister()
     }
 
-    private fun playParticle(player: Player, koishEntity: KoishEntity) = abilitySupport {
+    private fun playParticle(player: Player, koishEntity: KoishEntity) {
         // 设置粒子特效
-        koishEntity.addParticle(
+        koishEntity += ParticleEffectComponent(
             bukkitWorld = player.world,
             ParticleInfo(
                 builderProvider = { loc ->
