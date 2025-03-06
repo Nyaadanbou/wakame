@@ -428,22 +428,20 @@ private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item
         ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE
         else -> return
     }
-    val menuList = CatalogItemMenuStacks.get(player)
 
     // 图鉴菜单队列过长时, 不再打开新的
-    if (menuList.size > 50) {
+    if (CatalogItemMenuStacks.size(player) > 50) {
         player.sendMessage(TranslatableMessages.MSG_CATALOG_MENU_DEQUE_LIMIT)
         return
     }
 
     // 要打开的菜单和当前菜单一模一样, 不再打开新的
-    if (menuList.isNotEmpty()) {
-        val currentMenu = menuList.first()
-        if (currentMenu is CatalogItemFocusMenu && currentMenu.item == item && currentMenu.state == lookupState)
-            return
+    val currentMenu = CatalogItemMenuStacks.peek(player)
+    if (currentMenu is CatalogItemFocusMenu && currentMenu.item == item && currentMenu.state == lookupState) {
+        return
     }
 
-    // 要打开的菜单Gui列表为空，则不打开
+    // 要打开的菜单列表为空, 则不打开
     val catalogRecipeGuis = CatalogRecipeGuiManager.getGui(item, lookupState)
     if (catalogRecipeGuis.isEmpty())
         return

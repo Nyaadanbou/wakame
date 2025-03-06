@@ -41,8 +41,8 @@ internal object CatalogCommand : KoishCommandFactory<Source> {
         val viewer = player?.single() ?: (sender as? Player) ?: run { sender.sendPlainMessage("Player not found!"); return }
 
         if (category == null) {
-            val menu = CatalogItemMainMenu(viewer)
-            withContext(Dispatchers.minecraft) { menu.open() }
+            val mainMenu = CatalogItemMainMenu(viewer)
+            withContext(Dispatchers.minecraft) { CatalogItemMenuStacks.rewrite(viewer, mainMenu) }
         } else {
             val mainMenu = CatalogItemMainMenu(viewer)
             val categoryMenu = CatalogItemCategoryMenu(category, viewer)
