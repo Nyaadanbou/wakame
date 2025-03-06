@@ -6,19 +6,18 @@ import cc.mewcraft.wakame.ability.playerAbilityWorldInteraction
 import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ecs.Mechanic
-import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.event.Events
 import cc.mewcraft.wakame.util.event.Subscription
+import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 import java.lang.ref.WeakReference
 import java.util.stream.Stream
 
@@ -59,8 +58,19 @@ class PlayerComboInfo(
     private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
     private val manaCostPenalties: MutableMap<Identifier, ManaCostPenalty> = HashMap()
 
-    private val mechanicId: Identifier = Identifiers.of("player_state_info_reset_mechanic_${player.name}")
-    private val resetMechanic: Mechanic = PlayerStateInfoResetMechanic(this)
+    private var resetTask: BukkitTask? = null
+
+    private fun createResetTask(): BukkitTask {
+        return runTaskLater(40) {
+            clearSequence()
+            cancelTask()
+        }
+    }
+
+    private fun cancelTask() {
+        resetTask?.cancel()
+        resetTask = null
+    }
 
     fun addTrigger(trigger: SingleTrigger): PlayerComboResult = playerAbilityWorldInteraction {
         val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
@@ -77,7 +87,7 @@ class PlayerComboInfo(
             val sequenceAbility = trySequenceAbility(castTrigger)
             if (sequenceAbility.isNotEmpty()) {
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
-                ECS.removeMechanic(mechanicId)
+                cancelTask()
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
             }
@@ -124,7 +134,7 @@ class PlayerComboInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
-            ECS.addMechanic(mechanicId, resetMechanic)
+            resetTask = createResetTask()
             val completeSequence = currentSequence.readAll()
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 
@@ -132,7 +142,8 @@ class PlayerComboInfo(
                 val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
                 val abilityOnSequence = player.getAbilitiesBy(sequence)
                 // 如果成功，则清除当前序列
-                currentSequence.clear()
+                clearSequence()
+                cancelTask()
                 if (abilityOnSequence.isEmpty()) {
                     PlayerComboInfoDisplay.displayFailure(completeSequence, player)
                     return emptyList()

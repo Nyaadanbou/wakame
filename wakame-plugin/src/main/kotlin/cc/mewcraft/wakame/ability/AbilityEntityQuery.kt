@@ -1,84 +1,19 @@
-package cc.mewcraft.wakame.ecs.external
+package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.character.Caster
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ecs.ECS
-import cc.mewcraft.wakame.ecs.ECS.removeEntity
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
-import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.BlockComponent
-import cc.mewcraft.wakame.ecs.component.BukkitBridgeComponent
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.PlayerComponent
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.WithAbility
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.ecs.eEntity
+import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.metadata.Metadata
 import com.github.quillraven.fleks.Entity
-import org.bukkit.block.Block
-import org.bukkit.entity.Player
-import org.bukkit.entity.Entity as BukkitEntity
-
-object PlayerEntityQuery {
-    fun createPlayerEntity(player: Player) {
-        ECS.createEntity {
-            it += PlayerComponent(player)
-            it += BukkitBridgeComponent(MetadataKeys.PLAYER_ENTITY) { componentBridge -> Metadata.provide(componentBridge[PlayerComponent].player) }
-            it += WithAbility()
-        }
-    }
-
-    fun removePlayerEntity(player: Player) {
-        val entityToRemove = player.eEntity().entity
-        removeEntity(entityToRemove)
-    }
-}
-
-object BukkitEntityEntityQuery {
-    fun createBukkitEntity(bukkitEntity: BukkitEntity) {
-        if (bukkitEntity is Player) {
-            PlayerEntityQuery.createPlayerEntity(bukkitEntity)
-            return
-        }
-        ECS.createEntity {
-            it += BukkitEntityComponent(bukkitEntity)
-            it += BukkitBridgeComponent(MetadataKeys.BUKKIT_ENTITY_ENTITY) { componentBridge -> Metadata.provide(componentBridge[BukkitEntityComponent].bukkitEntity) }
-            it += WithAbility()
-        }
-    }
-
-    fun removeBukkitEntityEntity(bukkitEntity: BukkitEntity) {
-        if (bukkitEntity is Player) {
-            PlayerEntityQuery.removePlayerEntity(bukkitEntity)
-            return
-        }
-        val entityToRemove = bukkitEntity.eEntity()?.entity ?: return
-        removeEntity(entityToRemove)
-    }
-}
-
-object BlockEntityQuery {
-    fun createBlockEntity(block: Block) {
-        ECS.createEntity {
-            it += BlockComponent(block)
-            it += BukkitBridgeComponent(MetadataKeys.BLOCK_ENTITY) { componentBridge -> Metadata.provide(componentBridge[BlockComponent].block) }
-        }
-    }
-
-    fun removeBlockEntity(block: Block) {
-        val entityToRemove = block.eEntity()?.entity ?: return
-        removeEntity(entityToRemove)
-    }
-}
 
 /**
  * 用于外部快捷地获取特定技能.
@@ -107,9 +42,9 @@ object AbilityEntityQuery {
     fun findAbilityComponentBridges(abilityId: Identifier, caster: Caster): List<KoishEntity> {
         val koishEntities = mutableListOf<KoishEntity>()
         FamilyDefinitions.ABILITY.forEach { entity ->
-            if (entity[AbilityComponent].abilityId != abilityId)
+            if (entity[AbilityComponent.Companion].abilityId != abilityId)
                 return@forEach
-            if (entity[CastBy].caster != caster)
+            if (entity[CastBy.Companion].caster != caster)
                 return@forEach
             koishEntities.add(KoishEntity(entity))
         }
@@ -124,7 +59,7 @@ object AbilityEntityQuery {
     fun findAllAbilities(caster: Caster): List<PlayerAbility> {
         val koishEntities = mutableListOf<KoishEntity>()
         FamilyDefinitions.ABILITY.forEach { entity ->
-            if (entity[CastBy].caster != caster)
+            if (entity[CastBy.Companion].caster != caster)
                 return@forEach
             koishEntities.add(KoishEntity(entity))
         }
@@ -140,7 +75,7 @@ object AbilityEntityQuery {
     }
 
     private fun KoishEntity.getPlayerAbility(): PlayerAbility {
-        val abilityComponent = get(AbilityComponent)
+        val abilityComponent = get(AbilityComponent.Companion)
         return PlayerAbility(
             id = abilityComponent.abilityId,
             trigger = abilityComponent.trigger,

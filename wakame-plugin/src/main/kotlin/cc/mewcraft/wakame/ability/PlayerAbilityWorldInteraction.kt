@@ -2,14 +2,13 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.ecs.external.AbilityEntityQuery
 import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 

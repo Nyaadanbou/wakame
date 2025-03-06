@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.ability.system
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.archetype.abilitySupport
 import cc.mewcraft.wakame.ability.component.ExtraJump
+import cc.mewcraft.wakame.ecs.bridge.toKoish
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -13,7 +14,6 @@ import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.WithAbility
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.eEntity
 import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
@@ -46,7 +46,7 @@ class ExtraJumpSystem : IteratingSystem(
     override fun onInit() {
         inputListener = event<PlayerInputEvent> { event ->
             val player = event.player
-            val playerEEntity = player.eEntity()
+            val playerEEntity = player.toKoish()
             val extraJumps = playerEEntity[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
             for (bridge in extraJumps) {
                 val extraJump = bridge[ExtraJump]
@@ -77,7 +77,7 @@ class ExtraJumpSystem : IteratingSystem(
 
         moveListener = event<PlayerMoveEvent> { event ->
             val player = event.player
-            val extraJumps = player.eEntity()[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
+            val extraJumps = player.toKoish()[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
             for (bridge in extraJumps) {
                 val extraJump = bridge[ExtraJump]
                 if (extraJump.jumpCount <= 0)

@@ -1,35 +1,19 @@
 package cc.mewcraft.wakame.ecs.external
 
 import cc.mewcraft.wakame.ecs.ECS
-import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityTag
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
-import java.util.stream.Stream
 
-@JvmInline
-value class KoishEntity(
-    val entity: Entity,
-) : Examinable {
-    /**
-     * 存放所有外部组件的键值对.
-     *
-     * K - [ComponentType], 所有 [ComponentType] 在各个 [Component] 内静态存储.
-     * V - [Component] 实例.
-     */
-    val componentsMap: Map<ComponentType<out Any>, Component<out Any>>
-        get() = ECS.world().snapshotOf(entity).components.associate { it.type() to it }
+class KoishEntity(
+    private val entity: Entity,
+) {
 
-    /**
-     * [EntityTag] 列表.
-     */
-    val tags: List<UniqueId<out Any>>
-        get() = ECS.world().snapshotOf(entity).tags
+    internal fun invalidate() {
+        ECS.removeEntity(entity)
+    }
 
     internal inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T = with(ECS.world()) {
         return entity[type]
@@ -41,6 +25,10 @@ value class KoishEntity(
 
     operator fun contains(uniqueId: UniqueId<out Any>): Boolean = with(ECS.world()) {
         return entity.contains(uniqueId)
+    }
+
+    infix fun has(type: UniqueId<*>): Boolean = with(ECS.world()) {
+        return entity.has(type)
     }
 
     internal inline operator fun <reified T : Component<T>> plusAssign(component: T) {
@@ -67,15 +55,19 @@ value class KoishEntity(
         }
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty?> {
-        return Stream.of(
-            ExaminableProperty.of("entity", entity),
-            ExaminableProperty.of("componentsMap", componentsMap),
-            ExaminableProperty.of("tags", tags)
-        )
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KoishEntity) return false
+        if (entity != other.entity) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return entity.hashCode()
     }
 
     override fun toString(): String {
-        return toSimpleString()
+        return entity.toString()
     }
+
 }
