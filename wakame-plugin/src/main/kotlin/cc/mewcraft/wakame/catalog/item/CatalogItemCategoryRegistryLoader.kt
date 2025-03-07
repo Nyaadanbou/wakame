@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.catalog.item
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -10,7 +11,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
-import java.io.File
+import kotlin.io.path.*
 
 
 @Init(stage = InitStage.POST_WORLD)
@@ -30,8 +31,8 @@ internal object CatalogItemCategoryRegistryLoader : RegistryConfigStorage {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemCategory) -> Unit) {
-        val dir = getFileInConfigDirectory("catalog/item/category/")
-        for (file in dir.walk().drop(1).filter(File::isFile)) {
+        val dir = KoishDataPaths.CONFIGS.resolve("catalog/item/category/")
+        for (file in dir.walk().filter { it.extension == "yml" }) {
             try {
                 val id = Identifiers.of(file.nameWithoutExtension)
                 val loader = buildYamlConfigLoader {

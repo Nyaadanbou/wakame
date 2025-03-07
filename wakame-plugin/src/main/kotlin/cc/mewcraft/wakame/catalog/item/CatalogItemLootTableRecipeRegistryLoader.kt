@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.catalog.item.recipe.MojangLootTable
@@ -20,10 +21,7 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import kotlin.io.path.extension
-import kotlin.io.path.readText
-import kotlin.io.path.relativeTo
-import kotlin.io.path.walk
+import kotlin.io.path.*
 import kotlin.streams.asSequence
 
 @Init(
@@ -61,7 +59,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemLootTableRecipe) -> Unit) {
-        val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/loot_table")
+        val lootTableDir = KoishDataPaths.CONFIGS.resolve("catalog/item/loot_table/")
 
         // 所有要在图鉴中展示的战利品表的路径
         val lootTableIds = HashSet<String>(1024)
@@ -73,9 +71,9 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage
 
         // 遍历所有文件, 读取菜单布局和图标
         lootTableDir.walk()
-            .drop(1)
             .filter { it.extension == "yml" }
             .forEach { file ->
+                LOGGER.info("Found ${file.name}")
                 try {
                     val loader = buildYamlConfigLoader { withDefaults() }
                     val rootNode = loader.buildAndLoadString(file.readText())
