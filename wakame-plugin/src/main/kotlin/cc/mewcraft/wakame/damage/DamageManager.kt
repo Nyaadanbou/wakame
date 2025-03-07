@@ -344,7 +344,7 @@ object DamageManager : DamageManagerApi {
         val projectile = event.projectile
         if (projectile !is AbstractArrow) return
 
-        val force: Float
+        val force: Double
         val damageTags: DamageTags
         val damageBundle: DamageBundle
         val bowMaterial = event.bow?.type
@@ -352,12 +352,12 @@ object DamageManager : DamageManagerApi {
             Material.BOW -> {
                 damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.BOW)
                 // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
-                force = DamageRules.calculateBowForce(72000 - entity.itemUseRemainingTime)
+                force = DamageRules.calculateBowForce(entity.activeItemUsedTime)
             }
 
             Material.CROSSBOW -> {
                 damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.CROSSBOW)
-                force = 1F
+                force = 1.0
             }
 
             else -> {
@@ -443,33 +443,4 @@ object DamageManager : DamageManagerApi {
     }
 
     // TODO 更通用的临时标记工具类
-}
-
-/**
- * 伤害系统中与公式有关的内容
- */
-object DamageRules {
-    /**
-     * 计算*单种元素*被防御后的伤害.
-     *
-     * 影响防御后伤害的因素:
-     * - 原始伤害值
-     * - 防御(本元素+通用元素)
-     * - 防御穿透
-     */
-    fun calculateDamageAfterDefense(
-        originalDamage: Double, defense: Double, defensePenetration: Double, defensePenetrationRate: Double,
-    ): Double {
-        val validDefense = (defense - defensePenetration).coerceAtLeast(0.0) * (1 - defensePenetrationRate)
-        return (originalDamage - validDefense).coerceAtLeast(0.0)
-    }
-
-    /**
-     * 通过拉弓的时间计算拉弓的力度.
-     */
-    fun calculateBowForce(useTicks: Int): Float {
-        val useSeconds = useTicks / 20F
-        val force = (useSeconds * useSeconds + useSeconds * 2F) / 3F
-        return force.coerceIn(0F, 1F)
-    }
 }

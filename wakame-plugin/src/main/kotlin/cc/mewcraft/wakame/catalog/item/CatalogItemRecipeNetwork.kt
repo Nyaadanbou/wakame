@@ -78,7 +78,7 @@ object CatalogItemRecipeNetwork {
 
         // 战利品表配方
         for (lootTableRecipe in KoishRegistries.LOOT_TABLE_RECIPE) {
-            network.addRecipe(lootTableRecipe, "LootTableRecipe '${lootTableRecipe.lootTableId}' has no input or output")
+            network.addRecipe(lootTableRecipe)
         }
 
         // TODO 工作站配方
@@ -108,6 +108,7 @@ object CatalogItemRecipeNetwork {
 
     /**
      * 方便函数.
+     * 输入输出存在空时会抛异常.
      */
     private fun MutableNetwork<ItemX, CatalogRecipeEdge>.addRecipe(
         catalogRecipe: CatalogRecipe,
@@ -118,6 +119,28 @@ object CatalogItemRecipeNetwork {
         val lookupOutputs = catalogRecipe.getLookupOutputs()
         if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
             LOGGER.error(errorMessage)
+            return
+        }
+
+        for (inputNode in lookupInputs) {
+            for (outputNode in lookupOutputs) {
+                addNode(inputNode)
+                addNode(outputNode)
+                addEdge(inputNode, outputNode, CatalogRecipeEdge(catalogRecipe))
+            }
+        }
+    }
+
+    /**
+     * 方便函数.
+     * 输入输出存在空时仅跳过.
+     */
+    private fun MutableNetwork<ItemX, CatalogRecipeEdge>.addRecipe(
+        catalogRecipe: CatalogRecipe
+    ) {
+        val lookupInputs = catalogRecipe.getLookupInputs()
+        val lookupOutputs = catalogRecipe.getLookupOutputs()
+        if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
             return
         }
 

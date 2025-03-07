@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -12,9 +13,12 @@ import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.TypeSerializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.register
 import org.spongepowered.configurate.kotlin.extensions.get
-import java.io.File
+import kotlin.io.path.*
 
 @Init(
     stage = InitStage.PRE_WORLD,
@@ -60,8 +64,8 @@ internal object KizamiTypeRegistryLoader : RegistryConfigStorage {
 
         // 递归遍历文件夹 DIR_PATH 里的每个文件
         // 文件名将作为铭刻的 id (命名空间始终默认)
-        val dir = getFileInConfigDirectory(DIR_PATH)
-        for (file in dir.walk().drop(1).filter(File::isFile)) {
+        val dir = KoishDataPaths.CONFIGS.resolve(DIR_PATH)
+        for (file in dir.walk().filter { it.extension == "yml" }) {
             try {
                 val rootNode = loader.buildAndLoadString(file.readText())
                 val kizamiId = Identifiers.of(file.nameWithoutExtension)
