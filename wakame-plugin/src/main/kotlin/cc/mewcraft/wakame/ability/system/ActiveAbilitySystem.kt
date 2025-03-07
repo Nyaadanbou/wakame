@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.ability.system
 
+import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.KoishEntity
+import com.github.quillraven.fleks.EntityUpdateContext
 
 interface ActiveAbilitySystem {
     /**
@@ -13,45 +13,55 @@ interface ActiveAbilitySystem {
      *
      * @see cc.mewcraft.wakame.ability.state.PlayerComboInfo
      */
-    fun tickIdle(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+    context(EntityUpdateContext)
+    fun tickIdle(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
         // 默认将技能标记为准备移除.
-        koishEntity += Tags.READY_TO_REMOVE
+        fleksEntity[AbilityComponent].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
     }
 
     /**
      * 执行此技能施法前摇逻辑.
      */
-    fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    context(EntityUpdateContext)
+    fun tickCastPoint(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
-    fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    context(EntityUpdateContext)
+    fun tickCast(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
-    fun tickBackswing(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    context(EntityUpdateContext)
+    fun tickBackswing(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
-    fun tickReset(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    context(EntityUpdateContext)
+    fun tickReset(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
 
-    fun tick(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+    context(EntityUpdateContext)
+    fun tick(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
         try {
-            val state = koishEntity[AbilityComponent]
-
-            return when (state.phase) {
-                StatePhase.IDLE -> tickIdle(deltaTime, tickCount, koishEntity)
-                StatePhase.CAST_POINT -> tickCastPoint(deltaTime, tickCount, koishEntity)
-                StatePhase.CASTING -> tickCast(deltaTime, tickCount, koishEntity)
-                StatePhase.BACKSWING -> tickBackswing(deltaTime, tickCount, koishEntity)
-                StatePhase.RESET -> tickReset(deltaTime, tickCount, koishEntity)
+            val state = fleksEntity[AbilityComponent]
+            var tickResult = TickResult.CONTINUE_TICK
+            fleksEntity.configure {
+                tickResult = when (state.phase) {
+                    StatePhase.IDLE -> tickIdle(deltaTime, tickCount, fleksEntity)
+                    StatePhase.CAST_POINT -> tickCastPoint(deltaTime, tickCount, fleksEntity)
+                    StatePhase.CASTING -> tickCast(deltaTime, tickCount, fleksEntity)
+                    StatePhase.BACKSWING -> tickBackswing(deltaTime, tickCount, fleksEntity)
+                    StatePhase.RESET -> tickReset(deltaTime, tickCount, fleksEntity)
+                }
             }
+
+            return tickResult
         } catch (t: Throwable) {
-            val abilityName = koishEntity[IdentifierComponent].id
+            val abilityName = fleksEntity[IdentifierComponent].id
             throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
         }
     }

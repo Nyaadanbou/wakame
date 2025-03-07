@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.ability.system
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -26,7 +25,7 @@ class AbilityStatePhaseSystem : IteratingSystem(
         val tickResult = entity[TickResultComponent].result
         val oldPhase = entity[AbilityComponent].phase
         val newPhase = when {
-            tickResult.isNextState() || entity.has(Tags.NEXT_STATE) -> {
+            tickResult.isNextState() || entity[AbilityComponent].isMarkNextState -> {
                 oldPhase.next()
             }
 
@@ -43,7 +42,7 @@ class AbilityStatePhaseSystem : IteratingSystem(
 
         entity[AbilityComponent].phase = newPhase
         onStateChange(id, KoishRegistries.ABILITY.getOrThrow(id), oldPhase, newPhase)
-        entity.configure { it -= Tags.NEXT_STATE }
+        entity[AbilityComponent].isMarkNextState = false
     }
 
     private fun onStateChange(identifier: Identifier, ability: Ability, old: StatePhase, new: StatePhase) {

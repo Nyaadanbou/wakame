@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.KoishEntity
@@ -18,14 +17,14 @@ class StackCountSystem : IteratingSystem(
 
         // 如果 stackCount 小于等于 0，移除实体
         if (stackCountComponent.count <= 0) {
-            ECS.removeEntity(entity)
+            entity.remove()
             return
         }
 
         // 如果 tickCount 达到设置好的时间, 移除异常效果.
         if (tickCountComponent.tick >= stackCountComponent.disappearTick) {
             LOGGER.info("在 ${KoishEntity(entity)} 上的元素效果已失效.")
-            ECS.removeEntity(entity)
+            entity.remove()
         }
     }
 }

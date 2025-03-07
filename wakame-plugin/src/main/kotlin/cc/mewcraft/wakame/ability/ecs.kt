@@ -1,14 +1,14 @@
-package cc.mewcraft.wakame.ecs.bridge
+package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.WithAbility
@@ -17,7 +17,8 @@ import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Entity
 
 fun Ability.createAbilityEntity(input: AbilityInput): Entity {
-    return ECS.createEntity(archetype.key) {
+    return ECS.createEntity {
+        it += IdentifierComponent(archetype.key)
         it += AbilityComponent(
             abilityId = key,
             manaCost = input.manaCost,
@@ -27,9 +28,8 @@ fun Ability.createAbilityEntity(input: AbilityInput): Entity {
             mochaEngine = input.mochaEngine
         )
         configuration().invoke(this, it)
-        it += Tags.DISPOSABLE
-        it += CastBy(input.castBy)
-        it += TargetTo(input.targetTo)
+        it += CastBy(input.castBy.entity)
+        it += TargetTo(input.targetTo.entity)
         HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
         input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
         it += TickCountComponent(.0)
@@ -37,7 +37,7 @@ fun Ability.createAbilityEntity(input: AbilityInput): Entity {
 }
 
 fun BukkitPlayer.findKoishAbilityEntity(archetype: AbilityArchetype): Collection<KoishEntity> {
-    return toKoish()[WithAbility].abilities.get(archetype).map { KoishEntity(it) }
+    return koishify()[WithAbility].abilities.get(archetype).map { KoishEntity(it) }
 }
 
 fun BukkitPlayer.findAbilities(archetype: AbilityArchetype): List<PlayerAbility> {
@@ -46,7 +46,7 @@ fun BukkitPlayer.findAbilities(archetype: AbilityArchetype): List<PlayerAbility>
 }
 
 fun BukkitPlayer.findAllAbilities(): List<PlayerAbility> {
-    val koishEntities = toKoish()[WithAbility].abilities.values()
+    val koishEntities = koishify()[WithAbility].abilities.values()
     return koishEntities.map { KoishEntity(it).getPlayerAbility() }
 }
 
@@ -54,15 +54,6 @@ fun BukkitPlayer.editAbilities(archetype: AbilityArchetype, block: (KoishEntity)
     val componentBridges = findKoishAbilityEntity(archetype)
     for (bridge in componentBridges) {
         block(bridge)
-    }
-}
-
-fun BukkitPlayer.cleanupAbility() {
-    val abilities = toKoish()[WithAbility].abilities.values().iterator()
-    while (abilities.hasNext()) {
-        val abilityEntity = abilities.next()
-        ECS.removeEntity(abilityEntity)
-        abilities.remove()
     }
 }
 

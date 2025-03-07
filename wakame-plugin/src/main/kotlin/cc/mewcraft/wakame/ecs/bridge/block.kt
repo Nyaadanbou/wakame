@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ecs.bridge
 
 import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.MetadataKeys
-import cc.mewcraft.wakame.ecs.component.BlockComponent
+import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
 import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -19,16 +19,16 @@ import org.bukkit.event.world.ChunkUnloadEvent
  * ### 生命周期
  * 当本函数返回后, 如果 [BukkitBlock] 所在的区块卸载, 那么与之对应的 [KoishEntity] 也将变为无效.
  */
-fun BukkitBlock.toKoish(): KoishEntity {
+fun BukkitBlock.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_BLOCK_ENTITY_ID) {
-        KoishEntity(ECS.createEntity { it += BlockComponent(this@toKoish) })
+        KoishEntity(ECS.createEntity { it += BukkitBlockComponent(this@koishify) })
     }
     return koishEntity
 }
 
 @Init(stage = InitStage.POST_WORLD)
-internal object BukkitBlockBridge {
+private object BukkitBlockBridge {
 
     @InitFun
     fun init() {

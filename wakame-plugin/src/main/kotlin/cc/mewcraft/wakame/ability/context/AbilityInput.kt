@@ -2,10 +2,6 @@ package cc.mewcraft.wakame.ability.context
 
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -69,10 +65,6 @@ fun abilityInput(caster: KoishEntity, target: KoishEntity, initializer: AbilityI
     return AbilityInputDSL(caster, target).apply(initializer).build()
 }
 
-fun abilityInput(abilityEntity: KoishEntity): AbilityInput {
-    return KoishEntityAbilityInput(abilityEntity)
-}
-
 @AbilityInputMarker
 class AbilityInputDSL(
     private val castBy: KoishEntity,
@@ -131,52 +123,6 @@ private class SimpleAbilityInput(
     override val manaCost: Evaluable<*>,
     override val mochaEngine: MochaEngine<*>,
 ) : AbilityInput, Examinable {
-
-    override fun toBuilder(): AbilityInputDSL {
-        return AbilityInputDSL(castBy, targetTo)
-            .trigger(trigger)
-            .holdBy(holdBy)
-            .manaCost(manaCost)
-            .mochaEngine(mochaEngine)
-
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
-        ExaminableProperty.of("castBy", castBy),
-        ExaminableProperty.of("target", targetTo),
-        ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("holdBy", holdBy),
-        ExaminableProperty.of("manaCost", manaCost),
-        ExaminableProperty.of("mochaEngine", mochaEngine),
-    )
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
-}
-
-@JvmInline
-private value class KoishEntityAbilityInput(
-    private val koishEntity: KoishEntity,
-) : AbilityInput, Examinable {
-    override val castBy: KoishEntity
-        get() = koishEntity[CastBy].caster
-    override val targetTo: KoishEntity
-        get() = koishEntity[TargetTo].target
-    override val trigger: Trigger?
-        get() = koishEntity[AbilityComponent].trigger
-    override val variant: TriggerVariant
-        get() = koishEntity[AbilityComponent].variant
-    override val holdBy: Pair<ItemSlot, NekoStack>?
-        get() {
-            val slot = koishEntity.getOrNull(HoldBy)?.slot ?: return null
-            val nekoStack = koishEntity.getOrNull(HoldBy)?.nekoStack ?: return null
-            return slot to nekoStack
-        }
-    override val manaCost: Evaluable<*>
-        get() = koishEntity[AbilityComponent].manaCost
-    override val mochaEngine: MochaEngine<*>
-        get() = koishEntity[AbilityComponent].mochaEngine
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(castBy, targetTo)

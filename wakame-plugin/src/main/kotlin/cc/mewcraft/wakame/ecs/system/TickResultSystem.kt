@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ecs.ECS
-import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
@@ -18,7 +16,7 @@ class TickResultSystem : IteratingSystem(
 
         when (tickResult) {
             TickResult.INTERRUPT -> {
-                ECS.removeEntity(entity).also { LOGGER.error("ECS entity ${world.snapshotOf(entity)} interrupt.") }
+                entity.remove().also { LOGGER.error("ECS entity ${world.snapshotOf(entity)} interrupt.") }
                 return
             }
 
@@ -30,9 +28,9 @@ class TickResultSystem : IteratingSystem(
             }
 
             TickResult.ALL_DONE -> {
-                if (entity.has(Tags.DISPOSABLE)) {
+                if (entity[TickResultComponent].isDisposable) {
                     // 这个是临时实体, 在下一个阶段会被删除.
-                    ECS.removeEntity(entity)
+                    entity.remove()
                 }
             }
         }

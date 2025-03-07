@@ -1,22 +1,28 @@
-package cc.mewcraft.wakame.element.stack
+package cc.mewcraft.wakame.elementstack
 
-import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.external.KoishEntity
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-fun LivingEntity.applyElementStack(
-    element: RegistryEntry<out Element>,
+fun BukkitEntity.applyElementStack(
+    element: RegistryEntry<ElementType>,
     count: Int,
-    caster: KoishEntity? = null,
+    caster: BukkitEntity? = null,
 ) {
-    if (this is Player) {
-        ElementStackManager.applyElementStack(element, count, this.toKoish(), caster)
+    val caster = if (caster is Player) {
+        caster.koishify()
     } else {
-        ElementStackManager.applyElementStack(element, count, this.toKoish(), caster)
+        caster?.koishify()
+    }
+    if (this is Player) {
+        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
+    } else {
+        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
     }
 }
 
@@ -43,7 +49,7 @@ object ElementStackManager {
      * @param count 应用层数
      * @param caster 造成伤害的实体, 如果为空则表示无造成伤害实体.
      */
-    fun applyElementStack(element: RegistryEntry<out Element>, count: Int, victim: KoishEntity, caster: KoishEntity?) = elementStackWorldInteraction {
+    fun applyElementStack(element: RegistryEntry<ElementType>, count: Int, victim: KoishEntity, caster: KoishEntity?) = elementStackWorldInteraction {
         val entity = victim[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return@elementStackWorldInteraction
         if (entity.containsElementStack(element)) {
             entity.addElementStack(element, count)

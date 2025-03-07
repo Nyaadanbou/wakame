@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.state.PlayerComboResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.item.wrap
@@ -69,7 +69,7 @@ internal object AbilityEntryPointHandler {
             is AbstractArrow -> {
                 val koishStack = projectile.itemStack.wrap() ?: return
                 val abilities = koishStack.playerAbilities.takeUnlessEmpty() ?: return
-                val target = (hitEntity as? LivingEntity)?.toKoish() ?: projectile.attachedBlock?.toKoish() ?: return
+                val target = (hitEntity as? LivingEntity)?.koishify() ?: projectile.attachedBlock?.koishify() ?: return
                 for (ability in abilities) {
                     ability.recordBy(projectile.shooter as Player, target, ItemSlot.imaginary() to koishStack)
                 }

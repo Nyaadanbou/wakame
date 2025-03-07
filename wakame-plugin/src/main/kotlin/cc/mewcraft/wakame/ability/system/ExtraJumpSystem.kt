@@ -4,7 +4,8 @@ package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.component.ExtraJump
-import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -14,7 +15,6 @@ import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.WithAbility
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
 import com.destroystokyo.paper.ParticleBuilder
@@ -39,6 +39,7 @@ class ExtraJumpSystem : IteratingSystem(
         if (extraJump.cooldown > 0) {
             extraJump.cooldown--
         }
+        entity[AbilityComponent].isReadyToRemove = true
         val player = entity[CastBy].player()
         extraJump.isHoldingJump = player.currentInput.isJump
     }
@@ -46,15 +47,15 @@ class ExtraJumpSystem : IteratingSystem(
     override fun onInit() {
         inputListener = event<PlayerInputEvent> { event ->
             val player = event.player
-            val playerEEntity = player.toKoish()
+            val playerEEntity = player.koishify()
             val extraJumps = playerEEntity[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
-            for (bridge in extraJumps) {
-                val extraJump = bridge[ExtraJump]
+            for (fleksEntity in extraJumps) {
+                val extraJump = fleksEntity[ExtraJump]
                 if (extraJump.jumpCount <= 0)
                     continue
                 if (extraJump.cooldown > 0)
                     continue
-                if (@Suppress("DEPRECATION") player.isOnGround)
+                if (player.isOnGround) // 我们知道这是按照客户端发送到服务端的网络数据包为基准, 我们也是故意忽略这里造成的任何负面影响
                     continue
                 if (extraJump.isHoldingJump)
                     continue
@@ -68,7 +69,7 @@ class ExtraJumpSystem : IteratingSystem(
                 extraJump.jumpCount--
 
                 // 播放粒子特效.
-                playParticle(player, bridge)
+                playParticle(player, fleksEntity)
 
                 // 发送跳跃消息.
                 extraJump.jumpedMessages.send(player)
@@ -76,10 +77,10 @@ class ExtraJumpSystem : IteratingSystem(
         }
 
         moveListener = event<PlayerMoveEvent> { event ->
-            val player = event.player
-            val extraJumps = player.toKoish()[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
-            for (bridge in extraJumps) {
-                val extraJump = bridge[ExtraJump]
+            val bukkitPlayer = event.player
+            val koishEntities = bukkitPlayer.koishify()[WithAbility].abilityEntities(AbilityArchetypes.EXTRA_JUMP)
+            for (koishEntity in koishEntities) {
+                val extraJump = koishEntity[ExtraJump]
                 if (extraJump.jumpCount <= 0)
                     continue
                 if (event.to.y > event.from.y) {
@@ -94,25 +95,27 @@ class ExtraJumpSystem : IteratingSystem(
         moveListener.unregister()
     }
 
-    private fun playParticle(player: Player, koishEntity: KoishEntity) {
+    private fun playParticle(player: Player, fleksEntity: FleksEntity) {
         // 设置粒子特效
-        koishEntity += ParticleEffectComponent(
-            bukkitWorld = player.world,
-            ParticleInfo(
-                builderProvider = { loc ->
-                    ParticleBuilder(Particle.END_ROD)
-                        .location(loc)
-                        .receivers(64)
-                        .extra(.0)
-                        .source(player)
-                },
-                particlePath = CirclePath(
-                    center = Position.fine(player.location.x, player.location.y, player.location.z),
-                    radius = 0.5,
-                    axis = BlockFace.UP
-                ),
-                times = 1
+        fleksEntity.configure {
+            it += ParticleEffectComponent(
+                bukkitWorld = player.world,
+                ParticleInfo(
+                    builderProvider = { loc ->
+                        ParticleBuilder(Particle.END_ROD)
+                            .location(loc)
+                            .receivers(64)
+                            .extra(.0)
+                            .source(player)
+                    },
+                    particlePath = CirclePath(
+                        center = Position.fine(player.location.x, player.location.y, player.location.z),
+                        radius = 0.5,
+                        axis = BlockFace.UP
+                    ),
+                    times = 1
+                )
             )
-        )
+        }
     }
 }

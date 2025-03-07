@@ -2,7 +2,8 @@ package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.component.Dash
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ecs.bridge.toKoish
+import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -10,8 +11,8 @@ import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.TickResult
-import cc.mewcraft.wakame.ecs.external.KoishEntity
 import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.Material
@@ -32,23 +33,24 @@ class DashSystem : IteratingSystem(
 
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
-        val result = tick(deltaTime.toDouble(), tickCount, KoishEntity(entity))
         entity.configure {
-            it += TickResultComponent(result)
+            it += TickResultComponent(tick(deltaTime.toDouble(), tickCount, entity))
         }
     }
 
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
+    context(EntityUpdateContext)
+    override fun tickCastPoint(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
         return TickResult.NEXT_STATE
     }
 
-    override fun tickCast(deltaTime: Double, tickCount: Double, koishEntity: KoishEntity): TickResult {
-        val dash = koishEntity[Dash]
+    context(EntityUpdateContext)
+    override fun tickCast(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+        val dash = fleksEntity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
             return TickResult.NEXT_STATE_NO_CONSUME
         }
-        val entity = koishEntity[CastBy].entityOrPlayer()
+        val entity = fleksEntity[CastBy].entityOrPlayer()
         val direction = entity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
@@ -79,7 +81,7 @@ class DashSystem : IteratingSystem(
         // 应用速度到玩家对象上
         entity.velocity = stepVector
 
-        if (affectEntityNearby(entity, koishEntity)) {
+        if (this@DashSystem.affectEntityNearby(entity, fleksEntity)) {
             if (!dash.canContinueAfterHit) {
                 return TickResult.NEXT_STATE_NO_CONSUME
             }
@@ -88,8 +90,8 @@ class DashSystem : IteratingSystem(
         return TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(casterEntity: BukkitEntity, koishEntity: KoishEntity): Boolean {
-        val dash = koishEntity[Dash]
+    private fun affectEntityNearby(casterEntity: BukkitEntity, fleksEntity: FleksEntity): Boolean {
+        val dash = fleksEntity[Dash]
         val entities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (entities.isEmpty()) {
             return false
@@ -101,15 +103,15 @@ class DashSystem : IteratingSystem(
             for (ability in dash.hitEffects) {
                 val input = if (casterEntity is Player) {
                     if (entity is Player) {
-                        abilityInput(casterEntity.toKoish(), entity.toKoish())
+                        abilityInput(casterEntity.koishify(), entity.koishify())
                     } else {
-                        abilityInput(casterEntity.toKoish(), entity.toKoish())
+                        abilityInput(casterEntity.koishify(), entity.koishify())
                     }
                 } else {
                     if (entity is Player) {
-                        abilityInput(entity.toKoish(), casterEntity.toKoish())
+                        abilityInput(entity.koishify(), casterEntity.koishify())
                     } else {
-                        abilityInput(entity.toKoish(), casterEntity.toKoish())
+                        abilityInput(entity.koishify(), casterEntity.koishify())
                     }
                 }
                 ability.recordBy(input)

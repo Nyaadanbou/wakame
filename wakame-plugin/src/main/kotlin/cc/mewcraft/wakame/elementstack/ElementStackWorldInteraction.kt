@@ -1,15 +1,16 @@
-package cc.mewcraft.wakame.element.stack
+package cc.mewcraft.wakame.elementstack
 
 import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.ElementComponent
+import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.external.KoishEntity
-import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.LivingEntity
 
@@ -23,18 +24,19 @@ internal annotation class ElementStackWorldInteractionDsl
 @ElementStackWorldInteractionDsl
 object ElementStackWorldInteraction {
 
-    fun putElementStackIntoWorld(element: RegistryEntry<out Element>, count: Int, target: KoishEntity, caster: KoishEntity?) {
+    fun putElementStackIntoWorld(element: RegistryEntry<ElementType>, count: Int, target: KoishEntity, caster: KoishEntity?) {
         require(count > 0) { "Count must be greater than 0" }
-        ECS.createEntity(element.getKeyOrThrow().value) {
-            caster?.let { c -> it += CastBy(caster) }
-            it += TargetTo(target)
+        ECS.createEntity {
+            it += IdentifierComponent(element.getKeyOrThrow().value)
+            caster?.let { c -> it += CastBy(caster.entity) }
+            it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent()
             it += StackCountComponent(count)
         }
     }
 
-    fun LivingEntity.containsElementStack(element: RegistryEntry<out Element>): Boolean {
+    fun LivingEntity.containsElementStack(element: RegistryEntry<ElementType>): Boolean {
         var contains = false
         FamilyDefinitions.ELEMENT_STACK.forEach { entity ->
             if (entity[ElementComponent].element != element)
@@ -46,7 +48,7 @@ object ElementStackWorldInteraction {
         return contains
     }
 
-    fun LivingEntity.addElementStack(element: RegistryEntry<out Element>, count: Int) {
+    fun LivingEntity.addElementStack(element: RegistryEntry<ElementType>, count: Int) {
         FamilyDefinitions.ELEMENT_STACK.forEach { entity ->
             if (entity[ElementComponent].element != element)
                 return@forEach

@@ -2,17 +2,16 @@ package cc.mewcraft.wakame.ability.state
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.findAllAbilities
 import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.ECS
 import cc.mewcraft.wakame.ecs.FamilyDefinitions
-import cc.mewcraft.wakame.ecs.bridge.findAllAbilities
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.Tags
 import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
@@ -184,7 +183,7 @@ class PlayerComboInfo(
                 return@editEntities
             if (entity[IdentifierComponent].id != ability.archetype.key)
                 return@editEntities
-            entity.configure { it += Tags.NEXT_STATE }
+            entity[AbilityComponent].isMarkNextState = true
         }
     }
 

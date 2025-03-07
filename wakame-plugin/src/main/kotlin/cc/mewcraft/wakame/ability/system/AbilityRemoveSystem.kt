@@ -1,21 +1,37 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.FamilyDefinitions
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.Tags
+import cc.mewcraft.wakame.ecs.component.TargetTo
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.entity.Player
 
 class AbilityRemoveSystem : IteratingSystem(
-    family = family { all(AbilityComponent, Tags.READY_TO_REMOVE) }
+    family = FamilyDefinitions.ABILITY
 ) {
     override fun onTickEntity(entity: Entity) {
-        val caster = entity.getOrNull(CastBy)?.entityOrPlayer()
-        if (caster != null && caster is Player && entity.has(HoldBy)) {
+        val abilityComponent = entity[AbilityComponent]
+        val casterEntity = entity[CastBy].caster
+        val targetEntity = entity[TargetTo].target
+
+        // 开发日记 25/3/6
+        // 要判断一个生物是否在 world 中, 使用 World#contains(Entity)
+        // 而不是 Entity#isMarkedForRemoval
+        if (casterEntity !in world || targetEntity !in world) {
+            entity.remove()
+            return
+        }
+
+        // 还是有效的技能才判断逻辑
+
+        if (!abilityComponent.isReadyToRemove)
+            return
+
+        val caster = entity[CastBy].entityOrPlayer()
+        if (caster is Player && entity.has(HoldBy)) {
             // 如果技能被一个物品持有, 则进行物品技能的移除逻辑.
             val holdItem = entity[HoldBy].nekoStack
             val slot = entity[HoldBy].slot
@@ -24,7 +40,8 @@ class AbilityRemoveSystem : IteratingSystem(
                 return
             }
         }
+
         // 非物品技能直接移除.
-        ECS.removeEntity(entity)
+        entity.remove()
     }
 }
