@@ -7,7 +7,7 @@ import com.github.quillraven.fleks.ComponentType
 data class IdentifierComponent(
     val id: Identifier,
 ) : Component<IdentifierComponent> {
-    override fun type(): ComponentType<IdentifierComponent> = IdentifierComponent
-
     companion object : ComponentType<IdentifierComponent>()
+
+    override fun type(): ComponentType<IdentifierComponent> = IdentifierComponent
 }

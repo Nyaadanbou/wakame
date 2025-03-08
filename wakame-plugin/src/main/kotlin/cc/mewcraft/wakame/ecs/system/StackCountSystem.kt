@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ecs.system
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.component.StackCountComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.external.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family

@@ -22,19 +22,19 @@ class AbilityManaCostSystem : IteratingSystem(
         if (tickResult != TickResult.NEXT_STATE) {
             return
         }
-        val player = entity[CastBy].player()
+        val bukkitPlayer = entity[CastBy].player()
         val penalty = entity[AbilityComponent].penalty
         val engine = entity[AbilityComponent].mochaEngine.also {
             it.bindInstance<ManaPenalty>(ManaPenalty(penalty.penaltyCount), "mana_penalty")
         }
-        val user = player.toUser()
+        val user = bukkitPlayer.toUser()
         val manaCost = entity[AbilityComponent].manaCost.evaluate(engine).toInt()
         if (!user.resourceMap.take(ResourceTypeRegistry.MANA, manaCost)) {
-            PlayerNoEnoughManaEvent(player, manaCost).callEvent()
+            PlayerNoEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
             entity[TickResultComponent].result = TickResult.RESET_STATE
         } else {
             penalty.cooldown.reset()
-            PlayerManaCostEvent(player, manaCost).callEvent()
+            PlayerManaCostEvent(bukkitPlayer, manaCost).callEvent()
         }
     }
 }

@@ -27,7 +27,7 @@ enum class SingleTrigger(
      */
     val char: Char,
     override val id: String,
-): Trigger {
+) : Trigger {
     /**
      * 代表玩家按下了左键, 具体上是指左键空气与方块的交互.
      *
@@ -90,6 +90,7 @@ enum class SequenceTrigger(
      */
     val triggers: List<SingleTrigger>,
 ) : Trigger {
+
     LLL(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK),
     LLR(SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK),
     LRL(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK),
@@ -98,7 +99,6 @@ enum class SequenceTrigger(
     RRL(SingleTrigger.RIGHT_CLICK, SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK),
     RLR(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK),
     RLL(SingleTrigger.RIGHT_CLICK, SingleTrigger.LEFT_CLICK, SingleTrigger.LEFT_CLICK),
-
     ;
 
     constructor(vararg triggers: SingleTrigger) : this(triggers.toList())

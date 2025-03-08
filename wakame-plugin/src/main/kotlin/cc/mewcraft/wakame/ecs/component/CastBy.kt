@@ -10,6 +10,9 @@ import com.github.quillraven.fleks.EntityComponentContext
 data class CastBy(
     var caster: FleksEntity,
 ) : Component<CastBy> {
+    companion object : ComponentType<CastBy>()
+
+    override fun type(): ComponentType<CastBy> = CastBy
 
     context(EntityComponentContext)
     fun player(): BukkitPlayer {
@@ -29,8 +32,4 @@ data class CastBy(
             caster[BukkitEntityComponent].bukkitEntity
         }
     }
-
-    override fun type(): ComponentType<CastBy> = CastBy
-
-    companion object : ComponentType<CastBy>()
 }

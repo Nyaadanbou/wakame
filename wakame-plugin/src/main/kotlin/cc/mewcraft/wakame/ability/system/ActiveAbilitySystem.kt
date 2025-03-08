@@ -8,13 +8,14 @@ import cc.mewcraft.wakame.ecs.data.TickResult
 import com.github.quillraven.fleks.EntityUpdateContext
 
 interface ActiveAbilitySystem {
+
     /**
      * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.ability.state.PlayerComboInfo].
      *
      * @see cc.mewcraft.wakame.ability.state.PlayerComboInfo
      */
     context(EntityUpdateContext)
-    fun tickIdle(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    fun tickIdle(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         // 默认将技能标记为准备移除.
         fleksEntity[AbilityComponent].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
@@ -24,38 +25,42 @@ interface ActiveAbilitySystem {
      * 执行此技能施法前摇逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCastPoint(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    fun tickCastPoint(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+        TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCast(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    fun tickCast(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+        TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
-    fun tickBackswing(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    fun tickBackswing(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+        TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
-    fun tickReset(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult = TickResult.NEXT_STATE_NO_CONSUME
+    fun tickReset(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+        TickResult.NEXT_STATE_NO_CONSUME
 
     context(EntityUpdateContext)
-    fun tick(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    fun tick(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         try {
             val state = fleksEntity[AbilityComponent]
             var tickResult = TickResult.CONTINUE_TICK
             fleksEntity.configure {
                 tickResult = when (state.phase) {
-                    StatePhase.IDLE -> tickIdle(deltaTime, tickCount, fleksEntity)
-                    StatePhase.CAST_POINT -> tickCastPoint(deltaTime, tickCount, fleksEntity)
-                    StatePhase.CASTING -> tickCast(deltaTime, tickCount, fleksEntity)
-                    StatePhase.BACKSWING -> tickBackswing(deltaTime, tickCount, fleksEntity)
-                    StatePhase.RESET -> tickReset(deltaTime, tickCount, fleksEntity)
+                    StatePhase.IDLE -> tickIdle(tickCount, fleksEntity)
+                    StatePhase.CAST_POINT -> tickCastPoint(tickCount, fleksEntity)
+                    StatePhase.CASTING -> tickCast(tickCount, fleksEntity)
+                    StatePhase.BACKSWING -> tickBackswing(tickCount, fleksEntity)
+                    StatePhase.RESET -> tickReset(tickCount, fleksEntity)
                 }
             }
 

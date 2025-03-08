@@ -6,7 +6,7 @@ import com.github.quillraven.fleks.ComponentType
 data class TickCountComponent(
     var tick: Double = .0,
 ) : Component<TickCountComponent> {
-    override fun type(): ComponentType<TickCountComponent> = TickCountComponent
-
     companion object : ComponentType<TickCountComponent>()
+
+    override fun type(): ComponentType<TickCountComponent> = TickCountComponent
 }

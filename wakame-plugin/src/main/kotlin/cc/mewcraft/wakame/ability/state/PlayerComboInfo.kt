@@ -7,8 +7,7 @@ import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ecs.ECS
-import cc.mewcraft.wakame.ecs.FamilyDefinitions
+import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
@@ -175,24 +174,24 @@ class PlayerComboInfo(
     }
 
     private fun Player.setNextState(ability: Ability) {
-        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        Families.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setNextState)
-                return@editEntities
+                return@forEach
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
             // 只有在 IDLE 状态下才能进行下一个状态的标记.
-                return@editEntities
+                return@forEach
             if (entity[IdentifierComponent].id != ability.archetype.key)
-                return@editEntities
+                return@forEach
             entity[AbilityComponent].isMarkNextState = true
         }
     }
 
     private fun Player.setCostPenalty(ability: Ability, penalty: ManaCostPenalty) {
-        ECS.editEntities(FamilyDefinitions.ABILITY) { entity ->
+        Families.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setCostPenalty)
-                return@editEntities
+                return@forEach
             if (entity[IdentifierComponent].id != ability.archetype.key)
-                return@editEntities
+                return@forEach
             entity[AbilityComponent].penalty = penalty
         }
     }

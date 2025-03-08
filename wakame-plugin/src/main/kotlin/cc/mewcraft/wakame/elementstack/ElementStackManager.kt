@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.elementstack
 import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
-import cc.mewcraft.wakame.ecs.external.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.LivingEntity

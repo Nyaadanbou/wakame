@@ -8,7 +8,7 @@ data class TickResultComponent(
     var result: TickResult,
     var isDisposable: Boolean = false
 ) : Component<TickResultComponent> {
-    override fun type(): ComponentType<TickResultComponent> = TickResultComponent
-
     companion object : ComponentType<TickResultComponent>()
+
+    override fun type(): ComponentType<TickResultComponent> = TickResultComponent
 }

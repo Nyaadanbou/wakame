@@ -1,15 +1,9 @@
 package cc.mewcraft.wakame.ecs.bridge
 
-import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
-import cc.mewcraft.wakame.ecs.external.KoishEntity
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.metadata.Metadata
-import org.bukkit.event.world.ChunkUnloadEvent
 
 /**
  * 返回该 [BukkitBlock] 对应的 [KoishEntity].
@@ -22,25 +16,9 @@ import org.bukkit.event.world.ChunkUnloadEvent
 fun BukkitBlock.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_BLOCK_ENTITY_ID) {
-        KoishEntity(ECS.createEntity { it += BukkitBlockComponent(this@koishify) })
+        KoishEntity(Fleks.createEntity { it += BukkitBlockComponent(this@koishify) })
     }
     return koishEntity
 }
 
-@Init(stage = InitStage.POST_WORLD)
-private object BukkitBlockBridge {
-
-    @InitFun
-    fun init() {
-        registerListeners()
-    }
-
-    private fun registerListeners() {
-        event<ChunkUnloadEvent> { event ->
-            // TODO 将失效的 ECSEntity 移除 ( 调用 entity.remove() )
-            //  从区块里获取所有存在对应ECSEntity的Block似乎不是一个非常好的实现
-            //  更好的实现也许是在 ECSSystem 遍历时检查其 BukkitBlock 所在的区块是否已卸载
-        }
-    }
-
-}
+// BukkitBlock 所对应的 ECS entity 将通过一个 ECS system 自动移除

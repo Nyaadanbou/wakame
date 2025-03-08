@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.ComponentType
 data class ElementComponent(
     var element: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getDefaultEntry(),
 ) : Component<ElementComponent> {
-    override fun type(): ComponentType<ElementComponent> = ElementComponent
-
     companion object : ComponentType<ElementComponent>()
+
+    override fun type(): ComponentType<ElementComponent> = ElementComponent
 }

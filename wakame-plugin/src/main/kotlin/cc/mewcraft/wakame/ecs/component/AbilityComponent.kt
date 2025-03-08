@@ -19,10 +19,10 @@ data class AbilityComponent(
     var variant: TriggerVariant,
     var mochaEngine: MochaEngine<*>,
 ) : Component<AbilityComponent> {
-    var isReadyToRemove: Boolean = false
-    var isMarkNextState: Boolean = false
-
     companion object : ComponentType<AbilityComponent>()
 
     override fun type(): ComponentType<AbilityComponent> = AbilityComponent
+
+    var isReadyToRemove: Boolean = false
+    var isMarkNextState: Boolean = false
 }

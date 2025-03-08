@@ -34,17 +34,17 @@ class DashSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
         entity.configure {
-            it += TickResultComponent(tick(deltaTime.toDouble(), tickCount, entity))
+            it += TickResultComponent(tick(tickCount, entity))
         }
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         return TickResult.NEXT_STATE
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         val dash = fleksEntity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能

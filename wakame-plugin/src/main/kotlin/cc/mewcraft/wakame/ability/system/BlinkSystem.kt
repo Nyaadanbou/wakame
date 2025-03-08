@@ -32,12 +32,12 @@ class BlinkSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
         entity.configure {
-            it += TickResultComponent(tick(deltaTime.toDouble(), tickCount, entity))
+            it += TickResultComponent(tick(tickCount, entity))
         }
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity
 
         // 如果玩家面前方块过近, 无法传送
@@ -49,7 +49,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blink = fleksEntity[Blink]
         val location = entity.location.clone()
@@ -102,7 +102,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickBackswing(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.NEXT_STATE_NO_CONSUME
         val blink = fleksEntity[Blink]
         if (!blink.isTeleported) {
@@ -117,7 +117,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(deltaTime: Double, tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickReset(tickCount: Double, fleksEntity: FleksEntity): TickResult {
         val blink = fleksEntity[Blink]
         blink.isTeleported = false
         fleksEntity -= ParticleEffectComponent

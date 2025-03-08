@@ -6,15 +6,15 @@ import com.github.quillraven.fleks.ComponentType
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 
-data class BlackHole(
+data class Blackhole(
     var radius: Evaluable<*>,
     var duration: Evaluable<*>,
     var damage: Evaluable<*>,
-) : Component<BlackHole> {
-    var holeLocation: Location? = null
-    var blockFace: BlockFace = BlockFace.UP
+) : Component<Blackhole> {
+    companion object : ComponentType<Blackhole>()
 
-    companion object : ComponentType<BlackHole>()
+    override fun type(): ComponentType<Blackhole> = Blackhole
 
-    override fun type(): ComponentType<BlackHole> = BlackHole
+    var holeCenter: Location? = null
+    var holeDirection: BlockFace = BlockFace.UP
 }

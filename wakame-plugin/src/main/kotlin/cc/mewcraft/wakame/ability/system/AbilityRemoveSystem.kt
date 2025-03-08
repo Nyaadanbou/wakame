@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ecs.FamilyDefinitions
+import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
@@ -10,7 +10,7 @@ import com.github.quillraven.fleks.IteratingSystem
 import org.bukkit.entity.Player
 
 class AbilityRemoveSystem : IteratingSystem(
-    family = FamilyDefinitions.ABILITY
+    family = Families.ABILITY
 ) {
     override fun onTickEntity(entity: Entity) {
         val abilityComponent = entity[AbilityComponent]

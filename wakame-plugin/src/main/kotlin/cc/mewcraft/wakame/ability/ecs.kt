@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
-import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.AbilityComponent
@@ -11,13 +11,13 @@ import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.WithAbility
+import cc.mewcraft.wakame.ecs.component.AbilityContainer
 import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.ecs.external.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import com.github.quillraven.fleks.Entity
 
 fun Ability.createAbilityEntity(input: AbilityInput): Entity {
-    return ECS.createEntity {
+    return Fleks.createEntity {
         it += IdentifierComponent(archetype.key)
         it += AbilityComponent(
             abilityId = key,
@@ -37,7 +37,7 @@ fun Ability.createAbilityEntity(input: AbilityInput): Entity {
 }
 
 fun BukkitPlayer.findKoishAbilityEntity(archetype: AbilityArchetype): Collection<KoishEntity> {
-    return koishify()[WithAbility].abilities.get(archetype).map { KoishEntity(it) }
+    return koishify()[AbilityContainer][archetype].map(::KoishEntity)
 }
 
 fun BukkitPlayer.findAbilities(archetype: AbilityArchetype): List<PlayerAbility> {
@@ -46,7 +46,7 @@ fun BukkitPlayer.findAbilities(archetype: AbilityArchetype): List<PlayerAbility>
 }
 
 fun BukkitPlayer.findAllAbilities(): List<PlayerAbility> {
-    val koishEntities = koishify()[WithAbility].abilities.values()
+    val koishEntities = koishify()[AbilityContainer].values
     return koishEntities.map { KoishEntity(it).getPlayerAbility() }
 }
 

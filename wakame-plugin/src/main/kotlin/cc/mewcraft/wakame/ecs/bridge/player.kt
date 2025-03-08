@@ -1,15 +1,16 @@
 package cc.mewcraft.wakame.ecs.bridge
 
-import cc.mewcraft.wakame.ecs.ECS
+import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.ecs.external.KoishEntity
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.metadata.Metadata
+import cc.mewcraft.wakame.util.registerEvents
+import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
@@ -24,30 +25,32 @@ import org.bukkit.event.player.PlayerQuitEvent
 fun BukkitPlayer.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_PLAYER_ENTITY_ID) {
-        KoishEntity(ECS.createEntity { it += BukkitPlayerComponent(this@koishify) })
+        KoishEntity(Fleks.createEntity { it += BukkitPlayerComponent(this@koishify) })
     }
     return koishEntity
 }
 
+/**
+ * 负责管理 [BukkitPlayer] 对应的 [FleksEntity] 的生命周期
+ */
 @Init(stage = InitStage.POST_WORLD)
-private object BukkitPlayerBridge {
+private object BukkitPlayerBridge : Listener {
 
     @InitFun
     fun init() {
-        registerListeners()
+        registerEvents()
     }
 
-    private fun registerListeners() {
+    // 在玩家进入服务器时, 为他创建对应的 ECS Entity
+    @EventHandler(priority = EventPriority.LOWEST)
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        event.player.koishify()
+    }
 
-        // 在玩家进入服务器时, 为他创建对应的 ECS Entity
-        event<PlayerJoinEvent>(priority = EventPriority.LOWEST) { event ->
-            event.player.koishify()
-        }
-
-        // 在玩家退出服务器时, 移除他对应的 ECS Entity
-        event<PlayerQuitEvent> { event ->
-            event.player.koishify().invalidate()
-        }
+    // 在玩家退出服务器时, 移除他对应的 ECS Entity
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        event.player.koishify().invalidate()
     }
 
 }

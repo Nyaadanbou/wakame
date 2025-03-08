@@ -8,9 +8,9 @@ data class Blink(
     var distance: Int,
     var teleportedMessages: AudienceMessageGroup,
 ) : Component<Blink> {
-    var isTeleported: Boolean = false
-
     companion object : ComponentType<Blink>()
 
     override fun type(): ComponentType<Blink> = Blink
+
+    var isTeleported: Boolean = false
 }

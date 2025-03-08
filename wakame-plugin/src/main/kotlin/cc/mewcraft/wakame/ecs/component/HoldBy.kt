@@ -9,9 +9,9 @@ data class HoldBy(
     var nekoStack: NekoStack,
     var slot: ItemSlot
 ): Component<HoldBy> {
-    override fun type(): ComponentType<HoldBy> = HoldBy
-
     companion object : ComponentType<HoldBy>()
+
+    override fun type(): ComponentType<HoldBy> = HoldBy
 }
 
 fun HoldBy(pair: Pair<ItemSlot, NekoStack>?): HoldBy? {

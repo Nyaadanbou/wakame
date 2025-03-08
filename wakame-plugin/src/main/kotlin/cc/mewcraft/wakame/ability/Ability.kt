@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ecs.component.WithAbility
+import cc.mewcraft.wakame.ecs.component.AbilityContainer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
@@ -16,7 +16,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import java.util.stream.Stream
 
 /**
- * Represents a ability "attached" to a player.
+ * Represents an ability "attached" to a player.
  *
  * If a player has ability X, we say that the ability X is attached to that
  * player; By contrast, if the player has no ability, we say that the player
@@ -48,8 +48,8 @@ abstract class Ability(
      */
     fun recordBy(input: AbilityInput) {
         val abilityEntity = createAbilityEntity(input)
-        val entity = input.castBy
-        entity[WithAbility].abilities.put(this.archetype, abilityEntity)
+        val castByEntity = input.castBy
+        castByEntity[AbilityContainer][archetype] = abilityEntity
     }
 
     /**

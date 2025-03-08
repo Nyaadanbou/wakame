@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.event.bukkit
 
 import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ecs.external.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack

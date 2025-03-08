@@ -8,8 +8,7 @@ data class StackCountComponent(
     var maxCount: Int = 10,
     var disappearTick: Int = 500,
 ) : Component<StackCountComponent> {
+    companion object : ComponentType<StackCountComponent>()
 
     override fun type(): ComponentType<StackCountComponent> = StackCountComponent
-
-    companion object : ComponentType<StackCountComponent>()
 }
