@@ -75,25 +75,10 @@ class EntityDefenseMetadata(
         val leastDamage = if (packet.damageValue() > 0) DamageRules.LEAST_DAMAGE else 0.0
         finalDamage.coerceAtLeast(leastDamage)
 
-        return when (DamageRules.ROUNDING_MODE) {
-            DamageRules.RoundingMode.NONE -> {
-                finalDamage
-            }
-
-            DamageRules.RoundingMode.ROUND -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                round(finalDamage * factor) / factor
-            }
-
-            DamageRules.RoundingMode.CEIL -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                ceil(finalDamage * factor) / factor
-            }
-
-            DamageRules.RoundingMode.FLOOR -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                floor(finalDamage * factor) / factor
-            }
+        if (DamageRules.ROUNDING_DAMAGE){
+            finalDamage = round(finalDamage)
         }
+
+        return finalDamage
     }
 }

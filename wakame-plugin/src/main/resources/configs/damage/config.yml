@@ -11,19 +11,11 @@ attack_damage_rate_multiply_before_defense: false
 # false - 防御后计算
 critical_strike_power_multiply_before_defense: false
 
+# 对于某一元素类型, 其伤害计算时, 最终是否四舍五入到整数位.
+rounding_damage: false
+
 # 对于某一元素类型, 其最小伤害.
 least_damage: 1.0
-
-# 对于某一元素类型, 其伤害的取整模式.
-# none - 不取整
-# ceil - 向上取整
-# floor - 向下取整
-# round - 四舍五入
-rounding_mode: none
-
-# 对于某一元素类型, 其伤害的小数位数.
-# 取整模式为 none 时此配置项无实际效果.
-decimal_places: 0
 
 # 对于某一元素类型, 计算其有效防御的公式.
 #
@@ -52,4 +44,52 @@ damage_after_defense_formula: "math.max(query.original_damage - query.valid_defe
 # query.use_ticks
 #   玩家拉弓释放时, 累计长按使用的时间, 单位 tick
 bow_force_formula: "math.clamp((query.use_ticks * query.use_ticks / 400.0 + query.use_ticks / 10.0) / 3.0, 0.0, 1.0)"
+
+# 伤害显示相关.
+damage_display:
+  mode: detail
+  detail:
+    # 伤害显示总文本.
+    text: <critical_strike_style><critical_strike_text><element_text>
+    # 伤害值的数字格式.
+    format: "%.1f"
+    # 暴击状态风格.
+    critical_strike_style:
+      positive: <bold>
+      negative: <bold>
+      none: ""
+    # 暴击状态文本.
+    critical_strike_text:
+      positive: <color:#FF9900>💥</color:#FF9900>
+      negative: <color:#02AFFF>💥</color:#02AFFF>
+      none: ""
+    # 元素文本.
+    # 支持占位符:
+    # - <element:name> 元素名
+    # - <element:style> 元素风格
+    # - <damage_value> 该元素类型具体伤害值
+    element_text: <element:style><damage_value>
+    # 各元素类型的伤害文本之间的分隔字符串.
+    separator: " "
+  sum:
+    text: <critical_strike_style><critical_strike_text><element_text>
+    format: "%.1f"
+    critical_strike_style:
+      positive: <bold>
+      negative: <bold>
+      none: ""
+    critical_strike_text:
+      positive: <color:#FF9900>💥</color:#FF9900>
+      negative: <color:#02AFFF>💥</color:#02AFFF>
+      none: ""
+    # 元素文本.
+    # 支持占位符:
+    # - <element:name> 伤害占比最高的元素类型的元素名.
+    # - <element:style> 伤害占比最高的元素类型的风格.
+    # - <damage_value> 总伤害值.
+    element_text: <element:style><damage_value>
+
+
+
+
 

@@ -1,6 +1,9 @@
 package cc.mewcraft.wakame.network
 
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.damage.CriticalStrikeState
+import cc.mewcraft.wakame.damage.DamageDisplayConfig
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.Hologram
@@ -8,17 +11,17 @@ import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTaskLater
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.sound.Sound.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.Context
+import net.kyori.adventure.text.minimessage.tag.Tag
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.Sound
 import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.joml.Vector3f
@@ -56,44 +59,56 @@ internal object DamageDisplay {
         event<NekoEntityDamageEvent>(EventPriority.MONITOR, true) { event ->
             val damager = event.damageSource.causingEntity as? Player ?: return@event
             val damagee = event.damagee as? LivingEntity ?: return@event
-            val damageValueMap = event.getFinalDamageMap()
             val criticalState = event.getCriticalState()
 
             val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
-            val hologramText = damageValueMap
-                .map { (element, value) ->
-                    val damageValue = "%.1f".format(value)
-                    val damageText = text {
-                        content(damageValue)
-                        element.value.displayStyles.forEach { applicableApply(it) }
-                    }
-                    when (criticalState) {
-                        CriticalStrikeState.POSITIVE -> {
-                            damager.playSound(sound(Sound.ENTITY_PLAYER_ATTACK_CRIT, Source.PLAYER, 1f, 1f), Emitter.self())
-                            text {
-                                content("\ud83d\udca5 ")
-                                color(TextColor.color(0xff9900))
-                                style { decorate(TextDecoration.BOLD) }
-                                append(damageText)
-                            }
-                        }
-
-                        CriticalStrikeState.NEGATIVE -> {
-                            text {
-                                content("\ud83d\udca5 ")
-                                color(TextColor.color(0x02afff))
-                                style { decorate(TextDecoration.BOLD) }
-                                append(damageText)
-                            }
-                        }
-
-                        CriticalStrikeState.NONE -> damageText
-                    }
-                }.let { components ->
-                    Component.join(JoinConfiguration.spaces(), components)
-                }
+            val hologramText = buildHologramText(event)
 
             sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
+        }
+    }
+
+    private fun buildHologramText(event: NekoEntityDamageEvent): Component {
+        val damageMap = event.getFinalDamageMap()
+        if (DamageDisplayConfig.DETAIL) {
+            val elementTexts = damageMap.map { (element, value) ->
+                val damageValue = DamageDisplayConfig.FORMAT.format(value)
+                val resolver = TagResolver.builder().apply {
+                    tag("element") { queue: ArgumentQueue, ctx: Context ->
+                        val arg = queue.popOr("Tag <element:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
+                        when (arg) {
+                            "name" -> Tag.selfClosingInserting(element.displayName)
+                            "style" -> Tag.styling(*element.displayStyles)
+                            else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
+                        }
+                    }
+                    tag("damage_value") { _, _ ->
+                        Tag.selfClosingInserting(Component.text(damageValue))
+                    }
+                }.build()
+                MM.deserialize(DamageDisplayConfig.ELEMENT_TEXT, resolver)
+            }
+            return Component.join(JoinConfiguration.separator(Component.text(DamageDisplayConfig.SEPARATOR)), elementTexts)
+        } else {
+            // 获取伤害值最高的元素类型
+            val elementType = damageMap.maxWithOrNull(
+                compareBy<Map.Entry<ElementType, Double>> { it.value }
+            )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry().value
+            val damageValue = DamageDisplayConfig.FORMAT.format(event.getFinalDamage())
+            val resolver = TagResolver.builder().apply {
+                tag("element") { queue: ArgumentQueue, ctx: Context ->
+                    val arg = queue.popOr("Tag <element:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
+                    when (arg) {
+                        "name" -> Tag.selfClosingInserting(elementType.displayName)
+                        "style" -> Tag.styling(*elementType.displayStyles)
+                        else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
+                    }
+                }
+                tag("damage_value") { _, _ ->
+                    Tag.selfClosingInserting(Component.text(damageValue))
+                }
+            }.build()
+            return MM.deserialize(DamageDisplayConfig.ELEMENT_TEXT, resolver)
         }
     }
 

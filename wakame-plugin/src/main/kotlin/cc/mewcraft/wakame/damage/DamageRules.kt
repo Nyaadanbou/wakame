@@ -2,9 +2,12 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.util.bindInstance
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
+import xyz.xenondevs.commons.provider.orElse
 
 
 /**
@@ -15,10 +18,9 @@ object DamageRules {
 
     val ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE: Boolean by DAMAGE_CONFIG.entry<Boolean>("attack_damage_rate_multiply_before_defense")
     val CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE: Boolean by DAMAGE_CONFIG.entry<Boolean>("critical_strike_power_multiply_before_defense")
+    val ROUNDING_DAMAGE: Boolean by DAMAGE_CONFIG.entry<Boolean>("rounding_damage")
 
     val LEAST_DAMAGE: Double by DAMAGE_CONFIG.entry<Double>("least_damage")
-    val ROUNDING_MODE: RoundingMode by DAMAGE_CONFIG.entry<RoundingMode>("rounding_mode")
-    val DECIMAL_PLACES: Int by DAMAGE_CONFIG.entry<Int>("decimal_places")
 
     private val VALID_DEFENSE_FORMULA: String by DAMAGE_CONFIG.entry<String>("valid_defense_formula")
     private val DAMAGE_AFTER_DEFENSE_FORMULA: String by DAMAGE_CONFIG.entry<String>("damage_after_defense_formula")
@@ -90,14 +92,20 @@ object DamageRules {
         mocha.bindInstance(BindingBowForce(useTicks), "query")
         return mocha.eval(BOW_FORCE_FORMULA)
     }
+}
 
-    /**
-     * 伤害取整模式.
-     */
-    enum class RoundingMode {
-        NONE,
-        CEIL,
-        FLOOR,
-        ROUND,
-    }
+object DamageDisplayConfig {
+    private val DAMAGE_DISPLAY_NODE = Configs["damage/config"].node("damage_display")
+
+    val TEXT: String by DAMAGE_DISPLAY_NODE.entry<String>("text")
+    val FORMAT: String by DAMAGE_DISPLAY_NODE.entry<String>("format")
+    val CRITICAL_STRIKE_STYLE_POSITIVE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_style", "positive")
+    val CRITICAL_STRIKE_STYLE_NEGATIVE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_style", "negative")
+    val CRITICAL_STRIKE_STYLE_NONE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_style", "none")
+    val CRITICAL_STRIKE_TEXT_POSITIVE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_text", "positive")
+    val CRITICAL_STRIKE_TEXT_NEGATIVE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_text", "negative")
+    val CRITICAL_STRIKE_TEXT_NONE: String by DAMAGE_DISPLAY_NODE.entry<String>("critical_strike_text", "none")
+    val DETAIL: Boolean by DAMAGE_DISPLAY_NODE.entry<Boolean>("detail")
+    val ELEMENT_TEXT: String by DAMAGE_DISPLAY_NODE.entry<String>("element_text")
+    val SEPARATOR: String by DAMAGE_DISPLAY_NODE.optionalEntry<String>("separator").orElse(" ")
 }
