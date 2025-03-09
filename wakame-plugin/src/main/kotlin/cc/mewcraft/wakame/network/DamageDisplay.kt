@@ -1,8 +1,12 @@
 package cc.mewcraft.wakame.network
 
 import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
 import cc.mewcraft.wakame.damage.CriticalStrikeState
-import cc.mewcraft.wakame.damage.DamageDisplayConfig
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
@@ -12,31 +16,157 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.runTaskLater
+import net.kyori.adventure.extra.kotlin.join
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
-import net.kyori.adventure.text.minimessage.Context
-import net.kyori.adventure.text.minimessage.tag.Tag
-import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.kyori.adventure.text.format.StyleBuilderApplicable
+import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.joml.Vector3f
+import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.provider.Provider
+import java.lang.reflect.Type
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
+private val DAMAGE_CONFIG = Configs["damage/config"]
+private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
+private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
+private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
+
+internal interface DamageDisplayDecorator : DamageDisplayDecoratorFields {
+
+    fun finalText(context: NekoEntityDamageEvent): Component {
+        val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
+        val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
+        val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
+
+        val finalText = MM.deserialize(
+            MergedDamageDisplayDecorator.finalText,
+            Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
+            Placeholder.component("critical_strike_text", criticalStrikeText),
+            Placeholder.component("damage_value_text", damageValueText(context)),
+        )
+
+        return finalText
+    }
+
+    fun damageValueText(context: NekoEntityDamageEvent): Component
+
+    fun criticalStrikeStyle(context: CriticalStrikeMetadata): Array<StyleBuilderApplicable> = when (context.state) {
+        CriticalStrikeState.NONE -> criticalStrikeStyleNone
+        CriticalStrikeState.POSITIVE -> criticalStrikeStylePositive
+        CriticalStrikeState.NEGATIVE -> criticalStrikeStyleNegative
+    }
+
+    fun criticalStrikeText(context: CriticalStrikeMetadata): Component = when (context.state) {
+        CriticalStrikeState.NONE -> criticalStrikeTextNone
+        CriticalStrikeState.POSITIVE -> criticalStrikeTextPositive
+        CriticalStrikeState.NEGATIVE -> criticalStrikeTextNegative
+    }
+
+}
+
+internal interface DamageDisplayDecoratorFields {
+
+    val finalText: String
+    val criticalStrikeStylePositive: Array<StyleBuilderApplicable>
+    val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>
+    val criticalStrikeStyleNone: Array<StyleBuilderApplicable>
+    val criticalStrikeTextPositive: Component
+    val criticalStrikeTextNegative: Component
+    val criticalStrikeTextNone: Component
+
+}
+
+internal class DamageDisplayDecoratorCommonFields(
+    config: Provider<ConfigurationNode>,
+) : DamageDisplayDecoratorFields {
+
+    override val finalText: String by config.entry<String>("final_text")
+    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "positive")
+    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "negative")
+    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "none")
+    override val criticalStrikeTextPositive: Component by config.entry("critical_strike_text", "positive")
+    override val criticalStrikeTextNegative: Component by config.entry("critical_strike_text", "negative")
+    override val criticalStrikeTextNone: Component by config.entry("critical_strike_text", "none")
+
+}
+
+internal object MergedDamageDisplayDecorator : DamageDisplayDecorator, DamageDisplayDecoratorFields by DamageDisplayDecoratorCommonFields(MERGED_DISPLAY_CONFIG) {
+
+    val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
+
+    override fun damageValueText(context: NekoEntityDamageEvent): Component {
+        val damageMap = context.getFinalDamageMap()
+        val elementType = damageMap.maxWithOrNull(
+            compareBy<Map.Entry<ElementType, Double>> { it.value }
+        )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry().value
+        val damageValueText = MM.deserialize(
+            damageValueText,
+            Placeholder.component("element_name", elementType.displayName),
+            Placeholder.styling("element_style", *elementType.displayStyles),
+            Formatter.number("damage_value", context.getFinalDamage())
+        )
+        return damageValueText
+    }
+
+}
+
+internal object SeparatedDamageDisplayDecorator : DamageDisplayDecorator, DamageDisplayDecoratorFields by DamageDisplayDecoratorCommonFields(SEPARATED_DISPLAY_CONFIG) {
+
+    val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
+    val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
+
+    override fun damageValueText(context: NekoEntityDamageEvent): Component {
+        val damageMap = context.getFinalDamageMap()
+        val damageValueText = damageMap.map { (elementType, damageValue) ->
+            MM.deserialize(
+                damageValueText,
+                Placeholder.component("element_name", elementType.displayName),
+                Placeholder.styling("element_style", *elementType.displayStyles),
+                Formatter.number("damage_value", damageValue)
+            )
+        }.join(JoinConfiguration.separator(separator))
+        return damageValueText
+    }
+
+}
+
+internal enum class DamageDisplayMode {
+    MERGED, SEPARATED
+}
+
+@Init(stage = InitStage.PRE_CONFIG)
+internal object DamageDisplayDecoratorSerializer : TypeSerializer<DamageDisplayDecorator> {
+
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayDecorator = when (node.require<DamageDisplayMode>()) {
+        DamageDisplayMode.MERGED -> MergedDamageDisplayDecorator
+        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplayDecorator
+    }
+
+    @InitFun
+    private fun init() {
+        Configs.registerSerializer(KOISH_NAMESPACE, this)
+    }
+
+}
+
 /**
  * 以悬浮文字显示玩家造成的伤害.
  */
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(stage = InitStage.POST_WORLD)
 internal object DamageDisplay {
 
     // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
@@ -49,66 +179,26 @@ internal object DamageDisplay {
     // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
     private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
 
+    // 当前使用的 decorator (显示模式)
+    private val decorator by DISPLAY_CONFIG.entry<DamageDisplayDecorator>("mode")
+
+    // TODO 动画参数可配置
+
     @InitFun
-    fun init() {
+    private fun init() {
         registerListeners()
     }
 
     private fun registerListeners() {
-
         event<NekoEntityDamageEvent>(EventPriority.MONITOR, true) { event ->
             val damager = event.damageSource.causingEntity as? Player ?: return@event
             val damagee = event.damagee as? LivingEntity ?: return@event
             val criticalState = event.getCriticalState()
 
             val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
-            val hologramText = buildHologramText(event)
+            val hologramText = decorator.finalText(event)
 
             sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
-        }
-    }
-
-    private fun buildHologramText(event: NekoEntityDamageEvent): Component {
-        val damageMap = event.getFinalDamageMap()
-        if (DamageDisplayConfig.DETAIL) {
-            val elementTexts = damageMap.map { (element, value) ->
-                val damageValue = DamageDisplayConfig.FORMAT.format(value)
-                val resolver = TagResolver.builder().apply {
-                    tag("element") { queue: ArgumentQueue, ctx: Context ->
-                        val arg = queue.popOr("Tag <element:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
-                        when (arg) {
-                            "name" -> Tag.selfClosingInserting(element.displayName)
-                            "style" -> Tag.styling(*element.displayStyles)
-                            else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
-                        }
-                    }
-                    tag("damage_value") { _, _ ->
-                        Tag.selfClosingInserting(Component.text(damageValue))
-                    }
-                }.build()
-                MM.deserialize(DamageDisplayConfig.ELEMENT_TEXT, resolver)
-            }
-            return Component.join(JoinConfiguration.separator(Component.text(DamageDisplayConfig.SEPARATOR)), elementTexts)
-        } else {
-            // 获取伤害值最高的元素类型
-            val elementType = damageMap.maxWithOrNull(
-                compareBy<Map.Entry<ElementType, Double>> { it.value }
-            )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry().value
-            val damageValue = DamageDisplayConfig.FORMAT.format(event.getFinalDamage())
-            val resolver = TagResolver.builder().apply {
-                tag("element") { queue: ArgumentQueue, ctx: Context ->
-                    val arg = queue.popOr("Tag <element:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
-                    when (arg) {
-                        "name" -> Tag.selfClosingInserting(elementType.displayName)
-                        "style" -> Tag.styling(*elementType.displayStyles)
-                        else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
-                    }
-                }
-                tag("damage_value") { _, _ ->
-                    Tag.selfClosingInserting(Component.text(damageValue))
-                }
-            }.build()
-            return MM.deserialize(DamageDisplayConfig.ELEMENT_TEXT, resolver)
         }
     }
 
