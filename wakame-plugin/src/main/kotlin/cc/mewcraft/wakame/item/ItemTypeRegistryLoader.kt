@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
+import cc.mewcraft.wakame.ability.trigger.TriggerRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -23,9 +25,15 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * 1. 一般萌芽物品的注册表
  * 2. 原版套皮物品的注册表
  */
-@Init(stage = InitStage.PRE_WORLD)
+@Init(
+    stage = InitStage.PRE_WORLD,
+    runAfter = [
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
+        TriggerRegistryLoader::class
+    ]
+)
 @Reload
-object ItemTypeRegistryLoader : RegistryConfigStorage {
+internal object ItemTypeRegistryLoader : RegistryConfigStorage {
 
     /**
      * 命名空间 `minecraft` 下的物品仅用于实现原版套皮物品,
@@ -51,14 +59,14 @@ object ItemTypeRegistryLoader : RegistryConfigStorage {
         .build()
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.ITEM.resetRegistry()
         applyDataToRegistry(KoishRegistries.ITEM::add)
         KoishRegistries.ITEM.freeze()
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyDataToRegistry(KoishRegistries.ITEM::update)
     }
 

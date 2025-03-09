@@ -113,6 +113,7 @@ class MultiJumpSystem : IteratingSystem(
                         radius = 0.5,
                         axis = BlockFace.UP
                     ),
+                    amount = 8,
                     times = 1
                 )
             )

@@ -95,6 +95,7 @@ class BlackholeSystem : IteratingSystem(
                         radius = radius,
                         axis = blackhole.holeDirection
                     ),
+                    amount = 30,
                     times = 1
                 ),
                 ParticleConfiguration(
@@ -107,6 +108,7 @@ class BlackholeSystem : IteratingSystem(
                             .source(caster as? Player)
                     },
                     particlePath = FixedPath(targetLocation),
+                    amount = 30,
                     times = 1
                 )
             )

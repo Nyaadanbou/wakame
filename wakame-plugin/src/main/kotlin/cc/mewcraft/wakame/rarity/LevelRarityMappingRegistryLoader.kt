@@ -14,18 +14,18 @@ import org.spongepowered.configurate.ConfigurationNode
     stage = InitStage.PRE_WORLD,
 )
 @Reload
-object LevelRarityMappingRegistryLoader : RegistryConfigStorage {
+internal object LevelRarityMappingRegistryLoader : RegistryConfigStorage {
     private const val FILE_PATH = "levels.yml"
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.LEVEL_RARITY_MAPPING.resetRegistry()
         applyDataToRegistry(KoishRegistries.LEVEL_RARITY_MAPPING::add)
         KoishRegistries.LEVEL_RARITY_MAPPING.freeze()
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyDataToRegistry(KoishRegistries.LEVEL_RARITY_MAPPING::update)
     }
 

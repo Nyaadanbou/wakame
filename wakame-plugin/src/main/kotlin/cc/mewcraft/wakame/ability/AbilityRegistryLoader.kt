@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.ability
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
-import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.ability.trigger.TriggerRegistryLoader
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -23,29 +22,26 @@ import cc.mewcraft.wakame.util.require
     stage = InitStage.PRE_WORLD,
     runAfter = [
         AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
+        TriggerRegistryLoader::class,
     ]
 )
 @Reload
-object AbilityRegistryLoader : RegistryConfigStorage {
+internal object AbilityRegistryLoader : RegistryConfigStorage {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
      */
     const val DIR_PATH: String = "ability/"
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.ABILITY.resetRegistry()
-        // 初始化静态变量
-        SingleTrigger.RIGHT_CLICK
-        SequenceTrigger.RRR
 
         applyAbilityDataToRegistry(KoishRegistries.ABILITY::add)
         KoishRegistries.ABILITY.freeze()
-        KoishRegistries.TRIGGER.freeze()
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyAbilityDataToRegistry(KoishRegistries.ABILITY::update)
     }
 

@@ -36,7 +36,7 @@ import org.bukkit.entity.Player
         AbilityRegistryLoader::class,
     ]
 )
-object PlayerComboInfoDisplay : RegistryConfigStorage {
+internal object PlayerComboInfoDisplay : RegistryConfigStorage {
     const val CONFIG_NAME = "ability.yml"
 
     private lateinit var triggerNames: Map<Trigger, String>

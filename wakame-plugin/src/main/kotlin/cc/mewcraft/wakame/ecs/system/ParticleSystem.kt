@@ -10,16 +10,12 @@ import com.github.quillraven.fleks.World.Companion.family
 class ParticleSystem : IteratingSystem(
     family = family { all(ParticleEffectComponent) }
 ) {
-    companion object {
-        // 假设每个粒子路径可以分为 N 段，进度基于路径段
-        private const val NUMBER_OF_PARTICLES = 100  // 设置每个路径上生成粒子的数量
-    }
-
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]
         for (particleInfo in particleEffectComponent.particleConfigurations) {
             val builderProvider = particleInfo.builderProvider
             val particlePath = particleInfo.particlePath
+            val particleAmount = particleInfo.amount
 
             // 检查是否已经结束
             if (particleInfo.times == 0) {
@@ -29,9 +25,9 @@ class ParticleSystem : IteratingSystem(
             }
 
             // 遍历每个粒子，计算其在路径上的位置
-            for (i in 0 until NUMBER_OF_PARTICLES) {
+            for (i in 0 until particleAmount) {
                 // 计算每个粒子的进度：在 0 到 1 之间
-                val progress = i / (NUMBER_OF_PARTICLES - 1).toDouble()  // 进度从 0 到 1
+                val progress = i / particleAmount.toDouble()  // 进度从 0 到 1
 
                 // 获取粒子在路径上的位置
                 val position = particlePath.positionAtProgress(progress)

@@ -10,8 +10,16 @@ import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.util.*
-import kotlin.io.path.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 
 
 @Init(stage = InitStage.POST_WORLD)
@@ -19,14 +27,14 @@ import kotlin.io.path.*
 internal object CatalogItemCategoryRegistryLoader : RegistryConfigStorage {
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.ITEM_CATEGORY.resetRegistry()
         applyDataToRegistry(KoishRegistries.ITEM_CATEGORY::add)
         KoishRegistries.ITEM_CATEGORY.freeze()
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyDataToRegistry(KoishRegistries.ITEM_CATEGORY::update)
     }
 

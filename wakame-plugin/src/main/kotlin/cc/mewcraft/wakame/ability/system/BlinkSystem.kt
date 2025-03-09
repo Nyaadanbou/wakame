@@ -91,6 +91,7 @@ class BlinkSystem : IteratingSystem(
                         .extra(.0)
                         .source(entity as? Player)
                 },
+                amount = 10,
                 particlePath = LinePath(
                     start = Position.fine(location),
                     end = Position.fine(target)

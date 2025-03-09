@@ -21,18 +21,18 @@ import org.spongepowered.configurate.kotlin.extensions.get
     stage = InitStage.PRE_WORLD
 )
 @Reload
-object RarityTypeRegistryLoader : RegistryConfigStorage {
+internal object RarityTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "rarities.yml"
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.RARITY.resetRegistry()
         applyDataToRegistry(KoishRegistries.RARITY::add)
         KoishRegistries.RARITY.freeze()
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyDataToRegistry(KoishRegistries.RARITY::update)
     }
 

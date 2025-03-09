@@ -35,7 +35,7 @@ internal object KizamiTypeRegistryLoader : RegistryConfigStorage {
     const val DIR_PATH: String = "kizami/"
 
     @InitFun
-    fun init() {
+    private fun init() {
         KoishRegistries.KIZAMI.resetRegistry()
         applyDataToRegistry(KoishRegistries.KIZAMI::add)
         KoishRegistries.KIZAMI.freeze()
@@ -44,7 +44,7 @@ internal object KizamiTypeRegistryLoader : RegistryConfigStorage {
     }
 
     @ReloadFun
-    fun reload() {
+    private fun reload() {
         applyDataToRegistry(KoishRegistries.KIZAMI::update)
     }
 

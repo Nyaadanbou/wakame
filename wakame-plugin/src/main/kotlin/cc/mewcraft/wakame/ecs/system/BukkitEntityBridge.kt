@@ -13,7 +13,7 @@ class BukkitEntityBridge : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity
-        if (bukkitEntity.isValid) {
+        if (!bukkitEntity.isValid) {
             entity.remove()
         }
     }
