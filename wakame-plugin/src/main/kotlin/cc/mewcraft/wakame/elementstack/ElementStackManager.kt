@@ -65,7 +65,7 @@ object ElementStackManager {
             caster?.let { c -> it += CastBy(caster.entity) }
             it += TargetTo(target.entity)
             it += ElementComponent(element)
-            it += TickCountComponent()
+            it += TickCountComponent(0)
             it += ElementStackComponent(amount)
         }
         target[ElementStackContainer][element] = elementStackEntity
@@ -79,6 +79,6 @@ object ElementStackManager {
         require(amount > 0) { "Amount must be greater than 0" }
         val stack = entity[ElementStackContainer][element] ?: return@with
         stack[ElementStackComponent].amount += amount
-        stack[TickCountComponent].tick = .0
+        stack[TickCountComponent].tick = 0
     }
 }

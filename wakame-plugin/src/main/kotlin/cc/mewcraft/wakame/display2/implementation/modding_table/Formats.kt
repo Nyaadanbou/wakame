@@ -1,19 +1,7 @@
 package cc.mewcraft.wakame.display2.implementation.modding_table
 
-import cc.mewcraft.wakame.display2.DerivedIndex
-import cc.mewcraft.wakame.display2.IndexedText
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.SimpleIndexedText
-import cc.mewcraft.wakame.display2.TextMetaFactory
-import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
-import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
-import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
-import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
-import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
-import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
-import cc.mewcraft.wakame.display2.implementation.common.computeIndex
-import cc.mewcraft.wakame.display2.implementation.standard.AbilityCoreTextMetaFactory
+import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore

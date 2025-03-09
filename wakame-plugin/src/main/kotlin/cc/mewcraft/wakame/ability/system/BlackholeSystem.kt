@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.FixedPath
-import cc.mewcraft.wakame.ecs.data.ParticleInfo
+import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -35,7 +35,7 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blackhole = fleksEntity[Blackhole]
 
@@ -49,7 +49,7 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         val caster = fleksEntity[CastBy].entityOrPlayer()
         val blackhole = fleksEntity[Blackhole]
         val mochaEngine = fleksEntity[AbilityComponent].mochaEngine
@@ -76,11 +76,11 @@ class BlackholeSystem : IteratingSystem(
             return TickResult.NEXT_STATE_NO_CONSUME
         }
 
-        if (tickCount % 10 == 0.0) {
+        if (tickCount % 10 == 0) {
             // 每 10 tick 生成一个粒子效果
             fleksEntity += ParticleEffectComponent(
                 bukkitWorld = targetLocation.world,
-                ParticleInfo(
+                ParticleConfiguration(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
                             .location(loc)
@@ -97,7 +97,7 @@ class BlackholeSystem : IteratingSystem(
                     ),
                     times = 1
                 ),
-                ParticleInfo(
+                ParticleConfiguration(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.FLAME)
                             .location(loc)
@@ -116,12 +116,12 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         return TickResult.NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    override fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         val blackhole = fleksEntity[Blackhole]
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null

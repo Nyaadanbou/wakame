@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -24,17 +23,8 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * 1. 一般萌芽物品的注册表
  * 2. 原版套皮物品的注册表
  */
-@Init(
-    stage = InitStage.PRE_WORLD,
-    runAfter = [
-        AbilityRegistryLoader::class,
-    ]
-)
-@Reload(
-    runAfter = [
-        AbilityRegistryLoader::class,
-    ]
-)
+@Init(stage = InitStage.PRE_WORLD)
+@Reload
 object ItemTypeRegistryLoader : RegistryConfigStorage {
 
     /**

@@ -14,7 +14,7 @@ interface ActiveAbilitySystem {
      * @see cc.mewcraft.wakame.ability.combo.PlayerComboInfo
      */
     context(EntityUpdateContext)
-    fun tickIdle(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    fun tickIdle(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         // 默认将技能标记为准备移除.
         fleksEntity[AbilityComponent].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
@@ -24,32 +24,32 @@ interface ActiveAbilitySystem {
      * 执行此技能施法前摇逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCastPoint(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+    fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult =
         TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCast(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+    fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult =
         TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
-    fun tickBackswing(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+    fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult =
         TickResult.NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
-    fun tickReset(tickCount: Double, fleksEntity: FleksEntity): TickResult =
+    fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult =
         TickResult.NEXT_STATE_NO_CONSUME
 
     context(EntityUpdateContext)
-    fun tick(tickCount: Double, fleksEntity: FleksEntity): TickResult {
+    fun tick(tickCount: Int, fleksEntity: FleksEntity): TickResult {
         try {
             val state = fleksEntity[AbilityComponent]
             var tickResult = TickResult.CONTINUE_TICK

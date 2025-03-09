@@ -32,7 +32,7 @@ fun Ability.createAbilityEntity(input: AbilityInput): Entity {
         it += TargetTo(input.targetTo.entity)
         HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
         input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
-        it += TickCountComponent(.0)
+        it += TickCountComponent(0)
     }
 }
 

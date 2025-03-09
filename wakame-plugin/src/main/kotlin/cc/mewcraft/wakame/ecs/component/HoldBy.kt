@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.NekoStack
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
-// TODO 也许会变成在 BukkitPlayer FleksEntity 上的组件?
+// TODO 也许会变成在 BukkitPlayer 所对应的 FleksEntity 上的组件?
 data class HoldBy(
     var nekoStack: NekoStack,
     var slot: ItemSlot

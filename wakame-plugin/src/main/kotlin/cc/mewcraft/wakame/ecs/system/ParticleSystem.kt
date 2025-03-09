@@ -17,7 +17,7 @@ class ParticleSystem : IteratingSystem(
 
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]
-        for (particleInfo in particleEffectComponent.particleInfos) {
+        for (particleInfo in particleEffectComponent.particleConfigurations) {
             val builderProvider = particleInfo.builderProvider
             val particlePath = particleInfo.particlePath
 

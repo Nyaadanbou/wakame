@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
-import cc.mewcraft.wakame.ecs.data.ParticleInfo
+import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
 import com.destroystokyo.paper.ParticleBuilder
@@ -100,7 +100,7 @@ class MultiJumpSystem : IteratingSystem(
         fleksEntity.configure {
             it += ParticleEffectComponent(
                 bukkitWorld = player.world,
-                ParticleInfo(
+                ParticleConfiguration(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.END_ROD)
                             .location(loc)

@@ -23,7 +23,6 @@ import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.key.Key
@@ -48,7 +47,6 @@ object CommonNekoStackTest {
 
                 // dependencies
                 adventureModule(),
-                registryModule(),
                 worldModule(),
             )
         }

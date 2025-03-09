@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.AssetExtractor
 import cc.mewcraft.wakame.pack.packModule
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import cc.mewcraft.wakame.world.worldModule
@@ -65,7 +64,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 entityModule(),
                 guiModule(),
                 packModule(),
-                registryModule(),
                 worldModule(),
             )
         }

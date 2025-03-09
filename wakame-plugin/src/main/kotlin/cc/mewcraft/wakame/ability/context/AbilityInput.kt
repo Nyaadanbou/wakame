@@ -14,7 +14,7 @@ import team.unnamed.mocha.MochaEngine
 import java.util.stream.Stream
 
 /**
- * 一次技能执行的上下文.
+ * 表示了用于释放技能的输入参数.
  */
 interface AbilityInput {
 
