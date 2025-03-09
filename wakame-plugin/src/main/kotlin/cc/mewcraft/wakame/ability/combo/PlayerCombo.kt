@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.state
+package cc.mewcraft.wakame.ability.combo
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger

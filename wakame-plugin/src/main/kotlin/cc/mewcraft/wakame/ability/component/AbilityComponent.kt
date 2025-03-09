@@ -1,9 +1,9 @@
-package cc.mewcraft.wakame.ecs.component
+package cc.mewcraft.wakame.ability.component
 
 import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
-import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.util.Identifier
 import com.github.quillraven.fleks.Component

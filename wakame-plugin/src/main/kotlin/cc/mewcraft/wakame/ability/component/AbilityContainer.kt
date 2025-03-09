@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ecs.component
+package cc.mewcraft.wakame.ability.component
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
@@ -26,5 +26,9 @@ data class AbilityContainer(
 
     operator fun set(archetype: AbilityArchetype, entity: FleksEntity): Boolean {
         return abilities.put(archetype, entity)
+    }
+
+    fun remove(archetype: AbilityArchetype, entity: FleksEntity) {
+        abilities.remove(archetype, entity)
     }
 }

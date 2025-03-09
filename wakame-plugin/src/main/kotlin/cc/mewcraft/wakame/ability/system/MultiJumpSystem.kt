@@ -3,15 +3,15 @@
 package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.MultiJump
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.AbilityContainer
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
@@ -29,17 +29,17 @@ import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerMoveEvent
 
 class MultiJumpSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, IdentifierComponent, MultiJump) }
+    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent, MultiJump) }
 ) {
     private lateinit var inputListener: KoishListener
     private lateinit var moveListener: KoishListener
 
     override fun onTickEntity(entity: Entity) {
+        entity[AbilityComponent].isReadyToRemove = true
         val multiJump = entity[MultiJump]
         if (multiJump.cooldown > 0) {
             multiJump.cooldown--
         }
-        entity[AbilityComponent].isReadyToRemove = true
         val player = entity[CastBy].player()
         multiJump.isHoldingJump = player.currentInput.isJump
     }
@@ -48,7 +48,7 @@ class MultiJumpSystem : IteratingSystem(
         inputListener = event<PlayerInputEvent> { event ->
             val bukkitPlayer = event.player
             val playerEntity = bukkitPlayer.koishify()
-            val multiJumps = playerEntity[AbilityContainer][AbilityArchetypes.MULTIJUMP]
+            val multiJumps = playerEntity[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
             for (fleksEntity in multiJumps) {
                 val multiJump = fleksEntity[MultiJump]
                 if (multiJump.jumpCount <= 0)
@@ -78,14 +78,14 @@ class MultiJumpSystem : IteratingSystem(
 
         moveListener = event<PlayerMoveEvent> { event ->
             val bukkitPlayer = event.player
-            val koishEntities = bukkitPlayer.koishify()[AbilityContainer][AbilityArchetypes.MULTIJUMP]
-            for (koishEntity in koishEntities) {
-                val multiJump = koishEntity[MultiJump]
-                if (multiJump.jumpCount <= 0)
+            if (!bukkitPlayer.isOnGround)
+                return@event
+            val fleksEntities = bukkitPlayer.koishify()[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
+            for (fleksEntity in fleksEntities) {
+                val multiJump = fleksEntity[MultiJump]
+                if (multiJump.jumpCount > 0)
                     continue
-                if (event.to.y > event.from.y) {
-                    multiJump.jumpCount = multiJump.originCount
-                }
+                multiJump.jumpCount = multiJump.originCount
             }
         }
     }

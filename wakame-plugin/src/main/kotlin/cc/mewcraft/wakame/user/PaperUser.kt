@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.state.PlayerCombo
+import cc.mewcraft.wakame.ability.combo.PlayerCombo
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager

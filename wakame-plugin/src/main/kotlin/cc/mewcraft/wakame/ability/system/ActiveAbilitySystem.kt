@@ -1,18 +1,17 @@
 package cc.mewcraft.wakame.ability.system
 
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.data.StatePhase
+import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.data.StatePhase
-import cc.mewcraft.wakame.ecs.data.TickResult
 import com.github.quillraven.fleks.EntityUpdateContext
 
 interface ActiveAbilitySystem {
 
     /**
-     * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.ability.state.PlayerComboInfo].
+     * 一般不会在 [StatePhase.IDLE] 中直接进行状态转换, 这部分逻辑交给 [cc.mewcraft.wakame.ability.combo.PlayerComboInfo].
      *
-     * @see cc.mewcraft.wakame.ability.state.PlayerComboInfo
+     * @see cc.mewcraft.wakame.ability.combo.PlayerComboInfo
      */
     context(EntityUpdateContext)
     fun tickIdle(tickCount: Double, fleksEntity: FleksEntity): TickResult {
@@ -66,7 +65,7 @@ interface ActiveAbilitySystem {
 
             return tickResult
         } catch (t: Throwable) {
-            val abilityName = fleksEntity[IdentifierComponent].id
+            val abilityName = fleksEntity[AbilityComponent].abilityId
             throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
         }
     }

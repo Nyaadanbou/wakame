@@ -1,22 +1,23 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.system.AbilityInitSystem
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
 import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
+import cc.mewcraft.wakame.ability.system.AbilityTickResultSystem
 import cc.mewcraft.wakame.ability.system.BlackholeSystem
 import cc.mewcraft.wakame.ability.system.BlinkSystem
 import cc.mewcraft.wakame.ability.system.DashSystem
 import cc.mewcraft.wakame.ability.system.MultiJumpSystem
 import cc.mewcraft.wakame.ecs.Fleks.world
-import cc.mewcraft.wakame.ecs.component.AbilityContainer
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
-import cc.mewcraft.wakame.ecs.system.StackCountSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
-import cc.mewcraft.wakame.ecs.system.TickResultSystem
+import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
+import cc.mewcraft.wakame.elementstack.system.ElementStackSystem
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -41,9 +42,18 @@ object Fleks : Listener {
             Families.bootstrap()
 
             onAdd(Families.BUKKIT_PLAYER) { entity ->
-                entity.configure { it += AbilityContainer() }
+                entity.configure {
+                    it += AbilityContainer()
+                    it += ElementStackContainer()
+                }
             }
 
+            onAdd(Families.BUKKIT_ENTITY) { entity ->
+                entity.configure {
+                    it += AbilityContainer()
+                    it += ElementStackContainer()
+                }
+            }
         }
 
         systems {
@@ -52,8 +62,8 @@ object Fleks : Listener {
             add(AbilityRemoveSystem())
             add(BukkitEntityBridge())
             add(BukkitBlockBridge())
-            add(TickResultSystem())
-            add(StackCountSystem())
+            add(AbilityTickResultSystem())
+            add(ElementStackSystem())
 
             // 将所有标记重置到默认状态.
 

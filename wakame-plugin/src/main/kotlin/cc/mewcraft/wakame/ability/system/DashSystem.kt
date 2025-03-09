@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.ability.system
 
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
+import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.Dash
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.abilityInput
+import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.TickResultComponent
-import cc.mewcraft.wakame.ecs.data.TickResult
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.IteratingSystem
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Entity as BukkitEntity
 
 class DashSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, IdentifierComponent, Dash) }
+    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent, Dash) }
 ), ActiveAbilitySystem {
     companion object {
         /**
@@ -34,7 +34,7 @@ class DashSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
         entity.configure {
-            it += TickResultComponent(tick(tickCount, entity))
+            it += AbilityTickResultComponent(tick(tickCount, entity))
         }
     }
 

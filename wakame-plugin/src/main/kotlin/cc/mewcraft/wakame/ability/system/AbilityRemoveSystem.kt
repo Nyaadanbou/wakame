@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.ability.system
 
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
 import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import org.bukkit.entity.Player
@@ -42,6 +44,11 @@ class AbilityRemoveSystem : IteratingSystem(
         }
 
         // 非物品技能直接移除.
+        removeAbilityEntity(entity)
+    }
+
+    private fun removeAbilityEntity(entity: Entity) {
+        entity[CastBy].caster[AbilityContainer].remove(entity[AbilityArchetypeComponent].archetype, entity)
         entity.remove()
     }
 }

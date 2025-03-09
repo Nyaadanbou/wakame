@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.ElementComponent
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.AbilityContainer
+import cc.mewcraft.wakame.element.component.ElementComponent
+import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
 import com.github.quillraven.fleks.Family
 import com.github.quillraven.fleks.World.Companion.family
 
@@ -32,7 +32,7 @@ object Families {
     val BUKKIT_ENTITY: Family = family { all(BukkitObject, BukkitEntityComponent) }
 
     @JvmField
-    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitPlayerComponent, BukkitEntityComponent, AbilityContainer) }
+    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitPlayerComponent) }
 
     // ------------------------------
     // 其余 family 为任意系统的具体实现, 其具体定义应该参考具体的文档
@@ -41,10 +41,10 @@ object Families {
     // ------------------------------
 
     @JvmField
-    val ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, IdentifierComponent) }
+    val ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent) }
 
     @JvmField
-    val ELEMENT_STACK: Family = family { all(IdentifierComponent, ElementComponent, TargetTo) }
+    val ELEMENT_STACK: Family = family { all(ElementComponent, ElementStackComponent, TargetTo) }
 
     // 用于初始化本 object 里的 val
     internal fun bootstrap() = Unit

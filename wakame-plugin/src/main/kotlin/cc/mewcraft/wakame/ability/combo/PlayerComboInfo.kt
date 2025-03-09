@@ -1,17 +1,17 @@
-package cc.mewcraft.wakame.ability.state
+package cc.mewcraft.wakame.ability.combo
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.ManaCostPenalty
+import cc.mewcraft.wakame.ability.combo.display.PlayerComboInfoDisplay
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.findAllAbilities
-import cc.mewcraft.wakame.ability.state.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
 import cc.mewcraft.wakame.util.Identifier
@@ -180,7 +180,7 @@ class PlayerComboInfo(
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
             // 只有在 IDLE 状态下才能进行下一个状态的标记.
                 return@forEach
-            if (entity[IdentifierComponent].id != ability.archetype.key)
+            if (entity[AbilityArchetypeComponent].archetype != ability.archetype)
                 return@forEach
             entity[AbilityComponent].isMarkNextState = true
         }
@@ -190,7 +190,7 @@ class PlayerComboInfo(
         Families.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setCostPenalty)
                 return@forEach
-            if (entity[IdentifierComponent].id != ability.archetype.key)
+            if (entity[AbilityArchetypeComponent].archetype != ability.archetype)
                 return@forEach
             entity[AbilityComponent].penalty = penalty
         }

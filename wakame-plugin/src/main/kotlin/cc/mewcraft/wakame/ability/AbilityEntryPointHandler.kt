@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.state.PlayerComboResult
+import cc.mewcraft.wakame.ability.combo.PlayerComboResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ecs.data
+package cc.mewcraft.wakame.ability.data
 
 enum class StatePhase {
     IDLE,

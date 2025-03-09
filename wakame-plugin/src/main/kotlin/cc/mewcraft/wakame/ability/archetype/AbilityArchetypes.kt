@@ -14,7 +14,7 @@ internal object AbilityArchetypes {
     val BLACKHOLE = register(BlackholeArchetype)
     val BLINK = register(BlinkArchetype)
     val DASH = register(DashArchetype)
-    val MULTIJUMP = register(MultiJumpArchetype)
+    val MULTI_JUMP = register(MultiJumpArchetype)
 
     private inline fun <reified T : AbilityArchetype> register(entry: T): T {
         return Registry.register(KoishRegistries.ABILITY_ARCHETYPE, entry.key, entry)

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.state.display
+package cc.mewcraft.wakame.ability.combo.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader

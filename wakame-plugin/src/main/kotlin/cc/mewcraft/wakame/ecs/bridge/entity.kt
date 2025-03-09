@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ecs.bridge
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.util.metadata.Metadata
 import org.bukkit.entity.Player
 
@@ -19,7 +20,12 @@ fun BukkitEntity.koishify(): KoishEntity {
     if (!this.isValid) error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid. See BukkitEntity.isValid().")
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_ENTITY_ENTITY_ID) {
-        KoishEntity(Fleks.createEntity { it += BukkitEntityComponent(this@koishify) })
+        KoishEntity(
+            Fleks.createEntity {
+                it += BukkitEntityComponent(this@koishify)
+                it += BukkitObject
+            }
+        )
     }
     return koishEntity
 }

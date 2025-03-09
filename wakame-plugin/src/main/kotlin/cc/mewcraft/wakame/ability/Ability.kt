@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ecs.component.AbilityContainer
+import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext

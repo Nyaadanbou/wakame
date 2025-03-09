@@ -29,7 +29,7 @@ private class MultiJumpInstance(
     config: ConfigurationNode,
     val count: Int,
     val jumpedMessages: AudienceMessageGroup,
-) : Ability(key, AbilityArchetypes.MULTIJUMP, config) {
+) : Ability(key, AbilityArchetypes.MULTI_JUMP, config) {
     override fun configuration(): EntityCreateContext.(Entity) -> Unit = {
         it += MultiJump(
             count = count,

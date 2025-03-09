@@ -1,24 +1,24 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
-import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.HoldBy
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.AbilityContainer
-import cc.mewcraft.wakame.ecs.data.StatePhase
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 
 fun Ability.createAbilityEntity(input: AbilityInput): Entity {
     return Fleks.createEntity {
-        it += IdentifierComponent(archetype.key)
+        it += AbilityArchetypeComponent(archetype)
         it += AbilityComponent(
             abilityId = key,
             manaCost = input.manaCost,

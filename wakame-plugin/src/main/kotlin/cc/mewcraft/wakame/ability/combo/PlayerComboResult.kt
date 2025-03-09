@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.state
+package cc.mewcraft.wakame.ability.combo
 
 enum class PlayerComboResult {
     /**

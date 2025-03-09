@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 

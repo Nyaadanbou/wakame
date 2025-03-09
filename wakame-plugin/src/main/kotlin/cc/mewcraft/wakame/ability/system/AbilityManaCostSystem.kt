@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.TickResultComponent
-import cc.mewcraft.wakame.ecs.data.TickResult
+import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
+import cc.mewcraft.wakame.ability.data.TickResult
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.entity.resource.ResourceTypeRegistry
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
@@ -15,10 +15,10 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
 class AbilityManaCostSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TickResultComponent) }
+    family = family { all(AbilityComponent, CastBy, AbilityTickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
-        val tickResult = entity[TickResultComponent].result
+        val tickResult = entity[AbilityTickResultComponent].result
         if (tickResult != TickResult.NEXT_STATE) {
             return
         }
@@ -31,7 +31,7 @@ class AbilityManaCostSystem : IteratingSystem(
         val manaCost = entity[AbilityComponent].manaCost.evaluate(engine).toInt()
         if (!user.resourceMap.take(ResourceTypeRegistry.MANA, manaCost)) {
             PlayerNoEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
-            entity[TickResultComponent].result = TickResult.RESET_STATE
+            entity[AbilityTickResultComponent].result = TickResult.RESET_STATE
         } else {
             penalty.cooldown.reset()
             PlayerManaCostEvent(bukkitPlayer, manaCost).callEvent()

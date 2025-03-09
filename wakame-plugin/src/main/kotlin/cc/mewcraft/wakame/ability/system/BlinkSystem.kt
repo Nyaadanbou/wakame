@@ -2,18 +2,18 @@
 
 package cc.mewcraft.wakame.ability.system
 
+import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
+import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability.component.Blink
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.ecs.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.component.CastBy
-import cc.mewcraft.wakame.ecs.component.IdentifierComponent
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
-import cc.mewcraft.wakame.ecs.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.ecs.component.TickResultComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.ParticleInfo
-import cc.mewcraft.wakame.ecs.data.TickResult
 import cc.mewcraft.wakame.util.text.mini
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
@@ -27,12 +27,12 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 class BlinkSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, IdentifierComponent, Blink) }
+    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent, Blink) }
 ), ActiveAbilitySystem {
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick
         entity.configure {
-            it += TickResultComponent(tick(tickCount, entity))
+            it += AbilityTickResultComponent(tick(tickCount, entity))
         }
     }
 

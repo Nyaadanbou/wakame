@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ecs.bridge
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
+import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.util.metadata.Metadata
 
 /**
@@ -16,7 +17,12 @@ import cc.mewcraft.wakame.util.metadata.Metadata
 fun BukkitBlock.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_BLOCK_ENTITY_ID) {
-        KoishEntity(Fleks.createEntity { it += BukkitBlockComponent(this@koishify) })
+        KoishEntity(
+            Fleks.createEntity {
+                it += BukkitBlockComponent(this@koishify)
+                it += BukkitObject
+            }
+        )
     }
     return koishEntity
 }

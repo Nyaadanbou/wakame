@@ -1,13 +1,12 @@
-package cc.mewcraft.wakame.ecs.component
+package cc.mewcraft.wakame.element.component
 
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
 data class ElementComponent(
-    var element: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getDefaultEntry(),
+    val element: RegistryEntry<ElementType>,
 ) : Component<ElementComponent> {
     companion object : ComponentType<ElementComponent>()
 

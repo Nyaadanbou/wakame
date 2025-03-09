@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ecs.bridge
 
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
+import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -25,7 +26,12 @@ import org.bukkit.event.player.PlayerQuitEvent
 fun BukkitPlayer.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_PLAYER_ENTITY_ID) {
-        KoishEntity(Fleks.createEntity { it += BukkitPlayerComponent(this@koishify) })
+        KoishEntity(
+            Fleks.createEntity {
+                it += BukkitPlayerComponent(this@koishify)
+                it += BukkitObject
+            }
+        )
     }
     return koishEntity
 }
@@ -34,7 +40,7 @@ fun BukkitPlayer.koishify(): KoishEntity {
  * 负责管理 [BukkitPlayer] 对应的 [FleksEntity] 的生命周期
  */
 @Init(stage = InitStage.POST_WORLD)
-private object BukkitPlayerBridge : Listener {
+object BukkitPlayerBridge : Listener {
 
     @InitFun
     fun init() {
