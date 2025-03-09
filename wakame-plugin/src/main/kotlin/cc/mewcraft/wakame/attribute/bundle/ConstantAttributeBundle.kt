@@ -1,14 +1,13 @@
 package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeBinaryKeys
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.data.getIntOrNull
+import cc.mewcraft.wakame.util.data.getByteOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
@@ -186,6 +185,13 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     }
 }
 
+private const val SINGLE_VALUE_FIELD = "val"
+private const val RANGED_MIN_VALUE_FIELD = "min"
+private const val RANGED_MAX_VALUE_FIELD = "max"
+private const val ELEMENT_TYPE_FIELD = "elem"
+private const val OPERATION_TYPE_FIELD = "op"
+private const val QUALITY_FIELD = "qual"
+
 internal data class ConstantAttributeBundleS(
     override val id: String,
     override val operation: Operation,
@@ -197,19 +203,17 @@ internal data class ConstantAttributeBundleS(
     ) : this(
         id,
         compound.readOperation(),
-        compound.readNumber(AttributeBinaryKeys.SINGLE_VALUE),
+        compound.readNumber(SINGLE_VALUE_FIELD),
         compound.readQuality(),
     )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
-        return other is ConstantAttributeBundleS &&
-                other.id == id &&
-                other.operation == operation
+        return other is ConstantAttributeBundleS && other.id == id && other.operation == operation
     }
 
     override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
-        writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
+        writeNumber(SINGLE_VALUE_FIELD, value)
         writeQuality(quality)
     }
 }
@@ -226,21 +230,19 @@ internal data class ConstantAttributeBundleR(
     ) : this(
         id,
         compound.readOperation(),
-        compound.readNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
-        compound.readNumber(AttributeBinaryKeys.RANGED_MAX_VALUE),
+        compound.readNumber(RANGED_MIN_VALUE_FIELD),
+        compound.readNumber(RANGED_MAX_VALUE_FIELD),
         compound.readQuality(),
     )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
-        return other is ConstantAttributeBundleR &&
-                other.id == id &&
-                other.operation == operation
+        return other is ConstantAttributeBundleR && other.id == id && other.operation == operation
     }
 
     override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
-        writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
-        writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
+        writeNumber(RANGED_MIN_VALUE_FIELD, lower)
+        writeNumber(RANGED_MAX_VALUE_FIELD, upper)
         writeQuality(quality)
     }
 }
@@ -257,21 +259,18 @@ internal data class ConstantAttributeBundleSE(
     ) : this(
         id,
         compound.readOperation(),
-        compound.readNumber(AttributeBinaryKeys.SINGLE_VALUE),
+        compound.readNumber(SINGLE_VALUE_FIELD),
         compound.readElement(),
         compound.readQuality(),
     )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
-        return other is ConstantAttributeBundleSE &&
-                other.id == id &&
-                other.operation == operation &&
-                other.element == element
+        return other is ConstantAttributeBundleSE && other.id == id && other.operation == operation && other.element == element
     }
 
     override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
-        writeNumber(AttributeBinaryKeys.SINGLE_VALUE, value)
+        writeNumber(SINGLE_VALUE_FIELD, value)
         writeElement(element)
         writeQuality(quality)
     }
@@ -290,34 +289,32 @@ internal data class ConstantAttributeBundleRE(
     ) : this(
         id,
         compound.readOperation(),
-        compound.readNumber(AttributeBinaryKeys.RANGED_MIN_VALUE),
-        compound.readNumber(AttributeBinaryKeys.RANGED_MAX_VALUE),
+        compound.readNumber(RANGED_MIN_VALUE_FIELD),
+        compound.readNumber(RANGED_MAX_VALUE_FIELD),
         compound.readElement(),
         compound.readQuality(),
     )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
-        return other is ConstantAttributeBundleRE
-                && other.id == id
-                && other.operation == operation
-                && other.element == element
+        return other is ConstantAttributeBundleRE && other.id == id && other.operation == operation && other.element == element
     }
 
     override fun saveNbt(): CompoundTag = CompoundTag().apply {
         writeOperation(operation)
-        writeNumber(AttributeBinaryKeys.RANGED_MIN_VALUE, lower)
-        writeNumber(AttributeBinaryKeys.RANGED_MAX_VALUE, upper)
+        writeNumber(RANGED_MIN_VALUE_FIELD, lower)
+        writeNumber(RANGED_MAX_VALUE_FIELD, upper)
         writeElement(element)
         writeQuality(quality)
     }
 }
 
 private fun CompoundTag.readElement(): RegistryEntry<ElementType> {
-    return getIntOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { integerId -> KoishRegistries.ELEMENT.getEntry(integerId) } ?: KoishRegistries.ELEMENT.getDefaultEntry()
+    val id = getByte(ELEMENT_TYPE_FIELD).toInt()
+    return KoishRegistries.ELEMENT.getEntry(id) ?: KoishRegistries.ELEMENT.getDefaultEntry()
 }
 
 private fun CompoundTag.readOperation(): Operation {
-    val id = getInt(AttributeBinaryKeys.OPERATION_TYPE)
+    val id = getByte(OPERATION_TYPE_FIELD).toInt()
     return Operation.byId(id) ?: error("No such operation with id: $id")
 }
 
@@ -326,7 +323,8 @@ private fun CompoundTag.readNumber(key: String): Double {
 }
 
 private fun CompoundTag.readQuality(): ConstantAttributeBundle.Quality? {
-    return getIntOrNull(AttributeBinaryKeys.QUALITY)?.let(ConstantAttributeBundle.Quality.entries::get)
+    val id = getByteOrNull(QUALITY_FIELD)?.toInt() ?: return null
+    return ConstantAttributeBundle.Quality.entries[id]
 }
 
 private fun CompoundTag.writeNumber(key: String, value: Double) {
@@ -334,13 +332,17 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
 }
 
 private fun CompoundTag.writeElement(element: RegistryEntry<ElementType>) {
-    putByte(AttributeBinaryKeys.ELEMENT_TYPE, KoishRegistries.ELEMENT.getRawId(element.value).toByte())
+    val value = element.value
+    val id = KoishRegistries.ELEMENT.getRawId(value).toByte()
+    putByte(ELEMENT_TYPE_FIELD, id)
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {
-    putByte(AttributeBinaryKeys.OPERATION_TYPE, operation.id.toByte())
+    val id = operation.id.toByte()
+    putByte(OPERATION_TYPE_FIELD, id)
 }
 
 private fun CompoundTag.writeQuality(quality: ConstantAttributeBundle.Quality?) {
-    quality?.run { putByte(AttributeBinaryKeys.QUALITY, ordinal.toByte()) }
+    val id = quality?.ordinal?.toByte() ?: return
+    putByte(QUALITY_FIELD, id)
 }

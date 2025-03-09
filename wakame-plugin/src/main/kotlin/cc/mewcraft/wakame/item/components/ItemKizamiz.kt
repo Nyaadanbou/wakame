@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.getByteArrayOrNull
-import com.sun.org.apache.bcel.internal.util.Args.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import xyz.xenondevs.commons.collections.mapToByteArray
@@ -53,9 +52,9 @@ data class ItemKizamiz(
         override fun read(holder: ItemComponentHolder): ItemKizamiz? {
             val tag = holder.getNbt() ?: return null
             val kizamiSet = tag.getByteArrayOrNull(TAG_VALUE)
-                ?.mapTo(ObjectArraySet(4)) { KoishRegistries.KIZAMI.getEntryOrThrow(it.toInt()) }
+                ?.mapTo(ObjectArraySet(8)) { KoishRegistries.KIZAMI.getEntryOrThrow(it.toInt()) }
                 ?: return null
-            return ItemKizamiz(kizamiz = kizamiSet)
+            return ItemKizamiz(kizamiSet)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
