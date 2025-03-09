@@ -17,9 +17,7 @@ import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 
-@Init(
-    stage = InitStage.PRE_WORLD
-)
+@Init(stage = InitStage.PRE_WORLD)
 @Reload
 internal object ElementTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH: String = "elements.yml"
