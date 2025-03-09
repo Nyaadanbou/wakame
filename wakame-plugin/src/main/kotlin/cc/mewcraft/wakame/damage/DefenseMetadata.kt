@@ -73,7 +73,7 @@ class EntityDefenseMetadata(
             finalDamage *= criticalStrikePower
         }
         val leastDamage = if (packet.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
-        finalDamage.coerceAtLeast(leastDamage)
+        finalDamage = finalDamage.coerceAtLeast(leastDamage)
 
         if (DamageRules.ROUNDING_DAMAGE){
             finalDamage = round(finalDamage)
