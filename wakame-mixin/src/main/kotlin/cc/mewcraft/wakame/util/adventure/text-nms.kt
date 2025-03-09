@@ -1,25 +1,15 @@
-@file:Suppress("DEPRECATION")
-
-package cc.mewcraft.wakame.util.component.adventure
+package cc.mewcraft.wakame.util.adventure
 
 import cc.mewcraft.wakame.util.REGISTRY_ACCESS
 import cc.mewcraft.wakame.util.toResourceLocation
 import io.papermc.paper.adventure.PaperAdventure
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.format.Style
-import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
-import net.minecraft.nbt.StringTag
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
-import java.awt.Color
 import java.util.*
 import net.minecraft.network.chat.Component as MojangComponent
-import net.minecraft.network.chat.Style as MojangStyle
 
 fun MojangComponent.toAdventureComponent(): Component {
     return PaperAdventure.asAdventure(this)
@@ -33,23 +23,7 @@ fun Component.toNMSComponent(): MojangComponent {
     return PaperAdventure.asVanilla(this)
 }
 
-fun Component.toJson(): String {
-    return GsonComponentSerializer.gson().serialize(this)
-}
-
-fun Component.toNBT(): StringTag {
-    return StringTag.valueOf(toJson())
-}
-
-fun Component.font(font: String): Component {
-    return font(Key.key(font))
-}
-
-fun Component.fontName(): String? {
-    return font()?.toString()
-}
-
-private val DEFAULT_STYLE = MojangStyle.EMPTY
+private val DEFAULT_STYLE = net.minecraft.network.chat.Style.EMPTY
     .withColor(0xFFFFFF)
     .withBold(false)
     .withItalic(false)
@@ -63,8 +37,8 @@ fun MojangComponent.withoutPreFormatting(): MojangComponent {
         .append(this)
 }
 
-fun Style.toNmsStyle(): MojangStyle {
-    var style = MojangStyle.EMPTY
+fun Style.toNmsStyle(): net.minecraft.network.chat.Style {
+    var style = net.minecraft.network.chat.Style.EMPTY
     color()?.let { style = style.withColor(it.value()) }
     font()?.let { style = style.withFont(it.toResourceLocation()) }
 
@@ -133,15 +107,3 @@ internal fun MojangComponent.isEmpty(): Boolean {
 
     return true
 }
-
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
-    return font(Key.key(font))
-}
-
-fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.color(color: Color): B {
-    return color(TextColor.color(color.rgb))
-}
-
-internal fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.indent(spaces: Int): B {
-    return append(Component.text(" ".repeat(spaces)))
-} 

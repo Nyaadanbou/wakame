@@ -13,6 +13,7 @@ description = "The mixin part"
 
 repositories {
     nyaadanbouReleases()
+    nyaadanbouPrivate()
 }
 
 dependencies {
@@ -30,6 +31,17 @@ dependencies {
     implementation(project(":wakame-api")) // 提供运行时依赖
     implementation(project(":wakame-common")) // 同上
     implementation(local.shadow.bukkit)
+    implementation(platform(libs.bom.configurate.yaml))
+    implementation(platform(libs.bom.configurate.gson))
+    implementation(platform(libs.bom.configurate.extra.kotlin))
+    implementation(platform(libs.bom.configurate.extra.dfu8))
+}
+
+tasks {
+    shadowJar {
+        val shadedPattern = "cc.mewcraft.wakame.external."
+        relocate("org.spongepowered.configurate", shadedPattern + "config")
+    }
 }
 
 sourceSets {

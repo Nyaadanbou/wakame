@@ -18,9 +18,11 @@ public abstract class MixinItemStackInfo {
     @Final
     @Shadow
     public Holder<Item> item;
+
     @Final
     @Shadow
     public int count;
+
     @Final
     @Shadow
     public DataComponentPatch components;

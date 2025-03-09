@@ -9,8 +9,10 @@ import java.util.function.UnaryOperator;
 
 @Mixin(DataComponents.class)
 public interface InvokerDataComponents {
+
     @Invoker("register")
     static <T> DataComponentType<T> register(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         throw new AssertionError();
     }
+
 }

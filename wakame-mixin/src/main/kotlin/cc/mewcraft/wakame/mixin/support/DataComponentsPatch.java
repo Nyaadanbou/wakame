@@ -1,15 +1,13 @@
 package cc.mewcraft.wakame.mixin.support;
 
+import cc.mewcraft.wakame.item2.data.ItemDataContainer;
 import cc.mewcraft.wakame.mixin.core.InvokerDataComponents;
-import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
 
 public class DataComponentsPatch {
-    public static final DataComponentType<Boolean> IS_G22 = InvokerDataComponents.register(
-            "koish:is_g22", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
+
+    public static final DataComponentType<ItemDataContainer> ITEM_DATA_CONTAINER = InvokerDataComponents.register(
+            "koish:item_data_container", builder -> builder.persistent(ItemDataContainer.makeCodec())
     );
 
     public static void bootstrap() {
@@ -17,9 +15,7 @@ public class DataComponentsPatch {
     }
 
     public static boolean isCustomType(DataComponentType<?> type) {
-        ResourceLocation key = BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type);
-        if (key == null)
-            return false;
-        return key.getNamespace().equals("koish");
+        return type == ITEM_DATA_CONTAINER;
     }
+
 }

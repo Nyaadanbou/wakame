@@ -13,11 +13,16 @@ version = "0.0.1-SNAPSHOT"
 
 repositories {
     nyaadanbouReleases()
+    nyaadanbouPrivate()
 }
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
     compileOnly(local.shadow.bukkit)
+    compileOnly(platform(libs.bom.configurate.yaml))
+    compileOnly(platform(libs.bom.configurate.gson))
+    compileOnly(platform(libs.bom.configurate.extra.kotlin))
+    compileOnly(platform(libs.bom.configurate.extra.dfu8))
 }
 
 publishing {

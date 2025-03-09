@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(targets = "net.minecraft.world.item.ItemStack$1") // ItemStack#OPTIONAL_STREAM_CODEC
 public abstract class MixinItemStackOptionalStreamCodec {
+
     @Redirect(
             method = "encode(Lnet/minecraft/network/RegistryFriendlyByteBuf;Lnet/minecraft/world/item/ItemStack;)V",
             at = @At(
@@ -21,4 +22,5 @@ public abstract class MixinItemStackOptionalStreamCodec {
     private void encode(StreamCodec<RegistryFriendlyByteBuf, DataComponentPatch> instance, Object buf, Object patch) {
         instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch).forget(DataComponentsPatch::isCustomType));
     }
+
 }
