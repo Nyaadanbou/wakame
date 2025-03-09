@@ -3,24 +3,10 @@ package cc.mewcraft.wakame.entity.attribute
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeGetter
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.GLOBAL_ATTRIBUTE_CONFIG
-import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.attribute.bundle.*
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle.Quality
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleR
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleRE
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleSE
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleR
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleRE
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleS
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundleSE
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
@@ -31,12 +17,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.KOISH_NAMESPACE
-import cc.mewcraft.wakame.util.RandomizedValue
-import cc.mewcraft.wakame.util.ReloadableProperty
+import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.require
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -66,7 +48,7 @@ internal object AttributeBundleFacadeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH: String = "attributes.yml"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.resetRegistry()
         addAll()
         KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.freeze()

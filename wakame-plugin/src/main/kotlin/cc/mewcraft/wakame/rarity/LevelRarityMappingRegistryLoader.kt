@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.*
@@ -18,14 +17,14 @@ internal object LevelRarityMappingRegistryLoader : RegistryConfigStorage {
     private const val FILE_PATH = "levels.yml"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.LEVEL_RARITY_MAPPING.resetRegistry()
         applyDataToRegistry(KoishRegistries.LEVEL_RARITY_MAPPING::add)
         KoishRegistries.LEVEL_RARITY_MAPPING.freeze()
     }
 
-    @ReloadFun
-    private fun reload() {
+    @InitFun
+    fun reload() {
         applyDataToRegistry(KoishRegistries.LEVEL_RARITY_MAPPING::update)
     }
 

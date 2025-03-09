@@ -50,7 +50,7 @@ internal object PlayerComboInfoDisplay : RegistryConfigStorage {
 
     @InitFun
     @ReloadFun
-    private fun loadConfiguration() {
+    fun loadConfiguration() {
         val file = getFileInConfigDirectory(CONFIG_NAME)
         val loader = buildYamlConfigLoader {
             withDefaults()

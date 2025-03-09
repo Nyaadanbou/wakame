@@ -80,12 +80,12 @@ object ImaginaryAttributeMaps {
     val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("minecraft:arrow")
 
     @InitFun
-    private fun init() {
+    fun init() {
         applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::add)
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::update)
     }
 

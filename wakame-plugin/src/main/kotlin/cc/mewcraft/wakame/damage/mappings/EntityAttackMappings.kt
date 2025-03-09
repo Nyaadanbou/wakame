@@ -32,10 +32,10 @@ object EntityAttackMappings {
     private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
     @InitFun
-    private fun init() = loadDataIntoRegistry()
+    fun init() = loadDataIntoRegistry()
 
     @ReloadFun
-    private fun reload() = loadDataIntoRegistry()
+    fun reload() = loadDataIntoRegistry()
 
     /**
      * 获取某一伤害情景下原版生物的伤害映射.

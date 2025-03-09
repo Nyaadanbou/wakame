@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 internal object AttributeBootstrap {
 
     @InitFun
-    private fun init() {
+    fun init() {
 
         // 注册 AttributeMapAccess
         AttributeMapAccess.register(AttributeMapAccessImpl)

@@ -26,7 +26,7 @@ internal object Reloader {
     private val dependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     @InitFun
-    private fun collectAndRegisterTasks() = tryExecute {
+    fun collectAndRegisterTasks() = tryExecute {
         registerTasks(collectTasks(KOISH_JAR.toFile(), this.javaClass.classLoader))
     }
 

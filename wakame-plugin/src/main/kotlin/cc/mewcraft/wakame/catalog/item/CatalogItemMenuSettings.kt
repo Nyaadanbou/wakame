@@ -30,12 +30,12 @@ internal object CatalogItemMenuSettings {
     }
 
     @InitFun
-    private fun init() {
+    fun init() {
         loadMenuSettings()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         loadMenuSettings()
     }
 

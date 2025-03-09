@@ -48,12 +48,12 @@ internal object ItemEntityRenderer : PacketListener {
     private val entityId2EntityUniqueId = ConcurrentHashMap<Int, UUID>()
 
     @InitFun
-    private fun init() {
+    fun init() {
         registerPacketListener()
     }
 
     @DisableFun
-    private fun disable() {
+    fun disable() {
         unregisterPacketListener()
     }
 

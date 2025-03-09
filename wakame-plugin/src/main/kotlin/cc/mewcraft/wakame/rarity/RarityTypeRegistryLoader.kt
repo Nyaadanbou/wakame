@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
@@ -25,14 +24,14 @@ internal object RarityTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "rarities.yml"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.RARITY.resetRegistry()
         applyDataToRegistry(KoishRegistries.RARITY::add)
         KoishRegistries.RARITY.freeze()
     }
 
-    @ReloadFun
-    private fun reload() {
+    @InitFun
+    fun reload() {
         applyDataToRegistry(KoishRegistries.RARITY::update)
     }
 

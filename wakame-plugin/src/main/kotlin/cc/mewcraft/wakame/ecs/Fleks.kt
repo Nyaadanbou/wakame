@@ -2,15 +2,7 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.component.AbilityContainer
-import cc.mewcraft.wakame.ability.system.AbilityInitSystem
-import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
-import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
-import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
-import cc.mewcraft.wakame.ability.system.AbilityTickResultSystem
-import cc.mewcraft.wakame.ability.system.BlackholeSystem
-import cc.mewcraft.wakame.ability.system.BlinkSystem
-import cc.mewcraft.wakame.ability.system.DashSystem
-import cc.mewcraft.wakame.ability.system.MultiJumpSystem
+import cc.mewcraft.wakame.ability.system.*
 import cc.mewcraft.wakame.ecs.Fleks.world
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
@@ -24,11 +16,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityCreateContext
-import com.github.quillraven.fleks.EntityUpdateContext
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -113,12 +101,12 @@ object Fleks : Listener {
         }
 
     @InitFun
-    private fun init() {
+    fun init() {
         registerEvents() // 静态注册以提高性能
     }
 
     @DisableFun
-    private fun disable() {
+    fun disable() {
         world.dispose()
     }
 

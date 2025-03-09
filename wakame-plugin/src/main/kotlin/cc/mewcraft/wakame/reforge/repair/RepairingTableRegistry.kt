@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import net.kyori.adventure.key.Key
 import org.jetbrains.annotations.VisibleForTesting
@@ -24,12 +23,12 @@ object RepairingTableRegistry {
         get() = tables.keys
 
     @InitFun
-    private fun init() {
+    fun init() {
         load()
     }
 
-    @ReloadFun
-    private fun reload() {
+    @InitFun
+    fun reload() {
         load()
     }
 

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 
 /**
  * 定制台的注册表.
@@ -23,12 +22,12 @@ object ModdingTableRegistry {
         get() = tables.keys
 
     @InitFun
-    private fun init() {
+    fun init() {
         load()
     }
 
-    @ReloadFun
-    private fun reload() {
+    @InitFun
+    fun reload() {
         load()
     }
 

@@ -32,12 +32,12 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer"
 internal object ItemStackRenderer : PacketListener {
 
     @InitFun
-    private fun init() {
+    fun init() {
         registerPacketListener()
     }
 
     @DisableFun
-    private fun disable() {
+    fun disable() {
         unregisterPacketListener()
     }
 

@@ -45,7 +45,7 @@ object CatalogItemRecipeNetwork {
     )
 
     @InitFun
-    private fun init() {
+    fun init() {
 
         // 当原版配方注册完成时 -> 重建网络
         MapEventBus.subscribe<MinecraftRecipeRegistrationDoneEvent> {

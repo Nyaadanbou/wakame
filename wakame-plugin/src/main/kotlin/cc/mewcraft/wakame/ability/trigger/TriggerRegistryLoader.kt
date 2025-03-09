@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 @Init(stage = InitStage.PRE_WORLD)
 internal object TriggerRegistryLoader {
     @InitFun
-    private fun init() {
+    fun init() {
         SequenceTrigger.RRR // 初始化静态变量
         KoishRegistries.TRIGGER.freeze()
     }

@@ -12,7 +12,7 @@ import org.bukkit.event.Listener
 )
 object ElementStackListener : Listener {
     @InitFun
-    private fun init() {
+    fun init() {
         registerEvents()
     }
 

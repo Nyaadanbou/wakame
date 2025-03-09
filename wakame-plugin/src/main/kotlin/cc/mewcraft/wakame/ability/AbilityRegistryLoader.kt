@@ -33,7 +33,7 @@ internal object AbilityRegistryLoader : RegistryConfigStorage {
     const val DIR_PATH: String = "ability/"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.ABILITY.resetRegistry()
 
         applyAbilityDataToRegistry(KoishRegistries.ABILITY::add)
@@ -41,7 +41,7 @@ internal object AbilityRegistryLoader : RegistryConfigStorage {
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         applyAbilityDataToRegistry(KoishRegistries.ABILITY::update)
     }
 

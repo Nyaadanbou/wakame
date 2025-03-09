@@ -23,14 +23,14 @@ internal object EntityTypeHolderRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "entities.yml"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.ENTITY_TYPE_HOLDER.resetRegistry()
         applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::add)
         KoishRegistries.ENTITY_TYPE_HOLDER.freeze()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::update)
     }
 

@@ -26,14 +26,14 @@ internal object AttributeSupplierRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "entities.yml"
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.ATTRIBUTE_SUPPLIER.resetRegistry()
         applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::add)
         KoishRegistries.ATTRIBUTE_SUPPLIER.freeze()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::update)
     }
 

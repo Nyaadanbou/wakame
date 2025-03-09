@@ -31,10 +31,10 @@ object DirectEntityTypeMappings {
     private val playerDamageMapping: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
 
     @InitFun
-    private fun init() = loadDataIntoRegistry()
+    fun init() = loadDataIntoRegistry()
 
     @ReloadFun
-    private fun reload() = loadDataIntoRegistry()
+    fun reload() = loadDataIntoRegistry()
 
     fun getForNoCausing(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
         val damageMappings = noCausingDamageMapping[directEntityType] ?: return null

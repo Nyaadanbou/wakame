@@ -28,17 +28,17 @@ internal object ResourceTicker {
     private var resourceTickTask: BukkitTask? = null
 
     @InitFun
-    private fun init() {
+    fun init() {
         startTick()
     }
 
     @DisableFun
-    private fun stopTick() {
+    fun stopTick() {
         resourceTickTask?.cancel()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         stopTick()
         startTick()
     }

@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 internal object DamageApiBootstrap {
 
     @InitFun
-    private fun init() {
+    fun init() {
         // 注册 DamageBundleFactory
         DamageBundleFactory.register(DefaultDamageBundleFactory)
 

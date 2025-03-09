@@ -55,7 +55,7 @@ internal object PacketManager : Listener {
     
     @Suppress("UNCHECKED_CAST")
     @InitFun
-    private fun init() {
+    fun init() {
         registerEvents()
 
         val channels = SERVER_CONNECTION_LISTENER_CHANNELS_GETTER.invoke(MINECRAFT_SERVER.connection) as List<ChannelFuture>

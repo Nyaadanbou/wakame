@@ -59,14 +59,14 @@ internal object ItemTypeRegistryLoader : RegistryConfigStorage {
         .build()
 
     @InitFun
-    private fun init() {
+    fun init() {
         KoishRegistries.ITEM.resetRegistry()
         applyDataToRegistry(KoishRegistries.ITEM::add)
         KoishRegistries.ITEM.freeze()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         applyDataToRegistry(KoishRegistries.ITEM::update)
     }
 

@@ -42,7 +42,7 @@ internal object HooksLoader {
     // 因此对于外部系统, 应该在 post world 阶段加载它们的钩子,
     // 这样的话外部的钩子实例就可以覆盖默认的钩子实例.
     @InitFun
-    private fun init() {
+    fun init() {
         loadHooks()
     }
 

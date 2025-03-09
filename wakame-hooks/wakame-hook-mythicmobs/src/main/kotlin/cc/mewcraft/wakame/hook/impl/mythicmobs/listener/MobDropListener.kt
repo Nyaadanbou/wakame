@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 object MobDropListener {
 
     //@InitFun
-    private fun init() {
+    fun init() {
         registerListeners()
     }
 

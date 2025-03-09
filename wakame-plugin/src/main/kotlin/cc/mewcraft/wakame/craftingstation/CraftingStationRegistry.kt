@@ -35,10 +35,10 @@ internal object CraftingStationRegistry {
         get() = stations.keys
 
     @InitFun
-    private fun init() = loadDataIntoRegistry()
+    fun init() = loadDataIntoRegistry()
 
     @ReloadFun
-    private fun reload() = loadDataIntoRegistry()
+    fun reload() = loadDataIntoRegistry()
 
     operator fun get(id: String): CraftingStation? {
         return stations[id]
