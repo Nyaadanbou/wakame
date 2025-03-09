@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.data.getIntOrNull
+import cc.mewcraft.wakame.util.data.getByteOrNull
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
@@ -313,11 +313,11 @@ internal data class ConstantAttributeBundleRE(
 }
 
 private fun CompoundTag.readElement(): RegistryEntry<ElementType> {
-    return getIntOrNull(AttributeBinaryKeys.ELEMENT_TYPE)?.let { integerId -> KoishRegistries.ELEMENT.getEntry(integerId) } ?: KoishRegistries.ELEMENT.getDefaultEntry()
+    return getInt(AttributeBinaryKeys.ELEMENT_TYPE).let { integerId -> KoishRegistries.ELEMENT.getEntry(integerId) } ?: KoishRegistries.ELEMENT.getDefaultEntry()
 }
 
 private fun CompoundTag.readOperation(): Operation {
-    val id = getInt(AttributeBinaryKeys.OPERATION_TYPE)
+    val id = getByte(AttributeBinaryKeys.OPERATION_TYPE).toInt()
     return Operation.byId(id) ?: error("No such operation with id: $id")
 }
 
@@ -326,7 +326,7 @@ private fun CompoundTag.readNumber(key: String): Double {
 }
 
 private fun CompoundTag.readQuality(): ConstantAttributeBundle.Quality? {
-    return getIntOrNull(AttributeBinaryKeys.QUALITY)?.let(ConstantAttributeBundle.Quality.entries::get)
+    return getByteOrNull(AttributeBinaryKeys.QUALITY)?.toInt()?.let(ConstantAttributeBundle.Quality.entries::get)
 }
 
 private fun CompoundTag.writeNumber(key: String, value: Double) {
