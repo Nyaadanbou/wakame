@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
@@ -23,7 +24,7 @@ class NekoEntityDamageEvent(
     /**
      * 记录了每种伤害在计算防御后的最终数值.
      */
-    private val finalDamagePerElement: Reference2DoubleOpenHashMap<ElementType> = Reference2DoubleOpenHashMap()
+    private val finalDamagePerElement: Reference2DoubleOpenHashMap<RegistryEntry<ElementType>> = Reference2DoubleOpenHashMap()
 
     init {
         val damagePackets = damageMetadata.damageBundle.packets()
@@ -64,7 +65,7 @@ class NekoEntityDamageEvent(
     /**
      * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 null.
      */
-    fun getFinalDamage(element: ElementType): Double? {
+    fun getFinalDamage(element: RegistryEntry<ElementType>): Double? {
         if (!finalDamagePerElement.containsKey(element)) {
             return null
         }
@@ -81,7 +82,7 @@ class NekoEntityDamageEvent(
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      */
-    fun getFinalDamageMap(): Map<ElementType, Double> {
+    fun getFinalDamageMap(): Map<RegistryEntry<ElementType>, Double> {
         return finalDamagePerElement
     }
 

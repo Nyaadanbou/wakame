@@ -216,7 +216,7 @@ data class DirectDamageMetadataBuilder(
     private fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
+            val element0: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getEntry(element) ?: KoishRegistries.ELEMENT.getDefaultEntry()
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -311,7 +311,7 @@ data class DirectDamagePacketBuilder(
 ) : DamagePacketBuilder<Double> {
 
     override fun build(): DamagePacket {
-        return DamagePacket(element.value, min, max, rate, defensePenetration, defensePenetrationRate)
+        return DamagePacket(element, min, max, rate, defensePenetration, defensePenetrationRate)
     }
 }
 
@@ -346,7 +346,7 @@ data class MolangDamageMetadataBuilder(
     fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (element, packet) ->
-            val element0 = KoishRegistries.ELEMENT.getOrDefault(element)
+            val element0: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getEntry(element) ?: KoishRegistries.ELEMENT.getDefaultEntry()
             val packet0 = packet.build()
             element0 to packet0
         }.toMap().let(::DamageBundle)
@@ -373,7 +373,7 @@ data class MolangDamagePacketBuilder(
 ) : DamagePacketBuilder<Evaluable<*>> {
     override fun build(): DamagePacket {
         val engine = MochaEngine.createStandard()
-        val element = element.value
+        val element = element
         val min = min.evaluate(engine)
         val max = max.evaluate(engine)
         val rate = rate.evaluate(engine)

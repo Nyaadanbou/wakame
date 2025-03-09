@@ -2,11 +2,9 @@ package cc.mewcraft.wakame.ability.character
 
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import com.sun.org.apache.bcel.internal.util.Args.require
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
-import java.lang.ref.WeakReference
 import java.util.*
 import java.util.stream.Stream
 import org.bukkit.entity.Entity as BukkitEntity
@@ -26,62 +24,33 @@ sealed interface Caster {
 
 object CasterAdapter {
     fun adapt(user: User<*>): Caster {
-        return PlayerCaster(user.player())
+        return SimpleCaster(user.player())
     }
 
     fun adapt(player: Player): Caster {
-        return PlayerCaster(player)
+        return SimpleCaster(player)
     }
 
     fun adapt(entity: BukkitEntity): Caster {
         if (entity is BukkitPlayer) {
             return adapt(entity)
         }
-        return EntityCaster(entity)
+        return SimpleCaster(entity)
     }
 }
 
 /* Implementations */
 
-private class PlayerCaster(
-    bukkitPlayer: BukkitPlayer,
-) : Caster, Examinable {
-
-    init {
-        require(bukkitPlayer.isConnected) { "Player should be connected." }
-    }
-
-    private val weakBukkitPlayer: WeakReference<BukkitPlayer> = WeakReference(bukkitPlayer)
-
-    override val uniqueId: UUID = bukkitPlayer.uniqueId
-
-    override val entity: BukkitEntity
-        get() = requireNotNull(weakBukkitPlayer.get()) { "Player should not be null." }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("entity", entity)
-        )
-    }
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
-}
-
-private class EntityCaster(
-    bukkitEntity: BukkitEntity,
+@JvmInline
+private value class SimpleCaster(
+    override val entity: BukkitEntity,
 ) : Caster, Examinable {
     init {
-        require(bukkitEntity !is BukkitPlayer) { "EntityCaster should not be a player." }
+        require(entity !is BukkitPlayer) { "EntityCaster should not be a player." }
     }
 
-    private val weakBukkitEntity: WeakReference<BukkitEntity> = WeakReference(bukkitEntity)
-
-    override val uniqueId: UUID = bukkitEntity.uniqueId
-
-    override val entity: BukkitEntity
-        get() = requireNotNull(weakBukkitEntity.get()) { "Entity should not be null." }
+    override val uniqueId: UUID
+        get() = entity.uniqueId
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

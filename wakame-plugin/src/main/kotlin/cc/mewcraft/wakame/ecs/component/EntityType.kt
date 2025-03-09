@@ -15,9 +15,9 @@ enum class EntityType : EntityTags by entityTagOf() {
     MECHANIC,
 
     /**
-     * 代表一个元素特效实体.
+     * 代表一个元素层数实体.
      */
-    ELEMENT_EFFECT,
+    ELEMENT_STACK,
 
     ;
 }

@@ -15,38 +15,39 @@ import org.bukkit.entity.LivingEntity
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-internal inline fun <T> elementEffectWorldInteraction(block: ElementEffectWorldInteraction.() -> T): T {
-    return ElementEffectWorldInteraction.block()
+internal inline fun <T> elementStackWorldInteraction(block: ElementStackWorldInteraction.() -> T): T {
+    return ElementStackWorldInteraction.block()
 }
 
 @DslMarker
-internal annotation class ElementEffectWorldInteractionDsl
+internal annotation class ElementStackWorldInteractionDsl
 
-@ElementEffectWorldInteractionDsl
-object ElementEffectWorldInteraction : KoinComponent {
+@ElementStackWorldInteractionDsl
+object ElementStackWorldInteraction : KoinComponent {
     private val wakameWorld: WakameWorld by inject()
 
-    fun ElementEffect.putIntoWorld(caster: Caster?, target: Target) {
+    fun putElementStackIntoWorld(element: RegistryEntry<out Element>, count: Int, target: Target, caster: Caster?) {
+        require(count > 0) { "Count must be greater than 0" }
         wakameWorld.createEntity(element.getIdAsString()) {
-            it += EntityType.ELEMENT_EFFECT
+            it += EntityType.ELEMENT_STACK
             caster?.let { c -> it += CastBy(c) }
             it += TargetTo(target)
             it += ElementComponent(element)
             it += TickCountComponent()
-            it += StackCountComponent()
+            it += StackCountComponent(count)
         }
     }
 
-    fun LivingEntity.containsElementEffect(element: RegistryEntry<out Element>): Boolean {
+    fun LivingEntity.containsElementStack(element: RegistryEntry<out Element>): Boolean {
         var contains = false
         with(wakameWorld.world()) {
             forEach { entity ->
-                val family = family { all(EntityType.ELEMENT_EFFECT, ElementComponent, TargetTo) }
+                val family = family { all(EntityType.ELEMENT_STACK, ElementComponent, TargetTo) }
                 if (!family.contains(entity))
                     return@forEach
                 if (entity[ElementComponent].element != element)
                     return@forEach
-                if (entity[TargetTo].target.bukkitEntity != this@containsElementEffect)
+                if (entity[TargetTo].target.bukkitEntity != this@containsElementStack)
                     return@forEach
                 contains = true
             }
@@ -54,17 +55,17 @@ object ElementEffectWorldInteraction : KoinComponent {
         return contains
     }
 
-    fun LivingEntity.addElementEffect(elementEffect: ElementEffect) {
+    fun LivingEntity.addElementStack(element: RegistryEntry<out Element>, count: Int) {
         with(wakameWorld.world()) {
             forEach { entity ->
-                val family = family { all(EntityType.ELEMENT_EFFECT, StackCountComponent, TargetTo, ElementComponent, TickCountComponent) }
+                val family = family { all(EntityType.ELEMENT_STACK, StackCountComponent, TargetTo, ElementComponent, TickCountComponent) }
                 if (!family.contains(entity))
                     return@forEach
-                if (entity[ElementComponent].element != elementEffect.element)
+                if (entity[ElementComponent].element != element)
                     return@forEach
-                if (entity[TargetTo].target.bukkitEntity != this@addElementEffect)
+                if (entity[TargetTo].target.bukkitEntity != this@addElementStack)
                     return@forEach
-                entity[StackCountComponent].count++
+                entity[StackCountComponent].count += count
                 entity[TickCountComponent].tick = .0
                 return@forEach
             }

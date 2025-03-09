@@ -32,7 +32,7 @@ internal object AbilitySupport {
     }
 
     fun ComponentMap.targetToEntity(): LivingEntity {
-        return (targetTo() as? Target.LivingEntity)?.bukkitEntity ?: error("No entity found in TargetTo component")
+        return targetTo().bukkitEntity ?: error("No entity found in TargetTo component")
     }
 
     fun ComponentMap.evaluate(evaluable: Evaluable<*>): Double {
@@ -53,7 +53,7 @@ internal object AbilitySupport {
         }
     }
 
-    var ComponentMap.tickCount: Double
+    private var ComponentMap.tickCount: Double
         get() = this[TickCountComponent]?.tick ?: error("No TickCountComponent found")
         set(value) {
             this[TickCountComponent]?.tick = value

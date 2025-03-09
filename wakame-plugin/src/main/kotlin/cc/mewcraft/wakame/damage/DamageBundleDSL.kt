@@ -207,7 +207,7 @@ class DamagePacketDSL(
 
     fun build(): DamagePacket {
         return DamagePacket(
-            element.value,
+            element,
             validateValue(min),
             validateValue(max),
             validateValue(rate),

@@ -37,6 +37,7 @@ import cc.mewcraft.wakame.ecs.system.StackCountSystem
 import cc.mewcraft.wakame.ecs.system.StatePhaseSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.ecs.system.TickResultSystem
+import cc.mewcraft.wakame.element.effect.IgniteSystem
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -78,6 +79,7 @@ object WakameWorld {
 
             add(StatePhaseSystem())
             add(StackCountSystem())
+            add(IgniteSystem())
             add(AbilityMechanicRemoveSystem())
             add(TickResultSystem())
 
