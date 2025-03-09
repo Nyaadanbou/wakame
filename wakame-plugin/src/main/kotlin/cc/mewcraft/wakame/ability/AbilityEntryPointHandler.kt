@@ -1,14 +1,17 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.character.CasterAdapter
-import cc.mewcraft.wakame.ability.character.TargetAdapter
-import cc.mewcraft.wakame.ability.state.AbilityStateResult
+import cc.mewcraft.wakame.ability.combo.PlayerComboResult
 import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.Cancellable
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -34,8 +37,8 @@ internal object AbilityEntryPointHandler {
 
     private fun onLeftClick(player: Player, event: PlayerInteractEvent) {
         val user = player.toUser()
-        val result = user.abilityState.addTrigger(SingleTrigger.LEFT_CLICK)
-        if (result == AbilityStateResult.CANCEL_EVENT) {
+        val result = user.combo.addTrigger(SingleTrigger.LEFT_CLICK)
+        if (result == PlayerComboResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
     }
@@ -50,14 +53,14 @@ internal object AbilityEntryPointHandler {
 
     private fun onRightClick(player: Player, event: PlayerInteractEvent) {
         val user = player.toUser()
-        val result = user.abilityState.addTrigger(SingleTrigger.RIGHT_CLICK)
+        val result = user.combo.addTrigger(SingleTrigger.RIGHT_CLICK)
         tryApplyAbilityResult(result, event)
     }
 
     fun onAttack(player: Player, itemStack: ItemStack?, event: EntityDamageByEntityEvent) {
         val user = player.toUser()
         itemStack?.wrap() ?: return // 非萌芽物品应该完全不用处理吧?
-        val result = user.abilityState.addTrigger(SingleTrigger.ATTACK)
+        val result = user.combo.addTrigger(SingleTrigger.ATTACK)
         tryApplyAbilityResult(result, event)
     }
 
@@ -66,16 +69,16 @@ internal object AbilityEntryPointHandler {
             is AbstractArrow -> {
                 val koishStack = projectile.itemStack.wrap() ?: return
                 val abilities = koishStack.playerAbilities.takeUnlessEmpty() ?: return
-                val target = (hitEntity as? LivingEntity)?.let { TargetAdapter.adapt(it) } ?: TargetAdapter.adapt(projectile.location)
+                val target = (hitEntity as? LivingEntity)?.koishify() ?: projectile.attachedBlock?.koishify() ?: return
                 for (ability in abilities) {
-                    ability.recordBy(CasterAdapter.adapt(projectile.shooter as Player), target, ItemSlot.imaginary() to koishStack)
+                    ability.recordBy(projectile.shooter as Player, target, ItemSlot.imaginary() to koishStack)
                 }
             }
         }
     }
 
-    private fun tryApplyAbilityResult(result: AbilityStateResult, event: Cancellable) {
-        if (result == AbilityStateResult.CANCEL_EVENT) {
+    private fun tryApplyAbilityResult(result: PlayerComboResult, event: Cancellable) {
+        if (result == PlayerComboResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
     }

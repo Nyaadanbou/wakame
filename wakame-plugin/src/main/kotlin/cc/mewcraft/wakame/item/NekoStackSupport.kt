@@ -27,7 +27,6 @@ import org.bukkit.Material
 import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
-import kotlin.collections.set
 
 fun ItemStack.wrap(includeProxies: Boolean = true): NekoStack? = unwrapToMojang().wrap(includeProxies)
 fun MojangStack.wrapOrThrow(includeProxies: Boolean = true): NekoStack = wrap(includeProxies) ?: error("The ItemStack cannot be wrapped to NekoStack")
@@ -243,12 +242,12 @@ internal object ImaginaryKoishStackRegistry {
     private val CACHE: Object2ObjectOpenHashMap<Key, ImaginaryKoishStack> = Object2ObjectOpenHashMap(16)
 
     @InitFun
-    private fun init() {
+    fun init() {
         realizeAndStore()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         realizeAndStore()
     }
 

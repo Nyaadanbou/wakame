@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
@@ -21,7 +20,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
     stage = InitStage.PRE_WORLD
 )
 @Reload
-object RarityTypeRegistryLoader : RegistryConfigStorage {
+internal object RarityTypeRegistryLoader : RegistryConfigStorage {
     const val FILE_PATH = "rarities.yml"
 
     @InitFun
@@ -31,7 +30,7 @@ object RarityTypeRegistryLoader : RegistryConfigStorage {
         KoishRegistries.RARITY.freeze()
     }
 
-    @ReloadFun
+    @InitFun
     fun reload() {
         applyDataToRegistry(KoishRegistries.RARITY::update)
     }

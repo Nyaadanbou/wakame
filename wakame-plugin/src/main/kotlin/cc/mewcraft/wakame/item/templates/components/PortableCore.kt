@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
@@ -11,7 +9,6 @@ import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import cc.mewcraft.wakame.item.components.PortableCore as PortableCoreData
@@ -50,7 +47,7 @@ data class PortableCore(
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
                 .register<CoreArchetype>(CoreArchetypeSerializer)
-                .registerAll(Injector.get(named(ABILITY_EXTERNALS))) // 技能, 部分核心会用到
+//                .registerAll(Injector.get(named(ABILITY_EXTERNALS))) // 技能, 部分核心会用到
                 .build()
         }
     }

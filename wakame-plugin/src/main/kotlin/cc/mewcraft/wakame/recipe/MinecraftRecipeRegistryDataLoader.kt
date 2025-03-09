@@ -10,14 +10,12 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import net.kyori.adventure.key.Key
 import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
-import kotlin.collections.set
 
 @Init(
     stage = InitStage.POST_WORLD
@@ -34,13 +32,13 @@ object MinecraftRecipeRegistryDataLoader {
     private val checkedRecipes: HashMap<Key, VanillaRecipe> = HashMap(512)
 
     @InitFun
-    private fun init() {
+    fun init() {
         load()
         runTask(::postLoad)
     }
 
-    @ReloadFun
-    private fun reload() {
+    @InitFun
+    fun reload() {
         load()
         runTask(::postLoad)
     }

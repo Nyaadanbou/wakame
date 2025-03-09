@@ -1,0 +1,11 @@
+base: leather_boots
+
+item_name: "二段跳鞋"
+
+slot: vanilla:feet
+
+castable: {}
+
+player_ability:
+  - id: passive/double_jump
+    variant: 0

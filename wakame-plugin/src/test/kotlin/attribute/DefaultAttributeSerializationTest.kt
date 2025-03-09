@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import io.mockk.mockk
 import org.bukkit.attribute.Attributable
@@ -38,7 +37,6 @@ class DefaultAttributeSerializationTest : KoinTest {
                 // dependencies
                 modules(
                     adventureModule(),
-                    registryModule(),
                 )
             }
 

@@ -2,7 +2,6 @@ package reforge.reroll
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.reroll.RerollingTableSerializer
-import cc.mewcraft.wakame.registry.registryModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -22,7 +21,6 @@ class RerollingTableSerializationTest : KoinTest {
                 modules(
                     testEnv(),
                     adventureModule(),
-                    registryModule(),
                 )
             }
         }

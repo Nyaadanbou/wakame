@@ -65,7 +65,7 @@ internal object DamageDisplay {
                     val damageValue = "%.1f".format(value)
                     val damageText = text {
                         content(damageValue)
-                        element.displayStyles.forEach { applicableApply(it) }
+                        element.value.displayStyles.forEach { applicableApply(it) }
                     }
                     when (criticalState) {
                         CriticalStrikeState.POSITIVE -> {

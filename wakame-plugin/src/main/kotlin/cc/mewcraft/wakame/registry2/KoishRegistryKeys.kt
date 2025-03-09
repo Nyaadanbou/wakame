@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
@@ -26,6 +28,9 @@ object KoishRegistryKeys {
 
     @JvmField
     val ABILITY = createRegistryKey<Ability>("ability")
+
+    @JvmField
+    val ABILITY_ARCHETYPE = createRegistryKey<AbilityArchetype>("ability_archetype")
 
     @JvmField
     val ATTRIBUTE = createRegistryKey<Attribute>("attribute")
@@ -65,6 +70,9 @@ object KoishRegistryKeys {
 
     @JvmField
     val RARITY = createRegistryKey<RarityType>("rarity")
+
+    @JvmField
+    val TRIGGER = createRegistryKey<Trigger>("trigger")
 
     ///
 

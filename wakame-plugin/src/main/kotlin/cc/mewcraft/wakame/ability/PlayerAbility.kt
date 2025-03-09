@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.ability
 
-import cc.mewcraft.wakame.ability.character.Caster
-import cc.mewcraft.wakame.ability.character.Target
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
+import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.registry.AbilityRegistry
+import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.data.CompoundTag
 import cc.mewcraft.wakame.util.data.getIntOrNull
 import cc.mewcraft.wakame.util.data.getStringOrNull
@@ -19,6 +19,7 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -26,22 +27,6 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
-
-
-/**
- * 本函数用于直接构建 [PlayerAbility].
- *
- * @param id 技能的唯一标识, 也就是 [PlayerAbility.id]
- * @param trigger 触发此技能的触发器
- * @param variant 可以触发此技能的物品变体
- *
- * @return 构建的 [PlayerAbility]
- */
-fun PlayerAbility(
-    id: Key, trigger: Trigger, variant: TriggerVariant, manaCost: Evaluable<*>,
-): PlayerAbility {
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
-}
 
 /**
  * 本函数用于从 NBT 构建 [PlayerAbility].
@@ -65,7 +50,7 @@ fun PlayerAbility(
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
     val manaCost = tag.readEvaluable()
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
+    return PlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -88,10 +73,10 @@ fun PlayerAbility(
 fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
-    val trigger = node.node("trigger").get<Trigger>() ?: SingleTrigger.NOOP
+    val trigger = node.node("trigger").get<Trigger>()
     val variant = node.node("variant").require<TriggerVariant>()
     val manaCost = node.node("mana_cost").require<Evaluable<*>>()
-    return SimplePlayerAbility(id, trigger, variant, manaCost)
+    return PlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -105,88 +90,30 @@ fun PlayerAbility(
  * - 实现配置文件中技能的序列化
  * - 组成游戏内物品上的技能核心
  */
-// TODO 改成 class, 不要 interface - 此处接口没有实际作用
-interface PlayerAbility {
-    /**
-     * 技能的唯一标识.
-     */
-    val id: Key
-
-    /**
-     * 触发此技能的触发器.
-     */
-    val trigger: Trigger
-
-    /**
-     * 可以触发此技能的物品变体.
-     */
-    val variant: TriggerVariant
-
-    /**
-     * 获取对应的 [Ability] 实例.
-     */
+data class PlayerAbility(
+    val id: Key,
+    val trigger: Trigger?,
+    val variant: TriggerVariant,
+    val manaCost: Evaluable<*>,
+) {
     val instance: Ability
-
-    /**
-     * 技能的法力消耗.
-     */
-    val manaCost: Evaluable<*>
-
-    /**
-     * 技能的显示名称.
-     */
+        get() = KoishRegistries.ABILITY.getOrThrow(id)
     val displayName: Component
-
-    /**
-     * 技能的完整描述.
-     */
-    val description: List<Component>
-
-    /**
-     * 使用 [caster] 记录技能的信息到 ECS 中.
-     */
-    fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?)
-
-    /**
-     * 将此对象序列化为 NBT, 拥有以下结构:
-     *
-     * ```NBT
-     * string('trigger'): <trigger>
-     * int('variant'): <variant>
-     * ```
-     *
-     * 请注意本序列化不包含 [id].
-     */
-    fun saveNbt(): CompoundTag
-}
-
-/**
- * [PlayerAbility] 的标准实现.
- */
-internal data class SimplePlayerAbility(
-    override val id: Key,
-    override val trigger: Trigger,
-    override val variant: TriggerVariant,
-    override val manaCost: Evaluable<*>,
-) : PlayerAbility {
-    override val instance: Ability
-        get() = AbilityRegistry.INSTANCES[id]
-    override val displayName: Component
         get() = instance.displays.name.mini
-    override val description: List<Component>
+    val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    override fun recordBy(caster: Caster, target: Target?, holdBy: Pair<ItemSlot, NekoStack>?) {
-        val input = abilityInput(caster) {
+    fun recordBy(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
+        val target = target ?: caster.koishify()
+        val input = abilityInput(caster.koishify(), target) {
             trigger(trigger)
             manaCost(manaCost)
             holdBy(holdBy)
-            target?.let { target(it) }
         }
         instance.recordBy(input)
     }
 
-    override fun saveNbt(): CompoundTag = CompoundTag {
+    fun saveNbt(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
         writeEvaluable(manaCost)
@@ -221,8 +148,8 @@ private const val NBT_ABILITY_TRIGGER = "trigger"
 private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
-private fun CompoundTag.readTrigger(): Trigger {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { AbilityRegistry.TRIGGERS[Key.key(it)] } ?: SingleTrigger.NOOP
+private fun CompoundTag.readTrigger(): Trigger? {
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.TRIGGER[Identifiers.of(it)] }
 }
 
 private fun CompoundTag.readVariant(): TriggerVariant {
@@ -236,10 +163,10 @@ private fun CompoundTag.readEvaluable(): Evaluable<*> {
     return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Evaluable.parseExpression(it) } ?: Evaluable.parseNumber(0)
 }
 
-private fun CompoundTag.writeTrigger(trigger: Trigger) {
-    if (trigger == SingleTrigger.NOOP)
+private fun CompoundTag.writeTrigger(trigger: Trigger?) {
+    if (trigger == null)
         return
-    putString(NBT_ABILITY_TRIGGER, trigger.key.asString())
+    putString(NBT_ABILITY_TRIGGER, trigger.id)
 }
 
 private fun CompoundTag.writeVariant(variant: TriggerVariant) {

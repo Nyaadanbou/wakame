@@ -45,12 +45,12 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<NekoStack, Mergi
     private val textAssembler = TextAssembler(layout)
 
     @InitFun
-    private fun init() {
+    fun init() {
         loadDataFromConfigs()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         loadDataFromConfigs()
     }
 

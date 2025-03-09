@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.ability.PlayerAbility
-import cc.mewcraft.wakame.ability.character.CasterAdapter
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
@@ -58,7 +57,7 @@ internal class KizamiEffectPlayerAbility(
     override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
 
     override fun apply(user: User<*>) {
-        ability.recordBy(CasterAdapter.adapt(user), null, null)
+        ability.recordBy(user.player(), null, null)
     }
 
     override fun remove(user: User<*>) {

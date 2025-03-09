@@ -32,7 +32,7 @@ object PermissionManager {
     internal val integrations = ArrayList<PermissionIntegration>()
 
     @InitFun
-    private fun init() {
+    fun init() {
         if (integrations.size > 1) {
             LOGGER.warn("Multiple permission integrations have been registered: ${integrations.joinToString { it::class.simpleName!! }}, Nekoo will use the first one")
         }

@@ -1,7 +1,7 @@
 package item
 
 import cc.mewcraft.wakame.InjectionQualifier
-import cc.mewcraft.wakame.ability.abilityModule
+import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
@@ -11,7 +11,11 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
@@ -19,8 +23,6 @@ import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
-import cc.mewcraft.wakame.registry.AbilityRegistry
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.key.Key
@@ -45,8 +47,6 @@ object CommonNekoStackTest {
 
                 // dependencies
                 adventureModule(),
-                registryModule(),
-                abilityModule(),
                 worldModule(),
             )
         }
@@ -54,7 +54,7 @@ object CommonNekoStackTest {
         // 按依赖顺序, 初始化注册表
         ElementTypeRegistryLoader.init()
         AttributeBundleFacadeRegistryLoader.init()
-        AbilityRegistry.init()
+        AbilityRegistryLoader.init()
         KizamiTypeRegistryLoader.init()
         RarityTypeRegistryLoader.init()
         LevelRarityMappingRegistryLoader.init()

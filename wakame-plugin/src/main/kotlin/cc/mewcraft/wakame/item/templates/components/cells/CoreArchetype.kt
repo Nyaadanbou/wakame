@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.ability.ABILITY_EXTERNALS
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
@@ -174,7 +172,7 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
 internal object CoreArchetypeSampleNodeFacade : SampleNodeFacade<CoreArchetype, ItemGenerationContext>() {
     override val dataDir: Path = Path("random/item_core")
     override val serializers: TypeSerializerCollection = TypeSerializerCollection.builder()
-        .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
+//        .registerAll(Injector.get(named(ABILITY_EXTERNALS)))
         .register<CoreArchetype>(CoreArchetypeSerializer)
         .register<Filter<ItemGenerationContext>>(FilterSerializer)
         .build()

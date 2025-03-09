@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.pow
@@ -19,7 +20,7 @@ sealed interface DefenseMetadata {
     /**
      * 计算各元素最终伤害的方法.
      */
-    fun calculateFinalDamage(element: ElementType, damageMetadata: DamageMetadata): Double
+    fun calculateFinalDamage(element: RegistryEntry<ElementType>, damageMetadata: DamageMetadata): Double
 }
 
 /**
@@ -28,7 +29,7 @@ sealed interface DefenseMetadata {
 class EntityDefenseMetadata(
     override val damageeAttributeMap: AttributeMap,
 ) : DefenseMetadata {
-    override fun calculateFinalDamage(element: ElementType, damageMetadata: DamageMetadata): Double {
+    override fun calculateFinalDamage(element: RegistryEntry<ElementType>, damageMetadata: DamageMetadata): Double {
         // 当该元素的伤害包不存在时, 返回 0.0
         val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
 
@@ -78,7 +79,7 @@ class EntityDefenseMetadata(
             DamageRules.RoundingMode.NONE -> {
                 finalDamage
             }
-            
+
             DamageRules.RoundingMode.ROUND -> {
                 val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
                 round(finalDamage * factor) / factor
@@ -88,7 +89,7 @@ class EntityDefenseMetadata(
                 val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
                 ceil(finalDamage * factor) / factor
             }
-            
+
             DamageRules.RoundingMode.FLOOR -> {
                 val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
                 floor(finalDamage * factor) / factor

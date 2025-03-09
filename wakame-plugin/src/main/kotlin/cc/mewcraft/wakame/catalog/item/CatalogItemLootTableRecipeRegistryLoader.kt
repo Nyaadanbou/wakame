@@ -35,7 +35,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage
     private val MINECRAFT_LOOT_TABLE_MAP: HashMap<String, MojangLootTable> = HashMap(2048)
 
     @InitFun
-    private fun init() {
+    fun init() {
         reloadMinecraftLootTables()
         KoishRegistries.LOOT_TABLE_RECIPE.resetRegistry()
         applyDataToRegistry(KoishRegistries.LOOT_TABLE_RECIPE::add)
@@ -43,7 +43,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         reloadMinecraftLootTables()
         applyDataToRegistry(KoishRegistries.LOOT_TABLE_RECIPE::update)
     }

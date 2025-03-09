@@ -2,7 +2,6 @@ package reforge.mod
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer
-import cc.mewcraft.wakame.registry.registryModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -22,7 +21,6 @@ class ModdingTableSerializationTest : KoinTest {
                 modules(
                     testEnv(),
                     adventureModule(),
-                    registryModule(),
                 )
             }
         }

@@ -38,6 +38,7 @@ tasks {
             // we rely on IDE analysis
             suppressWarnings.set(true)
             freeCompilerArgs.add("-Xjvm-default=all")
+            freeCompilerArgs.add("-Xcontext-receivers")
         }
     }
     assemble {

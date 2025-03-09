@@ -19,9 +19,6 @@ import org.bukkit.damage.DamageType
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 
 @ConfigSerializable
@@ -53,10 +50,10 @@ object DamageTypeMappings {
     }
 
     @InitFun
-    private fun init() = loadDataIntoRegistry()
+    fun init() = loadDataIntoRegistry()
 
     @ReloadFun
-    private fun reload() = loadDataIntoRegistry()
+    fun reload() = loadDataIntoRegistry()
 
     private fun loadDataIntoRegistry() {
         mappings.clear()

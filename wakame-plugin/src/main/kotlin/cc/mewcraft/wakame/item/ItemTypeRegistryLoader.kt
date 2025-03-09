@@ -2,13 +2,14 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
+import cc.mewcraft.wakame.ability.trigger.TriggerRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry.AbilityRegistry
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryConfigStorage
 import cc.mewcraft.wakame.util.Identifier
@@ -27,15 +28,12 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AbilityRegistry::class,
+        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
+        TriggerRegistryLoader::class
     ]
 )
-@Reload(
-    runAfter = [
-        AbilityRegistry::class,
-    ]
-)
-object ItemTypeRegistryLoader : RegistryConfigStorage {
+@Reload
+internal object ItemTypeRegistryLoader : RegistryConfigStorage {
 
     /**
      * 命名空间 `minecraft` 下的物品仅用于实现原版套皮物品,

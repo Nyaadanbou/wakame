@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.util.data
 
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.registry.registryModule
 import com.google.common.collect.HashBiMap
 import io.papermc.paper.ServerBuildInfo
 import xyz.xenondevs.commons.collections.mapToIntArray

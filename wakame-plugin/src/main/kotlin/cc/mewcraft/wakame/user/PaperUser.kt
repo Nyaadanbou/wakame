@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.state.AbilityState
+import cc.mewcraft.wakame.ability.combo.PlayerCombo
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
@@ -41,7 +41,7 @@ class PaperUser(
 
     override val resourceMap: ResourceMap = ResourceMap(this)
 
-    override val abilityState: AbilityState<Player> = AbilityState(this)
+    override val combo: PlayerCombo = PlayerCombo(this.uniqueId)
 
     override val attackSpeed: AttackSpeed = AttackSpeed(this)
 
@@ -56,14 +56,13 @@ class PaperUser(
     }
 
     override fun cleanup() {
-        abilityState
+        combo.cleanup()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("uniqueId", uniqueId),
-            ExaminableProperty.of("level", level),
-            ExaminableProperty.of("abilityState", abilityState),
+            ExaminableProperty.of("level", level)
         )
     }
 

@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import mainEnv
@@ -27,7 +26,6 @@ class CheckMissingAttributeConfigTest : KoinTest {
         startKoin {
             modules(
                 adventureModule(),
-                registryModule(),
             )
         }
     }

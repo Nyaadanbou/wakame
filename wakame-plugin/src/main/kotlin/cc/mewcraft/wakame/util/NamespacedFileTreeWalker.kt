@@ -59,11 +59,13 @@ data class NamespacedFile(
  * @property dataDirectory 包含命名空间子目录的根目录
  * @property fileExtension 将被遍历的文件扩展名, 如果为 `null` 则遍历所有文件
  * @property includeFullPath 是否在 [NamespacedFile.path] 中包含完整的子文件夹路径
+ * @property includeNamespacePath 是否在 [NamespacedFile.path] 中包含命名空间路径
  */
 class NamespacedFileTreeWalker(
     private val dataDirectory: File,
     private val fileExtension: String? = null,
     private val includeFullPath: Boolean = false,
+    private val includeNamespacePath: Boolean = false,
 ) : Sequence<NamespacedFile> {
     override fun iterator(): Iterator<NamespacedFile> {
         // 遍历一级子目录(命名空间)
@@ -81,12 +83,15 @@ class NamespacedFileTreeWalker(
                     .drop(1) // 排除 namespace directory 本身
                     .filter { it.isFile && fileExtension != null && fileExtension == it.extension }
                     .map { file ->
-                        val relativePath = if (includeFullPath) {
+                        var relativePath = if (includeFullPath) {
                             file.relativeTo(namespaceDirectory)
                                 .invariantSeparatorsPath
                                 .removeSuffix(".${file.extension}")
                         } else {
                             file.nameWithoutExtension
+                        }
+                        if (includeNamespacePath) {
+                            relativePath = "$namespace/$relativePath"
                         }
                         NamespacedFile(file, namespace, relativePath)
                     }

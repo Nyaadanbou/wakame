@@ -2,17 +2,23 @@
 
 package cc.mewcraft.wakame.ecs.component
 
-import cc.mewcraft.wakame.ecs.data.ParticlePath
-import com.destroystokyo.paper.ParticleBuilder
+import cc.mewcraft.wakame.ecs.bridge.BukkitWorld
+import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
-import org.bukkit.Location
 
+/**
+ * 在指定的 [BukkitWorld] 上显示粒子效果.
+ *
+ * @see cc.mewcraft.wakame.ecs.system.ParticleSystem
+ */
 data class ParticleEffectComponent(
-    var builderProvider: (Location) -> ParticleBuilder, // 粒子效果构建器
-    var particlePath: ParticlePath,                     // 粒子路径（可能是直线、圆形等）
+    var bukkitWorld: BukkitWorld,
+    val particleConfigurations: MutableList<ParticleConfiguration>,
 ) : Component<ParticleEffectComponent> {
-    override fun type(): ComponentType<ParticleEffectComponent> = ParticleEffectComponent
-
     companion object : ComponentType<ParticleEffectComponent>()
+
+    constructor(bukkitWorld: BukkitWorld, vararg particleConfigurations: ParticleConfiguration) : this(bukkitWorld, particleConfigurations.toMutableList())
+
+    override fun type(): ComponentType<ParticleEffectComponent> = ParticleEffectComponent
 }

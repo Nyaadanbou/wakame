@@ -3,12 +3,21 @@
 package cc.mewcraft.wakame.ecs.data
 
 import io.papermc.paper.math.Position
-import org.bukkit.util.Vector
+import org.bukkit.block.BlockFace
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
 interface ParticlePath {
     fun positionAtProgress(progress: Double): Position
+}
+
+data class FixedPath(
+    val position: Position
+) : ParticlePath {
+    override fun positionAtProgress(progress: Double): Position {
+        return position
+    }
 }
 
 /**
@@ -32,49 +41,31 @@ data class LinePath(
 data class CirclePath(
     val center: Position,        // 圆心
     val radius: Double,          // 半径
-    val axis: Vector,            // 旋转轴（单位向量）
-    val startAngle: Double = 0.0, // 起始角度
-    val endAngle: Double = Math.PI * 2 // 默认一个完整的圆
+    val axis: BlockFace          // 旋转轴
 ) : ParticlePath {
-
-    // 用 Rodrigues' Rotation Formula 计算旋转后的点
-    private fun rotatePoint(p: Vector, axis: Vector, theta: Double): Vector {
-        val cosTheta = cos(theta)
-        val sinTheta = sin(theta)
-
-        // 使用 Rodrigues' 旋转公式
-        return p.clone().apply {
-            val dot = this.dot(axis)
-            val cross = this.crossProduct(axis)
-
-            // p_rotated = p * cos(theta) + (axis x p) * sin(theta) + axis * (axis . p) * (1 - cos(theta))
-            this.multiply(cosTheta)
-            cross.multiply(sinTheta)
-            axis.multiply(dot * (1 - cosTheta))
-            add(cross)
-            add(axis)
-        }
-    }
-
     override fun positionAtProgress(progress: Double): Position {
-        // 计算当前的角度
-        val angle = startAngle + (endAngle - startAngle) * progress
-        val x = cos(angle) * radius
-        val z = sin(angle) * radius
-        val y = 0.0
-
-        // 初始点
-        val point = Vector(x, y, z)
-
-        // 旋转点，假设旋转轴为单位向量
-        val rotatedPoint = rotatePoint(point, axis.normalize(), angle)
-
-        // 最终位置是圆心加上旋转后的点
-        val finalX = center.x() + rotatedPoint.x
-        val finalY = center.y() + rotatedPoint.y
-        val finalZ = center.z() + rotatedPoint.z
-
-        return Position.fine(finalX, finalY, finalZ)
+        val angle = 2 * PI * progress
+        return when (axis) {
+            BlockFace.UP, BlockFace.DOWN -> {
+                // 绕Y轴旋转
+                val x = center.x() + cos(angle) * radius
+                val z = center.z() + sin(angle) * radius
+                Position.fine(x, center.y(), z)
+            }
+            BlockFace.EAST, BlockFace.WEST -> {
+                // 绕X轴旋转
+                val y = center.y() + cos(angle) * radius
+                val z = center.z() + sin(angle) * radius
+                Position.fine(center.x(), y, z)
+            }
+            BlockFace.NORTH, BlockFace.SOUTH -> {
+                // 绕Z轴旋转
+                val x = center.x() + cos(angle) * radius
+                val y = center.y() + sin(angle) * radius
+                Position.fine(x, y, center.z())
+            }
+            else -> throw IllegalArgumentException("Unsupported axis: $axis")
+        }
     }
 }
 
@@ -88,7 +79,7 @@ data class SpiralPath(
     val rotations: Int
 ) : ParticlePath {
     override fun positionAtProgress(progress: Double): Position {
-        val angle = Math.PI * 2 * progress * rotations
+        val angle = PI * 2 * progress * rotations
         val x = center.x() + cos(angle) * radius
         val z = center.z() + sin(angle) * radius
         val y = center.y() + progress * height

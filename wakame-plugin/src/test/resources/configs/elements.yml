@@ -23,3 +23,10 @@ elements:
     binary_index: 5
     display_name: Thunder
     styles: "<white>"
+
+element_effects:
+  fire:
+    - amount: 3
+      effects: [ ignite ]
+    - amount: 6
+      effects: [ double_ignite ]

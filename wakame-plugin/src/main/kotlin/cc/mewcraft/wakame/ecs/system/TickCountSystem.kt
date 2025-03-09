@@ -9,6 +9,6 @@ class TickCountSystem : IteratingSystem(
     family = family { all(TickCountComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
-        entity[TickCountComponent].tick += deltaTime
+        entity[TickCountComponent].tick++
     }
 }

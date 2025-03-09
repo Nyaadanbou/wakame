@@ -16,7 +16,7 @@ apache-commons-compress = "1.27.1"
 # Shaded deps
 koin = "4.0.0"
 commons = "1.24"
-fleks = "2.10"
+fleks = "2.11"
 snakeyaml-engine = "2.8"
 
 # Server deps

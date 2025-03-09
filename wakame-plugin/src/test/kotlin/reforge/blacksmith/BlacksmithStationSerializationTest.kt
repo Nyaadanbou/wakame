@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStationSerializer
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
-import cc.mewcraft.wakame.registry.registryModule
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.koin.core.context.startKoin
@@ -22,7 +21,6 @@ class BlacksmithStationSerializationTest : KoinTest {
                 modules(
                     testEnv(),
                     adventureModule(),
-                    registryModule(),
                 )
             }
         }

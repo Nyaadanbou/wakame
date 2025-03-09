@@ -61,12 +61,12 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
     private val textAssembler = TextAssembler(layout)
 
     @InitFun
-    private fun init() {
+    fun init() {
         loadDataFromConfigs()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         loadDataFromConfigs()
     }
 

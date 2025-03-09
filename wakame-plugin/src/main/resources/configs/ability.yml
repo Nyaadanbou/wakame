@@ -1,38 +1,20 @@
 # 不要修改!
 version: 1
 
-# 支持全局配置的技能条件
-conditions:
-  mana:
-    success_message:
-      - type: title
-        title: "<green>You successfully removed the potion effect. mana: -10"
-        subtitle: "a"
-        fade_in: 10
-        stay: 20
-        fade_out: 10
-    failure_message:
-      - type: title
-        title: "<red>You failed to remove the potion effect. no mana"
-        subtitle: "a"
-        fade_in: 10
-        stay: 20
-        fade_out: 10
-
 display:
   triggers:
-    trigger:generic/left_click: "<green><b>L"
-    trigger:generic/right_click: "<green><b>R"
+    generic/left_click: "<green><b>L"
+    generic/right_click: "<green><b>R"
 
-  player_state:
+  player_combo:
     connector: "<gray>-"
     success_message:
       - type: actionbar
-        text: "You have successfully completed the state machine. <trigger_completed>"
+        text: "成功! <trigger_completed>"
 
     failure_message:
       - type: actionbar
-        text: "You have failed to complete the state machine. <trigger_completed>"
+        text: "失败. <trigger_completed>"
 
     progress_message:
       - type: actionbar
@@ -44,4 +26,4 @@ display:
 
     no_enough_mana_message:
       - type: chat
-        text: "<red>You don't have enough mana to use this ability. </red>"
+        text: "<red>没魔了. </red>"

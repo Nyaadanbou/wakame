@@ -61,6 +61,8 @@ internal object PaperUserManager : UserManager<Player> {
     }
 
     private fun unloadUser(player: Player) {
+        val user = userRepository.getIfPresent(player)
+        user?.cleanup()
         userRepository.invalidate(player)
     }
 

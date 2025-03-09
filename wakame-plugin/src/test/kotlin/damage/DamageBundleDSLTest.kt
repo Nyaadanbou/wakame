@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
-import cc.mewcraft.wakame.registry.registryModule
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import io.mockk.every
@@ -46,7 +45,6 @@ class DamageBundleDSLTest : KoinTest {
                 // dependencies
                 modules(
                     adventureModule(),
-                    registryModule(),
                 )
             }
 

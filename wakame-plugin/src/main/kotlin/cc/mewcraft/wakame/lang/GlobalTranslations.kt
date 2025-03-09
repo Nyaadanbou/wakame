@@ -51,13 +51,13 @@ object GlobalTranslations : RegistryConfigStorage {
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, Injector.get<MiniMessage>())
 
     @InitFun
-    private fun init() {
+    fun init() {
         GlobalTranslator.translator().addSource(translations)
         loadDataIntoRegistry()
     }
 
     @ReloadFun
-    private fun reload() {
+    fun reload() {
         translations.unregisterAll()
         loadDataIntoRegistry()
     }

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import net.kyori.examination.Examinable
@@ -14,14 +15,14 @@ import java.util.stream.Stream
  * 创建一个 [DamageBundle].
  */
 fun DamageBundle(
-    packets: Map<ElementType, DamagePacket> = emptyMap(),
+    packets: Map<RegistryEntry<ElementType>, DamagePacket> = emptyMap(),
 ): DamageBundle {
     return DamageBundleImpl(packets)
 }
 
 internal object DefaultDamageBundleFactory : DamageBundleFactory {
     override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
-        val packets = mutableMapOf<ElementType, DamagePacket>()
+        val packets = mutableMapOf<RegistryEntry<ElementType>, DamagePacket>()
         for ((id, packet) in data) {
             val element = getElementById(id)
             if (element != null) {
@@ -31,20 +32,17 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
         return DamageBundle(packets)
     }
 
-    override fun create(data: Map<ElementType, DamagePacket>): DamageBundle {
+    override fun create(data: Map<RegistryEntry<ElementType>, DamagePacket>): DamageBundle {
         return DamageBundle(data)
     }
 }
 
-private fun getElementById(id: String): ElementType? {
-    return KoishRegistries.ELEMENT[id] ?: run {
-        LOGGER.warn("No such element: '$id'")
-        return null
-    }
+private fun getElementById(id: String): RegistryEntry<ElementType>? {
+    return KoishRegistries.ELEMENT.getEntry(id)
 }
 
 private class DamageBundleImpl(
-    packets: Map<ElementType, DamagePacket>,
+    packets: Map<RegistryEntry<ElementType>, DamagePacket>,
 ) : DamageBundle, Examinable {
     private val packets = Reference2ObjectArrayMap(packets)
 
@@ -56,7 +54,7 @@ private class DamageBundleImpl(
         val element = packet.element
         val previous = packets.put(element, packet)
         if (previous != null) {
-            LOGGER.warn("Failed to overwrite a packet of the same element type: '${element.stringId}'")
+            LOGGER.warn("Failed to overwrite a packet of the same element type: '${element.getIdAsString()}'")
         }
     }
 
@@ -64,7 +62,7 @@ private class DamageBundleImpl(
         packets.putIfAbsent(packet.element, packet)
     }
 
-    override fun remove(element: ElementType): DamagePacket? {
+    override fun remove(element: RegistryEntry<ElementType>): DamagePacket? {
         return packets.remove(element)
     }
 
@@ -73,7 +71,7 @@ private class DamageBundleImpl(
         return packets.remove(element)
     }
 
-    override fun get(element: ElementType): DamagePacket? {
+    override fun get(element: RegistryEntry<ElementType>): DamagePacket? {
         return packets[element]
     }
 
