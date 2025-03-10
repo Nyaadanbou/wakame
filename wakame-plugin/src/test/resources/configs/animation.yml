@@ -1,0 +1,11 @@
+animation:
+  delay: 0
+  none_critical_strike:
+    start_interpolation: 0
+    interpolation_duration: 0
+    translation: [ 0,0,0 ]
+    scale: [ 1,1,1 ]
+  positive_critical_strike:
+    start_interpolation: 1
+    interpolation_duration: 2
+  negative_critical_strike: { }
