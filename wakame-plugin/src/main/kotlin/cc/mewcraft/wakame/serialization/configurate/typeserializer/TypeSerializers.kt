@@ -33,6 +33,8 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     // Namespaced
     .register(KeySerializer)
     .register(NamespacedKeySerializer)
+    // Math
+    .register(Vector3fSerializer)
     // Bukkit Object
     .register(PotionEffectSerializer)
     // Bukkit Enum

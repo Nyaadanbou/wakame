@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
+import cc.mewcraft.wakame.hologram.AnimationData
 import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -32,6 +33,7 @@ import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.joml.Vector3f
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import xyz.xenondevs.commons.provider.Provider
 import java.lang.reflect.Type
 import java.util.*
@@ -45,7 +47,7 @@ private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
 private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
 private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 
-internal interface DamageDisplayDecorator : DamageDisplayDecoratorFields {
+internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
 
     fun finalText(context: NekoEntityDamageEvent): Component {
         val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
@@ -53,7 +55,7 @@ internal interface DamageDisplayDecorator : DamageDisplayDecoratorFields {
         val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
 
         val finalText = MM.deserialize(
-            MergedDamageDisplayDecorator.finalText,
+            MergedDamageDisplaySettings.finalText,
             Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
             Placeholder.component("critical_strike_text", criticalStrikeText),
             Placeholder.component("damage_value_text", damageValueText(context)),
@@ -78,8 +80,10 @@ internal interface DamageDisplayDecorator : DamageDisplayDecoratorFields {
 
 }
 
-internal interface DamageDisplayDecoratorFields {
+internal interface DamageDisplaySettingsFields {
 
+    val animations: List<DamageDisplayAnimation>
+    val animationDuration: Long
     val finalText: String
     val criticalStrikeStylePositive: Array<StyleBuilderApplicable>
     val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>
@@ -90,11 +94,12 @@ internal interface DamageDisplayDecoratorFields {
 
 }
 
-internal class DamageDisplayDecoratorCommonFields(
-    config: Provider<ConfigurationNode>,
-) : DamageDisplayDecoratorFields {
-
-    override val finalText: String by config.entry<String>("final_text")
+internal class DamageDisplaySettingsCommonFields(
+    config: Provider<ConfigurationNode>
+) : DamageDisplaySettingsFields {
+    override val animations: List<DamageDisplayAnimation> by config.entry("animations")
+    override val animationDuration: Long by config.entry("animation_duration")
+    override val finalText: String by config.entry("final_text")
     override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "positive")
     override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "negative")
     override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "none")
@@ -104,7 +109,7 @@ internal class DamageDisplayDecoratorCommonFields(
 
 }
 
-internal object MergedDamageDisplayDecorator : DamageDisplayDecorator, DamageDisplayDecoratorFields by DamageDisplayDecoratorCommonFields(MERGED_DISPLAY_CONFIG) {
+internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(MERGED_DISPLAY_CONFIG) {
 
     val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
 
@@ -124,7 +129,7 @@ internal object MergedDamageDisplayDecorator : DamageDisplayDecorator, DamageDis
 
 }
 
-internal object SeparatedDamageDisplayDecorator : DamageDisplayDecorator, DamageDisplayDecoratorFields by DamageDisplayDecoratorCommonFields(SEPARATED_DISPLAY_CONFIG) {
+internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(SEPARATED_DISPLAY_CONFIG) {
 
     val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
     val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
@@ -144,16 +149,55 @@ internal object SeparatedDamageDisplayDecorator : DamageDisplayDecorator, Damage
 
 }
 
+/**
+ * 伤害显示中文本展示实体的单次动画.
+ */
+internal data class DamageDisplayAnimation(
+    val delay: Long,
+    val normalData: AnimationData,
+    val positiveData: AnimationData,
+    val negativeData: AnimationData,
+)
+
+@Init(stage = InitStage.PRE_CONFIG)
+internal object DamageDisplayAnimationSerializer : TypeSerializer<DamageDisplayAnimation> {
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
+        val delay = node.node("delay").require<Long>()
+
+        val normalData = buildData(AnimationData.DEFAULT, node.node("normal"))
+        val positiveData = buildData(normalData, node.node("positive_critical_strike"))
+        val negativeData = buildData(normalData, node.node("negative_critical_strike"))
+
+        return DamageDisplayAnimation(delay, normalData, positiveData, negativeData)
+    }
+
+    /**
+     * 方便函数.
+     */
+    private fun buildData(parentData: AnimationData, node: ConfigurationNode): AnimationData {
+        val startInterpolation: Int? = node.node("start_interpolation").get()
+        val interpolationDuration: Int? = node.node("interpolation_duration").get()
+        val translation: Vector3f? = node.node("translation").get()
+        val scale: Vector3f? = node.node("scale").get()
+        return AnimationData(parentData, startInterpolation, interpolationDuration, translation, scale)
+    }
+
+    @InitFun
+    private fun init() {
+        Configs.registerSerializer(KOISH_NAMESPACE, this)
+    }
+}
+
 internal enum class DamageDisplayMode {
     MERGED, SEPARATED
 }
 
 @Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplayDecoratorSerializer : TypeSerializer<DamageDisplayDecorator> {
+internal object DamageDisplaySettingsSerializer : TypeSerializer<DamageDisplaySettings> {
 
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayDecorator = when (node.require<DamageDisplayMode>()) {
-        DamageDisplayMode.MERGED -> MergedDamageDisplayDecorator
-        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplayDecorator
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
+        DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
+        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplaySettings
     }
 
     @InitFun
@@ -179,10 +223,8 @@ internal object DamageDisplay {
     // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
     private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
 
-    // 当前使用的 decorator (显示模式)
-    private val decorator by DISPLAY_CONFIG.entry<DamageDisplayDecorator>("mode")
-
-    // TODO 动画参数可配置
+    // 当前使用的伤害显示配置
+    private val settings by DISPLAY_CONFIG.entry<DamageDisplaySettings>("mode")
 
     @InitFun
     private fun init() {
@@ -196,9 +238,16 @@ internal object DamageDisplay {
             val criticalState = event.getCriticalState()
 
             val hologramLoc = calculateHologramLocation(damager = damager, damagee = damagee, distance = 3f)
-            val hologramText = decorator.finalText(event)
+            val hologramText = settings.finalText(event)
 
-            sendDamageHologram(damager, hologramLoc, hologramText, criticalState)
+            sendDamageHologram(
+                hologramViewer = damager,
+                hologramLocation = hologramLoc,
+                hologramText = hologramText,
+                hologramAnimations = settings.animations,
+                hologramDuration = settings.animationDuration,
+                criticalStrikeState = criticalState
+            )
         }
     }
 
@@ -248,52 +297,45 @@ internal object DamageDisplay {
     private fun sendDamageHologram(
         hologramViewer: Player,
         hologramLocation: Location,
-        damageText: Component,
+        hologramText: Component,
+        hologramAnimations: List<DamageDisplayAnimation>,
+        hologramDuration: Long,
         criticalStrikeState: CriticalStrikeState,
     ) {
         val hologramData = TextHologramData(
             location = hologramLocation,
-            text = damageText,
+            text = hologramText,
             background = Color.fromARGB(0),
             hasTextShadow = false,
             textAlignment = TextDisplay.TextAlignment.CENTER,
             isSeeThrough = true
         ).apply {
-            this.scale.mul(1.5f) // 初始大小
-            this.translation.add(0f, -1f, 0f) // 初始位置偏下
             this.brightness = Display.Brightness(15, 0)
         }
         val hologram = Hologram(hologramData)
 
-        hologram.show(hologramViewer)
-
-        runTaskLater(2) {
-            hologramData.apply {
-                this.startInterpolation = 0
-                this.interpolationDuration = 5
-                this.translation.add(0f, .5f, 0f)
-                if (criticalStrikeState == CriticalStrikeState.NONE) {
-                    this.scale.add(1f, 1f, 1f)
-                } else {
-                    this.scale.add(3f, 3f, 3f)
+//        hologram.show(hologramViewer)
+        // 遍历播放所有动画
+        hologramAnimations.forEach { animation ->
+            runTaskLater(animation.delay) {
+                hologramData.apply {
+                    val animationData = when (criticalStrikeState) {
+                        CriticalStrikeState.NONE -> animation.normalData
+                        CriticalStrikeState.POSITIVE -> animation.positiveData
+                        CriticalStrikeState.NEGATIVE -> animation.negativeData
+                    }
+                    this.startInterpolation = animationData.startInterpolation
+                    this.interpolationDuration = animationData.interpolationDuration
+                    this.translation = animationData.translation
+                    this.scale = animationData.scale
                 }
+                hologram.setEntityData(hologramData)
+                hologram.refresh(hologramViewer)
             }
-            hologram.setEntityData(hologramData)
-            hologram.refresh(hologramViewer)
         }
 
-        runTaskLater(8) {
-            hologramData.apply {
-                this.startInterpolation = 0
-                this.interpolationDuration = 20
-                this.scale.set(1f, 1f, 1f)
-                this.translation.add(0f, 1f, 0f)
-            }
-            hologram.setEntityData(hologramData)
-            hologram.refresh(hologramViewer)
-        }
-
-        runTaskLater(32) {
+        // 结束播放
+        runTaskLater(hologramDuration) {
             hologram.hide(hologramViewer)
         }
     }

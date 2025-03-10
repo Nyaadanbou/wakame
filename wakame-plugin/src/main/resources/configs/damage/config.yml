@@ -57,30 +57,94 @@ display:
   # 模式: separated
   # 每种元素的伤害单独显示.
   separated:
+    # 文本展示实体的变换动画.
+    # 列表的元素为单个变换.
+    animations:
+      - delay: 0 # 该动画开始播放前延迟的 tick 数.
+        # 常规状况下该次动画的参数.
+        # 常规动画中的参数未指定时, 将继承默认动画的参数.
+        # default:
+        #   start_interpolation: 0
+        #   interpolation_duration: 0
+        #   translation: [ .0, .0, .0 ]
+        #   scale: [ 1.0, 1.0, 1.0 ]
+        normal:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+        # 正暴击时该次动画的参数.
+        # 暴击动画的参数未指定时, 将继承常规动画参数.
+        positive_critical_strike: {}
+        # 负暴击时该次动画的参数.
+        negative_critical_strike: {}
+
+      - delay: 2
+        normal:
+          interpolation_duration: 5
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 2.5, 2.5, 2.5 ]
+        positive_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+        negative_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+
+      - delay: 8
+        normal:
+          interpolation_duration: 20
+          translation: [ .0, 0.5, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
+
+    # 动画持续的总 tick 数
+    # 即该时长后伤害显示文本不再显示
+    animation_duration: 32
+
     # 伤害显示总文本.
     final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+
     # 暴击状态风格.
     critical_strike_style:
       positive: <bold>
       negative: <bold>
       none: ""
+
     # 暴击状态文本.
     critical_strike_text:
       positive: <color:#FF9900>💥</color:#FF9900>
       negative: <color:#02AFFF>💥</color:#02AFFF>
       none: ""
+
     # 元素文本.
     # 支持占位符:
     # - <element_name> 元素名
     # - <element_style> 元素风格
     # - <damage_value> 该元素类型具体伤害值
     damage_value_text: "<element_style><damage_value:#>"
+
     # 各元素类型的伤害文本之间的分隔字符串.
     separator: " "
 
   # 模式: merged
   # 只显示所有元素的伤害之和.
   merged:
+    animations:
+      - delay: 0
+        normal:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+      - delay: 2
+        normal:
+          interpolation_duration: 5
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 2.5, 2.5, 2.5 ]
+        positive_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+        negative_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+      - delay: 8
+        normal:
+          interpolation_duration: 20
+          translation: [ .0, 0.5, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
+    animation_duration: 32
     final_text: <critical_strike_style><critical_strike_text><damage_value_text>
     critical_strike_style:
       positive: <bold>
