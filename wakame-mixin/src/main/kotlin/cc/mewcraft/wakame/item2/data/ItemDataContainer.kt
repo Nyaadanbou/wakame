@@ -16,6 +16,7 @@ import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 
@@ -33,11 +34,19 @@ class ItemDataContainer(
 
     companion object {
 
-        // Codec 的创建时机必须晚于本类 static block 初始化的时机
         @JvmStatic
         fun makeCodec(): Codec<ItemDataContainer> {
-            val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), ItemDataTypes.serializers())
+            val serializers = TypeSerializerCollection.builder()
+
+            // 添加 ItemDataContainer 的 TypeSerializer
+            serializers.register(typeTokenOf<ItemDataContainer>(), makeSerializer())
+
+            // 添加每一个 ItemData 的 TypeSerializer
+            serializers.registerAll(ItemDataTypes.serializers())
+
+            val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), serializers.build())
             requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${ItemDataContainer::class}" }
+
             return codec
         }
 
@@ -91,6 +100,7 @@ class ItemDataContainer(
         return data.entries.iterator()
     }
 
+    // FIXME make it thread local?
     fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
         return data.reference2ObjectEntrySet().fastIterator()
     }

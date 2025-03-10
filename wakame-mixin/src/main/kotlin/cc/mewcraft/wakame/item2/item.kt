@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
+import cc.mewcraft.wakame.item2.config.property.GlobalPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -13,9 +15,9 @@ import org.bukkit.inventory.ItemStack
 // 代表一个物品类型(由配置文件动态创建)
 class KoishItem(
     val id: Identifier,
-    val base: ItemBase,
-    val slot: ItemSlot,
-    val hidden: Boolean,
+    val base: ItemBase, // TODO 可作为 GlobalProperty
+    val slot: ItemSlot, // TODO 可作为 GlobalProperty
+    val hidden: Boolean, // TODO 可作为 GlobalProperty
     val behaviors: ItemBehaviorContainer,
 ) {
 
@@ -46,37 +48,71 @@ class KoishItemProxy(
 
 // 而对于一个 NMS ItemStack, 我们并不是必须为其抽象出一个 class 或 interface.
 // 我们只需要能够访问物品堆叠上的 ItemDataContainer 即可访问所有自定义添加的数据,
-// 并且这个过程中不涉及任何数据结构的转换.
-// TODO 考虑原版套皮物品
-val MojangStack.dataContainer: ItemDataContainer?
-    get() = get(DataComponentsPatch.ITEM_DATA_CONTAINER)
+// 并且这个过程中不需要涉及任何数据结构的转换.
+
+// ------------------
+// 用于访问 MojangStack 上的自定义数据
+// ------------------
+
+//// Base
 
 // TODO 考虑原版套皮物品
 val MojangStack.koishItem: KoishItem?
     get() = getData(ItemDataTypes.ID)?.type
 
 // TODO 考虑原版套皮物品
-fun MojangStack.hasData(type: ItemDataType<*>): Boolean = dataContainer?.has(type) == true
+val MojangStack.dataContainer: ItemDataContainer?
+    get() = get(DataComponentsPatch.ITEM_DATA_CONTAINER)
+
+
+//// Behavior
+
+fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean = TODO()
+
+//// Property
+
+fun <T> MojangStack.hasProperty(type: GlobalPropertyType<T>): Boolean = TODO()
+
+fun <T> MojangStack.getProperty(type: GlobalPropertyType<out T>): T? = TODO()
+
+//// ItemData
 
 // TODO 考虑原版套皮物品
-fun <T> MojangStack.getData(type: ItemDataType<out T>): T? = dataContainer?.get(type)
+fun MojangStack.hasData(type: ItemDataType<*>): Boolean = this@hasData.dataContainer?.has(type) == true
 
 // TODO 考虑原版套皮物品
-fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = dataContainer?.getOrDefault(type, fallback)
+fun <T> MojangStack.getData(type: ItemDataType<out T>): T? = this@getData.dataContainer?.get(type)
 
 // TODO 考虑原版套皮物品
-fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? = dataContainer?.set(type, value)
+fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = this@getDataOrDefault.dataContainer?.getOrDefault(type, fallback)
 
 // TODO 考虑原版套皮物品
-fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? = dataContainer?.remove(type)
+fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? = this@setData.dataContainer?.set(type, value)
+
+// TODO 考虑原版套皮物品
+fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? = this@removeData.dataContainer?.remove(type)
 
 // ------------------
 // 用于访问 ItemStack 上的自定义数据
 // ------------------
 
+//// Base
+
 val ItemStack.koishItem: KoishItem? get() = unwrapToMojang().koishItem
 
 val ItemStack.dataContainer: ItemDataContainer? get() = unwrapToMojang().dataContainer
+
+//// Behavior
+
+fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = unwrapToMojang().hasBehavior(behavior)
+
+//// Property
+
+fun <T> ItemStack.hasProperty(type: GlobalPropertyType<T>): Boolean = unwrapToMojang().hasProperty(type)
+
+fun <T> ItemStack.getProperty(type: GlobalPropertyType<out T>): T? = unwrapToMojang().getProperty(type)
+
+//// ItemData
 
 fun ItemStack.hasData(type: ItemDataType<*>): Boolean = unwrapToMojang().hasData(type)
 

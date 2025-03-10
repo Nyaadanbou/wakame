@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.item2.behavior
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer.Builder
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceArrayMap
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.Collections.emptyList
@@ -34,21 +33,16 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
     /**
      * Checks whether this [KoishItem] has specific [ItemBehavior].
      */
-    fun <T : ItemBehavior> has(type: ItemBehaviorType<T>): Boolean
-
-    /**
-     * Gets the specific [ItemBehavior] if this [KoishItem] has it.
-     */
-    fun <T : ItemBehavior> get(type: ItemBehaviorType<T>): T?
+    fun has(type: ItemBehavior): Boolean
 
     /**
      * [ItemBehaviorContainer] 的 builder, 用于构建一个 [ItemBehaviorContainer].
      */
     interface Builder : Examinable {
         /**
-         * 添加一个 [ItemBehavior]. 已存在的 [type] 会被覆盖.
+         * 添加一个 [ItemBehavior]. 已存在的 [behavior] 会被覆盖.
          */
-        fun <T : ItemBehavior> put(type: ItemBehaviorType<T>, behavior: T)
+        fun put(behavior: ItemBehavior)
 
         /**
          * 构建.
@@ -59,29 +53,25 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
     private object Empty : ItemBehaviorContainer {
 
         private val empty = emptyList<ItemBehavior>()
-        override fun <T : ItemBehavior> has(type: ItemBehaviorType<T>): Boolean = false
-        override fun <T : ItemBehavior> get(type: ItemBehaviorType<T>): T? = null
+        override fun has(type: ItemBehavior): Boolean = false
         override fun iterator(): Iterator<ItemBehavior> = empty.iterator()
         override fun toString(): String = toSimpleString()
 
     }
+
 }
 
 private class ItemBehaviorContainerImpl(
-    data: Map<ItemBehaviorType<*>, ItemBehavior>,
+    data: Set<ItemBehavior>,
 ) : ItemBehaviorContainer {
-    private val data: Reference2ReferenceArrayMap<ItemBehaviorType<*>, ItemBehavior> = Reference2ReferenceArrayMap(data)
+    private val data: ReferenceArraySet<ItemBehavior> = ReferenceArraySet(data)
 
-    override fun <T : ItemBehavior> has(type: ItemBehaviorType<T>): Boolean {
-        return data.containsKey(type)
-    }
-
-    override fun <T : ItemBehavior> get(type: ItemBehaviorType<T>): T? {
-        return data[type] as T?
+    override fun has(type: ItemBehavior): Boolean {
+        return data.contains(type)
     }
 
     override fun iterator(): Iterator<ItemBehavior> {
-        return data.values.iterator()
+        return this.data.iterator()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -92,10 +82,10 @@ private class ItemBehaviorContainerImpl(
 }
 
 private class ItemBehaviorContainerBuilderImpl : Builder {
-    private val data: Reference2ReferenceMap<ItemBehaviorType<*>, ItemBehavior> = Reference2ReferenceArrayMap()
+    private val data: ReferenceArraySet<ItemBehavior> = ReferenceArraySet()
 
-    override fun <T : ItemBehavior> put(type: ItemBehaviorType<T>, behavior: T) {
-        data.put(type, behavior)
+    override fun put(behavior: ItemBehavior) {
+        data.add(behavior)
     }
 
     override fun build(): ItemBehaviorContainer {

@@ -26,15 +26,10 @@ object ItemDataTypes {
     }
 
     /**
-     * 获取一个 [TypeSerializerCollection].
-     *
-     * 返回的实例可用来序列化 [ItemDataContainer] 中的所有 [ItemDataType].
+     * 获取一个 [TypeSerializerCollection]. 返回的实例可用来序列化 [ItemDataContainer] 中的所有数据类型.
      */
     internal fun serializers(): TypeSerializerCollection {
         val collection = TypeSerializerCollection.builder()
-
-        // 添加 ItemDataContainer 的 TypeSerializer
-        collection.register(typeTokenOf(), ItemDataContainer.makeSerializer())
 
         // 添加每一个 ItemDataType 的 TypeSerializer
         val dataTypes = listOf(ID, LEVEL) // FIXME: 从 KoishRegistry 遍历

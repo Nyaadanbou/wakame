@@ -44,8 +44,6 @@ sealed interface ItemBehaviorHolder
  * 然后服务端会一个一个根据地图存档里的数据, 将背包里的物品一个一个填充回去.
  * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
  */
-// FIXME 即然 ItemBehavior 在我们的设计中只是行为, 而不储存任何数据,
-//  那么 ItemBehavior 的实现应该都直接写为 object, 而不是 class.
 interface ItemBehavior : ItemBehaviorHolder {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
