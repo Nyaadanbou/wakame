@@ -8,4 +8,6 @@ animation:
   positive_critical_strike:
     start_interpolation: 1
     interpolation_duration: 2
-  negative_critical_strike: { }
+    scale: [ 3,3,3 ]
+  negative_critical_strike:
+    scale: [ .5,.5,.5 ]

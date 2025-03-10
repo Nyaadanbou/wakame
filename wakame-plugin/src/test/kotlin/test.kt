@@ -50,12 +50,12 @@ class Test {
         assertEquals(1f, animation.positiveCriticalStrike.startInterpolation)
         assertEquals(2f, animation.positiveCriticalStrike.interpolationDuration)
         assertContentEquals(listOf(0f, 0f, 0f), animation.positiveCriticalStrike.translation)
-        assertContentEquals(listOf(1f, 1f, 1f), animation.positiveCriticalStrike.scale)
+        assertContentEquals(listOf(3f, 3f, 3f), animation.positiveCriticalStrike.scale)
 
         assertEquals(0f, animation.negativeCriticalStrike.startInterpolation)
         assertEquals(0f, animation.negativeCriticalStrike.interpolationDuration)
         assertContentEquals(listOf(0f, 0f, 0f), animation.negativeCriticalStrike.translation)
-        assertContentEquals(listOf(1f, 1f, 1f), animation.negativeCriticalStrike.scale)
+        assertContentEquals(listOf(.5f, .5f, .5f), animation.negativeCriticalStrike.scale)
     }
 }
 
@@ -69,14 +69,22 @@ class Animation(source: Provider<ConfigurationNode>) {
     class Transform(
         source: Provider<ConfigurationNode>,
         fallback: Provider<ConfigurationNode> = source,
-    ) {
-        val startInterpolation: Float by entry0(source, fallback, "start_interpolation")
-        val interpolationDuration: Float by entry0(source, fallback, "interpolation_duration")
-        val translation: List<Float> by entry0(source, fallback, "translation")
-        val scale: List<Float> by entry0(source, fallback, "scale")
-
-        private inline fun <reified T : Any> entry0(source: Provider<ConfigurationNode>, fallback: Provider<ConfigurationNode> = source, vararg path: String): Provider<T> =
-            source.optionalEntry<T>(*path).orElse(fallback.entry<T>(*path))
+    ) : ConfigChain(source, fallback) {
+        val startInterpolation: Float by chain("start_interpolation")
+        val interpolationDuration: Float by chain("interpolation_duration")
+        val translation: List<Float> by chain("translation")
+        val scale: List<Float> by chain("scale")
     }
 
+}
+
+open class ConfigChain(
+    val source: Provider<ConfigurationNode>,
+    val fallback: Provider<ConfigurationNode>,
+) {
+    protected inline fun <reified T : Any> chain(
+        vararg path: String,
+    ): Provider<T> {
+        return source.optionalEntry<T>(*path).orElse(fallback.entry<T>(*path))
+    }
 }
