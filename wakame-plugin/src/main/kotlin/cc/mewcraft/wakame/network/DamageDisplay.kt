@@ -95,7 +95,7 @@ internal interface DamageDisplaySettingsFields {
 }
 
 internal class DamageDisplaySettingsCommonFields(
-    config: Provider<ConfigurationNode>
+    config: Provider<ConfigurationNode>,
 ) : DamageDisplaySettingsFields {
     override val animations: List<DamageDisplayAnimation> by config.entry("animations")
     override val animationDuration: Long by config.entry("animation_duration")
@@ -312,9 +312,12 @@ internal object DamageDisplay {
         ).apply {
             this.brightness = Display.Brightness(15, 0)
         }
+
         val hologram = Hologram(hologramData)
 
-//        hologram.show(hologramViewer)
+        // 发送创建 hologram 的封包
+        hologram.show(hologramViewer)
+
         // 遍历播放所有动画
         hologramAnimations.forEach { animation ->
             runTaskLater(animation.delay) {
@@ -334,7 +337,8 @@ internal object DamageDisplay {
             }
         }
 
-        // 结束播放
+        // 发送隐藏 hologram 的封包
+        // 注意需要手动确保在“动画”播放完毕后再隐藏
         runTaskLater(hologramDuration) {
             hologram.hide(hologramViewer)
         }
