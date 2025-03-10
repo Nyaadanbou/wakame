@@ -25,6 +25,6 @@ internal data class AnimationData(
     )
 
     companion object {
-        val DEFAULT = AnimationData(0, 0, Vector3f(0F), Vector3f(1F))
+        val DEFAULT = AnimationData(0, 0, Vector3f(0f), Vector3f(1f))
     }
 }
