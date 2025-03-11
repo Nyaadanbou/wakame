@@ -59,7 +59,8 @@ internal object ConfigExtractor {
                 val srcFile = srcRootDir.resolve(file)
                 val dstFile = dstRootDir.resolve(file)
                 if (!dstFile.exists()) {
-                    srcFile.copyTo(dstFile, false)
+                    dstFile.createParentDirectories()
+                    srcFile.copyTo(dstFile, overwrite = false)
                 }
             }
 
