@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.element
 
+import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -20,7 +22,6 @@ import org.spongepowered.configurate.kotlin.extensions.get
 @Init(stage = InitStage.PRE_WORLD)
 @Reload
 internal object ElementTypeRegistryLoader : RegistryConfigStorage {
-    const val FILE_PATH: String = "elements.yml"
 
     @InitFun
     fun init() {
@@ -39,11 +40,28 @@ internal object ElementTypeRegistryLoader : RegistryConfigStorage {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, ElementType) -> Unit) {
-        val loader = buildYamlConfigLoader { withDefaults() }
-        val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
-        for ((nodeKey, node) in rootNode.node("elements").childrenMap()) {
-            val entry = parseEntry(nodeKey, node)
-            registryAction(entry.first, entry.second)
+        val rootDirectory = KoishDataPaths.CONFIGS.resolve("element/").toFile()
+
+        // 获取元素的全局配置文件
+        val globalConfigFile = rootDirectory.resolve("config.yml")
+
+        // 获取元素的实例数据文件夹
+        val entryDataDirectory = rootDirectory.resolve("entries/")
+
+        val loader = buildYamlConfigLoader {
+            withDefaults()
+        }
+
+        // 加载所有元素实例, 并把它们添加进注册表
+        entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
+            try {
+                val elementId = f.toRelativeString(entryDataDirectory).substringBeforeLast('.')
+                val rootNode = loader.buildAndLoadString(f.readText())
+                val entry = parseEntry(elementId, rootNode)
+                registryAction(entry.first, entry.second)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to load element from file: ${f.toRelativeString(rootDirectory)}", e)
+            }
         }
     }
 

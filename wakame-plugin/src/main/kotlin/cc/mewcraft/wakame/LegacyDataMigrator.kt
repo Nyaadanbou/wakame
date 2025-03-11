@@ -27,6 +27,7 @@ internal object LegacyDataMigrator {
             val filesToMigrate = listOf(
                 "config.yml", "ability.yml", "attributes.yml", "elements.yml", "entities.yml",
                 "items.yml", "levels.yml", "rarities.yml", "resourcepack.yml"
+                "config.yml", "ability.yml", "attributes.yml", "entities.yml",
             )
             val dirsToMigrate = mapOf(
                 "damage" to "damage",
