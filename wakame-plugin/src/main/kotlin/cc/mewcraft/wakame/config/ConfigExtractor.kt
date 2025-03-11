@@ -32,7 +32,7 @@ internal object ConfigExtractor {
         "ability/",
         "catalog/",
         "crafting_station/",
-        "element",
+        "element/",
         "item/",
         "item_proxied/",
         "kizami/",
