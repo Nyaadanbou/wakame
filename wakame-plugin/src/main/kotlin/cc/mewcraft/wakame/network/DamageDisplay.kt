@@ -315,9 +315,6 @@ internal object DamageDisplay {
 
         val hologram = Hologram(hologramData)
 
-        // 发送创建 hologram 的封包
-        hologram.show(hologramViewer)
-
         // 遍历播放所有动画
         hologramAnimations.forEach { animation ->
             runTaskLater(animation.delay) {
@@ -332,8 +329,14 @@ internal object DamageDisplay {
                     this.translation = animationData.translation
                     this.scale = animationData.scale
                 }
-                hologram.setEntityData(hologramData)
-                hologram.refresh(hologramViewer)
+                if (animation.delay == 0L) {
+                    // 发送创建 hologram 的封包
+                    hologram.show(hologramViewer)
+                } else {
+                    // 更新动画
+                    hologram.setEntityData(hologramData)
+                    hologram.refresh(hologramViewer)
+                }
             }
         }
 
