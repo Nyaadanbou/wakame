@@ -7,8 +7,8 @@ import com.github.quillraven.fleks.ComponentType
 
 // TODO 也许会变成在 BukkitPlayer 所对应的 FleksEntity 上的组件?
 data class HoldBy(
+    var slot: ItemSlot,
     var nekoStack: NekoStack,
-    var slot: ItemSlot
 ): Component<HoldBy> {
     companion object : ComponentType<HoldBy>()
 
@@ -16,5 +16,5 @@ data class HoldBy(
 }
 
 fun HoldBy(pair: Pair<ItemSlot, NekoStack>?): HoldBy? {
-    return pair?.let { HoldBy(it.second, it.first) }
+    return pair?.let { HoldBy(it.first, it.second) }
 }

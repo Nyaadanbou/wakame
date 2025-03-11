@@ -2,7 +2,15 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.component.AbilityContainer
-import cc.mewcraft.wakame.ability.system.*
+import cc.mewcraft.wakame.ability.system.AbilityInitSystem
+import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
+import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
+import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
+import cc.mewcraft.wakame.ability.system.AbilityTickResultSystem
+import cc.mewcraft.wakame.ability.system.BlackholeSystem
+import cc.mewcraft.wakame.ability.system.BlinkSystem
+import cc.mewcraft.wakame.ability.system.DashSystem
+import cc.mewcraft.wakame.ability.system.MultiJumpSystem
 import cc.mewcraft.wakame.ecs.Fleks.world
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
@@ -10,13 +18,18 @@ import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
 import cc.mewcraft.wakame.elementstack.system.ElementStackSystem
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventInternals
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.*
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityCreateContext
+import com.github.quillraven.fleks.EntityUpdateContext
+import com.github.quillraven.fleks.World
+import com.github.quillraven.fleks.configureWorld
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -45,15 +58,19 @@ object Fleks : Listener {
         }
 
         systems {
-            // 关于顺序: 删除系统优先于一切系统.
+            // BukkitObject 的删除系统优先于一切系统.
 
-            add(AbilityRemoveSystem())
             add(BukkitEntityBridge())
             add(BukkitBlockBridge())
+
+            // 给每个 BukkitPlayer 的 itemSlotChangeEvent 进行处理.
+            add(ItemSlotChangeEventInternals())
+
+            // 其它内部功能的移除系统
+
+            add(AbilityRemoveSystem())
             add(AbilityTickResultSystem())
             add(ElementStackSystem())
-
-            // 将所有标记重置到默认状态.
 
             add(AbilityInitSystem())
 

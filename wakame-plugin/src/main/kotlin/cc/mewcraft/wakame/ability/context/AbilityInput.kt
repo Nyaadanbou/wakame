@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ability.context
 
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
+import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -63,6 +64,14 @@ annotation class AbilityInputMarker
 
 fun abilityInput(caster: KoishEntity, target: KoishEntity, initializer: AbilityInputDSL.() -> Unit = {}): AbilityInput {
     return AbilityInputDSL(caster, target).apply(initializer).build()
+}
+
+fun abilityInput(caster: FleksEntity, target: FleksEntity, initializer: AbilityInputDSL.() -> Unit = {}): AbilityInput {
+    return abilityInput(
+        caster = KoishEntity(caster),
+        target = KoishEntity(target),
+        initializer = initializer
+    )
 }
 
 @AbilityInputMarker

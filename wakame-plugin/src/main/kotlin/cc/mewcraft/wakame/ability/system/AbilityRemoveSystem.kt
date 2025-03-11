@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.item.logic.ItemRecord
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import org.bukkit.entity.Player
 
 class AbilityRemoveSystem : IteratingSystem(
     family = Families.ABILITY
@@ -32,12 +32,12 @@ class AbilityRemoveSystem : IteratingSystem(
         if (!abilityComponent.isReadyToRemove)
             return
 
-        val caster = entity[CastBy].entityOrPlayer()
-        if (caster is Player && entity.has(HoldBy)) {
+        val itemRecord = entity[CastBy].caster.getOrNull(ItemRecord)
+        if (itemRecord != null && entity.has(HoldBy)) {
             // 如果技能被一个物品持有, 则进行物品技能的移除逻辑.
             val holdItem = entity[HoldBy].nekoStack
             val slot = entity[HoldBy].slot
-            if (slot.getItem(caster) == holdItem.bukkitStack) {
+            if (itemRecord[slot] == holdItem.bukkitStack) {
                 // 如果玩家的背包里的物品是技能所对应的物品, 则不进行移除.
                 return
             }

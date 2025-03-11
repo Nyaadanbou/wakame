@@ -22,7 +22,7 @@ interface Food : ItemBehavior {
                 val input = abilityInput(player.koishify(), player.koishify()) {
                     holdBy(VanillaItemSlot.fromEquipmentSlot(event.hand)!! to koishStack)
                 }
-                ability.recordBy(input)
+                ability.castNow(input)
             }
         }
     }

@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.ability
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.trigger.Trigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
-import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
@@ -103,14 +103,14 @@ data class PlayerAbility(
     val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    fun recordBy(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
+    fun record(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
             trigger(trigger)
             manaCost(manaCost)
             holdBy(holdBy)
         }
-        instance.recordBy(input)
+        instance.record(input)
     }
 
     fun saveNbt(): CompoundTag = CompoundTag {

@@ -16,13 +16,13 @@ import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 
-fun Ability.createAbilityEntity(input: AbilityInput): Entity {
+fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase): Entity {
     return Fleks.createEntity {
         it += AbilityArchetypeComponent(archetype)
         it += AbilityComponent(
             abilityId = key,
             manaCost = input.manaCost,
-            phase = StatePhase.IDLE,
+            phase = phase,
             trigger = input.trigger,
             variant = input.variant,
             mochaEngine = input.mochaEngine
@@ -31,7 +31,6 @@ fun Ability.createAbilityEntity(input: AbilityInput): Entity {
         it += CastBy(input.castBy.entity)
         it += TargetTo(input.targetTo.entity)
         HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
-        input.holdBy?.let { castItem -> it += HoldBy(slot = castItem.first, nekoStack = castItem.second.clone()) }
         it += TickCountComponent(0)
     }
 }

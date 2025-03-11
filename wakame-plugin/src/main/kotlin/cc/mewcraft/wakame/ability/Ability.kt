@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
@@ -46,8 +47,14 @@ abstract class Ability(
     /**
      * 使用 [input] 记录技能的信息到 ECS 中.
      */
-    fun recordBy(input: AbilityInput) {
-        val abilityEntity = createAbilityEntity(input)
+    fun record(input: AbilityInput) {
+        val abilityEntity = createAbilityEntity(input, StatePhase.IDLE)
+        val castByEntity = input.castBy
+        castByEntity[AbilityContainer][archetype] = abilityEntity
+    }
+
+    fun castNow(input: AbilityInput) {
+        val abilityEntity = createAbilityEntity(input, StatePhase.CAST_POINT)
         val castByEntity = input.castBy
         castByEntity[AbilityContainer][archetype] = abilityEntity
     }

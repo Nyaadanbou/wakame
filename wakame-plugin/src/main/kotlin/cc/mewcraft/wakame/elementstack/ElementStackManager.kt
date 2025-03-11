@@ -1,17 +1,18 @@
 package cc.mewcraft.wakame.elementstack
 
+import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
 import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player
 
 fun BukkitEntity.applyElementStack(
@@ -62,11 +63,15 @@ object ElementStackManager {
         }
 
         val elementStackEntity = Fleks.createEntity {
-            caster?.let { c -> it += CastBy(caster.entity) }
+            it += if (caster == null) {
+                CastBy(target.entity)
+            } else {
+                CastBy(caster.entity)
+            }
             it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent(0)
-            it += ElementStackComponent(amount)
+            it += ElementStackComponent(Int2ObjectOpenHashMap())
         }
         target[ElementStackContainer][element] = elementStackEntity
     }

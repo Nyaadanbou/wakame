@@ -71,7 +71,7 @@ internal object AbilityEntryPointHandler {
                 val abilities = koishStack.playerAbilities.takeUnlessEmpty() ?: return
                 val target = (hitEntity as? LivingEntity)?.koishify() ?: projectile.attachedBlock?.koishify() ?: return
                 for (ability in abilities) {
-                    ability.recordBy(projectile.shooter as Player, target, ItemSlot.imaginary() to koishStack)
+                    ability.record(projectile.shooter as Player, target, ItemSlot.imaginary() to koishStack)
                 }
             }
         }

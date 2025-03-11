@@ -38,7 +38,7 @@ internal object AbilityCommand : KoishCommandFactory<Source> {
         val caster = casterPlayer.koishify()
         val target = context.getOrNull<SingleEntitySelector>("target")?.single()?.koishify() ?: caster
         val input = abilityInput(caster, target)
-        ability.recordBy(input)
+        ability.record(input)
     }
 
 }

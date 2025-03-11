@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.elementstack.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.bridge.KoishEntity
+import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.context.abilityInput
+import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
@@ -25,7 +26,8 @@ class ElementStackSystem : IteratingSystem(
         val elementStackComponent = entity[ElementStackComponent]
 
         // 如果 stackCount 小于等于 0，移除实体
-        if (elementStackComponent.amount <= 0) {
+        var currentAmount = elementStackComponent.amount
+        if (currentAmount <= 0) {
             removeEntity(entity, target)
             return
         }
@@ -34,11 +36,31 @@ class ElementStackSystem : IteratingSystem(
         if (tickCountComponent.tick >= elementStackComponent.disappearTick) {
             removeEntity(entity, target)
         }
+
+        val maxAmount = elementStackComponent.maxAmount
+        if (currentAmount > maxAmount) {
+            currentAmount = maxAmount
+            elementStackComponent.amount = currentAmount
+        }
+
+        val effects = elementStackComponent.effects.int2ObjectEntrySet().iterator()
+//        val effects = mapOf(4 to KoishRegistries.ABILITY.getOrThrow("melee/blink")).iterator()
+        val abilityInput = abilityInput(entity[CastBy].caster, entity[TargetTo].target)
+        while (effects.hasNext()) {
+            val (amount, ability) = effects.next()
+            if (elementStackComponent.triggeredLevels.contains(amount))
+                continue
+            if (currentAmount <= amount)
+                continue
+            ability.castNow(abilityInput)
+            elementStackComponent.triggeredLevels.add(amount)
+        }
     }
 
     private fun removeEntity(entity: Entity, target: Entity) {
-        LOGGER.info("在 ${KoishEntity(entity)} 上的元素效果已失效.")
-        target[ElementStackContainer].remove(entity[ElementComponent].element)
+        val element = entity[ElementComponent].element
+        target[ElementStackContainer].remove(element)
         entity.remove()
+        LOGGER.info("在 $entity 上的 $element 元素效果已失效.")
     }
 }

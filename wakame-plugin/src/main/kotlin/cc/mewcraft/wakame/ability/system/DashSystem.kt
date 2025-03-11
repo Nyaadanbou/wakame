@@ -114,7 +114,7 @@ class DashSystem : IteratingSystem(
                         abilityInput(entity.koishify(), casterEntity.koishify())
                     }
                 }
-                ability.recordBy(input)
+                ability.castNow(input)
             }
         }
         return true
