@@ -24,7 +24,6 @@ internal object ConfigExtractor {
         "entities.yml",
         "items.yml",
         "levels.yml",
-        "rarities.yml",
         "resourcepack.yml",
     )
 
@@ -38,6 +37,7 @@ internal object ConfigExtractor {
         "item_proxied/",
         "kizami/",
         "random/",
+        "rarity/",
         "recipe/",
         "reforging_station/",
         "renderer/",

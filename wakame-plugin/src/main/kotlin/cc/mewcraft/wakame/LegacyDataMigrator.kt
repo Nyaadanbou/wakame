@@ -25,9 +25,8 @@ internal object LegacyDataMigrator {
 
             // 定义需要迁移的文件和文件夹
             val filesToMigrate = listOf(
-                "config.yml", "ability.yml", "attributes.yml", "elements.yml", "entities.yml",
-                "items.yml", "levels.yml", "rarities.yml", "resourcepack.yml"
                 "config.yml", "ability.yml", "attributes.yml", "entities.yml",
+                "items.yml", "levels.yml", "resourcepack.yml"
             )
             val dirsToMigrate = mapOf(
                 "damage" to "damage",

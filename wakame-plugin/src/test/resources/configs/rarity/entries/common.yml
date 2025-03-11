@@ -1,0 +1,5 @@
+version: 1
+binary_index: 0
+display_name: "Common"
+styles: "<white>"
+glow_color: WHITE
