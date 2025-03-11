@@ -14,7 +14,7 @@ interface RegistryConfigStorage {
     }
 
     fun getFileInConfigDirectory(path: Path): File {
-        return KoishDataPaths.ROOT.resolve("configs").resolve(path).toFile()
+        return KoishDataPaths.CONFIGS.resolve(path).toFile()
     }
 
     fun getFileInDataDirectory(path: String): File {

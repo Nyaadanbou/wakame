@@ -18,6 +18,7 @@ import java.util.stream.Stream
 class KizamiType internal constructor(
     override val key: Key,
     override val stringId: String,
+    // FIXME 移除, 持久化直接储存字符串 id 而非数字 id
     override val integerId: Int,
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,

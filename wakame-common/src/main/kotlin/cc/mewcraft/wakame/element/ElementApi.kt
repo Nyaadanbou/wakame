@@ -17,6 +17,7 @@ interface Element : Keyed, Examinable, PlayerFriendlyNamed, StringIdentifiable, 
     // 用于配置文件
     override val key: Key
 
+    // FIXME 移除 binary_index, 持久化直接储存 id
     // 形如 "3" 的非零整数, 目前由配置文件手动指定, 之后由注册表自动分配
     // 用于压缩数据
     override val integerId: Int
