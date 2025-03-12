@@ -1,5 +1,6 @@
 package recipe
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.recipe.*
 import core.ItemXMock
@@ -24,6 +25,8 @@ class VanillaRecipeSerializationTest : KoinTest {
                     testEnv(),
                 )
             }
+
+            KoishDataPaths.initialize()
 
             ItemXBootstrap.init()
             MinecraftRecipeRegistryDataLoader.load()

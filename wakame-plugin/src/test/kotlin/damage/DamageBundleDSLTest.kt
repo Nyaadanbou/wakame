@@ -1,5 +1,6 @@
 package damage
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.Attributes
@@ -47,6 +48,8 @@ class DamageBundleDSLTest : KoinTest {
                     adventureModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
 
             // 按依赖顺序, 初始化注册表
             ElementTypeRegistryLoader.init()

@@ -1,3 +1,4 @@
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.pack.ResourcePackManager
 import cc.mewcraft.wakame.util.readFromDirectory
 import cc.mewcraft.wakame.util.readFromZipFile
@@ -34,6 +35,8 @@ class ResourcePackManagerTest : KoinTest {
             startKoin {
                 modules(testEnv())
             }
+
+            KoishDataPaths.initialize()
         }
 
         @JvmStatic

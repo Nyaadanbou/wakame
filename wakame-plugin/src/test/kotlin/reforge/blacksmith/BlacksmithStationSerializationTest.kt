@@ -1,5 +1,6 @@
 package reforge.blacksmith
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.blacksmith.BlacksmithStationSerializer
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
@@ -23,6 +24,8 @@ class BlacksmithStationSerializationTest : KoinTest {
                     adventureModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
         }
 
         @JvmStatic

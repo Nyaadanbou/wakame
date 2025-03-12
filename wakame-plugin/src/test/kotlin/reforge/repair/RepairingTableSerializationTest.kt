@@ -1,5 +1,6 @@
 package reforge.repair
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.repair.RepairingTableSerializer
 import org.junit.jupiter.api.AfterAll
@@ -21,6 +22,8 @@ class RepairingTableSerializationTest : KoinTest {
                     adventureModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
         }
 
         @JvmStatic
