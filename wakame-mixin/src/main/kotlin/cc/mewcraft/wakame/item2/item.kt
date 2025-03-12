@@ -15,9 +15,9 @@ import org.bukkit.inventory.ItemStack
 // 代表一个物品类型(由配置文件动态创建)
 class KoishItem(
     val id: Identifier,
-    val base: ItemBase, // TODO 可作为 GlobalProperty
-    val slot: ItemSlot, // TODO 可作为 GlobalProperty
-    val hidden: Boolean, // TODO 可作为 GlobalProperty
+    val base: ItemBase, // TODO #350: 可作为 GlobalProperty
+    val slot: ItemSlot, // TODO #350: 可作为 GlobalProperty
+    val hidden: Boolean, // TODO #350: 可作为 GlobalProperty
     val behaviors: ItemBehaviorContainer,
 ) {
 
@@ -56,40 +56,40 @@ class KoishItemProxy(
 
 //// Base
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 val MojangStack.koishItem: KoishItem?
-    get() = getData(ItemDataTypes.ID)?.type
+    get() = getData(ItemDataTypes.ID)?.koishItem
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 val MojangStack.dataContainer: ItemDataContainer?
     get() = get(DataComponentsPatch.ITEM_DATA_CONTAINER)
 
 
 //// Behavior
 
-fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean = TODO()
+fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean = TODO("#350")
 
 //// Property
 
-fun <T> MojangStack.hasProperty(type: GlobalPropertyType<T>): Boolean = TODO()
+fun <T> MojangStack.getProperty(type: GlobalPropertyType<out T>): T? = TODO("#350")
 
-fun <T> MojangStack.getProperty(type: GlobalPropertyType<out T>): T? = TODO()
+fun <T> MojangStack.hasProperty(type: GlobalPropertyType<T>): Boolean = getProperty(type) != null
 
 //// ItemData
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 fun MojangStack.hasData(type: ItemDataType<*>): Boolean = this@hasData.dataContainer?.has(type) == true
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 fun <T> MojangStack.getData(type: ItemDataType<out T>): T? = this@getData.dataContainer?.get(type)
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = this@getDataOrDefault.dataContainer?.getOrDefault(type, fallback)
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? = this@setData.dataContainer?.set(type, value)
 
-// TODO 考虑原版套皮物品
+// TODO #350: 考虑原版套皮物品
 fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? = this@removeData.dataContainer?.remove(type)
 
 // ------------------

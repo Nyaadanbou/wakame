@@ -13,7 +13,7 @@ data class ItemId(
     val variant: Int = 0,
 ) {
 
-    val type: KoishItem?
-
+    val koishItem: KoishItem?
+        get() = TODO("#350: 根据 id 从 Registry 获取 KoishItem")
 
 }

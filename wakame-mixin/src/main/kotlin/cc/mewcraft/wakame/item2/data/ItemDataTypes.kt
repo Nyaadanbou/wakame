@@ -13,16 +13,14 @@ object ItemDataTypes {
     @JvmField
     val LEVEL: ItemDataType<ItemLevel> = register("level")
 
-    // FIXME 使用 KoishRegistry
     @Deprecated("Not implemented")
     internal fun getType(id: String): ItemDataType<*>? {
-
+        TODO("#350: 使用 KoishRegistry")
     }
 
-    // FIXME 使用 KoishRegistry
     @Deprecated("Not implemented")
     internal fun getId(type: ItemDataType<*>): String {
-
+        TODO("#350: 使用 KoishRegistry")
     }
 
     /**
@@ -32,7 +30,7 @@ object ItemDataTypes {
         val collection = TypeSerializerCollection.builder()
 
         // 添加每一个 ItemDataType 的 TypeSerializer
-        val dataTypes = listOf(ID, LEVEL) // FIXME: 从 KoishRegistry 遍历
+        val dataTypes = listOf(ID, LEVEL) // FIXME #350: 从 KoishRegistry 遍历
         for (dataType in dataTypes) {
             val serializers = dataType.serializers
             if (serializers != null) {
@@ -48,7 +46,7 @@ object ItemDataTypes {
      * @param block 用于配置 [ItemDataType]
      */
     private inline fun <reified T> register(id: String, block: ItemDataType.Builder<T>.() -> Unit = {}): ItemDataType<T> {
-        // FIXME 在 KoishRegistry 中注册以支持 type dispatching
+        // FIXME #350: 在 KoishRegistry 中注册以支持 type dispatching
         return ItemDataType.builder(typeTokenOf<T>()).apply(block).build()
     }
 

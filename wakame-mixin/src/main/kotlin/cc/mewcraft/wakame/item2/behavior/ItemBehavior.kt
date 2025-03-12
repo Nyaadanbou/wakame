@@ -48,43 +48,34 @@ interface ItemBehavior : ItemBehaviorHolder {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 
-    //fun handleInteract(player: Player, itemStack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
+    //fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 
-    fun handleInteractAtEntity(player: Player, itemStack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
+    fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
-    //fun handleAttackEntity(player: Player, itemStack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
+    //fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
 
-    fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
+    fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
 
-    fun handleItemProjectileHit(player: Player, itemStack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
+    fun handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
 
-    fun handleBreakBlock(player: Player, itemStack: ItemStack, event: BlockBreakEvent) = Unit
+    fun handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
 
-    fun handleDamage(player: Player, itemStack: ItemStack, event: PlayerItemDamageEvent) = Unit
+    fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) = Unit
 
-    fun handleBreak(player: Player, itemStack: ItemStack, event: PlayerItemBreakEvent) = Unit
+    fun handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) = Unit
 
-    fun handleEquip(player: Player, itemStack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
+    fun handleEquip(player: Player, itemstack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
 
-    fun handleInventoryClick(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
 
-    fun handleInventoryClickOnCursor(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleInventoryClickOnCursor(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
 
-    fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, event: InventoryClickEvent) = Unit
+    fun handleInventoryHotbarSwap(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
 
-    fun handleRelease(player: Player, itemStack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
+    fun handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
 
-    fun handleConsume(player: Player, itemStack: ItemStack, event: PlayerItemConsumeEvent) = Unit
+    fun handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) = Unit
 
-    //fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) = Unit
+    //fun handleAbilityPrepareCast(player: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) = Unit
 
-}
-
-interface ItemBehaviorType<T : ItemBehavior> : ItemBehaviorHolder {
-    /**
-     * Creates a [ItemBehavior].
-     *
-     * @return an instance of [T]
-     */
-    fun create(): T
 }

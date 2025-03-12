@@ -1,10 +1,5 @@
-// ItemData
-// ItemData.WriteOnly (可用于现有的原版代理, 以程序化生成原版的数据)
-// ItemData.ReadOnly (无实际意义)
-// ItemData.ReadWrite
-
+// 备忘录:
 // ItemData 需要具有 lifecycle 属性, 用来表示可以在什么时候使用
-
 // ItemDataContainer
 
 package cc.mewcraft.wakame.item2.data
@@ -20,7 +15,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 
-// FIXME 这个数据类型将成为 NMS DataComponentMap 的一部分.
+// FIXME #350: 这个数据类型将成为 NMS DataComponentMap 的一部分.
 //  而根据 DataComponentMap 的契约, 该实例的数据必须为不可变, 所有 set 函数都不应该修改 `this` 的数据.
 //  从 ItemStack 来看, 如果要修改一个 ItemData, 则大概流程为:
 //  1) 先从 DataComponentMap 获取 ItemDataContainer
@@ -100,7 +95,7 @@ class ItemDataContainer(
         return data.entries.iterator()
     }
 
-    // FIXME make it thread local?
+    // FIXME #350: make it thread local?
     fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
         return data.reference2ObjectEntrySet().fastIterator()
     }
@@ -117,7 +112,7 @@ class ItemDataContainer(
         }
     }
 
-    // FIXME 需要确保 node 的 loader 加载了 ItemDataContainer 所需要的所有 TypeSerializer
+    // FIXME #350: 需要确保 node 的 loader 加载了 ItemDataContainer 所需要的所有 TypeSerializer
     private object Serializer : TypeSerializer<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             val data = Reference2ObjectOpenHashMap<ItemDataType<*>, Any>()

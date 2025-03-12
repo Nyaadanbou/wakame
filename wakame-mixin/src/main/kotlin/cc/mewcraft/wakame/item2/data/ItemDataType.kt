@@ -12,8 +12,8 @@ interface ItemDataType<T> {
         @JvmField
         val CODEC: Codec<ItemDataType<*>> = TODO()
 
-        // FIXME ItemDataType 的 TypeSerializer 应该是从:
-        //  Identifier <-> ItemDataType 之间进行转换,
+        // FIXME #350: ItemDataType 的 TypeSerializer 应该是从:
+        //  Identifier <-> ItemDataType<*> 之间进行转换,
         //  所以应该从 registry 生成一个 TypeSerializer
         @JvmField
         val SERIALIZER: TypeSerializer<ItemDataType<*>> = TODO()
