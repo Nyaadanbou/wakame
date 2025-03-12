@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.rarity
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -21,7 +22,6 @@ import org.spongepowered.configurate.kotlin.extensions.get
 )
 @Reload
 internal object RarityTypeRegistryLoader : RegistryConfigStorage {
-    const val FILE_PATH = "rarities.yml"
 
     @InitFun
     fun init() {
@@ -36,16 +36,30 @@ internal object RarityTypeRegistryLoader : RegistryConfigStorage {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, RarityType) -> Unit) {
+        val rootDirectory = getFileInConfigDirectory("rarity/")
+
+        // 获取稀有度的全局配置文件
+        val globalConfigFile = rootDirectory.resolve("config.yml")
+
+        // 获取稀有度的实例数据文件夹
+        val entryDataDirectory = rootDirectory.resolve("entries/")
+
         val loader = buildYamlConfigLoader {
             withDefaults()
             serializers {
                 register(GlowColorSerializer)
             }
         }
-        val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
-        for ((nodeKey, node) in rootNode.node("rarities").childrenMap()) {
-            val entry = parseEntry(nodeKey, node)
-            registryAction(entry.first, entry.second)
+
+        entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
+            try {
+                val rootNode = loader.buildAndLoadString(f.readText())
+                val rarityId = f.toRelativeString(entryDataDirectory).substringBeforeLast('.')
+                val entry = parseEntry(rarityId, rootNode)
+                registryAction(entry.first, entry.second)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to load rarity from file: ${f.toRelativeString(rootDirectory)}", e)
+            }
         }
     }
 

@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.NumberIdentifiable
+import cc.mewcraft.wakame.util.PlayerFriendlyNamed
+import cc.mewcraft.wakame.util.StringIdentifiable
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -26,6 +28,7 @@ class RarityType
 internal constructor(
     override val key: Key,
     override val stringId: String,
+    // FIXME 移除, 持久化直接储存字符串 id 而非数字 id
     override val integerId: Int,
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,

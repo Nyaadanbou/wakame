@@ -9,7 +9,7 @@ kizamiz:
       - type: item:rarity
         rarity: rare
     entries:
-      - type: wind_lace
+      - type: inner/wind_lace
         weight: 2
       - type: antigravity
         weight: 1

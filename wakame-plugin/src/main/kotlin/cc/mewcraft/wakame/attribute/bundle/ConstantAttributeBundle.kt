@@ -310,7 +310,9 @@ internal data class ConstantAttributeBundleRE(
 
 private fun CompoundTag.readElement(): RegistryEntry<ElementType> {
     val id = getByte(ELEMENT_TYPE_FIELD).toInt()
-    return KoishRegistries.ELEMENT.getEntry(id) ?: KoishRegistries.ELEMENT.getDefaultEntry()
+    // FIXME 临时实现
+    return KoishRegistries.ELEMENT.entrySequence.firstOrNull { type -> type.value.integerId == id }
+        ?: KoishRegistries.ELEMENT.getDefaultEntry()
 }
 
 private fun CompoundTag.readOperation(): Operation {
@@ -333,8 +335,9 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
 
 private fun CompoundTag.writeElement(element: RegistryEntry<ElementType>) {
     val value = element.value
-    val id = KoishRegistries.ELEMENT.getRawId(value).toByte()
-    putByte(ELEMENT_TYPE_FIELD, id)
+    // FIXME 临时实现
+    //val id = KoishRegistries.ELEMENT.getRawId(value).toByte()
+    putByte(ELEMENT_TYPE_FIELD, value.integerId.toByte())
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {

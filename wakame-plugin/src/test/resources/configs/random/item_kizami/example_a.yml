@@ -1,5 +1,5 @@
 nodes:
-  - type: wind_lace
+  - type: inner/wind_lace
     weight: 3
   - type: antigravity
     weight: 2
