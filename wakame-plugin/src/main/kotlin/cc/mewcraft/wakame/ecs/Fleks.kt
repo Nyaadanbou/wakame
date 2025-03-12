@@ -16,8 +16,8 @@ import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
-import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
-import cc.mewcraft.wakame.elementstack.system.ElementStackSystem
+import cc.mewcraft.wakame.element.component.ElementStackContainer
+import cc.mewcraft.wakame.element.system.ElementStackSystem
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventInternals
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init

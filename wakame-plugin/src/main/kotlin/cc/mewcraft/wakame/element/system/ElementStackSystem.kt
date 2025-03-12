@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.elementstack.system
+package cc.mewcraft.wakame.element.system
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.component.CastBy
@@ -6,15 +6,38 @@ import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.element.applyElementStack
 import cc.mewcraft.wakame.element.component.ElementComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
+import cc.mewcraft.wakame.element.component.ElementStackComponent
+import cc.mewcraft.wakame.element.component.ElementStackContainer
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.util.KoishListener
+import cc.mewcraft.wakame.util.event
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
 class ElementStackSystem : IteratingSystem(
     family = Families.ELEMENT_STACK
 ) {
+    private lateinit var damageListener: KoishListener
+
+    override fun onInit() {
+        damageListener = event<NekoEntityDamageEvent> { event ->
+            if (event.isCancelled)
+                return@event
+            val damagee = event.damagee
+            val damagePackets = event.damageMetadata.damageBundle.packets()
+            for (damagePacket in damagePackets) {
+                val causingEntity = event.damageSource.causingEntity
+                damagee.applyElementStack(damagePacket.element, 1, causingEntity)
+            }
+        }
+    }
+
+    override fun onDispose() {
+        damageListener.unregister()
+    }
+
     override fun onTickEntity(entity: Entity) {
         val target = entity[TargetTo].target
         if (target !in world) {
@@ -47,12 +70,14 @@ class ElementStackSystem : IteratingSystem(
 //        val effects = mapOf(4 to KoishRegistries.ABILITY.getOrThrow("melee/blink")).iterator()
         val abilityInput = abilityInput(entity[CastBy].caster, entity[TargetTo].target)
         while (effects.hasNext()) {
-            val (amount, ability) = effects.next()
+            val (amount, abilities) = effects.next()
             if (elementStackComponent.triggeredLevels.contains(amount))
                 continue
             if (currentAmount <= amount)
                 continue
-            ability.castNow(abilityInput)
+            for (ability in abilities) {
+                ability.value.castNow(abilityInput)
+            }
             elementStackComponent.triggeredLevels.add(amount)
         }
     }
@@ -61,6 +86,6 @@ class ElementStackSystem : IteratingSystem(
         val element = entity[ElementComponent].element
         target[ElementStackContainer].remove(element)
         entity.remove()
-        LOGGER.info("在 $entity 上的 $element 元素效果已失效.")
+        LOGGER.info("在 $entity 上的 ${element.getIdAsString()} 元素效果已失效.")
     }
 }

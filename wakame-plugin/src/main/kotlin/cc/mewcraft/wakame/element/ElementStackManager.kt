@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.elementstack
+package cc.mewcraft.wakame.element
 
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
@@ -7,10 +7,9 @@ import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.element.component.ElementComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
+import cc.mewcraft.wakame.element.component.ElementStackComponent
+import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player
@@ -71,7 +70,15 @@ object ElementStackManager {
             it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent(0)
-            it += ElementStackComponent(Int2ObjectOpenHashMap())
+            val stackEffect = element.value.stackEffect
+            it += if (stackEffect != null) {
+                ElementStackComponent(
+                    effects = stackEffect.stages.associate { it.amount to it.abilities }.toMap(Int2ObjectOpenHashMap()),
+                    maxAmount = stackEffect.maxAmount
+                )
+            } else {
+                ElementStackComponent(Int2ObjectOpenHashMap())
+            }
         }
         target[ElementStackContainer][element] = elementStackEntity
     }

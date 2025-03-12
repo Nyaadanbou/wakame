@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.elementstack.component
+package cc.mewcraft.wakame.element.component
 
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.element.ElementType
