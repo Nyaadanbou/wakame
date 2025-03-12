@@ -3,8 +3,8 @@
 package cc.mewcraft.wakame.util.item
 
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.component.adventure.toAdventureComponent
-import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.adventure.toAdventureComponent
+import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponentType

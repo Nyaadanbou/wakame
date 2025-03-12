@@ -31,17 +31,17 @@ dependencies {
     implementation(project(":wakame-api")) // 提供运行时依赖
     implementation(project(":wakame-common")) // 同上
     implementation(local.shadow.bukkit)
+    implementation(local.commons.collections)
+    implementation(local.commons.gson)
+    implementation(local.commons.provider)
+    implementation(local.commons.reflection)
+    implementation(local.commons.tuple)
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.extra.kotlin))
     implementation(platform(libs.bom.configurate.extra.dfu8))
-}
-
-tasks {
-    shadowJar {
-        val shadedPattern = "cc.mewcraft.wakame.external."
-        relocate("org.spongepowered.configurate", shadedPattern + "config")
-    }
+    implementation(platform(local.koin.bom))
+    implementation(local.koin.core)
 }
 
 sourceSets {

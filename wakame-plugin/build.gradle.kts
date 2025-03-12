@@ -20,6 +20,7 @@ dependencies {
     // internal
     compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnlyApi(project(":wakame-common")) // 同上
+    compileOnlyApi(project(":wakame-mixin")) // 同上
     compileOnly(project(":wakame-mixin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
@@ -33,14 +34,14 @@ dependencies {
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
-    implementation(platform(local.koin.bom))
-    implementation(local.koin.core)
+    compileOnly(platform(local.koin.bom)) // 运行时由 koish-mod 提供
+    compileOnly(local.koin.core)
     compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供
-    implementation(local.commons.collections)
-    implementation(local.commons.gson)
-    implementation(local.commons.provider)
-    implementation(local.commons.reflection)
-    implementation(local.commons.tuple)
+    compileOnly(local.commons.collections)
+    compileOnly(local.commons.gson)
+    compileOnly(local.commons.provider)
+    compileOnly(local.commons.reflection)
+    compileOnly(local.commons.tuple)
     implementation(local.fleks) {
         exclude("org.jetbrains")
     }
@@ -48,14 +49,14 @@ dependencies {
     implementation(local.snakeyaml.engine)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
-    compileOnly(platform(libs.bom.configurate.yaml))
+    compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供
     compileOnly(platform(libs.bom.configurate.gson))
     compileOnly(platform(libs.bom.configurate.extra.kotlin))
     compileOnly(platform(libs.bom.configurate.extra.dfu8))
     implementation(platform(libs.bom.creative))
     implementation(platform(libs.bom.cloud.paper))
     implementation(platform(libs.bom.cloud.kotlin))
-    compileOnly(platform(libs.bom.invui)) { // 由自定义的 classloader 加载
+    compileOnly(platform(libs.bom.invui)) /* 由自定义的 classloader 加载 */ {
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
@@ -67,35 +68,21 @@ dependencies {
     testImplementation(project(":wakame-api"))
     testImplementation(project(":wakame-common"))
     testImplementation(project(":wakame-mixin"))
-    testImplementation(libs.logback.classic)
     testImplementation(libs.mockk)
+    testImplementation(libs.logback.classic)
+    testImplementation(platform(local.koin.bom)) // koin 的 junit5 模块要求这个必须出现在 testRuntime
+    testImplementation(local.koin.core)
     testImplementation(local.koin.test.junit5)
-}
-
-tasks {
-    shadowJar {
-        val shadedPattern = "cc.mewcraft.wakame.external."
-        relocate("com.github.benmanes.caffeine.cache", shadedPattern + "caffeine")
-        relocate("org.koin", shadedPattern + "koin")
-        // relocate("team.unnamed.creative", "cc.mewcraft.wakame.external.resourcepack")
-        // relocate("team.unnamed.hephaestus", "cc.mewcraft.wakame.external.modelengine")
-        // relocate("com.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.api")
-        // relocate("io.github.retrooper.packetevents", "cc.mewcraft.wakame.external.packetevents.impl")
-
-        // cloud
-        // relocate("org.incendo.cloud", "cc.mewcraft.wakame.external.cloud") // We don't relocate cloud itself in this example, but you still should
-
-        // cloud & configurate dependency
-        // relocate("io.leangen.geantyref", "cc.mewcraft.wakame.external.geantyref")
-
-        // cloud-paper dependencies
-        // relocate("xyz.jpenilla.reflectionremapper", "cc.mewcraft.wakame.external.reflectionremapper")
-        // relocate("net.fabricmc.mappingio", "cc.mewcraft.wakame.external.mappingio")
-
-        // invui
-        // relocate("xyz.xenondevs.invui", "cc.mewcraft.wakame.external.invui")
-        // relocate("xyz.xenondevs.inventoryaccess", "cc.mewcraft.wakame.external.invui.inventoryaccess")
-    }
+    testImplementation(local.shadow.bukkit)
+    testImplementation(local.commons.collections)
+    testImplementation(local.commons.gson)
+    testImplementation(local.commons.provider)
+    testImplementation(local.commons.reflection)
+    testImplementation(local.commons.tuple)
+    testImplementation(platform(libs.bom.configurate.yaml))
+    testImplementation(platform(libs.bom.configurate.gson))
+    testImplementation(platform(libs.bom.configurate.extra.kotlin))
+    testImplementation(platform(libs.bom.configurate.extra.dfu8))
 }
 
 sourceSets {

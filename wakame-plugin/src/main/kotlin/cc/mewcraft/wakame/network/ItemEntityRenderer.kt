@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.rarity.GlowColor
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
-import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import cc.mewcraft.wakame.util.connection
 import cc.mewcraft.wakame.util.item.itemName
 import io.papermc.paper.adventure.PaperAdventure

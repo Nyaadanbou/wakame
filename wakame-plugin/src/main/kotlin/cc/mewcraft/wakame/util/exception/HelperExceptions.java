@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.exception;
 
-import cc.mewcraft.wakame.KoishBootstrapperKt;
+import cc.mewcraft.wakame.KoishLoggerProviderKt;
 import cc.mewcraft.wakame.util.event.Events;
 import cc.mewcraft.wakame.util.exception.events.HelperExceptionEvent;
 import cc.mewcraft.wakame.util.exception.types.EventHandlerException;
@@ -48,7 +48,7 @@ public final class HelperExceptions {
 
     private static void log(InternalException exception) {
         // print to logger
-        KoishBootstrapperKt.getLogger().error(exception.getMessage(), exception);
+        KoishLoggerProviderKt.getLogger().error(exception.getMessage(), exception);
 
         // call event
         AtomicBoolean firing = NOT_TODAY_STACK_OVERFLOW_EXCEPTION.get();

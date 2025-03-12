@@ -45,20 +45,6 @@ tasks {
     assemble {
         dependsOn(shadowJar)
     }
-    shadowJar {
-        archiveClassifier.set("shaded")
-        dependencies {
-            exclude("about.html")
-            exclude("META-INF/licenses/**")
-            exclude("META-INF/services/**")
-            exclude("META-INF/LICENSE")
-            exclude("META-INF/LICENSE.txt")
-            exclude("META-INF/NOTICE")
-            exclude("META-INF/NOTICE.txt")
-            exclude("META-INF/maven/**")
-            exclude("META-INF/versions/**")
-        }
-    }
     test {
         // suppress Java agent warning
         jvmArgs("-XX:+EnableDynamicAgentLoading")
@@ -66,6 +52,9 @@ tasks {
         jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
         // use JUnit 5
         useJUnitPlatform()
+    }
+    shadowJar {
+        configure()
     }
 }
 

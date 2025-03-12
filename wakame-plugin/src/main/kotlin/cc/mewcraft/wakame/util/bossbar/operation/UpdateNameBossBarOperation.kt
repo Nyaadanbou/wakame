@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util.bossbar.operation
 
-import cc.mewcraft.wakame.util.component.adventure.toAdventureComponent
-import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.adventure.toAdventureComponent
+import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import net.kyori.adventure.text.Component
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType

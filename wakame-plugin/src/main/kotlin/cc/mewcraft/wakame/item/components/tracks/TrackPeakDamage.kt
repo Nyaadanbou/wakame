@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.components.tracks
 
+import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.data.CompoundTag
