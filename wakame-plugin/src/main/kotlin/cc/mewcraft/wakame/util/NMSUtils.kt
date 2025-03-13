@@ -2,9 +2,19 @@
 
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.SERVER
+import com.google.common.collect.MapMaker
 import io.netty.buffer.Unpooled
 import net.kyori.adventure.key.Key
-import net.minecraft.core.*
+import net.minecraft.core.DefaultedRegistry
+import net.minecraft.core.Holder
+import net.minecraft.core.HolderGetter
+import net.minecraft.core.MappedRegistry
+import net.minecraft.core.NonNullList
+import net.minecraft.core.RegistrationInfo
+import net.minecraft.core.Registry
+import net.minecraft.core.RegistryAccess
+import net.minecraft.core.WritableRegistry
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.Packet
 import net.minecraft.resources.RegistryOps.RegistryInfoLookup
@@ -303,12 +313,18 @@ fun <E : Any> NonNullList(list: List<E>, default: E? = null): NonNullList<E> {
 }
 
 object NMSUtils {
+    private val ENTITY_ID_CACHE: MutableMap<Int, Entity?> = MapMaker().weakValues().makeMap()
+
     fun getEntity(entityId: Int, world: World? = null): Entity? {
+        return ENTITY_ID_CACHE.computeIfAbsent(entityId) { id -> getEntityByIdWithWorld(id, world) }
+    }
+
+    private fun getEntityByIdWithWorld(entityId: Int, world: World?): Entity? {
         if (world != null) {
-            return world.serverLevel.getEntity(entityId)?.bukkitEntity
+            return world.serverLevel.`moonrise$getEntityLookup`().get(entityId)?.bukkitEntity
         }
-        for (world in Bukkit.getWorlds()) {
-            val entity = world.serverLevel.getEntity(entityId)?.bukkitEntity
+        for (world in SERVER.worlds) {
+            val entity = world.serverLevel.`moonrise$getEntityLookup`().get(entityId)?.bukkitEntity
             if (entity != null) {
                 return entity
             }

@@ -18,12 +18,8 @@ import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
 import cc.mewcraft.wakame.util.connection
-import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.itemName
 import io.papermc.paper.adventure.PaperAdventure
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
 import net.minecraft.ChatFormatting
@@ -60,8 +56,8 @@ internal object ItemEntityRenderer : PacketListener {
     @PacketHandler
     private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val oldData = event.packedItems
-        val item = runBlocking { withContext(Dispatchers.minecraft) { NMSUtils.getEntity(event.id) as? Item } }
-        if (item == null || item.itemStack.wrap() == null)
+        val item = NMSUtils.getEntity(event.id) as? Item
+          if (item == null || item.itemStack.wrap() == null)
             return
         val newData = oldData.toMutableList()
         tryAddCustomNameEntityData(item, newData)
