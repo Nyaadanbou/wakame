@@ -14,9 +14,11 @@ import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
 import com.github.quillraven.fleks.Entity
 
-fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase): Entity {
+fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase, holder: Pair<ItemSlot, NekoStack>?): Entity {
     return Fleks.createEntity {
         it += AbilityArchetypeComponent(archetype)
         it += AbilityComponent(
@@ -30,7 +32,7 @@ fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase): Entity 
         configuration().invoke(this, it)
         it += CastBy(input.castBy.entity)
         it += TargetTo(input.targetTo.entity)
-        HoldBy(input.holdBy)?.let { holdBy -> it += holdBy }
+        HoldBy(holder)?.let { holdBy -> it += holdBy }
         it += TickCountComponent(0)
     }
 }

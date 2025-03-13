@@ -103,14 +103,22 @@ data class PlayerAbility(
     val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    fun record(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
+    fun record(caster: Player, target: KoishEntity?, holder: Pair<ItemSlot, NekoStack>) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
             trigger(trigger)
             manaCost(manaCost)
-            holdBy(holdBy)
         }
-        instance.record(input)
+        instance.record(input, holder)
+    }
+
+    fun cast(caster: Player, target: KoishEntity?) {
+        val target = target ?: caster.koishify()
+        val input = abilityInput(caster.koishify(), target) {
+            trigger(trigger)
+            manaCost(manaCost)
+        }
+        instance.cast(input)
     }
 
     fun saveNbt(): CompoundTag = CompoundTag {

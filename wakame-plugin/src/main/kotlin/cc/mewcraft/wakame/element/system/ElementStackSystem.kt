@@ -67,7 +67,6 @@ class ElementStackSystem : IteratingSystem(
         }
 
         val effects = elementStackComponent.effects.int2ObjectEntrySet().iterator()
-//        val effects = mapOf(4 to KoishRegistries.ABILITY.getOrThrow("melee/blink")).iterator()
         val abilityInput = abilityInput(entity[CastBy].caster, entity[TargetTo].target)
         while (effects.hasNext()) {
             val (amount, abilities) = effects.next()
@@ -76,7 +75,7 @@ class ElementStackSystem : IteratingSystem(
             if (currentAmount <= amount)
                 continue
             for (ability in abilities) {
-                ability.value.castNow(abilityInput)
+                ability.value.cast(abilityInput)
             }
             elementStackComponent.triggeredLevels.add(amount)
         }

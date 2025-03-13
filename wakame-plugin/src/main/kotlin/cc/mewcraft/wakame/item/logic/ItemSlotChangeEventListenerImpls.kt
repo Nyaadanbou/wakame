@@ -204,7 +204,7 @@ internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
         user.combo.reset()
     }
 
-    private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
-        ability.record(player, null, holdBy)
+    private fun recordAbility(player: Player, ability: PlayerAbility, holder: Pair<ItemSlot, NekoStack>) {
+        ability.record(player, null, holder)
     }
 }

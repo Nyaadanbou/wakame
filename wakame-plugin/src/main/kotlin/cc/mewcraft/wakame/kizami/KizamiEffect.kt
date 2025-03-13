@@ -57,7 +57,7 @@ internal class KizamiEffectPlayerAbility(
     override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
 
     override fun apply(user: User<*>) {
-        ability.record(user.player(), null, null)
+        ability.cast(user.player(), null)
     }
 
     override fun remove(user: User<*>) {

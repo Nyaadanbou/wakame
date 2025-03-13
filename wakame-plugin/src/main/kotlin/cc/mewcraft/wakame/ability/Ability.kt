@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
@@ -46,15 +48,18 @@ abstract class Ability(
 
     /**
      * 使用 [input] 记录技能的信息到 ECS 中.
+     *
+     * @param holder 当使用 [AbilityInput.castBy] 获取特定槽位的 [ItemSlot.getItem] 不为对应的 [NekoStack] 时
+     *        会将技能的信息从 ECS 中移除.
      */
-    fun record(input: AbilityInput) {
-        val abilityEntity = createAbilityEntity(input, StatePhase.IDLE)
+    fun record(input: AbilityInput, holder: Pair<ItemSlot, NekoStack>) {
+        val abilityEntity = createAbilityEntity(input, StatePhase.IDLE, holder)
         val castByEntity = input.castBy
         castByEntity[AbilityContainer][archetype] = abilityEntity
     }
 
-    fun castNow(input: AbilityInput) {
-        val abilityEntity = createAbilityEntity(input, StatePhase.CAST_POINT)
+    fun cast(input: AbilityInput) {
+        val abilityEntity = createAbilityEntity(input, StatePhase.CAST_POINT, null)
         val castByEntity = input.castBy
         castByEntity[AbilityContainer][archetype] = abilityEntity
     }
