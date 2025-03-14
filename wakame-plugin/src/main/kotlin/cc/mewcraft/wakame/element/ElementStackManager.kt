@@ -56,6 +56,9 @@ object ElementStackManager {
      */
     fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity, caster: KoishEntity?) {
         require(amount > 0) { "Amount must be greater than 0" }
+        val stackEffect = element.value.stackEffect
+        if (stackEffect == null)
+            return
         if (containsElementStack(target, element)) {
             addElementStack(target, element, amount)
             return
@@ -70,21 +73,20 @@ object ElementStackManager {
             it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent(0)
-            val stackEffect = element.value.stackEffect
-            it += if (stackEffect != null) {
-                ElementStackComponent(
-                    effects = stackEffect.stages.associate { it.amount to it.abilities }.toMap(Int2ObjectOpenHashMap()),
-                    maxAmount = stackEffect.maxAmount
-                )
-            } else {
-                ElementStackComponent(Int2ObjectOpenHashMap())
-            }
+            it += ElementStackComponent(
+                effects = stackEffect.stages.associate { it.amount to it.abilities }.toMap(Int2ObjectOpenHashMap()),
+                maxAmount = stackEffect.maxAmount,
+                disappearTime = stackEffect.disappearTime,
+            )
         }
         target[ElementStackContainer][element] = elementStackEntity
     }
 
     fun containsElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>): Boolean {
-        return element in entity[ElementStackContainer]
+        if (!entity.contains(ElementStackContainer))
+            return false
+        val elementEntity = entity[ElementStackContainer][element]
+        return elementEntity != null
     }
 
     private fun addElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>, amount: Int) = with(Fleks.world) {

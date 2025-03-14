@@ -12,6 +12,9 @@ data class StackEffect(
     @Setting(value = "max_amount")
     val maxAmount: Int,
     @Required
+    @Setting(value = "disappear_time")
+    val disappearTime: Int,
+    @Required
     val stages: List<StackEffectStage>
 )
 

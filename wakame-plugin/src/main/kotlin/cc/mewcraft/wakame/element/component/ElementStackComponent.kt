@@ -8,13 +8,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.ints.IntArraySet
 
 data class ElementStackComponent(
+    var maxAmount: Int,
+    var disappearTime: Int,
     val effects: Int2ObjectOpenHashMap<List<RegistryEntry<Ability>>>,
-    var amount: Int = 1,
-    var maxAmount: Int = 10,
-    var disappearTick: Int = 100,
-    val triggeredLevels: IntArraySet = IntArraySet()
 ) : Component<ElementStackComponent> {
     companion object : ComponentType<ElementStackComponent>()
 
     override fun type(): ComponentType<ElementStackComponent> = ElementStackComponent
+
+    var amount: Int = 1
+    val triggeredLevels: IntArraySet = IntArraySet()
 }

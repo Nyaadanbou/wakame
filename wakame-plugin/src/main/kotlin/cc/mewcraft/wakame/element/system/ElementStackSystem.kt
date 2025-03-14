@@ -56,7 +56,7 @@ class ElementStackSystem : IteratingSystem(
         }
 
         // 如果 tickCount 达到设置好的时间, 移除异常效果.
-        if (tickCountComponent.tick >= elementStackComponent.disappearTick) {
+        if (tickCountComponent.tick >= elementStackComponent.disappearTime) {
             removeEntity(entity, target)
         }
 
@@ -72,7 +72,7 @@ class ElementStackSystem : IteratingSystem(
             val (amount, abilities) = effects.next()
             if (elementStackComponent.triggeredLevels.contains(amount))
                 continue
-            if (currentAmount <= amount)
+            if (currentAmount < amount)
                 continue
             for (ability in abilities) {
                 ability.value.cast(abilityInput)
