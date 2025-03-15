@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item2
+package cc.mewcraft.wakame.item2.config.property.impl
 
 import net.kyori.examination.Examinable
 import org.bukkit.Material

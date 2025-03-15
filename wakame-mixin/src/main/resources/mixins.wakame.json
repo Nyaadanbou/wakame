@@ -19,7 +19,6 @@
     "MixinItemStackInfo",
     "MixinItemStackOptionalStreamCodec",
     "MixinLootPoolEntries",
-    "MixinPatchedDataComponentMap",
     "MixinPlayerInventory",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",

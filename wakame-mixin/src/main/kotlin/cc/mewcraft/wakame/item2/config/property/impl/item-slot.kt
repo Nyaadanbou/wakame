@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.item2
+package cc.mewcraft.wakame.item2.config.property.impl
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces

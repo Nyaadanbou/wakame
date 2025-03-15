@@ -82,10 +82,20 @@ fun <T> MojangStack.getData(type: ItemDataType<out T>): T? = dataContainer?.get(
 fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = dataContainer?.getOrDefault(type, fallback)
 
 // TODO #350: 考虑原版套皮物品
-fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? = dataContainer?.set(type, value)
+fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
+    val builder = dataContainer?.toBuilder() ?: return null
+    val oldValue = builder.set(type, value)
+    set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+    return oldValue
+}
 
 // TODO #350: 考虑原版套皮物品
-fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? = dataContainer?.remove(type)
+fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
+    val builder = dataContainer?.toBuilder() ?: return null
+    val oldValue = builder.remove(type)
+    set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+    return oldValue
+}
 
 // ------------------
 // 用于访问 ItemStack 上的自定义数据
