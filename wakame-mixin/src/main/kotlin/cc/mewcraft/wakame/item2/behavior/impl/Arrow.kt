@@ -14,11 +14,11 @@ import org.bukkit.inventory.ItemStack
 object Arrow : ItemBehavior {
 
     /**
-     * 实现 [cc.mewcraft.wakame.item2.config.property.impl.Arrow] 组件的下列功能:
-     * 穿透
-     * 拾取
-     * 箭矢着火时间
-     * 发光时间
+     * 实现 [cc.mewcraft.wakame.item2.config.property.impl.Arrow] 的下列功能:
+     * - 穿透
+     * - 拾取
+     * - 箭矢着火时间
+     * - 发光时间
      */
     override fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) {
         if (projectile !is AbstractArrow) return
@@ -35,7 +35,7 @@ object Arrow : ItemBehavior {
     }
 
     /**
-     * 实现 [cc.mewcraft.wakame.item2.config.property.impl.Arrow] 组件的下列功能:
+     * 实现 [cc.mewcraft.wakame.item2.config.property.impl.Arrow] 的下列功能:
      * - 命中着火时间
      * - 命中冰冻时间
      */

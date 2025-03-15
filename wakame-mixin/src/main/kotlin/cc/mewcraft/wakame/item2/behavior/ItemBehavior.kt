@@ -16,11 +16,6 @@ import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 /**
- * 代表一个包含 [ItemBehavior] 的类型.
- */
-sealed interface ItemBehaviorHolder
-
-/**
  * 代表一个“物品交互结果”的封装.
  *
  * 物品交互结果, 即玩家使用该物品与世界发生了交互后所发生的结果.
@@ -44,7 +39,7 @@ sealed interface ItemBehaviorHolder
  * 然后服务端会一个一个根据地图存档里的数据, 将背包里的物品一个一个填充回去.
  * 也就是说, 玩家登录时对于背包里的每个非空气物品都会触发一次该事件.
  */
-interface ItemBehavior : ItemBehaviorHolder {
+interface ItemBehavior {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 

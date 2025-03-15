@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
  *
  * 你也可以俗称该类为“物品基底”.
  */
-interface ItemBase : Examinable {
+interface ItemBase2 : Examinable {
     /**
      * 该物品基底的类型 [Material].
      */
@@ -33,22 +33,22 @@ interface ItemBase : Examinable {
     fun createItemStack(): ItemStack
 
     /**
-     * 包含了 [ItemBase] 的常量.
+     * 包含了 [ItemBase2] 的常量.
      */
     companion object {
-        private val NOP: ItemBase = object : ItemBase {
+        private val NOP: ItemBase2 = object : ItemBase2 {
             override val type: Material = Material.SHULKER_SHELL
             override val format: String = ""
             override fun createItemStack(): ItemStack = ItemStack.of(type)
         }
-        private val EMPTY: ItemBase = object : ItemBase {
+        private val EMPTY: ItemBase2 = object : ItemBase2 {
             override val type: Material = Material.AIR
             override val format: String = ""
             override fun createItemStack(): ItemStack = ItemStack.empty()
         }
 
-        fun nop(): ItemBase = NOP
+        fun nop(): ItemBase2 = NOP
 
-        fun empty(): ItemBase = EMPTY
+        fun empty(): ItemBase2 = EMPTY
     }
 }

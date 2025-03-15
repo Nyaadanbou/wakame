@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.item2.config.property
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import io.leangen.geantyref.TypeToken
+import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
@@ -14,8 +16,9 @@ interface ItemPropertyType<T> {
         // FIXME #350:
         //  Identifier <-> GlobalPropertyType 之间转换,
         //  所以应该从 Registry 生成一个 TypeSerializer
-        @JvmField
-        val SERIALIZER: TypeSerializer<ItemPropertyType<*>> = TODO()
+        fun makeSerializer(): ScalarSerializer<ItemPropertyType<*>> {
+            return KoishRegistries2.ITEM_PROPERTY_TYPE.valueByNameTypeSerializer()
+        }
 
         fun <T> builder(typeToken: TypeToken<T>): Builder<T> {
             return Builder(typeToken)

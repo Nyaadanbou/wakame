@@ -6,6 +6,7 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -73,7 +74,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
     val size: Int
 
     /**
-     * 判断容器是否为空.
+     * 判断该容器是否为空.
      */
     fun isEmpty(): Boolean
 
@@ -83,7 +84,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
     fun <T> get(type: ItemDataType<out T>): T?
 
     /**
-     * 判断容器里是否有指定类型的数据.
+     * 判断该容器是否有指定类型的数据.
      */
     fun has(type: ItemDataType<*>): Boolean
 
@@ -94,9 +95,17 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
     /**
      * 获取一个可以遍历该容器内所有数据的迭代器.
-     * 该迭代器是“快速迭代器”, 即 [Map.Entry] 实例会在整个迭代过程中复用.
+     * 该迭代器是“快速迭代器”, 即同一个 [Map.Entry] 实例会在整个迭代过程中复用.
      */
     fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>>
+
+    /**
+     * 快速遍历该容器内的所有数据.
+     * 该迭代器是“快速迭代器”, 即同一个 [Map.Entry] 实例会在整个迭代过程中复用.
+     */
+    fun fastForEach(action: (Map.Entry<ItemDataType<*>, Any>) -> Unit) {
+        fastIterator().forEach(action)
+    }
 
     /**
      * 创建一个该容器的副本.
@@ -104,8 +113,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
     fun copy(): ItemDataContainer
 
     /**
-     * 基于该容器创建一个 [Builder] 用于修改数据.
-     * 当然, 你无法通过此函数来修改 `this` 的数据.
+     * 基于该容器创建一个 [Builder], 可用来创建一个修改后的 [ItemDataContainer].
      */
     fun toBuilder(): Builder
 
@@ -143,15 +151,11 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
 private open class ItemDataContainerImpl(
-    private var data: Reference2ObjectOpenHashMap<ItemDataType<*>, Any>,
-    private var copyOnWrite: Boolean,
+    @JvmField
+    var data: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
+    @JvmField
+    var copyOnWrite: Boolean,
 ) : ItemDataContainer, ItemDataContainer.Builder {
-
-    /**
-     * 创建空的容器.
-     */
-    constructor() : this(Reference2ObjectOpenHashMap(), copyOnWrite = true)
-
     override val types: Set<ItemDataType<*>>
         get() = data.keys
 
@@ -220,14 +224,14 @@ private open class ItemDataContainerImpl(
             val data = Reference2ObjectOpenHashMap<ItemDataType<*>, Any>()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
-                // 该 node key 所对应的 type 必须存在
-                val dataType = ItemDataTypes.getType(nodeKey) ?: run {
+                // 注意: 该 node key 所对应的 type 必须存在
+                val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: run {
                     LOGGER.error("Unknown ItemDataType: '$nodeKey'")
                     continue
                 }
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
                 val dataValue = itemDataNode.get(dataType.typeToken) ?: run {
-                    LOGGER.error("Failed to deserialize $dataType")
+                    LOGGER.error("Failed to deserialize '$dataType'")
                     continue
                 }
                 data[dataType] = dataValue
@@ -237,13 +241,21 @@ private open class ItemDataContainerImpl(
 
         override fun serialize(type: Type, obj: ItemDataContainer?, node: ConfigurationNode) {
             if (obj == null) return
-            require(obj is ItemDataContainerImpl) { "Only expects ${ItemDataContainerImpl::class}" }
-            obj.data.reference2ObjectEntrySet().fastForEach { (type, value) ->
-                val typeId = ItemDataTypes.getId(type)
-                val dataNode = node.node(typeId)
-                dataNode.set(value)
+            if (obj !is ItemDataContainerImpl) {
+                LOGGER.error("Only expects ${ItemDataContainerImpl::class}, but got ${obj::class}")
+                return
+            }
+
+            val iter = obj.data.reference2ObjectEntrySet().fastIterator()
+            while (iter.hasNext()) {
+                val (typex, valuex) = iter.next()
+                val typeId = KoishRegistries2.ITEM_DATA_TYPE.getId(typex) ?: run {
+                    LOGGER.error("Unknown ItemDataType: $typex")
+                    continue
+                }
+                val dataNode = node.node(typeId.asString())
+                dataNode.set(valuex)
             }
         }
     }
-
 }

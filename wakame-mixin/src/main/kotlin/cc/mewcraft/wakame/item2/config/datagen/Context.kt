@@ -1,4 +1,11 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-// FIXME: 这接口放在这只能当作标记作用了
-class Context
+import kotlin.random.Random
+
+// FIXME #350: 补完
+class Context {
+
+    val random: Random = Random
+    var level: Int = 1
+
+}

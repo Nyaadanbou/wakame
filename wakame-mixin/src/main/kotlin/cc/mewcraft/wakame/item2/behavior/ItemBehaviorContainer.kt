@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer.Builder
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
@@ -19,24 +18,24 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
          * 获取一个空的 [ItemBehaviorContainer].
          */
         fun empty(): ItemBehaviorContainer {
-            return Empty
+            return EmptyItemBehaviorContainer
         }
 
         /**
          * 获取一个 builder.
          */
         fun build(block: Builder.() -> Unit): ItemBehaviorContainer {
-            return ItemBehaviorContainerBuilderImpl().apply(block).build()
+            return ItemBehaviorContainerImpl().apply(block).build()
         }
     }
 
     /**
-     * Checks whether this [KoishItem] has specific [ItemBehavior].
+     * 检查该容器是否有指定的 [ItemBehavior].
      */
     fun has(type: ItemBehavior): Boolean
 
     /**
-     * [ItemBehaviorContainer] 的 builder, 用于构建一个 [ItemBehaviorContainer].
+     * [ItemBehaviorContainer] 的生成器, 用于构建一个 [ItemBehaviorContainer].
      */
     interface Builder : Examinable {
         /**
@@ -50,46 +49,33 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
         fun build(): ItemBehaviorContainer
     }
 
-    private object Empty : ItemBehaviorContainer {
-
-        private val empty = emptyList<ItemBehavior>()
-        override fun has(type: ItemBehavior): Boolean = false
-        override fun iterator(): Iterator<ItemBehavior> = empty.iterator()
-        override fun toString(): String = toSimpleString()
-
-    }
-
 }
 
-private class ItemBehaviorContainerImpl(
-    data: Set<ItemBehavior>,
-) : ItemBehaviorContainer {
-    private val data: ReferenceArraySet<ItemBehavior> = ReferenceArraySet(data)
-
-    override fun has(type: ItemBehavior): Boolean {
-        return data.contains(type)
-    }
-
-    override fun iterator(): Iterator<ItemBehavior> {
-        return this.data.iterator()
-    }
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("data", data)
-    )
-
+private data object EmptyItemBehaviorContainer : ItemBehaviorContainer {
+    private val empty = emptyList<ItemBehavior>()
+    override fun has(type: ItemBehavior): Boolean = false
+    override fun iterator(): Iterator<ItemBehavior> = empty.iterator()
     override fun toString(): String = toSimpleString()
 }
 
-private class ItemBehaviorContainerBuilderImpl : Builder {
-    private val data: ReferenceArraySet<ItemBehavior> = ReferenceArraySet()
+// 该 class 同时实现了 ItemBehaviorContainer 和 ItemBehaviorContainer.Builder
+private class ItemBehaviorContainerImpl(
+    private val data: ReferenceArraySet<ItemBehavior> = ReferenceArraySet(),
+) : ItemBehaviorContainer, Builder {
+    override fun has(type: ItemBehavior): Boolean {
+        return data.contains(type)
+    }
 
     override fun put(behavior: ItemBehavior) {
         data.add(behavior)
     }
 
     override fun build(): ItemBehaviorContainer {
-        return ItemBehaviorContainerImpl(data)
+        return this
+    }
+
+    override fun iterator(): Iterator<ItemBehavior> {
+        return this.data.iterator()
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
