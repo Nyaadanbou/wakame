@@ -15,21 +15,28 @@ fun ShadowJar.configure() {
         exclude("META-INF/NOTICE.txt")
     }
 
-    val pattern = "cc.mewcraft.wakame.shaded."
+    val relocatePrefix = "cc.mewcraft.wakame.shaded."
+
+    fun relocate0(pattern: String) {
+        relocate(pattern, relocatePrefix + pattern)
+    }
+
+    // fleks
+    relocate0("com.github.quillraven.fleks")
     // configurate
-    relocate("org.spongepowered.configurate", pattern + "org.spongepowered.configurate")
+    relocate0("org.spongepowered.configurate")
     // commons
-    relocate("xyz.xenondevs.commons", pattern + "xyz.xenondevs.commons")
+    relocate0("xyz.xenondevs.commons")
     // koin
-    relocate("org.koin", pattern + "org.koin")
+    relocate0("org.koin")
     // creative
-    relocate("team.unnamed.creative", pattern + "team.unnamed.creative")
+    relocate0("team.unnamed.creative")
     // hephaestus
-    relocate("team.unnamed.hephaestus", pattern + "team.unnamed.hephaestus")
+    relocate0("team.unnamed.hephaestus")
     // cloud
-    relocate("org.incendo.cloud", pattern + "org.incendo.cloud")
+    relocate0("org.incendo.cloud")
     // other
-    relocate("io.leangen.geantyref", pattern + "io.leangen.geantyref")
-    relocate("xyz.jpenilla.reflectionremapper", pattern + "xyz.jpenilla.reflectionremapper")
-    relocate("net.fabricmc.mappingio", pattern + "net.fabricmc.mappingio")
+    relocate0("io.leangen.geantyref")
+    relocate0("xyz.jpenilla.reflectionremapper")
+    relocate0("net.fabricmc.mappingio")
 }

@@ -42,7 +42,7 @@ dependencies {
     compileOnly(local.commons.provider)
     compileOnly(local.commons.reflection)
     compileOnly(local.commons.tuple)
-    implementation(local.fleks) {
+    compileOnly(local.fleks) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
