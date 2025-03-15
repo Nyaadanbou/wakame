@@ -34,6 +34,7 @@ internal val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
 internal lateinit var BOOTSTRAPPER: KoishBootstrapper private set
 internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
 
+lateinit var KOISH_AUTHORS: List<String> private set
 lateinit var KOISH_NAME: String private set
 lateinit var KOISH_VERSION: Version private set
 lateinit var KOISH_JAR: Path private set
@@ -65,6 +66,7 @@ internal class KoishBootstrapper : PluginBootstrap {
 
         LIFECYCLE_MANAGER = context.lifecycleManager
         KoishLoggerProvider.set(context.logger)
+        KOISH_AUTHORS = context.pluginMeta.authors
         KOISH_NAME = context.pluginMeta.name
         KOISH_VERSION = Version(context.pluginMeta.version)
         KOISH_JAR = context.pluginSource
