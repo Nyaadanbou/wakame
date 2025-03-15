@@ -14,9 +14,7 @@ import cc.mewcraft.wakame.util.ServerUtils
 import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.registerEvents
 import kotlinx.coroutines.cancel
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
-import org.bukkit.Server
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.stopKoin
 import xyz.xenondevs.invui.InvUI
@@ -25,9 +23,6 @@ import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
 
-internal val MM: MiniMessage = MiniMessage.miniMessage()
-internal val SERVER: Server
-    get() = Bukkit.getServer()
 internal var PLUGIN_READY: Boolean = false
     private set
 

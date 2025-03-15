@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.registry2.RegistryKey.Companion.of
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap

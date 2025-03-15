@@ -2,18 +2,12 @@ package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
-import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
-import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.BufferedReader
 import java.io.BufferedWriter
-import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 
 // Builder extensions
@@ -116,52 +110,3 @@ internal fun YamlConfigurationLoader.Builder.withDefaultTypeSerializers(): YamlC
 internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
     return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultTypeSerializers()
 }
-
-/**
- * Creates a basic builder of configuration loader.
- */
-@Deprecated("Deprecated")
-internal fun buildYamlLoader(
-    builder: TypeSerializerCollection.Builder.() -> Unit = {},
-): YamlConfigurationLoader.Builder {
-    return YamlConfigurationLoader.builder()
-        .withDefaultEverything()
-        .defaultOptions { options ->
-            options.serializers {
-                it.builder()
-            }
-        }
-}
-
-internal inline fun <reified T> TypeSerializerCollection.Builder.register(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
-    this.register({ javaTypeOf<T>() == it }, serializer)
-
-@Deprecated("Deprecated", replaceWith = ReplaceWith("this.register(serializer)"))
-internal inline fun <reified T> TypeSerializerCollection.Builder.kregister(serializer: TypeSerializer<T>): TypeSerializerCollection.Builder =
-    this.register(serializer)
-
-
-// Node extensions
-
-
-internal inline fun <reified T> ConfigurationNode.require(): T =
-    this.require(typeOf<T>())
-
-internal fun <T : Any> ConfigurationNode.require(clazz: KClass<T>): T =
-    this.get(clazz) ?: throw NoSuchElementException("Can't parse value of type '${clazz}' at '[${path().joinToString()}]'")
-
-internal fun <T> ConfigurationNode.require(type: KType): T =
-    this.get(type) as T ?: throw NoSuchElementException("Can't parse value of type '${type}' at '[${path().joinToString()}]'")
-
-@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>()"))
-internal inline fun <reified T> ConfigurationNode.krequire(): T =
-    this.require(typeOf<T>())
-
-@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>(clazz)"))
-internal fun <T : Any> ConfigurationNode.krequire(clazz: KClass<T>): T =
-    this.require(clazz)
-
-@Deprecated("Deprecated", replaceWith = ReplaceWith("this.require<T>(type)"))
-internal fun <T> ConfigurationNode.krequire(type: KType): T =
-    this.require(type)
-

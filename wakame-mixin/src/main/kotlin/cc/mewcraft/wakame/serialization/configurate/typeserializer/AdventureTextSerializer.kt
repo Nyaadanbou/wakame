@@ -11,7 +11,7 @@ import java.lang.reflect.Type
 import java.util.function.Predicate
 
 
-internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
+/*internal*/ object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
         val message = obj.toString().replace("§", "")
         return MM.deserialize(message)
@@ -22,7 +22,7 @@ internal object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf())
     }
 }
 
-internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
+/*internal*/ object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Style {
         return ComponentSerializer.deserialize(type, obj).style()
     }
@@ -33,7 +33,7 @@ internal object StyleSerializer : ScalarSerializer<Style>(typeTokenOf()) {
     }
 }
 
-internal object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf()) {
+/*internal*/ object StyleBuilderApplicableSerializer : ScalarSerializer<Array<StyleBuilderApplicable>>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Array<StyleBuilderApplicable> {
         val component = ComponentSerializer.deserialize(type, obj)
         val styleList = ArrayList<StyleBuilderApplicable>()

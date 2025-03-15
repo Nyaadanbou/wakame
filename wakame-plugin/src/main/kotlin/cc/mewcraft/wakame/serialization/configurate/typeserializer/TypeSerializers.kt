@@ -7,8 +7,6 @@ import cc.mewcraft.wakame.molang.EvaluableSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -20,6 +18,8 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * [org.spongepowered.configurate.loader.ConfigurationLoader] 中注册.
  */
 val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
+    // Kotlin Object
+    .register(UnitSerializer)
     // Koish Object
     .register(AttributeModifierSerializer)
     .register(RandomizedValueSerializer)
@@ -60,28 +60,3 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
     .register(KoishRegistries.TRIGGER.valueByNameTypeSerializer())
     .build()
-
-object TypeSerializers {
-
-    /**
-     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
-     */
-    inline fun <reified K : Any, reified V : Any> dispatching(
-        noinline typeInfoLookup: (V) -> K,
-        noinline decodingLookup: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
-        return dispatching("type", typeInfoLookup, decodingLookup)
-    }
-
-    /**
-     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
-     */
-    inline fun <reified K : Any, reified V : Any> dispatching(
-        typeKey: String,
-        noinline typeInfoLookup: (V) -> K,
-        noinline decodingLookup: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
-        return DispatchingTypeSerializer(typeKey, typeTokenOf(), typeInfoLookup, decodingLookup)
-    }
-
-}

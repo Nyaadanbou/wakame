@@ -6,16 +6,10 @@ import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import it.unimi.dsi.fastutil.objects.ObjectList
-import it.unimi.dsi.fastutil.objects.Reference2IntMap
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import java.util.IdentityHashMap
+import java.util.*
 import kotlin.random.Random
 
 open class SimpleRegistry<T>(

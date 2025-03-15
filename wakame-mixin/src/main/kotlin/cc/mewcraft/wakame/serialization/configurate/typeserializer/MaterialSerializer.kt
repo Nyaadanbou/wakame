@@ -7,7 +7,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-internal object MaterialSerializer : ScalarSerializer<Material>(typeTokenOf()) {
+/*internal*/ object MaterialSerializer : ScalarSerializer<Material>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Material {
         return Material.matchMaterial(obj.toString()) ?: throw SerializationException(type, "No such material type: '$obj'")
     }

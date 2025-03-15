@@ -17,11 +17,11 @@ import java.lang.reflect.Type
 import java.util.function.Predicate
 
 //<editor-fold desc="Koish Registry">
-internal inline fun <reified T : Any> Registry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
+/*internal*/ inline fun <reified T : Any> Registry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
     return RegistryValueEntrySerializer(this, typeTokenOf())
 }
 
-internal inline fun <reified T : Any> Registry<T>.holderByNameTypeSerializer(): ScalarSerializer<RegistryEntry<T>> {
+/*internal*/ inline fun <reified T : Any> Registry<T>.holderByNameTypeSerializer(): ScalarSerializer<RegistryEntry<T>> {
     return RegistryHolderEntrySerializer(this, typeTokenOf())
 }
 
@@ -54,10 +54,11 @@ internal class RegistryHolderEntrySerializer<T : Any>(
 //</editor-fold>
 
 //<editor-fold desc="Paper Registry">
-internal inline fun <reified T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
+/*internal*/ inline fun <reified T : Keyed> RegistryKey<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
     return BukkitRegistryEntryValueSerializer(this, typeTokenOf<T>())
 }
 
+@PublishedApi
 internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
     private val registryKey: RegistryKey<T>, type: TypeToken<T>,
 ) : ScalarSerializer<T>(type) {
@@ -77,10 +78,11 @@ internal class BukkitRegistryEntryValueSerializer<T : Keyed>(
 //</editor-fold>
 
 //<editor-fold desc="Vanilla Registry">
-internal inline fun <reified T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
+/*internal*/ inline fun <reified T : Any> MojangRegistry<T>.valueByNameTypeSerializer(): ScalarSerializer<T> {
     return MojangRegistryValueEntrySerializer(this, typeTokenOf<T>())
 }
 
+@PublishedApi
 internal class MojangRegistryValueEntrySerializer<T : Any>(
     private val registry: MojangRegistry<T>, type: TypeToken<T>,
 ) : ScalarSerializer<T>(type) {

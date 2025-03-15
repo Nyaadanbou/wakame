@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 
-internal object PotionEffectSerializer : TypeSerializer<PotionEffect?> {
+/*internal*/ object PotionEffectSerializer : TypeSerializer<PotionEffect?> {
     override fun deserialize(type: Type, node: ConfigurationNode): PotionEffect? {
         if (node.raw() == null)
             return null
@@ -23,7 +23,7 @@ internal object PotionEffectSerializer : TypeSerializer<PotionEffect?> {
     }
 }
 
-// internal object PotionEffectTypeSerializer : TypeSerializer<PotionEffectType?> {
+// /*internal*/ object PotionEffectTypeSerializer : TypeSerializer<PotionEffectType?> {
 //     override fun deserialize(type: Type, node: ConfigurationNode): PotionEffectType? {
 //         if (node.raw() == null)
 //             return null

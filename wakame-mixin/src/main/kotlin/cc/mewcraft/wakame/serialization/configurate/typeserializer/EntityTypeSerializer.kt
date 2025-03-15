@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-internal object EntityTypeSerializer : ScalarSerializer<EntityType>(typeTokenOf()) {
+/*internal*/ object EntityTypeSerializer : ScalarSerializer<EntityType>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): EntityType {
         return EnumLookup.lookup<EntityType>(obj.toString()).getOrElse {
             LOGGER.error("No such entity type: '$obj', fallback to ARMOR_STAND")
