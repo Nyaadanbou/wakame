@@ -160,11 +160,7 @@ data class DamagePacket(
     val defensePenetrationRate: Double = .0,
 ) {
     /**
-     * 该伤害包的伤害值, 称为"包伤害".
-     * 初始化时会在 [min] 与 [max] 之间随机.
-     *
-     * "包伤害"在伤害包实例化时就已经确定了.
-     * 后续不会变化, 也不应该变化.
+     * 该伤害包的伤害值, 称为"包伤害". 初始化时会在 [min] 与 [max] 之间随机.
      */
     val packetDamage: Double = if (min >= max) {
         max
