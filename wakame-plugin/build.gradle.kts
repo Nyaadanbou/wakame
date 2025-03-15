@@ -43,7 +43,8 @@ dependencies {
     compileOnly(local.commons.reflection)
     compileOnly(local.commons.tuple)
     implementation(local.fleks) {
-        exclude("org.jetbrains")
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
     }
     implementation(libs.mocha)
     implementation(local.snakeyaml.engine)
@@ -68,7 +69,10 @@ dependencies {
     testImplementation(project(":wakame-api"))
     testImplementation(project(":wakame-common"))
     testImplementation(project(":wakame-mixin"))
-    testImplementation(libs.mockk)
+    testImplementation(libs.mockk) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     testImplementation(libs.logback.classic)
     testImplementation(platform(local.koin.bom)) // koin 的 junit5 模块要求这个必须出现在 testRuntime
     testImplementation(local.koin.core)
