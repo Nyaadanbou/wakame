@@ -47,7 +47,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
     implementation(libs.mocha)
-    implementation(local.snakeyaml.engine)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供
