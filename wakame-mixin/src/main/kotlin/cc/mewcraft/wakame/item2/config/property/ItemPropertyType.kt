@@ -7,7 +7,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 /**
  * @param T 数据类型
  */
-interface GlobalPropertyType<T> {
+interface ItemPropertyType<T> {
 
     companion object {
 
@@ -15,7 +15,7 @@ interface GlobalPropertyType<T> {
         //  Identifier <-> GlobalPropertyType 之间转换,
         //  所以应该从 Registry 生成一个 TypeSerializer
         @JvmField
-        val SERIALIZER: TypeSerializer<GlobalPropertyType<*>> = TODO()
+        val SERIALIZER: TypeSerializer<ItemPropertyType<*>> = TODO()
 
         fun <T> builder(typeToken: TypeToken<T>): Builder<T> {
             return Builder(typeToken)
@@ -45,14 +45,14 @@ interface GlobalPropertyType<T> {
             return this
         }
 
-        fun build(): GlobalPropertyType<T> {
+        fun build(): ItemPropertyType<T> {
             return Simple(typeToken, serializers)
         }
 
         private class Simple<T>(
             override val typeToken: TypeToken<T>,
             override val serializers: TypeSerializerCollection?,
-        ) : GlobalPropertyType<T> {
+        ) : ItemPropertyType<T> {
             override fun toString(): String = "Simple(type=${typeToken.type}, serializers=$serializers)"
         }
     }

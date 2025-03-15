@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
-import cc.mewcraft.wakame.item2.config.property.GlobalPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
 import org.bukkit.entity.*
 import org.bukkit.event.entity.ProjectileHitEvent
@@ -24,11 +24,10 @@ object Arrow : ItemBehavior {
         if (projectile !is AbstractArrow) return
         if (projectile is Trident) return
 
-        val arrowProperty = itemstack.getProperty(GlobalPropertyTypes.ARROW) ?: return
+        val arrowProperty = itemstack.getProperty(ItemPropertyTypes.ARROW) ?: return
         projectile.pierceLevel = arrowProperty.pierceLevel
         projectile.pickupStatus = arrowProperty.pickupStatus
         projectile.fireTicks = arrowProperty.fireTicks
-
 
         if (projectile is SpectralArrow) {
             projectile.glowingTicks = arrowProperty.glowTicks
@@ -45,9 +44,9 @@ object Arrow : ItemBehavior {
         if (projectile !is AbstractArrow) return
         if (projectile is Trident) return
 
-        val itemArrow = itemstack.getProperty(GlobalPropertyTypes.ARROW) ?: return
-        if (hitEntity.fireTicks < itemArrow.hitFireTicks) hitEntity.fireTicks = itemArrow.hitFireTicks
-        if (hitEntity.freezeTicks < itemArrow.hitFrozenTicks) hitEntity.freezeTicks = itemArrow.hitFrozenTicks
+        val arrowProperty = itemstack.getProperty(ItemPropertyTypes.ARROW) ?: return
+        if (hitEntity.fireTicks < arrowProperty.hitFireTicks) hitEntity.fireTicks = arrowProperty.hitFireTicks
+        if (hitEntity.freezeTicks < arrowProperty.hitFrozenTicks) hitEntity.freezeTicks = arrowProperty.hitFrozenTicks
     }
 
 }
