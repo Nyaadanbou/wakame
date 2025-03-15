@@ -11,14 +11,14 @@ import java.util.stream.Stream
 /**
  * [Element] 的实现.
  */
-class ElementType(
+class ElementType
+internal constructor(
     override val key: Key,
     override val stringId: String,
     override val integerId: Int,
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,
 ) : Element {
-
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("stringId", stringId),
@@ -28,5 +28,4 @@ class ElementType(
     )
 
     override fun toString(): String = toSimpleString()
-
 }
