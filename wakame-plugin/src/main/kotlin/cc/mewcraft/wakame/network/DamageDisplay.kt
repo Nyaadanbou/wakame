@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
 import cc.mewcraft.wakame.damage.CriticalStrikeState
-import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.AnimationData
@@ -17,7 +16,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.require
@@ -117,7 +115,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
     override fun damageValueText(context: NekoEntityDamageEvent): Component {
         val damageMap = context.getFinalDamageMap()
         val elementType = damageMap.maxWithOrNull(
-            compareBy<Map.Entry<RegistryEntry<ElementType>, Double>> { it.value }
+            compareBy { it.value }
         )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry()
         val damageValueText = MM.deserialize(
             damageValueText,
