@@ -1,55 +1,162 @@
 # 不要修改!
 version: 1
 
-# 元素伤害倍率(或称攻击威力)乘算时机.
-# true - 防御前计算
-# false - 防御后计算
-attack_damage_rate_multiply_before_defense: false
+# 伤害规则相关.
+rules:
+  # 元素伤害倍率(或称攻击威力)乘算时机.
+  # true - 防御前计算
+  # false - 防御后计算
+  attack_damage_rate_multiply_before_defense: false
 
-# 暴击倍率属性乘算时机.
-# true - 防御前计算
-# false - 防御后计算
-critical_strike_power_multiply_before_defense: false
+  # 暴击倍率属性乘算时机.
+  # true - 防御前计算
+  # false - 防御后计算
+  critical_strike_power_multiply_before_defense: false
 
-# 对于某一元素类型, 其最小伤害.
-least_damage: 1.0
+  # 对于某一元素类型, 其伤害计算时, 最终是否四舍五入到整数位.
+  rounding_damage: false
 
-# 对于某一元素类型, 其伤害的取整模式.
-# none - 不取整
-# ceil - 向上取整
-# floor - 向下取整
-# round - 四舍五入
-rounding_mode: none
+  # 对于某一元素类型, 其最小伤害.
+  least_damage: 1.0
 
-# 对于某一元素类型, 其伤害的小数位数.
-# 取整模式为 none 时此配置项无实际效果.
-decimal_places: 0
+  # 对于某一元素类型, 计算其有效防御的公式.
+  #
+  # 可用参数:
+  # 请注意: 下列各属性均为(本元素+通用元素), 不会小于0(属性值为负时会被置零)
+  # q.defense
+  #   受伤者该元素的防御力属性值
+  # q.defense_penetration
+  #   伤害元数据中该元素的防御穿透
+  # q.defense_penetration_rate
+  #   伤害元数据中该元素的防御穿透率
+  valid_defense_formula: "math.max(q.defense - q.defense_penetration, 0.0) * (1.0 - q.defense_penetration_rate)"
 
-# 对于某一元素类型, 计算其有效防御的公式.
-#
-# 可用参数:
-# 请注意: 下列各属性均为(本元素+通用元素), 不会小于0(属性值为负时会被置零)
-# query.defense
-#   受伤者该元素的防御力属性值
-# query.defense_penetration
-#   伤害元数据中该元素的防御穿透
-# query.defense_penetration_rate
-#   伤害元数据中该元素的防御穿透率
-valid_defense_formula: "math.max(query.defense - query.defense_penetration, 0.0) * (1.0 - query.defense_penetration_rate)"
+  # 对于某一元素类型, 计算其防御后伤害的公式.
+  #
+  # 可用参数:
+  # q.original_damage
+  #   原始伤害
+  # q.valid_defense
+  #   受伤者该元素的有效防御
+  damage_after_defense_formula: "math.max(q.original_damage - q.valid_defense, 0.0)"
 
-# 对于某一元素类型, 计算其防御后伤害的公式.
-#
-# 可用参数:
-# query.original_damage
-#   原始伤害
-# query.valid_defense
-#   受伤者该元素的有效防御
-damage_after_defense_formula: "math.max(query.original_damage - query.valid_defense, 0.0)"
+  # 计算拉弓力度的公式.
+  #
+  # 可用参数:
+  # q.use_ticks
+  #   玩家拉弓释放时, 累计长按使用的时间, 单位 tick
+  bow_force_formula: "math.clamp((q.use_ticks * q.use_ticks / 400.0 + q.use_ticks / 10.0) / 3.0, 0.0, 1.0)"
 
-# 计算拉弓力度的公式.
-#
-# 可用参数:
-# query.use_ticks
-#   玩家拉弓释放时, 累计长按使用的时间, 单位 tick
-bow_force_formula: "math.clamp((query.use_ticks * query.use_ticks / 400.0 + query.use_ticks / 10.0) / 3.0, 0.0, 1.0)"
+# 伤害显示相关.
+display:
 
+  # 伤害数值以何种模式显示.
+  # 可用选项: merged, separated
+  mode: separated
+
+  # 模式: separated
+  # 每种元素的伤害单独显示.
+  separated:
+    # 文本展示实体的变换动画.
+    # 列表的元素为单个变换.
+    animations:
+      - delay: 0 # 该动画开始播放前延迟的 tick 数.
+        # 常规状况下该次动画的参数.
+        # 常规动画中的参数未指定时, 将继承默认动画的参数.
+        # default:
+        #   start_interpolation: 0
+        #   interpolation_duration: 0
+        #   translation: [ .0, .0, .0 ]
+        #   scale: [ 1.0, 1.0, 1.0 ]
+        normal:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+        # 正暴击时该次动画的参数.
+        # 暴击动画的参数未指定时, 将继承常规动画参数.
+        positive_critical_strike: {}
+        # 负暴击时该次动画的参数.
+        negative_critical_strike: {}
+
+      - delay: 2
+        normal:
+          interpolation_duration: 5
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 2.5, 2.5, 2.5 ]
+        positive_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+        negative_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+
+      - delay: 8
+        normal:
+          interpolation_duration: 20
+          translation: [ .0, 0.5, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
+
+    # 动画持续的总 tick 数
+    # 即该时长后伤害显示文本不再显示
+    animation_duration: 32
+
+    # 伤害显示总文本.
+    final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+
+    # 暴击状态风格.
+    critical_strike_style:
+      positive: <bold>
+      negative: <bold>
+      none: ""
+
+    # 暴击状态文本.
+    critical_strike_text:
+      positive: <color:#FF9900>💥</color:#FF9900>
+      negative: <color:#02AFFF>💥</color:#02AFFF>
+      none: ""
+
+    # 元素文本.
+    # 支持占位符:
+    # - <element_name> 元素名
+    # - <element_style> 元素风格
+    # - <damage_value> 该元素类型具体伤害值
+    damage_value_text: "<element_style><damage_value:#>"
+
+    # 各元素类型的伤害文本之间的分隔字符串.
+    separator: " "
+
+  # 模式: merged
+  # 只显示所有元素的伤害之和.
+  merged:
+    animations:
+      - delay: 0
+        normal:
+          translation: [ .0, -1.0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
+      - delay: 2
+        normal:
+          interpolation_duration: 5
+          translation: [ .0, -0.5, .0 ]
+          scale: [ 2.5, 2.5, 2.5 ]
+        positive_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+        negative_critical_strike:
+          scale: [ 4.5, 4.5, 4.5 ]
+      - delay: 8
+        normal:
+          interpolation_duration: 20
+          translation: [ .0, 0.5, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
+    animation_duration: 32
+    final_text: <critical_strike_style><critical_strike_text><damage_value_text>
+    critical_strike_style:
+      positive: <bold>
+      negative: <bold>
+      none: ""
+    critical_strike_text:
+      positive: <color:#FF9900>💥</color:#FF9900>
+      negative: <color:#02AFFF>💥</color:#02AFFF>
+      none: ""
+    # 元素文本.
+    # 支持占位符:
+    # - <element_name> 伤害占比最高的元素类型的元素名.
+    # - <element_style> 伤害占比最高的元素类型的风格.
+    # - <damage_value> 总伤害值.
+    damage_value_text: "<element_style><damage_value:#>"

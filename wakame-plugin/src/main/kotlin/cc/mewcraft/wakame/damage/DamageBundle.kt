@@ -47,7 +47,7 @@ private class DamageBundleImpl(
     private val packets = Reference2ObjectArrayMap(packets)
 
     override fun total(): Double {
-        return packets.values.sumOf { it.damageValue() }
+        return packets.values.sumOf { it.packetDamage }
     }
 
     override fun add(packet: DamagePacket) {

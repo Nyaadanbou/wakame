@@ -43,7 +43,7 @@ class EntityDefenseMetadata(
         val incomingDamageRate = damageeAttributeMap.getValue(Attributes.INCOMING_DAMAGE_RATE.of(element))
 
         // 计算原始伤害
-        var originalDamage = packet.damageValue()
+        var originalDamage = packet.packetDamage
         if (DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
             originalDamage *= attackDamageRate
         }
@@ -72,28 +72,13 @@ class EntityDefenseMetadata(
         if (!DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
             finalDamage *= criticalStrikePower
         }
-        val leastDamage = if (packet.damageValue() > 0) DamageRules.LEAST_DAMAGE else 0.0
-        finalDamage.coerceAtLeast(leastDamage)
+        val leastDamage = if (packet.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
+        finalDamage = finalDamage.coerceAtLeast(leastDamage)
 
-        return when (DamageRules.ROUNDING_MODE) {
-            DamageRules.RoundingMode.NONE -> {
-                finalDamage
-            }
-
-            DamageRules.RoundingMode.ROUND -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                round(finalDamage * factor) / factor
-            }
-
-            DamageRules.RoundingMode.CEIL -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                ceil(finalDamage * factor) / factor
-            }
-
-            DamageRules.RoundingMode.FLOOR -> {
-                val factor = 10.0.pow(DamageRules.DECIMAL_PLACES)
-                floor(finalDamage * factor) / factor
-            }
+        if (DamageRules.ROUNDING_DAMAGE){
+            finalDamage = round(finalDamage)
         }
+
+        return finalDamage
     }
 }

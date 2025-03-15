@@ -2,29 +2,30 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.util.bindInstance
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
 
+private val DAMAGE_CONFIG = Configs["damage/config"]
+private val RULES_CONFIG = DAMAGE_CONFIG.node("rules")
 
 /**
  * 伤害系统中可通过配置修改的规则.
  */
 object DamageRules {
-    private val DAMAGE_CONFIG = Configs["damage/config"]
 
-    val ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE: Boolean by DAMAGE_CONFIG.entry<Boolean>("attack_damage_rate_multiply_before_defense")
-    val CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE: Boolean by DAMAGE_CONFIG.entry<Boolean>("critical_strike_power_multiply_before_defense")
+    val ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("attack_damage_rate_multiply_before_defense")
+    val CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("critical_strike_power_multiply_before_defense")
+    val ROUNDING_DAMAGE: Boolean by RULES_CONFIG.entry("rounding_damage")
 
-    val LEAST_DAMAGE: Double by DAMAGE_CONFIG.entry<Double>("least_damage")
-    val ROUNDING_MODE: RoundingMode by DAMAGE_CONFIG.entry<RoundingMode>("rounding_mode")
-    val DECIMAL_PLACES: Int by DAMAGE_CONFIG.entry<Int>("decimal_places")
+    val LEAST_DAMAGE: Double by RULES_CONFIG.entry("least_damage")
 
-    private val VALID_DEFENSE_FORMULA: String by DAMAGE_CONFIG.entry<String>("valid_defense_formula")
-    private val DAMAGE_AFTER_DEFENSE_FORMULA: String by DAMAGE_CONFIG.entry<String>("damage_after_defense_formula")
-    private val BOW_FORCE_FORMULA: String by DAMAGE_CONFIG.entry<String>("bow_force_formula")
+    private val VALID_DEFENSE_FORMULA: String by RULES_CONFIG.entry("valid_defense_formula")
+    private val DAMAGE_AFTER_DEFENSE_FORMULA: String by RULES_CONFIG.entry("damage_after_defense_formula")
+    private val BOW_FORCE_FORMULA: String by RULES_CONFIG.entry("bow_force_formula")
 
-    @Binding("query")
+    @Binding("q")
     internal class BindingValidDefense(
         @JvmField @Binding("defense")
         val defense: Double,
@@ -34,7 +35,7 @@ object DamageRules {
         val defensePenetrationRate: Double
     )
 
-    @Binding("query")
+    @Binding("q")
     internal class BindingDamageAfterDefense(
         @JvmField @Binding("original_damage")
         val originalDamage: Double,
@@ -42,7 +43,7 @@ object DamageRules {
         val validDefense: Double,
     )
 
-    @Binding("query")
+    @Binding("q")
     internal class BindingBowForce(
         @JvmField @Binding("use_ticks")
         val useTicks: Int,
@@ -60,7 +61,7 @@ object DamageRules {
         defense: Double, defensePenetration: Double, defensePenetrationRate: Double,
     ): Double {
         val mocha = MochaEngine.createStandard()
-        mocha.bindInstance(BindingValidDefense(defense, defensePenetration, defensePenetrationRate), "query")
+        mocha.bindInstance(BindingValidDefense(defense, defensePenetration, defensePenetrationRate), "q")
         return mocha.eval(VALID_DEFENSE_FORMULA)
     }
 
@@ -75,7 +76,7 @@ object DamageRules {
         originalDamage: Double, validDefense: Double
     ): Double {
         val mocha = MochaEngine.createStandard()
-        mocha.bindInstance(BindingDamageAfterDefense(originalDamage, validDefense), "query")
+        mocha.bindInstance(BindingDamageAfterDefense(originalDamage, validDefense), "q")
         return mocha.eval(DAMAGE_AFTER_DEFENSE_FORMULA)
     }
 
@@ -87,17 +88,8 @@ object DamageRules {
      */
     fun calculateBowForce(useTicks: Int): Double {
         val mocha = MochaEngine.createStandard()
-        mocha.bindInstance(BindingBowForce(useTicks), "query")
+        mocha.bindInstance(BindingBowForce(useTicks), "q")
         return mocha.eval(BOW_FORCE_FORMULA)
     }
 
-    /**
-     * 伤害取整模式.
-     */
-    enum class RoundingMode {
-        NONE,
-        CEIL,
-        FLOOR,
-        ROUND,
-    }
 }
