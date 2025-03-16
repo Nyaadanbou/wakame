@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -43,7 +43,7 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 
 @Init(stage = InitStage.PRE_WORLD)
 @Reload
-object GlobalTranslations : RegistryConfigStorage {
+object GlobalTranslations : RegistryLoader {
     private const val DIR_PATH = "lang/"
 
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")

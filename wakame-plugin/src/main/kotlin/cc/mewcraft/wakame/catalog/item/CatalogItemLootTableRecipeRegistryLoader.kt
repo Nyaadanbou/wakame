@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -29,7 +29,7 @@ import kotlin.streams.asSequence
     runAfter = [CatalogItemMenuSettings::class] // 要等预设菜单布局载入好
 )
 @Reload
-internal object CatalogItemLootTableRecipeRegistryLoader : RegistryConfigStorage {
+internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
 
     // 默认的战利品表数量庞大, 使用较大的容量以减少哈希冲突
     private val MINECRAFT_LOOT_TABLE_MAP: HashMap<String, MojangLootTable> = HashMap(2048)

@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
 import kotlin.io.path.*
@@ -16,7 +16,7 @@ import kotlin.io.path.*
 
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object CatalogItemCategoryRegistryLoader : RegistryConfigStorage {
+internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.*
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -13,7 +13,7 @@ import org.spongepowered.configurate.ConfigurationNode
     stage = InitStage.PRE_WORLD,
 )
 @Reload
-internal object LevelRarityMappingRegistryLoader : RegistryConfigStorage {
+internal object LevelRarityMappingRegistryLoader : RegistryLoader {
     private const val FILE_PATH = "levels.yml"
 
     @InitFun

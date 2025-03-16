@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
@@ -26,7 +26,7 @@ import cc.mewcraft.wakame.util.require
     ]
 )
 @Reload
-internal object AbilityRegistryLoader : RegistryConfigStorage {
+internal object AbilityRegistryLoader : RegistryLoader {
     /**
      * 存放铭刻的文件夹 (相对于插件文件夹).
      */

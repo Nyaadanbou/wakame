@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -37,7 +37,7 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     ]
 )
 @Reload
-internal object CustomItemRegistryLoader : RegistryConfigStorage {
+internal object CustomItemRegistryLoader : RegistryLoader {
 
     /**
      * 命名空间 `internal` 下的物品仅用于实现内部逻辑.
@@ -91,7 +91,7 @@ internal object CustomItemRegistryLoader : RegistryConfigStorage {
  */
 @Init(stage = InitStage.PRE_WORLD, runAfter = [CustomItemRegistryLoader::class])
 @Reload
-internal object ItemProxyRegistryLoader : RegistryConfigStorage {
+internal object ItemProxyRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {

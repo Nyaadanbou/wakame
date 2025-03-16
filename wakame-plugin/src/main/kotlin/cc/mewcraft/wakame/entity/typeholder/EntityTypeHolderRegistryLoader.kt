@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
@@ -19,7 +19,7 @@ import org.spongepowered.configurate.kotlin.extensions.getList
     stage = InitStage.PRE_WORLD
 )
 @Reload
-internal object EntityTypeHolderRegistryLoader : RegistryConfigStorage {
+internal object EntityTypeHolderRegistryLoader : RegistryLoader {
     const val FILE_PATH = "entities.yml"
 
     @InitFun
