@@ -17,6 +17,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.require
@@ -116,12 +117,12 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
     override fun damageValueText(context: NekoEntityDamageEvent): Component {
         val damageMap = context.getFinalDamageMap()
         val elementType = damageMap.maxWithOrNull(
-            compareBy<Map.Entry<ElementType, Double>> { it.value }
-        )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry().value
+            compareBy<Map.Entry<RegistryEntry<ElementType>, Double>> { it.value }
+        )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry()
         val damageValueText = MM.deserialize(
             damageValueText,
-            Placeholder.component("element_name", elementType.displayName),
-            Placeholder.styling("element_style", *elementType.displayStyles),
+            Placeholder.component("element_name", elementType.value.displayName),
+            Placeholder.styling("element_style", *elementType.value.displayStyles),
             Formatter.number("damage_value", context.getFinalDamage())
         )
         return damageValueText
@@ -139,8 +140,8 @@ internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDi
         val damageValueText = damageMap.map { (elementType, damageValue) ->
             MM.deserialize(
                 damageValueText,
-                Placeholder.component("element_name", elementType.displayName),
-                Placeholder.styling("element_style", *elementType.displayStyles),
+                Placeholder.component("element_name", elementType.value.displayName),
+                Placeholder.styling("element_style", *elementType.value.displayStyles),
                 Formatter.number("damage_value", damageValue)
             )
         }.join(JoinConfiguration.separator(separator))
