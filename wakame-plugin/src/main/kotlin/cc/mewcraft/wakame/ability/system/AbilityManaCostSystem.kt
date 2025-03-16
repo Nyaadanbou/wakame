@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ability.component.AbilityComponent
+import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.data.TickResult
+import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.entity.resource.ResourceTypeRegistry
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
@@ -22,7 +24,10 @@ class AbilityManaCostSystem : IteratingSystem(
         if (tickResult != TickResult.NEXT_STATE) {
             return
         }
-        val bukkitPlayer = entity[CastBy].player()
+        val caster = entity[CastBy].caster
+        if (caster !in Families.BUKKIT_PLAYER)
+            return
+        val bukkitPlayer = caster[BukkitPlayerComponent].bukkitPlayer
         val penalty = entity[AbilityComponent].penalty
         val engine = entity[AbilityComponent].mochaEngine.also {
             it.bindInstance<ManaPenalty>(ManaPenalty(penalty.penaltyCount), "mana_penalty")

@@ -3,33 +3,13 @@ package cc.mewcraft.wakame.element
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
-import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import org.bukkit.entity.Player
-
-fun BukkitEntity.applyElementStack(
-    element: RegistryEntry<ElementType>,
-    count: Int,
-    caster: BukkitEntity? = null,
-) {
-    val caster = if (caster is Player) {
-        caster.koishify()
-    } else {
-        caster?.koishify()
-    }
-    if (this is Player) {
-        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
-    } else {
-        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
-    }
-}
 
 /**
  * 元素效果管理.
@@ -54,7 +34,7 @@ object ElementStackManager {
      * @param amount 应用层数
      * @param caster 造成伤害的实体, 如果为空则表示无造成伤害实体.
      */
-    fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity, caster: KoishEntity?) {
+    fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity) {
         require(amount > 0) { "Amount must be greater than 0" }
         val stackEffect = element.value.stackEffect
         if (stackEffect == null)
@@ -65,11 +45,7 @@ object ElementStackManager {
         }
 
         val elementStackEntity = Fleks.createEntity {
-            it += if (caster == null) {
-                CastBy(target.entity)
-            } else {
-                CastBy(caster.entity)
-            }
+            it += CastBy(target.entity)
             it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent(0)

@@ -25,6 +25,10 @@ data class ElementStackContainer(
         return elementStacks.containsKey(element)
     }
 
+    fun elementStacks(): Map<RegistryEntry<ElementType>, FleksEntity> {
+        return elementStacks
+    }
+
     fun remove(element: RegistryEntry<ElementType>): Boolean {
         return elementStacks.remove(element) != null
     }

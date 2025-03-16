@@ -17,5 +17,8 @@ data class ElementStackComponent(
     override fun type(): ComponentType<ElementStackComponent> = ElementStackComponent
 
     var amount: Int = 1
+        set(value) {
+            field = (if (value > maxAmount) maxAmount else value)
+        }
     val triggeredLevels: IntArraySet = IntArraySet()
 }

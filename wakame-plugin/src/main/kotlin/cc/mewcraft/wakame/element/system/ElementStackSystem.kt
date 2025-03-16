@@ -5,8 +5,9 @@ import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.element.applyElementStack
+import cc.mewcraft.wakame.element.ElementStackManager
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
@@ -15,6 +16,10 @@ import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
+import net.kyori.adventure.extra.kotlin.text
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.Style
+import org.bukkit.entity.Player
 
 class ElementStackSystem : IteratingSystem(
     family = Families.ELEMENT_STACK
@@ -27,9 +32,41 @@ class ElementStackSystem : IteratingSystem(
                 return@event
             val damagee = event.damagee
             val damagePackets = event.damageMetadata.damageBundle.packets()
+            val causingEntity = event.damageSource.causingEntity
+
+            val target = if (damagee is Player) {
+                damagee.koishify()
+            } else {
+                damagee.koishify()
+            }
+
             for (damagePacket in damagePackets) {
-                val causingEntity = event.damageSource.causingEntity
-                damagee.applyElementStack(damagePacket.element, 1, causingEntity)
+                val element = damagePacket.element
+
+                if (damagee is Player) {
+                    ElementStackManager.applyElementStack(element, 1, target)
+                } else {
+                    ElementStackManager.applyElementStack(element, 1, target)
+                }
+            }
+
+            if (causingEntity != null && causingEntity is Player) {
+                val container = target[ElementStackContainer].elementStacks()
+                val elementStackMessage = text {
+                    for ((elementEntry, entity) in container) {
+                        val element = elementEntry.value
+                        val stack = entity[ElementStackComponent]
+
+                        append(
+                            Component.text()
+                                .content("${stack.amount} ")
+                                .append(element.displayName)
+                                .style(Style.style(*element.displayStyles))
+                        )
+                    }
+                }
+
+                causingEntity.sendMessage(elementStackMessage)
             }
         }
     }
@@ -39,8 +76,9 @@ class ElementStackSystem : IteratingSystem(
     }
 
     override fun onTickEntity(entity: Entity) {
+        val caster = entity[CastBy].caster
         val target = entity[TargetTo].target
-        if (target !in world) {
+        if (target !in world || caster !in world) {
             entity.remove()
             return
         }
@@ -49,8 +87,7 @@ class ElementStackSystem : IteratingSystem(
         val elementStackComponent = entity[ElementStackComponent]
 
         // 如果 stackCount 小于等于 0，移除实体
-        var currentAmount = elementStackComponent.amount
-        if (currentAmount <= 0) {
+        if (elementStackComponent.amount <= 0) {
             removeEntity(entity, target)
             return
         }
@@ -60,24 +97,18 @@ class ElementStackSystem : IteratingSystem(
             removeEntity(entity, target)
         }
 
-        val maxAmount = elementStackComponent.maxAmount
-        if (currentAmount > maxAmount) {
-            currentAmount = maxAmount
-            elementStackComponent.amount = currentAmount
-        }
-
         val effects = elementStackComponent.effects.int2ObjectEntrySet().iterator()
-        val abilityInput = abilityInput(entity[CastBy].caster, entity[TargetTo].target)
+        val abilityInput = abilityInput(caster, target)
         while (effects.hasNext()) {
-            val (amount, abilities) = effects.next()
-            if (elementStackComponent.triggeredLevels.contains(amount))
+            val (requiredAmount, abilities) = effects.next()
+            if (elementStackComponent.triggeredLevels.contains(requiredAmount))
                 continue
-            if (currentAmount < amount)
+            if (elementStackComponent.amount < requiredAmount)
                 continue
             for (ability in abilities) {
                 ability.value.cast(abilityInput)
             }
-            elementStackComponent.triggeredLevels.add(amount)
+            elementStackComponent.triggeredLevels.add(requiredAmount)
         }
     }
 
