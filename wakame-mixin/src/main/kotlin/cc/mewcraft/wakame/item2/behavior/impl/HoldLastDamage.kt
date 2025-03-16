@@ -17,7 +17,7 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
-object HoldLastDamage : ItemBehavior {
+data object HoldLastDamage : ItemBehavior {
 
     //override fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
     //    tryCancelEvent(itemstack,player, event)

@@ -6,6 +6,7 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
@@ -61,6 +62,14 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             return ItemDataContainerImpl.Serializer
         }
 
+        fun build(block: Builder.() -> Unit): ItemDataContainer {
+            return builder().apply(block).build()
+        }
+
+        fun builder(): Builder {
+            return ItemDataContainerImpl(copyOnWrite = true)
+        }
+
     }
 
     /**
@@ -81,12 +90,17 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
     /**
      * 获取指定类型的数据.
      */
-    fun <T> get(type: ItemDataType<out T>): T?
+    operator fun <T> get(type: ItemDataType<out T>): T?
 
     /**
      * 判断该容器是否有指定类型的数据.
      */
-    fun has(type: ItemDataType<*>): Boolean
+    infix fun has(type: ItemDataType<*>): Boolean
+
+    /**
+     * 判断该容器是否有指定类型的数据.
+     */
+    operator fun contains(type: ItemDataType<*>): Boolean = has(type)
 
     /**
      * 获取指定类型的数据, 如果没有, 则返回默认值.
@@ -129,7 +143,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
          *
          * @return 设置之前的数据, 如果没有则返回 `null`
          */
-        fun <T> set(type: ItemDataType<in T>, value: T): T?
+        operator fun <T> set(type: ItemDataType<in T>, value: T): T?
 
         /**
          * 移除指定类型的数据.
@@ -137,6 +151,13 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
          * @return 移除之前的数据, 如果没有则返回 `null`
          */
         fun <T> remove(type: ItemDataType<out T>): T?
+
+        /**
+         * 移除指定类型的数据.
+         */
+        operator fun minusAssign(type: ItemDataType<*>) {
+            remove(type)
+        }
 
         /**
          * 创建一个 [ItemDataContainer] 实例.
@@ -171,7 +192,7 @@ private open class ItemDataContainerImpl(
     }
 
     override fun has(type: ItemDataType<*>): Boolean {
-        return data.containsKey(type)
+        return get(type) != null
     }
 
     override fun <T> set(type: ItemDataType<in T>, value: T): T? {
@@ -226,12 +247,12 @@ private open class ItemDataContainerImpl(
                 val nodeKey = rawNodeKey.toString()
                 // 注意: 该 node key 所对应的 type 必须存在
                 val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: run {
-                    LOGGER.error("Unknown ItemDataType: '$nodeKey'")
+                    LOGGER.error("Unknown item data type: '$nodeKey'. Skipped.")
                     continue
                 }
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
                 val dataValue = itemDataNode.get(dataType.typeToken) ?: run {
-                    LOGGER.error("Failed to deserialize '$dataType'")
+                    LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
                 data[dataType] = dataValue
@@ -248,13 +269,12 @@ private open class ItemDataContainerImpl(
 
             val iter = obj.data.reference2ObjectEntrySet().fastIterator()
             while (iter.hasNext()) {
-                val (typex, valuex) = iter.next()
-                val typeId = KoishRegistries2.ITEM_DATA_TYPE.getId(typex) ?: run {
-                    LOGGER.error("Unknown ItemDataType: $typex")
+                val (dataType, dataValue) = iter.next()
+                val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: run {
+                    LOGGER.error("Unknown item data type: $dataType. Skipped.")
                     continue
                 }
-                val dataNode = node.node(typeId.asString())
-                dataNode.set(valuex)
+                node.node(dataTypeId.asString()).set(dataValue)
             }
         }
     }

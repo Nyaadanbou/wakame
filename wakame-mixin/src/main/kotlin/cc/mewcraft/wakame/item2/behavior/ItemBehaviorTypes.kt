@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 /**
  * 所有的物品行为类型.
  */
-object ItemBehaviorTypes {
+data object ItemBehaviorTypes {
 
     // ------------
     // 注册表
@@ -28,8 +28,7 @@ object ItemBehaviorTypes {
     // ------------
 
     private fun register(id: String, type: ItemBehavior): ItemBehavior {
-        KoishRegistries2.ITEM_BEHAVIOR.add(id, type)
-        return type
+        return type.also { KoishRegistries2.ITEM_BEHAVIOR.add(id, it) }
     }
 
 }

@@ -19,10 +19,10 @@ import kotlin.random.nextInt
  *
  * 等级的生成目前有两种模式: 固定等级, 动态等级.
  *
- * # 固定等级
+ * ### 固定等级
  * 直接在配置文件中指定好一个常数, 然后每次都按照该常数生成等级.
  *
- * # 动态等级
+ * ### 动态等级
  * 由生成的上下文决定要生成的等级.
  *
  * @param base 等级的基础值
@@ -68,8 +68,8 @@ data class MetaItemLevel(
 
         return raw
             .coerceIn(ItemLevel.minimumLevel, max)
-            .also { context.level = it } // populate the context with generated level
-            .let { ItemMetaResult.of(ItemLevel(level = it)) }
+            .also { lvl -> context.level = lvl } // populate the context with generated level
+            .let { lvl -> ItemMetaResult.of(ItemLevel(level = lvl)) }
     }
 
     enum class Option {

@@ -3,12 +3,14 @@ package cc.mewcraft.wakame.item2.config.datagen
 /**
  * 本类负责储存一个物品堆叠上所有可能的 "Item Data" 的[配置项][ItemMetaEntry].
  */
-class ItemMetaContainer {
-
+interface ItemMetaContainer {
+    class Builder
 }
 
 /**
  * 代表一个 "Item Data" 的配置项.
+ *
+ * @param T 对应的数据类型
  */
 interface ItemMetaEntry<T> {
 
@@ -62,7 +64,7 @@ sealed interface ItemMetaResult<out T> {
     // 内部实现
     // ------------
 
-    private data class Simple<T>(val value: T) : ItemMetaResult<T> {
+    private data class Simple<T>(private val value: T) : ItemMetaResult<T> {
         override fun unwrap(): T = value
         override fun isEmpty(): Boolean = false
     }

@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 自定义箭矢的相关行为.
  */
-object Arrow : ItemBehavior {
+data object Arrow : ItemBehavior {
 
     /**
      * 实现 [cc.mewcraft.wakame.item2.config.property.impl.Arrow] 的下列功能:

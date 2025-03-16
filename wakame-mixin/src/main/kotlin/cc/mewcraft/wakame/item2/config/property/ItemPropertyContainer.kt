@@ -1,25 +1,79 @@
 package cc.mewcraft.wakame.item2.config.property
 
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.Type
 
-class ItemPropertyContainer(
-    private val data: Reference2ObjectOpenHashMap<ItemPropertyType<*>, Any> = Reference2ObjectOpenHashMap(),
-) {
+interface ItemPropertyContainer {
+    companion object {
+        fun makeSerializer(): TypeSerializer<ItemPropertyContainer> {
+            return ItemPropertyContainerImpl.Serializer
+        }
 
-    fun <T> get(type: ItemPropertyType<out T>): T? {
-        return data[type] as T?
+        fun build(block: Builder.() -> Unit): ItemPropertyContainer {
+            return builder().apply(block).build()
+        }
+
+        fun builder(): Builder {
+            return ItemPropertyContainerImpl()
+        }
     }
 
-    fun has(type: ItemPropertyType<*>): Boolean {
-        return get(type) != null
+    operator fun <T> get(type: ItemPropertyType<out T>): T?
+    fun <T> getOrDefault(type: ItemPropertyType<out T>, fallback: T): T = get(type) ?: fallback
+    infix fun has(type: ItemPropertyType<*>): Boolean = get(type) != null
+    operator fun contains(type: ItemPropertyType<*>): Boolean = has(type)
+
+    interface Builder : ItemPropertyContainer {
+        operator fun <T> set(type: ItemPropertyType<in T>, value: T): T?
+        operator fun set(type: ItemPropertyType<*>, value: Any): Any?
+        fun build(): ItemPropertyContainer
+    }
+}
+
+private data object EmptyItemPropertyContainer : ItemPropertyContainer {
+    override fun <T> get(type: ItemPropertyType<out T>): T? = null
+}
+
+private class ItemPropertyContainerImpl(
+    private val properties: Reference2ObjectOpenHashMap<ItemPropertyType<*>, Any> = Reference2ObjectOpenHashMap(),
+) : ItemPropertyContainer, ItemPropertyContainer.Builder {
+    override fun <T> get(type: ItemPropertyType<out T>): T? {
+        return properties[type] as T?
     }
 
-    fun <T> getOrDefault(type: ItemPropertyType<out T>, fallback: T?): T? {
-        return get(type) ?: fallback
+    override fun <T> set(type: ItemPropertyType<in T>, value: T): T? {
+        return properties.put(type, value) as T?
     }
 
-    fun <T> set(type: ItemPropertyType<in T>, value: T): T? {
-        return data.put(type, value) as T?
+    override fun set(type: ItemPropertyType<*>, value: Any): Any? {
+        return properties.put(type, value)
     }
 
+    override fun build(): ItemPropertyContainer {
+        return if (properties.isEmpty()) EmptyItemPropertyContainer else this
+    }
+
+    object Serializer : TypeSerializer<ItemPropertyContainer> {
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemPropertyContainer {
+            val builder = ItemPropertyContainer.builder()
+            for ((rawNodeKey, node) in node.childrenMap()) {
+                val nodeKey = rawNodeKey.toString()
+                val dataType = KoishRegistries2.ITEM_PROPERTY_TYPE[nodeKey] ?: run {
+                    LOGGER.error("Unknown item property type: '$nodeKey'. Skipped.")
+                    continue
+                }
+                val dataTypeToken = dataType.typeToken
+                val dataValue = node.get(dataTypeToken) ?: run {
+                    LOGGER.error("Failed to deserialize $dataType. Skipped.")
+                    continue
+                }
+                builder[dataType] = dataValue
+            }
+            return builder.build()
+        }
+    }
 }

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-object ItemDataTypes {
+data object ItemDataTypes {
 
     // ------------
     // 注册表
@@ -50,13 +50,12 @@ object ItemDataTypes {
     }
 
     /**
-     * @param id 将作为 Registry 中的 id
+     * @param id 将作为注册表中的 ID
      * @param block 用于配置 [ItemDataType]
      */
     private inline fun <reified T> register(id: String, block: ItemDataType.Builder<T>.() -> Unit = {}): ItemDataType<T> {
         val type = ItemDataType.builder(typeTokenOf<T>()).apply(block).build()
-        KoishRegistries2.ITEM_DATA_TYPE.add(id, type)
-        return type
+        return type.also { KoishRegistries2.ITEM_DATA_TYPE.add(id, it) }
     }
 
 }

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry2
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import org.jetbrains.annotations.TestOnly
@@ -32,6 +33,13 @@ object KoishRegistries2 {
      */
     @JvmField
     val ITEM_DATA_TYPE: WritableRegistry<ItemDataType<*>> = registerSimple(KoishRegistryKeys2.ITEM_DATA_TYPE)
+
+    /**
+     * "Item Meta" 的类型.
+     * "Item Meta" 相当于 "Item Data" 的配置文件.
+     */
+    @JvmField
+    val ITEM_META_TYPE: WritableRegistry<ItemMetaType<*>> = registerSimple(KoishRegistryKeys2.ITEM_META_TYPE)
 
     /**
      * "Item Property" 的类型.

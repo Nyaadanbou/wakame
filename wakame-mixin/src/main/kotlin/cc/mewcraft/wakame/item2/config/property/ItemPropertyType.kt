@@ -56,7 +56,7 @@ interface ItemPropertyType<T> {
             override val typeToken: TypeToken<T>,
             override val serializers: TypeSerializerCollection?,
         ) : ItemPropertyType<T> {
-            override fun toString(): String = "Simple(type=${typeToken.type}, serializers=$serializers)"
+            override fun toString(): String = "ItemPropertyType(type=${typeToken.type}, serializers=$serializers)"
         }
     }
 

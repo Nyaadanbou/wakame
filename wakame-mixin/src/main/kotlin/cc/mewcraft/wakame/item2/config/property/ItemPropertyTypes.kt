@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 
-object ItemPropertyTypes {
+data object ItemPropertyTypes {
 
     // ------------
     // 注册表
@@ -43,13 +43,12 @@ object ItemPropertyTypes {
     // ------------
 
     /**
-     * @param id 将作为 Registry 中的 id
+     * @param id 将作为注册表中的 ID
      * @param block 用于配置 [ItemPropertyType]
      */
     private inline fun <reified T> register(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
         val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
-        KoishRegistries2.ITEM_PROPERTY_TYPE.add(id, type)
-        return type
+        return type.also { KoishRegistries2.ITEM_PROPERTY_TYPE.add(id, it) }
     }
 
 }
