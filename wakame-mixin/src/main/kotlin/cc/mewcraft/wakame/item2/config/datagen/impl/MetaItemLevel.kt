@@ -37,17 +37,14 @@ data class MetaItemLevel(
     private val max: Int,
 ) : ItemMetaEntry<ItemLevel> {
 
-    /**
-     * 检查等级是否为固定的.
-     */
-    val isConstant: Boolean
-        get() = base is Number
+    companion object {
+        val SERIALIZER: TypeSerializer<MetaItemLevel> = Serializer
+    }
 
     /**
      * 检查等级是否基于上下文.
      */
-    val isContextual: Boolean
-        get() = base == Option.CONTEXT
+    val isContextual: Boolean = base == Option.CONTEXT
 
     override fun generate(context: Context): ItemMetaResult<ItemLevel> {
         val raw: Int = when (base) {
@@ -62,7 +59,7 @@ data class MetaItemLevel(
             }
 
             else -> {
-                throw IllegalStateException("Something wrong with ${this::class.simpleName}")
+                throw IllegalStateException("Unrecognized base type: ${base::class}")
             }
         }
 
@@ -72,7 +69,7 @@ data class MetaItemLevel(
             .let { lvl -> ItemMetaResult.of(ItemLevel(level = lvl)) }
     }
 
-    enum class Option {
+    private enum class Option {
         CONTEXT
     }
 
@@ -95,7 +92,7 @@ data class MetaItemLevel(
      *   max: <int>
      * ```
      */
-    object Serializer : TypeSerializer<MetaItemLevel> {
+    private object Serializer : TypeSerializer<MetaItemLevel> {
         override fun deserialize(type: Type, node: ConfigurationNode): MetaItemLevel {
             val base = when (val scalar = node.node("base").rawScalar()) {
                 is Number -> scalar

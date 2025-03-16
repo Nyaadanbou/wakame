@@ -19,6 +19,11 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
      * [ItemBehaviorContainer] 的构造函数.
      */
     companion object {
+
+        fun makeSerializer(): TypeSerializer<ItemBehaviorContainer> {
+            return ItemBehaviorContainerImpl.Serializer
+        }
+
         /**
          * 获取一个空的 [ItemBehaviorContainer].
          */
@@ -112,6 +117,7 @@ private class ItemBehaviorContainerImpl(
         override fun deserialize(type: Type, node: ConfigurationNode): ItemBehaviorContainer {
             val builder = ItemBehaviorContainer.builder()
             for ((rawNodeKey, _) in node.childrenMap()) {
+                // 实现上只要 Node 存在那么 ItemBehavior 就存在
                 val nodeKey = rawNodeKey.toString()
                 val dataValue = KoishRegistries2.ITEM_BEHAVIOR[nodeKey] ?: run {
                     LOGGER.error("Unknown item behavior: '$nodeKey'. Skipped.")

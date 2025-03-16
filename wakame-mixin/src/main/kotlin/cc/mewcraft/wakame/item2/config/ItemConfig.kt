@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.config
 
+// FIXME #350: 似乎没有实际作用
 // 代表物品配置文件中的一部分
 interface ItemConfig {
 

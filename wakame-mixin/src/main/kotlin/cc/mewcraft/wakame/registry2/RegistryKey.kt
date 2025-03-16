@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.registry2.RegistryKey.Companion.of
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.MapMaker
 import java.util.concurrent.ConcurrentMap
@@ -37,7 +36,7 @@ private constructor(
 
         // 创建的 ResourceKey 位于 koish:root
         fun <T> ofRegistry(registryName: Identifier): RegistryKey<T> {
-            return of(KoishRegistryKeys.ROOT_REGISTRY_NAME, registryName)
+            return of(KoishRegistryKeys2.ROOT_REGISTRY_NAME, registryName)
         }
     }
 

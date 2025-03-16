@@ -24,9 +24,7 @@ class KoishItem(
     val dataConfig: ItemMetaContainer,
     val properties: ItemPropertyContainer,
     val behaviors: ItemBehaviorContainer,
-) {
-
-}
+)
 
 // 表示一个原版套皮物品
 // 一个套皮物品需要一个最基本的物品类型 (KoishItem) 以及在一开始就确定好的数据 (ItemDataContainer)

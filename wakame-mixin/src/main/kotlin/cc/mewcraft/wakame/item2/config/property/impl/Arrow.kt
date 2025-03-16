@@ -1,7 +1,9 @@
 package cc.mewcraft.wakame.item2.config.property.impl
 
 import org.bukkit.entity.AbstractArrow.PickupStatus
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
+@ConfigSerializable
 data class Arrow(
     /**
      * 可穿透的实体数.

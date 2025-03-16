@@ -7,6 +7,7 @@ import java.nio.file.Path
 /**
  * 用于简化从配置文件初始化注册表的代码.
  */
+// FIXME #350: rename to RegistryLoader
 interface RegistryConfigStorage {
 
     fun getFileInConfigDirectory(path: String): File {

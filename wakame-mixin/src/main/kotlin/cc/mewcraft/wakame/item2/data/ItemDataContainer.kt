@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
 
@@ -40,6 +41,9 @@ import java.lang.reflect.Type
 interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
     companion object {
+
+        @JvmStatic
+        val EMPTY: ItemDataContainer = EmptyItemDataContainer
 
         @JvmStatic
         fun makeCodec(): Codec<ItemDataContainer> {
@@ -146,6 +150,13 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
         operator fun <T> set(type: ItemDataType<in T>, value: T): T?
 
         /**
+         * 设置指定类型的数据.
+         *
+         * @return 设置之前的数据, 如果没有则返回 `null`
+         */
+        fun set0(type: ItemDataType<*>, value: Any): Any?
+
+        /**
          * 移除指定类型的数据.
          *
          * @return 移除之前的数据, 如果没有则返回 `null`
@@ -170,12 +181,24 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
 }
 
+private data object EmptyItemDataContainer : ItemDataContainer {
+    override val types: Set<ItemDataType<*>> = emptySet()
+    override val size: Int = 0
+    override fun isEmpty(): Boolean = true
+    override fun <T> get(type: ItemDataType<out T>): T? = null
+    override fun has(type: ItemDataType<*>): Boolean = false
+    override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = iterator()
+    override fun copy(): ItemDataContainer = this
+    override fun toBuilder(): ItemDataContainer.Builder = ItemDataContainerImpl(copyOnWrite = false)
+    override fun iterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = emptyMap<ItemDataType<*>, Any>().iterator()
+}
+
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
 private open class ItemDataContainerImpl(
     @JvmField
     var data: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
     @JvmField
-    var copyOnWrite: Boolean,
+    var copyOnWrite: Boolean, // 用于优化 copy 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
     override val types: Set<ItemDataType<*>>
         get() = data.keys
@@ -198,6 +221,12 @@ private open class ItemDataContainerImpl(
     override fun <T> set(type: ItemDataType<in T>, value: T): T? {
         ensureContainerOwnership()
         return data.put(type, value) as T?
+    }
+
+    override fun set0(type: ItemDataType<*>, value: Any): Any? {
+        require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
+        ensureContainerOwnership()
+        return data.put(type, value)
     }
 
     override fun <T> remove(type: ItemDataType<out T>): T? {
@@ -235,14 +264,14 @@ private open class ItemDataContainerImpl(
     }
 
     override fun build(): ItemDataContainer {
-        return this
+        return if (isEmpty()) EmptyItemDataContainer else this
     }
 
     // FIXME #350: 需要确保 node 的 loader 加载了 ItemDataContainer 所需要的所有 TypeSerializer
     //  具体来说, 是 ItemDataContainer 里面的数据类型的 TypeSerializer, 而非 ItemDataContainer 本身
     object Serializer : TypeSerializer<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
-            val data = Reference2ObjectOpenHashMap<ItemDataType<*>, Any>()
+            val builder = ItemDataContainer.builder()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 // 注意: 该 node key 所对应的 type 必须存在
@@ -255,15 +284,15 @@ private open class ItemDataContainerImpl(
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
-                data[dataType] = dataValue
+                builder.set0(dataType, dataValue)
             }
-            return ItemDataContainerImpl(data, copyOnWrite = true)
+            return builder.build()
         }
 
         override fun serialize(type: Type, obj: ItemDataContainer?, node: ConfigurationNode) {
             if (obj == null) return
             if (obj !is ItemDataContainerImpl) {
-                LOGGER.error("Only expects ${ItemDataContainerImpl::class}, but got ${obj::class}")
+                LOGGER.error("Only expects ${ItemDataContainerImpl::class.qualifiedName}, but got ${obj::class.qualifiedName}")
                 return
             }
 

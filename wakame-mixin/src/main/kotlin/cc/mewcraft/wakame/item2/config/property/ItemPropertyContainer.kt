@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
+import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
 interface ItemPropertyContainer {
@@ -29,7 +30,7 @@ interface ItemPropertyContainer {
 
     interface Builder : ItemPropertyContainer {
         operator fun <T> set(type: ItemPropertyType<in T>, value: T): T?
-        operator fun set(type: ItemPropertyType<*>, value: Any): Any?
+        fun set0(type: ItemPropertyType<*>, value: Any): Any?
         fun build(): ItemPropertyContainer
     }
 }
@@ -49,7 +50,8 @@ private class ItemPropertyContainerImpl(
         return properties.put(type, value) as T?
     }
 
-    override fun set(type: ItemPropertyType<*>, value: Any): Any? {
+    override fun set0(type: ItemPropertyType<*>, value: Any): Any? {
+        require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
         return properties.put(type, value)
     }
 
@@ -71,7 +73,7 @@ private class ItemPropertyContainerImpl(
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
-                builder[dataType] = dataValue
+                builder.set0(dataType, dataValue)
             }
             return builder.build()
         }
