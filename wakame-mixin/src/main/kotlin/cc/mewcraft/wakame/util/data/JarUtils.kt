@@ -4,14 +4,7 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
-import java.util.jar.JarInputStream
-import kotlin.reflect.KClass
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
@@ -19,13 +12,15 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.jar.JarInputStream
+import kotlin.reflect.KClass
 
-internal data class AnnotationSearchResult(
+data class AnnotationSearchResult(
     val classes: Map<KClass<out Annotation>, Map<String, List<Map<String, Any?>>>>,
     val functions: Map<KClass<out Annotation>, Map<String, Map<String, List<Map<String, Any?>>>>>,
 )
 
-internal object JarUtils {
+object JarUtils {
 
     fun extractJar(classLoader: ClassLoader, targetDirectory: String, destinationDirectory: File) {
         try {
