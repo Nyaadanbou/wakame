@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.extensions
 import org.bukkit.Location
 import org.bukkit.World
 import org.joml.Vector3f
+import kotlin.math.abs
 
 fun Location.toVector3f(): Vector3f {
     return Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
@@ -40,6 +41,19 @@ infix fun Vector3f.mul(other: Vector3f): Vector3f {
     return this.copy().mul(other)
 }
 
+infix fun Vector3f.dot(other: Vector3f): Float {
+    return this.copy().dot(other)
+}
+
 infix fun Vector3f.cross(other: Vector3f): Vector3f {
     return this.copy().cross(other)
 }
+
+fun Vector3f.isUnit(epsilon: Float = 1e-6f): Boolean {
+    return abs(length() - 1f) < epsilon
+}
+
+fun Vector3f.isOrthogonalTo(other: Vector3f, epsilon: Float = 1e-6f): Boolean {
+    return abs(this dot other) < epsilon
+}
+
