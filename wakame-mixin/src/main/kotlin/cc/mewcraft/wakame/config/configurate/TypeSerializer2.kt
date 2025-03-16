@@ -6,6 +6,8 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.AnnotatedType
 import java.lang.reflect.Type
 
+typealias TypeSerializer2<T> = cc.mewcraft.wakame.config.configurate.TypeSerializer<T>
+
 fun interface TypeSerializer<T> : TypeSerializer<T> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): T

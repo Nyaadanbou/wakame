@@ -11,6 +11,7 @@ import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
+// FIXME #350: 迁移到 wakame-mixin
 /**
  * 本集合包含会在项目多个地方使用的 [TypeSerializer].
  *

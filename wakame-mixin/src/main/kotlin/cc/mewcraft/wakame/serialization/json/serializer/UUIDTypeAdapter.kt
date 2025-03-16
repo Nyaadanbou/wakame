@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.serialization.json.serializer
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import java.util.UUID
+import java.util.*
 
 internal object UUIDTypeAdapter : TypeAdapter<UUID>() {
 
