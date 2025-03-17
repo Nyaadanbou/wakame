@@ -4,8 +4,10 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.util.EnumLookup
+import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.toKotlinRange
 import com.google.common.collect.Range
 import org.spongepowered.configurate.ConfigurationNode
@@ -38,15 +40,11 @@ data class MetaItemLevel(
 ) : ItemMetaEntry<ItemLevel> {
 
     companion object {
+        // 实现注意事项: 将内部的 TypeSerializer 暴露为一个 val
         val SERIALIZER: TypeSerializer<MetaItemLevel> = Serializer
     }
 
-    /**
-     * 检查等级是否基于上下文.
-     */
-    val isContextual: Boolean = base == Option.CONTEXT
-
-    override fun generate(context: Context): ItemMetaResult<ItemLevel> {
+    override fun make(context: Context): ItemMetaResult<ItemLevel> {
         val raw: Int = when (base) {
             is Number -> {
                 base.toInt() + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)
@@ -66,7 +64,11 @@ data class MetaItemLevel(
         return raw
             .coerceIn(ItemLevel.minimumLevel, max)
             .also { lvl -> context.level = lvl } // populate the context with generated level
-            .let { lvl -> ItemMetaResult.of(ItemLevel(level = lvl)) }
+            .let { lvl -> ItemMetaResult.of(ItemLevel(lvl)) }
+    }
+
+    override fun write(value: ItemLevel, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.LEVEL, value)
     }
 
     private enum class Option {
@@ -74,19 +76,10 @@ data class MetaItemLevel(
     }
 
     /**
-     * ## Node structure 1
+     * ## Node structure
      * ```yaml
      * <node>:
-     *   base: <int>
-     *   float_chance: <double>
-     *   float_amount: <string>
-     *   max: <int>
-     * ```
-     *
-     * ## Node structure 2
-     * ```yaml
-     * <node>:
-     *   base: <enum>
+     *   base: <int> OR <enum>
      *   float_chance: <double>
      *   float_amount: <string>
      *   max: <int>

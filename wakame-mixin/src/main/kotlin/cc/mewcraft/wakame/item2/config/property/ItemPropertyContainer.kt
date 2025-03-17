@@ -8,6 +8,10 @@ import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
+// FIXME #350: 补全文档
+/**
+ * 代表一个容器, 存放与 *物品类型* 绑定的数据.
+ */
 interface ItemPropertyContainer {
     companion object {
         fun makeSerializer(): TypeSerializer<ItemPropertyContainer> {

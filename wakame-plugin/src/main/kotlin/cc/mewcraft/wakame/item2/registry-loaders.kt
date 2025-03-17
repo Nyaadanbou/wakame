@@ -131,7 +131,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val properties = node.require<ItemPropertyContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
         val koishItem = KoishItem(id, dataConfig, properties, behaviors)
-        TODO("#350: 生成 ItemData")
+        TODO("#350: 为原版套皮物品生成 ItemDataContainer")
     }
 
     private fun isMinecraftItem(id: Identifier): Boolean {

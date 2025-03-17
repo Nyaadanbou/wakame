@@ -20,6 +20,8 @@ public abstract class MixinItemStackOptionalStreamCodec {
             )
     )
     private void encode(StreamCodec<RegistryFriendlyByteBuf, DataComponentPatch> instance, Object buf, Object patch) {
+        // 发包时不发送 Koish 添加的 DataComponent
+        // 注: 其实可以改发包实现, 但 Mixin 性能更好
         instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch).forget(DataComponentsPatch::isCustomType));
     }
 

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.ItemBase2
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot2
 import cc.mewcraft.wakame.item2.config.property.impl.Lore
 import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.KeySerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS_2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -17,9 +17,7 @@ data object ItemPropertyTypes {
     // ------------
 
     @JvmField
-    val ID: ItemPropertyType<Identifier> = typeOf("id") {
-        serializers { register(KeySerializer) }
-    }
+    val ID: ItemPropertyType<Identifier> = typeOf("id")
 
     @JvmField
     val BASE: ItemPropertyType<ItemBase2> = typeOf("base")
@@ -45,15 +43,17 @@ data object ItemPropertyTypes {
     /**
      * 获取一个 [TypeSerializerCollection] 实例, 可用来序列化 [ItemPropertyContainer] 中的数据类型.
      *
-     * 该 [TypeSerializerCollection] 实例被调用的时机发生在 *加载物品配置文件* 时.
+     * 该 [TypeSerializerCollection] 的序列化代码被调用的时机发生在 *加载物品配置文件* 时.
      */
     internal fun serializers(): TypeSerializerCollection {
         val collection = TypeSerializerCollection.builder()
 
-        KoishRegistries2.ITEM_PROPERTY_TYPE.valueSequence.fold(collection) { acc, type ->
+        KoishRegistries2.ITEM_PROPERTY_TYPE.fold(collection) { acc, type ->
             val serializers = type.serializers
             if (serializers != null) acc.registerAll(serializers) else acc
         }
+
+        collection.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
 
         return collection.build()
     }

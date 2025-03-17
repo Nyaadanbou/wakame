@@ -19,7 +19,7 @@ data object ItemBehaviorTypes {
     val ARROW = typeOf("arrow", Arrow)
 
     /**
-     * 使物品耐久耗尽进入“损坏状态”而不是消失的逻辑.
+     * 使物品耐久耗尽后进入“损坏状态”而非直接消失的逻辑.
      */
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
 

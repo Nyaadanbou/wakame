@@ -23,7 +23,7 @@ object KoishRegistries2 {
     val ITEM: WritableDefaultedFuzzyRegistry<KoishItem> = registerDefaultedFuzzy(KoishRegistryKeys2.ITEM, "internal:unknown")
 
     /**
-     * 原版套皮物品的实例.
+     * 套皮物品堆叠的实例.
      */
     @JvmField
     val ITEM_PROXY: WritableRegistry<KoishItemProxy> = registerSimple(KoishRegistryKeys2.ITEM_PROXY)
@@ -39,7 +39,7 @@ object KoishRegistries2 {
      * "Item Meta" 相当于 "Item Data" 的配置文件.
      */
     @JvmField
-    val ITEM_META_TYPE: WritableRegistry<ItemMetaType<*>> = registerSimple(KoishRegistryKeys2.ITEM_META_TYPE)
+    val ITEM_META_TYPE: WritableRegistry<ItemMetaType<*, *>> = registerSimple(KoishRegistryKeys2.ITEM_META_TYPE)
 
     /**
      * "Item Property" 的类型.

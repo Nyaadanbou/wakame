@@ -13,6 +13,9 @@ import java.lang.reflect.Type
 import java.util.Collections.emptyList
 import java.util.stream.Stream
 
+/**
+ * 代表一个容器, 存放关于 *物品类型* 的行为逻辑.
+ */
 interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
 
     /**

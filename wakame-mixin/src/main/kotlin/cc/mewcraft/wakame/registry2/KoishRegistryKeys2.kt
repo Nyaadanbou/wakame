@@ -21,7 +21,7 @@ object KoishRegistryKeys2 {
     val ITEM_DATA_TYPE = createRegistryKey<ItemDataType<*>>("item_data_type")
 
     @JvmField
-    val ITEM_META_TYPE = createRegistryKey<ItemMetaType<*>>("item_meta_type")
+    val ITEM_META_TYPE = createRegistryKey<ItemMetaType<*, *>>("item_meta_type")
 
     @JvmField
     val ITEM_PROPERTY_TYPE = createRegistryKey<ItemPropertyType<*>>("item_property_type")

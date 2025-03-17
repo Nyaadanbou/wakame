@@ -47,6 +47,7 @@ internal object KoishCommandManager {
             command(CraftCommand)
             command(DebugCommand)
             command(ItemCommand)
+            command(Item2Command)
             command(PluginCommand)
             command(ReforgeCommand)
             command(ResourcepackCommand)

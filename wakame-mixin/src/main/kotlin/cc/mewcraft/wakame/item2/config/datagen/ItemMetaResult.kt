@@ -39,6 +39,12 @@ sealed interface ItemMetaResult<out T> {
      */
     fun isEmpty(): Boolean
 
+    /**
+     * 检查生成的数据是否不为空.
+     * 如果不为空，则应该将数据写入到物品堆叠上.
+     */
+    fun isPresent(): Boolean
+
     // ------------
     // 内部实现
     // ------------
@@ -46,11 +52,13 @@ sealed interface ItemMetaResult<out T> {
     private data class Value<T>(private val value: T) : ItemMetaResult<T> {
         override fun unwrap(): T = value
         override fun isEmpty(): Boolean = false
+        override fun isPresent(): Boolean = true
     }
 
     private data object Empty : ItemMetaResult<Nothing> {
         override fun unwrap(): Nothing = throw UnsupportedOperationException("Empty result has no value")
         override fun isEmpty(): Boolean = true
+        override fun isPresent(): Boolean = false
     }
 
 }

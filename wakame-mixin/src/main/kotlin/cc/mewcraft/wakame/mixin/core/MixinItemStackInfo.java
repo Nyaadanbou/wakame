@@ -35,6 +35,8 @@ public abstract class MixinItemStackInfo {
             )
     )
     private ItemStack modifyNewItemStack(ItemStack original) {
+        // 发包时不发送 Koish 添加的 DataComponent
+        // 注: 其实可以改发包实现, 但 Mixin 性能更好
         return new ItemStack(item, count, components.forget(DataComponentsPatch::isCustomType));
     }
 }

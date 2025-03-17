@@ -31,12 +31,12 @@ import java.lang.reflect.Type
 //  另一套契约需要修改函数 PatchedDataComponentMap#copy, 插入一些我们自己的逻辑.
 //  “如无必要, 勿增实体”.
 /**
- * 储存物品数据的容器.
+ * 代表一个容器, 存放需要 *持久化* 的数据. 该容器实例与 [org.bukkit.inventory.ItemStack] 绑定.
  *
- * 该容器本身不可变, 容器内的数据也不可变. 违反此契约将导致此实例被克隆后, 出现数据的脏读/写.
+ * 该容器本身不可变, 容器内的数据也不可变. 违反此契约将导致此实例被克隆后出现数据错乱的问题.
  *
- * 如果要基于当前容器修改数据, 使用 [toBuilder] 创建一个 [Builder] 实例, 便可以修改数据.
- * 修改完后再使用 [build] 创建一个新的 [ItemDataContainer] 实例, 便获得了修改后的版本.
+ * 如果要基于当前容器修改数据, 使用 [toBuilder] 创建一个 [Builder] 实例便可开始修改数据.
+ * 修改完后再使用 [build] 创建一个新的 [ItemDataContainer] 实例, 便可获得修改后的版本.
  */
 interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
@@ -181,6 +181,10 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
 }
 
+// ------------
+// 内部实现
+// ------------
+
 private data object EmptyItemDataContainer : ItemDataContainer {
     override val types: Set<ItemDataType<*>> = emptySet()
     override val size: Int = 0
@@ -196,22 +200,22 @@ private data object EmptyItemDataContainer : ItemDataContainer {
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
 private open class ItemDataContainerImpl(
     @JvmField
-    var data: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
+    var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
     @JvmField
     var copyOnWrite: Boolean, // 用于优化 copy 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
     override val types: Set<ItemDataType<*>>
-        get() = data.keys
+        get() = dataMap.keys
 
     override val size: Int
-        get() = data.size
+        get() = dataMap.size
 
     override fun isEmpty(): Boolean {
         return this.size == 0
     }
 
     override fun <T> get(type: ItemDataType<out T>): T? {
-        return data[type] as? T
+        return dataMap[type] as? T
     }
 
     override fun has(type: ItemDataType<*>): Boolean {
@@ -220,37 +224,40 @@ private open class ItemDataContainerImpl(
 
     override fun <T> set(type: ItemDataType<in T>, value: T): T? {
         ensureContainerOwnership()
-        return data.put(type, value) as T?
+        return dataMap.put(type, value) as T?
     }
 
     override fun set0(type: ItemDataType<*>, value: Any): Any? {
+        // FIXME #350: 在这里使用反射需要考虑性能问题.
+        //  也许 ItemDataType 并不需要 TypeToken, 只需要一个 Class 就可以解决问题.
+        //  只需要求程序猿不要在数据类型上使用泛型参数就可以了.
         require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
         ensureContainerOwnership()
-        return data.put(type, value)
+        return dataMap.put(type, value)
     }
 
     override fun <T> remove(type: ItemDataType<out T>): T? {
         ensureContainerOwnership()
-        return data.remove(type) as T?
+        return dataMap.remove(type) as T?
     }
 
     override fun iterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
-        return data.entries.iterator()
+        return dataMap.entries.iterator()
     }
 
     // FIXME #350: make it thread local?
     override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
-        return data.reference2ObjectEntrySet().fastIterator()
+        return dataMap.reference2ObjectEntrySet().fastIterator()
     }
 
     private fun copy0(): ItemDataContainerImpl {
         copyOnWrite = true
-        return ItemDataContainerImpl(data, copyOnWrite = true)
+        return ItemDataContainerImpl(dataMap, copyOnWrite = true)
     }
 
     private fun ensureContainerOwnership() {
         if (copyOnWrite) {
-            data = Reference2ObjectOpenHashMap(data)
+            dataMap = Reference2ObjectOpenHashMap(dataMap)
             copyOnWrite = false
         }
     }
@@ -296,7 +303,7 @@ private open class ItemDataContainerImpl(
                 return
             }
 
-            val iter = obj.data.reference2ObjectEntrySet().fastIterator()
+            val iter = obj.dataMap.reference2ObjectEntrySet().fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
                 val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: run {

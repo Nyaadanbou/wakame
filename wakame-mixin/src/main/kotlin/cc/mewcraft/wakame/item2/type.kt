@@ -6,6 +6,11 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.util.Identifier
 
+
+// ------------
+// 物品类型
+// ------------
+
 // KoishItem 作为物品的[类型]会生成许多实例, 这些实例存在的形式有两种:
 // 1) NMS ItemStack 形式, 也就是实际存在于游戏世界内的物品堆叠
 // 2) KoishItemProxy 形式, 也就是一个物品堆叠(通常是原版)的代理
