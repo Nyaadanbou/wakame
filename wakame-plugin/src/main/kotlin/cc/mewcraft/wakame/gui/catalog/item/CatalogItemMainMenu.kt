@@ -57,7 +57,7 @@ internal class CatalogItemMainMenu(
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // 对 CategoryItem 进行缓存
         // TODO 权限检查代码美化
-        builder.setContent(KoishRegistries.ITEM_CATEGORY.valueSequence.filter { category ->
+        builder.setContent(KoishRegistries.ITEM_CATEGORY.filter { category ->
             if (category.permission == null) return@filter true
             PermissionManager.hasPermission(viewer.world, viewer.uniqueId, category.permission).get()
         }.map { category ->
