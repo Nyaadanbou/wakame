@@ -12,8 +12,10 @@ import cc.mewcraft.wakame.ability.system.BlinkSystem
 import cc.mewcraft.wakame.ability.system.DashSystem
 import cc.mewcraft.wakame.ability.system.MultiJumpSystem
 import cc.mewcraft.wakame.ecs.Fleks.world
+import cc.mewcraft.wakame.ecs.system.BossBarVisibleManager
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
+import cc.mewcraft.wakame.ecs.system.EntityInfoBossBar
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.element.component.ElementStackContainer
@@ -73,6 +75,9 @@ object Fleks : Listener {
             add(ElementStackSystem())
 
             add(AbilityInitSystem())
+
+            add(EntityInfoBossBar())
+            add(BossBarVisibleManager())
 
             // 给每个 entity 的 tick 计数.
 

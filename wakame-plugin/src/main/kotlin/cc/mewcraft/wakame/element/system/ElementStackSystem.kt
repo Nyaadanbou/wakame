@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.ecs.component.BossBarVisible
+import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.ElementStackManager
 import cc.mewcraft.wakame.element.component.ElementComponent
@@ -16,9 +18,6 @@ import cc.mewcraft.wakame.util.KoishListener
 import cc.mewcraft.wakame.util.event
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import net.kyori.adventure.extra.kotlin.text
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.Style
 import org.bukkit.entity.Player
 
 class ElementStackSystem : IteratingSystem(
@@ -51,22 +50,7 @@ class ElementStackSystem : IteratingSystem(
             }
 
             if (causingEntity != null && causingEntity is Player) {
-                val container = target[ElementStackContainer].elementStacks()
-                val elementStackMessage = text {
-                    for ((elementEntry, entity) in container) {
-                        val element = elementEntry.value
-                        val stack = entity[ElementStackComponent]
-
-                        append(
-                            Component.text()
-                                .content("${stack.amount} ")
-                                .append(element.displayName)
-                                .style(Style.style(*element.displayStyles))
-                        )
-                    }
-                }
-
-                causingEntity.sendMessage(elementStackMessage)
+                causingEntity.koishify()[BossBarVisible].bossBar2DurationTick.put(target[EntityInfoBossBarComponent].bossBar, 100)
             }
         }
     }
