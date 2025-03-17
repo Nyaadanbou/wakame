@@ -28,7 +28,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemType
 import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 
-fun ItemStack.wrap(includeProxies: Boolean = true): NekoStack? = unwrapToMojang().wrap(includeProxies)
+fun ItemStack.wrap(includeProxies: Boolean = true): NekoStack? = toNMS().wrap(includeProxies)
 fun MojangStack.wrapOrThrow(includeProxies: Boolean = true): NekoStack = wrap(includeProxies) ?: error("The ItemStack cannot be wrapped to NekoStack")
 fun MojangStack.wrap(includeProxies: Boolean = true): NekoStack? = KoishStackImplementations.wrap(this, includeProxies)
 
@@ -297,7 +297,7 @@ internal object KoishStackImplementations {
     }
 
     fun getItemStack(itemstack: MojangStack): ItemStack {
-        return itemstack.wrapToBukkit()
+        return itemstack.toBukkit()
     }
 
     fun getItemType(itemstack: MojangStack): Material {

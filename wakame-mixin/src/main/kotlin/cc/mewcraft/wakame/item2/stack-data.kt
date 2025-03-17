@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.item.unwrapToMojang
+import cc.mewcraft.wakame.util.item.toNMS
 import net.minecraft.world.item.Item
 import org.bukkit.Material
 import org.bukkit.craftbukkit.inventory.CraftItemType
@@ -23,24 +23,24 @@ import org.bukkit.inventory.ItemStack
 
 //// Type
 
-val ItemStack.isKoish: Boolean get() = unwrapToMojang().isKoish
-val ItemStack.koish: KoishItem? get() = unwrapToMojang().koish
-val ItemStack.typeId: Identifier? get() = unwrapToMojang().typeId
-internal val ItemStack.dataContainer: ItemDataContainer? get() = unwrapToMojang().dataContainer
+val ItemStack.isKoish: Boolean get() = toNMS().isKoish
+val ItemStack.koish: KoishItem? get() = toNMS().koish
+val ItemStack.typeId: Identifier? get() = toNMS().typeId
+internal val ItemStack.dataContainer: ItemDataContainer? get() = toNMS().dataContainer
 val Material.koishProxy: KoishItemProxy? get() = KoishRegistries2.ITEM_PROXY[key()]
 
 //// Property
 
-fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = unwrapToMojang().hasProperty(type)
-fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = unwrapToMojang().getProperty(type)
+fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
+fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
 
 //// ItemData
 
-fun ItemStack.hasData(type: ItemDataType<*>): Boolean = unwrapToMojang().hasData(type)
-fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = unwrapToMojang().getData(type)
-fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = unwrapToMojang().getDataOrDefault(type, fallback)
-fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = unwrapToMojang().setData(type, value)
-fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = unwrapToMojang().removeData(type)
+fun ItemStack.hasData(type: ItemDataType<*>): Boolean = toNMS().hasData(type)
+fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
+fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = toNMS().getDataOrDefault(type, fallback)
+fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
+fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
 
 // ------------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的自定义数据

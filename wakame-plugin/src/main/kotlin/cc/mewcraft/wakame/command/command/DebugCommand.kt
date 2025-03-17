@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import cc.mewcraft.wakame.util.item.unwrapToMojang
+import cc.mewcraft.wakame.util.item.toNMS
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +50,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
 
     private fun handleInspectNbt(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
-        val nbtOrNull = KoishStackImplementations.getNbt(sender.inventory.itemInMainHand.unwrapToMojang())
+        val nbtOrNull = KoishStackImplementations.getNbt(sender.inventory.itemInMainHand.toNMS())
         sender.sendPlainMessage("NBT: " + nbtOrNull?.asString?.prettifyJson())
     }
 

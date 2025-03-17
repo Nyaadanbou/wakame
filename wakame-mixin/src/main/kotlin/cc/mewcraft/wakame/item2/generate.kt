@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.item.wrapToBukkit
+import cc.mewcraft.wakame.util.item.toBukkit
 import net.minecraft.world.item.Items
 import org.bukkit.inventory.ItemStack
 
@@ -65,7 +65,7 @@ object ItemStackGenerator {
             makeItemDataThenWrite(metaType, dataConfig, itemstack, context)
         }
 
-        return itemstack.wrapToBukkit()
+        return itemstack.toBukkit()
     }
 
     private fun <U, V> makeItemDataThenWrite(

@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.MojangStack
-import cc.mewcraft.wakame.util.item.unwrapToMojang
+import cc.mewcraft.wakame.util.item.toNMS
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -25,8 +25,8 @@ import org.bukkit.inventory.ItemStack
 // 用于访问 `org.bukkit.inventory.ItemStack` 上的 ItemBehavior
 // ------------
 
-fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = unwrapToMojang().hasBehavior(behavior)
-fun ItemStack.forEachBehavior(action: (ItemBehavior) -> Unit) = unwrapToMojang().forEachBehavior(action)
+fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = toNMS().hasBehavior(behavior)
+fun ItemStack.forEachBehavior(action: (ItemBehavior) -> Unit) = toNMS().forEachBehavior(action)
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
 

@@ -56,14 +56,14 @@ fun <T> ItemStack.whenNotEmptyReturn(block: ItemStack.() -> T): T? {
 // 这里特别把这些特殊的定义写成扩展函数, 方便我们直接调用
 // 不然的话就得手动, 把完整的判断逻辑写一遍又一遍
 
-val ItemStack.isDamageable: Boolean get() = unwrapToMojang().isDamageableItem
-val ItemStack.isDamaged: Boolean get() = unwrapToMojang().isDamaged
+val ItemStack.isDamageable: Boolean get() = toNMS().isDamageableItem
+val ItemStack.isDamaged: Boolean get() = toNMS().isDamaged
 var ItemStack.damage: Int
-    get() = unwrapToMojang().damageValue
-    set(value) = whenNotEmpty { unwrapToMojang().damageValue = value }
-val ItemStack.maxDamage: Int get() = unwrapToMojang().maxDamage
-val ItemStack.shouldBreak: Boolean get() = unwrapToMojang().isBroken
-val ItemStack.willBreakNextUse: Boolean get() = unwrapToMojang().nextDamageWillBreak()
+    get() = toNMS().damageValue
+    set(value) = whenNotEmpty { toNMS().damageValue = value }
+val ItemStack.maxDamage: Int get() = toNMS().maxDamage
+val ItemStack.shouldBreak: Boolean get() = toNMS().isBroken
+val ItemStack.willBreakNextUse: Boolean get() = toNMS().nextDamageWillBreak()
 
 
 // 这些操作在项目中被高频使用, 创建这些扩展函数以减少重复代码
@@ -72,26 +72,26 @@ val ItemStack.willBreakNextUse: Boolean get() = unwrapToMojang().nextDamageWillB
 val ItemStack.itemName: Component? get() = getData(DataComponentTypes.ITEM_NAME)
 val ItemStack.itemNameOrType: Component get() = getData(DataComponentTypes.ITEM_NAME) ?: Component.translatable(type)
 val ItemStack.customName: Component? get() = getData(DataComponentTypes.CUSTOM_NAME)
-val ItemStack.fastLore: List<Component>? get() = unwrapToMojang().lore
-val ItemStack.fastLoreOrEmpty: List<Component> get() = unwrapToMojang().loreOrEmpty
-fun ItemStack.fastLore(lore: List<Component>) = unwrapToMojang().lore(lore)
-fun ItemStack.toHoverableComponent(): Component = unwrapToMojang().hoverName.toAdventureComponent()
+val ItemStack.fastLore: List<Component>? get() = toNMS().lore
+val ItemStack.fastLoreOrEmpty: List<Component> get() = toNMS().loreOrEmpty
+fun ItemStack.fastLore(lore: List<Component>) = toNMS().lore(lore)
+fun ItemStack.toHoverableComponent(): Component = toNMS().hoverName.toAdventureComponent()
 
-val ItemStack.nbtCopy: CompoundTag? get() = unwrapToMojang().nbtCopy
+val ItemStack.nbtCopy: CompoundTag? get() = toNMS().nbtCopy
 
 @Deprecated("Do not make any changes to the returned NBT element", ReplaceWith("nbt"))
-val ItemStack.nbt: CompoundTag? get() = unwrapToMojang().nbt
+val ItemStack.nbt: CompoundTag? get() = toNMS().nbt
 
-fun ItemStack.setNBT(nbt: CompoundTag) = unwrapToMojang().setNbt(nbt)
-fun ItemStack.editNbt(create: Boolean = true, applier: (CompoundTag) -> Unit) = unwrapToMojang().editNbt(create, applier)
-fun ItemStack.removeNBT() = unwrapToMojang().removeNbt()
+fun ItemStack.setNBT(nbt: CompoundTag) = toNMS().setNbt(nbt)
+fun ItemStack.editNbt(create: Boolean = true, applier: (CompoundTag) -> Unit) = toNMS().editNbt(create, applier)
+fun ItemStack.removeNBT() = toNMS().removeNbt()
 
 
 // 网络数据包相关
 
 var ItemStack.isNetworkRewrite: Boolean
-    get() = unwrapToMojang().isNetworkRewrite
-    set(value) = whenNotEmpty { unwrapToMojang().isNetworkRewrite = value }
+    get() = toNMS().isNetworkRewrite
+    set(value) = whenNotEmpty { toNMS().isNetworkRewrite = value }
 
 
 // 用于将数据隐藏于 ItemStack 的提示框
@@ -99,7 +99,7 @@ var ItemStack.isNetworkRewrite: Boolean
 // 设置这些扩展函数, 是为了降低 Koish 需要变动的代码, 以及提高代码的性能
 
 private fun <T : Any> ItemStack.hideData(type: DataComponentType<T>, change: (T) -> T) = whenNotEmpty {
-    val item = unwrapToMojang()
+    val item = toNMS()
     val oldData = item.get(type) ?: return@whenNotEmpty // 如果没有数据就不需要隐藏, 可以直接返回
     val newData = change(oldData)
     item.set(type, newData)
@@ -130,8 +130,8 @@ fun ItemStack.hideUnbreakable() = hideData(DataComponents.UNBREAKABLE) { it.with
 
 // Bukkit & Mojang 互相转换
 
-fun MojangStack?.wrapToBukkit(): ItemStack = CraftItemStack.asCraftMirror(this)
-fun ItemStack.unwrapToMojang(): MojangStack = CraftItemStack.unwrap(this)
+fun MojangStack?.toBukkit(): ItemStack = CraftItemStack.asCraftMirror(this)
+fun ItemStack.toNMS(): MojangStack = CraftItemStack.unwrap(this)
 
 
 // Mojang ItemStack 的扩展函数
