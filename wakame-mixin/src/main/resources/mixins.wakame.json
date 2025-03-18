@@ -11,6 +11,7 @@
     "InvokerLootPoolEntries",
     "InvokerRegistryData",
     "MixinAbstractContainerMenu",
+    "MixinBoatItem",
     "MixinDataComponents",
     "MixinEnchantmentEffectComponents",
     "MixinEnchantmentEntityEffect",
@@ -24,6 +25,7 @@
     "MixinRepairItemRecipe",
     "MixinServerGamePacketListenerImpl",
     "MixinServerPlayer",
+    "MixinServerPlayerGameMode",
     "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe"
   ]

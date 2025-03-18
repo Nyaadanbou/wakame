@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.mixin.core;
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent;
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
@@ -84,26 +83,23 @@ public abstract class MixinServerGamePacketListenerImpl {
                     shift = At.Shift.AFTER
             )
     )
-    private void onRightClickAirSurvival(CallbackInfo ci, @Local(ordinal = 0) InteractionHand enumhand) {
-        PlayerItemRightClickEvent rightClickEvent = new PlayerItemRightClickEvent(this.player.getBukkitEntity(), this.player.getInventory().getSelected().asBukkitMirror(), enumhand);
+    private void onRightClickAir(CallbackInfo ci, @Local(ordinal = 0) InteractionHand enumhand, @Local(ordinal = 0) ItemStack itemstack) {
+        PlayerItemRightClickEvent rightClickEvent = new PlayerItemRightClickEvent(this.player.getBukkitEntity(), itemstack.asBukkitMirror(), enumhand);
         rightClickEvent.callEvent();
     }
 
     @Inject(
-            method = "handlePlayerAction",
+            method = "handleUseItem",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket;getAction()Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;",
+                    target = "Lorg/bukkit/craftbukkit/event/CraftEventFactory;callPlayerInteractEvent(Lnet/minecraft/world/entity/player/Player;Lorg/bukkit/event/block/Action;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;Lnet/minecraft/world/item/ItemStack;ZLnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/Vec3;)Lorg/bukkit/event/player/PlayerInteractEvent;",
                     shift = At.Shift.AFTER
             )
     )
-    private void onHandlePlayerAction(CallbackInfo ci, @Local(argsOnly = true) ServerboundPlayerActionPacket packet) {
-        if (packet.getAction() == ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK) {
-            ItemStack selected = this.player.getInventory().getSelected();
-            if (selected.isEmpty())
-                return;
-            PlayerItemLeftClickEvent leftClickEvent = new PlayerItemLeftClickEvent(this.player.getBukkitEntity(), selected.asBukkitMirror());
-            leftClickEvent.callEvent();
-        }
+    private void onRightClickBlock(CallbackInfo ci, @Local(ordinal = 0) InteractionHand enumhand, @Local(ordinal = 0) ItemStack itemstack) {
+        if (itemstack.isEmpty())
+            return;
+        PlayerItemRightClickEvent rightClickEvent = new PlayerItemRightClickEvent(this.player.getBukkitEntity(), itemstack.asBukkitMirror(), enumhand);
+        rightClickEvent.callEvent();
     }
 }
