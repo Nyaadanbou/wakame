@@ -23,13 +23,16 @@ import org.bukkit.inventory.ItemStack
  * 本单例负责从物品类型 [KoishItem] 生成一个物品实例 [ItemStack].
  *
  * 生成的用途分为两种:
- * 1. 生成出来的 [ItemStack] 将直接放置在游戏世界内, 例如合成和战利品箱.
- * 2. 生成出来的 [ItemStack] 将充当原版套皮物品的实例.
+ * 1. 生成出来的 [ItemStack] 直接放置在游戏世界内, 例如合成和战利品箱.
+ * 2. 生成出来的 [ItemStack] 充当原版套皮物品的实例.
  *
  * 对于第一种, 我们需要生成一个完整的 [ItemStack], 里面包含了 [ItemDataContainer].
  * 对于第二种, 我们只需要生成的 [ItemDataContainer], 其余信息可以丢掉 (GC).
  *
  * 也就是说, 第一种包括了第二种, 因此可以共用一个实现.
+ *
+ * ### 对于终端用户 (编写物品配置文件的人)
+ * 如果编写的物品配置文件是用于套皮物品, 务必确保配置文件所生成的数据不具有*随机性*.
  */
 object ItemStackGenerator {
 
@@ -42,15 +45,18 @@ object ItemStackGenerator {
      */
     fun generate(type: KoishItem, context: Context): ItemStack {
         val dataContainer = ItemDataContainer.builder()
-        // FIXME #350: 生成 ItemDataContainer
 
         // 写入基础信息, 每个自定义物品都有
         dataContainer[ItemDataTypes.ID] = ItemId(type.id)
         dataContainer[ItemDataTypes.VERSION] = 0 // FIXME #350: 实现数据迁移系统
+        dataContainer[ItemDataTypes.VARIANT] = 0
+
+        // FIXME #350: 测试写入类型为 Unit 的数据
+        dataContainer[ItemDataTypes.BYPASS_NETWORK_REWRITE] = Unit
 
         // 直接操作 MojangStack 以提高生成物品的速度
         val base = type.properties[ItemPropertyTypes.BASE]
-        val itemstack = MojangStack(Items.STONE) // FIXME #350: 获取物品的底模
+        val itemstack = MojangStack(Items.STONE) // FIXME #350: 根据物品底模生成对应的 itemstack
 
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
@@ -60,26 +66,26 @@ object ItemStackGenerator {
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig
 
-        // 从 ItemMetaContainer 生成 ItemData, 并写入到物品堆叠上
+        // 从 ItemMetaContainer 生成数据, 然后写入到物品堆叠上
         for (metaType in KoishRegistries2.ITEM_META_TYPE) {
-            makeItemDataThenWrite(metaType, dataConfig, itemstack, context)
+            makePersistentDataThenWrite(metaType, dataConfig, itemstack, context)
         }
 
         return itemstack.toBukkit()
     }
 
-    private fun <U, V> makeItemDataThenWrite(
+    private fun <U, V> makePersistentDataThenWrite(
         metaType: ItemMetaType<U, V>,
         metaContainer: ItemMetaContainer,
         itemstack: MojangStack,
         context: Context,
     ) {
-        val metaEntry = metaContainer[metaType]
-        if (metaEntry != null) {
-            val result = metaEntry.make(context)
+        val entry = metaContainer[metaType]
+        if (entry != null) {
+            val result = entry.make(context)
             if (result.isPresent()) {
                 val value = result.unwrap()
-                metaEntry.write(value, itemstack)
+                entry.write(value, itemstack)
             }
         }
     }

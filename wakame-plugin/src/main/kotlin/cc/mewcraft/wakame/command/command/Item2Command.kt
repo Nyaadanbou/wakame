@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.incendo.cloud.bukkit.data.MultiplePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.MultiplePlayerSelectorParser
 import org.incendo.cloud.context.CommandContext
@@ -46,8 +47,7 @@ internal object Item2Command : KoishCommandFactory<Source> {
             ?: emptyList()
 
         // 创建这个 map 有点耗时, 异步执行
-        // Map<Player, List<ItemStack>>
-        val itemStackMap = recipients.associateWith { player ->
+        val itemstackMap: Map<Player, Array<ItemStack>> = recipients.associateWith { player ->
             buildList(amount) {
                 repeat(amount) {
                     add(ItemStackGenerator.generate(item, Context()))
@@ -58,7 +58,7 @@ internal object Item2Command : KoishCommandFactory<Source> {
         }
 
         withContext(Dispatchers.minecraft) {
-            for ((player, items) in itemStackMap) {
+            for ((player, items) in itemstackMap) {
                 player.inventory.addItem(*items)
                 player.sendPlainMessage("You received $amount item(s): ${item.id}")
             }

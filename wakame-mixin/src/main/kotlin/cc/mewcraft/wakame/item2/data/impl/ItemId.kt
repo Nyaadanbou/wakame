@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item2.KoishItemProxy
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 
 // FIXME #350: 对象池
 // FIXME #350: 对于 KoinItemProxy 也需要写入这个数据以提高查询性能
@@ -13,13 +14,11 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class ItemId(
+    @Setting(nodeFromParent = true)
     val id: Identifier,
-    val variant: Int = 0,
 ) {
 
-    @Transient // FIXME #350: 好像构造器之外的 property 本就不会参与序列化
     val itemType: KoishItem? = KoishRegistries2.ITEM[id]
-    @Transient
     val itemProxy: KoishItemProxy? = KoishRegistries2.ITEM_PROXY[id]
 
 }

@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.util.Identifiers
 
 object KoishRegistryKeys2 {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.of("root")
+    val ROOT_REGISTRY_NAME = Identifiers.of("root_2")
 
     ///
 

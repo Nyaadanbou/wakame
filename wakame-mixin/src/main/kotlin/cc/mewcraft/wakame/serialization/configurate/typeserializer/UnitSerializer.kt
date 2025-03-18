@@ -9,7 +9,6 @@ import java.lang.reflect.Type
     "RedundantUnitReturnType",
     "RedundantUnitExpression"
 )
-// FIXME #350: 搞清楚在 configurate 中表示 Unit 的最好方式
 /*internal*/ object UnitSerializer : TypeSerializer<Unit> {
     override fun deserialize(type: Type, node: ConfigurationNode): Unit {
         if (node.virtual() && node.isMap) {

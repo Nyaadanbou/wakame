@@ -1,1 +1,3 @@
 base: diamond_sword[!attribute_modifiers]
+item_name: { plain: "没用的钻石剑" }
+level: { base: 5 }

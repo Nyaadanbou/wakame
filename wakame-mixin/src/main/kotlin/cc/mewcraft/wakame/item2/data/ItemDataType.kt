@@ -2,27 +2,15 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
-import cc.mewcraft.wakame.util.typeTokenOf
-import com.mojang.serialization.Codec
 import io.leangen.geantyref.TypeToken
-import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
 import org.spongepowered.configurate.serialize.ScalarSerializer
+import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 interface ItemDataType<T> {
 
     companion object {
 
-        // Codec 是为了能够让数据能够被 DFU 序列化
-        @JvmStatic
-        fun makeCodec(): Codec<ItemDataType<*>> {
-            return DfuSerializers.codec(typeTokenOf(), TypeSerializerCollection.builder().register(makeSerializer()).build()) ?: error("Impossible")
-        }
-
-        // FIXME #350: ItemDataType 的 TypeSerializer 应该是从:
-        //  Identifier <-> ItemDataType<*> 之间进行转换,
-        //  所以应该从 registry 生成一个 TypeSerializer
-        @JvmStatic
         fun makeSerializer(): ScalarSerializer<ItemDataType<*>> {
             return KoishRegistries2.ITEM_DATA_TYPE.valueByNameTypeSerializer()
         }
@@ -36,9 +24,10 @@ interface ItemDataType<T> {
     // 类型 T 的 TypeToken, 用于给 configurate 传递类型信息 T
     val typeToken: TypeToken<T>
 
-    // 返回空则表示 ItemDataType<T> 中的 T 可以直接使用 ObjectMapper<T>.
-    //  但如果 ObjectMapper<T> 必须依赖其他的 TypeSerializer 工作,
-    //  则可以在这里传入那些依赖的 TypeSerializer
+    /**
+     * 返回空表示数据类型 [T] 可以直接使用现有的 [TypeSerializerCollection] 来完成序列化操作.
+     * 但如果数据类型 [T] 需要依赖额外的 [TypeSerializer] 来完成序列化操作, 可以在这里返回.
+     */
     val serializers: TypeSerializerCollection?
 
     class Builder<T>(

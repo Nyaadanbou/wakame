@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.ability.trigger.TriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
+import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -19,11 +21,10 @@ import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-// FIXME #350: 添加序列化器
 private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    .register(ItemMetaContainer.makeSerializer())
-    .register(ItemBehaviorContainer.makeSerializer())
-    .register(ItemPropertyContainer.makeSerializer())
+    .register<ItemBehaviorContainer>(ItemBehaviorContainer.makeSerializer())
+    .registerAll(ItemPropertyContainer.makeSerializers())
+    .registerAll(ItemMetaContainer.makeSerializers())
     .build()
 
 /**
@@ -66,10 +67,15 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         val dataDir = getFileInConfigDirectory("item2/")
 
         dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
-            val rootNode = loader.buildAndLoadString(f.readText())
-            val itemId = IdentifierTools.of(f.toRelativeString(dataDir).substringBeforeLast('.'))
-            val itemValue = loadValue(itemId, rootNode)
-            consumer(itemId, itemValue)
+            try {
+                val rootNode = loader.buildAndLoadString(f.readText())
+                val itemId = IdentifierTools.of(f.toRelativeString(dataDir).substringBeforeLast('.'))
+                val itemValue = loadValue(itemId, rootNode)
+                consumer(itemId, itemValue)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to load custom item config: {}", f.path)
+                Util.pauseInIde(e)
+            }
         }
     }
 
@@ -89,7 +95,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
  * 在游戏内不允许通过指令/后台指令, 图鉴等手段获取.
  * 代码上仍然可以直接访问该命名空间下的物品.
  */
-@Init(stage = InitStage.PRE_WORLD, runAfter = [CustomItemRegistryLoader::class])
+@Init(stage = InitStage.POST_WORLD) // 套皮物品的初始化需要生成 NMS ItemStack, 而此时会调用一些 Paper 的实例但这些实例并未初始化完毕, 因此 POST_WORLD
 @Reload
 internal object ItemProxyRegistryLoader : RegistryLoader {
 
@@ -115,14 +121,20 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val dataDir = getFileInConfigDirectory("item2_proxied/")
 
         for (f in dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }) {
-            val rootNode = loader.buildAndLoadString(f.readText())
-            val itemId = IdentifierTools.of(Identifier.MINECRAFT_NAMESPACE, f.toRelativeString(dataDir).substringBeforeLast('.'))
-            if (!isMinecraftItem(itemId)) {
-                LOGGER.error("Found a non-Minecraft item config in ${dataDir.name}: ${f.name}. Skipped.")
-                continue
+            try {
+                val rootNode = loader.buildAndLoadString(f.readText())
+                val itemId = IdentifierTools.of(Identifier.MINECRAFT_NAMESPACE, f.toRelativeString(dataDir).substringBeforeLast('.'))
+                // FIXME #350: java.lang.IllegalArgumentException: RegistryKeyImpl[key=minecraft:item] points to a registry that is not available yet
+                //if (!isMinecraftItem(itemId)) {
+                //    LOGGER.error("Found a non-Minecraft item config in ${dataDir.name}: ${f.name}. Skipped.")
+                //    continue
+                //}
+                val itemValue = loadValue(itemId, rootNode)
+                consumer(itemId, itemValue)
+            } catch (e: Exception) {
+                LOGGER.error("Failed to load item proxy config: {}", f.path)
+                Util.pauseInIde(e)
             }
-            val itemValue = loadValue(itemId, rootNode)
-            consumer(itemId, itemValue)
         }
     }
 
@@ -131,7 +143,12 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val properties = node.require<ItemPropertyContainer>()
         val behaviors = node.require<ItemBehaviorContainer>()
         val koishItem = KoishItem(id, dataConfig, properties, behaviors)
-        TODO("#350: 为原版套皮物品生成 ItemDataContainer")
+
+        // 生成一个完整的 ItemStack, 但只取其 ItemDataContainer
+        val tempItemstack = ItemStackGenerator.generate(koishItem, Context())
+        val dataContainer = tempItemstack.koishData(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
+
+        return KoishItemProxy(koishItem, dataContainer)
     }
 
     private fun isMinecraftItem(id: Identifier): Boolean {

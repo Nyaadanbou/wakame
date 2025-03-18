@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 
 /**
- * 所有的物品行为类型.
+ * 该 `object` 包含了所有可用的 [ItemBehavior].
+ *
+ * [ItemBehavior] 描述的是一个物品与世界交互的逻辑, 不包含任何数据.
  */
 data object ItemBehaviorTypes {
 

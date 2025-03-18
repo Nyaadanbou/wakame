@@ -40,8 +40,8 @@ sealed interface ItemMetaResult<out T> {
     fun isEmpty(): Boolean
 
     /**
-     * 检查生成的数据是否不为空.
-     * 如果不为空，则应该将数据写入到物品堆叠上.
+     * 检查生成的数据是否存在.
+     * 如果存在，则应该将数据写入到物品堆叠上.
      */
     fun isPresent(): Boolean
 

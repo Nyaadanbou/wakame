@@ -83,8 +83,8 @@ fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerI
 // ------------
 
 fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean =
-    koish?.behaviors?.has(behavior) == true
+    koishItem?.behaviors?.has(behavior) == true
 
 fun MojangStack.forEachBehavior(action: (ItemBehavior) -> Unit) {
-    koish?.behaviors?.forEach(action)
+    koishItem?.behaviors?.forEach(action)
 }

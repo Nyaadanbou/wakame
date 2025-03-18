@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
 import io.leangen.geantyref.TypeToken
+import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
- * 代表一个 "Item Data" 的元数据, 即 *如何生成一个数据*.
+ * 代表一个*持久化数据类型*的元数据的类型. 在这里“元数据”意为“如何生成数据”.
  *
- * @param U 配置类型, 即 [ItemMetaEntry] 的实现类
- * @param V 数据类型, 即 [配置类型][U] 对应的 *数据类型*
+ * @param U 元数据的类型, 即 [ItemMetaEntry] 的实现类
+ * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
  */
 interface ItemMetaType<U, V> {
 
@@ -19,11 +20,15 @@ interface ItemMetaType<U, V> {
 
     val typeToken: TypeToken<U>
 
+    /**
+     * 返回空表示数据类型 [U] 可以直接使用现有的 [TypeSerializerCollection] 来完成序列化操作.
+     * 但如果数据类型 [U] 需要依赖额外的 [TypeSerializer] 来完成序列化操作, 可以在这里返回.
+     */
     val serializers: TypeSerializerCollection?
 
     /**
-     * @param U 配置类型, 即 [ItemMetaEntry] 的实现类
-     * @param V 数据类型, 即 [配置类型][U] 对应的 *数据类型*
+     * @param U 元数据的类型, 即 [ItemMetaEntry] 的实现类
+     * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
      */
     class Builder<U, V>(
         private val typeToken: TypeToken<U>,

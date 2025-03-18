@@ -8,28 +8,17 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.KOISH_CONFIGURATE_SERIALIZERS_2
+import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
-import xyz.xenondevs.commons.reflection.rawType
 import java.lang.reflect.Type
 
 
-// FIXME #350: 这个数据类型将成为 NMS DataComponentMap 的一部分.
-//  而根据 DataComponentMap 的契约, 该实例的数据必须为不可变, 所有 set 函数都不应该修改 `this` 的数据.
-//  从 ItemStack 来看, 如果要修改一个 ItemData, 则大概流程为:
-//  1) 先从 DataComponentMap 获取 ItemDataContainer
-//  2) 使用 set 设置新的 ItemData, 返回一个新的 ItemDataContainer
-//  3) 将新的 ItemDataContainer 放回 DataComponentMap
-//  ---
-//  等等, 似乎只需要把 DataComponentMap 的不可变契约的设计用在 ItemDataContainer 上就行.
-//  ---
-//  实现了一下, 与其自行搞另一套契约, 最稳妥地还是遵循现有的契约.
-//  另一套契约需要修改函数 PatchedDataComponentMap#copy, 插入一些我们自己的逻辑.
-//  “如无必要, 勿增实体”.
 /**
  * 代表一个容器, 存放需要 *持久化* 的数据. 该容器实例与 [org.bukkit.inventory.ItemStack] 绑定.
  *
@@ -45,25 +34,49 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
         @JvmStatic
         val EMPTY: ItemDataContainer = EmptyItemDataContainer
 
+        /**
+         * 该 [Codec] 调用的时机与 ItemStack 发生序列化的时机一致, 即:
+         * - 服务端从持久化媒介读取 ItemStack 的数据时, 例如 读取区块和实体, 加载玩家物品栏
+         * - 服务端往持久化媒介保存 ItemStack 的数据时, 例如 执行保存任务
+         *
+         * 例外: 这些序列化代码不会参与发包, 因为发包时不会发送任何自定义数据 (hint: Mixin).
+         */
         @JvmStatic
         fun makeCodec(): Codec<ItemDataContainer> {
-            val serializers = TypeSerializerCollection.builder()
+            val serials = TypeSerializerCollection.builder()
 
-            // 添加 ItemDataContainer 的 TypeSerializer
-            serializers.register(typeTokenOf<ItemDataContainer>(), makeSerializer())
+            // Codec 要求所有遇到的数据类型都有序列化操作可使用,
+            // 因此这里需要再明确的添加一些潜在依赖的序列化操作.
 
-            // 添加每一个 “ItemData” 的 TypeSerializer
-            serializers.registerAll(ItemDataTypes.serializers())
+            // 添加 @ConfigSerializable 的 TypeSerializer
+            serials.registerAnnotatedObjects(ObjectMappers.DEFAULT)
+            // 添加 Configurate 内置的 TypeSerializer.
+            //
+            // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照 注册 TypeSerializer 的顺序 进行的.
+            // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
+            // 内置的 ObjectMapper 将被优先使用, 导致无法反序列化 Kotlin 的 data class.
+            serials.registerAll(TypeSerializerCollection.defaults())
+            // 添加 Koish 常用的 TypeSerializer
+            serials.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
+            // 添加显式声明的 TypeSerializer
+            serials.registerAll(makeSerializers())
 
-            val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), serializers.build())
+            val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), serials.build())
             requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${ItemDataContainer::class}" }
 
             return codec
         }
 
         @JvmStatic
-        fun makeSerializer(): TypeSerializer<ItemDataContainer> {
-            return ItemDataContainerImpl.Serializer
+        fun makeSerializers(): TypeSerializerCollection {
+            val serials = TypeSerializerCollection.builder()
+
+            // 添加 ItemDataContainer 的 TypeSerializer
+            serials.register(typeTokenOf<ItemDataContainer>(), ItemDataContainerImpl.Serializer)
+            // 添加每一个 “Item Data” 的 TypeSerializer
+            serials.registerAll(ItemDataTypes.directSerializers())
+
+            return serials.build()
         }
 
         fun build(block: Builder.() -> Unit): ItemDataContainer {
@@ -202,7 +215,7 @@ private open class ItemDataContainerImpl(
     @JvmField
     var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
     @JvmField
-    var copyOnWrite: Boolean, // 用于优化 copy 的性能
+    var copyOnWrite: Boolean, // 用于优化 copy() 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
     override val types: Set<ItemDataType<*>>
         get() = dataMap.keys
@@ -228,10 +241,7 @@ private open class ItemDataContainerImpl(
     }
 
     override fun set0(type: ItemDataType<*>, value: Any): Any? {
-        // FIXME #350: 在这里使用反射需要考虑性能问题.
-        //  也许 ItemDataType 并不需要 TypeToken, 只需要一个 Class 就可以解决问题.
-        //  只需要求程序猿不要在数据类型上使用泛型参数就可以了.
-        require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
+        // 警告: 实现上必须确保这里传入的 value 类型一定是正确的
         ensureContainerOwnership()
         return dataMap.put(type, value)
     }
@@ -245,7 +255,6 @@ private open class ItemDataContainerImpl(
         return dataMap.entries.iterator()
     }
 
-    // FIXME #350: make it thread local?
     override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
         return dataMap.reference2ObjectEntrySet().fastIterator()
     }
@@ -271,21 +280,32 @@ private open class ItemDataContainerImpl(
     }
 
     override fun build(): ItemDataContainer {
-        return if (isEmpty()) EmptyItemDataContainer else this
+        return if (dataMap.isEmpty()) ItemDataContainer.EMPTY else this
     }
 
-    // FIXME #350: 需要确保 node 的 loader 加载了 ItemDataContainer 所需要的所有 TypeSerializer
-    //  具体来说, 是 ItemDataContainer 里面的数据类型的 TypeSerializer, 而非 ItemDataContainer 本身
+    // 正确实现 equals & hashCode 以支持相同物品能够堆叠
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other is ItemDataContainerImpl
+            && this.dataMap == other.dataMap
+        ) {
+            return true
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        return dataMap.hashCode()
+    }
+
     object Serializer : TypeSerializer<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             val builder = ItemDataContainer.builder()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 // 注意: 该 node key 所对应的 type 必须存在
-                val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: run {
-                    LOGGER.error("Unknown item data type: '$nodeKey'. Skipped.")
-                    continue
-                }
+                val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: continue
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
                 val dataValue = itemDataNode.get(dataType.typeToken) ?: run {
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
@@ -306,11 +326,9 @@ private open class ItemDataContainerImpl(
             val iter = obj.dataMap.reference2ObjectEntrySet().fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
-                val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: run {
-                    LOGGER.error("Unknown item data type: $dataType. Skipped.")
-                    continue
-                }
-                node.node(dataTypeId.asString()).set(dataValue)
+                val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: continue
+                // 这里写入的 map key 省略了命名空间 "koish"
+                node.node(dataTypeId.value()).set(dataValue)
             }
         }
     }

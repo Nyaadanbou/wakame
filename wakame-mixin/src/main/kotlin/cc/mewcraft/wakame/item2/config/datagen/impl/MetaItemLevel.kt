@@ -90,10 +90,10 @@ data class MetaItemLevel(
             val base = when (val scalar = node.node("base").rawScalar()) {
                 is Number -> scalar
                 is String -> EnumLookup.lookup<Option>(scalar).getOrThrow()
-                else -> throw SerializationException(node, type, "Invalid `base`")
+                else -> throw SerializationException(node, type, "invalid `base`")
             }
-            val floatChance = node.node("float_chance").get<Double>(.0).takeIf { it in 0.0..1.0 } ?: throw SerializationException(node, type, "Invalid `float_chance`")
-            val floatAmount = node.node("float_amount").get<Range<Int>>(Range.closed(0, 0)).toKotlinRange() ?: throw SerializationException(node, type, "Invalid `float_amount`")
+            val floatChance = node.node("float_chance").get<Double>(.0).takeIf { it in 0.0..1.0 } ?: throw SerializationException(node, type, "invalid `float_chance`")
+            val floatAmount = node.node("float_amount").get<Range<Int>>(Range.closed(0, 0)).toKotlinRange() ?: throw SerializationException(node, type, "invalid `float_amount`")
             val max = node.node("max").get<Int>() ?: Int.MAX_VALUE
             return MetaItemLevel(base, floatChance, floatAmount, max)
         }

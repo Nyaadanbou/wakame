@@ -1,24 +1,17 @@
 package cc.mewcraft.wakame.item2.config.property
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import io.leangen.geantyref.TypeToken
-import org.spongepowered.configurate.serialize.ScalarSerializer
+import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
+ * 代表一个与*物品类型*所绑定的数据类型.
+ *
  * @param T 数据类型
  */
 interface ItemPropertyType<T> {
 
     companion object {
-
-        // FIXME #350:
-        //  Identifier <-> GlobalPropertyType 之间转换,
-        //  所以应该从 Registry 生成一个 TypeSerializer
-        fun makeSerializer(): ScalarSerializer<ItemPropertyType<*>> {
-            return KoishRegistries2.ITEM_PROPERTY_TYPE.valueByNameTypeSerializer()
-        }
 
         fun <T> builder(typeToken: TypeToken<T>): Builder<T> {
             return Builder(typeToken)
@@ -28,9 +21,10 @@ interface ItemPropertyType<T> {
 
     val typeToken: TypeToken<T>
 
-    // FIXME #350: 返回空则表示 ItemDataType<T> 中的 T 可以直接使用 ObjectMapper<T>.
-    //  但如果 ObjectMapper<T> 必须依赖其他的 TypeSerializer 工作,
-    //  则可以在这里传入那些依赖的 TypeSerializer
+    /**
+     * 返回空表示数据类型 [T] 可以直接使用现有的 [TypeSerializerCollection] 来完成序列化操作.
+     * 但如果数据类型 [T] 需要依赖额外的 [TypeSerializer] 来完成序列化操作, 可以在这里返回.
+     */
     val serializers: TypeSerializerCollection?
 
     class Builder<T>(

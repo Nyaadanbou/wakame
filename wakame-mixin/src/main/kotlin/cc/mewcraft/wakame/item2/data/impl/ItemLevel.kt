@@ -5,7 +5,6 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 data class ItemLevel(
-    // FIXME #350: 验证这样是否可以生成一个 IntTag 而非 CompoundTag
     @Setting(nodeFromParent = true)
     val level: Int,
 ) {

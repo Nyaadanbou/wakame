@@ -1,1 +1,4 @@
-item_name: "闪亮的钻石"
+item_name:
+  plain: "闪亮的钻石"
+  fancy: "<aqua>闪亮的钻石"
+level: { base: 1 }

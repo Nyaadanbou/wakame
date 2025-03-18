@@ -7,9 +7,11 @@ import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializer
+import org.spongepowered.configurate.ConfigurationOptions
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 /**
@@ -24,8 +26,14 @@ interface ItemMetaContainer {
 
     companion object {
 
-        fun makeSerializer(): TypeSerializer<ItemMetaContainer> {
-            return ItemMetaContainerImpl.Serializer
+        @JvmField
+        val EMPTY: ItemMetaContainer = EmptyItemMetaContainer
+
+        fun makeSerializers(): TypeSerializerCollection {
+            val collection = TypeSerializerCollection.builder()
+            collection.register<ItemMetaContainer>(ItemMetaContainerImpl.Serializer)
+            collection.registerAll(ItemMetaTypes.directSerializers())
+            return collection.build()
         }
 
         fun build(block: Builder.() -> Unit): ItemMetaContainer {
@@ -125,6 +133,10 @@ interface ItemMetaEntry<V> {
 // 内部实现
 // ------------
 
+private data object EmptyItemMetaContainer : ItemMetaContainer {
+    override fun <U, V> get(type: ItemMetaType<U, V>): ItemMetaEntry<V>? = null
+}
+
 private class ItemMetaContainerImpl(
     private val metaMap: Reference2ObjectLinkedOpenHashMap<ItemMetaType<*, *>, ItemMetaEntry<*>> = Reference2ObjectLinkedOpenHashMap(),
 ) : ItemMetaContainer, ItemMetaContainer.Builder {
@@ -139,12 +151,11 @@ private class ItemMetaContainerImpl(
 
     override fun set0(type: ItemMetaType<*, *>, value: Any) {
         // 警告: 这里无法对 value: Any 中的泛型参数做检查, 实现需要保证 value 的类型完全正确
-        require(value is ItemMetaEntry<*>) { "The type of value must be ${ItemMetaEntry::class}" }
-        metaMap.put(type, value)
+        metaMap.put(type, value as ItemMetaEntry<*>)
     }
 
     override fun build(): ItemMetaContainer {
-        return this
+        return if (metaMap.isEmpty()) ItemMetaContainer.EMPTY else this
     }
 
     object Serializer : TypeSerializer2<ItemMetaContainer> {
@@ -152,10 +163,7 @@ private class ItemMetaContainerImpl(
             val builder = ItemMetaContainer.builder()
             for ((rawNodeKey, node) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
-                val dataType = KoishRegistries2.ITEM_META_TYPE[nodeKey] ?: run {
-                    LOGGER.error("Unknown item meta type: '$nodeKey'. Skipped.")
-                    continue
-                }
+                val dataType = KoishRegistries2.ITEM_META_TYPE[nodeKey] ?: continue
                 val dataValue = node.get(dataType.typeToken) ?: run {
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
@@ -163,6 +171,10 @@ private class ItemMetaContainerImpl(
                 builder.set0(dataType, dataValue)
             }
             return builder.build()
+        }
+
+        override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemMetaContainer? {
+            return ItemMetaContainer.EMPTY
         }
     }
 

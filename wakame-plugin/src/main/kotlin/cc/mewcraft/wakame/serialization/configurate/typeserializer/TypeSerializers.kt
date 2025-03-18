@@ -1,5 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.ability.TriggerVariantSerializer
