@@ -22,6 +22,7 @@
     "MixinPlayerInventory",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",
+    "MixinServerGamePacketListenerImpl",
     "MixinServerPlayer",
     "MixinStackedContentsExtrasMap",
     "MixinTippedArrowRecipe"

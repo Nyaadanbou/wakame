@@ -241,22 +241,108 @@ internal object DamageDisplay {
 
     private fun registerListeners() {
         event<NekoEntityDamageEvent>(EventPriority.MONITOR, true) { event ->
+            val damager = event.damageSource.causingEntity as? Player
             val damagee = event.damagee as? LivingEntity ?: return@event
             val criticalState = event.getCriticalState()
             val hologramText = settings.finalText(event)
 
-            sendDamageHologram(
-                damagee = damagee,
-                hologramText = hologramText,
-                hologramAnimations = settings.animations,
-                hologramDuration = settings.animationDuration,
-                criticalStrikeState = criticalState
-            )
+            if (damager != null) {
+                sendDamageHologram(
+                    viewers = setOf(damager),
+                    hologramAnimations = settings.animations,
+                    hologramDuration = settings.animationDuration,
+                    criticalStrikeState = criticalState
+                ) { viewer ->
+                    TextHologramData(
+                        location = calculateHologramLocation(damager, damagee, 3f),
+                        text = hologramText,
+                        background = Color.fromARGB(0),
+                        hasTextShadow = true,
+                        textAlignment = TextDisplay.TextAlignment.CENTER,
+                        isSeeThrough = true
+                    ).apply {
+                        this.brightness = Display.Brightness(15, 0)
+                    }
+                }
+            } else {
+                sendDamageHologram(
+                    viewers = damagee.trackedBy,
+                    hologramAnimations = settings.animations,
+                    hologramDuration = settings.animationDuration,
+                    criticalStrikeState = criticalState
+                ) { viewer ->
+                    val randomPair = RADIAL_POINT_CYCLE.next(viewer)
+                    TextHologramData(
+                        location = damagee.location.clone().add(randomPair.first.toDouble(), damagee.height, randomPair.second.toDouble()),
+                        text = hologramText,
+                        background = Color.fromARGB(0),
+                        hasTextShadow = true,
+                        textAlignment = TextDisplay.TextAlignment.CENTER,
+                        isSeeThrough = false
+                    ).apply {
+                        this.brightness = Display.Brightness(15, 0)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun sendDamageHologram(
+        viewers: Set<Player>,
+        hologramAnimations: List<DamageDisplayAnimation>,
+        hologramDuration: Long,
+        criticalStrikeState: CriticalStrikeState,
+        hologramDataProvider: (Player) -> TextHologramData,
+    ) {
+        val holograms = viewers.map(hologramDataProvider).associateBy(::Hologram)
+        displayHolograms(viewers, holograms, hologramAnimations, hologramDuration, criticalStrikeState)
+    }
+
+    private fun displayHolograms(
+        viewers: Set<Player>,
+        holograms: Map<Hologram, TextHologramData>,
+        hologramAnimations: List<DamageDisplayAnimation>,
+        hologramDuration: Long,
+        criticalStrikeState: CriticalStrikeState,
+    ) {
+        // 遍历播放所有动画
+        for (animation in hologramAnimations) {
+            runTaskLater(animation.delay) {
+                for ((hologram, hologramData) in holograms) {
+                    hologramData.apply {
+                        val animationData = when (criticalStrikeState) {
+                            CriticalStrikeState.NONE -> animation.normalData
+                            CriticalStrikeState.POSITIVE -> animation.positiveData
+                            CriticalStrikeState.NEGATIVE -> animation.negativeData
+                        }
+                        this.startInterpolation = animationData.startInterpolation
+                        this.interpolationDuration = animationData.interpolationDuration
+                        this.translation = animationData.translation
+                        this.scale = animationData.scale
+                    }
+                    if (animation.delay == 0L) {
+                        // 发送创建 hologram 的封包
+                        viewers.forEach { hologramViewer -> hologram.show(hologramViewer) }
+                    } else {
+                        // 更新动画
+                        hologram.update()
+                        viewers.forEach { hologramViewer -> hologram.refresh(hologramViewer) }
+                    }
+                }
+            }
+        }
+
+        // 发送隐藏 hologram 的封包
+        // 注意需要手动确保在“动画”播放完毕后再隐藏
+        runTaskLater(hologramDuration) {
+            for ((hologram, _) in holograms) {
+                viewers.forEach { hologramViewer -> hologram.hide(hologramViewer) }
+            }
         }
     }
 
     /**
-     * 计算一个坐标 `C`, 使其落在 [玩家][viewer] 的眼睛与 [受伤实体][damagee]
+     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的眼睛与 [受伤实体][damagee]
      * 的眼睛的连线 `AB` 上, 并且与玩家的 [眼睛][Player.getEyeLocation]
      * 的距离为 [distance].
      *
@@ -269,11 +355,11 @@ internal object DamageDisplay {
      * - 无论玩家以什么角度发起攻击, 伤害信息始终都在正前方
      */
     private fun calculateHologramLocation(
-        viewer: Player,
+        damager: Player,
         damagee: LivingEntity,
         distance: Float,
     ): Location {
-        val a = viewer.eyeLocation.toVector3f()
+        val a = damager.eyeLocation.toVector3f()
         val b = damagee.eyeLocation.toVector3f().apply { y -= damagee.height.toFloat() / 3f } // 降低一点高度, 让数字落在屏幕正中间
         val ab = (b - a).normalize()
         val c0 = a + (ab mul distance)
@@ -292,68 +378,7 @@ internal object DamageDisplay {
         // 计算 C
         val c = c0 + (v1 mul r1) + (v2 mul r2)
 
-        return c.toLocation(viewer.world)
-    }
-
-    /**
-     * 发送伤害数值的悬浮文字.
-     */
-    private fun sendDamageHologram(
-        damagee: LivingEntity,
-        hologramText: Component,
-        hologramAnimations: List<DamageDisplayAnimation>,
-        hologramDuration: Long,
-        criticalStrikeState: CriticalStrikeState,
-    ) {
-        val hologramViewers = damagee.trackedBy
-
-        val holograms = hologramViewers.map { hologramViewer ->
-            TextHologramData(
-                location = calculateHologramLocation(viewer = hologramViewer, damagee = damagee, distance = 3f),
-                text = hologramText,
-                background = Color.fromARGB(0),
-                hasTextShadow = true,
-                textAlignment = TextDisplay.TextAlignment.CENTER,
-                isSeeThrough = true
-            ).apply {
-                this.brightness = Display.Brightness(15, 0)
-            }
-        }.map { it to Hologram(it) }
-
-        // 遍历播放所有动画
-        for (animation in hologramAnimations) {
-            runTaskLater(animation.delay) {
-                for ((hologramData, hologram) in holograms) {
-                    hologramData.apply {
-                        val animationData = when (criticalStrikeState) {
-                            CriticalStrikeState.NONE -> animation.normalData
-                            CriticalStrikeState.POSITIVE -> animation.positiveData
-                            CriticalStrikeState.NEGATIVE -> animation.negativeData
-                        }
-                        this.startInterpolation = animationData.startInterpolation
-                        this.interpolationDuration = animationData.interpolationDuration
-                        this.translation = animationData.translation
-                        this.scale = animationData.scale
-                    }
-                    if (animation.delay == 0L) {
-                        // 发送创建 hologram 的封包
-                        hologramViewers.forEach { hologramViewer -> hologram.show(hologramViewer) }
-                    } else {
-                        // 更新动画
-                        hologram.update()
-                        hologramViewers.forEach { hologramViewer -> hologram.refresh(hologramViewer) }
-                    }
-                }
-            }
-        }
-
-        // 发送隐藏 hologram 的封包
-        // 注意需要手动确保在“动画”播放完毕后再隐藏
-        runTaskLater(hologramDuration) {
-            for ((_, hologram) in holograms) {
-                hologramViewers.forEach { hologramViewer -> hologram.hide(hologramViewer) }
-            }
-        }
+        return c.toLocation(damager.world)
     }
 }
 
