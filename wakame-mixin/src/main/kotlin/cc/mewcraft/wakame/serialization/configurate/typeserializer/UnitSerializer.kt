@@ -10,7 +10,7 @@ import java.lang.reflect.Type
     "RedundantUnitReturnType",
     "RedundantUnitExpression"
 )
-// FIXME 350#: 暂时用值为 0 Byte 来表示 Unit.
+// FIXME #350: 暂时用值为 0 Byte 来表示 Unit.
 //  正经做法是用空 Map 来表示 Unit, 但 ConfigurateOps
 //  在 decode 时无法读取到 NbtOps 的空 CompoundTag.
 /*internal*/ object UnitSerializer : TypeSerializer<Unit> {
