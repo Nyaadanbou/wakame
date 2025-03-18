@@ -40,8 +40,11 @@ data class MetaItemLevel(
 ) : ItemMetaEntry<ItemLevel> {
 
     companion object {
+
         // 实现注意事项: 将内部的 TypeSerializer 暴露为一个 val
+        @JvmField
         val SERIALIZER: TypeSerializer<MetaItemLevel> = Serializer
+
     }
 
     override fun make(context: Context): ItemMetaResult<ItemLevel> {

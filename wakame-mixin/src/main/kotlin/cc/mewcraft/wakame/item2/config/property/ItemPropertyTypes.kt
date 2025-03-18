@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase2
+import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot2
 import cc.mewcraft.wakame.item2.config.property.impl.Lore
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -26,9 +27,12 @@ data object ItemPropertyTypes {
     @JvmField
     val ID: ItemPropertyType<Identifier> = typeOf("id")
 
-    // FIXME #350: 完成 itembase
     @JvmField
-    val BASE: ItemPropertyType<ItemBase2> = typeOf("base/todo")
+    val BASE: ItemPropertyType<ItemBase> = typeOf("base") {
+        serializers {
+            register<ItemBase>(ItemBase.SERIALIZER)
+        }
+    }
 
     // FIXME #350: 完成 itemslot
     @JvmField

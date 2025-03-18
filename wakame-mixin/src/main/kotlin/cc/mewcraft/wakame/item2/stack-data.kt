@@ -26,7 +26,7 @@ import org.bukkit.inventory.ItemStack
 
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.koish: KoishItem? get() = toNMS().koishItem
-val ItemStack.typeId: Identifier? get() = toNMS().typeId
+val ItemStack.typeId: Identifier get() = toNMS().typeId
 fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
 val Material.koishProxy: KoishItemProxy? get() = KoishRegistries2.ITEM_PROXY[key()]
 
@@ -55,7 +55,14 @@ val MojangStack.isKoish: Boolean
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
  *
- * 对于 *自定义物品堆叠* 和 *套皮物品堆叠*, 该函数均不会返回 `null`.
+ * 返回非空的情况:
+ * - 该物品堆叠是*自定义物品堆叠*
+ * - 该物品堆叠是*套皮物品堆叠*
+ *
+ * 返回空的情况:
+ * - 其余所有情况
+ *
+ * *绝大多数情况下无需使用该函数.*
  */
 val MojangStack.koishItem: KoishItem?
     get() = koishData(true)?.get(ItemDataTypes.ID)?.itemType
@@ -66,14 +73,14 @@ val MojangStack.koishItem: KoishItem?
  * - 如果该物品堆叠是一个 *自定义物品* , 则命名空间为 `koish`
  * - 如果该物品堆叠是一个 *原版(或套皮)物品*, 则命名空间为 `minecraft`
  */
-val MojangStack.typeId: Identifier?
-    get() = koishData(true)?.get(ItemDataTypes.ID)?.id
+val MojangStack.typeId: Identifier
+    get() = koishData(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
 /**
  * 获取该物品堆叠的持久化数据容器 [ItemDataContainer].
  * 参数 [includeProxy] 可以控制是否包含套皮物品的容器.
  *
- * *绝大多数情况不应该使用该函数.*
+ * *绝大多数情况下无需使用该函数.*
  *
  * @see hasData
  * @see getData
@@ -86,9 +93,11 @@ fun MojangStack.koishData(includeProxy: Boolean): ItemDataContainer? =
 
 /**
  * 获取该物品类型的套皮物品的实例.
+ *
+ * *绝大多数情况下无需使用该函数.*
  */
 val Item.koishProxy: KoishItemProxy?
-    get() = KoishRegistries2.ITEM_PROXY[CraftItemType.minecraftToBukkit(this).key() /*获得一个 Item 的命名空间形式的 ID*/]
+    get() = CraftItemType.minecraftToBukkit(this).koishProxy
 
 //// Property
 

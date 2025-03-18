@@ -127,8 +127,7 @@ private class SimpleItemPropertyContainer(
             for ((rawNodeKey, node) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 val dataType = KoishRegistries2.ITEM_PROPERTY_TYPE[nodeKey] ?: continue
-                val dataTypeToken = dataType.typeToken
-                val dataValue = node.get(dataTypeToken) ?: run {
+                val dataValue = node.get(dataType.typeToken) ?: run {
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
