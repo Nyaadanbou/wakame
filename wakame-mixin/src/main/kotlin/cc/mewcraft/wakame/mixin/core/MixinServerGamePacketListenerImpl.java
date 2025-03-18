@@ -49,7 +49,10 @@ public abstract class MixinServerGamePacketListenerImpl {
             )
     )
     private void onLeftClickAdventure(CallbackInfo ci) {
-        PlayerItemLeftClickEvent leftClickEvent = new PlayerItemLeftClickEvent(this.player.getBukkitEntity(), this.player.getInventory().getSelected().asBukkitMirror());
+        ItemStack selected = this.player.getInventory().getSelected();
+        if (selected.isEmpty())
+            return;
+        PlayerItemLeftClickEvent leftClickEvent = new PlayerItemLeftClickEvent(this.player.getBukkitEntity(), selected.asBukkitMirror());
         leftClickEvent.callEvent();
     }
 
@@ -62,15 +65,14 @@ public abstract class MixinServerGamePacketListenerImpl {
             )
     )
     private void afterLeftClickRaytrace(CallbackInfo ci, @Local Location origin, @Local RayTraceResult result) {
-        if (result != null) {
-            GameType gameType = this.player.gameMode.getGameModeForPlayer();
-            if (gameType != GameType.CREATIVE && result.getHitEntity() != null && origin.toVector().distanceSquared(result.getHitPosition()) < this.player.entityInteractionRange() * this.player.entityInteractionRange()) {
-                ItemStack selected = this.player.getInventory().getSelected();
-                if (selected.isEmpty())
-                    return;
-                PlayerItemLeftClickEvent leftClickEvent = new PlayerItemLeftClickEvent(this.player.getBukkitEntity(), selected.asBukkitMirror());
-                leftClickEvent.callEvent();
-            }
+        // 此时已经判定了 result 非空
+        GameType gameType = this.player.gameMode.getGameModeForPlayer();
+        if (gameType != GameType.CREATIVE && result.getHitEntity() != null && origin.toVector().distanceSquared(result.getHitPosition()) < this.player.entityInteractionRange() * this.player.entityInteractionRange()) {
+            ItemStack selected = this.player.getInventory().getSelected();
+            if (selected.isEmpty())
+                return;
+            PlayerItemLeftClickEvent leftClickEvent = new PlayerItemLeftClickEvent(this.player.getBukkitEntity(), selected.asBukkitMirror());
+            leftClickEvent.callEvent();
         }
     }
 
