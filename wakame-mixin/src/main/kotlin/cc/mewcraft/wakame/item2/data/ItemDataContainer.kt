@@ -51,7 +51,6 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             // 添加 @ConfigSerializable 的 TypeSerializer
             serials.registerAnnotatedObjects(ObjectMappers.DEFAULT)
             // 添加 Configurate 内置的 TypeSerializer.
-            //
             // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照 注册 TypeSerializer 的顺序 进行的.
             // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
             // 内置的 ObjectMapper 将被优先使用, 导致无法反序列化 Kotlin 的 data class.
