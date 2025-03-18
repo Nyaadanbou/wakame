@@ -31,7 +31,7 @@ interface ItemMetaContainer {
 
         fun makeSerializers(): TypeSerializerCollection {
             val collection = TypeSerializerCollection.builder()
-            collection.register<ItemMetaContainer>(ItemMetaContainerImpl.Serializer)
+            collection.register<ItemMetaContainer>(SimpleItemMetaContainer.Serializer)
             collection.registerAll(ItemMetaTypes.directSerializers())
             return collection.build()
         }
@@ -41,7 +41,7 @@ interface ItemMetaContainer {
         }
 
         fun builder(): Builder {
-            return ItemMetaContainerImpl()
+            return SimpleItemMetaContainer()
         }
 
     }
@@ -107,10 +107,10 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureSetData(type: ItemDataType<in T>, value: T): T? {
-        val container = getOrDefault(DataComponentsPatch.ITEM_DATA_CONTAINER, ItemDataContainer.EMPTY)
+        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.set(type, value)
-        set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
         return oldVal
     }
 
@@ -120,10 +120,10 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureRemoveData(type: ItemDataType<out T>): T? {
-        val container = getOrDefault(DataComponentsPatch.ITEM_DATA_CONTAINER, ItemDataContainer.EMPTY)
+        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.remove(type)
-        set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
         return oldVal
     }
 
@@ -137,7 +137,7 @@ private data object EmptyItemMetaContainer : ItemMetaContainer {
     override fun <U, V> get(type: ItemMetaType<U, V>): ItemMetaEntry<V>? = null
 }
 
-private class ItemMetaContainerImpl(
+private class SimpleItemMetaContainer(
     private val metaMap: Reference2ObjectLinkedOpenHashMap<ItemMetaType<*, *>, ItemMetaEntry<*>> = Reference2ObjectLinkedOpenHashMap(),
 ) : ItemMetaContainer, ItemMetaContainer.Builder {
 

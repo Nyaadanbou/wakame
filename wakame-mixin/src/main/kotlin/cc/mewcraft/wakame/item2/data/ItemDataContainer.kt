@@ -72,7 +72,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             val serials = TypeSerializerCollection.builder()
 
             // 添加 ItemDataContainer 的 TypeSerializer
-            serials.register(typeTokenOf<ItemDataContainer>(), ItemDataContainerImpl.Serializer)
+            serials.register(typeTokenOf<ItemDataContainer>(), SimpleItemDataContainer.Serializer)
             // 添加每一个 “Item Data” 的 TypeSerializer
             serials.registerAll(ItemDataTypes.directSerializers())
 
@@ -84,7 +84,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
         }
 
         fun builder(): Builder {
-            return ItemDataContainerImpl(copyOnWrite = true)
+            return SimpleItemDataContainer(copyOnWrite = true)
         }
 
     }
@@ -206,12 +206,12 @@ private data object EmptyItemDataContainer : ItemDataContainer {
     override fun has(type: ItemDataType<*>): Boolean = false
     override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = iterator()
     override fun copy(): ItemDataContainer = this
-    override fun toBuilder(): ItemDataContainer.Builder = ItemDataContainerImpl(copyOnWrite = false)
+    override fun toBuilder(): ItemDataContainer.Builder = SimpleItemDataContainer(copyOnWrite = false)
     override fun iterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = emptyMap<ItemDataType<*>, Any>().iterator()
 }
 
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
-private open class ItemDataContainerImpl(
+private open class SimpleItemDataContainer(
     @JvmField
     var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
     @JvmField
@@ -259,9 +259,9 @@ private open class ItemDataContainerImpl(
         return dataMap.reference2ObjectEntrySet().fastIterator()
     }
 
-    private fun copy0(): ItemDataContainerImpl {
+    private fun copy0(): SimpleItemDataContainer {
         copyOnWrite = true
-        return ItemDataContainerImpl(dataMap, copyOnWrite = true)
+        return SimpleItemDataContainer(dataMap, copyOnWrite = true)
     }
 
     private fun ensureContainerOwnership() {
@@ -287,7 +287,7 @@ private open class ItemDataContainerImpl(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other is ItemDataContainerImpl
+        if (other is SimpleItemDataContainer
             && this.dataMap == other.dataMap
         ) {
             return true
@@ -318,8 +318,8 @@ private open class ItemDataContainerImpl(
 
         override fun serialize(type: Type, obj: ItemDataContainer?, node: ConfigurationNode) {
             if (obj == null) return
-            if (obj !is ItemDataContainerImpl) {
-                LOGGER.error("Only expects ${ItemDataContainerImpl::class.qualifiedName}, but got ${obj::class.qualifiedName}")
+            if (obj !is SimpleItemDataContainer) {
+                LOGGER.error("Only expects ${SimpleItemDataContainer::class.qualifiedName}, but got ${obj::class.qualifiedName}")
                 return
             }
 

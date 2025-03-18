@@ -30,7 +30,7 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
          * 获取一个 [TypeSerializer] 用于序列化 [ItemBehaviorContainer].
          */
         fun makeSerializer(): TypeSerializer<ItemBehaviorContainer> {
-            return ItemBehaviorContainerImpl.Serializer
+            return SimpleItemBehaviorContainer.Serializer
         }
 
         /**
@@ -44,7 +44,7 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
          * 获取一个 [Builder] 用来创建 [ItemBehaviorContainer].
          */
         fun builder(): Builder {
-            return ItemBehaviorContainerImpl()
+            return SimpleItemBehaviorContainer()
         }
     }
 
@@ -94,7 +94,7 @@ private data object EmptyItemBehaviorContainer : ItemBehaviorContainer {
 }
 
 // 该 class 同时实现了 ItemBehaviorContainer 和 ItemBehaviorContainer.Builder
-private class ItemBehaviorContainerImpl(
+private class SimpleItemBehaviorContainer(
     private val behaviorMap: ReferenceArraySet<ItemBehavior> = ReferenceArraySet(),
 ) : ItemBehaviorContainer, Builder {
     override fun has(type: ItemBehavior): Boolean {

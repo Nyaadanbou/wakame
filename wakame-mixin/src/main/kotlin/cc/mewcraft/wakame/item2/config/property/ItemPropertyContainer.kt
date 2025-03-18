@@ -25,7 +25,7 @@ interface ItemPropertyContainer {
 
         fun makeSerializers(): TypeSerializerCollection {
             val collection = TypeSerializerCollection.builder()
-            collection.register<ItemPropertyContainer>(ItemPropertyContainerImpl.Serializer)
+            collection.register<ItemPropertyContainer>(SimpleItemPropertyContainer.Serializer)
             collection.registerAll(ItemPropertyTypes.directSerializers())
             return collection.build()
         }
@@ -35,7 +35,7 @@ interface ItemPropertyContainer {
         }
 
         fun builder(): Builder {
-            return ItemPropertyContainerImpl()
+            return SimpleItemPropertyContainer()
         }
     }
 
@@ -101,7 +101,7 @@ private data object EmptyItemPropertyContainer : ItemPropertyContainer {
     override fun <T> get(type: ItemPropertyType<out T>): T? = null
 }
 
-private class ItemPropertyContainerImpl(
+private class SimpleItemPropertyContainer(
     private val propertyMap: Reference2ObjectOpenHashMap<ItemPropertyType<*>, Any> = Reference2ObjectOpenHashMap(),
 ) : ItemPropertyContainer, ItemPropertyContainer.Builder {
     override fun <T> get(type: ItemPropertyType<out T>): T? {

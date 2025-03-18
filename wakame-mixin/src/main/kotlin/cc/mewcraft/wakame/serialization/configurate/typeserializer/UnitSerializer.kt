@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
@@ -9,17 +10,22 @@ import java.lang.reflect.Type
     "RedundantUnitReturnType",
     "RedundantUnitExpression"
 )
+// FIXME 350#: 暂时用值为 0 Byte 来表示 Unit.
+//  正经做法是用空 Map 来表示 Unit, 但 ConfigurateOps
+//  在 decode 时无法读取到 NbtOps 的空 CompoundTag.
 /*internal*/ object UnitSerializer : TypeSerializer<Unit> {
+    const val ZERO_BYTE: Byte = 0
+
     override fun deserialize(type: Type, node: ConfigurationNode): Unit {
-        if (node.virtual() && node.isMap) {
-            throw SerializationException(node, type, "Unit is not present")
+        if (node.empty() || node.get(Byte::class) == ZERO_BYTE) {
+            return Unit
+        } else {
+            throw SerializationException(node, type, "Cannot deserialize node to Unit (value must be a zero byte or empty)")
         }
-        return Unit
     }
 
     override fun serialize(type: Type, obj: Unit?, node: ConfigurationNode) {
         if (obj == null) return
-        // 只需让默认的 loader 可接受该泛型参数即可
-        node.set(emptyMap<String, String>())
+        node.set(ZERO_BYTE)
     }
 }

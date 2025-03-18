@@ -78,10 +78,11 @@ val MojangStack.typeId: Identifier?
  * @see hasData
  * @see getData
  * @see getDataOrDefault
+ * @see setData
  * @see removeData
  */
 fun MojangStack.koishData(includeProxy: Boolean): ItemDataContainer? =
-    get(DataComponentsPatch.ITEM_DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
+    get(DataComponentsPatch.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
 
 /**
  * 获取该物品类型的套皮物品的实例.
@@ -117,7 +118,7 @@ fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     //blockWriteToItemProxy(builder)
     val oldVal = builder.set(type, value)
-    set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+    set(DataComponentsPatch.DATA_CONTAINER, builder.build())
     return oldVal
 }
 
@@ -130,7 +131,7 @@ fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     //blockWriteToItemProxy(builder)
     val oldVal = builder.remove(type)
-    set(DataComponentsPatch.ITEM_DATA_CONTAINER, builder.build())
+    set(DataComponentsPatch.DATA_CONTAINER, builder.build())
     return oldVal
 }
 

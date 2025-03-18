@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
@@ -13,6 +14,7 @@ import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toBukkit
 import net.minecraft.world.item.Items
 import org.bukkit.inventory.ItemStack
+import kotlin.time.measureTimedValue
 
 
 // ------------
@@ -44,6 +46,12 @@ object ItemStackGenerator {
      * @return 新生成的 [ItemStack]
      */
     fun generate(type: KoishItem, context: Context): ItemStack {
+        val result = measureTimedValue { generate0(type, context) }
+        LOGGER.warn("Generated item in ${result.duration.inWholeMilliseconds}ms")
+        return result.value
+    }
+
+    private fun generate0(type: KoishItem, context: Context): ItemStack {
         val dataContainer = ItemDataContainer.builder()
 
         // 写入基础信息, 每个自定义物品都有
@@ -61,7 +69,7 @@ object ItemStackGenerator {
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
         // 因为 ItemStack.setData 只有在 ItemDataContainer 存在时才能写入数据
-        itemstack.set(DataComponentsPatch.ITEM_DATA_CONTAINER, dataContainer.build())
+        itemstack.set(DataComponentsPatch.DATA_CONTAINER, dataContainer.build())
 
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig
