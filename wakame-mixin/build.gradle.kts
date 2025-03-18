@@ -36,7 +36,9 @@ dependencies {
     }
     implementation(local.shadow.bukkit)
     implementation(local.commons.collections)
-    implementation(local.commons.gson)
+    implementation(local.commons.gson) {
+        exclude("com.google.code.gson")
+    }
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(local.commons.tuple)

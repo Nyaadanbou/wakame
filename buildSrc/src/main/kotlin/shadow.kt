@@ -18,9 +18,11 @@ fun ShadowJar.configure() {
     val relocatePrefix = "cc.mewcraft.wakame.shaded."
 
     fun relocate0(pattern: String) {
-        relocate(pattern, relocatePrefix + pattern)
+        relocate(pattern, relocatePrefix + pattern.substringAfterLast('.'))
     }
 
+    // shadow
+    relocate0("me.lucko.shadow")
     // fleks
     relocate0("com.github.quillraven.fleks")
     // configurate
@@ -29,6 +31,7 @@ fun ShadowJar.configure() {
     relocate0("xyz.xenondevs.commons")
     // koin
     relocate0("org.koin")
+    relocate0("co.touchlab.stately")
     // creative
     relocate0("team.unnamed.creative")
     // hephaestus
