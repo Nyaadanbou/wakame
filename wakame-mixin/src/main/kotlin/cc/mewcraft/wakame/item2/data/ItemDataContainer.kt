@@ -48,6 +48,10 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             // Codec 要求所有遇到的数据类型都有序列化操作可使用,
             // 因此这里需要再明确的添加一些潜在依赖的序列化操作.
 
+            // 添加显式声明的 TypeSerializer
+            serials.registerAll(makeSerializers())
+            // 添加 Koish 常用的 TypeSerializer
+            serials.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
             // 添加 @ConfigSerializable 的 TypeSerializer
             serials.registerAnnotatedObjects(ObjectMappers.DEFAULT)
             // 添加 Configurate 内置的 TypeSerializer.
@@ -55,10 +59,6 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
             // 内置的 ObjectMapper 将被优先使用, 导致无法反序列化 Kotlin 的 data class.
             serials.registerAll(TypeSerializerCollection.defaults())
-            // 添加 Koish 常用的 TypeSerializer
-            serials.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
-            // 添加显式声明的 TypeSerializer
-            serials.registerAll(makeSerializers())
 
             val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), serials.build())
             requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${ItemDataContainer::class}" }
