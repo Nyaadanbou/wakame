@@ -5,6 +5,10 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.adventure.toSimpleString
+import net.kyori.examination.Examinable
+import net.kyori.examination.ExaminableProperty
+import java.util.stream.Stream
 
 
 // ------------
@@ -23,17 +27,45 @@ import cc.mewcraft.wakame.util.Identifier
 // 我们只需要能够访问物品堆叠上的 ItemDataContainer 即可访问所有自定义添加的数据,
 // 并且这个过程中不需要涉及任何数据结构的转换. 相比基于 NBT 的实现, 这简直快到飞起!
 
-// 代表一个物品类型(由配置文件创建)
-class KoishItem(
+/**
+ * 代表一个物品类型(由配置文件创建).
+ *
+ * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM
+ */
+open class KoishItem(
     val id: Identifier,
     val dataConfig: ItemMetaContainer,
     val properties: ItemPropertyContainer,
     val behaviors: ItemBehaviorContainer,
-)
+) : Examinable {
 
-// 表示一个原版套皮物品
-// 一个套皮物品需要一个最基本的物品类型 (KoishItem) 以及在一开始就确定好的自定义数据 (ItemDataContainer)
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("id", id),
+    )
+
+    override fun toString(): String = toSimpleString()
+
+}
+
+/**
+ * 表示一个套皮物品(由配置文件创建).
+ *
+ * 一个套皮物品需要一个最基本的物品类型 ([KoishItem]) 以及在一开始就确定好的自定义数据 ([ItemDataContainer]).
+ *
+ * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM_PROXY
+ */
 class KoishItemProxy(
-    val type: KoishItem,
+    id: Identifier,
+    dataConfig: ItemMetaContainer,
+    properties: ItemPropertyContainer,
+    behaviors: ItemBehaviorContainer,
     val data: ItemDataContainer,
-)
+) : KoishItem(id, dataConfig, properties, behaviors) {
+
+    override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
+        ExaminableProperty.of("id", id),
+    )
+
+    override fun toString(): String = toSimpleString()
+
+}

@@ -57,7 +57,7 @@ object ItemStackGenerator {
         val dataContainer = ItemDataContainer.builder()
 
         // 写入基础信息, 每个自定义物品都有
-        dataContainer[ItemDataTypes.ID] = ItemId(type.id)
+        dataContainer[ItemDataTypes.ID] = ItemId.of(type.id)
         dataContainer[ItemDataTypes.VERSION] = 0 // FIXME #350: 实现数据迁移系统
         dataContainer[ItemDataTypes.VARIANT] = 0
 

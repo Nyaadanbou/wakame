@@ -104,6 +104,9 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         KoishRegistries2.ITEM_PROXY.resetRegistry()
         consumeData(KoishRegistries2.ITEM_PROXY::add)
         KoishRegistries2.ITEM_PROXY.freeze()
+
+        // 检查配置文件是否都是有效的原版物品, 并给出警告
+        runTask(::validateItemProxies)
     }
 
     @ReloadFun
@@ -124,11 +127,6 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
                 val itemId = IdentifierTools.of(Identifier.MINECRAFT_NAMESPACE, f.toRelativeString(dataDir).substringBeforeLast('.'))
-                // FIXME #350: java.lang.IllegalArgumentException: RegistryKeyImpl[key=minecraft:item] points to a registry that is not available yet
-                //if (!isMinecraftItem(itemId)) {
-                //    LOGGER.error("Found a non-Minecraft item config in ${dataDir.name}: ${f.name}. Skipped.")
-                //    continue
-                //}
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
@@ -148,7 +146,15 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val tempItemstack = ItemStackGenerator.generate(koishItem, Context())
         val dataContainer = tempItemstack.koishData(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
 
-        return KoishItemProxy(koishItem, dataContainer)
+        return KoishItemProxy(id, dataConfig, properties, behaviors, dataContainer)
+    }
+
+    private fun validateItemProxies() {
+        for (itemType in KoishRegistries2.ITEM_PROXY) {
+            if (!isMinecraftItem(itemType.id)) {
+                LOGGER.error("Found a non-Minecraft item config: ${itemType.id}. The item config will be effectively ignored.")
+            }
+        }
     }
 
     private fun isMinecraftItem(id: Identifier): Boolean {

@@ -146,7 +146,7 @@ interface RegistryEntry<T> {
     class Reference<T>
     private constructor(
         private val owner: RegistryEntryOwner<T>,
-        val referenceType: Type, // 目前仅仅是标记, 无实际用途
+        /*val*/ referenceType: Type, // 目前仅仅是标记, 无实际用途
         private val key: RegistryKey<T>,
         private var _value: T? = null,
     ) : RegistryEntry<T> {

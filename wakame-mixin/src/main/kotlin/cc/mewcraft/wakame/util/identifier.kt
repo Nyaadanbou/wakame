@@ -6,6 +6,7 @@ import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 
 const val KOISH_NAMESPACE = "koish"
+const val MINECRAFT_NAMESPACE = "minecraft"
 
 // adventure 已经提供比较完备的实现,
 // 直接用 typealias 也许更具有维护性

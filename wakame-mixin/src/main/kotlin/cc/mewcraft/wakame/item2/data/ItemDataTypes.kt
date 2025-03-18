@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item2.data
 import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -22,7 +23,11 @@ data object ItemDataTypes {
     // ------------
 
     @JvmField
-    val ID: ItemDataType<ItemId> = typeOf("id")
+    val ID: ItemDataType<ItemId> = typeOf("id") {
+        serializers {
+            register<ItemId>(ItemId.SERIALIZER)
+        }
+    }
 
     @JvmField
     val VARIANT: ItemDataType<Int> = typeOf("variant")

@@ -58,10 +58,12 @@ object KoishRegistries2 {
     @JvmField
     val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(KoishRegistryKeys2.ITEM_BEHAVIOR) { ItemBehaviorTypes }
 
+
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER
     init {
         INITIALIZERS.forEach { initializer -> initializer() }
     }
+
 
     // ------------
     // 方便函数
