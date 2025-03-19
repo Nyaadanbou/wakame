@@ -1,2 +1,3 @@
 base: shulker_shell
-item_name: { plain: "未知物品" }
+type_name: "未知物品*"
+item_name: "未知物品"

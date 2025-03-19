@@ -1,3 +1,4 @@
 base: golden_pickaxe[!tool]
-item_name: { plain: "没用的金镐子" }
+type_name: "没用的金镐子*"
+item_name: "没用的金镐子"
 level: { base: 10 }

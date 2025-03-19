@@ -1,3 +1,5 @@
-base: diamond_sword[!attribute_modifiers]
-item_name: { plain: "没用的钻石剑" }
+base: iron_sword[!attribute_modifiers]
+type_name: "没用的铁制剑*"
+item_name: "没用的铁制剑"
 level: { base: 5 }
+hidden: {}
