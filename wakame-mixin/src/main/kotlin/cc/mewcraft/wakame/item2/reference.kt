@@ -281,9 +281,7 @@ private object ItemRefManager {
 
     fun createChecked(id: Identifier): ItemRef? {
         val handler = getHandler(id) ?: return null
-        return checkedItemRefs.computeIfAbsent(id) { k ->
-            ItemRefImpl(id).also { it.handler = handler }
-        }
+        return checkedItemRefs.computeIfAbsent(id, ::ItemRefImpl).also { it.handler = handler }
     }
 
     fun getHandler(id: Identifier): ItemRefHandler<*>? {
