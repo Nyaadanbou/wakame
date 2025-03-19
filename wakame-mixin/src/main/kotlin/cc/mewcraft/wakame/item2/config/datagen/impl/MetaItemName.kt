@@ -9,15 +9,16 @@ import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import net.kyori.adventure.text.Component
 import net.minecraft.core.component.DataComponents
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 data class MetaItemName(
-    val plain: String,
-    val fancy: String = plain,
+    @Setting(nodeFromParent = true)
+    val itemName: String,
 ) : ItemMetaEntry<Component> {
 
     override fun make(context: Context): ItemMetaResult<Component> {
-        val itemName = MM.deserialize(fancy)
+        val itemName = MM.deserialize(itemName)
         return ItemMetaResult.of(itemName)
     }
 
