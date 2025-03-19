@@ -17,8 +17,6 @@ import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 /**
  * The parser for [KoishItem].
  *
- * It must be used together with [ItemNamespaceParser].
- *
  * @param C the sender type
  */
 class Item2Parser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionProvider.Strings<C> {

@@ -123,7 +123,7 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T?
  * 向物品堆叠写入 Koish 数据 [T].
  *
  * 警告: 该函数无法(也不应该)修改套皮物品的数据.
- * 如果该物品堆叠是套皮物品, 该函数将没有实际效果.
+ * 如果该物品堆叠是套皮物品, 该函数没有实际效果.
  */
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
@@ -136,7 +136,7 @@ fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
  * 移除物品堆叠上的 Koish 数据 [T].
  *
  * 警告: 该函数无法(也不应该)修改套皮物品的数据.
- * 如果该物品堆叠是套皮物品, 该函数将没有实际效果.
+ * 如果该物品堆叠是套皮物品, 该函数没有实际效果.
  */
 fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     val builder = koishData(false)?.toBuilder() ?: return null

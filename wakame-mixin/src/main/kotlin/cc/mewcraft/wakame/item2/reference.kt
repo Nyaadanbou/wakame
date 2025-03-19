@@ -59,14 +59,16 @@ sealed interface ItemRef {
          * 该函数对于任何 [id] 始终会返回一个 [ItemRef] 实例, 但如果未经检查
          * (即调用 [checkAll]) 而直接调用返回实例上面的属性/函数将会抛出异常.
          *
+         * 也就是说, 使用该函数意味着调用方可以分别执行“创建和检查” [ItemRef] 的逻辑, 而非“创建即检查”.
+         *
          * 具体的说:
          *
-         * 使用该函数创建的 [ItemRef] 必须在 *特定阶段* 调用函数 [checkAll] 来验证其有效性.
-         * 如果存在无效的 [ItemRef], 即: 引用没有指向一个有效的物品类型, 则应该 *记录并终止程序*.
-         * 只使用该函数而不调用 [checkAll] 将导致此函数返回的 [ItemRef] 永远是无效引用.
+         * 使用该函数创建的 [ItemRef] 必须在 *之后的某个时机* 调用函数 [checkAll] 来验证其有效性.
+         * 如果发现了无效的 [ItemRef], 即引用没有指向一个有效的物品类型, 调用方应该*记录并终止程序*.
+         * 只使用该函数而不调用 [checkAll] 将导致此函数返回的 [ItemRef] 永远无效, 导致使用时抛异常.
          *
          * 该函数可能的使用场景:
-         * 正在加载配置文件的内容, 游戏还未处于运行状态时.
+         * 正在加载配置文件的内容, 并且不希望单独处理 `ItemRef?`.
          */
         fun uncheckedItemRef(id: Identifier): ItemRef {
             return ItemRefManager.createUnchecked(id)
@@ -78,7 +80,7 @@ sealed interface ItemRef {
          * 如果当前已注册的 [ItemRefHandler] 都无法识别 [id], 则返回 `null`.
          *
          * 该函数可能的使用场景:
-         * 在配置文件加载完毕后, 游戏处于运行状态时, 需要接受来自玩家的输入 (在此场景下, 服务器管理员也算玩家).
+         * 游戏处于运行状态时, 需要接收来自玩家的输入 (在此场景下, 服务器管理员也算玩家).
          */
         fun checkedItemRef(id: Identifier): ItemRef? {
             return ItemRefManager.createChecked(id)
