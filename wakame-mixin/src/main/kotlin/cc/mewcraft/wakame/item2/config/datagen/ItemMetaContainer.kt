@@ -22,7 +22,7 @@ import java.lang.reflect.Type
  * 也就是说, 程序员可以为一个我们自己的数据类型编写配置文件, 也可以为 Minecraft 自带的物品组件编写配置文件.
  * 例如, 前者可以让 *物品等级* 按照特定规则生成, 后者可以让 *物品耐久度 (Minecraft 特性)* 具有随机性.
  */
-interface ItemMetaContainer {
+sealed interface ItemMetaContainer {
 
     companion object {
 
@@ -57,7 +57,7 @@ interface ItemMetaContainer {
     /**
      * [ItemMetaContainer] 的生成器.
      */
-    interface Builder : ItemMetaContainer {
+    sealed interface Builder : ItemMetaContainer {
 
         /**
          * 设置 [ItemMetaType] 对应的 [ItemMetaEntry].

@@ -16,7 +16,7 @@ import java.lang.reflect.Type
  *
  * @see cc.mewcraft.wakame.item2.data.ItemDataContainer 用于存储运行时可变物品数据的容器
  */
-interface ItemPropertyContainer {
+sealed interface ItemPropertyContainer {
 
     companion object {
 
@@ -67,7 +67,7 @@ interface ItemPropertyContainer {
     /**
      * [ItemPropertyContainer] 的生成器.
      */
-    interface Builder : ItemPropertyContainer {
+    sealed interface Builder : ItemPropertyContainer {
 
         /**
          * 设置指定类型的数据.

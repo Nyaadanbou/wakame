@@ -26,7 +26,7 @@ import org.bukkit.inventory.ItemStack
 // ------------
 
 fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = toNMS().hasBehavior(behavior)
-fun ItemStack.forEachBehavior(action: (ItemBehavior) -> Unit) = toNMS().forEachBehavior(action)
+fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
 
@@ -35,44 +35,44 @@ fun ItemStack.forEachBehavior(action: (ItemBehavior) -> Unit) = toNMS().forEachB
 //    forEachBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
 
 fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
-    forEachBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
+    handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
 
 // FIXME #350: 等完全迁移
 //fun ItemStack.handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) =
 //    forEachBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
 
 fun ItemStack.handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) =
-    forEachBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
+    handleBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
 
 fun ItemStack.handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) =
-    forEachBehavior { it.handleItemProjectileHit(player, itemstack, projectile, event) }
+    handleBehavior { it.handleItemProjectileHit(player, itemstack, projectile, event) }
 
 fun ItemStack.handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) =
-    forEachBehavior { it.handleBreakBlock(player, itemstack, event) }
+    handleBehavior { it.handleBreakBlock(player, itemstack, event) }
 
 fun ItemStack.handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) =
-    forEachBehavior { it.handleDamage(player, itemstack, event) }
+    handleBehavior { it.handleDamage(player, itemstack, event) }
 
 fun ItemStack.handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) =
-    forEachBehavior { it.handleBreak(player, itemstack, event) }
+    handleBehavior { it.handleBreak(player, itemstack, event) }
 
 fun ItemStack.handleEquip(player: Player, itemstack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) =
-    forEachBehavior { it.handleEquip(player, itemstack, equipped, event) }
+    handleBehavior { it.handleEquip(player, itemstack, equipped, event) }
 
 fun ItemStack.handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    forEachBehavior { it.handleInventoryClick(player, itemstack, event) }
+    handleBehavior { it.handleInventoryClick(player, itemstack, event) }
 
 fun ItemStack.handleInventoryClickOnCursor(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    forEachBehavior { it.handleInventoryClickOnCursor(player, itemstack, event) }
+    handleBehavior { it.handleInventoryClickOnCursor(player, itemstack, event) }
 
 fun ItemStack.handleInventoryHotbarSwap(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
-    forEachBehavior { it.handleInventoryHotbarSwap(player, itemstack, event) }
+    handleBehavior { it.handleInventoryHotbarSwap(player, itemstack, event) }
 
 fun ItemStack.handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) =
-    forEachBehavior { it.handleRelease(player, itemstack, event) }
+    handleBehavior { it.handleRelease(player, itemstack, event) }
 
 fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) =
-    forEachBehavior { it.handleConsume(player, itemstack, event) }
+    handleBehavior { it.handleConsume(player, itemstack, event) }
 
 // FIXME #350: 等完全迁移
 //fun ItemStack.handleAbilityPrepareCast(caster: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) =
@@ -85,6 +85,6 @@ fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerI
 fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean =
     koishItem?.behaviors?.has(behavior) == true
 
-fun MojangStack.forEachBehavior(action: (ItemBehavior) -> Unit) {
+fun MojangStack.handleBehavior(action: (ItemBehavior) -> Unit) {
     koishItem?.behaviors?.forEach(action)
 }

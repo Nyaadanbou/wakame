@@ -10,7 +10,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * @param U 元数据的类型, 即 [ItemMetaEntry] 的实现类
  * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
  */
-interface ItemMetaType<U, V> {
+sealed interface ItemMetaType<U, V> {
 
     companion object {
         fun <U, V> builder(typeToken: TypeToken<U>): Builder<U, V> {

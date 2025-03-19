@@ -7,7 +7,7 @@ import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-interface ItemDataType<T> {
+sealed interface ItemDataType<T> {
 
     companion object {
 

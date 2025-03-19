@@ -1,7 +1,3 @@
-// 备忘录:
-// ItemData 需要具有 lifecycle 属性, 用来表示可以在什么时候使用
-// ItemDataContainer
-
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
@@ -27,7 +23,7 @@ import java.lang.reflect.Type
  * 如果要基于当前容器修改数据, 使用 [toBuilder] 创建一个 [Builder] 实例便可开始修改数据.
  * 修改完后再使用 [build] 创建一个新的 [ItemDataContainer] 实例, 便可获得修改后的版本.
  */
-interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
+sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
 
     companion object {
 
@@ -152,7 +148,7 @@ interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
      *
      * 该生成器实例是可变的. 如果想基于当前生成器的状态来构建新的生成器, 使用 [toBuilder].
      */
-    interface Builder : ItemDataContainer {
+    sealed interface Builder : ItemDataContainer {
 
         /**
          * 设置指定类型的数据.
@@ -298,6 +294,18 @@ private open class SimpleItemDataContainer(
         return dataMap.hashCode()
     }
 
+    override fun toString(): String {
+        return "{${
+            joinToString(
+                separator = ", ",
+                prefix = "(",
+                postfix = ")",
+            ) { (key, value) ->
+                "${KoishRegistries2.ITEM_DATA_TYPE.getId(key)!!.value()}=$value"
+            }
+        }}"
+    }
+
     object Serializer : TypeSerializer<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             val builder = ItemDataContainer.builder()
@@ -322,7 +330,7 @@ private open class SimpleItemDataContainer(
                 return
             }
 
-            val iter = obj.dataMap.reference2ObjectEntrySet().fastIterator()
+            val iter = obj.fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
                 val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: continue

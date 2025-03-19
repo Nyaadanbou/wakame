@@ -16,7 +16,7 @@ import java.util.stream.Stream
 /**
  * 代表一个容器, 存放关于 *物品类型* 的行为逻辑.
  */
-interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
+sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
 
     /**
      * [ItemBehaviorContainer] 的构造函数.
@@ -61,7 +61,7 @@ interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
     /**
      * [ItemBehaviorContainer] 的生成器, 用于构建一个 [ItemBehaviorContainer].
      */
-    interface Builder {
+    sealed interface Builder {
 
         /**
          * 添加一个 [ItemBehavior]. 已存在的 [behavior] 会被覆盖.
@@ -114,7 +114,7 @@ private class SimpleItemBehaviorContainer(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("data", behaviorMap)
+        ExaminableProperty.of("behaviorMap", behaviorMap)
     )
 
     override fun toString(): String = toSimpleString()

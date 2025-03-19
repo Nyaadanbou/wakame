@@ -9,7 +9,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  *
  * @param T 数据类型
  */
-interface ItemPropertyType<T> {
+sealed interface ItemPropertyType<T> {
 
     companion object {
 
