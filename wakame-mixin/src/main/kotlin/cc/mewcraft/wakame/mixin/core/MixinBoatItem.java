@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -25,11 +23,11 @@ public abstract class MixinBoatItem {
             )
     )
     private void onRightClickBlock(Level world, Player user, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir, @Local ItemStack itemStack) {
-        if (itemStack.isEmpty())
-            return;
-        if (!(user instanceof ServerPlayer serverPlayer))
-            return;
-        PlayerItemRightClickEvent rightClickEvent = new PlayerItemRightClickEvent(serverPlayer.getBukkitEntity(), itemStack.asBukkitMirror(), hand);
-        rightClickEvent.callEvent();
+//        if (itemStack.isEmpty())
+//            return;
+//        if (!(user instanceof ServerPlayer serverPlayer))
+//            return;
+//        PlayerItemRightClickEvent rightClickEvent = new PlayerItemRightClickEvent(serverPlayer.getBukkitEntity(), itemStack.asBukkitMirror(), hand);
+//        rightClickEvent.callEvent();
     }
 }

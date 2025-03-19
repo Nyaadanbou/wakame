@@ -17,6 +17,11 @@ public abstract class MixinServerGamePacketListenerImplInteractPacketHandler {
     @Shadow
     ServerGamePacketListenerImpl this$0;
 
+    /**
+     * 服务端接收到来自客户端的interact包.
+     * 注入点上文判定玩家可以攻击到实体.
+     * 玩家正在左键点击生物, 触发左键事件.
+     */
     @Inject(
             method = "onAttack",
             at = @At(
