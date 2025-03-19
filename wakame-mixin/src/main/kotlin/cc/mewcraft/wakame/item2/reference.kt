@@ -312,14 +312,17 @@ private object ItemRefManager {
 
     fun checkAll(): String {
         val invalidRefs = mutableListOf<String>()
-        for ((id, ref) in uncheckedItemRefs) {
+
+        val iter = uncheckedItemRefs.iterator()
+        while (iter.hasNext()) {
+            val (id, ref) = iter.next()
             val handler = getHandler(id)
             if (ref.handler != null) {
                 // 找到了支持的 handler, 分配给这个 ref
                 ref.handler = handler
                 // 将 ref 放入已检查集合中, 并从未检查集合移除
                 checkedItemRefs[id] = ref
-                uncheckedItemRefs -= id
+                iter.remove()
             } else {
                 // 未找到任何支持的 handler, 验证失败
                 invalidRefs += id.toString()
