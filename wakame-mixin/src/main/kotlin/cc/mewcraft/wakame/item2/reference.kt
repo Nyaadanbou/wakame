@@ -92,7 +92,7 @@ sealed interface ItemRef {
          */
         fun checkedItemRef(stack: ItemStack): ItemRef {
             val handler = ItemRefManager.getHandler(stack) ?: error("Cannot get handler from ItemStack: ${stack.toJsonString()}. This is a bug!")
-            val id = handler.getId(stack) ?: error("Cannot get id from ItemStack: ${stack.toJsonString()}. This is a bug!")
+            val id = handler.getId(stack) ?: error("Cannot get type id from ItemStack: ${stack.toJsonString()}. This is a bug!")
             return checkedItemRef(id) ?: error("Cannot get reference from ItemStack: ${stack.toJsonString()}. This is a bug!")
         }
 
@@ -110,17 +110,17 @@ sealed interface ItemRef {
     val name: Component
 
     /**
-     * 判断传入的 [Identifier] 是否和当前 [ItemRef] 匹配.
+     * 判断传入的 [id] 是否和当前 [ItemRef] 匹配.
      */
     fun matches(id: Identifier): Boolean
 
     /**
-     * 判断传入的 [ItemRef] 是否和当前 [ItemRef] 匹配.
+     * 判断传入的 [ref] 是否和当前 [ItemRef] 匹配.
      */
     fun matches(ref: ItemRef): Boolean
 
     /**
-     * 判断传入的 [ItemStack] 是否和当前 [ItemRef] 匹配.
+     * 判断传入的 [stack] 是否和当前 [ItemRef] 匹配.
      */
     fun matches(stack: ItemStack): Boolean
 
