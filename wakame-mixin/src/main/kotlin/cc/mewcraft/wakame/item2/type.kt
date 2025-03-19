@@ -34,7 +34,7 @@ import java.util.stream.Stream
 /**
  * 代表一个物品类型(由配置文件创建).
  *
- * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM
+ * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM 包含本类型实例的注册表
  */
 open class KoishItem(
     val id: Identifier,
@@ -65,7 +65,7 @@ open class KoishItem(
  * 一个套皮物品需要一个最基本的物品类型 (即 [KoishItem], 这也是为什么这个类继承自 [KoishItem])
  * 以及在一开始就确定好的自定义数据 (即 [ItemDataContainer], 对应这个类的 [data] 字段).
  *
- * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM_PROXY
+ * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM_PROXY 包含本类型实例的注册表
  */
 class KoishItemProxy(
     id: Identifier,

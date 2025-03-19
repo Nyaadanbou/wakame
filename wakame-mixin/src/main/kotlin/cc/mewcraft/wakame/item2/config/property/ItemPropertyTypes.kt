@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.item2.config.property
 
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot2
-import cc.mewcraft.wakame.item2.config.property.impl.Lore
+import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
@@ -38,9 +35,13 @@ data object ItemPropertyTypes {
     @JvmField
     val NAME: ItemPropertyType<Component> = typeOf("type_name")
 
-    // FIXME #350: 完成 itemslot
     @JvmField
-    val SLOT: ItemPropertyType<ItemSlot2> = typeOf("slot/todo")
+    val SLOT: ItemPropertyType<ItemSlotGroup> = typeOf("slot") {
+        serializers {
+            register(ItemSlot.SERIALIZER)
+            register(ItemSlotGroup.SERIALIZER)
+        }
+    }
 
     @JvmField
     val HIDDEN: ItemPropertyType<Unit> = typeOf("hidden")
