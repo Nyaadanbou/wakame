@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
@@ -31,6 +32,9 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val ITEM_PROXY = createRegistryKey<KoishItemProxy>("item_proxy")
+
+    @JvmField
+    val ITEM_REF_HANDLER = createRegistryKey<ItemRefHandler<*>>("item_ref_handler")
 
     ///
 

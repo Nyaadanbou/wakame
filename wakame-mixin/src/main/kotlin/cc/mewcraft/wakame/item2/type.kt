@@ -45,6 +45,8 @@ open class KoishItem(
 
     /**
      * 该物品类型的名字, 可用于展示给玩家.
+     *
+     * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
      */
     val name: Component
         get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))

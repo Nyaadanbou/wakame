@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
@@ -10,6 +11,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
 
 object KoishRegistries2 {
@@ -57,6 +59,21 @@ object KoishRegistries2 {
      */
     @JvmField
     val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(KoishRegistryKeys2.ITEM_BEHAVIOR) { ItemBehaviorTypes }
+
+    /**
+     * [ItemRefHandler] 的实例.
+     * 存放来自第三方插件的 [ItemRefHandler].
+     */
+    @JvmField
+    val ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(KoishRegistryKeys2.ITEM_REF_HANDLER)
+
+    /**
+     * [ItemRefHandler] 的内置实例.
+     * 只包含 Koish 和 Minecraft 两个 [ItemRefHandler].
+     */
+    @ApiStatus.Internal
+    @JvmField
+    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(KoishRegistryKeys2.ITEM_REF_HANDLER)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

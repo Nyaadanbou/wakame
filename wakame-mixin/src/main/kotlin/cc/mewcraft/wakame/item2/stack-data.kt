@@ -24,9 +24,9 @@ import org.bukkit.inventory.ItemStack
 
 //// Type
 
-val ItemStack.isKoish: Boolean get() = toNMS().isKoish
-val ItemStack.koish: KoishItem? get() = toNMS().koishItem
 val ItemStack.typeId: Identifier get() = toNMS().typeId
+val ItemStack.isKoish: Boolean get() = toNMS().isKoish
+val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
 val Material.koishProxy: KoishItemProxy? get() = KoishRegistries2.ITEM_PROXY[key()]
 
@@ -49,6 +49,16 @@ fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData
 
 //// Type
 
+/**
+ * 获取该物品堆叠的物品类型的 [Identifier].
+ *
+ * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE]
+ * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
+ * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
+ */
+val MojangStack.typeId: Identifier
+    get() = koishData(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+
 val MojangStack.isKoish: Boolean
     get() = koishItem != null
 
@@ -66,16 +76,6 @@ val MojangStack.isKoish: Boolean
  */
 val MojangStack.koishItem: KoishItem?
     get() = koishData(true)?.get(ItemDataTypes.ID)?.itemType
-
-/**
- * 获取该物品堆叠的物品类型的 [Identifier].
- *
- * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE]
- * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
- * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
- */
-val MojangStack.typeId: Identifier
-    get() = koishData(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
 /**
  * 获取该物品堆叠的持久化数据容器 [ItemDataContainer].
