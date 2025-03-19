@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
+import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
@@ -33,6 +34,9 @@ data object ItemPropertyTypes {
             register<ItemBase>(ItemBase.SERIALIZER)
         }
     }
+
+    @JvmField
+    val NAME: ItemPropertyType<Component> = typeOf("type_name")
 
     // FIXME #350: 完成 itemslot
     @JvmField

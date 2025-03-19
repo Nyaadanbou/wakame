@@ -13,8 +13,8 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
  * [ItemDataType] 的数据将存在于*物品堆叠*上, 而不是*物品类型*上.
  * 也就是说, 这些数据将会被持久化, 并且可以在游戏内被(玩家或系统)修改.
  *
- * @see cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes 用于控制如何生成物品堆叠上的持久化数据
- * @see cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes 包含了所有存在于*物品类型*上的数据
+ * @see cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes 用于控制如何生成物品堆叠上的持久化数据类型
+ * @see cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes 包含了所有存在于*物品类型*上的数据类型
  */
 data object ItemDataTypes {
 

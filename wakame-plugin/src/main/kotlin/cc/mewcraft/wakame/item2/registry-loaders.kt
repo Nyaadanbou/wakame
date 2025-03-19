@@ -1,3 +1,5 @@
+@file:JvmName("ItemRegistryLoaders")
+
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
@@ -143,7 +145,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val koishItem = KoishItem(id, dataConfig, properties, behaviors)
 
         // 生成一个完整的 ItemStack, 但只取其 ItemDataContainer
-        val tempItemstack = ItemStackGenerator.generate(koishItem, Context())
+        val tempItemstack = KoishStackGenerator.generate(koishItem, Context())
         val dataContainer = tempItemstack.koishData(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
 
         return KoishItemProxy(id, dataConfig, properties, behaviors, dataContainer)
@@ -152,7 +154,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
     private fun validateItemProxies() {
         for (itemType in KoishRegistries2.ITEM_PROXY) {
             if (!isMinecraftItem(itemType.id)) {
-                LOGGER.error("Found a non-Minecraft item config: ${itemType.id}. The item config will be effectively ignored.")
+                LOGGER.error("Found a non-Minecraft proxy item config: ${itemType.id}. The config will be effectively ignored.")
             }
         }
     }

@@ -56,8 +56,8 @@ val MojangStack.isKoish: Boolean
  * 获取该物品堆叠的 *Koish 物品类型*.
  *
  * 返回非空的情况:
- * - 该物品堆叠是*自定义物品堆叠*
- * - 该物品堆叠是*套皮物品堆叠*
+ * - 该物品堆叠是*Koish 物品*
+ * - 该物品堆叠是*Koish 套皮物品*
  *
  * 返回空的情况:
  * - 其余所有情况
@@ -70,8 +70,9 @@ val MojangStack.koishItem: KoishItem?
 /**
  * 获取该物品堆叠的物品类型的 [Identifier].
  *
- * - 如果该物品堆叠是一个 *自定义物品* , 则命名空间为 `koish`
- * - 如果该物品堆叠是一个 *原版(或套皮)物品*, 则命名空间为 `minecraft`
+ * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE]
+ * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
+ * - 如果该物品堆叠来自其他物品系统, 则将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
  */
 val MojangStack.typeId: Identifier
     get() = koishData(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
@@ -119,35 +120,30 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T?
     koishData(true)?.getOrDefault(type, fallback)
 
 /**
- * 向物品堆叠写入自定义数据 [T].
+ * 向物品堆叠写入 Koish 数据 [T].
  *
- * 警告: 该函数不会修改套皮物品的数据.
+ * 警告: 该函数无法(也不应该)修改套皮物品的数据.
+ * 如果该物品堆叠是套皮物品, 该函数将没有实际效果.
  */
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
-    //blockWriteToItemProxy(builder)
     val oldVal = builder.set(type, value)
     set(DataComponentsPatch.DATA_CONTAINER, builder.build())
     return oldVal
 }
 
 /**
- * 移除物品堆叠上的自定义数据 [T].
+ * 移除物品堆叠上的 Koish 数据 [T].
  *
- * 警告: 该函数不会修改套皮物品的数据.
+ * 警告: 该函数无法(也不应该)修改套皮物品的数据.
+ * 如果该物品堆叠是套皮物品, 该函数将没有实际效果.
  */
 fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
-    //blockWriteToItemProxy(builder)
     val oldVal = builder.remove(type)
     set(DataComponentsPatch.DATA_CONTAINER, builder.build())
     return oldVal
 }
-
-//private fun MojangStack.blockWriteToItemProxy(container: ItemDataContainer) {
-//    val koishProxy = container[ItemDataTypes.ID]?.itemProxy
-//    if (koishProxy != null) throw IllegalStateException("Cannot write koish data to an item proxy")
-//}
 
 // -----------------
 // 内部实现

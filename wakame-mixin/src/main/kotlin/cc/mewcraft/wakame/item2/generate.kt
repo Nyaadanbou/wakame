@@ -1,3 +1,5 @@
+@file:JvmName("KoishStackGeneratorSupport")
+
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
@@ -38,7 +40,7 @@ import kotlin.time.measureTimedValue
  * ### 对于终端用户 (编写物品配置文件的人)
  * 如果编写的物品配置文件是用于套皮物品, 务必确保配置文件所生成的数据不具有*随机性*.
  */
-object ItemStackGenerator {
+object KoishStackGenerator {
 
     /**
      * 基于上下文 [Context] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.

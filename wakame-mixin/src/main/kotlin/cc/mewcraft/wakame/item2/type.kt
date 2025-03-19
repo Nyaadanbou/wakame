@@ -1,11 +1,15 @@
+@file:JvmName("KoishItemType")
+
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
@@ -39,6 +43,12 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
+    /**
+     * 该物品类型的名字, 可用于展示给玩家.
+     */
+    val name: Component
+        get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
@@ -50,7 +60,8 @@ open class KoishItem(
 /**
  * 表示一个套皮物品(由配置文件创建).
  *
- * 一个套皮物品需要一个最基本的物品类型 ([KoishItem]) 以及在一开始就确定好的自定义数据 ([ItemDataContainer]).
+ * 一个套皮物品需要一个最基本的物品类型 (即 [KoishItem], 这也是为什么这个类继承自 [KoishItem])
+ * 以及在一开始就确定好的自定义数据 (即 [ItemDataContainer], 对应这个类的 [data] 字段).
  *
  * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM_PROXY
  */
