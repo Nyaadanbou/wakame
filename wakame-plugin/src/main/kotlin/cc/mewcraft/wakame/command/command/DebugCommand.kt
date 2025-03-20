@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
@@ -92,7 +91,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             PlayerDamageMetadata(
                 sender.toUser(),
                 damageBundle {
-                    single(KoishRegistries.ELEMENT.getDefaultEntry()) {
+                    default {
                         min(114514.0)
                         max(114514.0)
                         rate(1.0)
