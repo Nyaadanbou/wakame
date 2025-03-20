@@ -15,6 +15,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.FamilyOnRemove
 import com.github.quillraven.fleks.IteratingSystem
+import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.extra.kotlin.text
 import net.kyori.adventure.text.format.Style
 import org.bukkit.entity.LivingEntity
@@ -25,12 +26,21 @@ class EntityInfoBossBar : IteratingSystem(
 ), FamilyOnAdd, FamilyOnRemove {
 
     override fun onTickEntity(entity: Entity) {
-        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
         val bossBar = entity[EntityInfoBossBarComponent].bossBar
+
+        tickEntityHealth(entity, bossBar)
+        tickElementStacks(entity, bossBar)
+    }
+
+    private fun tickEntityHealth(entity: Entity, bossBar: BossBar) {
+        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
         val entityMaxHealth = requireNotNull(AttributeMapAccess.instance().get(bukkitEntity).getOrThrow().getInstance(Attributes.MAX_HEALTH)?.getValue())
         val progress = bukkitEntity.health / entityMaxHealth
         bossBar.progress(progress.toStableFloat())
+    }
 
+    private fun tickElementStacks(entity: Entity, bossBar: BossBar) {
+        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
         val container = entity.getOrNull(ElementStackContainer)?.elementStacks() ?: return
         val elementStackMessage = text {
             for ((elementEntry, entity) in container) {
