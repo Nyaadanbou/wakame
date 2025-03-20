@@ -1,19 +1,6 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.item.behaviors.Arrow
-import cc.mewcraft.wakame.item.behaviors.Attack
-import cc.mewcraft.wakame.item.behaviors.Castable
-import cc.mewcraft.wakame.item.behaviors.Chargeable
-import cc.mewcraft.wakame.item.behaviors.Enchantable
-import cc.mewcraft.wakame.item.behaviors.Food
-import cc.mewcraft.wakame.item.behaviors.HoldLastDamage
-import cc.mewcraft.wakame.item.behaviors.LevelBarrier
-import cc.mewcraft.wakame.item.behaviors.Tool
-import cc.mewcraft.wakame.item.behaviors.TownFlight
-import cc.mewcraft.wakame.item.behaviors.Trackable
-import cc.mewcraft.wakame.item.behaviors.Wearable
-import cc.mewcraft.wakame.item.behaviors.WorldTimeControl
-import cc.mewcraft.wakame.item.behaviors.WorldWeatherControl
+import cc.mewcraft.wakame.item.behaviors.*
 
 /**
  * 所有的物品行为类型.
@@ -38,6 +25,9 @@ object ItemBehaviorTypes {
      * 物品充能的逻辑.
      */
     val CHARGEABLE: ItemBehaviorType<Chargeable> = Chargeable
+
+    // FIXME #363: 临时代码, 仅用于测试
+    val DOUBLE_ATTACK: ItemBehaviorType<DoubleAttack> = DoubleAttack
 
     /**
      * 物品附魔的逻辑.
