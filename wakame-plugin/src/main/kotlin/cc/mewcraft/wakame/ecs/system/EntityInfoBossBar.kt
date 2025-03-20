@@ -34,7 +34,7 @@ class EntityInfoBossBar : IteratingSystem(
 
     private fun tickEntityHealth(entity: Entity, bossBar: BossBar) {
         val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
-        val entityMaxHealth = requireNotNull(AttributeMapAccess.instance().get(bukkitEntity).getOrThrow().getInstance(Attributes.MAX_HEALTH)?.getValue())
+        val entityMaxHealth = AttributeMapAccess.instance().get(bukkitEntity).getOrNull()?.getInstance(Attributes.MAX_HEALTH)?.getValue() ?: return
         val progress = bukkitEntity.health / entityMaxHealth
         bossBar.progress(progress.toStableFloat())
     }
