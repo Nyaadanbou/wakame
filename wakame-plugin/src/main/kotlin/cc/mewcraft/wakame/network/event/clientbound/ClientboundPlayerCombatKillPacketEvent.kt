@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.network.event.clientbound
 
 import cc.mewcraft.wakame.network.event.PlayerPacketEvent
-import cc.mewcraft.wakame.util.component.adventure.toAdventureComponent
-import cc.mewcraft.wakame.util.component.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.adventure.toAdventureComponent
+import cc.mewcraft.wakame.util.adventure.toNMSComponent
 import net.kyori.adventure.text.Component
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket
 import org.bukkit.entity.Player
