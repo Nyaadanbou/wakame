@@ -9,20 +9,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.network.event.*
 import cc.mewcraft.wakame.network.event.PacketHandler
-import cc.mewcraft.wakame.network.event.PacketListener
-import cc.mewcraft.wakame.network.event.PlayerPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetContentPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundSystemChatPacketEvent
-import cc.mewcraft.wakame.network.event.registerPacketListener
-import cc.mewcraft.wakame.network.event.unregisterPacketListener
+import cc.mewcraft.wakame.network.event.clientbound.*
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.item.editNbt
@@ -46,14 +35,7 @@ import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.crafting.Ingredient
-import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
-import net.minecraft.world.item.crafting.display.RecipeDisplay
-import net.minecraft.world.item.crafting.display.RecipeDisplayEntry
-import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay
-import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay
-import net.minecraft.world.item.crafting.display.SlotDisplay
-import net.minecraft.world.item.crafting.display.SmithingRecipeDisplay
-import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
+import net.minecraft.world.item.crafting.display.*
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
@@ -324,16 +306,17 @@ internal object ItemStackRenderer : PacketListener, Listener {
     private const val PDC_FIELD = "PublicBukkitValues"
 
     private fun MojangStack.modify(): MojangStack {
-        val newMojangStack = copy()
+        val copy = copy()
+
         // 移除任意物品的 PDC
-        newMojangStack.editNbt { nbt ->
-            if (nbt.contains(this@ItemStackRenderer.PDC_FIELD)) {
+        copy.editNbt { nbt ->
+            if (nbt.contains(PDC_FIELD)) {
                 processed = true
             }
-            nbt.remove(this@ItemStackRenderer.PDC_FIELD)
+            nbt.remove(PDC_FIELD)
         }
 
-        val koishStack = newMojangStack.wrap()
+        val koishStack = copy.wrap()
         if (koishStack != null && isNetworkRewrite) {
             try {
                 ItemRenderers.STANDARD.render(koishStack)
@@ -344,7 +327,7 @@ internal object ItemStackRenderer : PacketListener, Listener {
             }
         }
 
-        return newMojangStack
+        return copy
     }
 
     private const val PROCESSED_FIELD = "processed"
