@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundLevelEventPacketE
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundOpenScreenPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundRegistryDataPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetCursorItemPacketEvent
@@ -82,6 +83,7 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundOpenScreenPacketEvent)
         registerPlayerEventType(::ClientboundRecipeBookAddPacketEvent)
         registerPlayerEventType(::ClientboundPlaceGhostRecipePacketEvent)
+        registerPlayerEventType(::ClientboundPlayerCombatKillPacketEvent)
         registerEventType(::ClientboundRegistryDataPacketEvent)
         
         // serverbound - player

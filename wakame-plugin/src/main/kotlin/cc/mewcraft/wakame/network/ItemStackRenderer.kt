@@ -16,18 +16,29 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetConte
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSystemChatPacketEvent
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.item.editNbt
 import cc.mewcraft.wakame.util.item.fastUpdate
 import cc.mewcraft.wakame.util.item.isNetworkRewrite
+import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.unregisterEvents
 import com.mojang.datafixers.util.Pair
+import io.papermc.paper.adventure.PaperAdventure
+import io.papermc.paper.event.player.AsyncChatEvent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.event.HoverEvent
 import net.minecraft.core.component.DataComponentPredicate
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
@@ -47,6 +58,8 @@ import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import java.util.*
 
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer")
@@ -55,15 +68,17 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer"
  * 修改 [net.minecraft.world.item.ItemStack].
  */
 @Init(stage = InitStage.POST_WORLD)
-internal object ItemStackRenderer : PacketListener {
+internal object ItemStackRenderer : PacketListener, Listener {
 
     @InitFun
     fun init() {
+        registerEvents()
         registerPacketListener()
     }
 
     @DisableFun
     fun disable() {
+        unregisterEvents()
         unregisterPacketListener()
     }
 
@@ -160,6 +175,23 @@ internal object ItemStackRenderer : PacketListener {
         event.recipeDisplay = getClientSideRecipeDisplay(event.recipeDisplay)
     }
 
+    @EventHandler
+    private fun handlePlayerChat(event: AsyncChatEvent) {
+        event.renderer { source, sourceDisplayName, message, viewer ->
+            getClientSideTextComponent(message)
+        }
+    }
+
+    @PacketHandler
+    private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
+        event.message = getClientSideTextComponent(event.message)
+    }
+
+    @PacketHandler
+    private fun handleCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
+        event.message = getClientSideTextComponent(event.message)
+    }
+
     private fun getClientSideIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
         optList.map { ingredientList ->
             ingredientList.map { ingredient ->
@@ -243,6 +275,36 @@ internal object ItemStackRenderer : PacketListener {
             LOGGER.warn("Unknown slot display type: ${display.javaClass}")
             display
         }
+    }
+
+    /**
+     * 递归修改 Adventure Component
+     *
+     * @param component Adventure Component
+     * @return 修改后的 Adventure Component
+     */
+    private fun getClientSideTextComponent(component: Component): Component {
+        if (component !is TranslatableComponent)
+            return component
+
+        val modified = getClientSideTranslatableComponent(component)
+
+        val modifiedChildren = modified.children().map { getClientSideTextComponent(it) }
+        val modifiedArguments = modified.arguments().map { getClientSideTextComponent(it.asComponent()) }
+
+        return modified.children(modifiedChildren).arguments(modifiedArguments)
+    }
+
+    private fun getClientSideTranslatableComponent(component: TranslatableComponent): TranslatableComponent {
+        val hoverEvent = component.hoverEvent() ?: return component
+        if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
+            val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
+            val originItemStack = MojangStack(Registries.ITEM.getOrThrow(itemStackInfo.item()), itemStackInfo.count(), PaperAdventure.asVanilla(itemStackInfo.dataComponents()))
+            val itemStack = getClientSideStack(originItemStack)
+            val newHover = itemStack.asBukkitMirror().asHoverEvent()
+            return component.hoverEvent(newHover)
+        }
+        return component
     }
 
     private fun isCreative(event: PlayerPacketEvent<*>): Boolean {
