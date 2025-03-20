@@ -88,16 +88,16 @@ internal object ItemStackRenderer : PacketListener, Listener {
         val items = event.items
 
         items.forEachIndexed { i, item ->
-            items[i] = getClientSideStack(item)
+            items[i] = item.modify()
         }
 
-        event.carriedItem = getClientSideStack(event.carriedItem)
+        event.carriedItem = event.carriedItem.modify()
     }
 
     @PacketHandler
     private fun handleSetSlot(event: ClientboundContainerSetSlotPacketEvent) {
         if (isCreative(event)) return
-        event.item = getClientSideStack(event.item)
+        event.item = event.item.modify()
     }
 
     @PacketHandler
@@ -110,7 +110,7 @@ internal object ItemStackRenderer : PacketListener, Listener {
                 newItems += DataValue(
                     dataValue.id,
                     EntityDataSerializers.ITEM_STACK,
-                    getClientSideStack(value)
+                    value.modify()
                 )
             } else {
                 newItems += dataValue
@@ -127,7 +127,7 @@ internal object ItemStackRenderer : PacketListener, Listener {
         for ((i, pair) in slots.withIndex()) {
             slots[i] = Pair(
                 pair.first,
-                getClientSideStack(pair.second)
+                pair.second.modify()
             )
         }
     }
@@ -137,14 +137,14 @@ internal object ItemStackRenderer : PacketListener, Listener {
         val newOffers = MerchantOffers()
 
         event.offers.forEach { offer ->
-            val stackA = getClientSideStack(offer.baseCostA.itemStack)
+            val stackA = offer.baseCostA.itemStack.modify()
             val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentPredicate.EMPTY, stackA)
             val costB = offer.costB.map {
-                val stackB = getClientSideStack(it.itemStack)
+                val stackB = it.itemStack.modify()
                 ItemCost(stackB.itemHolder, stackB.count, DataComponentPredicate.EMPTY, stackB)
             }
             newOffers += MerchantOffer(
-                costA, costB, getClientSideStack(offer.result),
+                costA, costB, offer.result.modify(),
                 offer.uses, offer.maxUses, offer.xp, offer.priceMultiplier, offer.demand
             )
         }
@@ -159,10 +159,10 @@ internal object ItemStackRenderer : PacketListener, Listener {
             ClientboundRecipeBookAddPacket.Entry(
                 RecipeDisplayEntry(
                     contents.id,
-                    getClientSideRecipeDisplay(contents.display),
+                    modifyRecipeDisplay(contents.display),
                     contents.group,
                     contents.category,
-                    getClientSideIngredientList(contents.craftingRequirements)
+                    modifyIngredientList(contents.craftingRequirements)
                 ),
                 entry.notification(),
                 entry.highlight()
@@ -172,71 +172,71 @@ internal object ItemStackRenderer : PacketListener, Listener {
 
     @PacketHandler
     private fun handlePlaceGhostRecipe(event: ClientboundPlaceGhostRecipePacketEvent) {
-        event.recipeDisplay = getClientSideRecipeDisplay(event.recipeDisplay)
+        event.recipeDisplay = modifyRecipeDisplay(event.recipeDisplay)
     }
 
     @EventHandler
     private fun handlePlayerChat(event: AsyncChatEvent) {
         event.renderer { source, sourceDisplayName, message, viewer ->
-            getClientSideTextComponent(message)
+            modifyTextComponent(message)
         }
     }
 
     @PacketHandler
     private fun handleSystemChat(event: ClientboundSystemChatPacketEvent) {
-        event.message = getClientSideTextComponent(event.message)
+        event.message = modifyTextComponent(event.message)
     }
 
     @PacketHandler
     private fun handleCombatKill(event: ClientboundPlayerCombatKillPacketEvent) {
-        event.message = getClientSideTextComponent(event.message)
+        event.message = modifyTextComponent(event.message)
     }
 
-    private fun getClientSideIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
+    private fun modifyIngredientList(optList: Optional<List<Ingredient>>): Optional<List<Ingredient>> =
         optList.map { ingredientList ->
             ingredientList.map { ingredient ->
                 val itemStacks = ingredient.itemStacks()
                 if (itemStacks != null)
-                    Ingredient.ofStacks(itemStacks.map { getClientSideStack(it) })
+                    Ingredient.ofStacks(itemStacks.map { it.modify() })
                 else ingredient
             }
         }
 
-    private fun getClientSideRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
+    private fun modifyRecipeDisplay(display: RecipeDisplay): RecipeDisplay = when (display) {
         is FurnaceRecipeDisplay -> FurnaceRecipeDisplay(
-            getClientSideSlotDisplay(display.ingredient),
-            getClientSideSlotDisplay(display.fuel),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation),
+            modifySlotDisplay(display.ingredient),
+            modifySlotDisplay(display.fuel),
+            modifySlotDisplay(display.result),
+            modifySlotDisplay(display.craftingStation),
             display.duration,
             display.experience
         )
 
         is ShapedCraftingRecipeDisplay -> ShapedCraftingRecipeDisplay(
             display.width, display.height,
-            display.ingredients.map(::getClientSideSlotDisplay),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            display.ingredients.map(::modifySlotDisplay),
+            modifySlotDisplay(display.result),
+            modifySlotDisplay(display.craftingStation)
         )
 
         is ShapelessCraftingRecipeDisplay -> ShapelessCraftingRecipeDisplay(
-            display.ingredients.map(::getClientSideSlotDisplay),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            display.ingredients.map(::modifySlotDisplay),
+            modifySlotDisplay(display.result),
+            modifySlotDisplay(display.craftingStation)
         )
 
         is SmithingRecipeDisplay -> SmithingRecipeDisplay(
-            getClientSideSlotDisplay(display.template),
-            getClientSideSlotDisplay(display.base),
-            getClientSideSlotDisplay(display.addition),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            modifySlotDisplay(display.template),
+            modifySlotDisplay(display.base),
+            modifySlotDisplay(display.addition),
+            modifySlotDisplay(display.result),
+            modifySlotDisplay(display.craftingStation)
         )
 
         is StonecutterRecipeDisplay -> StonecutterRecipeDisplay(
-            getClientSideSlotDisplay(display.input),
-            getClientSideSlotDisplay(display.result),
-            getClientSideSlotDisplay(display.craftingStation)
+            modifySlotDisplay(display.input),
+            modifySlotDisplay(display.result),
+            modifySlotDisplay(display.craftingStation)
         )
 
         else -> {
@@ -245,24 +245,24 @@ internal object ItemStackRenderer : PacketListener, Listener {
         }
     }
 
-    private fun getClientSideSlotDisplay(display: SlotDisplay): SlotDisplay = when (display) {
+    private fun modifySlotDisplay(display: SlotDisplay): SlotDisplay = when (display) {
         is SlotDisplay.Composite -> SlotDisplay.Composite(
-            display.contents.map(::getClientSideSlotDisplay)
+            display.contents.map(::modifySlotDisplay)
         )
 
         is SlotDisplay.ItemStackSlotDisplay -> SlotDisplay.ItemStackSlotDisplay(
-            getClientSideStack(display.stack)
+            display.stack.modify()
         )
 
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
-            getClientSideSlotDisplay(display.base),
-            getClientSideSlotDisplay(display.material),
-            getClientSideSlotDisplay(display.pattern)
+            modifySlotDisplay(display.base),
+            modifySlotDisplay(display.material),
+            modifySlotDisplay(display.pattern)
         )
 
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
-            getClientSideSlotDisplay(display.input),
-            getClientSideSlotDisplay(display.remainder)
+            modifySlotDisplay(display.input),
+            modifySlotDisplay(display.remainder)
         )
 
         is SlotDisplay.AnyFuel,
@@ -283,24 +283,24 @@ internal object ItemStackRenderer : PacketListener, Listener {
      * @param component Adventure Component
      * @return 修改后的 Adventure Component
      */
-    private fun getClientSideTextComponent(component: Component): Component {
+    private fun modifyTextComponent(component: Component): Component {
         if (component !is TranslatableComponent)
             return component
 
-        val modified = getClientSideTranslatableComponent(component)
+        val modified = modifyTranslatableComponent(component)
 
-        val modifiedChildren = modified.children().map { getClientSideTextComponent(it) }
-        val modifiedArguments = modified.arguments().map { getClientSideTextComponent(it.asComponent()) }
+        val modifiedChildren = modified.children().map { modifyTextComponent(it) }
+        val modifiedArguments = modified.arguments().map { modifyTextComponent(it.asComponent()) }
 
         return modified.children(modifiedChildren).arguments(modifiedArguments)
     }
 
-    private fun getClientSideTranslatableComponent(component: TranslatableComponent): TranslatableComponent {
+    private fun modifyTranslatableComponent(component: TranslatableComponent): TranslatableComponent {
         val hoverEvent = component.hoverEvent() ?: return component
         if (hoverEvent.action() == HoverEvent.Action.SHOW_ITEM) {
             val itemStackInfo = hoverEvent.value() as HoverEvent.ShowItem
             val originItemStack = MojangStack(Registries.ITEM.getOrThrow(itemStackInfo.item()), itemStackInfo.count(), PaperAdventure.asVanilla(itemStackInfo.dataComponents()))
-            val itemStack = getClientSideStack(originItemStack)
+            val itemStack = originItemStack.modify()
             val newHover = itemStack.asBukkitMirror().asHoverEvent()
             return component.hoverEvent(newHover)
         }
@@ -323,18 +323,18 @@ internal object ItemStackRenderer : PacketListener, Listener {
 
     private const val PDC_FIELD = "PublicBukkitValues"
 
-    private fun getClientSideStack(itemStack: MojangStack): MojangStack {
-        val newMojangStack = itemStack.copy()
+    private fun MojangStack.modify(): MojangStack {
+        val newMojangStack = copy()
         // 移除任意物品的 PDC
         newMojangStack.editNbt { nbt ->
-            if (nbt.contains(PDC_FIELD)) {
-                itemStack.processed = true
+            if (nbt.contains(this@ItemStackRenderer.PDC_FIELD)) {
+                processed = true
             }
-            nbt.remove(PDC_FIELD)
+            nbt.remove(this@ItemStackRenderer.PDC_FIELD)
         }
 
         val koishStack = newMojangStack.wrap()
-        if (koishStack != null && itemStack.isNetworkRewrite) {
+        if (koishStack != null && isNetworkRewrite) {
             try {
                 ItemRenderers.STANDARD.render(koishStack)
             } catch (e: Throwable) {
