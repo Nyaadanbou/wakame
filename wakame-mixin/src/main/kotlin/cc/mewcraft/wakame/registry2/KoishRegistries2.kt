@@ -73,7 +73,7 @@ object KoishRegistries2 {
      */
     @ApiStatus.Internal
     @JvmField
-    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(KoishRegistryKeys2.ITEM_REF_HANDLER)
+    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerDefaulted(KoishRegistryKeys2.ITEM_REF_HANDLER, "minecraft")
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

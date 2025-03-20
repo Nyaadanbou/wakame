@@ -14,13 +14,14 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Init(stage = InitStage.PRE_WORLD)
-internal object ItemRefBootstrap {
+internal object ItemRefBootstrapper {
 
     @InitFun
     fun init() {
         // 注册内置的 ItemRefHandler 实例 ( 兜底的放在最后注册 )
         KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("koish", KoishItemRefHandler)
         KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("minecraft", MinecraftItemRefHandler)
+        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.freeze()
     }
 
 }
