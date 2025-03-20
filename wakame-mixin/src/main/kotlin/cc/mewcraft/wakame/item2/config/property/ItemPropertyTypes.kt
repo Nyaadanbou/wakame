@@ -33,7 +33,7 @@ data object ItemPropertyTypes {
     }
 
     @JvmField
-    val NAME: ItemPropertyType<Component> = typeOf("type_name")
+    val NAME: ItemPropertyType<Component> = typeOf("name")
 
     @JvmField
     val SLOT: ItemPropertyType<ItemSlotGroup> = typeOf("slot") {

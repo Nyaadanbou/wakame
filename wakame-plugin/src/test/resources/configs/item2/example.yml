@@ -1,5 +1,5 @@
 base: iron_sword[!attribute_modifiers]
-type_name: "没用的铁制剑*"
-item_name: "没用的铁制剑"
+name: "没用的铁制剑*"
+item_name: "<gray>没用的铁制剑"
 level: { base: 5 }
 hidden: {}
