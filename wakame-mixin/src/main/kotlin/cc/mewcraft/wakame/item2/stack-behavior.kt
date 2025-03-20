@@ -32,14 +32,14 @@ fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBeh
 
 // FIXME #350: 等完全迁移
 //fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
-//    forEachBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
+//    handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
 
 fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
     handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
 
 // FIXME #350: 等完全迁移
 //fun ItemStack.handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) =
-//    forEachBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
+//    handleBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
 
 fun ItemStack.handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) =
     handleBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
@@ -76,7 +76,7 @@ fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerI
 
 // FIXME #350: 等完全迁移
 //fun ItemStack.handleAbilityPrepareCast(caster: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) =
-//    forEachBehavior { it.handleAbilityPrepareCast(caster, itemstack, ability, event) }
+//    handleBehavior { it.handleAbilityPrepareCast(caster, itemstack, ability, event) }
 
 // ------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 ItemBehavior

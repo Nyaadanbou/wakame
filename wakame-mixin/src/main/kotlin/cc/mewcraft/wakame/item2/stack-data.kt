@@ -18,7 +18,7 @@ import org.bukkit.inventory.ItemStack
 
 
 // ------------------
-// 用于访问 `org.bukkit.inventory.ItemStack` 上的自定义数据
+// 用于访问 `org.bukkit.inventory.ItemStack` 上的 Koish 数据
 // (关于注释和文档, 请参考下面的 MojangStack 的扩展函数)
 // ------------------
 
@@ -44,7 +44,7 @@ fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setD
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
 
 // ------------------
-// 用于访问 `net.minecraft.world.item.ItemStack` 上的自定义数据
+// 用于访问 `net.minecraft.world.item.ItemStack` 上的 Koish 数据
 // ------------------
 
 //// Type
