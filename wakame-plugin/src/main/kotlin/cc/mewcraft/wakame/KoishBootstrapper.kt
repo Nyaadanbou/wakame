@@ -21,13 +21,11 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.debug.DebugProbes
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext.startKoin
 import java.nio.file.Path
-import kotlin.reflect.KProperty
 
 private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.3")..Version("1.21.3")
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
@@ -43,9 +41,6 @@ lateinit var KOISH_JAR: Path private set
 @PublishedApi
 internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
-@get:JvmName("getLogger")
-val LOGGER: ComponentLogger by KoishLoggerProvider
-
 internal class KoishBootstrapper : PluginBootstrap {
     init {
         BOOTSTRAPPER = this
@@ -54,8 +49,8 @@ internal class KoishBootstrapper : PluginBootstrap {
     // See: https://docs.papermc.io/paper/dev/getting-started/paper-plugins#bootstrapper
     //
     // 该函数被调用的时机非常早, 会在以下关键时机之前被调用:
-    // 1) 加载 NMS 的 classes (因此理论上可以在这里对服务端进行 patching)
-    // 2) 创建 JavaPlugin 实例 (因此可以直接返回一个 Kotlin 的 object)
+    // 1) 加载 NMS 的 classes (因此可以在这里对服务端代码进行 patching)
+    // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
         startKoin {
             modules(
@@ -104,6 +99,9 @@ internal class KoishBootstrapper : PluginBootstrap {
                 DebugProbes.enableCreationStackTraces = true
             }
 
+            // 初始化 Koish 所使用的路径
+            KoishDataPaths.initialize()
+
             // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
             // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,
             // 而这些配置所对应的文件可能还没有内容 (例如首次使用 Koish 插件时数据文件还未被拷贝到插件的数据目录),
@@ -130,26 +128,4 @@ internal class KoishBootstrapper : PluginBootstrap {
     override fun createPlugin(context: PluginProviderContext): JavaPlugin {
         return Koish // 利用 Kotlin 的 object 特性来直接访问我们的 JavaPlugin 实例
     }
-}
-
-// 为了让代码在单元测试环境里也能直接使用 LOGGER, 我们创建该容器来装载不同环境下的 Logger 实例
-private object KoishLoggerProvider {
-    private var LOGGER: ComponentLogger? = null
-
-    init {
-        if (SharedConstants.isRunningInIde) {
-            // 单元测试使用专门的 Logger, 服务端上则由 PluginBootstrap#bootstrap 分配
-            set(ComponentLogger.logger("KoishTest"))
-        }
-    }
-
-    fun set(logger: ComponentLogger) {
-        LOGGER = logger
-    }
-
-    fun get(): ComponentLogger {
-        return LOGGER ?: error("Koish logger not initialized!")
-    }
-
-    operator fun getValue(thisRef: Any?, property: KProperty<*>?): ComponentLogger = get()
 }

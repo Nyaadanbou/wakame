@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.TypeSerializers
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializers
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -25,7 +25,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
     ]
 )
 @Reload
-internal object KizamiTypeRegistryLoader : RegistryConfigStorage {
+internal object KizamiTypeRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {

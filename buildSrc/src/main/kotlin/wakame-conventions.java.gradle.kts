@@ -19,6 +19,9 @@ tasks {
         // use JUnit 5
         useJUnitPlatform()
     }
+    shadowJar {
+        configure()
+    }
 }
 
 java {

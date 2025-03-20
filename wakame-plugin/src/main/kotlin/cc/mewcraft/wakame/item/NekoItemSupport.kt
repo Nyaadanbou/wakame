@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.item.unwrapToMojang
+import cc.mewcraft.wakame.util.item.toNMS
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.ExaminableProperty
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.stream.Stream
 
 val ItemStack?.nekoItem: NekoItem?
-    get() = this?.unwrapToMojang().koishItem
+    get() = this?.toNMS().koishItem
 val MojangStack?.koishItem: NekoItem?
     get() = this?.let(KoishStackImplementations::getArchetype)
 

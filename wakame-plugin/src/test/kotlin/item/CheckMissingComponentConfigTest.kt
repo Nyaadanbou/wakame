@@ -1,5 +1,6 @@
 package item
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.item.component.ItemComponentRegistry
@@ -40,6 +41,7 @@ class CheckMissingComponentConfigTest : KoinTest {
     @Test
     fun `check all item component config's at main`() {
         loadKoinModules(mainEnv())
+        KoishDataPaths.initialize()
         checkMissingConfigs()
     }
 
@@ -47,6 +49,7 @@ class CheckMissingComponentConfigTest : KoinTest {
     @Test
     fun `check all item component config's at test`() {
         loadKoinModules(testEnv())
+        KoishDataPaths.initialize()
         checkMissingConfigs()
     }
 

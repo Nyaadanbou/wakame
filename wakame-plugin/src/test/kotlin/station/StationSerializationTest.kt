@@ -1,5 +1,6 @@
 package station
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.text.adventureTextModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
@@ -17,11 +18,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import testEnv
-import kotlin.test.Test
-import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNotNull
+import kotlin.test.*
 
 class StationSerializationTest : KoinTest {
 
@@ -35,6 +32,8 @@ class StationSerializationTest : KoinTest {
                     adventureTextModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
 
             ItemXBootstrap.init()
         }

@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentMap.Companion.COMPONENTS_F
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.data.getCompoundOrNull
 import cc.mewcraft.wakame.util.data.getOrPut
-import cc.mewcraft.wakame.util.item.wrapToBukkit
+import cc.mewcraft.wakame.util.item.toBukkit
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
 
@@ -101,7 +101,7 @@ private class ItemComponentHolderImpl(
 ) : ItemComponentHolder {
 
     override val bukkitStack: ItemStack
-        get() = mojangStack.wrapToBukkit()
+        get() = mojangStack.toBukkit()
 
     /**
      * 从萌芽的根 NBT 标签中获取键为 [COMPONENTS_FIELD] 的标签.

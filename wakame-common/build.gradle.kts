@@ -13,11 +13,11 @@ version = "0.0.1-SNAPSHOT"
 
 repositories {
     nyaadanbouReleases()
+    nyaadanbouPrivate()
 }
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
-    compileOnly(local.shadow.bukkit)
 }
 
 publishing {

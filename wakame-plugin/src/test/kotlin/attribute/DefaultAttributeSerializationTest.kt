@@ -1,5 +1,6 @@
 package attribute
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
@@ -39,6 +40,8 @@ class DefaultAttributeSerializationTest : KoinTest {
                     adventureModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
 
             ElementTypeRegistryLoader.init()
             Attributes.init()

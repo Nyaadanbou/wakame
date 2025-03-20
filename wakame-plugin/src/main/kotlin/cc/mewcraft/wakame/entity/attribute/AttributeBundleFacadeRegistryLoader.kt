@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.*
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -43,7 +43,7 @@ import kotlin.reflect.KClass
         Attributes::class,
     ]
 )
-internal object AttributeBundleFacadeRegistryLoader : RegistryConfigStorage {
+internal object AttributeBundleFacadeRegistryLoader : RegistryLoader {
     const val CONFIG_ID: String = "attributes"
     const val FILE_PATH: String = "attributes.yml"
 

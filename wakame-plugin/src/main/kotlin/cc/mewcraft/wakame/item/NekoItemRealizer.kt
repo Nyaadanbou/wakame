@@ -3,15 +3,9 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.extension.makeItemModelKey
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationContexts
-import cc.mewcraft.wakame.item.template.ItemGenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.util.item.unwrapToMojang
+import cc.mewcraft.wakame.util.item.toNMS
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
@@ -138,7 +132,7 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
      */
     private fun realizeByContext(prototype: NekoItem, context: ItemGenerationContext): NekoStack {
         // 创建空的萌芽物品
-        val itemstack = prototype.base.createItemStack().unwrapToMojang()
+        val itemstack = prototype.base.createItemStack().toNMS()
         if (itemstack.isEmpty) {
             error("The item base cannot be empty")
         }

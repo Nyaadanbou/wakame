@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     }
     versionCatalogs {
         create("libs") {
-            from("cc.mewcraft.gradle:catalog:0.7-SNAPSHOT")
+            from("cc.mewcraft.gradle:catalog:0.8-SNAPSHOT")
         }
     }
 }

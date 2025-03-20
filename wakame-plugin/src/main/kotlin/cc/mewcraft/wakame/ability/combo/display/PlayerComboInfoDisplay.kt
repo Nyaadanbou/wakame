@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.RegistryConfigStorage
+import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -36,7 +36,7 @@ import org.bukkit.entity.Player
         AbilityRegistryLoader::class,
     ]
 )
-internal object PlayerComboInfoDisplay : RegistryConfigStorage {
+internal object PlayerComboInfoDisplay : RegistryLoader {
     const val CONFIG_NAME = "ability.yml"
 
     private lateinit var triggerNames: Map<Trigger, String>

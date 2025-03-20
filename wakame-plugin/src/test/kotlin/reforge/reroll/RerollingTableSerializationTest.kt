@@ -1,5 +1,6 @@
 package reforge.reroll
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.reroll.RerollingTableSerializer
 import org.junit.jupiter.api.AfterAll
@@ -23,6 +24,8 @@ class RerollingTableSerializationTest : KoinTest {
                     adventureModule(),
                 )
             }
+
+            KoishDataPaths.initialize()
         }
 
         @JvmStatic

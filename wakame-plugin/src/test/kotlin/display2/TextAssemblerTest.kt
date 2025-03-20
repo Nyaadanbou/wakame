@@ -1,5 +1,6 @@
 package display2
 
+import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.BlankStaticTextMeta
 import cc.mewcraft.wakame.display2.implementation.CustomStaticTextMeta
@@ -7,7 +8,7 @@ import io.mockk.every
 import io.mockk.mockkClass
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
-import net.kyori.adventure.key.Key.*
+import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import org.koin.core.context.startKoin
@@ -17,7 +18,10 @@ import org.koin.test.get
 import org.koin.test.mock.MockProvider
 import org.koin.test.mock.declareMock
 import testEnv
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 /**
  * 测试 [TextAssembler].
@@ -41,6 +45,8 @@ class TextAssemblerTest : KoinTest {
                 testEnv(),
             )
         }
+
+        KoishDataPaths.initialize()
     }
 
     @AfterTest

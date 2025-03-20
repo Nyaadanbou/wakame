@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.data.getByteArrayOrNull
-import com.sun.org.apache.bcel.internal.util.Args.require
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty

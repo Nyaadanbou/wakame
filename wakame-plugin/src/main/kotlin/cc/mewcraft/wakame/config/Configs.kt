@@ -197,7 +197,7 @@ object Configs {
                 opts.serializers { builder ->
                     builder.registerAnnotatedObjects(ObjectMappers.DEFAULT)
                     builder.registerAll(KOISH_CONFIGURATE_SERIALIZERS)
-                    customSerializers[namespace]?.build()?.let { builder.registerAll(it) }
+                    customSerializers[namespace]?.build()?.let(builder::registerAll)
                 }
             }
     }
