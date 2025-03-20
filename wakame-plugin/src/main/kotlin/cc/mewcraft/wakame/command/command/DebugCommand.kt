@@ -3,20 +3,30 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
+import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toNMS
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
+import org.bukkit.entity.LivingEntity
+import org.incendo.cloud.bukkit.data.MultipleEntitySelector
+import org.incendo.cloud.bukkit.parser.selector.MultipleEntitySelectorParser
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.kotlin.extension.getOrNull
 import org.incendo.cloud.paper.util.sender.PlayerSource
 import org.incendo.cloud.paper.util.sender.Source
+import org.incendo.cloud.parser.standard.DoubleParser
 import org.incendo.cloud.parser.standard.IntegerParser
+import kotlin.math.pow
 
 internal object DebugCommand : KoishCommandFactory<Source> {
+
+    private val MINECRAFT_KILL_DAMAGE: Double = 2.0.pow(128)
 
     override fun KoishCommandFactory.Builder<Source>.createCommands() {
         val commonBuilder = build {
@@ -38,6 +48,15 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             literal("change_variant")
             required("variant", IntegerParser.integerParser(0, 127))
             koishHandler(context = Dispatchers.minecraft, handler = ::handleChangeVariant)
+        }
+
+        // <root> debug damage <damage> [target]
+        // 对指定目标实体 [target] 造成自定义伤害 <damage>
+        buildAndAdd(commonBuilder) {
+            literal("damage")
+            required("damage", DoubleParser.doubleParser(.0, MINECRAFT_KILL_DAMAGE))
+            optional("target", MultipleEntitySelectorParser.multipleEntitySelectorParser(false))
+            koishHandler(context = Dispatchers.minecraft, handler = ::handleCustomDamage)
         }
     }
 
@@ -73,4 +92,27 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         nekoStack.variant = variant
         sender.sendPlainMessage("Variant has been changed from $oldVariant to $variant")
     }
+
+    private fun handleCustomDamage(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
+        val damage = context.get<Double>("damage")
+        val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
+        val damageMeta = PlayerDamageMetadata(
+            user = sender.toUser(),
+            damageBundle = damageBundle {
+                default {
+                    min(damage)
+                    max(damage)
+                    rate(1.0)
+                    defensePenetration(.0)
+                    defensePenetrationRate(.0)
+                }
+            },
+            damageTags = DamageTags(DamageTag.DIRECT)
+        )
+        target.filterIsInstance<LivingEntity>().forEach { entity ->
+            entity.hurt(damageMetadata = damageMeta, source = sender)
+        }
+    }
+
 }

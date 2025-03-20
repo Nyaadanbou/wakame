@@ -8,8 +8,13 @@ import me.lucko.shadow.shadow
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.*
-import net.minecraft.network.syncher.SynchedEntityData.*
+import net.minecraft.network.protocol.game.ClientGamePacketListener
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundBundlePacket
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Brightness
 import net.minecraft.world.entity.EntityType
@@ -20,8 +25,10 @@ import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.entity.TextDisplay
 import org.joml.Quaternionf
-import java.util.UUID
-import kotlin.experimental.*
+import java.util.*
+import kotlin.experimental.and
+import kotlin.experimental.inv
+import kotlin.experimental.or
 import net.minecraft.world.entity.Display as MojangDisplay
 import net.minecraft.world.item.ItemStack as MojangStack
 import org.bukkit.entity.Display as BukkitDisplay
@@ -31,7 +38,7 @@ import org.bukkit.entity.Display as BukkitDisplay
  * 一个对于 [MojangDisplay] 的封装.
  */
 class Hologram(
-    private var data: HologramData,
+    private val data: HologramData,
 ) {
     companion object {
         private const val LINE_WIDTH = 1000
@@ -236,10 +243,5 @@ class Hologram(
         packets += ClientboundSetEntityDataPacket(display.id, values)
 
         player.handle.connection.send(ClientboundBundlePacket(packets))
-    }
-
-    fun setEntityData(data: HologramData) {
-        this.data = data
-        update()
     }
 }

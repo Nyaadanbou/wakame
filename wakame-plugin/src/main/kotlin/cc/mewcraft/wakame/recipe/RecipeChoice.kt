@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.recipe
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.inventory.ItemStack
@@ -39,7 +38,6 @@ data class SingleRecipeChoice(
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemstack = item.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${item.key}'")
-        itemstack.setData(DataComponentTypes.ITEM_MODEL, item.key)
         return BukkitRecipeChoice.ExactChoice(itemstack)
     }
 
@@ -61,7 +59,6 @@ data class MultiRecipeChoice(
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         items.forEach {
             val itemstack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
-            itemstack.setData(DataComponentTypes.ITEM_MODEL, it.key)
             itemStacks.add(itemstack)
         }
         return BukkitRecipeChoice.ExactChoice(itemStacks)
