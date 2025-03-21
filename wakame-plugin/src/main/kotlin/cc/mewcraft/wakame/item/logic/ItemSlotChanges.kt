@@ -2,19 +2,12 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
-import cc.mewcraft.wakame.util.item.isEmpty
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.inventory.ItemStack
 
 data class ItemSlotChanges(
-    /**
-     * 在 [ItemSlotChangeEventInternals] 执行前, 保存了每个槽位 t - 1 刻的 [Entry].
-     * 在 [ItemSlotChangeEventInternals] 执行后, 该映射会更新为当前刻的 [Entry].
-     *
-     * @see ItemSlotChangeEventInternals
-     */
     private val items: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
 ) : Component<ItemSlotChanges> {
     companion object : ComponentType<ItemSlotChanges>()
@@ -29,18 +22,40 @@ data class ItemSlotChanges(
     }
 
     /**
-     * ## 注意!
+     * 记录对应的 [ItemSlot] 的变化.
      *
-     * 获取该类 [ItemStack] 相关变量时分两种情况:
-     * 1. 如果此变量在 [ItemSlotChangeEventInternals] 执行前获取, 则返回 t - 1 刻的 [ItemStack].
-     * 2. 如果此变量在 [ItemSlotChangeEventInternals] 执行后被获取, 则返回当前刻的 [ItemStack].
-     *
-     * 该变量不会是 [ItemStack.isEmpty] 为 `true` 的物品! 对于这类物品, 该变量会直接是 `null` 来表示它们.
+     * 一个 [Entry][cc.mewcraft.wakame.item.logic.ItemSlotChanges.Entry] 只会记录一个 [ItemSlot] 的变化.
      */
-    class Entry(
+    class Entry internal constructor(
+        /**
+         * 物品发生变化所在的 [ItemSlot].
+         */
         val slot: ItemSlot,
+        /**
+         * 发生变化后的[物品][ItemStack].
+         *
+         * 如果为空, 则表示该物品为不存在或为空气.
+         *
+         * ## 注意!
+         *
+         * 如果在 [ItemSlotChangeEventInternals] 进行 tick 之前获取此物品, 将会返回上一 tick 的物品结果.
+         */
         var current: ItemStack?,
+        /**
+         * 发生变化前的[物品][ItemStack].
+         *
+         * 如果为空, 则表示该物品为不存在或为空气.
+         *
+         * ## 注意!
+         *
+         * 如果在 [ItemSlotChangeEventInternals] 进行 tick 之前获取此物品, 将会返回上一 tick 的物品结果.
+         */
         var previous: ItemStack?,
+        /**
+         * 记录是否发生了变化.
+         *
+         * 如果为 `true`, 则表示该物品发生了变化, 反之则表示该物品没有发生变化.
+         */
         var isChanging: Boolean,
     ) {
         init {
@@ -51,6 +66,7 @@ data class ItemSlotChanges(
         operator fun component1(): ItemSlot = slot
         operator fun component2(): ItemStack? = current
         operator fun component3(): ItemStack? = previous
+        operator fun component4(): Boolean = isChanging
 
         fun update(newItem: ItemStack?) {
             newItem?.let { require(!it.isEmpty) { "newItem cannot be empty" } }

@@ -24,7 +24,7 @@ class AbilityAddSystem : IteratingSystem(
         val itemSlotChanges = entity[ItemSlotChanges]
         val changingItems = itemSlotChanges.changingItems
         val user = player.toUser()
-        for ((slot, current, _) in changingItems) {
+        for ((slot, current) in changingItems) {
             val nekoStack = current?.wrap() ?: continue
             if (!testLevel(user, nekoStack)) {
                 continue
