@@ -29,24 +29,24 @@ class ItemSlotChangeEventInternals : IteratingSystem(
         if (!user.isInventoryListenable) {
             // 当玩家的背包不可监听时, 跳过扫描, 跳过触发事件.
             // 换句话说, 在 isInventoryListenable 为 false 时,
-            // lastItemRecords 永远不会更新, 并且 isEmpty 为 true.
+            // ItemSlotChanges 永远不会更新, 并且 isEmpty 为 true.
             // 直到当 isInventoryListenable 为 true 时,
-            // lastItemRecords 才会开始更新.
+            // ItemSlotChanges 才会开始更新.
             return
         }
 
         for (itemSlot in everyItemSlot) {
             val currItemStack = itemSlot.getItem(player)
-            val lastItemStack = entity[ItemRecord][itemSlot]
-            if (currItemStack != lastItemStack) {
-                entity[ItemRecord][itemSlot] = currItemStack
-                val changeEvent = PlayerItemSlotChangeEvent(player, itemSlot, lastItemStack, currItemStack)
+            val itemSlotChangesEntry = entity[ItemSlotChanges][itemSlot]
+            itemSlotChangesEntry.update(currItemStack)
+            if (itemSlotChangesEntry.isChanging) {
+                val changeEvent = PlayerItemSlotChangeEvent(player, itemSlot, itemSlotChangesEntry.previous, itemSlotChangesEntry.current)
                 changeEvent.callEvent()
             }
         }
     }
 
     override fun onAddEntity(entity: Entity) {
-        entity.configure { it += ItemRecord() }
+        entity.configure { it += ItemSlotChanges() }
     }
 }

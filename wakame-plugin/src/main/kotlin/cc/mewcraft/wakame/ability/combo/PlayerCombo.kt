@@ -32,7 +32,7 @@ class PlayerCombo(
     private var comboDisplay: PlayerComboInfo by ComboDisplayProvider { PlayerComboInfo(player) }
 
     fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
-        if (trigger in COOLDOWN_TRIGGERS && !cooldown.test()) {
+        if (trigger in COOLDOWN_TRIGGERS && cooldown.test()) {
             return PlayerComboResult.SILENT_FAILURE
         }
         return comboDisplay.addTrigger(trigger)

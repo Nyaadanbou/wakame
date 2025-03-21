@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.molang.Evaluable
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifiers
@@ -103,13 +102,13 @@ data class PlayerAbility(
     val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    fun record(caster: Player, target: KoishEntity?, holder: Pair<ItemSlot, NekoStack>) {
+    fun record(caster: Player, target: KoishEntity?, slot: ItemSlot) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
             trigger(trigger)
             manaCost(manaCost)
         }
-        instance.record(input, holder)
+        instance.record(input, slot)
     }
 
     fun cast(caster: Player, target: KoishEntity?) {

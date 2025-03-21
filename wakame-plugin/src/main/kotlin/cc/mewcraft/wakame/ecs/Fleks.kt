@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.ability.system.AbilityAddSystem
 import cc.mewcraft.wakame.ability.system.AbilityInitSystem
 import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
 import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
@@ -70,6 +71,7 @@ object Fleks : Listener {
 
             // 其它内部功能的移除系统
 
+            add(AbilityAddSystem())
             add(AbilityRemoveSystem())
             add(AbilityTickResultSystem())
             add(ElementStackSystem())

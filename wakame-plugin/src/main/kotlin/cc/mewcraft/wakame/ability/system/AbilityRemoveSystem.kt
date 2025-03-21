@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.InSlot
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ability.component.HoldBy
-import cc.mewcraft.wakame.item.logic.ItemRecord
+import cc.mewcraft.wakame.item.logic.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
@@ -16,7 +16,8 @@ class AbilityRemoveSystem : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val abilityComponent = entity[AbilityComponent]
-        val casterEntity = entity[CastBy].caster
+        val caster = entity[CastBy].caster
+        val casterEntity = caster
         val targetEntity = entity[TargetTo].target
 
         // 开发日记 25/3/6
@@ -32,13 +33,13 @@ class AbilityRemoveSystem : IteratingSystem(
         if (!abilityComponent.isReadyToRemove)
             return
 
-        val itemRecord = entity[CastBy].caster.getOrNull(ItemRecord)
-        if (itemRecord != null && entity.has(HoldBy)) {
-            // 如果技能被一个物品持有, 则进行物品技能的移除逻辑.
-            val holdItem = entity[HoldBy].nekoStack
-            val slot = entity[HoldBy].slot
-            if (itemRecord[slot] == holdItem.bukkitStack) {
-                // 如果玩家的背包里的物品是技能所对应的物品, 则不进行移除.
+        if (caster in Families.BUKKIT_PLAYER) {
+            val itemSlotChanges = caster[ItemSlotChanges]
+            // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
+            val slot = entity[InSlot].slot
+            val itemSlotChangesEntry = itemSlotChanges[slot]
+            if (!itemSlotChangesEntry.isChanging) {
+                // 如果玩家栏位无变化, 则不进行移除.
                 return
             }
         }

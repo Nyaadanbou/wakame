@@ -67,10 +67,7 @@ class PlayerComboInfo(
     private var resetTask: BukkitTask? = null
 
     private fun createResetTask(): BukkitTask {
-        return runTaskLater(40) {
-            clearSequence()
-            cancelTask()
-        }
+        return runTaskLater(40) { clearSequence() }
     }
 
     private fun cancelTask() {
@@ -93,7 +90,6 @@ class PlayerComboInfo(
             val sequenceAbility = trySequenceAbility(castTrigger)
             if (sequenceAbility.isNotEmpty()) {
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
-                cancelTask()
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
             }
@@ -140,6 +136,7 @@ class PlayerComboInfo(
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
             currentSequence.write(trigger)
+            cancelTask()
             resetTask = createResetTask()
             val completeSequence = currentSequence.readAll()
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)

@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.InSlot
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.data.StatePhase
@@ -12,13 +13,11 @@ import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ability.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
 import com.github.quillraven.fleks.Entity
 
-fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase, holder: Pair<ItemSlot, NekoStack>?): Entity {
+fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase, slot: ItemSlot?): Entity {
     return Fleks.createEntity {
         it += AbilityArchetypeComponent(archetype)
         it += AbilityComponent(
@@ -32,7 +31,7 @@ fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase, holder: 
         configuration().invoke(this, it)
         it += CastBy(input.castBy.entity)
         it += TargetTo(input.targetTo.entity)
-        HoldBy(holder)?.let { holdBy -> it += holdBy }
+        slot?.let { slot -> it += InSlot(slot) }
         it += TickCountComponent(0)
     }
 }

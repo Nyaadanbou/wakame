@@ -30,6 +30,5 @@ internal object ItemSlotChangeEventListenerRegistry {
         listeners += AttributeItemSlotChangeListener
         listeners += EnchantmentItemSlotChangeListener
         listeners += KizamiItemSlotChangeListener
-        listeners += AbilityItemSlotChangeListener
     }
 }
