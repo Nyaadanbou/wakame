@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ability.component.HoldBy
 import cc.mewcraft.wakame.item.logic.ItemRecord
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem

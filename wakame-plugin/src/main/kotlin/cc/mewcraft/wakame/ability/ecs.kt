@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.HoldBy
+import cc.mewcraft.wakame.ability.component.HoldBy
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
