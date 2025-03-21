@@ -9,7 +9,7 @@ import net.kyori.adventure.bossbar.BossBar
  * 用于存放"提示生物信息的 BossBar" 的组件.
  */
 data class EntityInfoBossBarComponent(
-    val bossBar: BossBar = BossBar.bossBar(BukkitComponent.empty(), BossBar.MIN_PROGRESS, BossBar.Color.RED, BossBar.Overlay.PROGRESS),
+    val bossBar: BossBar = BossBar.bossBar(BukkitComponent.empty(), BossBar.MIN_PROGRESS, BossBar.Color.GREEN, BossBar.Overlay.PROGRESS),
 ) : Component<EntityInfoBossBarComponent> {
     companion object : ComponentType<EntityInfoBossBarComponent>()
 
