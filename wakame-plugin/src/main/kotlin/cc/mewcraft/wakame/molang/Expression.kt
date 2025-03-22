@@ -30,7 +30,7 @@ interface Expression {
     fun evaluate(): Double
 }
 
-internal object EvaluableSerializer : TypeSerializer<Expression> {
+internal object ExpressionSerializer : TypeSerializer<Expression> {
     override fun deserialize(type: Type, node: ConfigurationNode): Expression {
         val string = node.get<String>()
         val evalNumber = string?.toDoubleOrNull()

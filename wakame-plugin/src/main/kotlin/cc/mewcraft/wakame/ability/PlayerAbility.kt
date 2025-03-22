@@ -48,7 +48,7 @@ fun PlayerAbility(
 ): PlayerAbility {
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
-    val manaCost = tag.readEvaluable()
+    val manaCost = tag.readExpression()
     return PlayerAbility(id, trigger, variant, manaCost)
 }
 
@@ -123,7 +123,7 @@ data class PlayerAbility(
     fun saveNbt(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
-        writeEvaluable(manaCost)
+        writeExpression(manaCost)
     }
 }
 
@@ -166,7 +166,7 @@ private fun CompoundTag.readVariant(): TriggerVariant {
     return TriggerVariant.of(variant)
 }
 
-private fun CompoundTag.readEvaluable(): Expression {
+private fun CompoundTag.readExpression(): Expression {
     return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Expression.of(it) } ?: Expression.of(0)
 }
 
@@ -182,7 +182,7 @@ private fun CompoundTag.writeVariant(variant: TriggerVariant) {
     putInt(NBT_ABILITY_TRIGGER_VARIANT, variant.id)
 }
 
-private fun CompoundTag.writeEvaluable(expression: Expression) {
+private fun CompoundTag.writeExpression(expression: Expression) {
     putString(NBT_ABILITY_MANA_COST, expression.asString())
 }
 //</editor-fold>
