@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.ability.combo.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.findAllAbilities
 import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
@@ -189,7 +190,7 @@ class PlayerComboInfo(
                 return@forEach
             if (entity[AbilityArchetypeComponent].archetype != ability.archetype)
                 return@forEach
-            entity[AbilityComponent].penalty = penalty
+            entity[ManaCost].penalty = penalty
         }
     }
 

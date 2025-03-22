@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.molang.Evaluable
-import cc.mewcraft.wakame.molang.MoLangSupport
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -40,7 +39,7 @@ interface AbilityInput {
     /**
      * 此次技能的法力消耗 [Evaluable], 用于计算法力消耗.
      */
-    val manaCost: Evaluable<*>
+    val manaCost: Evaluable<*>?
 
     /**
      * 此次技能的计算引擎 [MochaEngine].
@@ -74,8 +73,8 @@ class AbilityInputDSL(
 ) {
     private var trigger: Trigger? = null
     private var variant: TriggerVariant = TriggerVariant.any()
-    private var manaCost: Evaluable<*> = Evaluable.parseNumber(0)
-    private var mochaEngine: MochaEngine<*> = MoLangSupport.createEngine()
+    private var manaCost: Evaluable<*>? = null
+    private var mochaEngine: MochaEngine<*> = MochaEngine.createStandard()
 
     fun trigger(trigger: Trigger?): AbilityInputDSL {
         this.trigger = trigger
@@ -87,7 +86,7 @@ class AbilityInputDSL(
         return this
     }
 
-    fun manaCost(manaCost: Evaluable<*>): AbilityInputDSL {
+    fun manaCost(manaCost: Evaluable<*>?): AbilityInputDSL {
         this.manaCost = manaCost
         return this
     }
@@ -114,7 +113,7 @@ private class SimpleAbilityInput(
     override val targetTo: KoishEntity,
     override val trigger: Trigger?,
     override val variant: TriggerVariant,
-    override val manaCost: Evaluable<*>,
+    override val manaCost: Evaluable<*>?,
     override val mochaEngine: MochaEngine<*>,
 ) : AbilityInput, Examinable {
 
@@ -123,7 +122,6 @@ private class SimpleAbilityInput(
             .trigger(trigger)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
-
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(

@@ -33,10 +33,11 @@ class AbilityRemoveSystem : IteratingSystem(
         if (!abilityComponent.isReadyToRemove)
             return
 
-        if (caster in Families.BUKKIT_PLAYER) {
+        val slot = entity.getOrNull(AtSlot)?.slot
+        if (slot != null && caster in Families.BUKKIT_PLAYER) {
             val itemSlotChanges = caster[ItemSlotChanges]
             // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
-            val slot = entity[AtSlot].slot
+
             val itemSlotChangesEntry = itemSlotChanges[slot]
             if (!itemSlotChangesEntry.changing) {
                 // 如果玩家栏位无变化, 则不进行移除.

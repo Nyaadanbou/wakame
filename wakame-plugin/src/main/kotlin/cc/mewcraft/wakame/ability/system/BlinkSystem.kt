@@ -80,6 +80,7 @@ class BlinkSystem : IteratingSystem(
         }
 
         entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
+        entity.fallDistance = 0f
 
         fleksEntity += ParticleEffectComponent(
             bukkitWorld = target.world,

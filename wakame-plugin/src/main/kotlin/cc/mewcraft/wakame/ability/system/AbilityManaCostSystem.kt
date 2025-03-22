@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ability.system
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
@@ -17,7 +18,7 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
 class AbilityManaCostSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, AbilityTickResultComponent) }
+    family = family { all(AbilityComponent, CastBy, ManaCost, AbilityTickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val tickResult = entity[AbilityTickResultComponent].result
@@ -28,12 +29,12 @@ class AbilityManaCostSystem : IteratingSystem(
         if (caster !in Families.BUKKIT_PLAYER)
             return
         val bukkitPlayer = caster[BukkitPlayerComponent].bukkitPlayer
-        val penalty = entity[AbilityComponent].penalty
+        val penalty = entity[ManaCost].penalty
         val engine = entity[AbilityComponent].mochaEngine.also {
             it.bindInstance<ManaPenalty>(ManaPenalty(penalty.penaltyCount), "mana_penalty")
         }
         val user = bukkitPlayer.toUser()
-        val manaCost = entity[AbilityComponent].manaCost.evaluate(engine).toInt()
+        val manaCost = entity[ManaCost].manaCost.evaluate(engine).toInt()
         if (!user.resourceMap.take(ResourceTypeRegistry.MANA, manaCost)) {
             PlayerNoEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
             entity[AbilityTickResultComponent].result = TickResult.RESET_STATE
