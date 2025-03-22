@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.Expression
 import com.github.quillraven.fleks.Entity
 
 fun Ability.createAbilityEntity(
@@ -64,7 +64,7 @@ fun BukkitPlayer.editAbilities(archetype: AbilityArchetype, block: (KoishEntity)
 
 fun KoishEntity.getPlayerAbility(): PlayerAbility {
     val abilityComponent = get(AbilityComponent)
-    val manaCost = getOrNull(ManaCost)?.manaCost ?: Evaluable.parseNumber(0)
+    val manaCost = getOrNull(ManaCost)?.manaCost ?: Expression.of(0)
     return PlayerAbility(
         id = abilityComponent.abilityId,
         trigger = abilityComponent.trigger,

@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
@@ -337,7 +337,7 @@ data class MolangDamageMetadataBuilder(
     val damageBundle: Map<String, MolangDamagePacketBuilder>,
     @Required
     val criticalStrikeMetadata: MolangCriticalStrikeMetadataBuilder,
-) : DamageMetadataBuilder<Evaluable<*>> {
+) : DamageMetadataBuilder<Expression> {
 
     override fun build(event: EntityDamageEvent): DamageMetadata {
         return build()
@@ -361,16 +361,16 @@ data class MolangDamagePacketBuilder(
     @Required
     override val element: RegistryEntry<ElementType>,
     @Required
-    override val min: Evaluable<*>,
+    override val min: Expression,
     @Required
-    override val max: Evaluable<*>,
+    override val max: Expression,
     @Required
-    override val rate: Evaluable<*>,
+    override val rate: Expression,
     @Required
-    override val defensePenetration: Evaluable<*>,
+    override val defensePenetration: Expression,
     @Required
-    override val defensePenetrationRate: Evaluable<*>,
-) : DamagePacketBuilder<Evaluable<*>> {
+    override val defensePenetrationRate: Expression,
+) : DamagePacketBuilder<Expression> {
     override fun build(): DamagePacket {
         val engine = MochaEngine.createStandard()
         val element = element
@@ -386,14 +386,14 @@ data class MolangDamagePacketBuilder(
 @ConfigSerializable
 data class MolangCriticalStrikeMetadataBuilder(
     @Required
-    override val chance: Evaluable<*>,
+    override val chance: Expression,
     @Required
-    override val positivePower: Evaluable<*>,
+    override val positivePower: Expression,
     @Required
-    override val negativePower: Evaluable<*>,
+    override val negativePower: Expression,
     @Required
-    override val nonePower: Evaluable<*>,
-) : CriticalStrikeMetadataBuilder<Evaluable<*>> {
+    override val nonePower: Expression,
+) : CriticalStrikeMetadataBuilder<Expression> {
     override fun build(): CriticalStrikeMetadata {
         val engine = MochaEngine.createStandard()
         return CriticalStrikeMetadata(

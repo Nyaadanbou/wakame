@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.data.CompoundTag
@@ -74,7 +74,7 @@ fun PlayerAbility(
 ): PlayerAbility {
     val trigger = node.node("trigger").get<Trigger>()
     val variant = node.node("variant").require<TriggerVariant>()
-    val manaCost = node.node("mana_cost").require<Evaluable<*>>()
+    val manaCost = node.node("mana_cost").require<Expression>()
     return PlayerAbility(id, trigger, variant, manaCost)
 }
 
@@ -93,7 +93,7 @@ data class PlayerAbility(
     val id: Key,
     val trigger: Trigger?,
     val variant: TriggerVariant,
-    val manaCost: Evaluable<*>,
+    val manaCost: Expression,
 ) {
     val instance: Ability
         get() = KoishRegistries.ABILITY.getOrThrow(id)
@@ -166,8 +166,8 @@ private fun CompoundTag.readVariant(): TriggerVariant {
     return TriggerVariant.of(variant)
 }
 
-private fun CompoundTag.readEvaluable(): Evaluable<*> {
-    return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Evaluable.parseExpression(it) } ?: Evaluable.parseNumber(0)
+private fun CompoundTag.readEvaluable(): Expression {
+    return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Expression.of(it) } ?: Expression.of(0)
 }
 
 private fun CompoundTag.writeTrigger(trigger: Trigger?) {
@@ -182,7 +182,7 @@ private fun CompoundTag.writeVariant(variant: TriggerVariant) {
     putInt(NBT_ABILITY_TRIGGER_VARIANT, variant.id)
 }
 
-private fun CompoundTag.writeEvaluable(evaluable: Evaluable<*>) {
-    putString(NBT_ABILITY_MANA_COST, evaluable.asString())
+private fun CompoundTag.writeEvaluable(expression: Expression) {
+    putString(NBT_ABILITY_MANA_COST, expression.asString())
 }
 //</editor-fold>
