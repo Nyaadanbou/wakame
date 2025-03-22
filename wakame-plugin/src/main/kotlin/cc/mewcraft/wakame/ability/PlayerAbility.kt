@@ -1,13 +1,12 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.trigger.Trigger
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
-import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.molang.Evaluable
+import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.data.CompoundTag
@@ -49,7 +48,7 @@ fun PlayerAbility(
 ): PlayerAbility {
     val trigger = tag.readTrigger()
     val variant = tag.readVariant()
-    val manaCost = tag.readEvaluable()
+    val manaCost = tag.readExpression()
     return PlayerAbility(id, trigger, variant, manaCost)
 }
 
@@ -73,9 +72,9 @@ fun PlayerAbility(
 fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
-    val trigger = node.node("trigger").get<Trigger>()
-    val variant = node.node("variant").require<TriggerVariant>()
-    val manaCost = node.node("mana_cost").require<Evaluable<*>>()
+    val trigger = node.node("trigger").get<AbilityTrigger>()
+    val variant = node.node("variant").require<AbilityTriggerVariant>()
+    val manaCost = node.node("mana_cost").require<Expression>()
     return PlayerAbility(id, trigger, variant, manaCost)
 }
 
@@ -92,9 +91,9 @@ fun PlayerAbility(
  */
 data class PlayerAbility(
     val id: Key,
-    val trigger: Trigger?,
-    val variant: TriggerVariant,
-    val manaCost: Evaluable<*>,
+    val trigger: AbilityTrigger?,
+    val variant: AbilityTriggerVariant,
+    val manaCost: Expression,
 ) {
     val instance: Ability
         get() = KoishRegistries.ABILITY.getOrThrow(id)
@@ -103,43 +102,51 @@ data class PlayerAbility(
     val description: List<Component>
         get() = instance.displays.tooltips.mini
 
-    fun recordBy(caster: Player, target: KoishEntity?, holdBy: Pair<ItemSlot, NekoStack>?) {
+    fun record(caster: Player, target: KoishEntity?, slot: ItemSlot) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
             trigger(trigger)
             manaCost(manaCost)
-            holdBy(holdBy)
         }
-        instance.recordBy(input)
+        instance.record(input, slot)
+    }
+
+    fun cast(caster: Player, target: KoishEntity?) {
+        val target = target ?: caster.koishify()
+        val input = abilityInput(caster.koishify(), target) {
+            trigger(trigger)
+            manaCost(manaCost)
+        }
+        instance.cast(input)
     }
 
     fun saveNbt(): CompoundTag = CompoundTag {
         writeTrigger(trigger)
         writeVariant(variant)
-        writeEvaluable(manaCost)
+        writeExpression(manaCost)
     }
 }
 
 /**
- * [TriggerVariant] 的序列化器.
+ * [AbilityTriggerVariant] 的序列化器.
  */
-internal object TriggerVariantSerializer : ScalarSerializer<TriggerVariant>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): TriggerVariant {
+internal object TriggerVariantSerializer : ScalarSerializer<AbilityTriggerVariant>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): AbilityTriggerVariant {
         val value = obj.toString()
 
         try {
-            return TriggerVariant.of(value.toInt())
+            return AbilityTriggerVariant.of(value.toInt())
         } catch (ex: NumberFormatException) {
             throw SerializationException(ex)
         }
     }
 
-    override fun serialize(item: TriggerVariant?, typeSupported: Predicate<Class<*>>?): Any {
+    override fun serialize(item: AbilityTriggerVariant?, typeSupported: Predicate<Class<*>>?): Any {
         throw UnsupportedOperationException()
     }
 
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): TriggerVariant {
-        return TriggerVariant.any()
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): AbilityTriggerVariant {
+        return AbilityTriggerVariant.any()
     }
 }
 
@@ -148,34 +155,34 @@ private const val NBT_ABILITY_TRIGGER = "trigger"
 private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
-private fun CompoundTag.readTrigger(): Trigger? {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.TRIGGER[Identifiers.of(it)] }
+private fun CompoundTag.readTrigger(): AbilityTrigger? {
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.ABILITY_TRIGGER[Identifiers.of(it)] }
 }
 
-private fun CompoundTag.readVariant(): TriggerVariant {
+private fun CompoundTag.readVariant(): AbilityTriggerVariant {
     val variant = this.getIntOrNull(NBT_ABILITY_TRIGGER_VARIANT)
     if (variant == null)
-        return TriggerVariant.any()
-    return TriggerVariant.of(variant)
+        return AbilityTriggerVariant.any()
+    return AbilityTriggerVariant.of(variant)
 }
 
-private fun CompoundTag.readEvaluable(): Evaluable<*> {
-    return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Evaluable.parseExpression(it) } ?: Evaluable.parseNumber(0)
+private fun CompoundTag.readExpression(): Expression {
+    return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Expression.of(it) } ?: Expression.of(0)
 }
 
-private fun CompoundTag.writeTrigger(trigger: Trigger?) {
+private fun CompoundTag.writeTrigger(trigger: AbilityTrigger?) {
     if (trigger == null)
         return
     putString(NBT_ABILITY_TRIGGER, trigger.id)
 }
 
-private fun CompoundTag.writeVariant(variant: TriggerVariant) {
-    if (variant == TriggerVariant.any())
+private fun CompoundTag.writeVariant(variant: AbilityTriggerVariant) {
+    if (variant == AbilityTriggerVariant.any())
         return
     putInt(NBT_ABILITY_TRIGGER_VARIANT, variant.id)
 }
 
-private fun CompoundTag.writeEvaluable(evaluable: Evaluable<*>) {
-    putString(NBT_ABILITY_MANA_COST, evaluable.asString())
+private fun CompoundTag.writeExpression(expression: Expression) {
+    putString(NBT_ABILITY_MANA_COST, expression.asString())
 }
 //</editor-fold>

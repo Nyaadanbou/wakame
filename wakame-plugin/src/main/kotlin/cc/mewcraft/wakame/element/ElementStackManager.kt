@@ -1,35 +1,15 @@
-package cc.mewcraft.wakame.elementstack
+package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
-import cc.mewcraft.wakame.ecs.bridge.KoishEntity
-import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ecs.Fleks
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.element.component.ElementComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackComponent
-import cc.mewcraft.wakame.elementstack.component.ElementStackContainer
+import cc.mewcraft.wakame.element.component.ElementStackComponent
+import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import org.bukkit.entity.Player
-
-fun BukkitEntity.applyElementStack(
-    element: RegistryEntry<ElementType>,
-    count: Int,
-    caster: BukkitEntity? = null,
-) {
-    val caster = if (caster is Player) {
-        caster.koishify()
-    } else {
-        caster?.koishify()
-    }
-    if (this is Player) {
-        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
-    } else {
-        ElementStackManager.applyElementStack(element, count, this.koishify(), caster)
-    }
-}
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 
 /**
  * 元素效果管理.
@@ -54,25 +34,35 @@ object ElementStackManager {
      * @param amount 应用层数
      * @param caster 造成伤害的实体, 如果为空则表示无造成伤害实体.
      */
-    fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity, caster: KoishEntity?) {
+    fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity) {
         require(amount > 0) { "Amount must be greater than 0" }
+        val stackEffect = element.value.stackEffect
+        if (stackEffect == null)
+            return
         if (containsElementStack(target, element)) {
             addElementStack(target, element, amount)
             return
         }
 
         val elementStackEntity = Fleks.createEntity {
-            caster?.let { c -> it += CastBy(caster.entity) }
+            it += CastBy(target.entity)
             it += TargetTo(target.entity)
             it += ElementComponent(element)
             it += TickCountComponent(0)
-            it += ElementStackComponent(amount)
+            it += ElementStackComponent(
+                effects = stackEffect.stages.associate { it.amount to it.abilities }.toMap(Int2ObjectOpenHashMap()),
+                maxAmount = stackEffect.maxAmount,
+                disappearTime = stackEffect.disappearTime,
+            )
         }
         target[ElementStackContainer][element] = elementStackEntity
     }
 
     fun containsElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>): Boolean {
-        return element in entity[ElementStackContainer]
+        if (!entity.contains(ElementStackContainer))
+            return false
+        val elementEntity = entity[ElementStackContainer][element]
+        return elementEntity != null
     }
 
     private fun addElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>, amount: Int) = with(Fleks.world) {

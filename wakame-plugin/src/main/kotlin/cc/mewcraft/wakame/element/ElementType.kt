@@ -18,13 +18,15 @@ internal constructor(
     override val integerId: Int,
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,
+    val stackEffect: StackEffect?,
 ) : Element {
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("key", key),
         ExaminableProperty.of("stringId", stringId),
         ExaminableProperty.of("integerId", integerId),
         ExaminableProperty.of("displayName", displayName.plain),
-        ExaminableProperty.of("styles", displayStyles)
+        ExaminableProperty.of("styles", displayStyles),
+        ExaminableProperty.of("stackEffect", stackEffect),
     )
 
     override fun toString(): String = toSimpleString()

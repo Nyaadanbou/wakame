@@ -49,7 +49,6 @@ internal object ResourceTicker {
         // * 恢复定量魔法值
         // * 显示当前魔法值
 
-        // TODO 移除魔法值更新/显示, 等重构技能时再加回来
         runTaskTimer(
             delay = 0,
             period = 1

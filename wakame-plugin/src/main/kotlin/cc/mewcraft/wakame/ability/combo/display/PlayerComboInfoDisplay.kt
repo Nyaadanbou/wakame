@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.ability.combo.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
@@ -16,7 +16,9 @@ import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.text.mini
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
@@ -39,9 +41,9 @@ import org.bukkit.entity.Player
 internal object PlayerComboInfoDisplay : RegistryLoader {
     const val CONFIG_NAME = "ability.yml"
 
-    private lateinit var triggerNames: Map<Trigger, String>
+    private lateinit var triggerDisplays: Map<AbilityTrigger, TriggerDisplay>
 
-    private lateinit var connector: String
+    private lateinit var connector: Component
     private lateinit var successMessages: AudienceMessageGroup
     private lateinit var failureMessages: AudienceMessageGroup
     private lateinit var progressMessages: AudienceMessageGroup
@@ -64,7 +66,7 @@ internal object PlayerComboInfoDisplay : RegistryLoader {
             val rootNode = loader.buildAndLoadString(file.readText())
             val playerComboConfig = rootNode.node("display", "player_combo")
 
-            triggerNames = rootNode.node("display", "triggers").require()
+            triggerDisplays = rootNode.node("display", "triggers").require()
             connector = playerComboConfig.node("connector").require()
             successMessages = playerComboConfig.node("success_message").require()
             failureMessages = playerComboConfig.node("failure_message").require()
@@ -76,30 +78,37 @@ internal object PlayerComboInfoDisplay : RegistryLoader {
         }
     }
 
-    fun displaySuccess(triggers: List<SingleTrigger>, audience: Player) {
-        successMessages.send(audience, getTagResolver(triggers))
+    fun displaySuccess(triggers: List<AbilitySingleTrigger>, audience: Player) {
+        val triggerTagResolver = getTriggersTagResolver(triggers) { it.successStyle }
+        successMessages.send(audience, triggerTagResolver)
     }
 
-    fun displayProgress(triggers: List<SingleTrigger>, audience: Player) {
-        progressMessages.send(audience, getTagResolver(triggers))
+    fun displayProgress(triggers: List<AbilitySingleTrigger>, audience: Player) {
+        val triggerTagResolver = getTriggersTagResolver(triggers) { it.progressStyle }
+        progressMessages.send(audience, triggerTagResolver)
     }
 
-    fun displayFailure(triggers: List<SingleTrigger>, audience: Player) {
-        failureMessages.send(audience, getTagResolver(triggers))
+    fun displayFailure(triggers: List<AbilitySingleTrigger>, audience: Player) {
+        val triggerTagResolver = getTriggersTagResolver(triggers) { it.failureStyle }
+        failureMessages.send(audience, triggerTagResolver)
     }
 
     fun displayManaCost(count: Int, audience: Player) {
         manaCostMessages.send(audience, Formatter.number("count", count))
     }
 
-    fun displayNoEnoughMana(audience: Player) {
+    fun displayNotEnoughMana(audience: Player) {
         noEnoughManaMessages.send(audience)
     }
 
-    private fun getTagResolver(triggers: List<SingleTrigger>): TagResolver {
+    private fun getTriggersTagResolver(triggers: List<AbilitySingleTrigger>, style: (TriggerDisplay) -> Style): TagResolver {
         return Placeholder.component("trigger_completed") {
-            val string = triggers.joinToString(separator = connector) { triggerNames[it].orEmpty() }
-            string.mini
+            Component.join(
+                JoinConfiguration.separator(connector),
+                triggers.map { triggerDisplays[it] }
+                    .map { it?.let { triggerDisplay -> Component.text().content(triggerDisplay.name).style(style(triggerDisplay)) } ?: Component.empty() }
+            )
         }
     }
+
 }

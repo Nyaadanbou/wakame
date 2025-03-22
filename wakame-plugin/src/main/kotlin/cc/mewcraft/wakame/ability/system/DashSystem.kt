@@ -1,11 +1,6 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.Dash
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
@@ -39,24 +34,24 @@ class DashSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        return TickResult.NEXT_STATE
+    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+        return TickResult.ADVANCE_TO_NEXT_STATE
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val dash = fleksEntity[Dash]
+    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+        val dash = entity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
         }
-        val entity = fleksEntity[CastBy].entityOrPlayer()
-        val direction = entity.location.direction.setY(0).normalize()
+        val bukkitEntity = entity[CastBy].entityOrPlayer()
+        val direction = bukkitEntity.location.direction.setY(0).normalize()
         val stepDistance = dash.stepDistance
         // 计算每一步的移动向量
         var stepVector = direction.clone().multiply(stepDistance)
         // 检查前方和脚下的方块
-        val nextLocation = entity.location.add(stepVector)
+        val nextLocation = bukkitEntity.location.add(stepVector)
         val blockInFront = nextLocation.block
         val blockBelow = nextLocation.clone().add(0.0, -1.0, 0.0).block
 
@@ -66,7 +61,7 @@ class DashSystem : IteratingSystem(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -79,42 +74,42 @@ class DashSystem : IteratingSystem(
         }
 
         // 应用速度到玩家对象上
-        entity.velocity = stepVector
+        bukkitEntity.velocity = stepVector
 
-        if (this@DashSystem.affectEntityNearby(entity, fleksEntity)) {
+        if (this.affectEntityNearby(bukkitEntity, entity)) {
             if (!dash.canContinueAfterHit) {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
             }
         }
 
         return TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(casterEntity: BukkitEntity, fleksEntity: FleksEntity): Boolean {
-        val dash = fleksEntity[Dash]
-        val entities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
-        if (entities.isEmpty()) {
+    private fun affectEntityNearby(casterEntity: BukkitEntity, entity: FleksEntity): Boolean {
+        val dash = entity[Dash]
+        val bukkitEntities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
+        if (bukkitEntities.isEmpty()) {
             return false
         }
-        for (entity in entities) {
-            if (entity !is LivingEntity)
+        for (bukkitEntity in bukkitEntities) {
+            if (bukkitEntity !is LivingEntity)
                 continue
 
             for (ability in dash.hitEffects) {
                 val input = if (casterEntity is Player) {
-                    if (entity is Player) {
-                        abilityInput(casterEntity.koishify(), entity.koishify())
+                    if (bukkitEntity is Player) {
+                        abilityInput(casterEntity.koishify(), bukkitEntity.koishify())
                     } else {
-                        abilityInput(casterEntity.koishify(), entity.koishify())
+                        abilityInput(casterEntity.koishify(), bukkitEntity.koishify())
                     }
                 } else {
-                    if (entity is Player) {
-                        abilityInput(entity.koishify(), casterEntity.koishify())
+                    if (bukkitEntity is Player) {
+                        abilityInput(bukkitEntity.koishify(), casterEntity.koishify())
                     } else {
-                        abilityInput(entity.koishify(), casterEntity.koishify())
+                        abilityInput(bukkitEntity.koishify(), casterEntity.koishify())
                     }
                 }
-                ability.recordBy(input)
+                ability.cast(input)
             }
         }
         return true

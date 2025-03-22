@@ -71,8 +71,9 @@ internal object ElementTypeRegistryLoader : RegistryLoader {
         val integerId = node.node("binary_index").require<Int>()
         val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
+        val stackEffect = node.node("stack_effects").get<StackEffect>()
 
-        return id to ElementType(id, stringId, integerId, displayName, displayStyles)
+        return id to ElementType(id, stringId, integerId, displayName, displayStyles, stackEffect)
     }
 }
 

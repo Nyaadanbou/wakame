@@ -24,6 +24,9 @@ dependencies:
     MythicMobs:
       required: false
       load: OMIT
+    PlaceholderAPI:
+      required: false
+      load: OMIT
     Towny:
       required: false
       load: OMIT

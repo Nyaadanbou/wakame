@@ -2,7 +2,7 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.ability.TriggerVariantSerializer
-import cc.mewcraft.wakame.molang.EvaluableSerializer
+import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register
@@ -24,7 +24,7 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(AttributeModifierSerializer)
     .register(RandomizedValueSerializer)
     .register(TriggerVariantSerializer)
-    .register(EvaluableSerializer)
+    .register(ExpressionSerializer)
     // Adventure Text
     .register(ComponentSerializer)
     .register(StyleSerializer)
@@ -58,5 +58,5 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(KoishRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
-    .register(KoishRegistries.TRIGGER.valueByNameTypeSerializer())
+    .register(KoishRegistries.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .build()

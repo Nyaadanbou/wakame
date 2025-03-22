@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.elementstack.component
+package cc.mewcraft.wakame.element.component
 
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.element.ElementType
@@ -23,6 +23,10 @@ data class ElementStackContainer(
 
     operator fun contains(element: RegistryEntry<ElementType>): Boolean {
         return elementStacks.containsKey(element)
+    }
+
+    fun elementStacks(): Map<RegistryEntry<ElementType>, FleksEntity> {
+        return elementStacks
     }
 
     fun remove(element: RegistryEntry<ElementType>): Boolean {

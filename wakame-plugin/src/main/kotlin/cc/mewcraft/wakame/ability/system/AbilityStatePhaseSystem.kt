@@ -16,7 +16,7 @@ class AbilityStatePhaseSystem : IteratingSystem(
         val tickResult = entity[AbilityTickResultComponent].result
         val oldPhase = entity[AbilityComponent].phase
         val newPhase = when {
-            tickResult.isNextState() || entity[AbilityComponent].isMarkNextState -> {
+            tickResult.canAdvanceToNextState() || entity[AbilityComponent].isMarkNextState -> {
                 oldPhase.next()
             }
 

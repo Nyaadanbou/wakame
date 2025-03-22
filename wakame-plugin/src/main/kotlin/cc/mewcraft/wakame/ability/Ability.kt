@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
+import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.context.AbilityInput
+import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.display.AbilityDisplay
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
@@ -45,9 +47,17 @@ abstract class Ability(
 
     /**
      * 使用 [input] 记录技能的信息到 ECS 中.
+     *
+     * @param slot 当发现 [AbilityInput.castBy] 特定槽位 [ItemSlot] 发生变化时会将技能的信息从 ECS 中移除.
      */
-    fun recordBy(input: AbilityInput) {
-        val abilityEntity = createAbilityEntity(input)
+    fun record(input: AbilityInput, slot: ItemSlot) {
+        val abilityEntity = AbilityEcsBridge.createEcsEntity(this, input, StatePhase.IDLE, slot)
+        val castByEntity = input.castBy
+        castByEntity[AbilityContainer][archetype] = abilityEntity
+    }
+
+    fun cast(input: AbilityInput) {
+        val abilityEntity = AbilityEcsBridge.createEcsEntity(this, input, StatePhase.CAST_POINT, null)
         val castByEntity = input.castBy
         castByEntity[AbilityContainer][archetype] = abilityEntity
     }
@@ -57,23 +67,16 @@ abstract class Ability(
      */
     abstract fun configuration(): EntityCreateContext.(Entity) -> Unit
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("displays", displays),
-        )
-    }
+    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
+        ExaminableProperty.of("displays", displays),
+    )
 
-    override fun toString(): String {
-        return toSimpleString()
-    }
+    override fun toString(): String = toSimpleString()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Ability) return false
-
-        if (key != other.key) return false
-        if (archetype != other.archetype) return false
-
+        if (key != other.key || archetype != other.archetype) return false
         return true
     }
 

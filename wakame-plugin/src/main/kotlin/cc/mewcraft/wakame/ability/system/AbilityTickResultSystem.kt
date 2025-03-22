@@ -22,7 +22,7 @@ class AbilityTickResultSystem : IteratingSystem(
 
             TickResult.CONTINUE_TICK -> return
 
-            TickResult.NEXT_STATE, TickResult.NEXT_STATE_NO_CONSUME, TickResult.RESET_STATE -> {
+            TickResult.ADVANCE_TO_NEXT_STATE, TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME, TickResult.RESET_STATE -> {
                 entity[TickCountComponent].tick = 0
                 return
             }

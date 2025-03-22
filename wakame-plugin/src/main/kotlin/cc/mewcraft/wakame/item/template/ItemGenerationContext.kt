@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.random.Random

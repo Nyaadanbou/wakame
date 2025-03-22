@@ -14,9 +14,9 @@ interface ActiveAbilitySystem {
      * @see cc.mewcraft.wakame.ability.combo.PlayerComboInfo
      */
     context(EntityUpdateContext)
-    fun tickIdle(tickCount: Int, fleksEntity: FleksEntity): TickResult {
+    fun tickIdle(tickCount: Int, entity: FleksEntity): TickResult {
         // 默认将技能标记为准备移除.
-        fleksEntity[AbilityComponent].isReadyToRemove = true
+        entity[AbilityComponent].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
     }
 
@@ -24,48 +24,48 @@ interface ActiveAbilitySystem {
      * 执行此技能施法前摇逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+    fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult =
+        TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+    fun tickCast(tickCount: Int, entity: FleksEntity): TickResult =
+        TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
-    fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+    fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult =
+        TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
-    fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+    fun tickReset(tickCount: Int, entity: FleksEntity): TickResult =
+        TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     context(EntityUpdateContext)
-    fun tick(tickCount: Int, fleksEntity: FleksEntity): TickResult {
+    fun tick(tickCount: Int, entity: FleksEntity): TickResult {
         try {
-            val state = fleksEntity[AbilityComponent]
+            val state = entity[AbilityComponent]
             var tickResult = TickResult.CONTINUE_TICK
-            fleksEntity.configure {
+            entity.configure {
                 tickResult = when (state.phase) {
-                    StatePhase.IDLE -> tickIdle(tickCount, fleksEntity)
-                    StatePhase.CAST_POINT -> tickCastPoint(tickCount, fleksEntity)
-                    StatePhase.CASTING -> tickCast(tickCount, fleksEntity)
-                    StatePhase.BACKSWING -> tickBackswing(tickCount, fleksEntity)
-                    StatePhase.RESET -> tickReset(tickCount, fleksEntity)
+                    StatePhase.IDLE -> tickIdle(tickCount, entity)
+                    StatePhase.CAST_POINT -> tickCastPoint(tickCount, entity)
+                    StatePhase.CASTING -> tickCast(tickCount, entity)
+                    StatePhase.BACKSWING -> tickBackswing(tickCount, entity)
+                    StatePhase.RESET -> tickReset(tickCount, entity)
                 }
             }
 
             return tickResult
         } catch (t: Throwable) {
-            val abilityName = fleksEntity[AbilityComponent].abilityId
+            val abilityName = entity[AbilityComponent].abilityId
             throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
         }
     }

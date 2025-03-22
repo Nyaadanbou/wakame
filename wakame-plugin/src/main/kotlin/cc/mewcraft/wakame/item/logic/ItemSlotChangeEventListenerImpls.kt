@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.attribute.AttributeInstance
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.enchantment2.getEffects
@@ -9,7 +7,6 @@ import cc.mewcraft.wakame.enchantment2.koishEnchantments
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.mixin.support.EnchantmentAttributeEffect
@@ -19,7 +16,6 @@ import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import xyz.xenondevs.commons.collections.takeUnlessEmpty
 
 /**
  * 攻击速度.
@@ -172,39 +168,5 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeEventListener() {
 
     private fun NekoStack.getKizamiz(): Set<RegistryEntry<KizamiType>>? {
         return components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz
-    }
-}
-
-/**
- * 技能.
- *
- * 物品发生变化时, 根据物品技能, 修改玩家可执行的 [Ability].
- */
-internal object AbilityItemSlotChangeListener : ItemSlotChangeEventListener() {
-
-    override val predicates: List<(Player, ItemSlot, ItemStack, NekoStack?) -> Boolean> = listOf(
-        ::testSlot,
-        ::testLevel,
-        ::testDurability
-    )
-
-    override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        // do nothing
-    }
-
-    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        if (nekoStack == null) return
-        val abilities = nekoStack.playerAbilities.takeUnlessEmpty() ?: return
-        abilities.forEach { ability -> recordAbility(player, ability, slot to nekoStack) }
-    }
-
-    override fun onEnd(player: Player) {
-        // 清空技能状态.
-        val user = player.toUser()
-        user.combo.reset()
-    }
-
-    private fun recordAbility(player: Player, ability: PlayerAbility, holdBy: Pair<ItemSlot, NekoStack>?) {
-        ability.recordBy(player, null, holdBy)
     }
 }

@@ -7,3 +7,4 @@ typealias BukkitEntity = org.bukkit.entity.Entity
 typealias BukkitBlock = org.bukkit.block.Block
 typealias BukkitPlayer = org.bukkit.entity.Player
 typealias BukkitWorld = org.bukkit.World
+typealias BukkitComponent = net.kyori.adventure.text.Component

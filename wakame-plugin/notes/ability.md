@@ -65,7 +65,7 @@ cells:
 ```yaml
 nodes:
   - type: ability:melee/blink
-    trigger: trigger:combo/111 # 一个多键触发器, 详见 trigger
+    trigger: trigger:combo/111 # 一个多键触发器, 详见 abilityTrigger
     weight: 5
 ```
 
