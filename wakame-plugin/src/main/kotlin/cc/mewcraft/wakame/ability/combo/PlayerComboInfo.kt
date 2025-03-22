@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ability.combo
 
 import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability.AbilityEcsBridge
 import cc.mewcraft.wakame.ability.ManaCostPenalty
 import cc.mewcraft.wakame.ability.combo.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.StatePhase
-import cc.mewcraft.wakame.ability.findAllAbilities
 import cc.mewcraft.wakame.ability.trigger.AbilitySequenceTrigger
 import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
@@ -158,11 +158,11 @@ class PlayerComboInfo(
     }
 
     private fun Player.getAbilitiesBy(trigger: AbilityTrigger): List<Ability> {
-        return findAllAbilities().filter { it.trigger == trigger }.map { it.instance }
+        return AbilityEcsBridge.getPlayerAllAbilities(this).filter { it.trigger == trigger }.map { it.instance }
     }
 
     private fun Player.getAllActiveTriggers(): Set<AbilityTrigger> {
-        return findAllAbilities().mapNotNull { it.trigger }.toSet()
+        return AbilityEcsBridge.getPlayerAllAbilities(this).mapNotNull { it.trigger }.toSet()
     }
 
     private fun Player.setNextState(ability: Ability) {
@@ -170,8 +170,7 @@ class PlayerComboInfo(
             if (entity[CastBy].entityOrPlayer() != this@setNextState)
                 return@forEach
             if (entity[AbilityComponent].phase != StatePhase.IDLE)
-            // 只有在 IDLE 状态下才能进行下一个状态的标记.
-                return@forEach
+                return@forEach // 只有在 IDLE 状态下才能进行下一个状态的标记.
             if (entity[AbilityArchetypeComponent].archetype != ability.archetype)
                 return@forEach
             entity[AbilityComponent].isMarkNextState = true

@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.component.Dash
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.require
+import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -33,7 +34,7 @@ private class DashInstance(
     val canContinueAfterHit: Boolean,
     val hitEffects: List<Ability>,
 ) : Ability(key, AbilityArchetypes.DASH, config) {
-    override fun configuration(): EntityCreateContext.(com.github.quillraven.fleks.Entity) -> Unit = {
+    override fun configuration(): EntityCreateContext.(Entity) -> Unit = {
         it += Dash(stepDistance, duration, canContinueAfterHit, hitEffects)
     }
 }
