@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 internal object TriggerRegistryLoader {
     @InitFun
     fun init() {
-        SequenceAbilityTrigger.RRR // 初始化静态变量
+        AbilitySequenceTrigger.RRR // 初始化静态变量
         KoishRegistries.ABILITY_TRIGGER.freeze()
     }
 }

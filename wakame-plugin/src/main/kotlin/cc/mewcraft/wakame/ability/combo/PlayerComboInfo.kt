@@ -9,12 +9,12 @@ import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.findAllAbilities
+import cc.mewcraft.wakame.ability.trigger.AbilitySequenceTrigger
+import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.SequenceAbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.SingleAbilityTrigger
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -39,30 +39,30 @@ class PlayerComboInfo(
     internal val player: Player
         get() = requireNotNull(weakPlayer.get())
 
-    private val manaNoEnoughSubscription: Subscription = Events.subscribe(PlayerNoEnoughManaEvent::class.java)
+    private val manaNoEnoughSubscription: Subscription = Events.subscribe(PlayerNotEnoughManaEvent::class.java)
         .filter { it.player == player }
         .handler { event ->
             if (event.player == player) {
-                PlayerComboInfoDisplay.displayNoEnoughMana(player)
+                PlayerComboInfoDisplay.displayNotEnoughMana(player)
             }
         }
 
-    private val manaCostSubscription: Subscription = Events.subscribe(PlayerManaCostEvent::class.java)
+    private val manaCostSubscription: Subscription = Events.subscribe(PlayerManaConsumeEvent::class.java)
         .filter { it.player == player }
         .handler { event ->
             if (event.player == player) {
-                PlayerComboInfoDisplay.displayManaCost(event.manaCost, player)
+                PlayerComboInfoDisplay.displayManaCost(event.amount, player)
             }
         }
 
     companion object {
         private const val SEQUENCE_SIZE = 3
 
-        private val SEQUENCE_GENERATION_TRIGGERS: List<SingleAbilityTrigger> =
-            listOf(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK)
+        private val SEQUENCE_GENERATION_TRIGGERS: List<AbilitySingleTrigger> =
+            listOf(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK)
     }
 
-    private val currentSequence: RingBuffer<SingleAbilityTrigger> = RingBuffer(SEQUENCE_SIZE)
+    private val currentSequence: RingBuffer<AbilitySingleTrigger> = RingBuffer(SEQUENCE_SIZE)
     private val manaCostPenalties: MutableMap<Identifier, ManaCostPenalty> = HashMap()
 
     private var resetTask: BukkitTask? = null
@@ -76,7 +76,7 @@ class PlayerComboInfo(
         resetTask = null
     }
 
-    fun addTrigger(trigger: SingleAbilityTrigger): PlayerComboResult {
+    fun addTrigger(trigger: AbilitySingleTrigger): PlayerComboResult {
         // 尝试找到使用当前触发器能够触发的技能
         val singleAbility = player.getAbilitiesBy(trigger)
         if (singleAbility.isNotEmpty()) {
@@ -115,8 +115,8 @@ class PlayerComboInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleAbilityTrigger): List<Ability> {
-        val triggerTypes = player.getAllActiveAbilityTriggers()
+    private fun trySequenceAbility(trigger: AbilitySingleTrigger): List<Ability> {
+        val triggerTypes = player.getAllActiveTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
         // currentSequence.isEmpty() | trigger == SingleTrigger.RIGHT_CLICK | triggerTypes.any { it is SequenceTrigger } -> isFirstRightClickAndHasTrigger
@@ -129,7 +129,7 @@ class PlayerComboInfo(
         // t | t | f -> f
         // t | t | t -> t
         // 可计算出最终表达式为: Result = triggerTypes.any { it is SequenceTrigger } && (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK)
-        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleAbilityTrigger.RIGHT_CLICK) && triggerTypes.any { it is SequenceAbilityTrigger }
+        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == AbilitySingleTrigger.RIGHT_CLICK) && triggerTypes.any { it is AbilitySequenceTrigger }
 
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
@@ -140,7 +140,7 @@ class PlayerComboInfo(
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 
             if (currentSequence.isFull()) {
-                val sequence = SequenceAbilityTrigger.of(completeSequence)
+                val sequence = AbilitySequenceTrigger.of(completeSequence)
                 val abilityOnSequence = player.getAbilitiesBy(sequence)
                 // 如果成功，则清除当前序列
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
@@ -157,16 +157,12 @@ class PlayerComboInfo(
         return emptyList()
     }
 
-    private fun Player.getAbilitiesBy(abilityTrigger: AbilityTrigger): List<Ability> {
-        return findAllAbilities()
-            .filter { it.abilityTrigger == abilityTrigger }
-            .map { it.instance }
+    private fun Player.getAbilitiesBy(trigger: AbilityTrigger): List<Ability> {
+        return findAllAbilities().filter { it.trigger == trigger }.map { it.instance }
     }
 
-    private fun Player.getAllActiveAbilityTriggers(): Set<AbilityTrigger> {
-        return findAllAbilities()
-            .mapNotNull { it.abilityTrigger }
-            .toSet()
+    private fun Player.getAllActiveTriggers(): Set<AbilityTrigger> {
+        return findAllAbilities().mapNotNull { it.trigger }.toSet()
     }
 
     private fun Player.setNextState(ability: Ability) {

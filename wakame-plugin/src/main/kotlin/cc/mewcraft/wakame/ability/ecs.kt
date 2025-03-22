@@ -1,13 +1,7 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.AbilityContainer
-import cc.mewcraft.wakame.ability.component.AtSlot
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.ManaCost
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ecs.Fleks
@@ -29,7 +23,7 @@ fun Ability.createAbilityEntity(
         it += AbilityComponent(
             abilityId = key,
             phase = phase,
-            abilityTrigger = input.abilityTrigger,
+            trigger = input.trigger,
             variant = input.variant,
             mochaEngine = input.mochaEngine
         )
@@ -68,7 +62,7 @@ fun KoishEntity.getPlayerAbility(): PlayerAbility {
     val manaCost = getOrNull(ManaCost)?.manaCost ?: Expression.of(0)
     return PlayerAbility(
         id = abilityComponent.abilityId,
-        abilityTrigger = abilityComponent.abilityTrigger,
+        trigger = abilityComponent.trigger,
         variant = abilityComponent.variant,
         manaCost = manaCost,
     )

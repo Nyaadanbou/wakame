@@ -29,7 +29,7 @@ interface AbilityInput {
     /**
      * 此次技能的触发器 [AbilityTrigger], null 表示没有触发器.
      */
-    val abilityTrigger: AbilityTrigger?
+    val trigger: AbilityTrigger?
 
     /**
      * 触发此技能的变体.
@@ -71,13 +71,13 @@ class AbilityInputDSL(
     private val castBy: KoishEntity,
     private val targetTo: KoishEntity,
 ) {
-    private var abilityTrigger: AbilityTrigger? = null
+    private var trigger: AbilityTrigger? = null
     private var variant: TriggerVariant = TriggerVariant.any()
     private var manaCost: Expression? = null
     private var mochaEngine: MochaEngine<*> = MochaEngine.createStandard()
 
-    fun trigger(abilityTrigger: AbilityTrigger?): AbilityInputDSL {
-        this.abilityTrigger = abilityTrigger
+    fun trigger(trigger: AbilityTrigger?): AbilityInputDSL {
+        this.trigger = trigger
         return this
     }
 
@@ -99,7 +99,7 @@ class AbilityInputDSL(
     fun build(): AbilityInput = SimpleAbilityInput(
         castBy = castBy,
         targetTo = this@AbilityInputDSL.targetTo,
-        abilityTrigger = abilityTrigger,
+        trigger = trigger,
         variant = variant,
         manaCost = manaCost,
         mochaEngine = mochaEngine
@@ -111,7 +111,7 @@ class AbilityInputDSL(
 private class SimpleAbilityInput(
     override val castBy: KoishEntity,
     override val targetTo: KoishEntity,
-    override val abilityTrigger: AbilityTrigger?,
+    override val trigger: AbilityTrigger?,
     override val variant: TriggerVariant,
     override val manaCost: Expression?,
     override val mochaEngine: MochaEngine<*>,
@@ -119,7 +119,7 @@ private class SimpleAbilityInput(
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(castBy, targetTo)
-            .trigger(abilityTrigger)
+            .trigger(trigger)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
     }
@@ -127,7 +127,7 @@ private class SimpleAbilityInput(
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("castBy", castBy),
         ExaminableProperty.of("target", targetTo),
-        ExaminableProperty.of("abilityTrigger", abilityTrigger),
+        ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("manaCost", manaCost),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )

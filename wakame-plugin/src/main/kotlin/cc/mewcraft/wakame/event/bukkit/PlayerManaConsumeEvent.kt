@@ -4,9 +4,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 
-class PlayerNoEnoughManaEvent(
+class PlayerManaConsumeEvent(
     player: Player,
-    val requiredMana: Int,
+    val amount: Int,
 ) : PlayerEvent(player) {
     override fun getHandlers(): HandlerList {
         return HANDLER_LIST

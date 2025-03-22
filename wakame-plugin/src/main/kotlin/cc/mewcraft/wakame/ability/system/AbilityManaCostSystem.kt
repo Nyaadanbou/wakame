@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.entity.resource.ResourceTypeRegistry
-import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
 import cc.mewcraft.wakame.molang.ManaPenalty
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.bindInstance
@@ -36,11 +36,11 @@ class AbilityManaCostSystem : IteratingSystem(
         val user = bukkitPlayer.toUser()
         val manaCost = entity[ManaCost].manaCost.evaluate(engine).toInt()
         if (!user.resourceMap.take(ResourceTypeRegistry.MANA, manaCost)) {
-            PlayerNoEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
+            PlayerNotEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
             entity[AbilityTickResultComponent].result = TickResult.RESET_STATE
         } else {
             penalty.cooldown.reset()
-            PlayerManaCostEvent(bukkitPlayer, manaCost).callEvent()
+            PlayerManaConsumeEvent(bukkitPlayer, manaCost).callEvent()
         }
     }
 }

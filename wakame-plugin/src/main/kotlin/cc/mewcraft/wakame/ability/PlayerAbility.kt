@@ -72,10 +72,10 @@ fun PlayerAbility(
 fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
-    val abilityTrigger = node.node("trigger").get<AbilityTrigger>()
+    val trigger = node.node("trigger").get<AbilityTrigger>()
     val variant = node.node("variant").require<TriggerVariant>()
     val manaCost = node.node("mana_cost").require<Expression>()
-    return PlayerAbility(id, abilityTrigger, variant, manaCost)
+    return PlayerAbility(id, trigger, variant, manaCost)
 }
 
 /**
@@ -91,7 +91,7 @@ fun PlayerAbility(
  */
 data class PlayerAbility(
     val id: Key,
-    val abilityTrigger: AbilityTrigger?,
+    val trigger: AbilityTrigger?,
     val variant: TriggerVariant,
     val manaCost: Expression,
 ) {
@@ -105,7 +105,7 @@ data class PlayerAbility(
     fun record(caster: Player, target: KoishEntity?, slot: ItemSlot) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
-            trigger(abilityTrigger)
+            trigger(trigger)
             manaCost(manaCost)
         }
         instance.record(input, slot)
@@ -114,14 +114,14 @@ data class PlayerAbility(
     fun cast(caster: Player, target: KoishEntity?) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
-            trigger(abilityTrigger)
+            trigger(trigger)
             manaCost(manaCost)
         }
         instance.cast(input)
     }
 
     fun saveNbt(): CompoundTag = CompoundTag {
-        writeTrigger(abilityTrigger)
+        writeTrigger(trigger)
         writeVariant(variant)
         writeExpression(manaCost)
     }
@@ -170,10 +170,10 @@ private fun CompoundTag.readExpression(): Expression {
     return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Expression.of(it) } ?: Expression.of(0)
 }
 
-private fun CompoundTag.writeTrigger(abilityTrigger: AbilityTrigger?) {
-    if (abilityTrigger == null)
+private fun CompoundTag.writeTrigger(trigger: AbilityTrigger?) {
+    if (trigger == null)
         return
-    putString(NBT_ABILITY_TRIGGER, abilityTrigger.id)
+    putString(NBT_ABILITY_TRIGGER, trigger.id)
 }
 
 private fun CompoundTag.writeVariant(variant: TriggerVariant) {

@@ -21,9 +21,9 @@ sealed interface AbilityTrigger : Examinable {
 /**
  * 代表一个由单个按键输入完成的操作.
  */
-enum class SingleAbilityTrigger(
+enum class AbilitySingleTrigger(
     /**
-     * 用于拼接成 [SequenceAbilityTrigger] 的字符.
+     * 用于拼接成 [AbilitySequenceTrigger] 的字符.
      */
     val char: Char,
     override val id: String,
@@ -60,26 +60,26 @@ enum class SingleAbilityTrigger(
 }
 
 /**
- * 代表一个由多个按键输入组成的操作, 也就是该触发器要求玩家按顺序触发指定的 [SingleAbilityTrigger].
+ * 代表一个由多个按键输入组成的操作, 也就是该触发器要求玩家按顺序触发指定的 [AbilitySingleTrigger].
  */
-enum class SequenceAbilityTrigger(
+enum class AbilitySequenceTrigger(
     /**
      * 组成该触发器序列的触发器 (按顺序).
      */
-    val triggers: List<SingleAbilityTrigger>,
+    val triggers: List<AbilitySingleTrigger>,
 ) : AbilityTrigger {
 
-    LLL(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.LEFT_CLICK),
-    LLR(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK),
-    LRL(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.LEFT_CLICK),
-    LRR(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.RIGHT_CLICK),
-    RRR(SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.RIGHT_CLICK),
-    RRL(SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.LEFT_CLICK),
-    RLR(SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK),
-    RLL(SingleAbilityTrigger.RIGHT_CLICK, SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.LEFT_CLICK),
+    LLL(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.LEFT_CLICK),
+    LLR(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK),
+    LRL(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.LEFT_CLICK),
+    LRR(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.RIGHT_CLICK),
+    RRR(AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.RIGHT_CLICK),
+    RRL(AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.LEFT_CLICK),
+    RLR(AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK),
+    RLL(AbilitySingleTrigger.RIGHT_CLICK, AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.LEFT_CLICK),
     ;
 
-    constructor(vararg triggers: SingleAbilityTrigger) : this(triggers.toList())
+    constructor(vararg triggers: AbilitySingleTrigger) : this(triggers.toList())
 
     override val id: String = "combo/${triggers.map { it.char }.joinToString("")}"
 
@@ -88,11 +88,11 @@ enum class SequenceAbilityTrigger(
     }
 
     companion object {
-        fun of(vararg triggers: SingleAbilityTrigger): SequenceAbilityTrigger? {
+        fun of(vararg triggers: AbilitySingleTrigger): AbilitySequenceTrigger? {
             return of(triggers.toList())
         }
 
-        fun of(triggers: List<SingleAbilityTrigger>): SequenceAbilityTrigger {
+        fun of(triggers: List<AbilitySingleTrigger>): AbilitySequenceTrigger {
             return entries.first { it.triggers.contentEquals(triggers) }
         }
 

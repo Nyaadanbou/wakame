@@ -11,7 +11,7 @@ import team.unnamed.mocha.MochaEngine
 data class AbilityComponent(
     val abilityId: Identifier,
     var phase: StatePhase,
-    var abilityTrigger: AbilityTrigger?,
+    var trigger: AbilityTrigger?,
     var variant: TriggerVariant,
     var mochaEngine: MochaEngine<*>,
 ) : Component<AbilityComponent> {

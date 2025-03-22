@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.util.ObservableDelegates
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.ExaminableProperty
-import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 import java.util.stream.Stream
 import kotlin.random.Random
@@ -104,7 +103,7 @@ private class SimpleItemGenerationContext(
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("abilityTrigger", trigger),
+        ExaminableProperty.of("trigger", trigger),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("seed", seed),
         ExaminableProperty.of("level", level),
