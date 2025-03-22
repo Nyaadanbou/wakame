@@ -21,7 +21,7 @@ import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
-import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventInternals
+import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -67,7 +67,7 @@ object Fleks : Listener {
             add(BukkitBlockBridge())
 
             // 给每个 BukkitPlayer 的 itemSlotChangeEvent 进行处理.
-            add(ItemSlotChangeEventInternals())
+            add(ItemSlotChangeMonitor())
 
             // 其它内部功能的移除系统
 
