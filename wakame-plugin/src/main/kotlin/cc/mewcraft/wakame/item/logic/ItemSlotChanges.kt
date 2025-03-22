@@ -24,12 +24,14 @@ data class ItemSlotChanges(
     /**
      * 记录对应的 [ItemSlot] 的变化.
      *
-     * 一个 [Entry][cc.mewcraft.wakame.item.logic.ItemSlotChanges.Entry] 只会记录一个 [ItemSlot] 的变化.
+     * 一个 [Entry] 只会记录一个 [ItemSlot] 的变化.
      *
      * 如果 [changing] 为 `true`, 则表示该物品槽位在当前 tick 发生了变化, 反之则表示该物品槽位没有发生变化.
-     * 设当前 tick 为 t, 当 [changing] 为 `true`: 则 [current] 为 t 刻的 [ItemStack],
-     * [previous] 为 t-1 刻的 [ItemStack]. 当 [changing] 为 `false`: [previous] 与 [current] 是一致的,
-     * 判断 [previous] 与 [current] 没有任何意义.
+     *
+     * 设当前 tick 为 t:
+     *
+     * 当 [changing] 为 `true` 时, [current] 为 t 刻的 [ItemStack], [previous] 为 t-1 刻的 [ItemStack].
+     * 当 [changing] 为 `false` 时, [previous] 与 [current] 相同, 判断 [previous] 与 [current] 没有任何意义.
      */
     class Entry internal constructor(
         /**

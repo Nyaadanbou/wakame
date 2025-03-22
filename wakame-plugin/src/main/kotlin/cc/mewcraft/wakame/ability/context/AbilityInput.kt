@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.context
 
 import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
+import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.molang.Expression
@@ -34,7 +34,7 @@ interface AbilityInput {
     /**
      * 触发此技能的变体.
      */
-    val variant: TriggerVariant
+    val variant: AbilityTriggerVariant
 
     /**
      * 此次技能的法力消耗 [Expression], 用于计算法力消耗.
@@ -72,7 +72,7 @@ class AbilityInputDSL(
     private val targetTo: KoishEntity,
 ) {
     private var trigger: AbilityTrigger? = null
-    private var variant: TriggerVariant = TriggerVariant.any()
+    private var variant: AbilityTriggerVariant = AbilityTriggerVariant.any()
     private var manaCost: Expression? = null
     private var mochaEngine: MochaEngine<*> = MochaEngine.createStandard()
 
@@ -81,7 +81,7 @@ class AbilityInputDSL(
         return this
     }
 
-    fun variant(variant: TriggerVariant): AbilityInputDSL {
+    fun variant(variant: AbilityTriggerVariant): AbilityInputDSL {
         this.variant = variant
         return this
     }
@@ -112,7 +112,7 @@ private class SimpleAbilityInput(
     override val castBy: KoishEntity,
     override val targetTo: KoishEntity,
     override val trigger: AbilityTrigger?,
-    override val variant: TriggerVariant,
+    override val variant: AbilityTriggerVariant,
     override val manaCost: Expression?,
     override val mochaEngine: MochaEngine<*>,
 ) : AbilityInput, Examinable {

@@ -1,11 +1,6 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.AbilityContainer
-import cc.mewcraft.wakame.ability.component.AtSlot
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.item.logic.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
@@ -17,13 +12,12 @@ class AbilityRemoveSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val abilityComponent = entity[AbilityComponent]
         val caster = entity[CastBy].caster
-        val casterEntity = caster
-        val targetEntity = entity[TargetTo].target
+        val target = entity[TargetTo].target
 
         // 开发日记 25/3/6
         // 要判断一个生物是否在 world 中, 使用 World#contains(Entity)
         // 而不是 Entity#isMarkedForRemoval
-        if (casterEntity !in world || targetEntity !in world) {
+        if (caster !in world || target !in world) {
             entity.remove()
             return
         }

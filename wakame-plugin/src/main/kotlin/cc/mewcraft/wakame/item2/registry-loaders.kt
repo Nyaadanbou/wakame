@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.trigger.TriggerRegistryLoader
+import cc.mewcraft.wakame.ability.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.Context
@@ -36,7 +36,7 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     stage = InitStage.PRE_WORLD,
     runAfter = [
         AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
-        TriggerRegistryLoader::class
+        AbilityTriggerRegistryLoader::class
     ]
 )
 @Reload

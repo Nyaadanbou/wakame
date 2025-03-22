@@ -20,10 +20,10 @@ class AbilityAddSystem : IteratingSystem(
     family = Families.BUKKIT_PLAYER
 ) {
     override fun onTickEntity(entity: Entity) {
-        val player = entity[BukkitPlayerComponent].bukkitPlayer
+        val bukkitPlayer = entity[BukkitPlayerComponent].bukkitPlayer
         val itemSlotChanges = entity[ItemSlotChanges]
         val changingItems = itemSlotChanges.changingItems
-        val user = player.toUser()
+        val user = bukkitPlayer.toUser()
         for ((slot, current) in changingItems) {
             val nekoStack = current?.wrap() ?: continue
             if (!testLevel(user, nekoStack)) {
@@ -33,7 +33,7 @@ class AbilityAddSystem : IteratingSystem(
                 continue
             }
             val abilities = nekoStack.playerAbilities.takeUnlessEmpty() ?: continue
-            abilities.forEach { ability -> ability.record(player, null, slot) }
+            abilities.forEach { ability -> ability.record(bukkitPlayer, null, slot) }
         }
 
         user.combo.reset()

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.context.abilityInput
 import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.TriggerVariant
+import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
@@ -73,7 +73,7 @@ fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
     val trigger = node.node("trigger").get<AbilityTrigger>()
-    val variant = node.node("variant").require<TriggerVariant>()
+    val variant = node.node("variant").require<AbilityTriggerVariant>()
     val manaCost = node.node("mana_cost").require<Expression>()
     return PlayerAbility(id, trigger, variant, manaCost)
 }
@@ -92,7 +92,7 @@ fun PlayerAbility(
 data class PlayerAbility(
     val id: Key,
     val trigger: AbilityTrigger?,
-    val variant: TriggerVariant,
+    val variant: AbilityTriggerVariant,
     val manaCost: Expression,
 ) {
     val instance: Ability
@@ -128,25 +128,25 @@ data class PlayerAbility(
 }
 
 /**
- * [TriggerVariant] 的序列化器.
+ * [AbilityTriggerVariant] 的序列化器.
  */
-internal object TriggerVariantSerializer : ScalarSerializer<TriggerVariant>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): TriggerVariant {
+internal object TriggerVariantSerializer : ScalarSerializer<AbilityTriggerVariant>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): AbilityTriggerVariant {
         val value = obj.toString()
 
         try {
-            return TriggerVariant.of(value.toInt())
+            return AbilityTriggerVariant.of(value.toInt())
         } catch (ex: NumberFormatException) {
             throw SerializationException(ex)
         }
     }
 
-    override fun serialize(item: TriggerVariant?, typeSupported: Predicate<Class<*>>?): Any {
+    override fun serialize(item: AbilityTriggerVariant?, typeSupported: Predicate<Class<*>>?): Any {
         throw UnsupportedOperationException()
     }
 
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): TriggerVariant {
-        return TriggerVariant.any()
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): AbilityTriggerVariant {
+        return AbilityTriggerVariant.any()
     }
 }
 
@@ -159,11 +159,11 @@ private fun CompoundTag.readTrigger(): AbilityTrigger? {
     return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.ABILITY_TRIGGER[Identifiers.of(it)] }
 }
 
-private fun CompoundTag.readVariant(): TriggerVariant {
+private fun CompoundTag.readVariant(): AbilityTriggerVariant {
     val variant = this.getIntOrNull(NBT_ABILITY_TRIGGER_VARIANT)
     if (variant == null)
-        return TriggerVariant.any()
-    return TriggerVariant.of(variant)
+        return AbilityTriggerVariant.any()
+    return AbilityTriggerVariant.of(variant)
 }
 
 private fun CompoundTag.readExpression(): Expression {
@@ -176,8 +176,8 @@ private fun CompoundTag.writeTrigger(trigger: AbilityTrigger?) {
     putString(NBT_ABILITY_TRIGGER, trigger.id)
 }
 
-private fun CompoundTag.writeVariant(variant: TriggerVariant) {
-    if (variant == TriggerVariant.any())
+private fun CompoundTag.writeVariant(variant: AbilityTriggerVariant) {
+    if (variant == AbilityTriggerVariant.any())
         return
     putInt(NBT_ABILITY_TRIGGER_VARIANT, variant.id)
 }

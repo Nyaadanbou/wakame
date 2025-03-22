@@ -2,12 +2,7 @@
 
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability.component.Blink
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
@@ -37,28 +32,28 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity
+    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity
 
         // 如果玩家面前方块过近, 无法传送
-        if (entity?.getTargetBlockExact(3) != null) {
-            entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
+        if (bukkitEntity?.getTargetBlockExact(3) != null) {
+            bukkitEntity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
             return TickResult.RESET_STATE
         }
-        return TickResult.ADVANCE_NEXT_STATE
+        return TickResult.ADVANCE_TO_NEXT_STATE
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
-        val blink = fleksEntity[Blink]
-        val location = entity.location.clone()
+    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
+        val blink = entity[Blink]
+        val location = bukkitEntity.location.clone()
 
         // 计算目标位置
         val target = location.clone()
 
         // 获取视线上的所有方块, 并将其从远到近排序
-        val blocks = entity.getLineOfSight(null, blink.distance)
+        val blocks = bukkitEntity.getLineOfSight(null, blink.distance)
 
         // 遍历所有方块，试图找到第一个可传送的方块
         for (block in blocks) {
@@ -75,14 +70,14 @@ class BlinkSystem : IteratingSystem(
 
         // 如果没有找到可传送的方块，那么就不传送
         if (!blink.isTeleported) {
-            entity.sendMessage("无法传送至目标位置".mini)
+            bukkitEntity.sendMessage("无法传送至目标位置".mini)
             return TickResult.RESET_STATE
         }
 
-        entity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
-        entity.fallDistance = 0f
+        bukkitEntity.teleport(target, TeleportFlag.Relative.VELOCITY_X, TeleportFlag.Relative.VELOCITY_Y, TeleportFlag.Relative.VELOCITY_Z, TeleportFlag.Relative.VELOCITY_ROTATION)
+        bukkitEntity.fallDistance = 0f
 
-        fleksEntity += ParticleEffectComponent(
+        entity += ParticleEffectComponent(
             bukkitWorld = target.world,
             ParticleConfiguration(
                 builderProvider = { loc ->
@@ -90,7 +85,7 @@ class BlinkSystem : IteratingSystem(
                         .location(loc)
                         .receivers(64)
                         .extra(.0)
-                        .source(entity as? Player)
+                        .source(bukkitEntity as? Player)
                 },
                 amount = 10,
                 particlePath = LinePath(
@@ -100,29 +95,29 @@ class BlinkSystem : IteratingSystem(
             )
         )
 
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
-        val blink = fleksEntity[Blink]
+    override fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+        val blink = entity[Blink]
         if (!blink.isTeleported) {
-            return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
         }
 
         // 再给予一个向前的固定惯性
-        entity.velocity = entity.location.direction.normalize()
+        bukkitEntity.velocity = bukkitEntity.location.direction.normalize()
 
-        blink.teleportedMessages.send(entity)
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+        blink.teleportedMessages.send(bukkitEntity)
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val blink = fleksEntity[Blink]
+    override fun tickReset(tickCount: Int, entity: FleksEntity): TickResult {
+        val blink = entity[Blink]
         blink.isTeleported = false
-        fleksEntity -= ParticleEffectComponent
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+        entity -= ParticleEffectComponent
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 }

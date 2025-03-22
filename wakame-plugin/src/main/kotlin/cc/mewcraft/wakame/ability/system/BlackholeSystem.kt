@@ -1,11 +1,6 @@
 package cc.mewcraft.wakame.ability.system
 
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability.component.Blackhole
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ability.data.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
@@ -35,31 +30,31 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
-        val blackhole = fleksEntity[Blackhole]
+    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
+        val blackhole = entity[Blackhole]
 
         // 设置技能选定的位置
-        val rayTraceResult = entity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
-        val targetLocation = rayTraceResult.hitPosition.toLocation(entity.world)
+        val rayTraceResult = bukkitEntity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
+        val targetLocation = rayTraceResult.hitPosition.toLocation(bukkitEntity.world)
         rayTraceResult.hitBlockFace?.let { blackhole.holeDirection = it }
         blackhole.holeCenter = targetLocation
 
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val caster = fleksEntity[CastBy].entityOrPlayer()
-        val blackhole = fleksEntity[Blackhole]
-        val mochaEngine = fleksEntity[AbilityComponent].mochaEngine
+    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+        val caster = entity[CastBy].entityOrPlayer()
+        val blackhole = entity[Blackhole]
+        val mochaEngine = entity[AbilityComponent].mochaEngine
         val targetLocation = blackhole.holeCenter ?: return TickResult.RESET_STATE
         val radius = blackhole.radius.evaluate(mochaEngine)
         val damage = blackhole.damage.evaluate(mochaEngine)
 
         // 吸引周围的怪物并造成伤害
-        val entities = targetLocation.getNearbyEntities(radius, radius, radius)
-        for (entity in entities) {
+        val bukkitEntities = targetLocation.getNearbyEntities(radius, radius, radius)
+        for (entity in bukkitEntities) {
             if (entity == caster) {
                 continue
             }
@@ -73,12 +68,12 @@ class BlackholeSystem : IteratingSystem(
         }
 
         if (tickCount >= blackhole.duration.evaluate(mochaEngine)) {
-            return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
         }
 
         if (tickCount % 10 == 0) {
             // 每 10 tick 生成一个粒子效果
-            fleksEntity += ParticleEffectComponent(
+            entity += ParticleEffectComponent(
                 bukkitWorld = targetLocation.world,
                 ParticleConfiguration(
                     builderProvider = { loc ->
@@ -118,16 +113,16 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+    override fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult {
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val blackhole = fleksEntity[Blackhole]
+    override fun tickReset(tickCount: Int, entity: FleksEntity): TickResult {
+        val blackhole = entity[Blackhole]
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null
-        fleksEntity -= ParticleEffectComponent
-        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
+        entity -= ParticleEffectComponent
+        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 }
