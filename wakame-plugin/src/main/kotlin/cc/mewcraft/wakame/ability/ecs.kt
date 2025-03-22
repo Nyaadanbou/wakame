@@ -29,7 +29,7 @@ fun Ability.createAbilityEntity(
         it += AbilityComponent(
             abilityId = key,
             phase = phase,
-            trigger = input.trigger,
+            abilityTrigger = input.abilityTrigger,
             variant = input.variant,
             mochaEngine = input.mochaEngine
         )
@@ -68,7 +68,7 @@ fun KoishEntity.getPlayerAbility(): PlayerAbility {
     val manaCost = getOrNull(ManaCost)?.manaCost ?: Expression.of(0)
     return PlayerAbility(
         id = abilityComponent.abilityId,
-        trigger = abilityComponent.trigger,
+        abilityTrigger = abilityComponent.abilityTrigger,
         variant = abilityComponent.variant,
         manaCost = manaCost,
     )

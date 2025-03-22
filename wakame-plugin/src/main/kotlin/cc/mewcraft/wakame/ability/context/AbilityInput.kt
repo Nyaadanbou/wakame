@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability.context
 
-import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
@@ -27,9 +27,9 @@ interface AbilityInput {
     val targetTo: KoishEntity
 
     /**
-     * 此次技能的触发器 [Trigger], null 表示没有触发器.
+     * 此次技能的触发器 [AbilityTrigger], null 表示没有触发器.
      */
-    val trigger: Trigger?
+    val abilityTrigger: AbilityTrigger?
 
     /**
      * 触发此技能的变体.
@@ -71,13 +71,13 @@ class AbilityInputDSL(
     private val castBy: KoishEntity,
     private val targetTo: KoishEntity,
 ) {
-    private var trigger: Trigger? = null
+    private var abilityTrigger: AbilityTrigger? = null
     private var variant: TriggerVariant = TriggerVariant.any()
     private var manaCost: Expression? = null
     private var mochaEngine: MochaEngine<*> = MochaEngine.createStandard()
 
-    fun trigger(trigger: Trigger?): AbilityInputDSL {
-        this.trigger = trigger
+    fun trigger(abilityTrigger: AbilityTrigger?): AbilityInputDSL {
+        this.abilityTrigger = abilityTrigger
         return this
     }
 
@@ -99,7 +99,7 @@ class AbilityInputDSL(
     fun build(): AbilityInput = SimpleAbilityInput(
         castBy = castBy,
         targetTo = this@AbilityInputDSL.targetTo,
-        trigger = trigger,
+        abilityTrigger = abilityTrigger,
         variant = variant,
         manaCost = manaCost,
         mochaEngine = mochaEngine
@@ -111,7 +111,7 @@ class AbilityInputDSL(
 private class SimpleAbilityInput(
     override val castBy: KoishEntity,
     override val targetTo: KoishEntity,
-    override val trigger: Trigger?,
+    override val abilityTrigger: AbilityTrigger?,
     override val variant: TriggerVariant,
     override val manaCost: Expression?,
     override val mochaEngine: MochaEngine<*>,
@@ -119,7 +119,7 @@ private class SimpleAbilityInput(
 
     override fun toBuilder(): AbilityInputDSL {
         return AbilityInputDSL(castBy, targetTo)
-            .trigger(trigger)
+            .trigger(abilityTrigger)
             .manaCost(manaCost)
             .mochaEngine(mochaEngine)
     }
@@ -127,7 +127,7 @@ private class SimpleAbilityInput(
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("castBy", castBy),
         ExaminableProperty.of("target", targetTo),
-        ExaminableProperty.of("trigger", trigger),
+        ExaminableProperty.of("abilityTrigger", abilityTrigger),
         ExaminableProperty.of("manaCost", manaCost),
         ExaminableProperty.of("mochaEngine", mochaEngine),
     )

@@ -10,7 +10,7 @@
 |-----------|------------------------------------------|---------|
 | type      | 使用技能的类型, 详见技能的详细参数                       | -       |
 | displays  | 技能的显示文字, 由 `name` 与 `tooltip` 组成         | 空       |
-| triggers  | 在技能的执行过程中对 trigger 的操作, 详见下方 trigger 的描述 | 空       |
+| triggers  | 在技能的执行过程中对 abilityTrigger 的操作, 详见下方 abilityTrigger 的描述 | 空       |
 
 `ability/melee/dash.yml`
 
@@ -38,7 +38,7 @@ teleported_messages:
 | Arguments | Description           | Default |
 |-----------|-----------------------|---------|
 | type      | 核孔的类型, 详见关于核孔的 PR     | -       |
-| trigger   | 触发此技能的触发器, 详见 Trigger | -       |
+| abilityTrigger   | 触发此技能的触发器, 详见 Trigger | -       |
 | weight    | 选择中此技能的权重             | -       |
 
 ##### 如果是直接在物品内写. `items/test.yml`
@@ -55,7 +55,7 @@ cells:
           pool_1:
             entries:
               - type: ability:melee/blink
-                trigger: trigger:combo/111 # 一个多键触发器, 详见 trigger
+                abilityTrigger: abilityTrigger:combo/111 # 一个多键触发器, 详见 abilityTrigger
                 weight: 5
         default: [ ]
 ```
@@ -65,13 +65,13 @@ cells:
 ```yaml
 nodes:
   - type: ability:melee/blink
-    trigger: trigger:combo/111 # 一个多键触发器, 详见 trigger
+    abilityTrigger: abilityTrigger:combo/111 # 一个多键触发器, 详见 abilityTrigger
     weight: 5
 ```
 
 ### Trigger (触发器)
 
-用于触发技能的玩家游戏操作, 分为单键和组合键. `namespace` 是 `trigger`
+用于触发技能的玩家游戏操作, 分为单键和组合键. `namespace` 是 `abilityTrigger`
 
 #### 单键触发器
 

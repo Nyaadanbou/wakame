@@ -20,16 +20,22 @@ import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toJsonString
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.Bukkit
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.ThrowableProjectile
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 @Init(
@@ -221,15 +227,6 @@ object ItemListener {
                 Action.RIGHT_CLICK_AIR -> AbilityEntryPointHandler.onRightClickAir(player, event)
                 else -> return@event
             }
-        }
-
-        event<EntityDamageByEntityEvent> { event ->
-            val damager = event.damager as? Player ?: return@event
-            if (!damager.isHandleableByKoish) return@event
-            val entity = event.entity as? LivingEntity ?: return@event
-            val itemStack = damager.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-
-            AbilityEntryPointHandler.onAttack(damager, itemStack, event)
         }
 
         event<ProjectileHitEvent> { event ->

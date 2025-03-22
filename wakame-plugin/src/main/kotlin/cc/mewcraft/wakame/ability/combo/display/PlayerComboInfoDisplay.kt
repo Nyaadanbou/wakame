@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.ability.combo.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability.trigger.SingleAbilityTrigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
@@ -41,7 +41,7 @@ import org.bukkit.entity.Player
 internal object PlayerComboInfoDisplay : RegistryLoader {
     const val CONFIG_NAME = "ability.yml"
 
-    private lateinit var triggerDisplays: Map<Trigger, TriggerDisplay>
+    private lateinit var abilityTriggerDisplays: Map<AbilityTrigger, TriggerDisplay>
 
     private lateinit var connector: Component
     private lateinit var successMessages: AudienceMessageGroup
@@ -66,7 +66,7 @@ internal object PlayerComboInfoDisplay : RegistryLoader {
             val rootNode = loader.buildAndLoadString(file.readText())
             val playerComboConfig = rootNode.node("display", "player_combo")
 
-            triggerDisplays = rootNode.node("display", "triggers").require()
+            abilityTriggerDisplays = rootNode.node("display", "triggers").require()
             connector = playerComboConfig.node("connector").require()
             successMessages = playerComboConfig.node("success_message").require()
             failureMessages = playerComboConfig.node("failure_message").require()
@@ -78,17 +78,17 @@ internal object PlayerComboInfoDisplay : RegistryLoader {
         }
     }
 
-    fun displaySuccess(triggers: List<SingleTrigger>, audience: Player) {
+    fun displaySuccess(triggers: List<SingleAbilityTrigger>, audience: Player) {
         val triggerTagResolver = getTriggersTagResolver(triggers) { it.successStyle }
         successMessages.send(audience, triggerTagResolver)
     }
 
-    fun displayProgress(triggers: List<SingleTrigger>, audience: Player) {
+    fun displayProgress(triggers: List<SingleAbilityTrigger>, audience: Player) {
         val triggerTagResolver = getTriggersTagResolver(triggers) { it.progressStyle }
         progressMessages.send(audience, triggerTagResolver)
     }
 
-    fun displayFailure(triggers: List<SingleTrigger>, audience: Player) {
+    fun displayFailure(triggers: List<SingleAbilityTrigger>, audience: Player) {
         val triggerTagResolver = getTriggersTagResolver(triggers) { it.failureStyle }
         failureMessages.send(audience, triggerTagResolver)
     }
@@ -101,11 +101,11 @@ internal object PlayerComboInfoDisplay : RegistryLoader {
         noEnoughManaMessages.send(audience)
     }
 
-    private fun getTriggersTagResolver(triggers: List<SingleTrigger>, style: (TriggerDisplay) -> Style): TagResolver {
+    private fun getTriggersTagResolver(triggers: List<SingleAbilityTrigger>, style: (TriggerDisplay) -> Style): TagResolver {
         return Placeholder.component("trigger_completed") {
             Component.join(
                 JoinConfiguration.separator(connector),
-                triggers.map { triggerDisplays[it] }
+                triggers.map { abilityTriggerDisplays[it] }
                     .map { it?.let { triggerDisplay -> Component.text().content(triggerDisplay.name).style(style(triggerDisplay)) } ?: Component.empty() }
             )
         }

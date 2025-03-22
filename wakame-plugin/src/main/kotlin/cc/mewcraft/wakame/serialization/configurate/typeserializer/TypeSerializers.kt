@@ -58,5 +58,5 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     .register(KoishRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())
     .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
-    .register(KoishRegistries.TRIGGER.valueByNameTypeSerializer())
+    .register(KoishRegistries.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .build()

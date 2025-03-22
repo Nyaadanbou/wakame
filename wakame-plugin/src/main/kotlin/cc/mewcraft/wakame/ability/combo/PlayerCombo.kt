@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.combo
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
+import cc.mewcraft.wakame.ability.trigger.SingleAbilityTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -18,8 +18,8 @@ class PlayerCombo(
     private val uniqueId: UUID,
 ) : Examinable {
     companion object {
-        private val COOLDOWN_TRIGGERS: List<SingleTrigger> =
-            listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+        private val COOLDOWN_TRIGGERS: List<SingleAbilityTrigger> =
+            listOf(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK)
     }
 
     private val cooldown: Cooldown = Cooldown.ofTicks(2)
@@ -31,7 +31,7 @@ class PlayerCombo(
 
     private var comboDisplay: PlayerComboInfo by ComboDisplayProvider { PlayerComboInfo(player) }
 
-    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
+    fun addTrigger(trigger: SingleAbilityTrigger): PlayerComboResult {
         if (trigger in COOLDOWN_TRIGGERS && cooldown.test()) {
             return PlayerComboResult.SILENT_FAILURE
         }

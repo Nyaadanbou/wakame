@@ -9,9 +9,9 @@ import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.StatePhase
 import cc.mewcraft.wakame.ability.findAllAbilities
-import cc.mewcraft.wakame.ability.trigger.SequenceTrigger
-import cc.mewcraft.wakame.ability.trigger.SingleTrigger
-import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability.trigger.SequenceAbilityTrigger
+import cc.mewcraft.wakame.ability.trigger.SingleAbilityTrigger
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.event.bukkit.PlayerManaCostEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNoEnoughManaEvent
@@ -58,11 +58,11 @@ class PlayerComboInfo(
     companion object {
         private const val SEQUENCE_SIZE = 3
 
-        private val SEQUENCE_GENERATION_TRIGGERS: List<SingleTrigger> =
-            listOf(SingleTrigger.LEFT_CLICK, SingleTrigger.RIGHT_CLICK)
+        private val SEQUENCE_GENERATION_TRIGGERS: List<SingleAbilityTrigger> =
+            listOf(SingleAbilityTrigger.LEFT_CLICK, SingleAbilityTrigger.RIGHT_CLICK)
     }
 
-    private val currentSequence: RingBuffer<SingleTrigger> = RingBuffer(SEQUENCE_SIZE)
+    private val currentSequence: RingBuffer<SingleAbilityTrigger> = RingBuffer(SEQUENCE_SIZE)
     private val manaCostPenalties: MutableMap<Identifier, ManaCostPenalty> = HashMap()
 
     private var resetTask: BukkitTask? = null
@@ -76,9 +76,7 @@ class PlayerComboInfo(
         resetTask = null
     }
 
-    fun addTrigger(trigger: SingleTrigger): PlayerComboResult {
-        val castTrigger = if (trigger == SingleTrigger.ATTACK) SingleTrigger.LEFT_CLICK else trigger
-
+    fun addTrigger(trigger: SingleAbilityTrigger): PlayerComboResult {
         // 尝试找到使用当前触发器能够触发的技能
         val singleAbility = player.getAbilitiesBy(trigger)
         if (singleAbility.isNotEmpty()) {
@@ -87,8 +85,8 @@ class PlayerComboInfo(
         }
 
         // 尝试找到使用当前 combo 能够触发的技能
-        if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
-            val sequenceAbility = trySequenceAbility(castTrigger)
+        if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
+            val sequenceAbility = trySequenceAbility(trigger)
             if (sequenceAbility.isNotEmpty()) {
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
@@ -117,7 +115,7 @@ class PlayerComboInfo(
         return penalty
     }
 
-    private fun trySequenceAbility(trigger: SingleTrigger): List<Ability> {
+    private fun trySequenceAbility(trigger: SingleAbilityTrigger): List<Ability> {
         val triggerTypes = player.getAllActiveAbilityTriggers()
         // 第一个按下的是右键并且玩家有 Sequence 类型的 Trigger
         // isFirstRightClickAndHasTrigger 的真值表:
@@ -131,7 +129,7 @@ class PlayerComboInfo(
         // t | t | f -> f
         // t | t | t -> t
         // 可计算出最终表达式为: Result = triggerTypes.any { it is SequenceTrigger } && (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK)
-        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleTrigger.RIGHT_CLICK) && triggerTypes.any { it is SequenceTrigger }
+        val isFirstRightClickAndHasTrigger = (!currentSequence.isEmpty() || trigger == SingleAbilityTrigger.RIGHT_CLICK) && triggerTypes.any { it is SequenceAbilityTrigger }
 
         if (isFirstRightClickAndHasTrigger) {
             // If the trigger is a sequence generation trigger, we should add it to the sequence
@@ -142,7 +140,7 @@ class PlayerComboInfo(
             PlayerComboInfoDisplay.displayProgress(completeSequence, player)
 
             if (currentSequence.isFull()) {
-                val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
+                val sequence = SequenceAbilityTrigger.of(completeSequence)
                 val abilityOnSequence = player.getAbilitiesBy(sequence)
                 // 如果成功，则清除当前序列
                 PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
@@ -159,15 +157,15 @@ class PlayerComboInfo(
         return emptyList()
     }
 
-    private fun Player.getAbilitiesBy(trigger: Trigger): List<Ability> {
+    private fun Player.getAbilitiesBy(abilityTrigger: AbilityTrigger): List<Ability> {
         return findAllAbilities()
-            .filter { it.trigger == trigger }
+            .filter { it.abilityTrigger == abilityTrigger }
             .map { it.instance }
     }
 
-    private fun Player.getAllActiveAbilityTriggers(): Set<Trigger> {
+    private fun Player.getAllActiveAbilityTriggers(): Set<AbilityTrigger> {
         return findAllAbilities()
-            .mapNotNull { it.trigger }
+            .mapNotNull { it.abilityTrigger }
             .toSet()
     }
 

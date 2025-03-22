@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.trigger.Trigger
+import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ability.trigger.TriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
@@ -72,10 +72,10 @@ fun PlayerAbility(
 fun PlayerAbility(
     id: Key, node: ConfigurationNode,
 ): PlayerAbility {
-    val trigger = node.node("trigger").get<Trigger>()
+    val abilityTrigger = node.node("trigger").get<AbilityTrigger>()
     val variant = node.node("variant").require<TriggerVariant>()
     val manaCost = node.node("mana_cost").require<Expression>()
-    return PlayerAbility(id, trigger, variant, manaCost)
+    return PlayerAbility(id, abilityTrigger, variant, manaCost)
 }
 
 /**
@@ -91,7 +91,7 @@ fun PlayerAbility(
  */
 data class PlayerAbility(
     val id: Key,
-    val trigger: Trigger?,
+    val abilityTrigger: AbilityTrigger?,
     val variant: TriggerVariant,
     val manaCost: Expression,
 ) {
@@ -105,7 +105,7 @@ data class PlayerAbility(
     fun record(caster: Player, target: KoishEntity?, slot: ItemSlot) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
-            trigger(trigger)
+            trigger(abilityTrigger)
             manaCost(manaCost)
         }
         instance.record(input, slot)
@@ -114,14 +114,14 @@ data class PlayerAbility(
     fun cast(caster: Player, target: KoishEntity?) {
         val target = target ?: caster.koishify()
         val input = abilityInput(caster.koishify(), target) {
-            trigger(trigger)
+            trigger(abilityTrigger)
             manaCost(manaCost)
         }
         instance.cast(input)
     }
 
     fun saveNbt(): CompoundTag = CompoundTag {
-        writeTrigger(trigger)
+        writeTrigger(abilityTrigger)
         writeVariant(variant)
         writeExpression(manaCost)
     }
@@ -155,8 +155,8 @@ private const val NBT_ABILITY_TRIGGER = "trigger"
 private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
-private fun CompoundTag.readTrigger(): Trigger? {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.TRIGGER[Identifiers.of(it)] }
+private fun CompoundTag.readTrigger(): AbilityTrigger? {
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.ABILITY_TRIGGER[Identifiers.of(it)] }
 }
 
 private fun CompoundTag.readVariant(): TriggerVariant {
@@ -170,10 +170,10 @@ private fun CompoundTag.readExpression(): Expression {
     return getStringOrNull(NBT_ABILITY_MANA_COST)?.let { Expression.of(it) } ?: Expression.of(0)
 }
 
-private fun CompoundTag.writeTrigger(trigger: Trigger?) {
-    if (trigger == null)
+private fun CompoundTag.writeTrigger(abilityTrigger: AbilityTrigger?) {
+    if (abilityTrigger == null)
         return
-    putString(NBT_ABILITY_TRIGGER, trigger.id)
+    putString(NBT_ABILITY_TRIGGER, abilityTrigger.id)
 }
 
 private fun CompoundTag.writeVariant(variant: TriggerVariant) {

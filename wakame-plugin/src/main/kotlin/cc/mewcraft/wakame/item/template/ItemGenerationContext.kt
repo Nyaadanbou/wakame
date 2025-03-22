@@ -104,7 +104,7 @@ private class SimpleItemGenerationContext(
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("trigger", trigger),
+        ExaminableProperty.of("abilityTrigger", trigger),
         ExaminableProperty.of("target", target),
         ExaminableProperty.of("seed", seed),
         ExaminableProperty.of("level", level),
