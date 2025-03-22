@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.AbilityContainer
 import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.InSlot
+import cc.mewcraft.wakame.ability.component.AtSlot
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ability.context.AbilityInput
 import cc.mewcraft.wakame.ability.data.StatePhase
@@ -31,7 +31,7 @@ fun Ability.createAbilityEntity(input: AbilityInput, phase: StatePhase, slot: It
         configuration().invoke(this, it)
         it += CastBy(input.castBy.entity)
         it += TargetTo(input.targetTo.entity)
-        slot?.let { slot -> it += InSlot(slot) }
+        slot?.let { slot -> it += AtSlot(slot) }
         it += TickCountComponent(0)
     }
 }

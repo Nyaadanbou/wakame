@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.item.ItemSlot
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
-data class InSlot(
+data class AtSlot(
     var slot: ItemSlot,
-): Component<InSlot> {
-    companion object : ComponentType<InSlot>()
+): Component<AtSlot> {
+    companion object : ComponentType<AtSlot>()
 
-    override fun type(): ComponentType<InSlot> = InSlot
+    override fun type(): ComponentType<AtSlot> = AtSlot
 }

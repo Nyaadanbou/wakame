@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.ability.system
 import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.AbilityContainer
+import cc.mewcraft.wakame.ability.component.AtSlot
 import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.InSlot
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.item.logic.ItemSlotChanges
@@ -36,7 +36,7 @@ class AbilityRemoveSystem : IteratingSystem(
         if (caster in Families.BUKKIT_PLAYER) {
             val itemSlotChanges = caster[ItemSlotChanges]
             // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
-            val slot = entity[InSlot].slot
+            val slot = entity[AtSlot].slot
             val itemSlotChangesEntry = itemSlotChanges[slot]
             if (!itemSlotChangesEntry.isChanging) {
                 // 如果玩家栏位无变化, 则不进行移除.
