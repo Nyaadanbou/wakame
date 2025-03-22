@@ -15,25 +15,21 @@ import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
-import cc.mewcraft.wakame.util.KoishListener
-import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 import io.papermc.paper.math.Position
 import org.bukkit.Particle
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerMoveEvent
 
-class MultiJumpSystem : IteratingSystem(
+class MultiJumpSystem : ListenableIteratingSystem(
     family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent, MultiJump) }
 ) {
-    private lateinit var inputListener: KoishListener
-    private lateinit var moveListener: KoishListener
-
     override fun onTickEntity(entity: Entity) {
         entity[AbilityComponent].isReadyToRemove = true
         val multiJump = entity[MultiJump]
@@ -44,55 +40,50 @@ class MultiJumpSystem : IteratingSystem(
         multiJump.isHoldingJump = player.currentInput.isJump
     }
 
-    override fun onInit() {
-        inputListener = event<PlayerInputEvent> { event ->
-            val bukkitPlayer = event.player
-            val playerEntity = bukkitPlayer.koishify()
-            val multiJumps = playerEntity[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
-            for (fleksEntity in multiJumps) {
-                val multiJump = fleksEntity[MultiJump]
-                if (multiJump.jumpCount <= 0)
-                    continue
-                if (multiJump.cooldown > 0)
-                    continue
-                if (bukkitPlayer.isOnGround) // 我们知道这是按照客户端发送到服务端的网络数据包为基准, 我们也是故意忽略这里造成的任何负面影响
-                    continue
-                if (multiJump.isHoldingJump)
-                    continue
-                if (!event.input.isJump)
-                    continue
-                multiJump.cooldown = MultiJump.USE_COOLDOWN
-                // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
-                val direction = bukkitPlayer.location.direction.normalize()
-                bukkitPlayer.velocity = bukkitPlayer.velocity.add(direction.multiply(0.3)).setY(0.6)
-                // 减少跳跃次数.
-                multiJump.jumpCount--
+    @EventHandler
+    private fun onPlayerMove(event: PlayerInputEvent) {
+        val bukkitPlayer = event.player
+        val playerEntity = bukkitPlayer.koishify()
+        val multiJumps = playerEntity[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
+        for (fleksEntity in multiJumps) {
+            val multiJump = fleksEntity[MultiJump]
+            if (multiJump.jumpCount <= 0)
+                continue
+            if (multiJump.cooldown > 0)
+                continue
+            if (bukkitPlayer.isOnGround) // 我们知道这是按照客户端发送到服务端的网络数据包为基准, 我们也是故意忽略这里造成的任何负面影响
+                continue
+            if (multiJump.isHoldingJump)
+                continue
+            if (!event.input.isJump)
+                continue
+            multiJump.cooldown = MultiJump.USE_COOLDOWN
+            // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
+            val direction = bukkitPlayer.location.direction.normalize()
+            bukkitPlayer.velocity = bukkitPlayer.velocity.add(direction.multiply(0.3)).setY(0.6)
+            // 减少跳跃次数.
+            multiJump.jumpCount--
 
-                // 播放粒子特效.
-                playParticle(bukkitPlayer, fleksEntity)
+            // 播放粒子特效.
+            playParticle(bukkitPlayer, fleksEntity)
 
-                // 发送跳跃消息.
-                multiJump.jumpedMessages.send(bukkitPlayer)
-            }
-        }
-
-        moveListener = event<PlayerMoveEvent> { event ->
-            val bukkitPlayer = event.player
-            if (!bukkitPlayer.isOnGround)
-                return@event
-            val fleksEntities = bukkitPlayer.koishify()[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
-            for (fleksEntity in fleksEntities) {
-                val multiJump = fleksEntity[MultiJump]
-                if (multiJump.jumpCount > 0)
-                    continue
-                multiJump.jumpCount = multiJump.originCount
-            }
+            // 发送跳跃消息.
+            multiJump.jumpedMessages.send(bukkitPlayer)
         }
     }
 
-    override fun onDispose() {
-        inputListener.unregister()
-        moveListener.unregister()
+    @EventHandler
+    private fun onPlayerMove(event: PlayerMoveEvent) {
+        val bukkitPlayer = event.player
+        if (!bukkitPlayer.isOnGround)
+            return
+        val fleksEntities = bukkitPlayer.koishify()[AbilityContainer][AbilityArchetypes.MULTI_JUMP]
+        for (fleksEntity in fleksEntities) {
+            val multiJump = fleksEntity[MultiJump]
+            if (multiJump.jumpCount > 0)
+                continue
+            multiJump.jumpCount = multiJump.originCount
+        }
     }
 
     private fun playParticle(player: Player, fleksEntity: FleksEntity) {

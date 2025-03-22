@@ -9,56 +9,19 @@ import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import cc.mewcraft.wakame.element.ElementStackManager
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.util.KoishListener
-import cc.mewcraft.wakame.util.event
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.IteratingSystem
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 
-class ElementStackSystem : IteratingSystem(
+class ElementStackSystem : ListenableIteratingSystem(
     family = Families.ELEMENT_STACK
 ) {
-    private lateinit var damageListener: KoishListener
-
-    override fun onInit() {
-        damageListener = event<NekoEntityDamageEvent> { event ->
-            if (event.isCancelled)
-                return@event
-            val damagee = event.damagee
-            val damagePackets = event.damageMetadata.damageBundle.packets()
-            val causingEntity = event.damageSource.causingEntity
-
-            val target = if (damagee is Player) {
-                damagee.koishify()
-            } else {
-                damagee.koishify()
-            }
-
-            for (damagePacket in damagePackets) {
-                val element = damagePacket.element
-
-                if (damagee is Player) {
-                    ElementStackManager.applyElementStack(element, 1, target)
-                } else {
-                    ElementStackManager.applyElementStack(element, 1, target)
-                }
-            }
-
-            if (causingEntity != null && causingEntity is Player) {
-                causingEntity.koishify()[BossBarVisible].bossBar2DurationTick.put(target[EntityInfoBossBarComponent].bossBar, 100)
-            }
-        }
-    }
-
-    override fun onDispose() {
-        damageListener.unregister()
-    }
-
     override fun onTickEntity(entity: Entity) {
         val caster = entity[CastBy].caster
         val target = entity[TargetTo].target
@@ -93,6 +56,33 @@ class ElementStackSystem : IteratingSystem(
                 ability.value.cast(abilityInput)
             }
             elementStackComponent.triggeredLevels.add(requiredAmount)
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    private fun onNekoDamage(event: NekoEntityDamageEvent) {
+        val damagee = event.damagee
+        val damagePackets = event.damageMetadata.damageBundle.packets()
+        val causingEntity = event.damageSource.causingEntity
+
+        val target = if (damagee is Player) {
+            damagee.koishify()
+        } else {
+            damagee.koishify()
+        }
+
+        for (damagePacket in damagePackets) {
+            val element = damagePacket.element
+
+            if (damagee is Player) {
+                ElementStackManager.applyElementStack(element, 1, target)
+            } else {
+                ElementStackManager.applyElementStack(element, 1, target)
+            }
+        }
+
+        if (causingEntity != null && causingEntity is Player) {
+            causingEntity.koishify()[BossBarVisible].bossBar2DurationTick.put(target[EntityInfoBossBarComponent].bossBar, 100)
         }
     }
 
