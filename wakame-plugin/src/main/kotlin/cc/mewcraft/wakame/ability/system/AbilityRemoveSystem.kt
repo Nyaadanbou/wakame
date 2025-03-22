@@ -38,7 +38,7 @@ class AbilityRemoveSystem : IteratingSystem(
             // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
             val slot = entity[AtSlot].slot
             val itemSlotChangesEntry = itemSlotChanges[slot]
-            if (!itemSlotChangesEntry.isChanging) {
+            if (!itemSlotChangesEntry.changing) {
                 // 如果玩家栏位无变化, 则不进行移除.
                 return
             }

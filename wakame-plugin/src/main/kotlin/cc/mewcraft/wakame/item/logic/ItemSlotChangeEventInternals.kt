@@ -39,7 +39,7 @@ class ItemSlotChangeEventInternals : IteratingSystem(
             val currItemStack = itemSlot.getItem(player)
             val itemSlotChangesEntry = entity[ItemSlotChanges][itemSlot]
             itemSlotChangesEntry.update(currItemStack)
-            if (itemSlotChangesEntry.isChanging) {
+            if (itemSlotChangesEntry.changing) {
                 val changeEvent = PlayerItemSlotChangeEvent(player, itemSlot, itemSlotChangesEntry.previous, itemSlotChangesEntry.current)
                 changeEvent.callEvent()
             }
