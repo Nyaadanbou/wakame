@@ -25,6 +25,11 @@ data class ItemSlotChanges(
      * 记录对应的 [ItemSlot] 的变化.
      *
      * 一个 [Entry][cc.mewcraft.wakame.item.logic.ItemSlotChanges.Entry] 只会记录一个 [ItemSlot] 的变化.
+     *
+     * 如果 [changing] 为 `true`, 则表示该物品槽位在当前 tick 发生了变化, 反之则表示该物品槽位没有发生变化.
+     * 设当前 tick 为 t, 当 [changing] 为 `true`: 则 [current] 为 t 刻的 [ItemStack],
+     * [previous] 为 t-1 刻的 [ItemStack]. 当 [changing] 为 `false`: [previous] 与 [current] 是一致的,
+     * 判断 [previous] 与 [current] 没有任何意义.
      */
     class Entry internal constructor(
         /**
@@ -34,33 +39,19 @@ data class ItemSlotChanges(
     ) {
 
         /**
-         * 发生变化后的[物品][ItemStack].
-         *
-         * 如果为空, 则表示该物品为不存在或为空气.
-         *
-         * ## 注意!
-         *
-         * 如果在 [ItemSlotChangeEventInternals] 进行 tick 之前获取此物品, 将会返回上一 tick 的物品结果.
+         * 发生变化后的物品.
          */
         var current: ItemStack? = null
             private set
 
         /**
-         * 发生变化前的[物品][ItemStack].
-         *
-         * 如果为空, 则表示该物品为不存在或为空气.
-         *
-         * ## 注意!
-         *
-         * 如果在 [ItemSlotChangeEventInternals] 进行 tick 之前获取此物品, 将会返回上一 tick 的物品结果.
+         * 发生变化前的物品.
          */
         var previous: ItemStack? = null
             private set
 
         /**
-         * 记录是否发生了变化.
-         *
-         * 如果为 `true`, 则表示该物品发生了变化, 反之则表示该物品没有发生变化.
+         * [slot] 在当前 tick 是否发生了变化.
          */
         var changing: Boolean = false
             private set
@@ -70,13 +61,10 @@ data class ItemSlotChanges(
         operator fun component3(): ItemStack? = previous
         operator fun component4(): Boolean = changing
 
-        fun update(newItem: ItemStack?) {
-            if (newItem != null) {
-                if (newItem.isEmpty)
-                    error("newItem cannot be empty")
-            }
+        internal fun update(current: ItemStack?) {
+            require(current?.isEmpty != true) { "current cannot be empty" }
 
-            this.current = newItem?.clone().also { this.previous = this.current }
+            this.current = current?.clone().also { this.previous = this.current }
             this.changing = this.current != this.previous
         }
     }

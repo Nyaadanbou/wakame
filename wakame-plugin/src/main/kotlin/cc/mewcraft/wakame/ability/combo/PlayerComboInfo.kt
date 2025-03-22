@@ -89,7 +89,6 @@ class PlayerComboInfo(
         if (castTrigger in SEQUENCE_GENERATION_TRIGGERS) {
             val sequenceAbility = trySequenceAbility(castTrigger)
             if (sequenceAbility.isNotEmpty()) {
-                PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
                 markNextState(sequenceAbility)
                 return PlayerComboResult.CANCEL_EVENT
             }
@@ -145,6 +144,7 @@ class PlayerComboInfo(
                 val sequence = SequenceTrigger.fromSingleTriggers(completeSequence)
                 val abilityOnSequence = player.getAbilitiesBy(sequence)
                 // 如果成功，则清除当前序列
+                PlayerComboInfoDisplay.displaySuccess(currentSequence.readAll(), player)
                 clearSequence()
                 cancelTask()
                 if (abilityOnSequence.isEmpty()) {
