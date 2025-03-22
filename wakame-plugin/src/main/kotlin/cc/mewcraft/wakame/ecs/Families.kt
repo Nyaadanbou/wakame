@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ecs
 import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
 import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.CastBy
+import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.component.TargetTo
 import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
@@ -42,6 +43,9 @@ object Families {
 
     @JvmField
     val ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent) }
+
+    @JvmField
+    val MANA_COSTING_ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, AbilityArchetypeComponent, ManaCost) }
 
     @JvmField
     val ELEMENT_STACK: Family = family { all(ElementComponent, ElementStackComponent, TargetTo) }

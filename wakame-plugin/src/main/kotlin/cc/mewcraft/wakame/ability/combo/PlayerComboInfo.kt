@@ -185,7 +185,7 @@ class PlayerComboInfo(
     }
 
     private fun Player.setCostPenalty(ability: Ability, penalty: ManaCostPenalty) {
-        Families.ABILITY.forEach { entity ->
+        Families.MANA_COSTING_ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setCostPenalty)
                 return@forEach
             if (entity[AbilityArchetypeComponent].archetype != ability.archetype)

@@ -36,6 +36,7 @@ fun Ability.createAbilityEntity(
         configuration().invoke(this, it)
         it += CastBy(input.castBy.entity)
         it += TargetTo(input.targetTo.entity)
+        input.manaCost?.let { manaCost -> it += ManaCost(manaCost) }
         slot?.let { slot -> it += AtSlot(slot) }
         it += TickCountComponent(0)
     }
