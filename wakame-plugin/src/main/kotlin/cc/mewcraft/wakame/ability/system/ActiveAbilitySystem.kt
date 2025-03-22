@@ -25,28 +25,28 @@ interface ActiveAbilitySystem {
      */
     context(EntityUpdateContext)
     fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+        TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
     context(EntityUpdateContext)
     fun tickCast(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+        TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
     fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+        TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
     fun tickReset(tickCount: Int, fleksEntity: FleksEntity): TickResult =
-        TickResult.NEXT_STATE_NO_CONSUME
+        TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
 
     context(EntityUpdateContext)
     fun tick(tickCount: Int, fleksEntity: FleksEntity): TickResult {

@@ -22,7 +22,7 @@ class AbilityManaCostSystem : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val tickResult = entity[AbilityTickResultComponent].result
-        if (tickResult != TickResult.NEXT_STATE) {
+        if (tickResult != TickResult.ADVANCE_NEXT_STATE) {
             return
         }
         val caster = entity[CastBy].caster

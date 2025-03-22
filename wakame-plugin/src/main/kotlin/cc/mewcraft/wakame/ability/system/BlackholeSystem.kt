@@ -45,7 +45,7 @@ class BlackholeSystem : IteratingSystem(
         rayTraceResult.hitBlockFace?.let { blackhole.holeDirection = it }
         blackhole.holeCenter = targetLocation
 
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 
     context(EntityUpdateContext)
@@ -73,7 +73,7 @@ class BlackholeSystem : IteratingSystem(
         }
 
         if (tickCount >= blackhole.duration.evaluate(mochaEngine)) {
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
         }
 
         if (tickCount % 10 == 0) {
@@ -119,7 +119,7 @@ class BlackholeSystem : IteratingSystem(
 
     context(EntityUpdateContext)
     override fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 
     context(EntityUpdateContext)
@@ -128,6 +128,6 @@ class BlackholeSystem : IteratingSystem(
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null
         fleksEntity -= ParticleEffectComponent
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 }

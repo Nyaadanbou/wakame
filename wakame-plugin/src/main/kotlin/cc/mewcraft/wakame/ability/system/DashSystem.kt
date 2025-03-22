@@ -40,7 +40,7 @@ class DashSystem : IteratingSystem(
 
     context(EntityUpdateContext)
     override fun tickCastPoint(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        return TickResult.NEXT_STATE
+        return TickResult.ADVANCE_NEXT_STATE
     }
 
     context(EntityUpdateContext)
@@ -48,7 +48,7 @@ class DashSystem : IteratingSystem(
         val dash = fleksEntity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
         }
         val entity = fleksEntity[CastBy].entityOrPlayer()
         val direction = entity.location.direction.setY(0).normalize()
@@ -66,7 +66,7 @@ class DashSystem : IteratingSystem(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -83,7 +83,7 @@ class DashSystem : IteratingSystem(
 
         if (this@DashSystem.affectEntityNearby(entity, fleksEntity)) {
             if (!dash.canContinueAfterHit) {
-                return TickResult.NEXT_STATE_NO_CONSUME
+                return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
             }
         }
 

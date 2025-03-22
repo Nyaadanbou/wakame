@@ -45,7 +45,7 @@ class BlinkSystem : IteratingSystem(
             entity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
             return TickResult.RESET_STATE
         }
-        return TickResult.NEXT_STATE
+        return TickResult.ADVANCE_NEXT_STATE
     }
 
     context(EntityUpdateContext)
@@ -100,22 +100,22 @@ class BlinkSystem : IteratingSystem(
             )
         )
 
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 
     context(EntityUpdateContext)
     override fun tickBackswing(tickCount: Int, fleksEntity: FleksEntity): TickResult {
-        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.NEXT_STATE_NO_CONSUME
+        val entity = fleksEntity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
         val blink = fleksEntity[Blink]
         if (!blink.isTeleported) {
-            return TickResult.NEXT_STATE_NO_CONSUME
+            return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
         }
 
         // 再给予一个向前的固定惯性
         entity.velocity = entity.location.direction.normalize()
 
         blink.teleportedMessages.send(entity)
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 
     context(EntityUpdateContext)
@@ -123,6 +123,6 @@ class BlinkSystem : IteratingSystem(
         val blink = fleksEntity[Blink]
         blink.isTeleported = false
         fleksEntity -= ParticleEffectComponent
-        return TickResult.NEXT_STATE_NO_CONSUME
+        return TickResult.ADVANCE_NEXT_STATE_WITHOUT_CONSUME
     }
 }
