@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -36,7 +37,7 @@ private data object MinecraftItemRefHandler : ItemRefHandler<Material> {
 
     override val systemName: String = "Minecraft"
 
-    override fun supports(id: Identifier): Boolean {
+    override fun accepts(id: Identifier): Boolean {
         return Material.matchMaterial(id.asString()) != null
     }
 
@@ -47,11 +48,6 @@ private data object MinecraftItemRefHandler : ItemRefHandler<Material> {
     override fun getName(id: Identifier): Component {
         val type = getInternalType(id)
         return Component.translatable(type)
-    }
-
-    override fun matches(xId: Identifier, yStack: ItemStack): Boolean {
-        val yId = yStack.type.key
-        return matches(xId, yId)
     }
 
     override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {
@@ -71,26 +67,19 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
 
     override val systemName: String = "Koish"
 
-    override fun supports(id: Identifier): Boolean {
+    override fun accepts(id: Identifier): Boolean {
         return KoishRegistries2.ITEM.containsId(id)
     }
 
     override fun getId(stack: ItemStack): Identifier? {
         // 对于 Koish 物品, 返回非空
         // 对于 原版套皮/纯原版/其他 物品, 返回空
-        return stack.koishItem?.id
+        return stack.koishData(false)?.get(ItemDataTypes.ID)?.id
     }
 
     override fun getName(id: Identifier): Component {
         val type = getInternalType(id)
         return type.name
-    }
-
-    override fun matches(xId: Identifier, yStack: ItemStack): Boolean {
-        // 对于 Koish 物品, 返回 true
-        // 对于 原版套皮/纯原版/其他 物品, 返回 false
-        val yId = yStack.koishItem?.id ?: return false
-        return matches(xId, yId)
     }
 
     override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {

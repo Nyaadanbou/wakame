@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -81,7 +82,8 @@ sealed interface ItemPropertyContainer {
          *
          * @return 设置之前的数据, 如果不存在则返回 `null`
          */
-        fun set0(type: ItemPropertyType<*>, value: Any): Any?
+        @ApiStatus.Internal
+        fun setUnsafe(type: ItemPropertyType<*>, value: Any): Any?
 
         /**
          * 构建 [ItemPropertyContainer].
@@ -112,7 +114,7 @@ private class SimpleItemPropertyContainer(
         return propertyMap.put(type, value) as T?
     }
 
-    override fun set0(type: ItemPropertyType<*>, value: Any): Any? {
+    override fun setUnsafe(type: ItemPropertyType<*>, value: Any): Any? {
         require(type.typeToken.type.rawType.isInstance(value)) { "Value type mismatch: ${type.typeToken.type.rawType.name} != ${value.javaClass.name}" }
         return propertyMap.put(type, value)
     }
@@ -131,7 +133,7 @@ private class SimpleItemPropertyContainer(
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
-                builder.set0(dataType, dataValue)
+                builder.setUnsafe(dataType, dataValue)
             }
             return builder.build()
         }

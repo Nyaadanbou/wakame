@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -162,7 +163,8 @@ sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
          *
          * @return 设置之前的数据, 如果没有则返回 `null`
          */
-        fun set0(type: ItemDataType<*>, value: Any): Any?
+        @ApiStatus.Internal
+        fun setUnsafe(type: ItemDataType<*>, value: Any): Any?
 
         /**
          * 移除指定类型的数据.
@@ -235,7 +237,7 @@ private open class SimpleItemDataContainer(
         return dataMap.put(type, value) as T?
     }
 
-    override fun set0(type: ItemDataType<*>, value: Any): Any? {
+    override fun setUnsafe(type: ItemDataType<*>, value: Any): Any? {
         // 警告: 实现上必须确保这里传入的 value 类型一定是正确的
         ensureContainerOwnership()
         return dataMap.put(type, value)
@@ -318,7 +320,7 @@ private open class SimpleItemDataContainer(
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
-                builder.set0(dataType, dataValue)
+                builder.setUnsafe(dataType, dataValue)
             }
             return builder.build()
         }

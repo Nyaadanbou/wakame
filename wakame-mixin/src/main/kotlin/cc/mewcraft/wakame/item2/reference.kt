@@ -166,7 +166,7 @@ interface ItemRefHandler<T> {
     // 而非出现在 ItemRef 框架内专门的 id 验证阶段.
     // 而 Koish 能做的就是尽可能的晚的调用下面这些函数,
     // 目前已经做了的事情包括: 让合成配方的注册发生在游戏的第一个 tick, 而非 JavaPlugin#onEnable 中.
-    fun supports(id: Identifier): Boolean
+    fun accepts(id: Identifier): Boolean
 
     // 获取传入的 ItemStack 在该系统之下的物品类型 id
     // 如果该系统无法识别传入的 ItemStack 则应该返回 `null`
@@ -177,6 +177,19 @@ interface ItemRefHandler<T> {
     // 实现应该假设 id 永远是有效 id
     // 对于无效的 id 可以直接抛出异常 (bug)
     fun getName(id: Identifier): Component
+
+    // 在该系统下获取 id 对应的物品类型 T
+    // 对于无效的物品类型该函数应该直接抛异常 (bug)
+    fun getInternalType(id: Identifier): T
+
+    // 实现应该假设 id 永远是有效 id
+    // 对于无效的 id 可以直接抛出异常 (bug)
+    /**
+     * 从 [id] 和基于可能存在的 [player] 创建一个新的 [ItemStack].
+     *
+     * @throws ItemStackGenerationException 如果物品堆叠创建失败
+     */
+    fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack
 
     // 判断两个物品 id 是否一致
     //
@@ -198,22 +211,12 @@ interface ItemRefHandler<T> {
     // 判断两个物品 id 是否一致
     //
     // 同上, 只不过是对于 ItemStack
-    fun matches(xId: Identifier, yStack: ItemStack): Boolean
+    fun matches(xId: Identifier, yStack: ItemStack): Boolean {
+        val yId = getId(yStack) ?: return false
+        return matches(xId, yId)
+    }
 
-    // 实现应该假设 id 永远是有效 id
-    // 对于无效的 id 可以直接抛出异常 (bug)
-    /**
-     * 从 [id] 和基于可能存在的 [player] 创建一个新的 [ItemStack].
-     *
-     * @throws ItemStackGenerationException 如果物品堆叠创建失败
-     */
-    fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack
-
-    // 在该系统下获取 id 对应的物品类型 T
-    // 对于无效的物品类型该函数应该直接抛异常 (bug)
-    fun getInternalType(id: Identifier): T
-
-    // 方便函数
+    // 方便函数, 用于当物品类型不存在时, 统一抛出异常的逻辑
     fun throwItemTypeNotFound(id: Identifier): Nothing {
         val cause = IllegalArgumentException("Cannot find a item type in '$systemName' item system by: $id. This is a bug!")
         throw ItemStackGenerationException(id, cause)
@@ -287,7 +290,7 @@ private object ItemRefManager {
     }
 
     fun getHandler(id: Identifier): ItemRefHandler<*>? {
-        return getHandler { handler -> handler.supports(id) }
+        return getHandler { handler -> handler.accepts(id) }
     }
 
     fun getHandler(stack: ItemStack): ItemRefHandler<*>? {

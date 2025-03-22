@@ -3,12 +3,10 @@ package cc.mewcraft.wakame.item2.config.datagen
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
-import cc.mewcraft.wakame.item2.data.ItemDataType
-import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
 import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
+import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -16,7 +14,7 @@ import java.lang.reflect.Type
 
 /**
  * 代表一个容器, 存放 "Item Data" 的 [配置项][ItemMetaEntry].
- * 该接口的实例会依附在物品的配置文件实例上, 作为物品生成的元数据.
+ * 该接口实例会与物品的配置文件实例相绑定, 作为生成物品堆叠的元数据.
  *
  * 这里的 “Item Data” 不仅包括我们自己的数据类型, 也包括 Minecraft 自带的 [物品组件](https://minecraft.wiki/w/Data_component_format).
  * 也就是说, 程序员可以为一个我们自己的数据类型编写配置文件, 也可以为 Minecraft 自带的物品组件编写配置文件.
@@ -67,7 +65,8 @@ sealed interface ItemMetaContainer {
         /**
          * 设置 [ItemMetaType] 对应的 [ItemMetaEntry].
          */
-        fun set0(type: ItemMetaType<*, *>, value: Any)
+        @ApiStatus.Internal
+        fun setUnsafe(type: ItemMetaType<*, *>, value: Any)
 
         /**
          * 以当前状态创建一个 [ItemDataContainer] 实例.
@@ -76,55 +75,6 @@ sealed interface ItemMetaContainer {
          */
         fun build(): ItemMetaContainer
 
-    }
-
-}
-
-/**
- * 代表一个 "Item Data" 的配置项.
- *
- * @param V 对应的数据类型
- */
-interface ItemMetaEntry<V> {
-
-    /**
-     * 根据上下文生成数据 [V].
-     */
-    fun make(context: Context): ItemMetaResult<V>
-
-    /**
-     * 向物品堆叠写入数据 [V].
-     *
-     * ### 实现注意事项
-     * 如果要写入的数据是自定义数据类型, 而不是 Minecraft 自带的数据类型,
-     * 应该使用函数 [MojangStack.ensureSetData] 来确保数据可以写入成功.
-     */
-    fun write(value: V, itemstack: MojangStack)
-
-    /**
-     * 向该物品堆叠写入数据 [T], *无论该物品堆叠是否为合法的自定义物品*.
-     *
-     * @return 原有的值, 如果没有则返回 `null`
-     */
-    fun <T> MojangStack.ensureSetData(type: ItemDataType<in T>, value: T): T? {
-        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.EMPTY)
-        val builder = container.toBuilder()
-        val oldVal = builder.set(type, value)
-        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
-        return oldVal
-    }
-
-    /**
-     * 向该物品堆叠写入数据 [T], *无论该物品堆叠是否为合法的自定义物品*.
-     *
-     * @return 原有的值, 如果没有则返回 `null`
-     */
-    fun <T> MojangStack.ensureRemoveData(type: ItemDataType<out T>): T? {
-        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.EMPTY)
-        val builder = container.toBuilder()
-        val oldVal = builder.remove(type)
-        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
-        return oldVal
     }
 
 }
@@ -149,7 +99,7 @@ private class SimpleItemMetaContainer(
         metaMap.put(type, value)
     }
 
-    override fun set0(type: ItemMetaType<*, *>, value: Any) {
+    override fun setUnsafe(type: ItemMetaType<*, *>, value: Any) {
         // 警告: 这里无法对 value: Any 中的泛型参数做检查, 实现需要保证 value 的类型完全正确
         metaMap.put(type, value as ItemMetaEntry<*>)
     }
@@ -168,7 +118,7 @@ private class SimpleItemMetaContainer(
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }
-                builder.set0(dataType, dataValue)
+                builder.setUnsafe(dataType, dataValue)
             }
             return builder.build()
         }
