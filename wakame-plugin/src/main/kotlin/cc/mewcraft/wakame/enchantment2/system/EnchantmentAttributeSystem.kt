@@ -21,7 +21,7 @@ object EnchantmentAttributeSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val bukkitPlayer = entity[BukkitPlayerComponent].bukkitPlayer
         val slotChanges = entity[ItemSlotChanges]
-        for ((slot, prev, curr, _) in slotChanges.changingItems) {
+        for ((slot, curr, prev, _) in slotChanges.changingItems) {
 
             // 返回的 slot 一定都是在当前 tick 发生了变化的,
             // 因此这个 if-block 不可能执行, 写在这里仅供参考
