@@ -1,14 +1,16 @@
 package cc.mewcraft.wakame.enchantment2.effect
 
+import cc.mewcraft.wakame.enchantment2.component.AutoMelting
+import cc.mewcraft.wakame.item.ItemSlot
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 
-// FIXME #365: 与 datapack 里的魔咒定义绑定的数据类型.
-//  在 datapack 里的 id 可以是比如说 “koish:auto_melting”
 @JvmRecord
 data class EnchantmentAutoMeltingEffect(
     val activated: Boolean,
-) {
+) : EnchantmentListenerBasedEffect {
 
     companion object {
 
@@ -17,6 +19,20 @@ data class EnchantmentAutoMeltingEffect(
             instance.group(
                 Codec.BOOL.fieldOf("activated").forGetter(EnchantmentAutoMeltingEffect::activated)
             ).apply(instance, ::EnchantmentAutoMeltingEffect)
+        }
+    }
+
+    context(EntityComponentContext)
+    override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
+        entity.configure {
+            it += AutoMelting(activated = activated)
+        }
+    }
+
+    context(EntityComponentContext)
+    override fun remove(entity: Entity, level: Int, slot: ItemSlot) {
+        entity.configure {
+            it -= AutoMelting
         }
     }
 

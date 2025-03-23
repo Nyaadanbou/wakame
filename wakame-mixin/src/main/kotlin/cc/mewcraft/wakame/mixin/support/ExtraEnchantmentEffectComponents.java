@@ -30,8 +30,7 @@ import java.util.function.UnaryOperator;
  * }
  * </pre>
  */
-// FIXME #365: 改名 ExtraEnchantmentEffectComponents
-public class EnchantmentEffectComponentsPatch {
+public class ExtraEnchantmentEffectComponents {
 
     /**
      * 提供自定义属性.

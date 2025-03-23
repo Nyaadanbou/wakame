@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.enchantment2
 
+import cc.mewcraft.wakame.enchantment2.effect.EnchantmentListenerBasedEffect
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import cc.mewcraft.wakame.util.handle
@@ -14,17 +15,20 @@ import org.bukkit.inventory.ItemStack
 /**
  * 返回该魔咒的所有 *魔咒效果组件*.
  *
- * @see net.minecraft.world.item.enchantment.EnchantmentEffectComponents
- * @see cc.mewcraft.wakame.mixin.support.EnchantmentEffectComponentsPatch
+ * @see net.minecraft.world.item.enchantment.EnchantmentEffectComponents NMS 内置的魔咒效果组件
+ * @see cc.mewcraft.wakame.mixin.support.ExtraEnchantmentEffectComponents Koish 添加的魔咒效果组件
  */
-val Enchantment.effects: DataComponentMap
-    get() = handle.effects()
-
-fun <T> Enchantment.getEffects(type: DataComponentType<List<T>>): List<T> =
-    handle.getEffects(type)
+fun Enchantment.getEffectList(): DataComponentMap =
+    handle.effects()
 
 fun <T> Enchantment.getEffect(type: DataComponentType<T>): T? =
     handle.effects().get(type)
+
+fun <T> Enchantment.getEffectList(type: DataComponentType<List<T>>): List<T> =
+    handle.getEffects(type)
+
+fun Enchantment.getListenerBasedEffects(): Sequence<EnchantmentListenerBasedEffect> =
+    getEffectList().asSequence().map { it.value }.filterIsInstance<EnchantmentListenerBasedEffect>()
 
 /**
  * 返回该物品上非 [MINECRAFT_NAMESPACE] 命名空间下的 [Enchantment].

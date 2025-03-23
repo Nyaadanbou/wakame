@@ -2,20 +2,19 @@ package cc.mewcraft.wakame.enchantment2.system
 
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.enchantment2.getEffects
+import cc.mewcraft.wakame.enchantment2.getEffectList
 import cc.mewcraft.wakame.enchantment2.koishEnchantments
 import cc.mewcraft.wakame.item.logic.ItemSlotChanges
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.mixin.support.EnchantmentEffectComponentsPatch
+import cc.mewcraft.wakame.mixin.support.ExtraEnchantmentEffectComponents
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World
 
 /**
- * [cc.mewcraft.wakame.enchantment2.effect.EnchantmentAttributeEffect] 的运行逻辑.
- * 根据玩家背包里的物品变化来给玩家添加/移除相应的属性修饰器.
+ * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentAttributeEffect
  */
-object AttributeSystem : IteratingSystem(
+object EnchantmentAttributeSystem : IteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayerComponent, ItemSlotChanges) }
 ) {
 
@@ -33,8 +32,8 @@ object AttributeSystem : IteratingSystem(
             // 对于 prev (变化之前的物品), 我们需要从玩家身上 <移除> 其属性修饰器
             if (prev != null && ItemSlotChanges.testSlot(slot, prev.wrap())) {
                 prev.koishEnchantments.forEach { (enchant, level) ->
-                    enchant.getEffects(EnchantmentEffectComponentsPatch.ATTRIBUTES).forEach { attribute ->
-                        attribute.remove(level, slot, bukkitPlayer)
+                    enchant.getEffectList(ExtraEnchantmentEffectComponents.ATTRIBUTES).forEach { attribute ->
+                        attribute.remove(bukkitPlayer, level, slot)
                     }
                 }
             }
@@ -46,8 +45,8 @@ object AttributeSystem : IteratingSystem(
                 ItemSlotChanges.testDurability(curr)
             ) {
                 curr.koishEnchantments.forEach { (enchant, level) ->
-                    enchant.getEffects(EnchantmentEffectComponentsPatch.ATTRIBUTES).forEach { attribute ->
-                        attribute.apply(level, slot, bukkitPlayer)
+                    enchant.getEffectList(ExtraEnchantmentEffectComponents.ATTRIBUTES).forEach { attribute ->
+                        attribute.apply(bukkitPlayer, level, slot)
                     }
                 }
             }

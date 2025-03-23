@@ -13,13 +13,6 @@ import com.github.quillraven.fleks.World.Companion.family
 object Families {
 
     // ------------------------------
-    // 空 family, 用作占位符
-    // ------------------------------
-
-    @JvmField
-    val EMPTY: Family = family { }
-
-    // ------------------------------
     // 这些 family 为 Bukkit API 游戏实例在 ECS 下的唯一映射
     // 也就是说这些 family 里的每一个 entity, 都存在一个唯一的 Bukkit API 游戏实例与之对应
     // Bukkit API 游戏实例与这些 family 中的 ECS entity 是 one-to-one 的关系

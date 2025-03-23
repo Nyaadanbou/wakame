@@ -7,8 +7,7 @@ import net.minecraft.core.component.DataComponentType;
 
 import java.util.function.UnaryOperator;
 
-// FIXME #365: 改名 ExtraDataComponents
-public class DataComponentsPatch {
+public class ExtraDataComponents {
 
     /**
      * 用于储存 Koish 添加的自定义数据.

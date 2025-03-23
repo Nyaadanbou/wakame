@@ -14,11 +14,10 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 
-// 爆破挖矿: 每次挖掘有概率挖掘一定范围内的所有方块。
 /**
- *
+ * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentBlastMiningEffect
  */
-object BlastMiningSystem : ListenableIteratingSystem(
+object EnchantmentBlastMiningSystem : ListenableIteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayerComponent, BlastMining) }
 ) {
 

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.DataComponentsPatch;
+import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
@@ -37,6 +37,6 @@ public abstract class MixinItemStackInfo {
     private ItemStack modifyNewItemStack(ItemStack original) {
         // 发包时不发送 Koish 添加的 DataComponent
         // 注: 其实可以改发包实现, 但 Mixin 性能更好
-        return new ItemStack(item, count, components.forget(DataComponentsPatch::isCustomType));
+        return new ItemStack(item, count, components.forget(ExtraDataComponents::isCustomType));
     }
 }

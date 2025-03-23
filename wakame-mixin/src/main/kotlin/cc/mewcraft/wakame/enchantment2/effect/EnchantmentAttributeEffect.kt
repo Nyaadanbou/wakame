@@ -22,7 +22,7 @@ data class EnchantmentAttributeEffect(
     val attribute: Attribute,
     val amount: LevelBasedValue,
     val operation: AttributeModifier.Operation,
-) {
+) : EnchantmentSpecialEffect {
 
     companion object {
 
@@ -40,7 +40,7 @@ data class EnchantmentAttributeEffect(
 
     }
 
-    fun apply(level: Int, slot: ItemSlot, player: Player) {
+    fun apply(player: Player, level: Int, slot: ItemSlot) {
         val attributeMapResult = AttributeMapAccess.instance().get(player)
         attributeMapResult.fold(
             { map -> map.addTransientModifiers(makeAttributeMap(level, slot)) },
@@ -48,7 +48,7 @@ data class EnchantmentAttributeEffect(
         )
     }
 
-    fun remove(level: Int, slot: ItemSlot, player: Player) {
+    fun remove(player: Player, level: Int, slot: ItemSlot) {
         val attributeMapResult = AttributeMapAccess.instance().get(player)
         attributeMapResult.fold(
             { map -> map.removeModifiers(makeAttributeMap(level, slot)) },

@@ -11,8 +11,10 @@ import com.github.quillraven.fleks.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerItemDamageEvent
 
-// 易碎: 增加单次消耗的耐久度。
-object FragileSystem : ListenableIteratingSystem(
+/**
+ * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentFragileEffect
+ */
+object EnchantmentFragileSystem : ListenableIteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayerComponent, Fragile) }
 ) {
 
