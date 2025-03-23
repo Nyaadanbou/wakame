@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attribute.AttributeProvider
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 
-internal object AttributeCodec {
+object AttributeCodec {
 
     @JvmStatic
     val INSTANCE: Codec<Attribute> = Codec.STRING.comapFlatMap(this::read, Attribute::id).stable()

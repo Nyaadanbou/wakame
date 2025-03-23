@@ -10,6 +10,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 /**
  * 负责注册新的 {@link LootPoolEntryType}.
  */
+// FIXME #365: 改名 ExtraLootPoolEntries
 public class LootPoolEntriesPatch {
 
     public static final LootPoolEntryType KOISH_ITEM = register(

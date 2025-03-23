@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.util.StringIdentifiable
 import com.mojang.serialization.Codec
 
-internal object AttributeModifierOperationCodec {
+object AttributeModifierOperationCodec {
 
     @JvmStatic
     val INSTANCE: Codec<AttributeModifier.Operation> = StringIdentifiable.createCodec(AttributeModifier.Operation::values)

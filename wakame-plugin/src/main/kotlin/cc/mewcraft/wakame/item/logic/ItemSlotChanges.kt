@@ -2,23 +2,71 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.item.NekoStack
+import cc.mewcraft.wakame.item.component.ItemComponentTypes
+import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.item.damage
+import cc.mewcraft.wakame.util.item.isDamageable
+import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 data class ItemSlotChanges(
     private val items: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
 ) : Component<ItemSlotChanges> {
-    companion object : ComponentType<ItemSlotChanges>()
+
+    companion object : ComponentType<ItemSlotChanges>() {
+        /**
+         * 检查物品在“正确”的物品槽.
+         */
+        fun testSlot(slot: ItemSlot, nekoStack: NekoStack?): Boolean {
+            if (nekoStack == null) return false
+            return nekoStack.slotGroup.contains(slot)
+        }
+
+        /**
+         * 检查物品的等级小于等于玩家的冒险等级.
+         */
+        fun testLevel(player: Player, nekoStack: NekoStack?): Boolean {
+            if (nekoStack == null) {
+                return true // 如果不是萌芽物品, 那么玩家的等级一定高于该物品 (0)
+            }
+
+            val itemLevel = nekoStack.components.get(ItemComponentTypes.LEVEL)?.level
+            if (itemLevel == null) {
+                return true // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
+            }
+
+            val playerLevel = player.toUser().level
+            return itemLevel <= playerLevel
+        }
+
+        /**
+         * 检查物品没有损坏.
+         */
+        fun testDurability(itemStack: ItemStack): Boolean {
+            if (!itemStack.isDamageable) {
+                return true // 如果物品有“无法破坏”或耐久组件不完整, 那么认为物品没有耐久度, 应该返回 true
+            }
+
+            if (itemStack.damage >= itemStack.maxDamage) {
+                return false // 如果物品已经损坏, 那么应该返回 false
+            }
+
+            return true
+        }
+    }
 
     override fun type(): ComponentType<ItemSlotChanges> = ItemSlotChanges
 
     val changingItems: Collection<Entry>
-        get() = items.values.filter { it.changing }
+        get() = items.values.filter(Entry::changing)
 
     operator fun get(itemSlot: ItemSlot): Entry {
-        return items.computeIfAbsent(itemSlot) { Entry(itemSlot) }
+        return items.computeIfAbsent(itemSlot, ::Entry)
     }
 
     /**

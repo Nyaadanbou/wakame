@@ -1,15 +1,7 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ability.component.AbilityArchetypeComponent
-import cc.mewcraft.wakame.ability.component.AbilityComponent
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.ManaCost
-import cc.mewcraft.wakame.ability.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
-import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ability.component.*
+import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import com.github.quillraven.fleks.Family
@@ -19,6 +11,13 @@ import com.github.quillraven.fleks.World.Companion.family
  * 所有会长期使用到的 [Family] 都应该在此声明.
  */
 object Families {
+
+    // ------------------------------
+    // 空 family, 用作占位符
+    // ------------------------------
+
+    @JvmField
+    val EMPTY: Family = family { }
 
     // ------------------------------
     // 这些 family 为 Bukkit API 游戏实例在 ECS 下的唯一映射
