@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.context.abilityInput
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.data.CompoundTag
 import cc.mewcraft.wakame.util.data.getIntOrNull
@@ -156,7 +157,7 @@ private const val NBT_ABILITY_TRIGGER_VARIANT = "variant"
 private const val NBT_ABILITY_MANA_COST = "mana_cost"
 
 private fun CompoundTag.readTrigger(): AbilityTrigger? {
-    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries.ABILITY_TRIGGER[Identifiers.of(it)] }
+    return getStringOrNull(NBT_ABILITY_TRIGGER)?.let { KoishRegistries2.ABILITY_TRIGGER[Identifiers.of(it)] }
 }
 
 private fun CompoundTag.readVariant(): AbilityTriggerVariant {

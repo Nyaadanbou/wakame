@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.context
 
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerVariant
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.molang.Expression

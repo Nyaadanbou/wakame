@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.component.*
 import cc.mewcraft.wakame.ability.data.TickResult
+import cc.mewcraft.wakame.ability2.component.Blackhole
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent

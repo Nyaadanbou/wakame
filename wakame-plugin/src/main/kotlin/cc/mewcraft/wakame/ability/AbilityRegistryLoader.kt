@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ability
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerRegistryLoader
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init

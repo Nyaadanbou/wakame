@@ -10,7 +10,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 const val ADVENTURE_AUDIENCE_MESSAGE_SERIALIZERS = "adventure_audience_message_serializers"
 
-internal fun adventureModule(): Module = module {
+fun adventureModule(): Module = module {
     includes(
         adventureTextModule(),
         adventureTranslatorModule()

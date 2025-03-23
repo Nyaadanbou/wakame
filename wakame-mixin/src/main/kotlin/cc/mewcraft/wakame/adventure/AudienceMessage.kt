@@ -141,7 +141,7 @@ internal class SoundStopAudienceMessage(
  * (相关设置 ...)
  * ```
  */
-internal object CombinedAudienceMessageSerializer : TypeSerializer<AudienceMessage> {
+object CombinedAudienceMessageSerializer : TypeSerializer<AudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessageSerializer.deserialize(type, node)
@@ -166,7 +166,7 @@ internal object CombinedAudienceMessageSerializer : TypeSerializer<AudienceMessa
     }
 }
 
-internal object AudienceMessageGroupSerializer : TypeSerializer<AudienceMessageGroup> {
+object AudienceMessageGroupSerializer : TypeSerializer<AudienceMessageGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessageGroup {
         if (node.rawScalar() != null) {
             return AudienceMessageGroupImpl(listOf(node.require<AudienceMessage>()))

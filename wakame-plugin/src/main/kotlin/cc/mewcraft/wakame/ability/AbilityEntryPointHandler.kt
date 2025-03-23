@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.ability
 
 import cc.mewcraft.wakame.ability.combo.PlayerComboResult
-import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item.extension.playerAbilities
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.Cancellable
 import org.bukkit.event.player.PlayerInteractEvent
 import xyz.xenondevs.commons.collections.takeUnlessEmpty

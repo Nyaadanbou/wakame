@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ability.archetype.implement
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
-import cc.mewcraft.wakame.ability.component.Dash
+import cc.mewcraft.wakame.ability2.component.Dash
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.require
 import com.github.quillraven.fleks.Entity
@@ -35,6 +35,6 @@ private class DashInstance(
     val hitEffects: List<Ability>,
 ) : Ability(key, AbilityArchetypes.DASH, config) {
     override fun configuration(): EntityCreateContext.(Entity) -> Unit = {
-        it += Dash(stepDistance, duration, canContinueAfterHit, hitEffects)
+        it += Dash(stepDistance, duration, canContinueAfterHit)
     }
 }

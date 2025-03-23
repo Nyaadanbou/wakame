@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability.component
+package cc.mewcraft.wakame.ability2.component
 
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import com.github.quillraven.fleks.Component

@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ability.archetype.implement
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
-import cc.mewcraft.wakame.ability.component.Blackhole
+import cc.mewcraft.wakame.ability2.component.Blackhole
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.require

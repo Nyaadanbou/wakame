@@ -30,7 +30,7 @@ interface Expression {
     fun evaluate(): Double
 }
 
-internal object ExpressionSerializer : TypeSerializer<Expression> {
+object ExpressionSerializer : TypeSerializer<Expression> {
     override fun deserialize(type: Type, node: ConfigurationNode): Expression {
         val string = node.get<String>()
         val evalNumber = string?.toDoubleOrNull()
@@ -52,7 +52,7 @@ internal object ExpressionSerializer : TypeSerializer<Expression> {
 private data class StringEval(val value: String) : Expression {
     override fun evaluate(engine: MochaEngine<*>): Double = engine.eval(value)
     override fun evaluate(): Double {
-        val engine = MoLangSupport.createEngine()
+        val engine = MochaEngine.createStandard()
         return evaluate(engine)
     }
 

@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.ability.combo.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader
-import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer

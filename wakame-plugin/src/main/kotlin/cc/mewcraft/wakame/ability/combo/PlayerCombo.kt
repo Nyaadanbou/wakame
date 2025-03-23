@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability.combo
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.user.PlayerAdapters
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.adventure.toSimpleString

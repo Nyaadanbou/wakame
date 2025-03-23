@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.ability.system
 
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetypes
 import cc.mewcraft.wakame.ability.component.*
+import cc.mewcraft.wakame.ability2.component.MultiJump
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent

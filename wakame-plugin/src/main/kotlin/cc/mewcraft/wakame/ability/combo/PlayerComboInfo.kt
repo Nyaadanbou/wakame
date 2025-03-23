@@ -9,9 +9,9 @@ import cc.mewcraft.wakame.ability.component.AbilityComponent
 import cc.mewcraft.wakame.ability.component.CastBy
 import cc.mewcraft.wakame.ability.component.ManaCost
 import cc.mewcraft.wakame.ability.data.StatePhase
-import cc.mewcraft.wakame.ability.trigger.AbilitySequenceTrigger
-import cc.mewcraft.wakame.ability.trigger.AbilitySingleTrigger
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilitySequenceTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent

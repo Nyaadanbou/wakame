@@ -1,7 +1,22 @@
 package cc.mewcraft.wakame.serialization.configurate
 
+import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.*
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.AttributeModifierSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.ComponentSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.DispatchingTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.EntityTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.IntRangeSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.KeySerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.MaterialSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.NamespacedKeySerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.PotionEffectSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.StyleBuilderApplicableSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.StyleSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.UnitSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.Vector3fSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.holderByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -33,6 +48,7 @@ val KOISH_CONFIGURATE_SERIALIZERS_2: TypeSerializerCollection = TypeSerializerCo
     .register(Vector3fSerializer)
     // Bukkit Object
     .register(PotionEffectSerializer)
+    .register(ExpressionSerializer)
     // Bukkit Enum
     .register(EntityTypeSerializer)
     .register(MaterialSerializer)
@@ -43,6 +59,8 @@ val KOISH_CONFIGURATE_SERIALIZERS_2: TypeSerializerCollection = TypeSerializerCo
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
     // Koish Registry
+    .register(KoishRegistries2.ABILITY_META_TYPE.valueByNameTypeSerializer())
+    .register(KoishRegistries2.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .register(KoishRegistries2.ITEM.holderByNameTypeSerializer())
     .register(KoishRegistries2.ITEM_PROXY.holderByNameTypeSerializer())
     .build()

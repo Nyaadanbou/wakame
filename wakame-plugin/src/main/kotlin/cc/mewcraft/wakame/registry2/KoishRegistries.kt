@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
-import cc.mewcraft.wakame.ability.trigger.AbilityTrigger
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
@@ -35,12 +34,6 @@ object KoishRegistries {
      */
     @JvmField
     val ABILITY_ARCHETYPE: WritableRegistry<AbilityArchetype> = registerSimple(KoishRegistryKeys.ABILITY_ARCHETYPE)
-
-    /**
-     * 技能触发器.
-     */
-    @JvmField
-    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(KoishRegistryKeys.ABILITY_TRIGGER)
 
     /**
      * 属性.
