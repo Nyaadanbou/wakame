@@ -6,11 +6,20 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.ExtraCodecs
+import net.minecraft.world.item.enchantment.LevelBasedValue
 
 @JvmRecord
 data class EnchantmentBlastMiningEffect(
-    val explodeLevel: Int,
+    /**
+     * Explosion power. The more power = the more blocks (area) to explode.
+     */
+    val explosionPower: LevelBasedValue,
+    /**
+     * Minimal block hardness for the enchantment to have effect.
+     * Block hardness value is how long it takes to break the block by a hand.
+     * For example, a Stone has 3.0 hardness.
+     */
+    val minBlockHardness: LevelBasedValue,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
@@ -18,7 +27,8 @@ data class EnchantmentBlastMiningEffect(
         @JvmField
         val CODEC: Codec<EnchantmentBlastMiningEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
-                ExtraCodecs.intRange(1, 16).fieldOf("explode_level").forGetter(EnchantmentBlastMiningEffect::explodeLevel)
+                LevelBasedValue.CODEC.fieldOf("explosion_power").forGetter(EnchantmentBlastMiningEffect::explosionPower),
+                LevelBasedValue.CODEC.fieldOf("min_block_hardness").forGetter(EnchantmentBlastMiningEffect::minBlockHardness)
             ).apply(instance, ::EnchantmentBlastMiningEffect)
         }
 
@@ -27,7 +37,10 @@ data class EnchantmentBlastMiningEffect(
     context(EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
-            it += BlastMining(explodeLevel = explodeLevel)
+            it += BlastMining(
+                explosionPower.calculate(level),
+                minBlockHardness.calculate(level),
+            )
         }
     }
 
