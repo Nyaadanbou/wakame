@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.enchantment2.system
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
@@ -10,6 +9,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerItemDamageEvent
+import kotlin.math.ceil
 
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentFragileEffect
@@ -28,9 +28,7 @@ object EnchantmentFragileSystem : ListenableIteratingSystem(
         val playerEntity = player.koishify().unwrap()
         val fragile = playerEntity.getOrNull(Fragile) ?: return
 
-        event.damage = event.damage * fragile.multiplier
-
-        LOGGER.info("PlayerItemDamageEvent passed to FragileSystem")
+        event.damage = event.damage * ceil(fragile.multiplier).toInt()
     }
 
 }

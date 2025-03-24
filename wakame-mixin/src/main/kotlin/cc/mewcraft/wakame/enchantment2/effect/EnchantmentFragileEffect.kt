@@ -6,11 +6,11 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityComponentContext
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import net.minecraft.util.ExtraCodecs
+import net.minecraft.world.item.enchantment.LevelBasedValue
 
 @JvmRecord
 data class EnchantmentFragileEffect(
-    val multiplier: Int,
+    val multiplier: LevelBasedValue,
 ) : EnchantmentListenerBasedEffect {
 
     companion object {
@@ -18,7 +18,7 @@ data class EnchantmentFragileEffect(
         @JvmField
         val CODEC: Codec<EnchantmentFragileEffect> = RecordCodecBuilder.create { instance ->
             instance.group(
-                ExtraCodecs.intRange(1, 99).fieldOf("multiplier").forGetter(EnchantmentFragileEffect::multiplier)
+                LevelBasedValue.CODEC.fieldOf("multiplier").forGetter(EnchantmentFragileEffect::multiplier)
             ).apply(instance, ::EnchantmentFragileEffect)
         }
 
@@ -27,7 +27,9 @@ data class EnchantmentFragileEffect(
     context(EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
-            it += Fragile(multiplier = multiplier)
+            it += Fragile(
+                multiplier.calculate(level),
+            )
         }
     }
 

@@ -4,7 +4,7 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
 class Fragile(
-    val multiplier: Int,
+    val multiplier: Float,
 ) : Component<Fragile> {
 
     companion object : ComponentType<Fragile>()
