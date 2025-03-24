@@ -77,10 +77,11 @@ object Fleks : Listener {
             // ------------
 
             add(EnchantmentEffectApplier) // framework
-            add(EnchantmentAttributeSystem) // special
-            add(EnchantmentSmelterSystem) // listener-based
-            add(EnchantmentBlastMiningSystem) // listener-based
-            add(EnchantmentFragileSystem) // listener-based
+            add(EnchantmentAttributeSystem)
+            add(EnchantmentAntigravShotSystem)
+            add(EnchantmentSmelterSystem)
+            add(EnchantmentBlastMiningSystem)
+            add(EnchantmentFragileSystem)
 
             // ------------
             // 粒子

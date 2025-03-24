@@ -64,6 +64,13 @@ public class ExtraEnchantmentEffectComponents {
             "koish:veinminer", builder -> builder.persistent(EnchantmentVeinminerEffect.CODEC)
     );
 
+    /**
+     * 玩家射出的弹射物不受重力影响.
+     */
+    public static final DataComponentType<EnchantmentAntigravShotEffect> ANTIGRAV_SHOT = register(
+            "koish:antigrav_shot", builder -> builder.persistent(EnchantmentAntigravShotEffect.CODEC)
+    );
+
     public static void bootstrap() {
         // 用于初始化静态变量
     }
