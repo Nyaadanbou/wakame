@@ -78,7 +78,7 @@ object Fleks : Listener {
 
             add(EnchantmentEffectApplier) // framework
             add(EnchantmentAttributeSystem) // special
-            add(EnchantmentAutoMeltingSystem) // listener-based
+            add(EnchantmentSmelterSystem) // listener-based
             add(EnchantmentBlastMiningSystem) // listener-based
             add(EnchantmentFragileSystem) // listener-based
 

@@ -39,8 +39,8 @@ public class ExtraEnchantmentEffectComponents {
     /**
      * 如果目标方块可烧炼, 挖掘后掉落熔炼后的物品.
      */
-    public static final DataComponentType<EnchantmentAutoMeltingEffect> AUTO_MELTING = register(
-            "koish:auto_melting", builder -> builder.persistent(EnchantmentAutoMeltingEffect.CODEC)
+    public static final DataComponentType<EnchantmentSmelterEffect> SMELTER = register(
+            "koish:smelter", builder -> builder.persistent(EnchantmentSmelterEffect.CODEC)
     );
 
     /**
