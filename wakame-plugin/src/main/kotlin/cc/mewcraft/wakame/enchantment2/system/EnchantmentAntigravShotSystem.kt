@@ -16,7 +16,7 @@ object EnchantmentAntigravShotSystem : ListenableIteratingSystem(
 ) {
 
     override fun onTickEntity(entity: Entity) {
-
+        // 无操作
     }
 
     @EventHandler
