@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.enchantment2.system
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
@@ -34,9 +33,6 @@ object EnchantmentSmelterSystem : ListenableIteratingSystem(
         val player = event.player
         val playerEntity = player.koishify().unwrap()
         val smelter = playerEntity.getOrNull(Smelter) ?: return
-
-        LOGGER.info("BlockDropItemEvent passed to EnchantmentSmelterSystem")
-
         if (smelter.disableOnCrouch && player.isSneaking) return
         val blockState = event.blockState
         if (blockState is Container) return
