@@ -4,9 +4,7 @@ import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemSlot
-import cc.mewcraft.wakame.mixin.support.codec.AttributeCodec
-import cc.mewcraft.wakame.mixin.support.codec.AttributeModifierOperationCodec
-import cc.mewcraft.wakame.mixin.support.codec.IdentifierCodec
+import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.HashMultimap
 import com.mojang.logging.LogUtils
@@ -29,10 +27,10 @@ data class EnchantmentAttributeEffect(
         @JvmField
         val CODEC: MapCodec<EnchantmentAttributeEffect> = RecordCodecBuilder.mapCodec { instance ->
             instance.group(
-                IdentifierCodec.INSTANCE.fieldOf("id").forGetter(EnchantmentAttributeEffect::id),
-                AttributeCodec.INSTANCE.fieldOf("attribute").forGetter(EnchantmentAttributeEffect::attribute),
+                KoishCodecs.IDENTIFIER.fieldOf("id").forGetter(EnchantmentAttributeEffect::id),
+                KoishCodecs.ATTRIBUTE.fieldOf("attribute").forGetter(EnchantmentAttributeEffect::attribute),
                 LevelBasedValue.CODEC.fieldOf("amount").forGetter(EnchantmentAttributeEffect::amount),
-                AttributeModifierOperationCodec.INSTANCE.fieldOf("operation").forGetter(EnchantmentAttributeEffect::operation)
+                KoishCodecs.ATTRIBUTE_MODIFIER_OPERATION.fieldOf("operation").forGetter(EnchantmentAttributeEffect::operation)
             ).apply(instance, ::EnchantmentAttributeEffect)
         }
 
@@ -41,16 +39,14 @@ data class EnchantmentAttributeEffect(
     }
 
     fun apply(player: Player, level: Int, slot: ItemSlot) {
-        val attributeMapResult = AttributeMapAccess.instance().get(player)
-        attributeMapResult.fold(
+        AttributeMapAccess.instance().get(player).fold(
             { map -> map.addTransientModifiers(makeAttributeMap(level, slot)) },
             { ex -> LOGGER.error("Failed to apply attribute modifier to player: ${ex.message}") }
         )
     }
 
     fun remove(player: Player, level: Int, slot: ItemSlot) {
-        val attributeMapResult = AttributeMapAccess.instance().get(player)
-        attributeMapResult.fold(
+        AttributeMapAccess.instance().get(player).fold(
             { map -> map.removeModifiers(makeAttributeMap(level, slot)) },
             { ex -> LOGGER.error("Failed to remove attribute modifier from player: ${ex.message}") }
         )

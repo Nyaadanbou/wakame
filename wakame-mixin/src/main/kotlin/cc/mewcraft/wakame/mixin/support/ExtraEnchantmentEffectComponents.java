@@ -1,9 +1,6 @@
 package cc.mewcraft.wakame.mixin.support;
 
-import cc.mewcraft.wakame.enchantment2.effect.EnchantmentAttributeEffect;
-import cc.mewcraft.wakame.enchantment2.effect.EnchantmentAutoMeltingEffect;
-import cc.mewcraft.wakame.enchantment2.effect.EnchantmentBlastMiningEffect;
-import cc.mewcraft.wakame.enchantment2.effect.EnchantmentFragileEffect;
+import cc.mewcraft.wakame.enchantment2.effect.*;
 import cc.mewcraft.wakame.mixin.core.InvokerEnchantmentEffectComponents;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -58,6 +55,13 @@ public class ExtraEnchantmentEffectComponents {
      */
     public static final DataComponentType<EnchantmentFragileEffect> FRAGILE = register(
             "koish:fragile", builder -> builder.persistent(EnchantmentFragileEffect.CODEC)
+    );
+
+    /**
+     * 挖掘矿物时, 自动挖掘与其相邻的同种矿物.
+     */
+    public static final DataComponentType<EnchantmentVeinminerEffect> VEINMINER = register(
+            "koish:veinminer", builder -> builder.persistent(EnchantmentVeinminerEffect.CODEC)
     );
 
     public static void bootstrap() {
