@@ -322,7 +322,7 @@ private object ItemRefManager {
         while (iter.hasNext()) {
             val (id, ref) = iter.next()
             val handler = getHandler(id)
-            if (ref.handler != null) {
+            if (handler != null) {
                 // 找到了支持的 handler, 分配给这个 ref
                 ref.handler = handler
                 // 将 ref 放入已检查集合中, 并从未检查集合移除
