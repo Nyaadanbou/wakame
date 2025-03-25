@@ -3,8 +3,12 @@ package cc.mewcraft.wakame.ability2.component
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Required
 
+@ConfigSerializable
 data class MultiJump(
+    @Required
     var count: Int,
     var jumpedMessages: AudienceMessageGroup,
 ) : Component<MultiJump> {

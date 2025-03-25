@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
@@ -52,10 +50,6 @@ interface LevelBarrier : ItemBehavior {
         }
 
         override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
-            tryCancelEvent(itemStack, koishStack, player, event)
-        }
-
-        override fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
             tryCancelEvent(itemStack, koishStack, player, event)
         }
 

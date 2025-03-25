@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.user.toUser
 import com.github.quillraven.fleks.Entity
@@ -38,7 +37,8 @@ class ItemSlotChangeMonitor : IteratingSystem(
             val entry = entity[ItemSlotChanges][slot]
             entry.update(curr) // TODO 优化这里的性能
             if (entry.changing) {
-                PlayerItemSlotChangeEvent(bukkitPlayer, slot, entry.previous, entry.current).callEvent()
+                // TODO: 支持新的 ItemSlot
+                // PlayerItemSlotChangeEvent(bukkitPlayer, slot, entry.previous, entry.current).callEvent()
             }
         }
     }

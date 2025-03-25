@@ -1,5 +1,12 @@
 package cc.mewcraft.wakame.ability2.trigger
 
+import cc.mewcraft.wakame.util.typeTokenOf
+import org.spongepowered.configurate.ConfigurationOptions
+import org.spongepowered.configurate.serialize.ScalarSerializer
+import org.spongepowered.configurate.serialize.SerializationException
+import java.lang.reflect.Type
+import java.util.function.Predicate
+
 /**
  * 代表一个可以触发此技能的物品变体.
  *
@@ -15,6 +22,9 @@ interface AbilityTriggerVariant {
     val id: Int
 
     companion object {
+
+        val SERIALIZER: ScalarSerializer<AbilityTriggerVariant> = AbilityTriggerVariantSerializer
+
         /**
          * 返回一个代表任意 [AbilityTriggerVariant] 的实例.
          */
@@ -36,5 +46,28 @@ interface AbilityTriggerVariant {
 
     private data object Any : AbilityTriggerVariant {
         override val id: Int = -1 // magic value
+    }
+}
+
+/**
+ * [AbilityTriggerVariant] 的序列化器.
+ */
+private object AbilityTriggerVariantSerializer : ScalarSerializer<AbilityTriggerVariant>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): AbilityTriggerVariant {
+        val value = obj.toString()
+
+        try {
+            return AbilityTriggerVariant.of(value.toInt())
+        } catch (ex: NumberFormatException) {
+            throw SerializationException(ex)
+        }
+    }
+
+    override fun serialize(item: AbilityTriggerVariant, typeSupported: Predicate<Class<*>>): Any {
+        return item.id.toString()
+    }
+
+    override fun emptyValue(specificType: Type, options: ConfigurationOptions): AbilityTriggerVariant {
+        return AbilityTriggerVariant.any()
     }
 }

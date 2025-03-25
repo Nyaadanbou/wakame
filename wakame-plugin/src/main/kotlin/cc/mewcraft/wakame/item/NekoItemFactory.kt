@@ -93,7 +93,6 @@ object VanillaNekoItemFactory {
             tryAdd("level", ItemTemplateTypes.LEVEL, Validator.restricted { cfg -> cfg.isConstant }) // LEVEL 必须使用固定值
             tryAdd("lore", ItemTemplateTypes.LORE)
             tryAdd("max_damage", ItemTemplateTypes.MAX_DAMAGE, Validator.unsupported())
-            tryAdd("player_ability", ItemTemplateTypes.PLAYER_ABILITY)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE, Validator.unsupported())
             tryAdd("rarity", ItemTemplateTypes.RARITY, Validator.restricted { cfg -> cfg.isStatic }) // RARITY 必须使用固定值
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS, Validator.unsupported())
@@ -190,7 +189,6 @@ object StandardNekoItemFactory {
             tryAdd("slot_display_dict", ItemTemplateTypes.SLOT_DISPLAY_DICT)
             tryAdd("slot_display_lore", ItemTemplateTypes.SLOT_DISPLAY_LORE)
             tryAdd("slot_display_name", ItemTemplateTypes.SLOT_DISPLAY_NAME)
-            tryAdd("player_ability", ItemTemplateTypes.PLAYER_ABILITY)
             tryAdd("portable_core", ItemTemplateTypes.PORTABLE_CORE)
             tryAdd("rarity", ItemTemplateTypes.RARITY)
             tryAdd("stored_enchantments", ItemTemplateTypes.STORED_ENCHANTMENTS)

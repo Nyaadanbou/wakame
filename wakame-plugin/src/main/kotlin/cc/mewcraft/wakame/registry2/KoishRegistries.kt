@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.archetype.AbilityArchetype
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeSupplier
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMap
@@ -22,18 +20,6 @@ object KoishRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
 
     ///
-
-    /**
-     * 技能实例.
-     */
-    @JvmField
-    val ABILITY: WritableRegistry<Ability> = registerSimple(KoishRegistryKeys.ABILITY)
-
-    /**
-     * 技能原型.
-     */
-    @JvmField
-    val ABILITY_ARCHETYPE: WritableRegistry<AbilityArchetype> = registerSimple(KoishRegistryKeys.ABILITY_ARCHETYPE)
 
     /**
      * 属性.

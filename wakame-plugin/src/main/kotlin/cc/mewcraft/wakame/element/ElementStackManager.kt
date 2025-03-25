@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.element
 
-import cc.mewcraft.wakame.ability.component.CastBy
-import cc.mewcraft.wakame.ability.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.component.TickCountComponent

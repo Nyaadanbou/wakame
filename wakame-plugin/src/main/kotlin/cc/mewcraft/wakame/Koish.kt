@@ -34,6 +34,7 @@ internal object Koish : JavaPlugin(), IKoish {
         Initializer.registerEvents()
         ItemXBootstrap.init()
         KoishProvider.register(this)
+        KoishHolder.INSTANCE = this
 
         LIFECYCLE_MANAGER = lifecycleManager
         PLUGIN_READY = true

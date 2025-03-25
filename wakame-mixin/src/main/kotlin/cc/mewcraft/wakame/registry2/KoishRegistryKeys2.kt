@@ -22,7 +22,7 @@ object KoishRegistryKeys2 {
     val ABILITY_META = createRegistryKey<AbilityMeta>("ability_meta")
 
     @JvmField
-    val ABILITY_META_TYPE = createRegistryKey<AbilityMetaType<*, *>>("ability_meta")
+    val ABILITY_META_TYPE = createRegistryKey<AbilityMetaType<*>>("ability_meta")
 
     @JvmField
     val ABILITY_TRIGGER = createRegistryKey<AbilityTrigger>("ability_trigger")

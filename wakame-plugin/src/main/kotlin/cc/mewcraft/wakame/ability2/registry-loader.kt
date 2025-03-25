@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaContainer
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
+import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
+import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -16,12 +18,15 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
     .registerAll(AbilityMetaContainer.makeSerializers())
+    .register(AudienceMessageGroupSerializer)
+    .register(CombinedAudienceMessageSerializer)
     .build()
 
 /**

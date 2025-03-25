@@ -36,7 +36,7 @@ object KoishRegistries2 {
      * 技能配置的类型.
      */
     @JvmField
-    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*, *>> = registerSimple(KoishRegistryKeys2.ABILITY_META_TYPE)
+    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(KoishRegistryKeys2.ABILITY_META_TYPE)
 
     /**
      * 技能触发器.

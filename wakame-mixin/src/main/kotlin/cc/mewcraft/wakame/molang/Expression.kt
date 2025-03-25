@@ -41,6 +41,12 @@ object ExpressionSerializer : TypeSerializer<Expression> {
         return evalString ?: throw IllegalArgumentException("Cannot deserialize Expression from ${node.path()}")
     }
 
+    override fun serialize(type: Type, obj: Expression?, node: ConfigurationNode) {
+        if (obj == null)
+            return
+        node.set(obj.asString())
+    }
+
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): Expression {
         return Expression.of(0)
     }

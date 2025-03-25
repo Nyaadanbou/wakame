@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.ability.Ability
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
@@ -187,9 +185,9 @@ interface NekoStack : Examinable {
         behaviors.forEach { it.handleConsume(player, itemStack, koishStack, event) }
     }
 
-    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
-        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, koishStack, ability, event) }
-    }
+//    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
+//        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, koishStack, ability, event) }
+//    }
     //</editor-fold>
 }
 

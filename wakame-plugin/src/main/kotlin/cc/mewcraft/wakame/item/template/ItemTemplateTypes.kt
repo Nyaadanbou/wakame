@@ -1,8 +1,37 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.item.ItemConstants
-import cc.mewcraft.wakame.item.templates.archetype.ItemPlayerAbilityArchetype
-import cc.mewcraft.wakame.item.templates.components.*
+import cc.mewcraft.wakame.item.templates.components.ArmorTrim
+import cc.mewcraft.wakame.item.templates.components.Castable
+import cc.mewcraft.wakame.item.templates.components.CustomName
+import cc.mewcraft.wakame.item.templates.components.DamageResistant
+import cc.mewcraft.wakame.item.templates.components.ExtraLore
+import cc.mewcraft.wakame.item.templates.components.FoodProperties
+import cc.mewcraft.wakame.item.templates.components.HideAdditionalTooltip
+import cc.mewcraft.wakame.item.templates.components.HideTooltip
+import cc.mewcraft.wakame.item.templates.components.ItemAdventurePredicate
+import cc.mewcraft.wakame.item.templates.components.ItemArrow
+import cc.mewcraft.wakame.item.templates.components.ItemAttack
+import cc.mewcraft.wakame.item.templates.components.ItemAttackSpeed
+import cc.mewcraft.wakame.item.templates.components.ItemAttributeModifiers
+import cc.mewcraft.wakame.item.templates.components.ItemCells
+import cc.mewcraft.wakame.item.templates.components.ItemCrate
+import cc.mewcraft.wakame.item.templates.components.ItemDamage
+import cc.mewcraft.wakame.item.templates.components.ItemDyeColor
+import cc.mewcraft.wakame.item.templates.components.ItemElements
+import cc.mewcraft.wakame.item.templates.components.ItemEnchantments
+import cc.mewcraft.wakame.item.templates.components.ItemGlowable
+import cc.mewcraft.wakame.item.templates.components.ItemKizamiz
+import cc.mewcraft.wakame.item.templates.components.ItemLevel
+import cc.mewcraft.wakame.item.templates.components.ItemMaxDamage
+import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.item.templates.components.ItemRarity
+import cc.mewcraft.wakame.item.templates.components.ItemTownFlight
+import cc.mewcraft.wakame.item.templates.components.PortableCore
+import cc.mewcraft.wakame.item.templates.components.Tool
+import cc.mewcraft.wakame.item.templates.components.Unbreakable
+import cc.mewcraft.wakame.item.templates.components.WorldTimeControl
+import cc.mewcraft.wakame.item.templates.components.WorldWeatherControl
 import cc.mewcraft.wakame.item.templates.virtual.ItemSlotDisplayDict
 import cc.mewcraft.wakame.item.templates.virtual.ItemSlotDisplayLore
 import cc.mewcraft.wakame.item.templates.virtual.ItemSlotDisplayName
@@ -170,12 +199,6 @@ object ItemTemplateTypes {
      */
     @JvmField
     val SLOT_DISPLAY_DICT: ItemTemplateType<ItemSlotDisplayDict> = ItemSlotDisplayDict.codec(ItemConstants.SLOT_DISPLAY_DICT).register()
-
-    /**
-     * 组件: [cc.mewcraft.wakame.item.components.ItemPlayerAbility]
-     */
-    @JvmField
-    val PLAYER_ABILITY: ItemTemplateType<ItemPlayerAbilityArchetype> = ItemPlayerAbilityArchetype.codec(ItemConstants.PLAYER_ABILITY).register()
 
     /**
      * 组件: [cc.mewcraft.wakame.item.components.PortableCore]

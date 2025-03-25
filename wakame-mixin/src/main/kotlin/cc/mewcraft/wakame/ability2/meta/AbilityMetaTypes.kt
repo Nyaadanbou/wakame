@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.ability2.meta
 
+import cc.mewcraft.wakame.ability2.component.Blink
 import cc.mewcraft.wakame.ability2.component.MultiJump
-import cc.mewcraft.wakame.ability2.meta.impl.MetaMultiJump
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.typeTokenOf
+import com.github.quillraven.fleks.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 object AbilityMetaTypes {
@@ -13,7 +14,10 @@ object AbilityMetaTypes {
     // ------------
 
     @JvmField
-    val MULTI_JUMP: AbilityMetaType<MetaMultiJump, MultiJump> = typeOf("multi_jump")
+    val BLINK: AbilityMetaType<Blink> = typeOf("blink")
+
+    @JvmField
+    val MULTI_JUMP: AbilityMetaType<MultiJump> = typeOf("multi_jump")
 
     // ------------
     // 方便函数
@@ -23,8 +27,8 @@ object AbilityMetaTypes {
      * @param id 将作为注册表中的 ID
      * @param block 用于配置 [AbilityMetaType]
      */
-    private inline fun <reified U : AbilityMetaEntry<V>, V> typeOf(id: String, block: AbilityMetaType.Builder<U, V>.() -> Unit = {}): AbilityMetaType<U, V> {
-        val type = AbilityMetaType.builder<U, V>(typeTokenOf<U>()).apply(block).build()
+    private inline fun <reified V : Component<V>> typeOf(id: String, block: AbilityMetaType.Builder<V>.() -> Unit = {}): AbilityMetaType<V> {
+        val type = AbilityMetaType.builder<V>(typeTokenOf<V>()).apply(block).build()
         return type.also { KoishRegistries2.ABILITY_META_TYPE.add(id, it) }
     }
 

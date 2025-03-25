@@ -1,12 +1,11 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.ability.Ability
-import cc.mewcraft.wakame.ability.context.abilityInput
+import cc.mewcraft.wakame.ability2.AbilityCastManager
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.command.parser.AbilityParser
-import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.command.parser.AbilityMetaParser
 import org.incendo.cloud.bukkit.data.SingleEntitySelector
 import org.incendo.cloud.bukkit.data.SinglePlayerSelector
 import org.incendo.cloud.bukkit.parser.selector.SingleEntitySelectorParser
@@ -26,19 +25,18 @@ internal object AbilityCommand : KoishCommandFactory<Source> {
         buildAndAdd(commonBuilder) {
             literal("cast")
             required("caster", SinglePlayerSelectorParser.singlePlayerSelectorParser())
-            required("ability", AbilityParser.abilityParser())
+            required("ability", AbilityMetaParser.abilityMetaParser())
             optional("target", SingleEntitySelectorParser.singleEntitySelectorParser())
             koishHandler(handler = ::handleCastAbilityAtTarget)
         }
     }
 
     private fun handleCastAbilityAtTarget(context: CommandContext<Source>) {
-        val ability = context.get<Ability>("ability")
+        val ability = context.get<AbilityMeta>("ability")
         val casterPlayer = context.get<SinglePlayerSelector>("caster").single()
-        val caster = casterPlayer.koishify()
-        val target = context.getOrNull<SingleEntitySelector>("target")?.single()?.koishify() ?: caster
-        val input = abilityInput(caster, target)
-        ability.cast(input)
+        val caster = casterPlayer
+        val target = context.getOrNull<SingleEntitySelector>("target")?.single() ?: caster
+        AbilityCastManager.castMeta(ability, caster, target)
     }
 
 }

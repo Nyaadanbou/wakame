@@ -10,6 +10,7 @@ class AbilityMeta(
     val id: Identifier,
     val dataConfig: AbilityMetaContainer,
 ) : Examinable {
+
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
         ExaminableProperty.of("id", id),
     )
