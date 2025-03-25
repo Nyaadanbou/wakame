@@ -13,6 +13,11 @@ import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
+/**
+ * 代表所有技能的配置. 一个配置可包含多个技能.
+ *
+ * 包含了所有需要添加到 Ecs 世界中的组件.
+ */
 sealed interface AbilityMetaContainer : Iterable<AbilityMetaType<*>> {
 
     companion object {

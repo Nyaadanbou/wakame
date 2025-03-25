@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ability2.SingleAbility
+import cc.mewcraft.wakame.ability2.AbilityInfo
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
-import cc.mewcraft.wakame.molang.Expression
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
@@ -20,16 +19,13 @@ data class AbilityContainer(
 
     override fun type(): ComponentType<AbilityContainer> = AbilityContainer
 
-    fun convertToSingleAbilityList(): List<SingleAbility> {
+    fun convertToSingleAbilityList(): List<AbilityInfo> {
         val abilityEntities = abilities.values().map(::KoishEntity)
         val playerAbilities = abilityEntities.map { koishEntity ->
             val abilityComponent = koishEntity[AbilityComponent]
-            val manaCost = koishEntity.getOrNull(ManaCost)?.manaCost ?: Expression.of(0)
-            SingleAbility(
+            AbilityInfo(
                 metaType = abilityComponent.metaType,
-                trigger = abilityComponent.trigger,
-                variant = abilityComponent.variant,
-                manaCost = manaCost
+                trigger = abilityComponent.trigger
             )
         }
         return playerAbilities

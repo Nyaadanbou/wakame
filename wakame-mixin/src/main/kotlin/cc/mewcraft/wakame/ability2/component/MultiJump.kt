@@ -6,8 +6,9 @@ import com.github.quillraven.fleks.ComponentType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Required
 
+@ConsistentCopyVisibility
 @ConfigSerializable
-data class MultiJump(
+data class MultiJump private constructor(
     @Required
     var count: Int,
     var jumpedMessages: AudienceMessageGroup,

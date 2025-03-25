@@ -6,6 +6,9 @@ import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import java.util.stream.Stream
 
+/**
+ * 代表一个技能的**配置**.
+ */
 class AbilityMeta(
     val id: Identifier,
     val dataConfig: AbilityMetaContainer,

@@ -29,7 +29,6 @@ object AbilityEcsBridge {
         for (metaType in ability.meta.dataConfig) {
             val entity = Fleks.createEntity { entity ->
                 entity += AbilityComponent(
-                    createdBy = ability.meta,
                     metaType = metaType,
                     phase = phase,
                     trigger = ability.trigger,
@@ -60,7 +59,6 @@ object AbilityEcsBridge {
         for (metaType in ability.dataConfig) {
             val entity = Fleks.createEntity { entity ->
                 entity += AbilityComponent(
-                    createdBy = ability,
                     metaType = metaType,
                     phase = phase,
                     trigger = null,
@@ -79,7 +77,7 @@ object AbilityEcsBridge {
         }
     }
 
-    fun getPlayerAllSingleAbilities(bukkitPlayer: BukkitPlayer): List<SingleAbility> {
+    fun getPlayerAllSingleAbilities(bukkitPlayer: BukkitPlayer): List<AbilityInfo> {
         return bukkitPlayer.koishify()[AbilityContainer].convertToSingleAbilityList()
     }
 }

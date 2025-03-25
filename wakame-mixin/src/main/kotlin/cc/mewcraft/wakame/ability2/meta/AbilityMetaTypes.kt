@@ -27,8 +27,8 @@ object AbilityMetaTypes {
      * @param id 将作为注册表中的 ID
      * @param block 用于配置 [AbilityMetaType]
      */
-    private inline fun <reified V : Component<V>> typeOf(id: String, block: AbilityMetaType.Builder<V>.() -> Unit = {}): AbilityMetaType<V> {
-        val type = AbilityMetaType.builder<V>(typeTokenOf<V>()).apply(block).build()
+    private inline fun <reified T : Component<T>> typeOf(id: String, block: AbilityMetaType.Builder<T>.() -> Unit = {}): AbilityMetaType<T> {
+        val type = AbilityMetaType.builder<T>(typeTokenOf<T>()).apply(block).build()
         return type.also { KoishRegistries2.ABILITY_META_TYPE.add(id, it) }
     }
 
