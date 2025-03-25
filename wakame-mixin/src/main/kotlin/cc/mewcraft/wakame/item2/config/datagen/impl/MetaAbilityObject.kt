@@ -11,17 +11,14 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 data class MetaAbilityObject(
-    @Required
     @Setting("id")
     val meta: AbilityMeta,
     val trigger: AbilityTrigger?,
     val variant: AbilityTriggerVariant,
-    @Setting("mana_cost")
     val manaCost: Expression?,
 ) : ItemMetaEntry<AbilityObject> {
 
