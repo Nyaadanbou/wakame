@@ -44,6 +44,9 @@ internal object DamageListener {
                 return@event
             }
 
+            // TODO #365: 需要在这里支持修改传入 DamageManager.generateDamageMetadata 的 AttributeMap 才能实现剩下关于伤害的魔咒效果.
+            //  这个也可以被修改箭矢伤害的系统使用
+
             val damageMetadata = DamageManager.generateDamageMetadata(event)
             if (damageMetadata == null) {
                 event.isCancelled = true
