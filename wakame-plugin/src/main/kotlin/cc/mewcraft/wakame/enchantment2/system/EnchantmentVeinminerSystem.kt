@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ecs.component.EntityPlayer
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import cc.mewcraft.wakame.enchantment2.component.Veinminer
 import cc.mewcraft.wakame.enchantment2.component.VeinminerChild
-import cc.mewcraft.wakame.util.adventure.sound
+import cc.mewcraft.wakame.util.adventure.playSound
 import cc.mewcraft.wakame.util.serverTick
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.World
@@ -33,17 +33,15 @@ object EnchantmentVeinminerSystem : ListenableIteratingSystem(
         BlockFace.DOWN,
     )
 
-    private val runningBlock: ThreadLocal<Block> = ThreadLocal()
+    @JvmStatic
+    val runningBlock: ThreadLocal<Block> = ThreadLocal()
 
     override fun onTickEntity(entity: Entity) {
         if (serverTick % 2 == 0) return // 慢一点儿, 避免音效过于密集
 
-        val entityPlayer = entity[EntityPlayer].entityOrNull
-        if (entityPlayer == null) {
-            entity.remove(); return
-        }
-        if (!entityPlayer.has(Veinminer)) {
-            entity.remove(); return
+        val entityPlayer = entity[EntityPlayer]()
+        if (entityPlayer == null || entityPlayer.has(Veinminer) == false) {
+            entity.remove(); return // 玩家离线或失去该魔咒, 停止连锁采矿效果
         }
 
         // BFS
@@ -51,7 +49,7 @@ object EnchantmentVeinminerSystem : ListenableIteratingSystem(
         val veinminerChild = entity[VeinminerChild]
         val queue = veinminerChild.queue
         if (queue.isEmpty() || veinminerChild.currentCount++ > veinminerChild.maximumCount) {
-            entity.remove(); return
+            entity.remove(); return // 整个矿脉已遍历完毕或达到遍历次数上限
         }
 
         val bukkitPlayer = entity[BukkitPlayerComponent]()
@@ -59,13 +57,15 @@ object EnchantmentVeinminerSystem : ListenableIteratingSystem(
 
         this.runningBlock.set(bukkitBlock)
         bukkitPlayer.breakBlock(bukkitBlock)
+        // ... 这里将接着执行 BlockBreakEvent 的逻辑
         this.runningBlock.remove()
 
-        if (!queue.isEmpty()) { // 不播放第一个方块的音效 (第一个方块是玩家自己破坏掉的方块, 音效已经播放)
-            bukkitPlayer.playSound(sound {
-                type(entity[Veinminer].blockBreakSound)
+        if (!queue.isEmpty()) { // 不播放第一个方块的特效 (第一个方块是玩家自己破坏掉的方块, 特效已经播放)
+            val veinminer = entity[Veinminer]
+            bukkitPlayer.playSound(bukkitBlock.location) {
+                type(veinminer.blockBreakSound)
                 source(Sound.Source.BLOCK)
-            }, bukkitBlock.x + 0.5, bukkitBlock.y + 0.5, bukkitBlock.z + 0.5)
+            }
         }
 
         val visited = veinminerChild.visited
@@ -81,12 +81,12 @@ object EnchantmentVeinminerSystem : ListenableIteratingSystem(
     @EventHandler
     fun on(event: BlockBreakEvent) {
         val block = event.block
-        if (block == this.runningBlock.get()) return
-
+        if (block == this.runningBlock.get()) return // 禁止 Veinminer 破坏的方块再次触发 Veinminer
+        //if (block == EnchantmentBlastMiningSystem.runningBlock.get()) return // 禁止 BlastMining 破坏的方块触发 Veinminer
         val player = event.player
+        if (player.isSneaking) return // 潜行时不触发该魔咒效果
         val playerEntity = player.koishify().unwrap()
         val veinminer = playerEntity.getOrNull(Veinminer) ?: return
-
         val allowedBlockTypes = veinminer.allowedBlockTypes
         if (block.type !in allowedBlockTypes) return
 

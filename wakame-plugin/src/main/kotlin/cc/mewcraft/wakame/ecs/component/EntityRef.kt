@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.ecs.component
 
-// TODO #365: 添加一些通用的用于存放 ecs entity 的 component
-interface EntityRef {
+import cc.mewcraft.wakame.ecs.Fleks
+import com.github.quillraven.fleks.Entity
+
+abstract class EntityRef(private val entity: Entity) {
+    private val entityOrNull: Entity? get() = entity.takeIf<Entity>(Fleks.world::contains)
+    operator fun invoke(): Entity? = entityOrNull
 }

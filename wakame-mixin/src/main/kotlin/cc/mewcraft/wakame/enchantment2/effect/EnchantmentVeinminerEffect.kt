@@ -19,6 +19,7 @@ data class EnchantmentVeinminerEffect(
     val allowedBlockTypes: Set<Material>,
     val blockBreakSound: Identifier,
 ) : EnchantmentListenerBasedEffect {
+
     companion object {
 
         @JvmField
