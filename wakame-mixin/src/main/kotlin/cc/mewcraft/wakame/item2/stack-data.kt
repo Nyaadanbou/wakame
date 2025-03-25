@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
+import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
@@ -90,7 +90,7 @@ val MojangStack.koishItem: KoishItem?
  * @see removeData
  */
 fun MojangStack.koishData(includeProxy: Boolean): ItemDataContainer? =
-    get(DataComponentsPatch.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
+    get(ExtraDataComponents.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
 
 /**
  * 获取该物品类型的套皮物品的实例.
@@ -128,7 +128,7 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T?
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     val oldVal = builder.set(type, value)
-    set(DataComponentsPatch.DATA_CONTAINER, builder.build())
+    set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
 }
 
@@ -141,7 +141,7 @@ fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
 fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     val oldVal = builder.remove(type)
-    set(DataComponentsPatch.DATA_CONTAINER, builder.build())
+    set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
 }
 

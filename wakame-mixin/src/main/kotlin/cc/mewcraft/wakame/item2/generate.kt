@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemId
-import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
+import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toBukkit
@@ -73,7 +73,7 @@ object KoishStackGenerator {
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
         // 因为 ItemStack.setData 只有在 ItemDataContainer 存在时才能写入数据
-        itemstack.set(DataComponentsPatch.DATA_CONTAINER, dataContainer.build())
+        itemstack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
 
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig

@@ -2,15 +2,11 @@ package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.attribute.AttributeInstance
 import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.enchantment2.getEffects
-import cc.mewcraft.wakame.enchantment2.koishEnchantments
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.mixin.support.EnchantmentAttributeEffect
-import cc.mewcraft.wakame.mixin.support.EnchantmentEffectComponentsPatch
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.toUser
@@ -74,51 +70,6 @@ internal object AttributeItemSlotChangeListener : ItemSlotChangeEventListener() 
             val instance = attributeMap.getInstance(type)
             if (instance != null)
                 update(instance, modifier)
-        }
-    }
-}
-
-/**
- * 附魔.
- *
- * 物品发生变化时, 根据物品附魔, 应用与移除相应的附魔效果.
- */
-internal object EnchantmentItemSlotChangeListener : ItemSlotChangeEventListener() {
-    // 在 1.20.5 以后, 可以通过数据包添加自定义的魔咒.
-    // 这也意味着我们不再需要手动处理与附魔相关的机制, 例如铁砧.
-    // 唯一需要处理的就是监听物品栏发生的变化, 以应用附魔的效果.
-
-    override val predicates: List<(Player, ItemSlot, ItemStack, NekoStack?) -> Boolean> = listOf(
-        ::testSlot, // 要让魔咒生效, 必须让 Koish 物品位于生效的装备槽位上, 与魔咒本身的数据包定义无关
-        ::testLevel,
-        ::testDurability
-    )
-
-    override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { xeffect, xlevel, xplayer, xslot ->
-            xeffect.remove(xlevel, xslot, xplayer)
-        }
-    }
-
-    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        modifyEnchantmentEffects(player, slot, itemStack) { xeffect, xlevel, xplayer, xslot ->
-            xeffect.apply(xlevel, xslot, xplayer)
-        }
-    }
-
-    private fun modifyEnchantmentEffects(
-        player: Player, slot: ItemSlot, itemStack: ItemStack,
-        action: (effect: EnchantmentAttributeEffect, level: Int, player: Player, slot: ItemSlot) -> Unit,
-    ) {
-        val enchantments = itemStack.koishEnchantments
-        for ((enchantment, level) in enchantments) {
-            // 处理 enchantment effect component: koish:attributes
-            for (effect in enchantment.getEffects(EnchantmentEffectComponentsPatch.ATTRIBUTES)) {
-                action(effect, level, player, slot)
-            }
-
-            // 处理 enchantment effect component: koish:abilities
-            //
         }
     }
 }

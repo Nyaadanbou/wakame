@@ -47,7 +47,7 @@ public class LootKoishItem extends LootPoolSingletonContainer {
 
     @Override
     public LootPoolEntryType getType() {
-        return LootPoolEntriesPatch.KOISH_ITEM;
+        return ExtraLootPoolEntries.KOISH_ITEM;
     }
 
     @Override

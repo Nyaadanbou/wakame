@@ -2,25 +2,12 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability.component.AbilityContainer
-import cc.mewcraft.wakame.ability.system.AbilityAddSystem
-import cc.mewcraft.wakame.ability.system.AbilityInitSystem
-import cc.mewcraft.wakame.ability.system.AbilityManaCostSystem
-import cc.mewcraft.wakame.ability.system.AbilityRemoveSystem
-import cc.mewcraft.wakame.ability.system.AbilityStatePhaseSystem
-import cc.mewcraft.wakame.ability.system.AbilityTickResultSystem
-import cc.mewcraft.wakame.ability.system.BlackholeSystem
-import cc.mewcraft.wakame.ability.system.BlinkSystem
-import cc.mewcraft.wakame.ability.system.DashSystem
-import cc.mewcraft.wakame.ability.system.MultiJumpSystem
+import cc.mewcraft.wakame.ability.system.*
 import cc.mewcraft.wakame.ecs.Fleks.world
-import cc.mewcraft.wakame.ecs.system.BossBarVisibleManager
-import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
-import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
-import cc.mewcraft.wakame.ecs.system.EntityInfoBossBar
-import cc.mewcraft.wakame.ecs.system.ParticleSystem
-import cc.mewcraft.wakame.ecs.system.TickCountSystem
+import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
+import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -28,11 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityCreateContext
-import com.github.quillraven.fleks.EntityUpdateContext
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -61,44 +44,49 @@ object Fleks : Listener {
         }
 
         systems {
-            // BukkitObject 的删除系统优先于一切系统.
+            add(BukkitEntityBridge()) // 移除无效 bukkit entity 所映射的 ecs entity
+            add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
+            add(ItemSlotChangeMonitor()) // 监听背包物品变化
 
-            add(BukkitEntityBridge())
-            add(BukkitBlockBridge())
+            // -------------
+            // 带“移除”的系统 ???
+            // -------------
 
-            // 给每个 BukkitPlayer 的 itemSlotChangeEvent 进行处理.
-            add(ItemSlotChangeMonitor())
+            add(AbilityAddSystem()) // “激活”玩家装备的技能
+            add(AbilityRemoveSystem()) // “移除”玩家装备的技能
+            add(AbilityTickResultSystem()) // 根据 TickResult 更新 entity
+            add(ElementStackSystem()) // 元素特效
+            add(AbilityInitSystem()) // ???
+            add(EntityInfoBossBar()) // 各种关于 boss bar 的逻辑
+            add(BossBarVisibleManager()) // 显示/移除 boss bar
+            add(TickCountSystem()) // 记录 entity 存在的 tick 数
 
-            // 其它内部功能的移除系统
-
-            add(AbilityAddSystem())
-            add(AbilityRemoveSystem())
-            add(AbilityTickResultSystem())
-            add(ElementStackSystem())
-
-            add(AbilityInitSystem())
-
-            add(EntityInfoBossBar())
-            add(BossBarVisibleManager())
-
-            // 给每个 entity 的 tick 计数.
-
-            add(TickCountSystem())
-
-            // 根据标记与组件进行交互的系统, 例如技能.
+            // ------------
+            // 技能
+            // ------------
 
             add(BlackholeSystem())
             add(BlinkSystem())
             add(DashSystem())
             add(MultiJumpSystem())
+            add(AbilityManaCostSystem()) // 消耗使用技能的魔法值
+            add(AbilityStatePhaseSystem()) // 管理技能的当前状态
 
-            // 消耗类系统, 可能会阻止进行下一阶段的系统.
+            // ------------
+            // 附魔
+            // ------------
 
-            add(AbilityManaCostSystem())
+            add(EnchantmentEffectApplier) // framework
+            add(EnchantmentAntigravShotSystem)
+            add(EnchantmentAttributeSystem)
+            add(EnchantmentBlastMiningSystem)
+            add(EnchantmentFragileSystem)
+            add(EnchantmentSmelterSystem)
+            add(EnchantmentVeinminerSystem)
 
-            // 会改变状态的系统.
-
-            add(AbilityStatePhaseSystem())
+            // ------------
+            // 粒子
+            // -------------
 
             add(ParticleSystem())
         }

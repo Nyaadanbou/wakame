@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item2.config.datagen
 
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
-import cc.mewcraft.wakame.mixin.support.DataComponentsPatch
+import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.util.MojangStack
 
 /**
@@ -32,10 +32,10 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureSetData(type: ItemDataType<in T>, value: T): T? {
-        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
+        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.set(type, value)
-        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
+        set(ExtraDataComponents.DATA_CONTAINER, builder.build())
         return oldVal
     }
 
@@ -45,10 +45,10 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureRemoveData(type: ItemDataType<out T>): T? {
-        val container = getOrDefault(DataComponentsPatch.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
+        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.remove(type)
-        set(DataComponentsPatch.DATA_CONTAINER, builder.build())
+        set(ExtraDataComponents.DATA_CONTAINER, builder.build())
         return oldVal
     }
 

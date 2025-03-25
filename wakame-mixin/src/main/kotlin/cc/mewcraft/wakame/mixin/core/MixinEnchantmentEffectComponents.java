@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.EnchantmentEffectComponentsPatch;
+import cc.mewcraft.wakame.mixin.support.ExtraEnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ public interface MixinEnchantmentEffectComponents {
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void onInit(CallbackInfo ci) {
-        EnchantmentEffectComponentsPatch.bootstrap();
+        ExtraEnchantmentEffectComponents.bootstrap();
     }
 
 }
