@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.util.RecursionGuard
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.bukkit.Material
 import org.bukkit.entity.*
@@ -37,11 +38,21 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
  */
 object DamageManager : DamageManagerApi {
 
+    // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
+    private const val PLACEHOLDER_DAMAGE_VALUE = 4.95
+
     /**
      * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
-     * 当 [source] 为 `null` 时, 伤害属于无源, 即不会产生击退.
+     * 当 [source] 为 `null` 时, 伤害属于无源, 不会产生击退.
      */
-    override fun hurt(victim: LivingEntity, damageMetadata: DamageMetadata, source: LivingEntity?, knockback: Boolean) {
+    override fun hurt(
+        victim: LivingEntity,
+        damageMetadata: DamageMetadata,
+        source: LivingEntity?,
+        knockback: Boolean,
+    ) = RecursionGuard.with(
+        functionName = "hurt", silenceLogs = true
+    ) {
         putCustomDamageMetadata(victim.uniqueId, damageMetadata)
 
         // 如果自定义伤害有源且需要取消击退.
@@ -51,7 +62,7 @@ object DamageManager : DamageManagerApi {
         }
 
         // 造成伤害
-        DamageApplier.damage(victim, source, 4.95)
+        DamageApplier.damage(victim, source, PLACEHOLDER_DAMAGE_VALUE)
     }
 
     /**
@@ -61,12 +72,12 @@ object DamageManager : DamageManagerApi {
     private val DAMAGE_PROJECTILE_TYPES: List<EntityType> = listOf(
         EntityType.ARROW,
         EntityType.BREEZE_WIND_CHARGE,
-//        EntityType.DRAGON_FIREBALL,
+        //EntityType.DRAGON_FIREBALL,
         EntityType.EGG,
         EntityType.ENDER_PEARL,
         EntityType.FIREBALL,
         EntityType.FIREWORK_ROCKET,
-//        EntityType.FISHING_BOBBER,
+        //EntityType.FISHING_BOBBER,
         EntityType.LLAMA_SPIT,
         EntityType.POTION,
         EntityType.SHULKER_BULLET,

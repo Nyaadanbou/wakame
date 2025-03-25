@@ -34,6 +34,9 @@ object VanillaNekoItemFactory {
                 }
             }
 
+            // FIXME #363: 临时代码, 仅用于测试
+            tryAdd("double_attack", ItemBehaviorTypes.DOUBLE_ATTACK)
+
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
             tryAdd("arrow", ItemBehaviorTypes.ARROW)
@@ -131,6 +134,9 @@ object StandardNekoItemFactory {
             fun <T : ItemBehavior> tryAdd(path: String, type: ItemBehaviorType<T>) {
                 if (rootNode.contains(path)) this.put(type, type.create())
             }
+
+            // FIXME #363: 临时代码, 仅用于测试
+            tryAdd("double_attack", ItemBehaviorTypes.DOUBLE_ATTACK)
 
             tryAdd("level_barrier", ItemBehaviorTypes.LEVEL_BARRIER)
             tryAdd("hold_last_damage", ItemBehaviorTypes.HOLD_LAST_DAMAGE)
