@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.Dash
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ability2.data.TickResult
+import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity

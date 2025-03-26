@@ -68,7 +68,7 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
             val rootNode = loader.buildAndLoadString(file.readText())
             val abilityId = Identifiers.of(path)
             try {
-                consumer(abilityId, loadValue(abilityId, rootNode))
+                consumer(abilityId, loadValue(rootNode))
             } catch (t: Throwable) {
                 LOGGER.warn("Failed to load ability: '$abilityId', Path: '${file.path}'", t)
                 continue
@@ -76,8 +76,8 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun loadValue(id: Identifier, node: ConfigurationNode): AbilityMeta {
+    private fun loadValue(node: ConfigurationNode): AbilityMeta {
         val dataConfig = node.require<AbilityMetaContainer>()
-        return AbilityMeta(id, dataConfig)
+        return AbilityMeta(dataConfig)
     }
 }

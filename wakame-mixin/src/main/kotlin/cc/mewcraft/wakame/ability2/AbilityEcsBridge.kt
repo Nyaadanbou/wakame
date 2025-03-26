@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ability2.component.AtSlot
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ability2.data.StatePhase
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.Fleks
@@ -15,18 +14,19 @@ import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import team.unnamed.mocha.MochaEngine
 
 object AbilityEcsBridge {
 
     fun createEcsEntities(
-        ability: AbilityObject,
+        ability: AbilityOnItem,
         caster: KoishEntity,
         target: KoishEntity,
         phase: StatePhase,
         slot: ItemSlot?,
     ) {
-        for (metaType in ability.meta.dataConfig) {
+        for ((metaType, component) in ability.meta.dataConfig) {
             val entity = Fleks.createEntity { entity ->
                 entity += AbilityComponent(
                     metaType = metaType,
@@ -35,7 +35,7 @@ object AbilityEcsBridge {
                     variant = ability.variant,
                     mochaEngine = MochaEngine.createStandard()
                 )
-                ability.meta.dataConfig[metaType]?.let { entity += listOf(it) }
+                entity += listOf(component)
                 entity += CastBy(caster.entity)
                 entity += TargetTo(target.entity)
                 ability.manaCost?.let { entity += ManaCost(it) }
@@ -56,7 +56,7 @@ object AbilityEcsBridge {
         target: KoishEntity,
         phase: StatePhase,
     ) {
-        for (metaType in ability.dataConfig) {
+        for ((metaType, component)  in ability.dataConfig) {
             val entity = Fleks.createEntity { entity ->
                 entity += AbilityComponent(
                     metaType = metaType,
@@ -65,9 +65,9 @@ object AbilityEcsBridge {
                     variant = AbilityTriggerVariant.any(),
                     mochaEngine = MochaEngine.createStandard()
                 )
-                ability.dataConfig[metaType]?.let { entity += listOf(it) }
-                entity += CastBy(caster.entity)
-                entity += TargetTo(target.entity)
+                entity += listOf(component)
+                entity += CastBy(caster.unwrap())
+                entity += TargetTo(target.unwrap())
             }
 
             if (caster.has(AbilityContainer)) {

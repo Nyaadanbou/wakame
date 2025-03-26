@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability.AbilityEntryPointHandler
+import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager

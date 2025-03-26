@@ -1,22 +1,14 @@
 package cc.mewcraft.wakame.ability2.meta
 
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.adventure.toSimpleString
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
-import java.util.stream.Stream
-
 /**
- * 代表一个技能的**配置**.
+ * 代表一个已经填充了参数的技能类型.
+ * 
+ * @see AbilityMetaType
  */
-class AbilityMeta(
-    val id: Identifier,
+data class AbilityMeta(
     val dataConfig: AbilityMetaContainer,
-) : Examinable {
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("id", id),
-    )
-
-    override fun toString(): String = toSimpleString()
+) {
+    override fun toString(): String {
+        return "AbilityMeta(dataConfig=$dataConfig)"
+    }
 }

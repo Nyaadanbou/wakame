@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.item2.data
 
-import cc.mewcraft.wakame.ability2.AbilityObject
-import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.registry2.KoishRegistries2
@@ -42,13 +40,6 @@ data object ItemDataTypes {
 
     @JvmField
     val PROCESSED: ItemDataType<Unit> = typeOf("processed")
-
-    @JvmField
-    val ABILITY_OBJECT: ItemDataType<AbilityObject> = typeOf("ability_object") {
-        serializers {
-            register(AbilityTriggerVariant.SERIALIZER)
-        }
-    }
 
     @JvmField
     val LEVEL: ItemDataType<ItemLevel> = typeOf("level")

@@ -1,10 +1,9 @@
-package cc.mewcraft.wakame.ability
+package cc.mewcraft.wakame.ability2
 
-import cc.mewcraft.wakame.ability2.AbilityCastManager
 import cc.mewcraft.wakame.ability2.combo.PlayerComboResult
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import org.bukkit.entity.AbstractArrow
@@ -16,7 +15,7 @@ import org.bukkit.event.Cancellable
 import org.bukkit.event.player.PlayerInteractEvent
 
 /**
- * 控制 [cc.mewcraft.wakame.ability2.AbilityObject] 开始执行的逻辑.
+ * 控制 [cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem] 开始执行的逻辑.
  *
  * 具体来说, 这个类负责:
  * - 根据玩家的操作, 处理玩家的机制触发逻辑
@@ -58,10 +57,10 @@ internal object AbilityEntryPointHandler {
         when (projectile) {
             is AbstractArrow -> {
                 val itemStack = projectile.itemStack.takeUnlessEmpty() ?: return
-                val abilities = itemStack.getData(ItemDataTypes.ABILITY_OBJECT) ?: return
+                val abilityOnItem = itemStack.getProperty(ItemPropertyTypes.ABILITY) ?: return
                 val caster = projectile.shooter as? LivingEntity ?: return
                 val target = hitEntity ?: return
-                AbilityCastManager.castObject(abilities, caster, target)
+                AbilityCastUtils.castPoint(abilityOnItem.meta, caster, target)
             }
         }
     }

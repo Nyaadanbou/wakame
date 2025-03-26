@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.register
 import com.github.quillraven.fleks.Component
-import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
@@ -14,11 +13,9 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 /**
- * 代表所有技能的配置. 一个配置可包含多个技能.
- *
- * 包含了所有需要添加到 Ecs 世界中的组件.
+ * 代表一个装着多个"技能"的容器.
  */
-sealed interface AbilityMetaContainer : Iterable<AbilityMetaType<*>> {
+sealed interface AbilityMetaContainer : Iterable<Map.Entry<AbilityMetaType<*>, Component<*>>> {
 
     companion object {
         @JvmField
@@ -79,7 +76,7 @@ sealed interface AbilityMetaContainer : Iterable<AbilityMetaType<*>> {
 
 private data object EmptyAbilityMetaContainer : AbilityMetaContainer {
     override fun <V : Component<V>> get(type: AbilityMetaType<V>): V? = null
-    override fun iterator(): Iterator<AbilityMetaType<*>> = emptyList<AbilityMetaType<*>>().iterator()
+    override fun iterator(): Iterator<Map.Entry<AbilityMetaType<*>, Component<*>>> = emptyMap<AbilityMetaType<*>, Component<*>>().iterator()
 }
 
 private class SimpleAbilityMetaContainer(
@@ -102,8 +99,8 @@ private class SimpleAbilityMetaContainer(
         return if (metaMap.isEmpty()) AbilityMetaContainer.EMPTY else this
     }
 
-    override fun iterator(): ObjectIterator<AbilityMetaType<*>> {
-        return metaMap.keys.iterator()
+    override fun iterator(): Iterator<Map.Entry<AbilityMetaType<*>, Component<*>>> {
+        return metaMap.reference2ObjectEntrySet().iterator()
     }
 
     object Serializer : TypeSerializer2<AbilityMetaContainer> {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ability2.data.StatePhase
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant

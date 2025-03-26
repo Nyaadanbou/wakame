@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.ability2.combo
 
 import cc.mewcraft.wakame.ability2.AbilityEcsBridge
 import cc.mewcraft.wakame.ability2.ManaCostPenalty
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.combo.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
-import cc.mewcraft.wakame.ability2.data.StatePhase
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilitySequenceTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
@@ -104,7 +104,7 @@ class PlayerComboInfo(
 
     private fun penalizeManaCost(abilityMetaType: AbilityMetaType<*>): ManaCostPenalty {
         val penalty = manaCostPenalties.getOrPut(abilityMetaType) { ManaCostPenalty() }
-        if (penalty.cooldown.testSilently()) {
+        if (penalty.resetCooldown.testSilently()) {
             penalty.penaltyCount = 1
         } else {
             penalty.penaltyCount++

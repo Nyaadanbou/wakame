@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.AbilityCastManager
+import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.item.logic.ItemSlotChanges
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.damage
@@ -31,8 +33,8 @@ class AbilityAddSystem : IteratingSystem(
             if (!testDurability(current)) {
                 continue
             }
-            val abilityObject = current.getData(ItemDataTypes.ABILITY_OBJECT) ?: continue
-            AbilityCastManager.record(abilityObject, bukkitPlayer, bukkitPlayer, slot)
+            val abilityObject = current.getProperty(ItemPropertyTypes.ABILITY) ?: continue
+            AbilityCastUtils.idle(abilityObject, bukkitPlayer, bukkitPlayer, slot)
         }
 
         user.combo.reset()

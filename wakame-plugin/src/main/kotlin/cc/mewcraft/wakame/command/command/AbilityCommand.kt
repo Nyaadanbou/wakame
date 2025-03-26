@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.ability2.AbilityCastManager
+import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
@@ -36,7 +36,7 @@ internal object AbilityCommand : KoishCommandFactory<Source> {
         val casterPlayer = context.get<SinglePlayerSelector>("caster").single()
         val caster = casterPlayer
         val target = context.getOrNull<SingleEntitySelector>("target")?.single() ?: caster
-        AbilityCastManager.castMeta(ability, caster, target)
+        AbilityCastUtils.castPoint(ability, caster, target)
     }
 
 }

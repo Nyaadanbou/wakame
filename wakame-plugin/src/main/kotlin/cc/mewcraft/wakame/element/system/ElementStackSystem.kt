@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.element.system
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.AbilityCastManager
+import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.KoishFamilies
@@ -52,7 +52,7 @@ class ElementStackSystem : ListenableIteratingSystem(
             if (elementStackComponent.amount < requiredAmount)
                 continue
             for (ability in abilities) {
-                AbilityCastManager.castMeta(ability.value, entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
+                AbilityCastUtils.castPoint(ability.value, entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
             }
             elementStackComponent.triggeredLevels.add(requiredAmount)
         }

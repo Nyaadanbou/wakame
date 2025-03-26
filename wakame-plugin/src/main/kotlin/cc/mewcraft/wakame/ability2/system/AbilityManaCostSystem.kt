@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ability2.system
 
+import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
-import cc.mewcraft.wakame.ability2.data.TickResult
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.entity.resource.ResourceTypeRegistry
@@ -39,7 +39,7 @@ class AbilityManaCostSystem : IteratingSystem(
             PlayerNotEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
             entity[AbilityTickResultComponent].result = TickResult.RESET_STATE
         } else {
-            penalty.cooldown.reset()
+            penalty.resetCooldown.reset()
             PlayerManaConsumeEvent(bukkitPlayer, manaCost).callEvent()
         }
     }

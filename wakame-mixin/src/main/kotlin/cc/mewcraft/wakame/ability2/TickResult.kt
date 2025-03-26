@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ability2.data
+package cc.mewcraft.wakame.ability2
 
 /**
  * 代表一次 tick 的执行结果.

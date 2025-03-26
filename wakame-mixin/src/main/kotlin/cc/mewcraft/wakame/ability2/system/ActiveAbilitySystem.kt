@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.data.StatePhase
-import cc.mewcraft.wakame.ability2.data.TickResult
+import cc.mewcraft.wakame.ability2.StatePhase
+import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import com.github.quillraven.fleks.EntityUpdateContext

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ability2.data.TickResult
+import cc.mewcraft.wakame.ability2.TickResult
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 

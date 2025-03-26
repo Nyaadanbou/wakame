@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability2.data.StatePhase
-import cc.mewcraft.wakame.ability2.data.TickResult
+import cc.mewcraft.wakame.ability2.StatePhase
+import cc.mewcraft.wakame.ability2.TickResult
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family

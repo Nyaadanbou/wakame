@@ -1,8 +1,5 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-import cc.mewcraft.wakame.ability2.AbilityObject
-import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaAbilityObject
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
@@ -45,13 +42,6 @@ data object ItemMetaTypes {
     //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
     @JvmField
     val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
-
-    @JvmField
-    val ABILITY_OBJECT: ItemMetaType<MetaAbilityObject, AbilityObject> = typeOf("ability_object") {
-        serializers {
-            register(AbilityTriggerVariant.SERIALIZER)
-        }
-    }
 
     // ------------
     // 方便函数

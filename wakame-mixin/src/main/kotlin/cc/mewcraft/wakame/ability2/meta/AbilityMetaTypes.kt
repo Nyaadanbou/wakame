@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import com.github.quillraven.fleks.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
-object AbilityMetaTypes {
+data object AbilityMetaTypes {
 
     // ------------
     // 注册表

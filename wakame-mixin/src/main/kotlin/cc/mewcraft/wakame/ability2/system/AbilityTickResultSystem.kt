@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability2.data.TickResult
+import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
