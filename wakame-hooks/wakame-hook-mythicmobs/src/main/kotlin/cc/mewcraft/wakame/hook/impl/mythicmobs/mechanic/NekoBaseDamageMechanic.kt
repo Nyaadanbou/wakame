@@ -1,15 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
-import cc.mewcraft.wakame.damage.CriticalStrikeState
-import cc.mewcraft.wakame.damage.DamageBundle
-import cc.mewcraft.wakame.damage.DamageBundleFactory
-import cc.mewcraft.wakame.damage.DamageManagerApi
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.DamagePacket
-import cc.mewcraft.wakame.damage.DamageTag
-import cc.mewcraft.wakame.damage.DamageTags
-import cc.mewcraft.wakame.damage.DamageTagsFactory
+import cc.mewcraft.wakame.damage.*
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -78,9 +69,9 @@ class NekoBaseDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.create()
+            return DamageTagsFactory.INSTANCE.create()
         }
-        return DamageTagsFactory.create(origin.map { DamageTag.valueOf(it) })
+        return DamageTagsFactory.INSTANCE.create(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {
@@ -102,7 +93,7 @@ class NekoBaseDamageMechanic(
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
 
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.hurt(entity, damageMetadata, casterEntity, knockback)
+        DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, casterEntity, knockback)
 
         return SkillResult.SUCCESS
     }

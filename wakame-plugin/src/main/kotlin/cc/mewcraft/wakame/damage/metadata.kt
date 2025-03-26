@@ -23,15 +23,155 @@ import org.spongepowered.configurate.serialize.SerializationException
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
 import kotlin.math.absoluteValue
+import kotlin.math.round
 import kotlin.random.Random
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
+
+/**
+ * 防御元数据.
+ * 包含了一次伤害中“防御阶段”的有关信息.
+ * 在实例化后, 最终伤害数值以及各种信息就已经确定了.
+ */
+sealed interface DefenseMetadata {
+    val damageeAttributeMap: AttributeMap
+
+    /**
+     * 计算各元素最终伤害的方法.
+     */
+    fun calculateFinalDamage(element: RegistryEntry<ElementType>, damageMetadata: DamageMetadata): Double
+}
+
+/**
+ * 玩家和非玩家实体的防御元数据.
+ */
+internal class EntityDefenseMetadata(
+    override val damageeAttributeMap: AttributeMap,
+) : DefenseMetadata {
+    override fun calculateFinalDamage(element: RegistryEntry<ElementType>, damageMetadata: DamageMetadata): Double {
+        // 当该元素的伤害包不存在时, 返回 0.0
+        val packet = damageMetadata.damageBundle.get(element) ?: return 0.0
+
+        // 该元素伤害倍率(或称攻击威力)
+        val attackDamageRate = packet.rate
+        // 暴击倍率
+        val criticalStrikePower = damageMetadata.criticalStrikeMetadata.power
+        // 受伤者防御, 不会小于0
+        val defense = (damageeAttributeMap.getValue(Attributes.DEFENSE.of(element)) + damageeAttributeMap.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0)
+        // 受伤者承伤倍率
+        val incomingDamageRate = damageeAttributeMap.getValue(Attributes.INCOMING_DAMAGE_RATE.of(element))
+
+        // 计算原始伤害
+        var originalDamage = packet.packetDamage
+        if (DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
+            originalDamage *= attackDamageRate
+        }
+        if (DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
+            originalDamage *= criticalStrikePower
+        }
+
+        // 计算有效防御
+        val validDefense = DamageRules.calculateValidDefense(
+            defense = defense,
+            defensePenetration = packet.defensePenetration,
+            defensePenetrationRate = packet.defensePenetrationRate
+        )
+
+        // 计算防御后伤害
+        val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
+            originalDamage = originalDamage,
+            validDefense = validDefense
+        )
+
+        // 计算最终伤害
+        var finalDamage = damageAfterDefense * incomingDamageRate
+        if (!DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
+            finalDamage *= attackDamageRate
+        }
+        if (!DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
+            finalDamage *= criticalStrikePower
+        }
+        val leastDamage = if (packet.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
+        finalDamage = finalDamage.coerceAtLeast(leastDamage)
+
+        if (DamageRules.ROUNDING_DAMAGE){
+            finalDamage = round(finalDamage)
+        }
+
+        return finalDamage
+    }
+}
+
+/**
+ * 伤害元数据, 包含了一次伤害中"攻击阶段"的有关信息.
+ * 一旦实例化后, 攻击伤害的数值以及各种信息就已经确定.
+ */
+data class DamageMetadata(
+    /**
+     * 伤害标签.
+     */
+    val damageTags: DamageTags,
+
+    /**
+     * 伤害捆绑包.
+     */
+    val damageBundle: DamageBundle,
+
+    /**
+     * 暴击元数据.
+     */
+    val criticalStrikeMetadata: CriticalStrikeMetadata,
+)
+
+/**
+ * 伤害的暴击元数据.
+ */
+data class CriticalStrikeMetadata(
+    /**
+     * 暴击倍率的值.
+     */
+    val power: Double,
+
+    /**
+     * 这次伤害的暴击状态.
+     */
+    val state: CriticalStrikeState,
+) {
+    companion object Constants {
+        /**
+         * 默认的暴击元数据.
+         * 用于不会暴击的攻击.
+         */
+        @JvmField
+        val NONE: CriticalStrikeMetadata = CriticalStrikeMetadata(1.0, CriticalStrikeState.NONE)
+    }
+}
+
+/**
+ * 暴击状态.
+ */
+enum class CriticalStrikeState {
+    /**
+     * 正暴击.
+     */
+    POSITIVE,
+
+    /**
+     * 负暴击.
+     */
+    NEGATIVE,
+
+    /**
+     * 无暴击.
+     */
+    NONE
+}
 
 //<editor-fold desc="CriticalStrikeMetadata">
 /**
  * 通过属性计算和随机过程创建一个 [CriticalStrikeMetadata].
  */
-fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
+internal fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
     val power: Double
     val state: CriticalStrikeState
     if (chance < 0) {
@@ -54,7 +194,7 @@ fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower:
     return CriticalStrikeMetadata(power, state)
 }
 
-fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
+internal fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
     return CriticalStrikeMetadata(
         attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
         attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
@@ -71,7 +211,7 @@ fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
  * 如: 给溺水伤害加上水元素, 给着火伤害加上火元素.
  * 或用于无来源的弹射物的伤害.
  */
-object VanillaDamageMetadata {
+internal object VanillaDamageMetadata {
     operator fun invoke(damageBundle: DamageBundle): DamageMetadata {
         return DamageMetadata(
             damageTags = DamageTags(),
@@ -99,7 +239,7 @@ object VanillaDamageMetadata {
     }
 }
 
-object PlayerDamageMetadata {
+internal object PlayerDamageMetadata {
     /**
      * 玩家徒手造成的伤害.
      * 或使用非ATTACK, 相当于徒手攻击的物品造成的伤害.
@@ -134,7 +274,7 @@ object PlayerDamageMetadata {
     }
 }
 
-object EntityDamageMetadata {
+internal object EntityDamageMetadata {
     operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata, damageTags: DamageTags): DamageMetadata {
         return DamageMetadata(
             damageTags = damageTags,
@@ -153,7 +293,7 @@ object EntityDamageMetadata {
 /**
  * 从配置文件反序列化得到的能够构建 [DamageMetadata] 的构造器.
  */
-sealed interface DamageMetadataBuilder<T> {
+internal sealed interface DamageMetadataBuilder<T> {
     val damageTags: DamageTagsBuilder
 
     fun build(event: EntityDamageEvent): DamageMetadata
@@ -162,7 +302,7 @@ sealed interface DamageMetadataBuilder<T> {
 /**
  * 从配置文件反序列化得到的能够构建 [DamageTags] 的构造器.
  */
-interface DamageTagsBuilder {
+internal interface DamageTagsBuilder {
     val damageTags: List<DamageTag>
 
     fun build(): DamageTags
@@ -171,7 +311,7 @@ interface DamageTagsBuilder {
 /**
  * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
  */
-interface DamagePacketBuilder<T> {
+internal interface DamagePacketBuilder<T> {
     val element: RegistryEntry<ElementType>
     val min: T
     val max: T
@@ -185,7 +325,7 @@ interface DamagePacketBuilder<T> {
 /**
  * 从配置文件反序列化得到的能够构建 [CriticalStrikeMetadata] 的构造器.
  */
-interface CriticalStrikeMetadataBuilder<T> {
+internal interface CriticalStrikeMetadataBuilder<T> {
     val chance: T
     val positivePower: T
     val negativePower: T
@@ -199,7 +339,7 @@ interface CriticalStrikeMetadataBuilder<T> {
  * 配置文件 **直接** 指定全部内容的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-data class DirectDamageMetadataBuilder(
+internal data class DirectDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
@@ -231,7 +371,7 @@ data class DirectDamageMetadataBuilder(
  * 用于爆炸等伤害由原版决定的地方.
  */
 @ConfigSerializable
-data class VanillaDamageMetadataBuilder(
+internal data class VanillaDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
@@ -264,7 +404,7 @@ data class VanillaDamageMetadataBuilder(
  * 依赖攻击实体的 [cc.mewcraft.wakame.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-data class AttributeDamageMetadataBuilder(
+internal data class AttributeDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
@@ -286,7 +426,7 @@ data class AttributeDamageMetadataBuilder(
 }
 
 @ConfigSerializable
-data class DirectDamageTagsBuilder(
+internal data class DirectDamageTagsBuilder(
     @Required
     override val damageTags: List<DamageTag>,
 ) : DamageTagsBuilder {
@@ -297,7 +437,7 @@ data class DirectDamageTagsBuilder(
 }
 
 @ConfigSerializable
-data class DirectDamagePacketBuilder(
+internal data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
     override val element: RegistryEntry<ElementType>,
@@ -316,7 +456,7 @@ data class DirectDamagePacketBuilder(
 }
 
 @ConfigSerializable
-data class DirectCriticalStrikeMetadataBuilder(
+internal data class DirectCriticalStrikeMetadataBuilder(
     override val chance: Double = 0.0,
     override val positivePower: Double = 1.0,
     override val negativePower: Double = 1.0,
@@ -329,7 +469,7 @@ data class DirectCriticalStrikeMetadataBuilder(
 }
 
 @ConfigSerializable
-data class MolangDamageMetadataBuilder(
+internal data class MolangDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
     override val damageTags: DirectDamageTagsBuilder,
@@ -356,7 +496,7 @@ data class MolangDamageMetadataBuilder(
 }
 
 @ConfigSerializable
-data class MolangDamagePacketBuilder(
+internal data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
     override val element: RegistryEntry<ElementType>,
@@ -384,7 +524,7 @@ data class MolangDamagePacketBuilder(
 }
 
 @ConfigSerializable
-data class MolangCriticalStrikeMetadataBuilder(
+internal data class MolangCriticalStrikeMetadataBuilder(
     @Required
     override val chance: Expression,
     @Required

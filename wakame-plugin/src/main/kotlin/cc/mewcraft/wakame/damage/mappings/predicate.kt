@@ -17,7 +17,7 @@ import java.lang.reflect.Type
  * 用于检查某次伤害事件相关场景的谓词.
  * 这里相当于直接把 [EntityDamageEvent] 当上下文用.
  */
-sealed interface DamagePredicate {
+internal sealed interface DamagePredicate {
     fun test(event: EntityDamageEvent): Boolean
 }
 
@@ -25,7 +25,7 @@ sealed interface DamagePredicate {
  * 检查攻击实体某个特定数据的谓词.
  * 目前支持检查的数据在伴生类中列举.
  */
-data class EntityDataPredicate(
+internal data class EntityDataPredicate(
     val requiredData: Map<String, Int>,
 ) : DamagePredicate {
     companion object {
@@ -62,7 +62,7 @@ data class EntityDataPredicate(
 /**
  * 检查伤害类型的谓词.
  */
-data class DamageTypePredicate(
+internal data class DamageTypePredicate(
     val types: Set<DamageType>,
 ) : DamagePredicate {
     companion object {
@@ -77,7 +77,7 @@ data class DamageTypePredicate(
 /**
  * 检查来源实体类型的谓词.
  */
-data class CausingEntityTypePredicate(
+internal data class CausingEntityTypePredicate(
     val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {
@@ -93,7 +93,7 @@ data class CausingEntityTypePredicate(
 /**
  * 检查直接实体类型的谓词.
  */
-data class DirectEntityTypePredicate(
+internal data class DirectEntityTypePredicate(
     val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {
@@ -109,7 +109,7 @@ data class DirectEntityTypePredicate(
 /**
  * 检查受伤实体类型的谓词.
  */
-data class VictimEntityTypePredicate(
+internal data class VictimEntityTypePredicate(
     val types: Set<EntityType>,
 ) : DamagePredicate {
     companion object {

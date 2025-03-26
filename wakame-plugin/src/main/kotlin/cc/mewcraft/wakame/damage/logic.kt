@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.jetbrains.annotations.ApiStatus
 import java.time.Duration
 import java.util.*
 
@@ -33,10 +34,44 @@ fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = nu
     DamageManager.hurt(this, damageMetadata, source, knockback)
 }
 
+interface DamageManagerApi {
+
+    /**
+     * 对 [victim] 造成由 [damageMetadata] 指定的萌芽伤害.
+     * 当 [source] 为 `null` 时, 伤害属于无源, 不会产生击退效果.
+     *
+     * @param victim 受到伤害的实体
+     * @param damageMetadata 伤害的元数据
+     * @param source 造成伤害的实体
+     * @param knockback 是否产生击退效果
+     */
+    fun hurt(
+        victim: LivingEntity, damageMetadata: DamageMetadata,
+        source: LivingEntity? = null, knockback: Boolean = false,
+    )
+
+    /**
+     * 伴生对象, 提供 [DamageManagerApi] 的实例.
+     */
+    companion object {
+
+        @get:JvmName("getInstance")
+        lateinit var INSTANCE: DamageManagerApi
+            private set
+
+        @ApiStatus.Internal
+        fun register(instance: DamageManagerApi) {
+            this.INSTANCE = instance
+        }
+
+    }
+
+}
+
 /**
  * 包含伤害系统的核心逻辑和状态.
  */
-object DamageManager : DamageManagerApi {
+internal object DamageManager : DamageManagerApi {
 
     // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
     private const val PLACEHOLDER_DAMAGE_VALUE = 4.95
@@ -62,7 +97,7 @@ object DamageManager : DamageManagerApi {
         }
 
         // 造成伤害
-        DamageApplier.damage(victim, source, PLACEHOLDER_DAMAGE_VALUE)
+        DamageApplier.INSTANCE.damage(victim, source, PLACEHOLDER_DAMAGE_VALUE)
     }
 
     /**
@@ -266,7 +301,7 @@ object DamageManager : DamageManagerApi {
         val damageMapping = if (forPlayer) {
             DirectEntityTypeMappings.getForPlayer(entityType, event)
         } else {
-            DirectEntityTypeMappings.getForNoCausing(entityType, event)
+            DirectEntityTypeMappings.getForUntracked(entityType, event)
         }
         if (damageMapping == null) {
             LOGGER.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not defined in the configs! Fallback to default damage metadata.")

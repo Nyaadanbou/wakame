@@ -13,7 +13,7 @@ import java.lang.reflect.Type
  * [predicates] 用于检查场景是否匹配.
  * 使用 [builder] 创建 [DamageMetadata].
  */
-data class DamageMapping(
+internal data class DamageMapping(
     val predicates: List<DamagePredicate>,
     val builder: DamageMetadataBuilder<*>,
 ) {

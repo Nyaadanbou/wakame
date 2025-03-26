@@ -5,11 +5,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 /**
- * 负责初始化伤害系统 API 的一些实例.
+ * 负责初始化伤害系统的一些内部状态, 如 API 实例.
  */
-@Init(
-    stage = InitStage.PRE_WORLD
-)
+@Init(stage = InitStage.PRE_WORLD)
 internal object DamageApiBootstrap {
 
     @InitFun
@@ -26,4 +24,5 @@ internal object DamageApiBootstrap {
         // 注册 DamageManagerApi
         DamageManagerApi.register(DamageManager)
     }
+
 }
