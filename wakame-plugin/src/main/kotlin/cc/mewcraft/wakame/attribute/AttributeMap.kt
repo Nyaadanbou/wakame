@@ -469,6 +469,25 @@ private class AttributeMapSnapshotImpl(
         return data[attribute]?.getModifier(id)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
     }
 
+    override fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.forEach { attribute, modifier ->
+            val attributeInstance = this.getInstance(attribute)
+            if (attributeInstance != null) {
+                attributeInstance.removeModifier(modifier.id)
+                attributeInstance.addModifier(modifier)
+            }
+        }
+    }
+
+    override fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.asMap().forEach { (attribute, modifiers) ->
+            val attributeInstance = this.data[attribute]
+            if (attributeInstance != null) {
+                modifiers.forEach { modifier -> attributeInstance.removeModifier(modifier.id) }
+            }
+        }
+    }
+
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
         return data.reference2ObjectEntrySet().iterator()
     }

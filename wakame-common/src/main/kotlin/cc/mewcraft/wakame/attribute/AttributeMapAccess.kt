@@ -11,21 +11,19 @@ interface AttributeMapAccess {
 
     companion object Holder {
 
-        private var instance: AttributeMapAccess? = null
+        @get:JvmName("getInstance()")
+        lateinit var INSTANCE: AttributeMapAccess
+            private set
 
+        @Deprecated("", replaceWith = ReplaceWith("INSTANCE"))
         @JvmStatic
         fun instance(): AttributeMapAccess {
-            return instance ?: throw IllegalStateException("AttributeMapAccess has not been initialized")
+            return INSTANCE
         }
 
         @ApiStatus.Internal
         fun register(provider: AttributeMapAccess) {
-            instance = provider
-        }
-
-        @ApiStatus.Internal
-        fun unregister() {
-            instance = null
+            INSTANCE = provider
         }
 
     }

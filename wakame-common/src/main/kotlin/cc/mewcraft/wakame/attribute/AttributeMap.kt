@@ -48,6 +48,16 @@ interface AttributeMapSnapshot : AttributeMapLike, Iterable<Map.Entry<Attribute,
      * 如果指定的 [attribute] 不存在, 则返回 `null`.
      */
     fun getInstance(attribute: Attribute): AttributeInstanceSnapshot?
+
+    /**
+     * 添加临时的 [AttributeModifier].
+     */
+    fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
+
+    /**
+     * 移除非默认的 [AttributeModifier].
+     */
+    fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
 }
 
 /**

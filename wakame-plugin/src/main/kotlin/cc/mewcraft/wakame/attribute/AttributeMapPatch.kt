@@ -38,9 +38,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
 
@@ -186,7 +183,7 @@ internal object AttributeMapPatchAccess {
                 put(entity.uniqueId, patch)
 
                 // 触发 AttributeMap 的初始化, 例如应用原版属性
-                AttributeMapAccess.instance().get(entity).onFailure {
+                AttributeMapAccess.INSTANCE.get(entity).onFailure {
                     LOGGER.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
                 }
             }
@@ -197,7 +194,7 @@ internal object AttributeMapPatchAccess {
 
             // 触发 AttributeMap 的初始化, 例如应用原版属性
             val entity = event.entity
-            val attributeMap = AttributeMapAccess.instance().get(entity)
+            val attributeMap = AttributeMapAccess.INSTANCE.get(entity)
                 .onFailure { LOGGER.error("Failed to initialize the attribute map for entity $entity: ${it.message}") }
                 .getOrNull() ?: return@event
 
