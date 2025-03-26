@@ -25,42 +25,53 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
 // ------------
-// 从配置文件加载 mapping
+// 从配置文件加载 mappings
 // ------------
 
 private const val DATA_DIR = "damage"
 
 @ConfigSerializable
-internal data class DamageTypeMapping(@Setting("damage_metadata") val builder: DamageMetadataBuilder<*>)
+internal data class DamageTypeMapper(
+    @Setting("damage_metadata")
+    val builder: DamageMetadataBuilder<*>,
+) : DamageMapper {
+    override fun generate(event: EntityDamageEvent): DamageMetadata {
+        return builder.build(event)
+    }
+}
 
 /**
- * 依据原版伤害类型来获取萌芽伤害的映射.
+ * 当 `DamageSource#directEntity` 为 `null` 时会使用到这个映射.
+ * 原版下, 只有环境(比如岩浆)造成的伤害 `directEntity` 为 `null`.
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object DamageTypeMappings {
+internal object DamageTypeDamageMappings {
 
-    private val default: DamageTypeMapping by lazy {
-        DamageTypeMapping(
+    private val default: DamageTypeMapper =
+        DamageTypeMapper(
             VanillaDamageMetadataBuilder(
                 damageTags = DirectDamageTagsBuilder(emptyList()),
                 criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
                 element = KoishRegistries.ELEMENT.getDefaultEntry()
             )
         )
-    }
 
-    private val mappings: Reference2ObjectOpenHashMap<DamageType, DamageTypeMapping> = Reference2ObjectOpenHashMap()
+    private val mappings: Reference2ObjectOpenHashMap<DamageType, DamageTypeMapper> = Reference2ObjectOpenHashMap()
 
-    fun get(damageType: DamageType): DamageTypeMapping {
+    fun get(damageType: DamageType): DamageMapper {
         return mappings[damageType] ?: default
     }
 
     @InitFun
-    fun init() = loadDataIntoRegistry()
+    fun init() {
+        loadDataIntoRegistry()
+    }
 
     @ReloadFun
-    fun reload() = loadDataIntoRegistry()
+    fun reload() {
+        loadDataIntoRegistry()
+    }
 
     private fun loadDataIntoRegistry() {
         mappings.clear()
@@ -68,7 +79,7 @@ internal object DamageTypeMappings {
         val rootNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
+                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             KoishDataPaths.CONFIGS
@@ -80,7 +91,7 @@ internal object DamageTypeMappings {
 
         val damageTypeToNode = rootNode.childrenMap()
         for ((damageType, node) in damageTypeToNode.transformKeys<DamageType>(throwIfFail = false)) {
-            val mapping = node.get<DamageTypeMapping>()
+            val mapping = node.get<DamageTypeMapper>()
             if (mapping == null) {
                 LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
                 continue
@@ -95,28 +106,26 @@ internal object DamageTypeMappings {
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object EntityAttackMappings {
+internal object AttackCharacteristicDamageMappings {
 
-    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
-    fun init() = loadDataIntoRegistry()
+    fun init() {
+        loadDataIntoRegistry()
+    }
 
     @ReloadFun
-    fun reload() = loadDataIntoRegistry()
+    fun reload() {
+        loadDataIntoRegistry()
+    }
 
     /**
      * 获取某一伤害情景下原版生物的伤害映射.
      * 返回空表示未指定该情景下的伤害映射.
      */
-    fun get(damager: LivingEntity, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = mappings[damager.type] ?: return null
-        for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) {
-                return damageMapping
-            }
-        }
-        return null
+    fun get(damager: LivingEntity, event: EntityDamageEvent): DamageMapper? {
+        return mappings[damager.type]?.first { mapper -> mapper.match(event) }
     }
 
     private fun loadDataIntoRegistry() {
@@ -125,9 +134,9 @@ internal object EntityAttackMappings {
         val rootNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                register<DamageMapping>(DamageMappingSerializer)
-                register<DamagePredicate>(DamagePredicateSerializer)
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
+                register<DamagePredicate>(DamagePredicate.SERIALIZER)
+                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
+                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             KoishDataPaths.CONFIGS
@@ -141,7 +150,7 @@ internal object EntityAttackMappings {
         for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
             val damageMappingList = node.childrenMap()
                 .map { (_, node) ->
-                    val result: DamageMapping? = node.get<DamageMapping>()
+                    val result: DamagePredicateMapper? = node.get<DamagePredicateMapper>()
                     if (result == null) {
                         LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
                     }
@@ -155,51 +164,43 @@ internal object EntityAttackMappings {
 }
 
 /**
- * 依据直接伤害实体的类型来获取萌芽伤害的映射.
+ * 依据 *直接伤害实体* 的类型来获取萌芽伤害的映射.
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object DirectEntityTypeMappings {
+internal object DirectEntityDamageMappings {
 
-    private val untrackedDamageMapping: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
-    private val playerDamageMapping: Reference2ObjectOpenHashMap<EntityType, List<DamageMapping>> = Reference2ObjectOpenHashMap()
+    private val playerMappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+    private val untrackedMappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
-    fun init() = loadDataIntoRegistry()
-
-    @ReloadFun
-    fun reload() = loadDataIntoRegistry()
-
-    fun getForUntracked(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = untrackedDamageMapping[directEntityType] ?: return null
-        for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) {
-                return damageMapping
-            }
-        }
-        return null
+    fun init() {
+        loadDataIntoRegistry()
     }
 
-    fun getForPlayer(directEntityType: EntityType, event: EntityDamageEvent): DamageMapping? {
-        val damageMappings = playerDamageMapping[directEntityType] ?: return null
-        for (damageMapping in damageMappings) {
-            if (damageMapping.match(event)) {
-                return damageMapping
-            }
-        }
-        return null
+    @ReloadFun
+    fun reload() {
+        loadDataIntoRegistry()
+    }
+
+    fun getForPlayer(direct: EntityType, event: EntityDamageEvent): DamageMapper? {
+        return playerMappings[direct]?.first { mapper -> mapper.match(event) }
+    }
+
+    fun getForUntracked(direct: EntityType, event: EntityDamageEvent): DamageMapper? {
+        return untrackedMappings[direct]?.first { mapper -> mapper.match(event) }
     }
 
     private fun loadDataIntoRegistry() {
-        untrackedDamageMapping.clear()
-        playerDamageMapping.clear()
+        playerMappings.clear()
+        untrackedMappings.clear()
 
         val rootNode = buildYamlConfigLoader {
             withDefaults()
             serializers {
-                register<DamageMapping>(DamageMappingSerializer)
-                register<DamagePredicate>(DamagePredicateSerializer)
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilderSerializer)
+                register<DamagePredicate>(DamagePredicate.SERIALIZER)
+                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
+                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             KoishDataPaths.CONFIGS
@@ -208,19 +209,19 @@ internal object DirectEntityTypeMappings {
                 .toFile().readText()
         )
 
-        processDamageMappings(rootNode, untrackedDamageMapping, "no_causing")
-        processDamageMappings(rootNode, playerDamageMapping, "player")
+        readNodeThenPutIntoMap(rootNode, playerMappings, "player")
+        readNodeThenPutIntoMap(rootNode, untrackedMappings, "no_causing") // FIXME #366: rename node to "untracked"
     }
 
-    private fun processDamageMappings(
+    private fun readNodeThenPutIntoMap(
         rootNode: ConfigurationNode,
-        targetMap: MutableMap<EntityType, List<DamageMapping>>,
-        nodeName: String
+        targetMap: MutableMap<EntityType, List<DamagePredicateMapper>>,
+        nodeName: String,
     ) {
         val entityTypeToNode = rootNode.node(nodeName).childrenMap()
         for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
             val damageMappingList = node.childrenMap().map { (_, node) ->
-                val result: DamageMapping? = node.get<DamageMapping>()
+                val result: DamagePredicateMapper? = node.get<DamagePredicateMapper>()
                 if (result == null) {
                     LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
                 }

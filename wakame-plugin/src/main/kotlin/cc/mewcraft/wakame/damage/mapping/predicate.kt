@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.require
 import org.bukkit.damage.DamageType
@@ -18,7 +19,14 @@ import java.lang.reflect.Type
  * 这里相当于直接把 [EntityDamageEvent] 当上下文用.
  */
 internal sealed interface DamagePredicate {
+
+    companion object {
+        @JvmField
+        val SERIALIZER: TypeSerializer2<DamagePredicate> = DamagePredicateSerializer
+    }
+
     fun test(event: EntityDamageEvent): Boolean
+
 }
 
 /**
@@ -121,9 +129,9 @@ internal data class VictimEntityTypePredicate(
     }
 }
 
-// FIXME 使用 DispatchingTypeSerializer 替代
-internal object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
+private object DamagePredicateSerializer : TypeSerializer<DamagePredicate> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicate {
+        // FIXME 使用 DispatchingTypeSerializer 替代
         // FIXME 这里没有使用单独的 Node 来指定 type, 而是用的 Node 本身的 key 来指定 type
         //  截止 1/26 DispatchingTypeSerializer 仅支持在单独的 Node 上指定 type
         //  新的 DispatchingTypeSerializer 实现应该支持这种 “inline” type

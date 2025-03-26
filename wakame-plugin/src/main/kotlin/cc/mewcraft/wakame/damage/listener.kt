@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessEntityDamageEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -44,11 +44,9 @@ internal object DamageListener : Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
         val entity = event.entity
-        if (entity !is LivingEntity) {
-            return
-        }
+        if (entity !is LivingEntity) return
 
-        // TODO #365: 需要在这里支持修改传入 DamageManager.generateDamageMetadata 的 AttributeMap 才能实现剩下关于伤害的魔咒效果.
+        // TODO #366: 需要在这里支持修改传入 DamageManager.generateDamageMetadata 的 AttributeMap 才能实现剩下关于伤害的魔咒效果.
         //  这个也可以被修改箭矢伤害的系统使用
 
         val damageMetadata = DamageManager.generateDamageMetadata(event)
@@ -58,16 +56,16 @@ internal object DamageListener : Listener {
         }
 
         val defenseMetadata = DamageManager.generateDefenseMetadata(event)
-        val nekoEntityDamageEvent = NekoEntityDamageEvent(damageMetadata, defenseMetadata, event)
+        val koishEvent = NekoPostprocessEntityDamageEvent(damageMetadata, defenseMetadata, event)
 
-        // 萌芽伤害事件被取消, 则直接返回
-        // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
-        if (!nekoEntityDamageEvent.callEvent()) {
+        if (!NekoPostprocessEntityDamageEvent(damageMetadata, defenseMetadata, event).callEvent()) {
+            // 萌芽伤害事件被取消, 则直接返回
+            // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
             return
         }
 
         // 修改最终伤害
-        event.damage = nekoEntityDamageEvent.getFinalDamage()
+        event.damage = koishEvent.getFinalDamage()
 
         // 记录日志
         if (LOGGING) {
@@ -106,26 +104,25 @@ internal object DamageListener : Listener {
 
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
-        DamageManager.recordProjectileDamageMetadata(event)
+        DamageManager.registerProjectile(event)
     }
 
     @EventHandler
     fun on(event: EntityShootBowEvent) {
-        DamageManager.recordProjectileDamageMetadata(event)
+        DamageManager.registerProjectile(event)
     }
 
     // 在弹射物击中方块时移除记录的 DamageMetadata.
     @EventHandler
     fun on(event: ProjectileHitEvent) {
         if (event.hitBlock == null) return
-        DamageManager.removeProjectileDamageMetadata(event.entity.uniqueId)
+        DamageManager.unregisterProjectile(event.entity)
     }
 
     // 用于取消自定义伤害的击退.
     @EventHandler
     fun on(event: EntityKnockbackEvent) {
-        val uuid = event.entity.uniqueId
-        if (DamageManager.unmarkCancelKnockback(uuid)) {
+        if (DamageManager.unregisterCancelKnockback(event.entity)) {
             event.isCancelled = true
         }
     }
@@ -144,7 +141,7 @@ internal object DamageIntegration : Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: NekoEntityDamageEvent) {
+    fun on(event: NekoPostprocessEntityDamageEvent) {
         val damager = event.damageSource.causingEntity as? Player ?: return
         val damagee = event.damagee as? LivingEntity ?: return
         event.isCancelled = !ProtectionManager.canHurtEntity(damager, damagee, null)

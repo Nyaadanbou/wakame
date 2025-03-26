@@ -15,7 +15,11 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 
-class NekoEntityDamageEvent(
+@Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessEntityDamageEvent"))
+typealias NekoEntityDamageEvent = NekoPostprocessEntityDamageEvent
+
+class NekoPostprocessEntityDamageEvent
+internal constructor(
     val damageMetadata: DamageMetadata,
     val defenseMetadata: DefenseMetadata,
     private val bukkitEvent: EntityDamageEvent,
@@ -109,14 +113,13 @@ class NekoEntityDamageEvent(
     }
 
     override fun getHandlers(): HandlerList {
-        return HANDLER_LIST
+        return handlerList
     }
 
     companion object {
-        @JvmStatic
-        val HANDLER_LIST = HandlerList()
+        private val handlerList = HandlerList()
 
         @JvmStatic
-        fun getHandlerList(): HandlerList = HANDLER_LIST
+        fun getHandlerList(): HandlerList = handlerList
     }
 }
