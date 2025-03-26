@@ -4,11 +4,11 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.isOnCooldown
-import cc.mewcraft.wakame.player.interact.PlayerClickEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
@@ -16,7 +16,6 @@ import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
 import cc.mewcraft.wakame.util.runTaskLater
 import cc.mewcraft.wakame.util.runTaskTimer
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.extra.kotlin.text
@@ -166,14 +165,11 @@ data class KatanaWeapon(
         return null
     }
 
-    override fun handleClick(player: Player, nekoStack: NekoStack, clickAction: PlayerClickEvent.Action, clickHand: PlayerClickEvent.Hand, event: PlayerClickEvent) {
+    override fun handleLeftClick(player: Player, nekoStack: NekoStack, event: PlayerItemLeftClickEvent) {
         val katanaWeaponData = getData(player)
         if (!katanaWeaponData.isHold) return
 
         if (nekoStack.isOnCooldown(player)) return
-
-        // 玩家不是左键点击
-        if (clickAction != PlayerClickEvent.Action.LEFT_CLICK) return
 
         val isShift = player.currentInput.isSneak
         if (!isShift) {
@@ -211,10 +207,6 @@ data class KatanaWeapon(
             event.setUseItemInHand(Event.Result.DENY)
         }
         wrappedEvent.actionPerformed = true
-    }
-
-    override fun handleActiveTick(player: Player, nekoStack: NekoStack, event: ServerTickStartEvent) {
-
     }
 
     override fun handleSlotChangePreviousItem(player: Player, nekoStack: NekoStack, slot: ItemSlot) {

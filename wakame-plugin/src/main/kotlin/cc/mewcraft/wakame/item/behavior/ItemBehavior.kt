@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.behavior
 
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
@@ -54,6 +56,8 @@ interface ItemBehavior : ItemBehaviorHolder {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 NekoItem
 
+    fun handleLeftClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemLeftClickEvent) = Unit
+    fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
     fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
     fun handleInteractAtEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
     fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) = Unit

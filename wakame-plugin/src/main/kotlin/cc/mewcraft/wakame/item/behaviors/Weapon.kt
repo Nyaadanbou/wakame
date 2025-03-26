@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.player.interact.PlayerClickEvent
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
@@ -23,24 +23,24 @@ import org.bukkit.inventory.ItemStack
  */
 interface Weapon : ItemBehavior {
     private object Default : Weapon {
-        override fun handleActiveTick(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: ServerTickStartEvent) {
+        override fun handleLeftClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemLeftClickEvent) {
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
-            weapon.weaponType.handleActiveTick(player, koishStack, event)
+            weapon.weaponType.handleLeftClick(player, koishStack, event)
         }
 
-        override fun handleClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickAction: PlayerClickEvent.Action, clickHand: PlayerClickEvent.Hand, event: PlayerClickEvent) {
+        override fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) {
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
-            weapon.weaponType.handleClick(player, koishStack, clickAction, clickHand, event)
+            weapon.weaponType.handleRightClick(player, koishStack, clickHand, event)
         }
 
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
             if (event.isCancelled) return
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
             if (damagee !is LivingEntity) return
             weapon.weaponType.handleAttackEntity(player, koishStack, damagee, event)
         }
 
-        override fun handlePlayerDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, damageSource: DamageSource, event: NekoEntityDamageEvent) {
+        override fun handlePlayerDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
             if (event.isCancelled) return
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
             weapon.weaponType.handlePlayerDamage(player, koishStack, damageSource, event)

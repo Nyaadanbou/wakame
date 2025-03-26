@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
@@ -129,6 +131,14 @@ interface NekoStack : Examinable {
     fun erase()
 
     //<editor-fold desc="Fast access to call ItemBehavior functions">
+    fun handleLeftClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemLeftClickEvent) {
+        behaviors.forEach { it.handleLeftClick(player, itemStack, koishStack, event) }
+    }
+
+    fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) {
+        behaviors.forEach { it.handleRightClick(player, itemStack, koishStack, clickHand, event) }
+    }
+
     fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         behaviors.forEach { it.handleInteract(player, itemStack, koishStack, action, wrappedEvent) }
     }

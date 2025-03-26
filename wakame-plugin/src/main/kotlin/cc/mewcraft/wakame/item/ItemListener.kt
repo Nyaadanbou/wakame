@@ -6,6 +6,8 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
@@ -79,6 +81,24 @@ object ItemListener {
 
             previous?.wrap()?.let { it.handleEquip(player, previous, it, false, event) }
             current?.wrap()?.let { it.handleEquip(player, current, it, true, event) }
+        }
+
+        event<PlayerItemLeftClickEvent>(EventPriority.HIGHEST) { event ->
+            val player = event.player
+            if (!player.isHandleableByKoish) return@event
+            val itemStack = event.item
+            val koishStack = itemStack.wrap() ?: return@event
+
+            koishStack.handleLeftClick(player, itemStack, koishStack, event)
+        }
+
+        event<PlayerItemRightClickEvent>(EventPriority.HIGHEST) { event ->
+            val player = event.player
+            if (!player.isHandleableByKoish) return@event
+            val itemStack = event.item
+            val koishStack = itemStack.wrap() ?: return@event
+
+            koishStack.handleRightClick(player, itemStack, koishStack, event.hand, event)
         }
 
         event<WrappedPlayerInteractEvent>(EventPriority.NORMAL) { wrappedEvent ->

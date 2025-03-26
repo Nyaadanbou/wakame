@@ -4,12 +4,13 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
-import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
@@ -30,7 +31,7 @@ sealed interface WeaponType {
      * 玩家使用该武器类型物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].
      * 默认返回造成 1 点默认元素伤害的伤害元数据.
      * 返回 `null` 后续会使本次伤害事件取消.
-     * 请注意, 被取消的伤害事件仍然会触发 [PlayerClickEvent]
+     * 请注意, 被取消的伤害事件仍然会触发 [PlayerItemLeftClickEvent]
      *
      * !!! 不要在该方法中的实现中写攻击的附带效果 !!!
      */
@@ -49,17 +50,18 @@ sealed interface WeaponType {
     fun handleSlotChangeCurrentItem(player: Player, nekoStack: NekoStack, slot: ItemSlot) = Unit
 
     /**
-     * 玩家 "激活" 该武器类型物品时, 每tick执行的逻辑.
-     * "激活": 正在使用或消耗.
+     * 玩家使用该武器类型物品进行有效的**左键点击**时执行的逻辑.
+     *
+     * !!! 注意该事件与 [handleAttackEntity] 之间的区别与联系 !!!
      */
-    fun handleActiveTick(player: Player, nekoStack: NekoStack, event: ServerTickStartEvent) = Unit
+    fun handleLeftClick(player: Player, nekoStack: NekoStack, event: PlayerItemLeftClickEvent) = Unit
 
     /**
-     * 玩家使用该武器类型物品点击时执行的逻辑.
+     * 玩家使用该武器类型物品进行有效的**右键点击**时执行的逻辑.
      *
-     * !!! 注意该事件与以下两个事件之间的联系 !!!
+     * !!! 注意该事件与 [handleInteract] 之间的区别与联系 !!!
      */
-    fun handleClick(player: Player, nekoStack: NekoStack, clickAction: PlayerClickEvent.Action, clickHand: PlayerClickEvent.Hand, event: PlayerClickEvent) = Unit
+    fun handleRightClick(player: Player, nekoStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
 
     /**
      * 玩家使用该武器类型物品对直接生物造成伤害时执行的逻辑.
@@ -84,7 +86,7 @@ sealed interface WeaponType {
     /**
      * 玩家使用该武器类型物品触发原版掉耐久事件时执行的逻辑.
      */
-    @Deprecated("Use weapon component instead after upgrading to 1.20.5")
+    @Deprecated("Use weapon component instead after upgrading to 1.21.5")
     fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) = Unit
 }
 
