@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.ability2
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
-import cc.mewcraft.wakame.ability2.meta.AbilityMetaContainer
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
@@ -20,14 +19,6 @@ import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.TypeSerializerCollection
-
-private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    .registerAll(AbilityMetaContainer.makeSerializers())
-    .register(AudienceMessageGroupSerializer)
-    .register(CombinedAudienceMessageSerializer)
-    .build()
 
 /**
  * 加载技能类型.
@@ -58,7 +49,11 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
     private fun consumeData(consumer: (Identifier, AbilityMeta) -> Unit) {
         val loader = buildYamlConfigLoader {
             withDefaults()
-            serializers { registerAll(SERIALIZERS) }
+            serializers {
+                register(AbilityMeta.SERIALIZER)
+                register(AudienceMessageGroupSerializer)
+                register(CombinedAudienceMessageSerializer)
+            }
         }
 
         // 获取存放所有物品配置的文件夹
@@ -68,16 +63,11 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
             val rootNode = loader.buildAndLoadString(file.readText())
             val abilityId = Identifiers.of(path)
             try {
-                consumer(abilityId, loadValue(rootNode))
+                consumer(abilityId, rootNode.require<AbilityMeta>())
             } catch (t: Throwable) {
                 LOGGER.warn("Failed to load ability: '$abilityId', Path: '${file.path}'", t)
                 continue
             }
         }
-    }
-
-    private fun loadValue(node: ConfigurationNode): AbilityMeta {
-        val dataConfig = node.require<AbilityMetaContainer>()
-        return AbilityMeta(dataConfig)
     }
 }

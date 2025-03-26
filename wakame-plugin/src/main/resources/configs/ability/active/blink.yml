@@ -1,21 +1,10 @@
-# 技能模板的 type
-blink:
-  # 冲刺距离
-  distance: 20
+type: blink
 
-  teleported_messages:
-    - type: sound
-      name: "entity.player.teleport"
-      source: "master"
-      emitter: self
+# 冲刺距离
+distance: 20
 
-# 技能模板的 type
-multi_jump:
-  # 跳跃次数
-  count: 2
-
-  jumped_messages:
-    - type: sound
-      name: "entity.player.swim"
-      source: "master"
-      emitter: self
+teleported_messages:
+  - type: sound
+    name: "entity.player.teleport"
+    source: "master"
+    emitter: self

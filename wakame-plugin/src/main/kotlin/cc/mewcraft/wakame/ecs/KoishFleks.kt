@@ -14,10 +14,13 @@ import cc.mewcraft.wakame.ability2.system.DashSystem
 import cc.mewcraft.wakame.ability2.system.MultiJumpSystem
 import cc.mewcraft.wakame.ecs.KoishFleks.world
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.system.AttributeMapSystem
 import cc.mewcraft.wakame.ecs.system.BossBarVisibleManager
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
 import cc.mewcraft.wakame.ecs.system.EntityInfoBossBar
+import cc.mewcraft.wakame.ecs.system.ManaHudSystem
+import cc.mewcraft.wakame.ecs.system.ManaSystem
 import cc.mewcraft.wakame.ecs.system.ParticleSystem
 import cc.mewcraft.wakame.ecs.system.TickCountSystem
 import cc.mewcraft.wakame.element.component.ElementStackContainer
@@ -74,6 +77,12 @@ internal object KoishFleks : Listener, Fleks {
             add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
             add(ItemSlotChangeMonitor()) // 监听背包物品变化
 
+            // ------------
+            // 属性
+            // ------------
+
+            add(AttributeMapSystem())
+
             // -------------
             // 带“移除”的系统 ???
             // -------------
@@ -109,6 +118,13 @@ internal object KoishFleks : Listener, Fleks {
             add(EnchantmentFragileSystem)
             add(EnchantmentSmelterSystem)
             add(EnchantmentVeinminerSystem)
+
+            // ------------
+            // 资源
+            // ------------
+
+            add(ManaSystem())
+            add(ManaHudSystem())
 
             // ------------
             // 粒子

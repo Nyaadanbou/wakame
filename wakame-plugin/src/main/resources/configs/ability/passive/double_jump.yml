@@ -1,10 +1,10 @@
 # 技能模板的 type
-multi_jump:
-  # 跳跃次数
-  count: 2
+type: multi_jump
+# 跳跃次数
+count: 2
 
-  jumped_messages:
-    - type: sound
-      name: "entity.player.swim"
-      source: "master"
-      emitter: self
+jumped_messages:
+  - type: sound
+    name: "entity.player.swim"
+    source: "master"
+    emitter: self

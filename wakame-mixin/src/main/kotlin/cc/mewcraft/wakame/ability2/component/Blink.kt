@@ -5,9 +5,8 @@ import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
-@ConsistentCopyVisibility
 @ConfigSerializable
-data class Blink private constructor(
+data class Blink(
     var distance: Int,
     var teleportedMessages: AudienceMessageGroup,
 ) : Component<Blink> {
