@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
-import cc.mewcraft.wakame.damage.mappings.DamageTypeMappings
-import cc.mewcraft.wakame.damage.mappings.DirectEntityTypeMappings
-import cc.mewcraft.wakame.damage.mappings.EntityAttackMappings
+import cc.mewcraft.wakame.damage.mapping.DamageTypeMappings
+import cc.mewcraft.wakame.damage.mapping.DirectEntityTypeMappings
+import cc.mewcraft.wakame.damage.mapping.EntityAttackMappings
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes

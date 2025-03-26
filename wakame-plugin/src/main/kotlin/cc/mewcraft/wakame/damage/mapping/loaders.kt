@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.damage.mappings
+package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER

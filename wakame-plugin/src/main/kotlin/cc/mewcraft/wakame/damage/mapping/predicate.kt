@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.damage.mappings
+package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
