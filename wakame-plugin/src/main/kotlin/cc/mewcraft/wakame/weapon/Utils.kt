@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.weapon
 
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.extensions.mul
 import cc.mewcraft.wakame.extensions.plus
 import cc.mewcraft.wakame.user.toUser
@@ -8,6 +10,8 @@ import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+
+private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "attack_hitbox")
 
 internal val Player.boundingBoxScale: Float get() = this.toUser().attributeMap.getValue(Attributes.SCALE).toFloat()
 
@@ -28,10 +32,14 @@ internal fun getHitEntities(player: Player, aabbRadius: Double, halfWidthBase: F
     val halfHeight = halfHeightBase * scale
     val halfDepth = halfDepthBase * scale
     val attackOBB = OBB(
-        centerVector + forwardVector mul halfDepth,
+        (forwardVector mul halfDepth) + centerVector,
         calculateOrthonormalBasis(player, angle),
         floatArrayOf(halfWidth, halfHeight, halfDepth)
     )
+    if (LOGGING) {
+        player.sendMessage("obb中心: ${attackOBB.center}")
+        attackOBB.drawWireframe(player)
+    }
 
     return location.getNearbyLivingEntities(aabbRadius) { entity ->
         entity != player

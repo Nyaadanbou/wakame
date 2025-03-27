@@ -1,8 +1,14 @@
 package cc.mewcraft.wakame.util.collision
 
-import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.ecs.Fleks
+import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
+import cc.mewcraft.wakame.ecs.data.LinePath
+import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import cc.mewcraft.wakame.extensions.*
+import com.destroystokyo.paper.ParticleBuilder
+import org.bukkit.Particle
 import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.bukkit.util.BoundingBox
 import org.joml.Vector3f
 import kotlin.math.PI
@@ -83,6 +89,57 @@ data class OBB(
 
     fun isCollide(entity: Entity): Boolean {
         return isCollide(entity.boundingBox)
+    }
+
+    /**
+     * 使用末地烛粒子绘制盒体边界线框.
+     * 用于调试.
+     */
+    fun drawWireframe(viewer: Player) {
+        val vertices = getVertices().map { it.toLocation(viewer.world) }
+
+        val edges = arrayOf(
+            0 to 1, 1 to 2, 2 to 3, 3 to 0,
+            4 to 5, 5 to 6, 6 to 7, 7 to 4,
+            0 to 4, 1 to 5, 2 to 6, 3 to 7
+        )
+        for ((i, j) in edges) {
+            val start = vertices[i]
+            val end = vertices[j]
+            Fleks.createEntity {
+                it += ParticleEffectComponent(
+                    bukkitWorld = viewer.world,
+                    ParticleConfiguration(
+                        builderProvider = { loc ->
+                            ParticleBuilder(Particle.END_ROD)
+                                .location(loc)
+                                .receivers(listOf(viewer))
+                                .extra(.0)
+                        },
+                        particlePath = LinePath(start, end),
+                        amount = (start.distance(end) / 0.25).toInt(),
+                        times = 1
+                    )
+                )
+            }
+        }
+    }
+
+    private fun getVertices(): List<Vector3f> {
+        val signs = arrayOf(-1f, 1f)
+        val vertices = mutableListOf<Vector3f>()
+        for (dx in signs) {
+            for (dy in signs) {
+                for (dz in signs) {
+                    val vertex = center +
+                            (axes[0] mul (dx * halfExtents[0])) +
+                            (axes[1] mul (dy * halfExtents[1])) +
+                            (axes[2] mul (dz * halfExtents[2]))
+                    vertices.add(vertex)
+                }
+            }
+        }
+        return vertices
     }
 }
 
@@ -207,10 +264,6 @@ private fun obbProjectionLength(obb: OBB, axis: Vector3f): Float {
  * 即三个向量两两垂直且均为单位向量.
  */
 private fun isOrthonormalBasis(a: Vector3f, b: Vector3f, c: Vector3f, epsilon: Float = 1e-6f): Boolean {
-    LOGGER.info("被检查的三个向量:")
-    LOGGER.info(a.toString())
-    LOGGER.info(b.toString())
-    LOGGER.info(c.toString())
     return a.isUnit(epsilon) && b.isUnit(epsilon) && c.isUnit(epsilon) &&
             a.isOrthogonalTo(b, epsilon) && a.isOrthogonalTo(c, epsilon) && b.isOrthogonalTo(c, epsilon)
 }
@@ -224,9 +277,9 @@ private fun rotateVectorAroundAxis(v: Vector3f, axis: Vector3f, angle: Float): V
     val angleRad = angle.toRadians()
     val cos = cos(angleRad)
     val sin = sin(angleRad)
-    val axisNorm = axis.normalize()
+    val axisNorm = axis.copy().normalize()
 
-    return (v mul cos) + ((axisNorm cross v) mul sin) + (axisNorm mul (axisNorm dot v) * (1 - cos))
+    return (v mul cos) + ((axisNorm cross v) mul sin) + (axisNorm mul ((axisNorm dot v) * (1 - cos)))
 }
 
 /**

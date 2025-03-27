@@ -97,3 +97,4 @@ debug:
     registry: false
     # 记录 ItemStackRenderer
     renderer: false
+  attack_hitbox : false

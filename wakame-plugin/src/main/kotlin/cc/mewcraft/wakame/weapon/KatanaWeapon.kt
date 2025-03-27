@@ -14,7 +14,6 @@ import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
-import cc.mewcraft.wakame.util.runTaskLater
 import cc.mewcraft.wakame.util.runTaskTimer
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.bossbar.BossBar
@@ -166,13 +165,13 @@ data class KatanaWeapon(
     }
 
     override fun handleLeftClick(player: Player, nekoStack: NekoStack, event: PlayerItemLeftClickEvent) {
+        player.sendMessage("太刀左键")
         val katanaWeaponData = getData(player)
         if (!katanaWeaponData.isHold) return
 
         if (nekoStack.isOnCooldown(player)) return
 
-        val isShift = player.currentInput.isSneak
-        if (!isShift) {
+        if (!player.isSneaking) {
             // 玩家单纯左键点击
             // 发动横斩
             horizontalSlash(player, nekoStack, katanaWeaponData)
@@ -247,7 +246,7 @@ data class KatanaWeapon(
             }
         )
 
-        val hitEntities = getHitEntities(player, 5.0, 1.5f, 0.05f, 1f)
+        val hitEntities = getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
             hitEntities.forEach { entity ->
@@ -344,7 +343,7 @@ data class KatanaWeapon(
             }
         )
 
-        val hitEntities = getHitEntities(player, 5.0, 1.75f, 0.05f, 1.25f, angel)
+        val hitEntities = getHitEntities(player, 5.0, 1.7f, 0.05f, 1.4f, angel)
         // 造成伤害
         hitEntities.forEach { entity ->
             entity.hurt(damageMetadata, player, true)
@@ -358,7 +357,7 @@ data class KatanaWeapon(
     private fun spiritBladeSlash1(player: Player, nekoStack: NekoStack, katanaWeaponData: KatanaWeaponData) {
         // 消耗气
         katanaWeaponData.addBladeSpirit(-spiritBladeSlashSpiritConsume1)
-        spiritBladeSlashBase(player, katanaWeaponData, 40f)
+        spiritBladeSlashBase(player, katanaWeaponData, 35f)
         // 连招状态
         katanaWeaponData.spiritBladeSlashState = KatanaWeaponData.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_1
         katanaWeaponData.spiritBladeSlashComboTicks = spiritBladeSlashAllowComboTicks
@@ -373,7 +372,7 @@ data class KatanaWeapon(
     private fun spiritBladeSlash2(player: Player, nekoStack: NekoStack, katanaWeaponData: KatanaWeaponData) {
         // 消耗气
         katanaWeaponData.addBladeSpirit(-spiritBladeSlashSpiritConsume2)
-        spiritBladeSlashBase(player, katanaWeaponData, -40f)
+        spiritBladeSlashBase(player, katanaWeaponData, -35f)
         // 连招状态
         katanaWeaponData.spiritBladeSlashState = KatanaWeaponData.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_2
         katanaWeaponData.spiritBladeSlashComboTicks = spiritBladeSlashAllowComboTicks
@@ -388,10 +387,8 @@ data class KatanaWeapon(
     private fun spiritBladeSlash3(player: Player, nekoStack: NekoStack, katanaWeaponData: KatanaWeaponData) {
         // 消耗气
         katanaWeaponData.addBladeSpirit(-spiritBladeSlashSpiritConsume3)
-        spiritBladeSlashBase(player, katanaWeaponData, 40f)
-        runTaskLater(10) {
-            spiritBladeSlashBase(player, katanaWeaponData, -40f)
-        }
+        spiritBladeSlashBase(player, katanaWeaponData, 35f)
+        spiritBladeSlashBase(player, katanaWeaponData, -35f)
         // 连招状态
         katanaWeaponData.spiritBladeSlashState = KatanaWeaponData.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_3
         katanaWeaponData.spiritBladeSlashComboTicks = spiritBladeSlashAllowComboTicks
@@ -565,6 +562,9 @@ data class KatanaWeapon(
         // 气刃斩连段时间自减
         if (katanaWeaponData.spiritBladeSlashComboTicks > 0) {
             katanaWeaponData.spiritBladeSlashComboTicks -= 1
+            if (katanaWeaponData.spiritBladeSlashComboTicks <= 0) {
+                katanaWeaponData.spiritBladeSlashState = KatanaWeaponData.SpiritBladeSlashState.NONE
+            }
         }
 
         // 居合无敌时间自减

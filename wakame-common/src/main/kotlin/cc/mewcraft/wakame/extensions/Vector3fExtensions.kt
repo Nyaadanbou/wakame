@@ -42,7 +42,7 @@ infix fun Vector3f.mul(other: Vector3f): Vector3f {
 }
 
 infix fun Vector3f.dot(other: Vector3f): Float {
-    return this.copy().dot(other)
+    return this.dot(other)
 }
 
 infix fun Vector3f.cross(other: Vector3f): Vector3f {
