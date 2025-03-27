@@ -14,6 +14,27 @@ import org.bukkit.entity.Player
 import java.util.*
 import java.util.stream.Stream
 
+val Player.koishLevel: Int
+    get() = toUser().level
+
+val Player.kizamiContainer: KizamiMap
+    get() = toUser().kizamiMap
+
+val Player.attributeContainer: AttributeMap
+    get() = toUser().attributeMap
+
+val Player.resourceContainer: ResourceMap
+    get() = toUser().resourceMap
+
+val Player.combo: PlayerCombo
+    get() = toUser().combo
+
+val Player.attackSpeed: AttackSpeed
+    get() = toUser().attackSpeed
+
+val Player.isInventoryListenable: Boolean
+    get() = toUser().isInventoryListenable
+
 /**
  * Adapts the [Player] into [NekoPlayer][User].
  */
