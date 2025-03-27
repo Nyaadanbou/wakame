@@ -14,13 +14,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 
 @Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessEntityDamageEvent"))
-typealias NekoEntityDamageEvent = NekoPostprocessEntityDamageEvent
+typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
 
 /**
  * @property damageMetadata 伤害信息 (计算防御前)
  * @property finalDamageMap 伤害信息 (计算防御后)
  */
-class NekoPostprocessEntityDamageEvent
+class NekoPostprocessDamageEvent
 internal constructor(
     val damageMetadata: DamageMetadata,
     private val finalDamageMap: Reference2DoubleMap<RegistryEntry<ElementType>>,
