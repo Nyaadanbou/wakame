@@ -4,12 +4,11 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
-import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -21,8 +20,6 @@ import java.lang.reflect.Type
 /**
  * 攻击类型.
  */
-// 其实现类先不要写成单例.
-// 未来确认是无参数的实现再写成单例.
 sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].
@@ -31,25 +28,24 @@ sealed interface AttackType {
      *
      * !!! 不要在该方法中的实现中写攻击的附带效果 !!!
      */
-    fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
-    }
+    fun generateDamageMetadata(itemstack: NekoStack, event: NekoPreprocessDamageEvent): DamageMetadata? =
+        PlayerDamageMetadata.INTRINSIC_ATTACK
 
     /**
      * 玩家使用该攻击类型的物品对直接生物造成伤害时执行的逻辑.
      */
-    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) = Unit
+    fun handleAttackEntity(itemstack: NekoStack, event: NekoPreprocessDamageEvent) = Unit
 
     /**
      * 玩家使用该攻击类型的物品进行交互事件时执行的逻辑.
      * 默认左键点击时触发攻击冷却.
      */
-    fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
         val user = player.toUser()
-        if (!user.attackSpeed.isActive(nekoStack.id)) {
+        if (!user.attackSpeed.isActive(itemstack.id)) {
             // 没有左键到生物时, 也应该应用攻击冷却
-            nekoStack.applyAttackCooldown(player)
+            itemstack.applyAttackCooldown(player)
         }
         wrappedEvent.actionPerformed = true
     }
@@ -57,7 +53,7 @@ sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品触发原版掉耐久事件时执行的逻辑.
      */
-    fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) = Unit
+    fun handleDamage(player: Player, itemstack: NekoStack, event: PlayerItemDamageEvent) = Unit
 }
 
 /**

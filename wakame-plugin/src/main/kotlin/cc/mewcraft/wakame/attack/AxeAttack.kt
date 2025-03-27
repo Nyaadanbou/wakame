@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.damage.*
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
-import org.bukkit.entity.LivingEntity
+import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -28,42 +29,32 @@ class AxeAttack(
         const val NAME = "axe"
     }
 
-    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
-        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
-            event.isCancelled = true
-        }
-    }
-
-    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
-            return null
-        }
-
-        return PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.AXE),
-            damageBundle = damageBundle(user.attributeMap) {
+    override fun generateDamageMetadata(itemstack: NekoStack, event: NekoPreprocessDamageEvent): DamageMetadata? {
+        val player = event.damager
+        if (player.attackSpeed.isActive(itemstack.id)) return null
+        val attributeContainer = event.damagerAttributes
+        val directDamageMetadata = PlayerDamageMetadata(
+            attributes = attributeContainer,
+            damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
                 }
             }
         )
+
+        return directDamageMetadata
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
-            return
-        }
-
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
-            return
-        }
-
-        // 应用攻击冷却
-        nekoStack.applyAttackCooldown(player)
-        // 扣除耐久
+    override fun handleAttackEntity(itemstack: NekoStack, event: NekoPreprocessDamageEvent) {
+        val player = event.damager
+        if (player.attackSpeed.isActive(itemstack.id)) return
+        itemstack.applyAttackCooldown(player)
         player.damageItemStack2(EquipmentSlot.HAND, 1)
+    }
+
+    override fun handleDamage(player: Player, itemstack: NekoStack, event: PlayerItemDamageEvent) {
+        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
+            event.isCancelled = true
+        }
     }
 }

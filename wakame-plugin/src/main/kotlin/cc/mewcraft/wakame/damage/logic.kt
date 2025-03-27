@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
 import cc.mewcraft.wakame.damage.mapping.NullCausingDamageMappings
 import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -101,7 +101,7 @@ internal class DamageContext(
     val damage: Double,
     val damagee: LivingEntity,
     val damageSource: DamageSource,
-    val damageCause: EntityDamageEvent.DamageCause,
+    val damageCause: DamageCause,
 ) {
     override fun toString(): String {
         return "DamageContext(damage=$damage, damagee=$damagee, damageCause=$damageCause, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
@@ -117,7 +117,7 @@ internal object DamageManager : DamageManagerApi {
     private const val PLACEHOLDER_DAMAGE_VALUE = 4.95
 
     /**
-     * 作为 direct_entity 能够造成伤害的 projectile 类型.
+     * 作为 direct_entity 时能够造成伤害的 projectile 类型.
      */
     private val PROJECTILE_DAMAGER_TYPES: Set<EntityType> = enumSetOf(
         EntityType.ARROW,
@@ -145,7 +145,7 @@ internal object DamageManager : DamageManagerApi {
     )
 
     /**
-     * 非常特殊的能够造成伤害的 entity 类型.
+     * 作为 direct_entity 时能够造成伤害的并且比较“特殊”的 entity 类型.
      */
     private val SPECIAL_DAMAGER_TYPES: Set<EntityType> = enumSetOf(
         EntityType.TNT,
@@ -245,51 +245,24 @@ internal object DamageManager : DamageManagerApi {
 
             is Player -> {
                 if (directEntity.type in REGISTERED_PROJECTILE_TYPES) {
-                    // 这里的情况: direct_entity 的类型在需要注册的弹射物类型当中.
-                    // 因此这里先尝试获取已经注册的伤害信息; 若没有注册则使用伤害映射.
+                    // 这里的情况: direct_entity 的 *类型* 在已注册弹射物类型当中.
+                    // 这意味着 direct_entity 在之前的某个时间点也许已经注册了一个伤害信息.
+                    // 因此这里先尝试获取已经注册的伤害信息; 若没有注册, 则使用伤害映射.
                     val damageMetadata = (directEntity as Projectile).getDamageMetadata()
                     return damageMetadata ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 } else if (directEntity.type in MISC_DAMAGER_TYPES) {
-                    // 这里的情况: direct_entity 属于游戏里比较特殊的伤害机制.
+                    // 这里的情况: direct_entity 属于游戏里比较特殊的能够造成伤害的实体.
                     // 直接使用伤害映射.
                     return context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 }
 
-                val nekoStack = causingEntity.inventory.itemInMainHand.wrap()
-                val attack = nekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
-                val damageCause = context.damageCause
-                when (damageCause) {
+                when (val damageCause = context.damageCause) {
                     DamageCause.ENTITY_ATTACK -> { // 左键直接点到了实体
-                        if (attack != null) {
-                            // 玩家手中的物品是 Attack; 可以返回 null, 意为取消本次伤害
-                            // FIXME #366: v
-                            val preprocessEvent = NekoPreprocessEntityDamageEvent(causingEntity, damagee, damageSource).apply { callEvent() }
-                            return attack.attackType.generateDamageMetadata(nekoStack, preprocessEvent)
-                        } else {
-                            return PlayerDamageMetadata.INTRINSIC_ATTACK // 手中的物品无 Attack 行为甚至不是 Koish 物品
-                        }
+                        return createPlayerDirectAttackDamageMetadata(context)
                     }
 
                     DamageCause.ENTITY_SWEEP_ATTACK -> { // 横扫之刃“溅射”到了实体
-                        // TODO 横扫的临时实现, 等待麻将的组件化
-                        // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
-                        if (attack?.attackType is SwordAttack) {
-                            // FIXME #366: v
-                            val preprocessEvent = NekoPreprocessEntityDamageEvent(causingEntity, damagee, damageSource).apply { callEvent() }
-                            val playerAttributes = preprocessEvent.damagerAttributes
-                            return PlayerDamageMetadata(
-                                attributes = playerAttributes,
-                                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD),
-                                damageBundle = damageBundle(playerAttributes) {
-                                    every {
-                                        standard()
-                                        rate { standard() * playerAttributes.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
-                                    }
-                                }
-                            )
-                        } else {
-                            return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
-                        }
+                        return createPlayerSweepAttackDamageMetadata(context)
                     }
 
                     else -> { // 不太可能
@@ -474,19 +447,48 @@ internal object DamageManager : DamageManagerApi {
     }
 
     private fun createAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
-        val nekoStack = arrow.itemStack.wrap() ?: return null
-        if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) return null
-        val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return null
-        val attributeModifiersOnArrow = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val arrowAttributes by ImaginaryAttributeMaps.ARROW
-        val arrowAttributesSnapshot = arrowAttributes.getSnapshot()
-        arrowAttributesSnapshot.addTransientModifiers(attributeModifiersOnArrow)
-        val damageBundle = damageBundle(arrowAttributesSnapshot) {
+        val itemstack = arrow.itemStack.wrap() ?: return null
+        if (!itemstack.templates.has(ItemTemplateTypes.ARROW)) return null
+        val cells = itemstack.components.get(ItemComponentTypes.CELLS) ?: return null
+        val modifiersOnArrow = cells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
+        val arrowAttributes = ImaginaryAttributeMaps.ARROW.value.getSnapshot()
+        arrowAttributes.addTransientModifiers(modifiersOnArrow)
+        val damageBundle = damageBundle(arrowAttributes) {
             every {
                 standard()
             }
         }
         return VanillaDamageMetadata(damageBundle)
+    }
+
+    // 可以返回 null, 意为取消本次伤害
+    private fun createPlayerDirectAttackDamageMetadata(context: DamageContext): DamageMetadata? {
+        val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
+        val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
+        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
+        val preprocessEvent = NekoPreprocessDamageEvent(player, context.damagee, context.damageSource).apply { callEvent() }
+        return attack.attackType.generateDamageMetadata(itemstack, preprocessEvent)
+    }
+
+    // 可以返回 null, 意为取消本次伤害
+    private fun createPlayerSweepAttackDamageMetadata(context: DamageContext): DamageMetadata? {
+        // TODO 横扫的临时实现, 等待麻将的组件化
+        // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
+        val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
+        val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
+        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return null
+        if (attack.attackType !is SwordAttack) return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
+        val preprocessEvent = NekoPreprocessDamageEvent(player, context.damagee, context.damageSource).apply { callEvent() }
+        val playerAttributes = preprocessEvent.damagerAttributes
+        return PlayerDamageMetadata(
+            attributes = playerAttributes,
+            damageBundle = damageBundle(playerAttributes) {
+                every {
+                    standard()
+                    rate { standard() * playerAttributes.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
+                }
+            }
+        )
     }
 
     private fun calculateDefaultDamageMetadata(context: DamageContext): DamageMetadata {
@@ -532,7 +534,7 @@ internal object DamageManager : DamageManagerApi {
 
         // FIXME #366: v
         // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
-        val preprocessEvent = NekoPreprocessEntityDamageEvent(shooter, null, null).apply { callEvent() }
+        val preprocessEvent = NekoPreprocessDamageEvent(shooter, null, null).apply { callEvent() }
         val playerAttributes = preprocessEvent.damagerAttributes
 
         projectile.registerCustomDamageMetadata(
@@ -568,27 +570,17 @@ internal object DamageManager : DamageManagerApi {
         val projectile = event.projectile as? AbstractArrow ?: return
 
         val force: Double
-        val damageTags: DamageTags
         val damageBundle: DamageBundle
-        val bowMaterial = event.bow?.type
-        when (bowMaterial) {
-            Material.BOW -> {
-                damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.BOW)
-                // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
-                force = DamageRules.calculateBowForce(shooter.activeItemUsedTime)
-            }
-
-            Material.CROSSBOW -> {
-                damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.CROSSBOW)
-                force = 1.0
-            }
-
+        when (event.bow?.type) {
+            // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
+            Material.BOW -> force = DamageRules.calculateBowForce(shooter.activeItemUsedTime)
+            Material.CROSSBOW -> force = 1.0
             else -> return
         }
 
         // FIXME #366: v
         // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
-        val preprocessEvent = NekoPreprocessEntityDamageEvent(shooter, null, null).apply { callEvent() }
+        val preprocessEvent = NekoPreprocessDamageEvent(shooter, null, null).apply { callEvent() }
         val playerAttributes = preprocessEvent.damagerAttributes
         val itemstack = projectile.itemStack.wrap()
         val cells = itemstack?.components?.get(ItemComponentTypes.CELLS)
@@ -615,7 +607,6 @@ internal object DamageManager : DamageManagerApi {
         projectile.putDamageMetadata(
             PlayerDamageMetadata(
                 attributes = preprocessEvent.damagerAttributes,
-                damageTags = damageTags,
                 damageBundle = damageBundle
             )
         )

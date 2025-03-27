@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.block.Action
@@ -22,9 +22,9 @@ class BowAttack : AttackType {
         const val NAME = "bow"
     }
 
-    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    override fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (action.isRightClick) {
-            if (player.toUser().attackSpeed.isActive(nekoStack.id)) {
+            if (player.attackSpeed.isActive(itemstack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用弓
@@ -39,6 +39,7 @@ class BowAttack : AttackType {
                 }
             }
         }
+
         wrappedEvent.actionPerformed = true
     }
 }

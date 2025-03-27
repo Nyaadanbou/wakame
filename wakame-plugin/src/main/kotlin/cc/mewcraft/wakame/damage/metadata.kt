@@ -175,7 +175,7 @@ internal object PlayerDamageMetadata {
         criticalStrikeMetadata = CriticalStrikeMetadata.NONE
     )
 
-    operator fun invoke(attributes: AttributeMapSnapshot, damageBundle: DamageBundle, damageTags: DamageTags): DamageMetadata {
+    operator fun invoke(attributes: AttributeMapSnapshot, damageBundle: DamageBundle, damageTags: DamageTags = DamageTags()): DamageMetadata {
         return DamageMetadata(
             damageTags = damageTags,
             damageBundle = damageBundle,
