@@ -27,6 +27,7 @@ import java.lang.ref.WeakReference
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+// FIXME #366: 搞点合适的构造函数, 还有 user#attributemap 的扩展函数
 /**
  * A constructor function of [AttributeMap].
  *
@@ -441,6 +442,17 @@ private class ImaginaryAttributeMapImpl(
 private class AttributeMapSnapshotImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
+    @Suppress("DuplicatedCode")
+    override fun getSnapshot(): AttributeMapSnapshot {
+        val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
+        for (attribute in getAttributes()) {
+            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
+            val snapshot = instance.getSnapshot()
+            data.put(attribute, snapshot)
+        }
+        return AttributeMapSnapshotImpl(data)
+    }
+
     override fun getInstance(attribute: Attribute): AttributeInstanceSnapshot? {
         return data[attribute]
     }

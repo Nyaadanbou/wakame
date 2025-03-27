@@ -135,7 +135,7 @@ interface ImaginaryAttributeInstance : AttributeInstanceSnapshotable {
 /**
  * 代表一个属性实例的快照 (支持读/写), 用于临时的数值储存和计算.
  */
-interface AttributeInstanceSnapshot {
+interface AttributeInstanceSnapshot : AttributeInstanceSnapshotable {
     /**
      * 该属性实例的 [Attribute].
      */

@@ -41,7 +41,7 @@ interface AttributeMapLike {
 /**
  * 代表一个 [AttributeMapLike] 的快照, 支持读/写, 用于临时的数值储存和计算.
  */
-interface AttributeMapSnapshot : AttributeMapLike, Iterable<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
+interface AttributeMapSnapshot : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
     /**
      * 获取指定 [attribute] 的实例快照.
      *

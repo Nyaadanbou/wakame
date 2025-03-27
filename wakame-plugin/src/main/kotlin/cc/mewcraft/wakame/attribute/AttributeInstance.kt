@@ -3,18 +3,14 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import com.google.common.collect.ImmutableSet
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
-import it.unimi.dsi.fastutil.objects.ObjectArraySet
-import it.unimi.dsi.fastutil.objects.ObjectCollection
-import it.unimi.dsi.fastutil.objects.ObjectSets
+import it.unimi.dsi.fastutil.objects.*
 import net.kyori.adventure.key.Key
 import org.bukkit.attribute.Attributable
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.VisibleForTesting
 import xyz.xenondevs.commons.collections.enumMap
 import java.lang.ref.WeakReference
-import java.util.EnumMap
+import java.util.*
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
@@ -509,4 +505,8 @@ private class AttributeInstanceSnapshotImpl(
 
     override fun toImaginary(): ImaginaryAttributeInstance =
         ImaginaryAttributeInstanceImpl(delegation.copy())
+
+    override fun getSnapshot(): AttributeInstanceSnapshot {
+        return AttributeInstanceSnapshotImpl(delegation.copy())
+    }
 }
