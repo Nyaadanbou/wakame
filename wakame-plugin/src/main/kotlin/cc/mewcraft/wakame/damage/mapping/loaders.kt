@@ -17,12 +17,9 @@ import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
-import org.spongepowered.configurate.objectmapping.ConfigSerializable
-import org.spongepowered.configurate.objectmapping.meta.Setting
 
 // ------------
 // 从配置文件加载 mappings
@@ -30,15 +27,6 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 
 private const val DATA_DIR = "damage"
 
-@ConfigSerializable
-internal data class DamageTypeMapper(
-    @Setting("damage_metadata")
-    val builder: DamageMetadataBuilder<*>,
-) : DamageMapper {
-    override fun generate(event: EntityDamageEvent): DamageMetadata {
-        return builder.build(event)
-    }
-}
 
 /**
  * 当 `DamageSource#directEntity` 为 `null` 时会使用到这个映射.
@@ -102,7 +90,7 @@ internal object DamageTypeDamageMappings {
 }
 
 /**
- * 依据原版生物的攻击特征来获取萌芽伤害的映射.
+ * 依据原版生物的攻击特征来获取 [DamageMapper].
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
@@ -120,12 +108,9 @@ internal object AttackCharacteristicDamageMappings {
         loadDataIntoRegistry()
     }
 
-    /**
-     * 获取某一伤害情景下原版生物的伤害映射.
-     * 返回空表示未指定该情景下的伤害映射.
-     */
-    fun get(damager: LivingEntity, event: EntityDamageEvent): DamageMapper? {
-        return mappings[damager.type]?.first { mapper -> mapper.match(event) }
+    fun get(context: DamageContext): DamageMapper? {
+        val directEntity = context.damageSource.directEntity ?: error("Context has no direct entity.")
+        return mappings[directEntity.type]?.first { mapper -> mapper.match(context) }
     }
 
     private fun loadDataIntoRegistry() {
@@ -141,7 +126,7 @@ internal object AttackCharacteristicDamageMappings {
         }.buildAndLoadString(
             KoishDataPaths.CONFIGS
                 .resolve(DATA_DIR)
-                .resolve("entity_attack_mappings.yml")
+                .resolve("attack_characteristics_mappings.yml")
                 .toFile()
                 .readText()
         )
@@ -168,10 +153,9 @@ internal object AttackCharacteristicDamageMappings {
  */
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object DirectEntityDamageMappings {
+internal object NullCausingDamageMappings {
 
-    private val playerMappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
-    private val untrackedMappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 
     @InitFun
     fun init() {
@@ -183,17 +167,15 @@ internal object DirectEntityDamageMappings {
         loadDataIntoRegistry()
     }
 
-    fun getForPlayer(direct: EntityType, event: EntityDamageEvent): DamageMapper? {
-        return playerMappings[direct]?.first { mapper -> mapper.match(event) }
-    }
-
-    fun getForUntracked(direct: EntityType, event: EntityDamageEvent): DamageMapper? {
-        return untrackedMappings[direct]?.first { mapper -> mapper.match(event) }
+    fun get(context: DamageContext): DamageMapper? {
+        val damageSource = context.damageSource
+        val directEntity = damageSource.directEntity ?: error("Context has no direct entity. This is a misuse of the mappings.")
+        require(damageSource.causingEntity == null) { "Context *has* causing entity. This is a misuse of the mappings."}
+        return mappings[directEntity.type]?.first { mapper -> mapper.match(context) }
     }
 
     private fun loadDataIntoRegistry() {
-        playerMappings.clear()
-        untrackedMappings.clear()
+        mappings.clear()
 
         val rootNode = buildYamlConfigLoader {
             withDefaults()
@@ -205,20 +187,18 @@ internal object DirectEntityDamageMappings {
         }.buildAndLoadString(
             KoishDataPaths.CONFIGS
                 .resolve(DATA_DIR)
-                .resolve("direct_entity_type_mappings.yml")
+                .resolve("null_causing_mappings.yml")
                 .toFile().readText()
         )
 
-        readNodeThenPutIntoMap(rootNode, playerMappings, "player")
-        readNodeThenPutIntoMap(rootNode, untrackedMappings, "no_causing") // FIXME #366: rename node to "untracked"
+        readNodeThenPutIntoMap(rootNode, mappings)
     }
 
     private fun readNodeThenPutIntoMap(
         rootNode: ConfigurationNode,
         targetMap: MutableMap<EntityType, List<DamagePredicateMapper>>,
-        nodeName: String,
     ) {
-        val entityTypeToNode = rootNode.node(nodeName).childrenMap()
+        val entityTypeToNode = rootNode.childrenMap()
         for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
             val damageMappingList = node.childrenMap().map { (_, node) ->
                 val result: DamagePredicateMapper? = node.get<DamagePredicateMapper>()
@@ -231,4 +211,65 @@ internal object DirectEntityDamageMappings {
             targetMap[entityType] = damageMappingList
         }
     }
+}
+
+@Init(stage = InitStage.POST_WORLD)
+internal object PlayerAdhocDamageMappings {
+    private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
+
+    @InitFun
+    fun init() {
+        loadDataIntoRegistry()
+    }
+
+    @ReloadFun
+    fun reload() {
+        loadDataIntoRegistry()
+    }
+
+    fun get(context: DamageContext): DamageMapper? {
+        val damageSource = context.damageSource
+        val directEntity = damageSource.directEntity ?: error("Context has no direct entity. This is a misuse of the mappings.")
+        require(damageSource.causingEntity is Player) { "Context has no causing *player*. This is a misuse of the mappings." }
+        return mappings[directEntity.type]?.first { mapper -> mapper.match(context) }
+    }
+
+    private fun loadDataIntoRegistry() {
+        mappings.clear()
+
+        val rootNode = buildYamlConfigLoader {
+            withDefaults()
+            serializers {
+                register<DamagePredicate>(DamagePredicate.SERIALIZER)
+                register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
+                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+            }
+        }.buildAndLoadString(
+            KoishDataPaths.CONFIGS
+                .resolve(DATA_DIR)
+                .resolve("player_adhoc_mappings.yml")
+                .toFile().readText()
+        )
+
+        readNodeThenPutIntoMap(rootNode, mappings)
+    }
+
+    private fun readNodeThenPutIntoMap(
+        rootNode: ConfigurationNode,
+        targetMap: MutableMap<EntityType, List<DamagePredicateMapper>>,
+    ) {
+        val entityTypeToNode = rootNode.childrenMap()
+        for ((entityType, node) in entityTypeToNode.transformKeys<EntityType>(throwIfFail = false)) {
+            val damageMappingList = node.childrenMap().map { (_, node) ->
+                val result: DamagePredicateMapper? = node.get<DamagePredicateMapper>()
+                if (result == null) {
+                    LOGGER.error("Malformed damage type mapping at ${node.path()}. Skipped.")
+                }
+                result
+            }.filterNotNull()
+
+            targetMap[entityType] = damageMappingList
+        }
+    }
+
 }

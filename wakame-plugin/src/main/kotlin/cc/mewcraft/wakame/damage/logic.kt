@@ -8,18 +8,20 @@ import cc.mewcraft.wakame.attribute.AttributeMap
 import cc.mewcraft.wakame.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
+import cc.mewcraft.wakame.damage.DamageManager.calculateDamageBeforeDefense
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamage
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamageMap
 import cc.mewcraft.wakame.damage.mapping.AttackCharacteristicDamageMappings
 import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
-import cc.mewcraft.wakame.damage.mapping.DirectEntityDamageMappings
+import cc.mewcraft.wakame.damage.mapping.NullCausingDamageMappings
+import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessEntityDamageEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.RecursionGuard
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -27,12 +29,14 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.jetbrains.annotations.ApiStatus
+import xyz.xenondevs.commons.collections.enumSetOf
 import java.time.Duration
 import java.util.*
 import kotlin.math.round
@@ -85,6 +89,25 @@ interface DamageManagerApi {
 // 内部实现
 // ------------
 
+internal fun DamageContext(event: EntityDamageEvent): DamageContext {
+    val damage = event.damage
+    val damagee = event.entity as? LivingEntity ?: error("The damagee must be a living entity")
+    val damageSource = event.damageSource
+    val damageCause = event.cause
+    return DamageContext(damage, damagee, damageSource, damageCause)
+}
+
+internal class DamageContext(
+    val damage: Double,
+    val damagee: LivingEntity,
+    val damageSource: DamageSource,
+    val damageCause: EntityDamageEvent.DamageCause,
+) {
+    override fun toString(): String {
+        return "DamageContext(damage=$damage, damagee=$damagee, damageCause=$damageCause, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
+    }
+}
+
 /**
  * 包含伤害系统的核心逻辑和状态.
  */
@@ -92,6 +115,68 @@ internal object DamageManager : DamageManagerApi {
 
     // 特殊值, 方便识别. 仅用于触发事件, 以被事件系统监听&修改.
     private const val PLACEHOLDER_DAMAGE_VALUE = 4.95
+
+    /**
+     * 作为 direct_entity 能够造成伤害的 projectile 类型.
+     */
+    private val PROJECTILE_DAMAGER_TYPES: Set<EntityType> = enumSetOf(
+        EntityType.ARROW,
+        EntityType.BREEZE_WIND_CHARGE,
+        EntityType.EGG,
+        EntityType.ENDER_PEARL,
+        EntityType.FIREBALL,
+        EntityType.FIREWORK_ROCKET,
+        EntityType.LLAMA_SPIT,
+        EntityType.POTION,
+        EntityType.SHULKER_BULLET,
+        EntityType.SMALL_FIREBALL,
+        EntityType.SNOWBALL,
+        EntityType.SPECTRAL_ARROW,
+        EntityType.TRIDENT,
+        EntityType.WIND_CHARGE,
+    )
+    /**
+     * 作为 direct_entity 时能够造成伤害的 entity 类型.
+     */
+    private val MISC_DAMAGER_TYPES: Set<EntityType> = PROJECTILE_DAMAGER_TYPES + enumSetOf(
+        EntityType.TNT,
+        EntityType.END_CRYSTAL,
+        EntityType.AREA_EFFECT_CLOUD,
+    )
+
+    /**
+     * 非常特殊的能够造成伤害的 entity 类型.
+     */
+    private val SPECIAL_DAMAGER_TYPES: Set<EntityType> = enumSetOf(
+        EntityType.TNT,
+        EntityType.END_CRYSTAL,
+    )
+
+    /**
+     * 需要提前注册 damage_metadata 的 projectile 类型 (由玩家射出的).
+     * 这些 projectile 类型的特点是它们的物品形式都可以带上修改伤害的属性.
+     *
+     * 系统会在这些 projectile 生成时(但还未击中目标之前)根据属性为其注册 damage_metadata.
+     * 等到这些 projectile 击中目标后, 将使用已经注册的 damage_metadata 作为计算的依据.
+     *
+     * 如此设计是为了让玩家打出的 projectile 在刚离开玩家时, 其最终将要造成的伤害就已经确定.
+     */
+    private val REGISTERED_PROJECTILE_TYPES: Set<EntityType> = enumSetOf(
+        EntityType.ARROW,
+        EntityType.SPECTRAL_ARROW,
+        EntityType.TRIDENT,
+    )
+
+    /**
+     * 可以作为(用弓/弩射出的)“箭矢”的实体类型.
+     */
+    // 如果 BukkitAPI 存在一个这样的接口表示这类实体,
+    // 那我们也就不需要这么一个 set 了, 可以直接用 is.
+    // 问题就是没有, 所以只能这样了.
+    private val ARROW_TYPES: Set<EntityType> = enumSetOf(
+        EntityType.ARROW,
+        EntityType.SPECTRAL_ARROW
+    )
 
     /**
      * 对 [victim] 造成由 [metadata] 指定的萌芽伤害.
@@ -118,198 +203,184 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
-     * 能够造成伤害的弹射物类型.
-     * 伤害系统会处理这些弹射物.
-     */
-    private val DAMAGE_PROJECTILE_TYPES: List<EntityType> = listOf(
-        EntityType.ARROW,
-        EntityType.BREEZE_WIND_CHARGE,
-        //EntityType.DRAGON_FIREBALL,
-        EntityType.EGG,
-        EntityType.ENDER_PEARL,
-        EntityType.FIREBALL,
-        EntityType.FIREWORK_ROCKET,
-        //EntityType.FISHING_BOBBER,
-        EntityType.LLAMA_SPIT,
-        EntityType.POTION,
-        EntityType.SHULKER_BULLET,
-        EntityType.SMALL_FIREBALL,
-        EntityType.SNOWBALL,
-        EntityType.SPECTRAL_ARROW,
-        EntityType.TRIDENT,
-        EntityType.WIND_CHARGE,
-    )
-
-    /**
-     * 作为直接实体时, 能够造成伤害的实体类型.
-     * 伤害系统会处理这些实体.
-     */
-    private val DAMAGE_DIRECT_ENTITY_TYPES = DAMAGE_PROJECTILE_TYPES + listOf(
-        EntityType.TNT,
-        EntityType.END_CRYSTAL,
-        EntityType.AREA_EFFECT_CLOUD,
-    )
-
-    /**
-     * 需要记录的弹射物.
-     * 伤害系统会在这些弹射物生成时就记录伤害元数据.
-     */
-    private val MARK_PROJECTILE_TYPES: List<EntityType> = listOf(
-        EntityType.ARROW,
-        EntityType.SPECTRAL_ARROW,
-        EntityType.TRIDENT,
-    )
-
-    /**
-     * 计算“攻击阶段”之后的伤害. 返回的 [DamageMetadata] 包含了攻击阶段的伤害信息.
+     * 计算“攻击阶段”之后-“防御阶段”之前-的伤害.
      *
+     * @return 攻击阶段的伤害信息
      * @see calculateFinalDamage 计算“防御阶段”之后的单个元素的伤害
      * @see calculateFinalDamageMap 计算“防御阶段”之后的所有元素的伤害之和
      */
-    fun generateDamageMetadata(event: EntityDamageEvent): DamageMetadata? {
-        // 先检查是不是自定义伤害; 若是, 则直接返回自定义伤害信息
-        val customDamageMetadata = event.entity.getCustomDamageMetadata()
+    fun calculateDamageBeforeDefense(context: DamageContext): DamageMetadata? {
+        val damagee = context.damagee
+        val customDamageMetadata = damagee.getCustomDamageMetadata()
         if (customDamageMetadata != null) {
-            event.entity.unregisterCustomDamageMetadata() // FIXME #366: x
+            // 该伤害是一个自定义伤害(由代码执行 hurt 造成的),
+            // 直接返回已经注册的自定义伤害信息
+            damagee.unregisterCustomDamageMetadata() // 注销, 因为已经“用掉”了
             return customDamageMetadata
         }
 
-        val damageSource = event.damageSource
-        val causingEntity = damageSource.causingEntity
+        val damageSource = context.damageSource
         val directEntity = damageSource.directEntity
-
-        // 不存在直接实体
-        // 自然伤害(溺水、岩浆)
-        // 使用伤害类型映射, 根据伤害类型调整伤害
         if (directEntity == null) {
-            val damageMapper = DamageTypeDamageMappings.get(damageSource.damageType)
-            return damageMapper.generate(event)
+            // 不存在 direct_entity, 例如: 自然伤害(溺水、岩浆)
+            // 使用 damage_type_mappings, 根据 damage_type 生成 damage_metadata
+            return context.toDamageMetadata(Mapping.DAMAGE_TYPE)
         }
 
-        // 存在直接实体后
-        when (causingEntity) {
-            // 无来源实体
-            null -> {
-                if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
-                    // 使用默认
-                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
+        val causingEntity = damageSource.causingEntity
+        when (causingEntity) { // 根据 causing_entity 的类型, 生成 damage_metadata
+
+            null -> { // 不存在 causing_entity
+                if (directEntity.type in ARROW_TYPES) {
+                    // 特殊处理属于 arrow_types 的 direct_entity, 考虑物品本身给予的额外伤害.
+                    return createAttributedArrowDamage(directEntity as AbstractArrow)
+                } else if (directEntity.type in MISC_DAMAGER_TYPES) {
+                    // 使用映射来计算 direct_entity 造成的伤害.
+                    return context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 } else {
-                    // 不应该发生
-                    return generateDefaultMetadata(event)
+                    // 不太可能发生
+                    return calculateDefaultDamageMetadata(context)
                 }
             }
-            // 来源实体是玩家
+
             is Player -> {
-                // 直接实体是需要记录弹射物
-                // 查找弹射物是否被记录, 尝试返回记录的值
-                // 箭矢和三叉戟的伤害和词条栏有关, 会被记录
-                // 没有记录则使用默认
-                if (directEntity.type in MARK_PROJECTILE_TYPES) {
-                    return (directEntity as Projectile).getProjectileDamageMetadata() ?: buildDirectEntityDamageMetadataByDefault(directEntity, event, true)  // FIXME #366: x
-                } else if (directEntity.type in DAMAGE_DIRECT_ENTITY_TYPES) {
-                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, true)
+                if (directEntity.type in REGISTERED_PROJECTILE_TYPES) {
+                    // 这里的情况: direct_entity 的类型在需要注册的弹射物类型当中.
+                    // 因此这里先尝试获取已经注册的伤害信息; 若没有注册则使用伤害映射.
+                    val damageMetadata = (directEntity as Projectile).getDamageMetadata()
+                    return damageMetadata ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
+                } else if (directEntity.type in MISC_DAMAGER_TYPES) {
+                    // 这里的情况: direct_entity 属于游戏里比较特殊的伤害机制.
+                    // 直接使用伤害映射.
+                    return context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 }
 
-                val itemStack = causingEntity.inventory.itemInMainHand
-                val nekoStack = itemStack.wrap()
+                val nekoStack = causingEntity.inventory.itemInMainHand.wrap()
                 val attack = nekoStack?.templates?.get(ItemTemplateTypes.ATTACK)
-                when (event.cause) {
-                    DamageCause.ENTITY_ATTACK -> {
+                val damageCause = context.damageCause
+                when (damageCause) {
+                    DamageCause.ENTITY_ATTACK -> { // 左键直接点到了实体
                         if (attack != null) {
-                            // 玩家手中的物品是 Attack
-                            // 可能返回null, 意为取消伤害事件
-                            return attack.attackType.generateDamageMetadata(causingEntity, nekoStack) // FIXME #366: v
+                            // 玩家手中的物品是 Attack; 可以返回 null, 意为取消本次伤害
+                            // FIXME #366: v
+                            val preprocessEvent = NekoPreprocessEntityDamageEvent(causingEntity, damagee, damageSource).apply { callEvent() }
+                            return attack.attackType.generateDamageMetadata(nekoStack, preprocessEvent)
                         } else {
-                            // 手中的物品无 Attack 行为甚至不是 NekoStack
-                            return PlayerDamageMetadata.HAND_WITHOUT_ATTACK // FIXME #366: x
+                            return PlayerDamageMetadata.INTRINSIC_ATTACK // 手中的物品无 Attack 行为甚至不是 Koish 物品
                         }
                     }
 
-                    DamageCause.ENTITY_SWEEP_ATTACK -> {
+                    DamageCause.ENTITY_SWEEP_ATTACK -> { // 横扫之刃“溅射”到了实体
                         // TODO 横扫的临时实现, 等待麻将的组件化
                         // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
                         if (attack?.attackType is SwordAttack) {
-                            val attributeMap = causingEntity.toUser().attributeMap // FIXME #366: v
+                            // FIXME #366: v
+                            val preprocessEvent = NekoPreprocessEntityDamageEvent(causingEntity, damagee, damageSource).apply { callEvent() }
+                            val playerAttributes = preprocessEvent.damagerAttributes
                             return PlayerDamageMetadata(
-                                user = causingEntity.toUser(),
+                                attributes = playerAttributes,
                                 damageTags = DamageTags(DamageTag.MELEE, DamageTag.SWORD),
-                                damageBundle = damageBundle(attributeMap) {
+                                damageBundle = damageBundle(playerAttributes) {
                                     every {
                                         standard()
-                                        rate { standard() * attributeMap.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
+                                        rate { standard() * playerAttributes.getValue(Attributes.SWEEPING_DAMAGE_RATIO) }
                                     }
                                 }
                             )
                         } else {
-                            // 返回 null 是为了供外部识别以不触发萌芽伤害事件
-                            return null
+                            return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
                         }
                     }
 
-                    else -> {
-                        // 其他 Cause 的玩家伤害
-                        // 不应该发生
-                        return generateDefaultMetadata(event)
+                    else -> { // 不太可能
+                        return calculateDefaultDamageMetadata(context)
                     }
                 }
             }
-            // 来源实体是非玩家生物
+
             is LivingEntity -> {
-                // 直接实体是TNT、末影水晶, 视为无源处理
-                if (directEntity.type == EntityType.TNT || directEntity.type == EntityType.END_CRYSTAL) {
-                    return buildDirectEntityDamageMetadataByDefault(directEntity, event, false)
+                if (directEntity.type in SPECIAL_DAMAGER_TYPES) {
+                    // 特殊处理: causing_entity 是 living_entity 但 direct_entity
+                    // 是 tnt_primed 或 ender_crystal 时, 视为没有 causing_entity
+                    return context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 }
-                val damageMapper = AttackCharacteristicDamageMappings.get(causingEntity, event)
-                if (damageMapper == null) {
-                    // 配置文件未指定该情景下生物的伤害映射
-                    // 返回默认元素、无防御穿透、无暴击、原版伤害值
-                    LOGGER.warn("The vanilla entity damage from '${damageSource.causingEntity?.type}' to '${event.entity.type}' by '${damageSource.directEntity?.type}' with damage type of '${damageSource.damageType.key}' is not config! Use default damage metadata.")
-                    return EntityDamageMetadata(
-                        damageBundle = damageBundle {
-                            default {
-                                min(event.damage)
-                                max(event.damage)
-                                rate(1.0)
-                                defensePenetration(0.0)
-                                defensePenetrationRate(0.0)
-                            }
-                        },
-                        criticalStrikeMetadata = CriticalStrikeMetadata.NONE
-                    )
-                } else {
-                    // 配置文件指定了该情景下生物的伤害映射
-                    return damageMapper.generate(event)
-                }
+                return context.toDamageMetadata(Mapping.ATTACK_CHARACTERISTIC)
             }
-            // 不可能发生
-            else -> {
-                return generateDefaultMetadata(event)
+
+            else -> { // 不可能发生
+                return calculateDefaultDamageMetadata(context)
             }
+
         }
     }
 
     /**
-     * 计算单个元素“防御阶段”之后的伤害.
+     * @see calculateFinalDamageMap
      */
-    private fun calculateFinalDamage(
-        elementType: RegistryEntry<ElementType>,
+    fun calculateFinalDamageMap(
+        damageMetadata: DamageMetadata,
+        damagee: LivingEntity,
+    ): Reference2DoubleMap<RegistryEntry<ElementType>> {
+        val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
+            error("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
+        }
+        return calculateFinalDamageMap(damageMetadata, damageeAttributes)
+    }
+
+    /**
+     * 计算所有元素-“防御阶段”之后-的伤害之和, 即最终伤害.
+     *
+     * @param damageMetadata “攻击阶段”的信息, 该信息通过 [calculateDamageBeforeDefense] 计算得出
+     * @param damageeAttributes 受伤实体的属性
+     */
+    private fun calculateFinalDamageMap(
         damageMetadata: DamageMetadata,
         damageeAttributes: AttributeMap,
-    ): Double {
-        // 当该元素的伤害包不存在时, 返回 0.0
-        val packet = damageMetadata.damageBundle.get(elementType) ?: return 0.0
+    ): Reference2DoubleMap<RegistryEntry<ElementType>> {
+        val damagePackets = damageMetadata.damageBundle.packets()
+        if (damagePackets.isEmpty()) {
+            // 记录空伤害包以方便定位问题
+            LOGGER.warn("Empty damage bundle!", IllegalStateException())
+            return Reference2DoubleMaps.emptyMap()
+        } else {
+            val res = Reference2DoubleOpenHashMap<RegistryEntry<ElementType>>()
+            damagePackets.forEach { damagePacket ->
+                val elementType = damagePacket.element
+                val criticalStrikeMetadata = damageMetadata.criticalStrikeMetadata
+                val damage = calculateFinalDamage(damagePacket, criticalStrikeMetadata, damageeAttributes)
+                if (damage > 0) {
+                    res[elementType] = damage
+                }
+            }
+            return res
+        }
+    }
 
+    /**
+     * 计算单个元素-“防御阶段”之后-的伤害.
+     *
+     * @param damagePacket “攻击阶段”的伤害信息
+     * @param criticalStrikeMetadata 暴击信息
+     * @param damageeAttributes 受伤实体的属性
+     */
+    private fun calculateFinalDamage(
+        damagePacket: DamagePacket,
+        criticalStrikeMetadata: CriticalStrikeMetadata,
+        damageeAttributes: AttributeMap,
+    ): Double {
+        // 伤害包的元素类型
+        val elementType = damagePacket.element
         // 该元素伤害倍率(或称攻击威力)
-        val attackDamageRate = packet.rate
+        val attackDamageRate = damagePacket.rate
         // 暴击倍率
-        val criticalStrikePower = damageMetadata.criticalStrikeMetadata.power
+        val criticalStrikePower = criticalStrikeMetadata.power
         // 受伤者防御, 不会小于0
         val defense = (damageeAttributes.getValue(Attributes.DEFENSE.of(elementType)) + damageeAttributes.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0)
         // 受伤者承伤倍率
         val incomingDamageRate = damageeAttributes.getValue(Attributes.INCOMING_DAMAGE_RATE.of(elementType))
 
         // 计算原始伤害
-        var originalDamage = packet.packetDamage
+        var originalDamage = damagePacket.packetDamage
         if (DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
             originalDamage *= attackDamageRate
         }
@@ -320,8 +391,8 @@ internal object DamageManager : DamageManagerApi {
         // 计算有效防御
         val validDefense = DamageRules.calculateValidDefense(
             defense = defense,
-            defensePenetration = packet.defensePenetration,
-            defensePenetrationRate = packet.defensePenetrationRate
+            defensePenetration = damagePacket.defensePenetration,
+            defensePenetrationRate = damagePacket.defensePenetrationRate
         )
 
         // 计算防御后伤害
@@ -338,7 +409,7 @@ internal object DamageManager : DamageManagerApi {
         if (!DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
             finalDamage *= criticalStrikePower
         }
-        val leastDamage = if (packet.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
+        val leastDamage = if (damagePacket.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
         finalDamage = finalDamage.coerceAtLeast(leastDamage)
 
         if (DamageRules.ROUNDING_DAMAGE) {
@@ -348,173 +419,153 @@ internal object DamageManager : DamageManagerApi {
         return finalDamage
     }
 
-    /**
-     * 计算所有元素“防御阶段”之后的伤害之和, 即最终伤害.
-     *
-     * @param damageMetadata “攻击阶段”的信息
-     * @param damageeAttributes 受伤实体的属性
-     */
-    private fun calculateFinalDamageMap(
-        damageMetadata: DamageMetadata,
-        damageeAttributes: AttributeMap,
-    ): Reference2DoubleMap<RegistryEntry<ElementType>> {
-        val damagePackets = damageMetadata.damageBundle.packets()
-        if (damagePackets.isEmpty()) {
-            // 记录空伤害包以方便定位问题
-            LOGGER.warn("Empty damage bundle!", IllegalStateException())
-            return Reference2DoubleMaps.emptyMap()
-        } else {
-            val res = Reference2DoubleOpenHashMap<RegistryEntry<ElementType>>()
-            damagePackets.forEach { packet ->
-                val element = packet.element
-                val damage = calculateFinalDamage(element, damageMetadata, damageeAttributes)
-                if (damage > 0) {
-                    res[element] = damage
+    private enum class Mapping {
+        DAMAGE_TYPE,
+        PLAYER_ADHOC,
+        NULL_CAUSING_ENTITY,
+        ATTACK_CHARACTERISTIC,
+    }
+
+    private fun DamageContext.toDamageMetadata(mapping: Mapping): DamageMetadata {
+        when (mapping) {
+            Mapping.DAMAGE_TYPE -> {
+                val damageMapper = DamageTypeDamageMappings.get(this.damageSource.damageType)
+                return damageMapper.generate(this)
+            }
+
+            Mapping.PLAYER_ADHOC -> {
+                val damageMapper = PlayerAdhocDamageMappings.get(this)
+                return damageMapper?.generate(this) ?: run {
+                    LOGGER.warn("Cannot find a player-adhoc mapper for context: $this. Using default damage metadata.")
+                    return VanillaDamageMetadata(this.damage)
                 }
             }
-            return res
-        }
-    }
 
-    private val ARROW_TYPES: List<EntityType> = listOf(EntityType.ARROW, EntityType.SPECTRAL_ARROW)
+            Mapping.NULL_CAUSING_ENTITY -> {
+                val damageMapper = NullCausingDamageMappings.get(this)
+                return damageMapper?.generate(this) ?: run {
+                    LOGGER.warn("Cannot find a null-causing mapper for context: $this. Using default damage metadata.")
+                    return VanillaDamageMetadata(this.damage)
+                }
+            }
 
-    /**
-     * 构建无来源实体直接伤害实体的伤害元数据.
-     * 使用直接伤害实体类型映射, 根据弹射物类型获取伤害元数据.
-     * 箭矢会被特殊处理, 考虑词条栏给予的额外伤害.
-     */
-    private fun buildDirectEntityDamageMetadataByDefault(directEntity: Entity, event: EntityDamageEvent, forPlayer: Boolean): DamageMetadata {
-        val entityType = directEntity.type
-        if (entityType in ARROW_TYPES) {
-            val damageBundle = buildArrowDamageBundleByCells(directEntity as AbstractArrow)
-            if (damageBundle != null) {
-                return VanillaDamageMetadata(damageBundle)
+            Mapping.ATTACK_CHARACTERISTIC -> {
+                val damageMapper = AttackCharacteristicDamageMappings.get(this)
+                return damageMapper?.generate(this) ?: run {
+                    // 配置文件未指定该情景下生物的伤害映射,
+                    // 这种情况返回原版伤害值、默认元素、无防穿、无暴击
+                    LOGGER.warn("Cannot find a attack-characteristic mapper for context: $this. Using default damage metadata.")
+                    val damage = this.damage
+                    return EntityDamageMetadata(
+                        damageBundle = damageBundle {
+                            default {
+                                min(damage)
+                                max(damage)
+                                rate(1.0)
+                                defensePenetration(0.0)
+                                defensePenetrationRate(0.0)
+                            }
+                        },
+                        criticalStrikeMetadata = CriticalStrikeMetadata.NONE
+                    )
+                }
             }
         }
-        val damageMapper = if (forPlayer) {
-            DirectEntityDamageMappings.getForPlayer(entityType, event)
-        } else {
-            DirectEntityDamageMappings.getForUntracked(entityType, event)
-        }
-        if (damageMapper == null) {
-            LOGGER.warn("The damage from 'null' to '${event.entity.type}' by '${entityType}' with damage type of '${event.damageSource.damageType.key}' is not defined in the config! Fallback to default damage metadata.")
-            return VanillaDamageMetadata(event.damage)
-        }
-        return damageMapper.generate(event)
     }
 
-    private fun buildArrowDamageBundleByCells(arrow: AbstractArrow): DamageBundle? {
-        val itemStack = arrow.itemStack
-        val nekoStack = itemStack.wrap() ?: return null
+    private fun createAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
+        val nekoStack = arrow.itemStack.wrap() ?: return null
         if (!nekoStack.templates.has(ItemTemplateTypes.ARROW)) return null
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return null
-        val attributeModifiers = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
-        val arrowImaginaryAttributeMap by ImaginaryAttributeMaps.ARROW
-        val attributeMapSnapshot = arrowImaginaryAttributeMap.getSnapshot()
-        attributeModifiers.forEach { attribute, modifier ->
-            attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
-        }
-        return damageBundle(attributeMapSnapshot) {
+        val attributeModifiersOnArrow = cells.collectAttributeModifiers(nekoStack, ItemSlot.imaginary())
+        val arrowAttributes by ImaginaryAttributeMaps.ARROW
+        val arrowAttributesSnapshot = arrowAttributes.getSnapshot()
+        arrowAttributesSnapshot.addTransientModifiers(attributeModifiersOnArrow)
+        val damageBundle = damageBundle(arrowAttributesSnapshot) {
             every {
                 standard()
             }
         }
+        return VanillaDamageMetadata(damageBundle)
     }
 
-    private fun generateDefaultMetadata(event: EntityDamageEvent): DamageMetadata {
-        val damageSource = event.damageSource
-        LOGGER.warn("Why can ${damageSource.causingEntity?.type} cause damage to ${event.entity.type} through ${damageSource.directEntity?.type}? This should not happen.")
-        return VanillaDamageMetadata(event.damage)
-    }
-
-    fun generateDefenseMetadata(event: EntityDamageEvent): DefenseMetadata {
-        return when (val damagee = event.entity) {
-            is Player -> {
-                EntityDefenseMetadata(damagee.toUser().attributeMap)
-            }
-
-            is LivingEntity -> {
-                EntityDefenseMetadata(AttributeMapAccess.instance().get(damagee).getOrElse {
-                    error("Failed to generate defense metadata because the entity does not have an attribute map.")
-                })
-            }
-
-            else -> {
-                throw IllegalArgumentException("Damagee is not a living entity!")
-            }
-        }
+    private fun calculateDefaultDamageMetadata(context: DamageContext): DamageMetadata {
+        val damagee = context.damagee
+        val directEntity = context.damageSource.directEntity
+        val causingEntity = context.damageSource.causingEntity
+        LOGGER.warn("Why can ${causingEntity?.type} cause damage to ${damagee.type} through ${directEntity?.type}? This should not happen.")
+        return VanillaDamageMetadata(context.damage)
     }
 
     private val projectileDamageMetadataMap = Caffeine.newBuilder()
-        .softValues()
-        .expireAfterAccess(Duration.ofSeconds(60))
+        .expireAfterAccess(Duration.ofSeconds(30))
         .build<UUID, DamageMetadata>()
 
-    fun unregisterProjectile(projectile: Projectile) {
-        projectileDamageMetadataMap.invalidate(projectile.uniqueId)
-    }
-
-    private fun Projectile.registerProjectileDamageMetadata(damageMetadata: DamageMetadata) {
+    private fun Projectile.putDamageMetadata(damageMetadata: DamageMetadata) {
         projectileDamageMetadataMap.put(uniqueId, damageMetadata)
     }
 
-    private fun Projectile.getProjectileDamageMetadata(): DamageMetadata? {
+    private fun Projectile.getDamageMetadata(): DamageMetadata? {
         return projectileDamageMetadataMap.getIfPresent(uniqueId)
     }
 
     /**
-     * 在弹射物射出时记录其 [DamageMetadata].
-     * 目前只记录玩家的箭矢和三叉戟.
-     *
-     * 伤害元数据过期的情况如下 (满足其一):
-     * - 超过有效期 (60秒)
-     * - 击中方块
+     * 为 [projectile] 注销伤害.
+     * 该函数应该在弹射物不再可能造成伤害时调用.
      */
-    fun registerProjectile(event: ProjectileLaunchEvent) {
-        val projectile = event.entity
-
-        // FIXME #366: v
-
-        val shooter = projectile.shooter
-        if (shooter !is Player) return
-        when (projectile) {
-            is Trident -> {
-                val key = projectile.uniqueId
-                val metadata = PlayerDamageMetadata(
-                    user = shooter.toUser(),
-                    damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT),
-                    damageBundle = damageBundle(shooter.toUser().attributeMap) {
-                        every {
-                            standard()
-                        }
-                    }
-                )
-                projectileDamageMetadataMap.put(key, metadata)
-            }
-
-            is Arrow, is SpectralArrow -> {
-                // 玩家箭矢的伤害信息需要拉弓力度
-                // 由 #registerProjectile(EntityShootBowEvent) 处理
-            }
-        }
+    fun unregisterProjectile(projectile: Projectile) {
+        projectileDamageMetadataMap.invalidate(projectile.uniqueId)
     }
 
     /**
-     * 在弹射物射出时记录其 [DamageMetadata]. 目前只记录玩家的箭矢和三叉戟.
-     * 玩家射出的箭矢伤害需要根据拉弓的力度进行调整, 所以监听此事件而非 [ProjectileLaunchEvent].
+     * 为 [event] 中的弹射物注册伤害.
+     * 该函数应该在弹射物即将离开玩家时调用.
+     * 目前只注册玩家的箭矢 [Arrow] 和三叉戟 [Trident].
+     *
+     * 伤害过期的情况如下 (满足其一):
+     * - 超过有效期 (30秒)
+     * - 击中方块
+     */
+    fun registerProjectile(event: ProjectileLaunchEvent) {
+        val projectile = event.entity as? Trident ?: return
+        val shooter = projectile.shooter as? Player ?: return
+
+        // FIXME #366: v
+        // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
+        val preprocessEvent = NekoPreprocessEntityDamageEvent(shooter, null, null).apply { callEvent() }
+        val playerAttributes = preprocessEvent.damagerAttributes
+
+        projectile.registerCustomDamageMetadata(
+            PlayerDamageMetadata(
+                attributes = playerAttributes,
+                damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.TRIDENT),
+                damageBundle = damageBundle(playerAttributes) {
+                    every {
+                        standard()
+                    }
+                }
+            )
+        )
+
+        // 对于 Arrow, SpectralArrow:
+        // 计算玩家箭矢的伤害信息需要知道拉弓力度,
+        // 这部分逻辑放到 #registerProjectile(EntityShootBowEvent)
+    }
+
+    /**
+     * 为 [event] 中的弹射物注册伤害.
+     * 该函数应该在玩家通过拉弓/弩射出弹射物时调用.
+     * 目前只记录玩家的箭矢 [Arrow] 和三叉戟 [Trident].
+     *
+     * 因为玩家射出的箭矢伤害需要根据拉弓的力度进行调整, 所以监听此事件而非 [ProjectileLaunchEvent].
      *
      * 伤害元数据过期的情况如下 (满足其一):
-     * - 超过有效期 (60秒)
+     * - 超过有效期 (30秒)
      * - 击中方块
      */
     fun registerProjectile(event: EntityShootBowEvent) {
-        val entity = event.entity
-        if (entity !is Player) return
-
-        // FIXME #366: v
-
-        val projectile = event.projectile
-        if (projectile !is AbstractArrow) return
+        val shooter = event.entity as? Player ?: return
+        val projectile = event.projectile as? AbstractArrow ?: return
 
         val force: Double
         val damageTags: DamageTags
@@ -524,7 +575,7 @@ internal object DamageManager : DamageManagerApi {
             Material.BOW -> {
                 damageTags = DamageTags(DamageTag.PROJECTILE, DamageTag.BOW)
                 // 玩家射出的箭矢伤害需要根据拉弓的力度进行调整
-                force = DamageRules.calculateBowForce(entity.activeItemUsedTime)
+                force = DamageRules.calculateBowForce(shooter.activeItemUsedTime)
             }
 
             Material.CROSSBOW -> {
@@ -532,20 +583,19 @@ internal object DamageManager : DamageManagerApi {
                 force = 1.0
             }
 
-            else -> {
-                return
-            }
+            else -> return
         }
 
+        // FIXME #366: v
+        // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
+        val preprocessEvent = NekoPreprocessEntityDamageEvent(shooter, null, null).apply { callEvent() }
+        val playerAttributes = preprocessEvent.damagerAttributes
         val itemstack = projectile.itemStack.wrap()
         val cells = itemstack?.components?.get(ItemComponentTypes.CELLS)
         if (itemstack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
-            val attributeModifiers = cells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-            val attributeMapSnapshot = entity.toUser().attributeMap.getSnapshot()
-            attributeModifiers.forEach { attribute, modifier ->
-                attributeMapSnapshot.getInstance(attribute)?.addModifier(modifier)
-            }
-            damageBundle = damageBundle(attributeMapSnapshot) {
+            val attributeModifiersOnArrow = cells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
+            playerAttributes.addTransientModifiers(attributeModifiersOnArrow)
+            damageBundle = damageBundle(playerAttributes) {
                 every {
                     standard()
                     min { force * standard() }
@@ -553,7 +603,7 @@ internal object DamageManager : DamageManagerApi {
                 }
             }
         } else {
-            damageBundle = damageBundle(entity.toUser().attributeMap) {
+            damageBundle = damageBundle(playerAttributes) {
                 every {
                     standard()
                     min { force * standard() }
@@ -562,9 +612,9 @@ internal object DamageManager : DamageManagerApi {
             }
         }
 
-        projectile.registerProjectileDamageMetadata(
+        projectile.putDamageMetadata(
             PlayerDamageMetadata(
-                user = entity.toUser(),
+                attributes = preprocessEvent.damagerAttributes,
                 damageTags = damageTags,
                 damageBundle = damageBundle
             )

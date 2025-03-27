@@ -2,23 +2,38 @@ package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
 import cc.mewcraft.wakame.util.require
-import org.bukkit.event.entity.EntityDamageEvent
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.lang.reflect.Type
 
 /**
- * 代表从 [EntityDamageEvent] 创建 [DamageMetadata] 的逻辑.
+ * 代表一个从 [DamageContext] 创建 [DamageMetadata] 的逻辑.
  */
-interface DamageMapper {
+internal interface DamageMapper {
 
     /**
-     * 生成一个反映此映射的 [DamageMetadata] 实例.
+     * 生成一个反映 [context] 的 [DamageMetadata].
      */
-    fun generate(event: EntityDamageEvent): DamageMetadata
+    fun generate(context: DamageContext): DamageMetadata
 
+}
+
+/**
+ * 用于将特定伤害类型
+ */
+@ConfigSerializable
+internal data class DamageTypeMapper(
+    @Setting("damage_metadata")
+    val builder: DamageMetadataBuilder<*>,
+) : DamageMapper {
+    override fun generate(context: DamageContext): DamageMetadata {
+        return builder.build(context)
+    }
 }
 
 /**
@@ -34,32 +49,30 @@ internal data class DamagePredicateMapper(
 
     companion object {
         @JvmField
-        val SERIALIZER: TypeSerializer2<DamagePredicateMapper> = DamageMapperSerializer
+        val SERIALIZER: TypeSerializer2<DamagePredicateMapper> = Serializer
     }
 
     /**
-     * 检查传入的 [event] 是否与此映射相匹配.
+     * 检查传入的 [context] 是否与此映射相匹配.
      */
-    fun match(event: EntityDamageEvent): Boolean {
-        return tests.all { it.test(event) }
+    fun match(context: DamageContext): Boolean {
+        return tests.all { it.test(context) }
     }
 
-    override fun generate(event: EntityDamageEvent): DamageMetadata {
-        return builder.build(event)
+    override fun generate(context: DamageContext): DamageMetadata {
+        return builder.build(context)
     }
 
-}
+    //
 
-private object DamageMapperSerializer : TypeSerializer<DamagePredicateMapper> {
+    private object Serializer : TypeSerializer<DamagePredicateMapper> {
 
-    override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicateMapper {
-        val predicates = node.node("predicates").childrenMap()
-            // 顺序在这里有作用
-            .map { (_, mapValue) ->
-                mapValue.require<DamagePredicate>()
-            }
-        val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
-        return DamagePredicateMapper(predicates, builder)
+        override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicateMapper {
+            val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }
+            val builder = node.node("damage_metadata").require<DamageMetadataBuilder<*>>()
+            return DamagePredicateMapper(tests, builder)
+        }
+
     }
 
 }

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * 创建一个 [DamageTags].
  */
+@Deprecated("In favor of DamageType")
 fun DamageTags(vararg tags: DamageTag): DamageTags {
     return DamageTagsImpl(*tags)
 }
@@ -12,6 +13,7 @@ fun DamageTags(vararg tags: DamageTag): DamageTags {
 /**
  * 创建一个 [DamageTags].
  */
+@Deprecated("In favor of DamageType")
 fun DamageTags(tags: List<DamageTag>): DamageTags {
     return DamageTagsImpl(tags)
 }
@@ -20,6 +22,7 @@ fun DamageTags(tags: List<DamageTag>): DamageTags {
  * 伤害标签集.
  * 可能包含0个或多个伤害标签.
  */
+@Deprecated("In favor of DamageType")
 interface DamageTags {
     /**
      * 伤害标签集是否为空
@@ -52,6 +55,7 @@ interface DamageTags {
 /**
  * 用于创建 [DamageTags] 的实例.
  */
+@Deprecated("In favor of DamageType")
 interface DamageTagsFactory {
     /**
      * 创建一个 [DamageTags].
@@ -84,6 +88,7 @@ interface DamageTagsFactory {
 /**
  * 伤害标签.
  */
+@Deprecated("In favor of DamageType")
 enum class DamageTag {
 
     // TODO DamageTag 改为接口, 获取实例采用 static final, 以支持数据驱动

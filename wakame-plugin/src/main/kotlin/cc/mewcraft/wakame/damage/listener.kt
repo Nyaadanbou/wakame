@@ -43,40 +43,35 @@ internal object DamageListener : Listener {
     // 由于 MythicMobs 的各种问题, priority 必须设置为 MONITOR.
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
-        val entity = event.entity
-        if (entity !is LivingEntity) return
+        val damagee = event.entity as? LivingEntity ?: return
 
-        // TODO #366: 需要在这里支持修改传入 DamageManager.generateDamageMetadata 的 AttributeMap 才能实现剩下关于伤害的魔咒效果.
-        //  这个也可以被修改箭矢伤害的系统使用
-
-        val damageMetadata = DamageManager.generateDamageMetadata(event)
-        if (damageMetadata == null) {
+        // 计算最终伤害
+        val damageContext = DamageContext(event)
+        val damageMetadata = DamageManager.calculateDamageBeforeDefense(damageContext) ?: run {
             event.isCancelled = true
             return
         }
-
-        val defenseMetadata = DamageManager.generateDefenseMetadata(event)
-        val koishEvent = NekoPostprocessEntityDamageEvent(damageMetadata, defenseMetadata, event)
-
-        if (!NekoPostprocessEntityDamageEvent(damageMetadata, defenseMetadata, event).callEvent()) {
+        val finalDamageMap = DamageManager.calculateFinalDamageMap(damageMetadata, damagee)
+        val postprocessEvent = NekoPostprocessEntityDamageEvent(damageMetadata, finalDamageMap, event)
+        if (!postprocessEvent.callEvent()) {
             // 萌芽伤害事件被取消, 则直接返回
             // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
             return
         }
 
         // 修改最终伤害
-        event.damage = koishEvent.getFinalDamage()
+        event.damage = postprocessEvent.getFinalDamage()
 
         // 记录日志
         if (LOGGING) {
-            LOGGER.info("${entity.type}(${entity.uniqueId}) 受到了 ${event.damage} 点伤害")
+            LOGGER.info("${damagee.type}(${damagee.uniqueId}) 受到了 ${event.damage} 点伤害")
 
             // 记录聊天
             // 2024/7/25 小米
             // 我承认, 我很复古.
             val message = LinearComponents.linear(
-                translatable(entity.type),
-                if (entity is Player) text(" ${entity.name} ") else empty(),
+                translatable(damagee.type),
+                if (damagee is Player) text(" ${damagee.name} ") else empty(),
                 text("受到了"),
                 text(" ${event.damage} "),
                 text("点伤害")
@@ -95,7 +90,7 @@ internal object DamageListener : Listener {
                         )
                     }
             ).clickEvent(
-                ClickEvent.copyToClipboard(entity.uniqueId.toString())
+                ClickEvent.copyToClipboard(damagee.uniqueId.toString())
             )
 
             SERVER.sendMessage(message)

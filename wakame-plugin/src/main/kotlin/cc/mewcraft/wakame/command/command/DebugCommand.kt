@@ -4,15 +4,17 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessEntityDamageEvent
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toNMS
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
+import org.bukkit.damage.DamageSource
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.incendo.cloud.bukkit.data.MultipleEntitySelector
 import org.incendo.cloud.bukkit.parser.selector.MultipleEntitySelectorParser
@@ -97,20 +99,29 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val sender = (context.sender() as PlayerSource).source()
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
-        val damageMeta = PlayerDamageMetadata(
-            user = sender.toUser(),
-            damageBundle = damageBundle {
-                default {
-                    min(damage)
-                    max(damage)
-                    rate(1.0)
-                    defensePenetration(.0)
-                    defensePenetrationRate(.0)
-                }
-            },
-            damageTags = DamageTags(DamageTag.DIRECT)
-        )
         target.filterIsInstance<LivingEntity>().forEach { entity ->
+            val preprocessEvent = NekoPreprocessEntityDamageEvent(
+                sender,
+                entity,
+                DamageSource.builder(DamageType.GENERIC)
+                    .withDirectEntity(sender)
+                    .withCausingEntity(sender)
+                    .withDamageLocation(entity.location)
+                    .build()
+            ).apply { callEvent() }
+            val damageMeta = PlayerDamageMetadata(
+                attributes = preprocessEvent.damagerAttributes,
+                damageTags = DamageTags(DamageTag.DIRECT),
+                damageBundle = damageBundle {
+                    default {
+                        min(damage)
+                        max(damage)
+                        rate(1.0)
+                        defensePenetration(.0)
+                        defensePenetrationRate(.0)
+                    }
+                }
+            )
             entity.hurt(damageMetadata = damageMeta, source = sender)
         }
     }

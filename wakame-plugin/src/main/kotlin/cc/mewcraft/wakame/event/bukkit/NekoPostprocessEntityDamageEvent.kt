@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.DefenseMetadata
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
@@ -18,33 +16,16 @@ import org.bukkit.event.entity.EntityDamageEvent
 @Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessEntityDamageEvent"))
 typealias NekoEntityDamageEvent = NekoPostprocessEntityDamageEvent
 
+/**
+ * @property damageMetadata 伤害信息 (计算防御前)
+ * @property finalDamageMap 伤害信息 (计算防御后)
+ */
 class NekoPostprocessEntityDamageEvent
 internal constructor(
     val damageMetadata: DamageMetadata,
-    val defenseMetadata: DefenseMetadata,
+    private val finalDamageMap: Reference2DoubleMap<RegistryEntry<ElementType>>,
     private val bukkitEvent: EntityDamageEvent,
 ) : Event(), Cancellable {
-
-    /**
-     * 记录了每种伤害在计算防御后的最终数值.
-     */
-    private val finalDamagePerElement: Reference2DoubleOpenHashMap<RegistryEntry<ElementType>> = Reference2DoubleOpenHashMap()
-
-    init {
-        val damagePackets = damageMetadata.damageBundle.packets()
-        if (damagePackets.isEmpty()) {
-            // 记录空伤害包以方便定位问题
-            LOGGER.warn("Empty damage bundle!")
-        } else {
-            damagePackets.forEach { packet ->
-                val element = packet.element
-                val damage = defenseMetadata.calculateFinalDamage(element, damageMetadata)
-                if (damage > 0) {
-                    finalDamagePerElement[element] = damage
-                }
-            }
-        }
-    }
 
     /**
      * 受伤的实体.
@@ -67,27 +48,25 @@ internal constructor(
     }
 
     /**
-     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 null.
+     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 `null`.
      */
     fun getFinalDamage(element: RegistryEntry<ElementType>): Double? {
-        if (!finalDamagePerElement.containsKey(element)) {
-            return null
-        }
-        return finalDamagePerElement.getDouble(element)
+        if (!finalDamageMap.containsKey(element)) return null
+        return finalDamageMap.getDouble(element)
     }
 
     /**
      * 获取本次伤害事件的最终伤害的值 (即各元素的最终伤害的简单相加).
      */
     fun getFinalDamage(): Double {
-        return finalDamagePerElement.values.sumOf { it }
+        return finalDamageMap.values.sum()
     }
 
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      */
     fun getFinalDamageMap(): Map<RegistryEntry<ElementType>, Double> {
-        return finalDamagePerElement
+        return finalDamageMap
     }
 
     /**
@@ -122,4 +101,5 @@ internal constructor(
         @JvmStatic
         fun getHandlerList(): HandlerList = handlerList
     }
+
 }
