@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import net.minecraft.server.MinecraftServer.currentTick
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import kotlin.jvm.optionals.getOrNull
 
 /**
  * 当玩家使用物品点击右键时触发.
@@ -25,15 +23,15 @@ class PlayerItemRightClickEvent(
     init {
         require(!item.isEmpty) { "Item cannot be empty" } // throw early
 
-        player.sendMessage(
-            "$currentTick ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
-                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-                    stream.dropWhile { frame ->
-                        frame.className == PlayerItemRightClickEvent::class.qualifiedName
-                    }.findFirst().getOrNull()?.methodType?.lastParameterType()?.simpleName
-                }
-            }"
-        )
+        //player.sendMessage(
+        //    "$currentTick ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
+        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+        //            stream.asSequence().dropWhile { frame ->
+        //                frame.className == PlayerItemRightClickEvent::class.qualifiedName
+        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+        //        }
+        //    }"
+        //)
     }
 
     val hand = when (hand) {
