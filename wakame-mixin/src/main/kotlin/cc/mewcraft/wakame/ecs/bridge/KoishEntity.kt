@@ -7,8 +7,8 @@ import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
 
 class KoishEntity(
-    @Deprecated("Use unwrap()", replaceWith = ReplaceWith("unwrap()"))
-    val entity: FleksEntity,
+    @PublishedApi
+    internal val entity: FleksEntity,
 ) {
 
     fun unwrap(): FleksEntity =

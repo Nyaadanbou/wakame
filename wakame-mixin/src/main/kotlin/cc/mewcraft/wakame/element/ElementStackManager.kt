@@ -32,7 +32,6 @@ object ElementStackManager {
      * @param target 目标实体
      * @param element 元素效果的元素
      * @param amount 应用层数
-     * @param caster 造成伤害的实体, 如果为空则表示无造成伤害实体.
      */
     fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity) {
         require(amount > 0) { "Amount must be greater than 0" }
@@ -45,8 +44,8 @@ object ElementStackManager {
         }
 
         val elementStackEntity = Fleks.createEntity {
-            it += CastBy(target.entity)
-            it += TargetTo(target.entity)
+            it += CastBy(target.unwrap())
+            it += TargetTo(target.unwrap())
             it += ElementComponent(element)
             it += TickCountComponent(0)
             it += ElementStackComponent(

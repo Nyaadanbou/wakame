@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.Koish
+import cc.mewcraft.wakame.KoishHolder
+import cc.mewcraft.wakame.SERVER
 import org.bukkit.Bukkit
 import org.bukkit.event.Event
 import org.bukkit.event.Event.Result
@@ -59,12 +60,12 @@ fun <T : Event> event(
     ignoreCancelled: Boolean = false,
     callback: (T) -> Unit,
 ): KoishListener = KoishListener().apply {
-    Koish.server.pluginManager.registerEvent(
+    SERVER.pluginManager.registerEvent(
         eventClazz,
         this,
         priority,
         { _, event -> if (eventClazz.isInstance(event)) callback(event as T) },
-        Koish,
+        KoishHolder.INSTANCE,
         ignoreCancelled
     )
 }
@@ -77,7 +78,7 @@ class KoishListener : Listener {
 }
 
 fun Listener.registerEvents() {
-    Bukkit.getPluginManager().registerEvents(this, Koish)
+    Bukkit.getPluginManager().registerEvents(this, KoishHolder.INSTANCE)
 }
 
 fun Listener.unregisterEvents() {

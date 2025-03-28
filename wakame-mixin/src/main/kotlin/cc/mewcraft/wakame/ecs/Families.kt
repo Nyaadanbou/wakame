@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.element.component.ElementComponent
+import cc.mewcraft.wakame.element.component.ElementStackComponent
 import com.github.quillraven.fleks.Family
 import com.github.quillraven.fleks.World.Companion.family
 
@@ -43,6 +45,9 @@ object Families {
 
     @JvmField
     val MANA_COSTING_ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, ManaCost) }
+
+    @JvmField
+    val ELEMENT_STACK: Family = family { all(ElementComponent, ElementStackComponent, TargetTo) }
 
     // 用于初始化本 object 里的 val
     fun bootstrap() = Unit

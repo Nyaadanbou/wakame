@@ -55,7 +55,6 @@ internal object KoishFleks : Listener, Fleks {
         families {
 
             Families.bootstrap()
-            KoishFamilies.bootstrap()
 
             onAdd(Families.BUKKIT_PLAYER) { entity ->
                 entity.configure {

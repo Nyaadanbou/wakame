@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ecs.KoishFamilies
+import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
@@ -20,7 +20,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 
 class ElementStackSystem : ListenableIteratingSystem(
-    family = KoishFamilies.ELEMENT_STACK
+    family = Families.ELEMENT_STACK
 ) {
     override fun onTickEntity(entity: Entity) {
         val caster = entity[CastBy].caster

@@ -8,10 +8,19 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * 代表了一个粒子路径. 用于控制粒子的图案.
+ */
 interface ParticlePath {
+    /**
+     * 根据进度返回粒子的位置.
+     */
     fun positionAtProgress(progress: Double): Position
 }
 
+/**
+ * 固定点路径: 粒子在固定位置运动
+ */
 data class FixedPath(
     val position: Position
 ) : ParticlePath {
@@ -21,7 +30,7 @@ data class FixedPath(
 }
 
 /**
- * 直线路径：粒子沿着两点之间的直线运动
+ * 直线路径: 粒子沿着两点之间的直线运动
  */
 data class LinePath(
     val start: Position,
@@ -36,7 +45,7 @@ data class LinePath(
 }
 
 /**
- * 圆形路径：粒子沿着圆形轨迹运动
+ * 圆形路径: 粒子沿着圆形轨迹运动
  */
 data class CirclePath(
     val center: Position,        // 圆心
@@ -70,7 +79,7 @@ data class CirclePath(
 }
 
 /**
- * 螺旋路径：粒子沿着螺旋路径运动
+ * 螺旋路径: 粒子沿着螺旋路径运动
  */
 data class SpiralPath(
     val center: Position,
