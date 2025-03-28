@@ -92,6 +92,9 @@ internal class KoishBootstrapper : PluginBootstrap {
         // }
 
         try {
+            // 初始化 Koish 所使用的路径
+            KoishDataPaths.initialize()
+
             if (PREVIOUS_KOISH_VERSION == null || PREVIOUS_KOISH_VERSION != Version("0.0.1-snapshot")) {
                 LegacyDataMigrator.migrate()
             }
@@ -100,9 +103,6 @@ internal class KoishBootstrapper : PluginBootstrap {
                 DebugProbes.install()
                 DebugProbes.enableCreationStackTraces = true
             }
-
-            // 初始化 Koish 所使用的路径
-            KoishDataPaths.initialize()
 
             // 配置文件必须最先初始化, 因为一般来说 Configs[...] 的返回值(下面称配置)都会赋值到 top-level 的 val,
             // 也就是说这些配置会随着 class 被 classloader 加载时直接实例化,

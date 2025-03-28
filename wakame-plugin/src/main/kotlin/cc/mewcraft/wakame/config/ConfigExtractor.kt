@@ -34,7 +34,8 @@ internal object ConfigExtractor {
         "crafting_station/",
         "element/",
         "item/",
-        "item_proxied/",
+        "item2/", // TODO item2 迁移完后移除
+        "item2_proxied/",
         "kizami/",
         "random/",
         "rarity/",
