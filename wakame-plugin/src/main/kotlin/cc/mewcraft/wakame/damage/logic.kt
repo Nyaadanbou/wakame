@@ -466,7 +466,7 @@ internal object DamageManager : DamageManagerApi {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
         val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
         val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        val preprocessEvent = NekoPreprocessDamageEvent(player, context.damagee, context.damageSource).apply { callEvent() }
+        val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(player, context).apply { callEvent() }
         return attack.attackType.generateDamageMetadata(itemstack, preprocessEvent)
     }
 
@@ -478,8 +478,8 @@ internal object DamageManager : DamageManagerApi {
         val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
         val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return null
         if (attack.attackType !is SwordAttack) return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
-        val preprocessEvent = NekoPreprocessDamageEvent(player, context.damagee, context.damageSource).apply { callEvent() }
-        val playerAttributes = preprocessEvent.damagerAttributes
+        val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(player, context).apply { callEvent() }
+        val playerAttributes = preprocessEvent.causingAttributes
         return PlayerDamageMetadata(
             attributes = playerAttributes,
             damageBundle = damageBundle(playerAttributes) {
@@ -534,8 +534,8 @@ internal object DamageManager : DamageManagerApi {
 
         // FIXME #366: v
         // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
-        val preprocessEvent = NekoPreprocessDamageEvent(shooter, null, null).apply { callEvent() }
-        val playerAttributes = preprocessEvent.damagerAttributes
+        val preprocessEvent = NekoPreprocessDamageEvent.searchingTarget(shooter).apply { callEvent() }
+        val playerAttributes = preprocessEvent.causingAttributes
 
         projectile.registerCustomDamageMetadata(
             PlayerDamageMetadata(
@@ -580,8 +580,8 @@ internal object DamageManager : DamageManagerApi {
 
         // FIXME #366: v
         // FIXME #366: 能否在弹射物打到实体时, 再拦截? 这样就可以得到非空的 damagee 和 damageSource 了
-        val preprocessEvent = NekoPreprocessDamageEvent(shooter, null, null).apply { callEvent() }
-        val playerAttributes = preprocessEvent.damagerAttributes
+        val preprocessEvent = NekoPreprocessDamageEvent.searchingTarget(shooter).apply { callEvent() }
+        val playerAttributes = preprocessEvent.causingAttributes
         val itemstack = projectile.itemStack.wrap()
         val cells = itemstack?.components?.get(ItemComponentTypes.CELLS)
         if (itemstack?.templates?.has(ItemTemplateTypes.ARROW) == true && cells != null) {
@@ -606,7 +606,7 @@ internal object DamageManager : DamageManagerApi {
 
         projectile.putDamageMetadata(
             PlayerDamageMetadata(
-                attributes = preprocessEvent.damagerAttributes,
+                attributes = preprocessEvent.causingAttributes,
                 damageBundle = damageBundle
             )
         )

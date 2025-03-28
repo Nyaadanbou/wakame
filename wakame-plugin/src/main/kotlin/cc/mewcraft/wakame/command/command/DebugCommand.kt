@@ -3,7 +3,9 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
@@ -13,8 +15,6 @@ import cc.mewcraft.wakame.util.item.toNMS
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
-import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.incendo.cloud.bukkit.data.MultipleEntitySelector
 import org.incendo.cloud.bukkit.parser.selector.MultipleEntitySelectorParser
@@ -100,18 +100,10 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
         target.filterIsInstance<LivingEntity>().forEach { entity ->
-            val preprocessEvent = NekoPreprocessDamageEvent(
-                sender,
-                entity,
-                DamageSource.builder(DamageType.GENERIC)
-                    .withDirectEntity(sender)
-                    .withCausingEntity(sender)
-                    .withDamageLocation(entity.location)
-                    .build()
-            ).apply { callEvent() }
+            val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(sender, entity).apply { callEvent() }
+            val attributes = preprocessEvent.causingAttributes
             val damageMeta = PlayerDamageMetadata(
-                attributes = preprocessEvent.damagerAttributes,
-                damageTags = DamageTags(DamageTag.DIRECT),
+                attributes = attributes,
                 damageBundle = damageBundle {
                     default {
                         min(damage)

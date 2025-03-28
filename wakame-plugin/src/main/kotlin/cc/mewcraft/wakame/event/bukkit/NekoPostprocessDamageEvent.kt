@@ -17,8 +17,15 @@ import org.bukkit.event.entity.EntityDamageEvent
 typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
 
 /**
+ * 该事件发生在最终伤害已经计算完毕, 但还未实际将最终伤害应用到实体上.
+ *
+ * - 监听该事件可以读取到完整的伤害信息 (计算防御前/后).
+ * - 取消该事件会使本次伤害失效.
+ * - 无法使用该事件修改伤害.
+ *
  * @property damageMetadata 伤害信息 (计算防御前)
  * @property finalDamageMap 伤害信息 (计算防御后)
+ * @see NekoPreprocessDamageEvent 如果需要修改伤害, 使用这个事件
  */
 class NekoPostprocessDamageEvent
 internal constructor(
