@@ -1,24 +1,19 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
+import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.attackSpeed
-import cc.mewcraft.wakame.util.adventure.BukkitSound
-import cc.mewcraft.wakame.util.adventure.SoundSource
-import cc.mewcraft.wakame.util.adventure.playSound
+import cc.mewcraft.wakame.user.attributeContainer
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
-import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
+import org.bukkit.Sound
+import org.bukkit.SoundCategory
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -44,92 +39,86 @@ class CudgelAttack(
         const val MAX_RADIUS = 32.0
     }
 
-    override fun generateDamageMetadata(itemstack: NekoStack, event: NekoPreprocessDamageEvent): DamageMetadata? {
-        val player = event.damager
-        if (player.attackSpeed.isActive(itemstack.id)) return null
-        val playerAttributes = event.damagerAttributes
-        val directDamageMetadata = PlayerDamageMetadata(
-            attributes = playerAttributes,
-            damageBundle = damageBundle(playerAttributes) {
+    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
+        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
+            event.isCancelled = true
+        }
+    }
+
+    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return null
+        }
+
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
 
-        return directDamageMetadata
+        return damageMeta
     }
 
-    override fun handleAttackEntity(itemstack: NekoStack, event: NekoPreprocessDamageEvent) {
-        val player = event.damager
-        val damagee = event.damagee!!
-        if (player.attackSpeed.isActive(itemstack.id)) return
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
+
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return
+        }
 
         applyCudgelAttack(player, damagee)
 
-        itemstack.applyAttackCooldown(player)
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
         player.damageItemStack2(EquipmentSlot.HAND, 1)
     }
 
-    override fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackSpeed.isActive(itemstack.id)) return
+        if (player.attackSpeed.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 
-        itemstack.applyAttackCooldown(player)
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
         player.damageItemStack2(EquipmentSlot.HAND, 1)
     }
 
-    override fun handleDamage(player: Player, itemstack: NekoStack, event: PlayerItemDamageEvent) {
-        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
-            event.isCancelled = true
-        }
-    }
-
     private fun applyCudgelAttack(player: Player, vararg excludeEntities: LivingEntity) {
-        // FIXME #366: 触发两次事件真的好吗? 有没有办法只触发一次事件?
-        val preprocessEvent = NekoPreprocessDamageEvent(player, null, null).apply { callEvent() }
-        val playerAttributes = preprocessEvent.damagerAttributes
-
+        val world = player.world
+        val attributes = player.attributeContainer
+        val radius = attributes.getValue(Attributes.ENTITY_INTERACTION_RANGE).coerceIn(0.0, MAX_RADIUS)
         // 范围伤害目标的判定为:
         // 以玩家的脚部坐标为起点,
-        // 向 y 轴正方向 (上方) 1 格
+        // 向 y 轴正方向(上方) 1 格
         // 向 x 轴, z 轴正负方向各 radius 格的长方体所碰撞到的生物
-        val attackRadius = playerAttributes.getValue(Attributes.ENTITY_INTERACTION_RANGE).coerceIn(0.0, MAX_RADIUS)
-        player.location.add(.0, .5, .0).getNearbyLivingEntities(attackRadius, .5) {
+        player.location.add(.0, .5, .0).getNearbyLivingEntities(radius, .5) {
             it != player && !excludeEntities.contains(it)
-        }.forEach { xdamagee ->
-            val preprocessEvent = NekoPreprocessDamageEvent(
-                player,
-                xdamagee,
-                DamageSource.builder(DamageType.GENERIC) // TODO 使用数据包添加的 damage_type
-                    .withCausingEntity(player)
-                    .withDirectEntity(player)
-                    .withDamageLocation(xdamagee.location)
-                    .build()
-            ).apply { callEvent() }
-            val playerAttributes2 = preprocessEvent.damagerAttributes
-            val damageMetadata = PlayerDamageMetadata(
-                attributes = playerAttributes2,
-                damageBundle = damageBundle(playerAttributes) {
+        }.forEach { victim ->
+            val damageMeta = PlayerDamageMetadata(
+                attributes = attributes,
+                damageBundle = damageBundle(attributes) {
                     every {
                         standard()
                     }
                 }
             )
-            xdamagee.hurt(damageMetadata, player, true)
+            victim.hurt(damageMeta, player, true)
         }
 
         ParticleBuilder(Particle.SWEEP_ATTACK)
             .location(player.location.add(.0, 1.0, .0))
-            .receivers(16)
+            .receivers(64)
             .spawn()
-        player.playSound(player) {
-            type(BukkitSound.ENTITY_PLAYER_ATTACK_SWEEP)
-            source(SoundSource.PLAYER)
-            pitch(1f)
-            volume(1f)
-        }
+        world.playSound(player.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1F, 1F)
+
     }
 }

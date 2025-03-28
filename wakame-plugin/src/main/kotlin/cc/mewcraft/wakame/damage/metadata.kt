@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.AttributeMapSnapshot
+import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
@@ -175,7 +175,7 @@ internal object PlayerDamageMetadata {
         criticalStrikeMetadata = CriticalStrikeMetadata.NONE
     )
 
-    operator fun invoke(attributes: AttributeMapSnapshot, damageBundle: DamageBundle, damageTags: DamageTags = DamageTags()): DamageMetadata {
+    operator fun invoke(attributes: AttributeMapLike, damageBundle: DamageBundle, damageTags: DamageTags = DamageTags()): DamageMetadata {
         return DamageMetadata(
             damageTags = damageTags,
             damageBundle = damageBundle,

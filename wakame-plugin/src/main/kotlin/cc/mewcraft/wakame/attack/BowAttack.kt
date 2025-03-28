@@ -22,9 +22,9 @@ class BowAttack : AttackType {
         const val NAME = "bow"
     }
 
-    override fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (action.isRightClick) {
-            if (player.attackSpeed.isActive(itemstack.id)) {
+            if (player.attackSpeed.isActive(nekoStack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用弓
@@ -39,7 +39,6 @@ class BowAttack : AttackType {
                 }
             }
         }
-
         wrappedEvent.actionPerformed = true
     }
 }

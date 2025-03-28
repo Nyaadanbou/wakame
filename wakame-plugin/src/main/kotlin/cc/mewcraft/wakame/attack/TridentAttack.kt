@@ -1,15 +1,18 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamageTag
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.block.Action
@@ -32,37 +35,53 @@ class TridentAttack(
         const val NAME = "trident"
     }
 
-    override fun generateDamageMetadata(itemstack: NekoStack, event: NekoPreprocessDamageEvent): DamageMetadata? {
-        val player = event.damager
-        if (player.attackSpeed.isActive(itemstack.id)) return null
-        val playerAttributes = event.damagerAttributes
-        val playerDamageMetadata = PlayerDamageMetadata(
-            attributes = playerAttributes,
-            damageBundle = damageBundle(playerAttributes) {
+    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
+        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
+            event.isCancelled = true
+        }
+    }
+
+    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return null
+        }
+
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
 
-        return playerDamageMetadata
+        return damageMeta
     }
 
-    override fun handleAttackEntity(itemstack: NekoStack, event: NekoPreprocessDamageEvent) {
-        val player = event.damager
-        if (player.attackSpeed.isActive(itemstack.id)) return
-        itemstack.applyAttackCooldown(player)
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
+
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return
+        }
+
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
         player.damageItemStack2(EquipmentSlot.HAND, 1)
     }
 
-    override fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (action.isLeftClick) {
-            if (!player.attackSpeed.isActive(itemstack.id)) {
+            if (!player.attackSpeed.isActive(nekoStack.id)) {
                 // 没有左键到生物时, 也应该应用攻击冷却
-                itemstack.applyAttackCooldown(player)
+                nekoStack.applyAttackCooldown(player)
             }
         } else if (action.isRightClick) {
-            if (player.attackSpeed.isActive(itemstack.id)) {
+            if (player.attackSpeed.isActive(nekoStack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用三叉戟
@@ -78,11 +97,5 @@ class TridentAttack(
             }
         }
         wrappedEvent.actionPerformed = true
-    }
-
-    override fun handleDamage(player: Player, itemstack: NekoStack, event: PlayerItemDamageEvent) {
-        if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
-            event.isCancelled = true
-        }
     }
 }

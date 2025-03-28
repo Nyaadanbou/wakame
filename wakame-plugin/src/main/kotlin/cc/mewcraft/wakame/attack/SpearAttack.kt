@@ -1,11 +1,8 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
+import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -13,13 +10,9 @@ import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
 import cc.mewcraft.wakame.user.attackSpeed
-import cc.mewcraft.wakame.util.adventure.BukkitSound
-import cc.mewcraft.wakame.util.adventure.SoundSource
-import cc.mewcraft.wakame.util.adventure.playSound
+import cc.mewcraft.wakame.user.attributeContainer
 import com.destroystokyo.paper.ParticleBuilder
-import org.bukkit.FluidCollisionMode
-import org.bukkit.Particle
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -39,7 +32,7 @@ import org.joml.Vector3f
  *   size: <double>
  * ```
  */
-class SpearAttack(
+data class SpearAttack(
     private val cancelVanillaDamage: Boolean,
     private val size: Double,
 ) : AttackType {
@@ -48,56 +41,68 @@ class SpearAttack(
         const val MAX_HIT_AMOUNT = 100
     }
 
-    override fun generateDamageMetadata(itemstack: NekoStack, event: NekoPreprocessDamageEvent): DamageMetadata? {
-        val player = event.damager
-        if (player.attackSpeed.isActive(itemstack.id)) return null
-        val playerAttributes = event.damagerAttributes
-        val directDamageMetadata = PlayerDamageMetadata(
-            attributes = playerAttributes,
-            damageBundle = damageBundle(playerAttributes) {
-                every { standard() }
-            }
-        )
-
-        return directDamageMetadata
-    }
-
-    override fun handleAttackEntity(itemstack: NekoStack, event: NekoPreprocessDamageEvent) {
-        val player = event.damager
-        if (player.attackSpeed.isActive(itemstack.id)) return
-        val damagee = event.damagee!!
-
-        applySpearAttack(player, damagee)
-
-        itemstack.applyAttackCooldown(player)
-        player.damageItemStack2(EquipmentSlot.HAND, 1)
-    }
-
-    override fun handleInteract(player: Player, itemstack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        if (!action.isLeftClick) return
-        if (player.attackSpeed.isActive(itemstack.id)) return
-
-        applySpearAttack(player)
-
-        itemstack.applyAttackCooldown(player)
-        player.damageItemStack2(EquipmentSlot.HAND, 1)
-        wrappedEvent.actionPerformed = true
-    }
-
-    override fun handleDamage(player: Player, itemstack: NekoStack, event: PlayerItemDamageEvent) {
+    override fun handleDamage(player: Player, nekoStack: NekoStack, event: PlayerItemDamageEvent) {
         if (cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
             event.isCancelled = true
         }
     }
 
-    private fun applySpearAttack(player: Player, vararg excludeEntities: LivingEntity) {
-        val preprocessEvent = NekoPreprocessDamageEvent(player, null, null).apply { callEvent() }
-        val playerAttributes = preprocessEvent.damagerAttributes
+    override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return null
+        }
 
-        var end: Vector3f? = null
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
+                every {
+                    standard()
+                }
+            }
+        )
+
+        return damageMeta
+    }
+
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
+            return
+        }
+
+        if (player.attackSpeed.isActive(nekoStack.id)) {
+            return
+        }
+
+        applySpearAttack(player, damagee)
+
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
+        player.damageItemStack2(EquipmentSlot.HAND, 1)
+    }
+
+    override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
+        if (!action.isLeftClick) return
+        if (player.attackSpeed.isActive(nekoStack.id)) return
+
+        applySpearAttack(player)
+
+        // 应用攻击冷却
+        nekoStack.applyAttackCooldown(player)
+        // 扣除耐久
+        player.damageItemStack2(EquipmentSlot.HAND, 1)
+
+        wrappedEvent.actionPerformed = true
+    }
+
+    private fun applySpearAttack(player: Player, vararg excludeEntities: LivingEntity) {
         val world = player.world
         val hitEntities = mutableListOf<LivingEntity>()
-        val maxDistance = playerAttributes.getValue(Attributes.ENTITY_INTERACTION_RANGE)
+        val attributes = player.attributeContainer
+        val maxDistance = attributes.getValue(Attributes.ENTITY_INTERACTION_RANGE)
+
+        var end: Vector3f? = null
         for (i in 0 until MAX_HIT_AMOUNT) {
             val rayTraceResult = world.rayTrace(
                 player.eyeLocation,
@@ -124,14 +129,16 @@ class SpearAttack(
             }
         }
 
-        hitEntities.forEach { xdamagee ->
+        hitEntities.forEach { victim ->
             val playerDamageMetadata = PlayerDamageMetadata(
-                attributes = playerAttributes,
-                damageBundle = damageBundle(playerAttributes) {
-                    every { standard() }
+                attributes = attributes,
+                damageBundle = damageBundle(attributes) {
+                    every {
+                        standard()
+                    }
                 },
             )
-            xdamagee.hurt(playerDamageMetadata, player, true)
+            victim.hurt(playerDamageMetadata, player, true)
         }
 
         // 特效
@@ -148,12 +155,7 @@ class SpearAttack(
             .location(end.toLocation(world))
             .receivers(64)
             .spawn()
-        world.playSound(player) {
-            type(BukkitSound.ENTITY_ARROW_SHOOT)
-            source(SoundSource.PLAYER)
-            pitch(1f)
-            volume(1f)
-        }
+        world.playSound(player.location, Sound.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 1F, 1F)
     }
 
     private fun particleLine(world: World, start: Vector3f, end: Vector3f, particleBuilder: ParticleBuilder) {

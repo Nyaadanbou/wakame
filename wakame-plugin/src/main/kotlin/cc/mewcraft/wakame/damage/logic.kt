@@ -467,7 +467,7 @@ internal object DamageManager : DamageManagerApi {
         val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
         val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(player, context).apply { callEvent() }
-        return attack.attackType.generateDamageMetadata(itemstack, preprocessEvent)
+        return attack.attackType.generateDamageMetadata(player, itemstack)
     }
 
     // 可以返回 null, 意为取消本次伤害
