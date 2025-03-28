@@ -10,6 +10,8 @@ import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.Material
+import org.bukkit.block.Block
+import org.bukkit.craftbukkit.block.CraftBlockState
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -39,19 +41,14 @@ internal object ItemClickEventSupport : Listener {
     @JvmStatic
     private val haveRightClicked: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
-    // 可以右键交互的方块类型
+    /**
+     * 可以右键交互的方块类型.
+     * 大部分情况已经通过判断 [org.bukkit.block.BlockState] 是否为 [CraftBlockState] 被过滤掉了.
+     * 这里仅需要枚举一些无法通过判断 [org.bukkit.block.BlockState] 来过滤掉的方块类型.
+     */
     @JvmStatic
     private val RL_INTERACTABLE_BLOCK_TYPES: Set<Material> = enumSetOf(
-        Material.CHEST,
-        Material.TRAPPED_CHEST,
-        Material.ENDER_CHEST,
-        Material.SHULKER_BOX,
-        Material.WHITE_SHULKER_BOX,
-        Material.ORANGE_SHULKER_BOX,
-        Material.MAGENTA_SHULKER_BOX,
-        Material.LIGHT_BLUE_SHULKER_BOX,
-        Material.YELLOW_SHULKER_BOX,
-        Material.LIME_SHULKER_BOX,
+        Material.ANVIL,
     )
 
     @EventHandler
@@ -80,16 +77,27 @@ internal object ItemClickEventSupport : Listener {
 
             event.action == Action.RIGHT_CLICK_BLOCK -> {
                 if (haveRightClicked.add(player)) {
-                    val clickedBlock = event.clickedBlock
-                    if (clickedBlock != null && clickedBlock.type in RL_INTERACTABLE_BLOCK_TYPES) {
-                        return
-                    }
+                    if (isInteractable(event.clickedBlock)) return
                     PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                 }
             }
 
             else -> {} // Action = PHYSICAL
         }
+    }
+
+    private fun isInteractable(block: Block?): Boolean {
+        val block = block ?: return false
+
+        // 绝大部分 BlockState 的实现类都是可右键交互的方块
+        // 注意: 这里不能用 is 因为 CraftBlockState 是所有 BlockState 实现的 superclass
+        if (block.getState(false).javaClass != CraftBlockState::class.java) return true
+        // 部分方块的 BlockState 返回的是 CraftBlockState, 但仍然可以右键交互, 进一步排除
+        if (block.type in RL_INTERACTABLE_BLOCK_TYPES) return true
+
+        // TODO 引入家具系统后, 这里需要补充逻辑
+
+        return false
     }
 
     // 注意: 手持物品左键 Boat/Minecart 不会触发 EntityDamageEvent
