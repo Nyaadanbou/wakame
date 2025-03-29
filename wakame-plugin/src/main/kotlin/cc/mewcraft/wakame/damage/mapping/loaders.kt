@@ -214,6 +214,7 @@ internal object NullCausingDamageMappings {
 }
 
 @Init(stage = InitStage.POST_WORLD)
+@Reload
 internal object PlayerAdhocDamageMappings {
     private val mappings: Reference2ObjectOpenHashMap<EntityType, List<DamagePredicateMapper>> = Reference2ObjectOpenHashMap()
 

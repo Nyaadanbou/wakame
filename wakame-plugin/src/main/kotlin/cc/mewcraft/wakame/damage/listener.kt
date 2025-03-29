@@ -99,12 +99,12 @@ internal object DamageListener : Listener {
 
     @EventHandler
     fun on(event: ProjectileLaunchEvent) {
-        DamageManager.registerProjectile(event)
+        DamageManager.registerTrident(event)
     }
 
     @EventHandler
     fun on(event: EntityShootBowEvent) {
-        DamageManager.registerProjectile(event)
+        DamageManager.registerExactArrow(event)
     }
 
     // 在弹射物击中方块时移除记录的 DamageMetadata.

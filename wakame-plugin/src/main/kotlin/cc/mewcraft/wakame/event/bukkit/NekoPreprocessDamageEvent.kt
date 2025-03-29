@@ -159,5 +159,15 @@ internal constructor(
                 _damageSource = damageContext.damageSource,
             )
         }
+
+        internal fun actuallyDamage(causingEntity: Player, causingAttributes: AttributeMapSnapshot, damageContext: DamageContext): NekoPreprocessDamageEvent {
+            return NekoPreprocessDamageEvent(
+                phase = Phase.ACTUALLY_DAMAGE,
+                causingEntity = causingEntity,
+                causingAttributes = causingAttributes,
+                _damageeEntity = damageContext.damagee,
+                _damageSource = damageContext.damageSource,
+            )
+        }
     }
 }
