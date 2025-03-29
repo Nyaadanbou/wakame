@@ -507,7 +507,7 @@ internal object DamageManager : DamageManagerApi {
      * 该函数应该在弹射物不再可能造成伤害时调用.
      */
     fun unregisterProjectile(projectile: Projectile) {
-        registeredProjectileDamages.invalidate(projectile.uniqueId)
+        projectile.unregisterDamage()
     }
 
     /**
@@ -604,7 +604,7 @@ internal object DamageManager : DamageManagerApi {
      * 不要跟 [registeredProjectileDamages] 搞混了, 这里的伤害基本来源于由代码额外造成的伤害(比如: 武器攻击特效, MythicMobs Mechanic).
      */
     private val registeredCustomDamageMetadata = Caffeine.newBuilder()
-        .expireAfterAccess(Duration.ofSeconds(30_000))
+        .expireAfterAccess(Duration.ofSeconds(30))
         .build<UUID, DamageMetadata>()
 
     private fun Entity.getCustomDamageMetadata(): DamageMetadata? {
@@ -627,7 +627,7 @@ internal object DamageManager : DamageManagerApi {
      * 而不是*创建*弹射物时拦截属性和修改 - 代码无法从这个时机得知受伤实体的状态.
      */
     private val registeredProjectileDamages: Cache<UUID, RegisteredProjectileDamage> = Caffeine.newBuilder()
-        .expireAfterAccess(Duration.ofSeconds(10_000))
+        .expireAfterAccess(Duration.ofSeconds(10))
         .build()
 
     private fun Projectile.getRegisteredDamage(): RegisteredProjectileDamage? {
