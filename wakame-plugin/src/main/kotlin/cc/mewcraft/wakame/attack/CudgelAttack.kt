@@ -8,7 +8,8 @@ import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -45,23 +46,21 @@ class CudgelAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
 
-        val attributeMap = user.attributeMap
-        val directDamageMetadata = PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.CUDGEL),
-            damageBundle = damageBundle(attributeMap) {
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
 
-        return directDamageMetadata
+        return damageMeta
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
@@ -69,8 +68,7 @@ class CudgelAttack(
             return
         }
 
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return
         }
 
@@ -84,7 +82,7 @@ class CudgelAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.toUser().attackSpeed.isActive(nekoStack.id)) return
+        if (player.attackSpeed.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 
@@ -96,10 +94,8 @@ class CudgelAttack(
 
     private fun applyCudgelAttack(player: Player, vararg excludeEntities: LivingEntity) {
         val world = player.world
-        val user = player.toUser()
-        val attributeMap = user.attributeMap
-        val radius = attributeMap.getValue(Attributes.ENTITY_INTERACTION_RANGE).coerceIn(0.0, MAX_RADIUS)
-        val damageTags = DamageTags(DamageTag.MELEE, DamageTag.CUDGEL)
+        val attributes = player.attributeContainer
+        val radius = attributes.getValue(Attributes.ENTITY_INTERACTION_RANGE).coerceIn(0.0, MAX_RADIUS)
         // 范围伤害目标的判定为:
         // 以玩家的脚部坐标为起点,
         // 向 y 轴正方向(上方) 1 格
@@ -107,16 +103,15 @@ class CudgelAttack(
         player.location.add(.0, .5, .0).getNearbyLivingEntities(radius, .5) {
             it != player && !excludeEntities.contains(it)
         }.forEach { victim ->
-            val damageMetadata = PlayerDamageMetadata(
-                user = user,
-                damageTags = damageTags,
-                damageBundle = damageBundle(attributeMap) {
+            val damageMeta = PlayerDamageMetadata(
+                attributes = attributes,
+                damageBundle = damageBundle(attributes) {
                     every {
                         standard()
                     }
                 }
             )
-            victim.hurt(damageMetadata, player, true)
+            victim.hurt(damageMeta, player, true)
         }
 
         ParticleBuilder(Particle.SWEEP_ATTACK)

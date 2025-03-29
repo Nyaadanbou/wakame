@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.entity.player
 
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -9,16 +11,18 @@ import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
-import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.BlockType
 import org.bukkit.craftbukkit.block.CraftBlockState
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import xyz.xenondevs.commons.collections.enumSetOf
+import xyz.xenondevs.commons.provider.map
 
 /**
  * 本 object 负责实现:
@@ -43,13 +47,13 @@ internal object ItemClickEventSupport : Listener {
 
     /**
      * 可以右键交互的方块类型.
-     * 大部分情况已经通过判断 [org.bukkit.block.BlockState] 是否为 [CraftBlockState] 被过滤掉了.
-     * 这里仅需要枚举一些无法通过判断 [org.bukkit.block.BlockState] 来过滤掉的方块类型.
+     * 大部分情况已经通过判断 [org.bukkit.block.BlockState] 被过滤掉了.
+     * 这里仅需要指定一些无法通过判断 [org.bukkit.block.BlockState] 来过滤掉的.
      */
     @JvmStatic
-    private val RL_INTERACTABLE_BLOCK_TYPES: Set<Material> = enumSetOf(
-        Material.ANVIL,
-    )
+    private val RL_INTERACTABLE_BLOCK_TYPES: HashSet<BlockType> by MAIN_CONFIG
+        .entry<List<BlockType>>("right_click_interactable_blocks")
+        .map { it.toHashSet() }
 
     @EventHandler
     fun on(event: ServerTickStartEvent) {
@@ -57,11 +61,10 @@ internal object ItemClickEventSupport : Listener {
         haveRightClicked.clear()
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerInteractEvent) {
         val player = event.player
         val item = event.item ?: return
-        val itemType = item.type // 优化: 调用 ItemStack#type 需要查询, 这里只计算一次
         when {
             event.action.isLeftClick -> {
                 if (haveLeftClicked.add(player)) {
@@ -77,7 +80,12 @@ internal object ItemClickEventSupport : Listener {
 
             event.action == Action.RIGHT_CLICK_BLOCK -> {
                 if (haveRightClicked.add(player)) {
-                    if (isInteractable(event.clickedBlock)) return
+                    if (
+                        event.useInteractedBlock() != Event.Result.DENY &&
+                        isRightClickInteractable(event.clickedBlock)
+                    ) {
+                        return // 如果 interacted_block 已被其他代码显式禁用的话, 物品应该就可以无条件 right_click 了
+                    }
                     PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                 }
             }
@@ -86,14 +94,14 @@ internal object ItemClickEventSupport : Listener {
         }
     }
 
-    private fun isInteractable(block: Block?): Boolean {
+    private fun isRightClickInteractable(block: Block?): Boolean {
         val block = block ?: return false
 
         // 绝大部分 BlockState 的实现类都是可右键交互的方块
         // 注意: 这里不能用 is 因为 CraftBlockState 是所有 BlockState 实现的 superclass
         if (block.getState(false).javaClass != CraftBlockState::class.java) return true
         // 部分方块的 BlockState 返回的是 CraftBlockState, 但仍然可以右键交互, 进一步排除
-        if (block.type in RL_INTERACTABLE_BLOCK_TYPES) return true
+        if (block.type.asBlockType() in RL_INTERACTABLE_BLOCK_TYPES) return true
 
         // TODO 引入家具系统后, 这里需要补充逻辑
 

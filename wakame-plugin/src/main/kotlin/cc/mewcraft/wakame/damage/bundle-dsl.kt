@@ -3,16 +3,11 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeGetter
-import cc.mewcraft.wakame.attribute.AttributeMapLike
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
+import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 /**
  * 开始构建一个 [DamageBundle].
@@ -129,11 +124,11 @@ class DamagePacketDSL(
     private val element: RegistryEntry<ElementType>,
     private val attrMap: AttributeMapLike? = null,
 ) {
-    private var min: Double? = null
-    private var max: Double? = null
-    private var rate: Double? = null
-    private var defensePenetration: Double? = null
-    private var defensePenetrationRate: Double? = null
+    private var min: Double = Double.NaN
+    private var max: Double = Double.NaN
+    private var rate: Double = Double.NaN
+    private var defensePenetration: Double = Double.NaN
+    private var defensePenetrationRate: Double = Double.NaN
 
     /**
      * 使用“标准”计算方式定义所有的值.
@@ -216,14 +211,9 @@ class DamagePacketDSL(
         )
     }
 
-    private fun <T> validateValue(value: T?): T {
-        // 使用 contract 以告知编译器: 如果该函数成功返回, 那么 value 一定不为 null.
-        contract {
-            returns() implies (value != null)
-        }
-        return value ?: throw IllegalArgumentException(
-            "A value is not present in the DSL object"
-        )
+    private fun validateValue(value: Double): Double {
+        require(!value.isNaN()) { "A value is not present in the DSL object" }
+        return value
     }
 
     @DamagePacketBundleDsl

@@ -109,7 +109,7 @@ class EntityInfoBossBar : IteratingSystem(
     }
 
     private fun getMaxHealth(bukkitEntity: BukkitEntity): Double? {
-        return AttributeMapAccess.instance().get(bukkitEntity).getOrNull()?.getInstance(Attributes.MAX_HEALTH)?.getValue()
+        return AttributeMapAccess.INSTANCE.get(bukkitEntity).getOrNull()?.getInstance(Attributes.MAX_HEALTH)?.getValue()
     }
 
     override fun onAddEntity(entity: Entity) {

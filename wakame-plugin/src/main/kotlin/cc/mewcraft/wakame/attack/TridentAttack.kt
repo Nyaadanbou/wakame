@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DamageTag
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -38,20 +42,21 @@ class TridentAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
 
-        return PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.TRIDENT),
-            damageBundle = damageBundle(user.attributeMap) {
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
+
+        return damageMeta
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
@@ -59,8 +64,7 @@ class TridentAttack(
             return
         }
 
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return
         }
 
@@ -71,14 +75,13 @@ class TridentAttack(
     }
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val user = player.toUser()
         if (action.isLeftClick) {
-            if (!user.attackSpeed.isActive(nekoStack.id)) {
+            if (!player.attackSpeed.isActive(nekoStack.id)) {
                 // 没有左键到生物时, 也应该应用攻击冷却
                 nekoStack.applyAttackCooldown(player)
             }
         } else if (action.isRightClick) {
-            if (user.attackSpeed.isActive(nekoStack.id)) {
+            if (player.attackSpeed.isActive(nekoStack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用三叉戟

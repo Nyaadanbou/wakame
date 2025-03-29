@@ -1,12 +1,15 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -35,29 +38,25 @@ class SwordAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
 
-        return PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.SWORD),
-            damageBundle = damageBundle(user.attributeMap) {
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
+
+        return damageMeta
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
-            return
-        }
-
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return
         }
 

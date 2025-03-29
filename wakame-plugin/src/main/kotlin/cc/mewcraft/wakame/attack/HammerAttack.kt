@@ -7,7 +7,8 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Location
 import org.bukkit.Particle
@@ -50,18 +51,16 @@ class HammerAttack(
             return
         }
 
-        val user = player.toUser()
         // 只要这个物品的内部冷却处于激活状态就不处理
         // 内部冷却不一定是攻速组件造成的
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return
         }
 
-        val attributeMap = user.attributeMap
+        val attributes = player.attributeContainer
         val hitLocation = damagee.location
-        val radius = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceIn(0.0, MAX_RADIUS)
-        val ratio = attributeMap.getValue(Attributes.HAMMER_DAMAGE_RATIO)
-        val damageTags = DamageTags(DamageTag.MELEE, DamageTag.HAMMER)
+        val radius = attributes.getValue(Attributes.HAMMER_DAMAGE_RANGE).coerceIn(0.0, MAX_RADIUS)
+        val ratio = attributes.getValue(Attributes.HAMMER_DAMAGE_RATIO)
         // 范围伤害目标的判定为:
         // 以直接受击实体的脚部坐标为起点,
         // 向 y 轴正方向(上方) 1 格
@@ -71,9 +70,8 @@ class HammerAttack(
         }.forEach { victim ->
             // 锤子范围命中的生物的伤害元数据
             val extraDamageMetadata = PlayerDamageMetadata(
-                user = user,
-                damageTags = damageTags,
-                damageBundle = damageBundle(attributeMap) {
+                attributes = attributes,
+                damageBundle = damageBundle(attributes) {
                     every {
                         standard()
                         rate {
@@ -120,23 +118,21 @@ class HammerAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
 
-        val attributeMap = user.attributeMap
+        val attributes = player.attributeContainer
         // 锤子直接命中的生物的伤害元数据
-        val directDamageMetadata = PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.HAMMER),
-            damageBundle = damageBundle(attributeMap) {
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
                 every {
                     standard()
                 }
             }
         )
 
-        return directDamageMetadata
+        return damageMeta
     }
 }

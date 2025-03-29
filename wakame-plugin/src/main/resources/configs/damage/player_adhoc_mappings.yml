@@ -1,0 +1,159 @@
+# 不要修改!
+version: 1
+
+# 映射:
+#   key: direct_entity
+#   val: damage_metadata
+#
+# 使用场景:
+# 玩家造成了基于原版特殊机制的伤害, 而非使用武器左键造成的直接伤害.
+# 也就是说 damage_source 需要同时满足以下条件:
+# - direct_entity 和 causing_entity 都存在
+# - direct_entity 不是 player; 但 causing_entity 是 player
+# - direct_entity 不能是 arrow 和 trident FIXME #366: 存疑
+
+tnt:
+  一般:
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+end_crystal:
+  一般:
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+arrow:
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 1.0, max: 1.0 }
+      critical_strike_metadata:
+        chance: 0.0
+egg:
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 0.0, max: 0.0 }
+      critical_strike_metadata:
+        chance: 0.0
+ender_pearl:
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 0.0, max: 0.0 }
+      critical_strike_metadata:
+        chance: 0.0
+fireball: # 玩家反弹的恶魂火球算玩家发射的
+  爆炸:
+    predicates:
+      damage_type:
+        - explosion
+        - player_explosion
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: fire
+      critical_strike_metadata:
+        chance: 0.0
+  攻击恶魂:
+    predicates:
+      victim_entity_type:
+        - ghast
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        fire: { min: 1000.0, max: 1000.0 }
+      critical_strike_metadata:
+        chance: 0.0
+  攻击其他实体:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        fire: { min: 6.0, max: 6.0 }
+      critical_strike_metadata:
+        chance: 0.0
+firework_rocket:
+  一般:
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+area_effect_cloud:
+  一般:
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+snowball:
+  攻击烈焰人:
+    predicates:
+      victim_entity_type:
+        - blaze
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 3.0, max: 3.0 }
+      critical_strike_metadata:
+        chance: 0.0
+  攻击其他实体:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 0.0, max: 0.0 }
+      critical_strike_metadata:
+        chance: 0.0
+potion:
+  一般:
+    damage_metadata:
+      type: vanilla
+      damage_tags: [ ]
+      element: neutral
+      critical_strike_metadata:
+        chance: 0.0
+trident:
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        neutral: { min: 8.0, max: 8.0 }
+      critical_strike_metadata:
+        chance: 0.0
+wind_charge:
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        wind: { min: 1.0, max: 1.0 }
+      critical_strike_metadata:
+        chance: 0.0
+breeze_wind_charge: # 玩家反弹的旋风人风弹算玩家发射的
+  一般:
+    damage_metadata:
+      type: direct
+      damage_tags: [ ]
+      damage_bundle:
+        wind: { min: 1.0, max: 1.0 }
+      critical_strike_metadata:
+        chance: 0.0

@@ -39,14 +39,14 @@ data class EnchantmentAttributeEffect(
     }
 
     fun apply(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.instance().get(player).fold(
+        AttributeMapAccess.INSTANCE.get(player).fold(
             { map -> map.addTransientModifiers(makeAttributeMap(level, slot)) },
             { ex -> LOGGER.error("Failed to apply attribute modifier to player: ${ex.message}") }
         )
     }
 
     fun remove(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.instance().get(player).fold(
+        AttributeMapAccess.INSTANCE.get(player).fold(
             { map -> map.removeModifiers(makeAttributeMap(level, slot)) },
             { ex -> LOGGER.error("Failed to remove attribute modifier from player: ${ex.message}") }
         )

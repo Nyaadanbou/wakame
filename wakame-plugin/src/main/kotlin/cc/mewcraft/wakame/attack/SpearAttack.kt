@@ -9,7 +9,8 @@ import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attackSpeed
+import cc.mewcraft.wakame.user.attributeContainer
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.*
 import org.bukkit.entity.LivingEntity
@@ -47,21 +48,21 @@ data class SpearAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return null
         }
 
-        val attributeMap = user.attributeMap
-        val directDamageMetadata = PlayerDamageMetadata(
-            user = user,
-            damageTags = DamageTags(DamageTag.DIRECT, DamageTag.MELEE, DamageTag.SPEAR),
-            damageBundle = damageBundle(attributeMap) {
-                every { standard() }
+        val attributes = player.attributeContainer
+        val damageMeta = PlayerDamageMetadata(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes) {
+                every {
+                    standard()
+                }
             }
         )
 
-        return directDamageMetadata
+        return damageMeta
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
@@ -69,8 +70,7 @@ data class SpearAttack(
             return
         }
 
-        val user = player.toUser()
-        if (user.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackSpeed.isActive(nekoStack.id)) {
             return
         }
 
@@ -84,7 +84,7 @@ data class SpearAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.toUser().attackSpeed.isActive(nekoStack.id)) return
+        if (player.attackSpeed.isActive(nekoStack.id)) return
 
         applySpearAttack(player)
 
@@ -99,9 +99,8 @@ data class SpearAttack(
     private fun applySpearAttack(player: Player, vararg excludeEntities: LivingEntity) {
         val world = player.world
         val hitEntities = mutableListOf<LivingEntity>()
-        val user = player.toUser()
-        val attributeMap = user.attributeMap
-        val maxDistance = attributeMap.getValue(Attributes.ENTITY_INTERACTION_RANGE)
+        val attributes = player.attributeContainer
+        val maxDistance = attributes.getValue(Attributes.ENTITY_INTERACTION_RANGE)
 
         var end: Vector3f? = null
         for (i in 0 until MAX_HIT_AMOUNT) {
@@ -132,9 +131,12 @@ data class SpearAttack(
 
         hitEntities.forEach { victim ->
             val playerDamageMetadata = PlayerDamageMetadata(
-                user = user,
-                damageBundle = damageBundle(attributeMap) { every { standard() } },
-                damageTags = DamageTags(DamageTag.MELEE, DamageTag.SPEAR)
+                attributes = attributes,
+                damageBundle = damageBundle(attributes) {
+                    every {
+                        standard()
+                    }
+                },
             )
             victim.hurt(playerDamageMetadata, player, true)
         }

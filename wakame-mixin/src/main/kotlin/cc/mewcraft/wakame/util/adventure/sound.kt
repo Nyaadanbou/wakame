@@ -4,6 +4,9 @@ import io.papermc.paper.math.FinePosition
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.sound.Sound
 
+typealias BukkitSound = org.bukkit.Sound
+typealias SoundSource = Sound.Source
+
 fun sound(block: Sound.Builder.() -> Unit): Sound {
     return Sound.sound().apply(block).build()
 }

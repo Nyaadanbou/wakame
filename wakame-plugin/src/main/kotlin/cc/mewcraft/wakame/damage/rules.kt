@@ -13,7 +13,7 @@ private val RULES_CONFIG = DAMAGE_CONFIG.node("rules")
 /**
  * 伤害系统中可通过配置修改的规则.
  */
-object DamageRules {
+internal object DamageRules {
 
     val ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("attack_damage_rate_multiply_before_defense")
     val CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("critical_strike_power_multiply_before_defense")

@@ -21,26 +21,28 @@ interface DamageApplier {
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
-    companion object Holder : DamageApplier {
-        private var instance: DamageApplier? = null
+    companion object {
 
-        @JvmStatic
-        fun instance(): DamageApplier {
-            return instance ?: throw IllegalStateException("DamageApplier has not been initialized")
-        }
+        @get:JvmName("getInstance")
+        lateinit var INSTANCE: DamageApplier
+            private set
 
         @ApiStatus.Internal
         fun register(instance: DamageApplier) {
-            this.instance = instance
+            this.INSTANCE = instance
         }
 
-        @ApiStatus.Internal
-        fun unregister() {
-            instance = null
-        }
+    }
+}
 
-        override fun damage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
-            instance().damage(victim, source, amount)
-        }
+// ------------
+// 内部实现
+// ------------
+
+internal object BukkitDamageApplier : DamageApplier {
+    override fun damage(victim: LivingEntity, source: LivingEntity?, amount: Double) {
+        // 这里仅仅用于触发一下 Bukkit 的 EntityDamageEvent.
+        // 伤害数值填多少都无所谓, 最后都会被事件监听逻辑重新计算.
+        victim.damage(amount, source)
     }
 }

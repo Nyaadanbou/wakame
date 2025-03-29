@@ -3,9 +3,26 @@ package cc.mewcraft.wakame.damage
 import org.jetbrains.annotations.ApiStatus
 
 /**
+ * 创建一个 [DamageTags].
+ */
+@Deprecated("In favor of DamageType")
+fun DamageTags(vararg tags: DamageTag): DamageTags {
+    return DamageTagsImpl(*tags)
+}
+
+/**
+ * 创建一个 [DamageTags].
+ */
+@Deprecated("In favor of DamageType")
+fun DamageTags(tags: List<DamageTag>): DamageTags {
+    return DamageTagsImpl(tags)
+}
+
+/**
  * 伤害标签集.
  * 可能包含0个或多个伤害标签.
  */
+@Deprecated("In favor of DamageType")
 interface DamageTags {
     /**
      * 伤害标签集是否为空
@@ -38,6 +55,7 @@ interface DamageTags {
 /**
  * 用于创建 [DamageTags] 的实例.
  */
+@Deprecated("In favor of DamageType")
 interface DamageTagsFactory {
     /**
      * 创建一个 [DamageTags].
@@ -52,37 +70,25 @@ interface DamageTagsFactory {
     /**
      * 半生对象, 用于获取 [DamageTagsFactory] 的实例.
      */
-    companion object Holder : DamageTagsFactory {
-        private var instance: DamageTagsFactory? = null
+    companion object {
 
-        @JvmStatic
-        fun instance(): DamageTagsFactory {
-            return instance ?: throw IllegalStateException("DamageTagsFactory has not been initialized.")
-        }
+        @get:JvmName("getInstance")
+        lateinit var INSTANCE: DamageTagsFactory
+            private set
 
         @ApiStatus.Internal
         fun register(factory: DamageTagsFactory) {
-            instance = factory
+            INSTANCE = factory
         }
 
-        @ApiStatus.Internal
-        fun unregister() {
-            instance = null
-        }
-
-        override fun create(vararg tags: DamageTag): DamageTags {
-            return instance().create(*tags)
-        }
-
-        override fun create(tags: List<DamageTag>): DamageTags {
-            return instance().create(tags)
-        }
     }
+
 }
 
 /**
  * 伤害标签.
  */
+@Deprecated("In favor of DamageType")
 enum class DamageTag {
 
     // TODO DamageTag 改为接口, 获取实例采用 static final, 以支持数据驱动
@@ -162,4 +168,46 @@ enum class DamageTag {
      * 标记法杖类武器的伤害.
      */
     WAND,
+}
+
+// ------------
+// 内部实现
+// ------------
+
+internal object DefaultDamageTagsFactory : DamageTagsFactory {
+    override fun create(vararg tags: DamageTag): DamageTags {
+        return DamageTagsImpl(*tags)
+    }
+
+    override fun create(tags: List<DamageTag>): DamageTags {
+        return DamageTagsImpl(tags)
+    }
+}
+
+private class DamageTagsImpl(
+    vararg tags: DamageTag,
+) : DamageTags {
+    private val tagSet: MutableSet<DamageTag> = mutableSetOf(*tags)
+
+    constructor(tags: List<DamageTag>) : this(*tags.toTypedArray())
+
+    override fun isEmpty(): Boolean {
+        return tagSet.isEmpty()
+    }
+
+    override fun add(tag: DamageTag): Boolean {
+        return tagSet.add(tag)
+    }
+
+    override fun remove(tag: DamageTag): Boolean {
+        return tagSet.remove(tag)
+    }
+
+    override fun contains(tag: DamageTag): Boolean {
+        return tag in tagSet
+    }
+
+    override fun tags(): Set<DamageTag> {
+        return tagSet.toSet()
+    }
 }

@@ -32,7 +32,7 @@ sealed interface AttackType {
      * !!! 不要在该方法中的实现中写攻击的附带效果 !!!
      */
     fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        return PlayerDamageMetadata.HAND_WITHOUT_ATTACK
+        return PlayerDamageMetadata.INTRINSIC_ATTACK
     }
 
     /**

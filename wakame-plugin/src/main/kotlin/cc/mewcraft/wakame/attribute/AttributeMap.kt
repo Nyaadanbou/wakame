@@ -27,6 +27,7 @@ import java.lang.ref.WeakReference
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+// FIXME #366: 搞点合适的构造函数, 还有 user#attributemap 的扩展函数
 /**
  * A constructor function of [AttributeMap].
  *
@@ -441,6 +442,17 @@ private class ImaginaryAttributeMapImpl(
 private class AttributeMapSnapshotImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
+    @Suppress("DuplicatedCode")
+    override fun getSnapshot(): AttributeMapSnapshot {
+        val data = Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>()
+        for (attribute in getAttributes()) {
+            val instance = requireNotNull(getInstance(attribute)) { "The returned AttributeInstance should not be null. This is a bug!" }
+            val snapshot = instance.getSnapshot()
+            data.put(attribute, snapshot)
+        }
+        return AttributeMapSnapshotImpl(data)
+    }
+
     override fun getInstance(attribute: Attribute): AttributeInstanceSnapshot? {
         return data[attribute]
     }
@@ -467,6 +479,25 @@ private class AttributeMapSnapshotImpl(
 
     override fun getModifierValue(attribute: Attribute, id: Key): Double {
         return data[attribute]?.getModifier(id)?.amount ?: throw NoSuchElementException("Attribute '$attribute' not found in AttributeMapSnapshot")
+    }
+
+    override fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.forEach { attribute, modifier ->
+            val attributeInstance = this.getInstance(attribute)
+            if (attributeInstance != null) {
+                attributeInstance.removeModifier(modifier.id)
+                attributeInstance.addModifier(modifier)
+            }
+        }
+    }
+
+    override fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>) {
+        modifiersMap.asMap().forEach { (attribute, modifiers) ->
+            val attributeInstance = this.data[attribute]
+            if (attributeInstance != null) {
+                modifiers.forEach { modifier -> attributeInstance.removeModifier(modifier.id) }
+            }
+        }
     }
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstanceSnapshot>> {

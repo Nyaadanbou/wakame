@@ -41,13 +41,23 @@ interface AttributeMapLike {
 /**
  * 代表一个 [AttributeMapLike] 的快照, 支持读/写, 用于临时的数值储存和计算.
  */
-interface AttributeMapSnapshot : AttributeMapLike, Iterable<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
+interface AttributeMapSnapshot : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstanceSnapshot>> {
     /**
      * 获取指定 [attribute] 的实例快照.
      *
      * 如果指定的 [attribute] 不存在, 则返回 `null`.
      */
     fun getInstance(attribute: Attribute): AttributeInstanceSnapshot?
+
+    /**
+     * 添加临时的 [AttributeModifier].
+     */
+    fun addTransientModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
+
+    /**
+     * 移除非默认的 [AttributeModifier].
+     */
+    fun removeModifiers(modifiersMap: Multimap<Attribute, AttributeModifier>)
 }
 
 /**

@@ -73,7 +73,7 @@ class NekoPercentDamageMechanic(
                 target.health * percent
             } else {
                 val maxHealthAttribute = requireNotNull(AttributeProvider.instance().get("max_health")) { "Max health attribute is Null!" }
-                val maxHealth = AttributeMapAccess.instance().get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
+                val maxHealth = AttributeMapAccess.INSTANCE.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }
             damage
@@ -86,9 +86,9 @@ class NekoPercentDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.create()
+            return DamageTagsFactory.INSTANCE.create()
         }
-        return DamageTagsFactory.create(origin.map { DamageTag.valueOf(it) })
+        return DamageTagsFactory.INSTANCE.create(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {
@@ -110,7 +110,7 @@ class NekoPercentDamageMechanic(
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity
 
         // 对目标生物造成自定义的萌芽伤害
-        DamageManagerApi.hurt(entity, damageMetadata, casterEntity, knockback)
+        DamageManagerApi.INSTANCE.hurt(entity, damageMetadata, casterEntity, knockback)
 
         return SkillResult.SUCCESS
     }

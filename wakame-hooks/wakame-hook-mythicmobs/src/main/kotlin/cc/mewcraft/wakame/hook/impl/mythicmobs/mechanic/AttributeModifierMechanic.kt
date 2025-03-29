@@ -37,7 +37,7 @@ class AttributeModifierMechanic(
 
     override fun cast(data: SkillMetadata): SkillResult {
         val targetEntity = data.caster.entity.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.instance().get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)
@@ -47,7 +47,7 @@ class AttributeModifierMechanic(
 
     override fun castAtEntity(data: SkillMetadata, target: AbstractEntity): SkillResult {
         val targetEntity = target.bukkitEntity as? LivingEntity ?: return SkillResult.INVALID_TARGET
-        val attributeMap = AttributeMapAccess.instance().get(targetEntity).getOrNull() ?: return SkillResult.ERROR
+        val attributeMap = AttributeMapAccess.INSTANCE.get(targetEntity).getOrNull() ?: return SkillResult.ERROR
         val modifier = AttributeModifier(Key.key(name[data]), amount[data], operation)
         val attributeInstance = attributeMap.getInstance(attribute) ?: return SkillResult.INVALID_TARGET
         addModifierAndScheduleRemoval(attributeInstance, modifier, duration[data], targetEntity is Player)

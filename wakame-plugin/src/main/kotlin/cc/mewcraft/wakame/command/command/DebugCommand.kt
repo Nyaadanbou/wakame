@@ -3,10 +3,12 @@ package cc.mewcraft.wakame.command.command
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.damage.hurt
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toNMS
@@ -97,20 +99,21 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val sender = (context.sender() as PlayerSource).source()
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
-        val damageMeta = PlayerDamageMetadata(
-            user = sender.toUser(),
-            damageBundle = damageBundle {
-                default {
-                    min(damage)
-                    max(damage)
-                    rate(1.0)
-                    defensePenetration(.0)
-                    defensePenetrationRate(.0)
-                }
-            },
-            damageTags = DamageTags(DamageTag.DIRECT)
-        )
         target.filterIsInstance<LivingEntity>().forEach { entity ->
+            val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(sender, entity).apply { callEvent() }
+            val attributes = preprocessEvent.causingAttributes
+            val damageMeta = PlayerDamageMetadata(
+                attributes = attributes,
+                damageBundle = damageBundle {
+                    default {
+                        min(damage)
+                        max(damage)
+                        rate(1.0)
+                        defensePenetration(.0)
+                        defensePenetrationRate(.0)
+                    }
+                }
+            )
             entity.hurt(damageMetadata = damageMeta, source = sender)
         }
     }
