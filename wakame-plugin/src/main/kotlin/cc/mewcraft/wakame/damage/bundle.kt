@@ -31,6 +31,9 @@ interface DamageBundle {
      */
     fun total(): Double
 
+    // TODO #366: 分离 API.
+    //  1) Mixin 模块中的 DamageBundle 不需要 mutable.
+    //  2) ElementType 必须先迁移到 Mixin 才能迁移伤害.
     /**
      * 向伤害捆绑包中添加元素伤害包, 将覆盖已有的元素伤害包.
      */
