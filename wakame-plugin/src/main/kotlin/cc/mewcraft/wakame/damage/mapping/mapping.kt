@@ -24,7 +24,7 @@ internal interface DamageMapper {
 }
 
 /**
- * 用于将特定伤害类型
+ * 用于生成 [org.bukkit.damage.DamageType] 对应的 [DamageMetadata].
  */
 @ConfigSerializable
 internal data class DamageTypeMapper(
@@ -37,7 +37,7 @@ internal data class DamageTypeMapper(
 }
 
 /**
- * 一个特定攻击场景的伤害映射.
+ * 一个特定攻击场景的伤害映射. 攻击场景的检查由 [tests] 负责.
  *
  * @param tests 用于检查场景是否匹配
  * @param builder 用于构建 [DamageMetadata]
