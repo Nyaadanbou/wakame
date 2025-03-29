@@ -45,13 +45,17 @@ internal object DamageListener : Listener {
     fun on(event: EntityDamageEvent) {
         val damagee = event.entity as? LivingEntity ?: return
 
-        // 计算最终伤害
         val damageContext = DamageContext(event)
+
+        // 计算防御前的伤害
         val damageMetadata = DamageManager.calculateDamageBeforeDefense(damageContext) ?: run {
             event.isCancelled = true
             return
         }
+
+        // 计算防御后的伤害 (最终伤害)
         val finalDamageMap = DamageManager.calculateFinalDamageMap(damageMetadata, damagee)
+
         val postprocessEvent = NekoPostprocessDamageEvent(damageMetadata, finalDamageMap, event)
         if (!postprocessEvent.callEvent()) {
             // 萌芽伤害事件被取消, 则直接返回
