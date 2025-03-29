@@ -27,6 +27,18 @@ world_time_control_use_interval_ticks: 12000
 # 世界天气控制器的全局最小使用间隔 (刻)
 world_weather_control_use_interval_ticks: 12000
 
+# 可右键交互的方块列表
+# 已经被 org.bukkit.block.BlockState 覆盖的方块类型不需要在这里配置
+right_click_interactable_blocks:
+  - "minecraft:lever"
+  - "#minecraft:anvil"
+  - "#minecraft:buttons"
+  - "#minecraft:fence_gate"
+  - "#minecraft:doors"
+  - "#minecraft:pressure_plates"
+  - "#minecraft:candle_cakes"
+  - "#minecraft:cauldrons"
+
 # 关于调试模式
 debug:
   # 调试模式信息记录控制
