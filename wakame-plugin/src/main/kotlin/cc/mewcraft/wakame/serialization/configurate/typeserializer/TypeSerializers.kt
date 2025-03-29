@@ -1,4 +1,5 @@
 @file:Suppress("UnstableApiUsage")
+
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.ability.TriggerVariantSerializer
@@ -40,6 +41,8 @@ val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerColl
     // Bukkit Enum
     .register(EntityTypeSerializer)
     .register(MaterialSerializer)
+    .register(BlockTypeListTypeSerializer)
+    .register(ItemTypeListTypeSerializer)
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())
