@@ -61,34 +61,32 @@ internal object ItemClickEventSupport : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerInteractEvent) {
-        val player = event.player
         val item = event.item ?: return
-        when {
-            event.action.isLeftClick -> {
+        val player = event.player
+        val action = event.action
+        when (action) {
+            Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
                 if (haveLeftClicked.add(player)) {
                     PlayerItemLeftClickEvent(player, item).callEvent()
                 }
             }
 
-            event.action == Action.RIGHT_CLICK_AIR -> {
+            Action.RIGHT_CLICK_AIR -> {
                 if (haveRightClicked.add(player)) {
                     PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                 }
             }
 
-            event.action == Action.RIGHT_CLICK_BLOCK -> {
+            Action.RIGHT_CLICK_BLOCK -> {
                 if (haveRightClicked.add(player)) {
-                    if (
-                        event.useInteractedBlock() != Event.Result.DENY &&
-                        !player.isSneaking &&
-                        isRightClickInteractable(event.clickedBlock)
+                    if (player.isSneaking || // c1
+                        event.useInteractedBlock() == Event.Result.DENY || // c2
+                        !isRightClickInteractable(event.clickedBlock) // c3
                     ) {
-                        // 如果 interacted_block 已被其他代码显式禁用
-                        // 或者玩家是潜行点击
-                        // 物品可以无条件 right_click 了
-                        return
+                        // 如果玩家是潜行右键点击 (c1) 或者方块右键交互已被其他代码显式禁用 (c2)
+                        // 则认为物品可以无条件 right_click, 不再考虑可右键交互的方块类型 (c3)
+                        PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                     }
-                    PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                 }
             }
 
