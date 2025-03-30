@@ -108,7 +108,7 @@ class EntityInfoBossBar : IteratingSystem(
 
     private fun getMaxHealth(entity: Entity): Double? {
         val attributeMap = entity[AttributeMapComponent].invoke()
-        val maxHealth = AttributeProvider.INSTANCE.get("max_health") ?: return null
+        val maxHealth = AttributeProvider.instance().get("max_health") ?: return null
         return attributeMap.getInstance(maxHealth)?.getValue()
     }
 
