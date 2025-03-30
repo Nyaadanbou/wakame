@@ -28,16 +28,60 @@ world_time_control_use_interval_ticks: 12000
 world_weather_control_use_interval_ticks: 12000
 
 # 可右键交互的方块列表
-# 已经被 org.bukkit.block.BlockState 覆盖的方块类型不需要在这里配置
 right_click_interactable_blocks:
-  - "minecraft:lever"
+  - "#minecraft:all_signs"
   - "#minecraft:anvil"
+  - "#minecraft:beds"
   - "#minecraft:buttons"
-  - "#minecraft:fence_gate"
   - "#minecraft:doors"
-  - "#minecraft:pressure_plates"
-  - "#minecraft:candle_cakes"
-  - "#minecraft:cauldrons"
+  - "#minecraft:fence_gates"
+  - "#minecraft:flower_pots"
+  - "#minecraft:shulker_boxes"
+  - "#minecraft:trapdoors"
+
+  - "minecraft:barrel"
+  - "minecraft:beacon"
+  - "minecraft:bell"
+  - "minecraft:blast_furnace"
+  - "minecraft:brewing_stand"
+  - "minecraft:cartography_table"
+  - "minecraft:chest"
+  - "minecraft:comparator"
+  - "minecraft:crafter"
+  - "minecraft:crafting_table"
+  - "minecraft:daylight_detector"
+  - "minecraft:decorated_pot"
+  - "minecraft:dispenser"
+  - "minecraft:dropper"
+  - "minecraft:enchanting_table"
+  - "minecraft:ender_chest"
+  - "minecraft:furnace"
+  - "minecraft:grindstone"
+  - "minecraft:hopper"
+  - "minecraft:lectern"
+  - "minecraft:lever"
+  - "minecraft:loom"
+  - "minecraft:repeater"
+  - "minecraft:smithing_table"
+  - "minecraft:smoker"
+  - "minecraft:stonecutter"
+  - "minecraft:trapped_chest"
+
+  # 以下方块需要玩家手持特定物品才是可交互的.
+  # 结合点击事件的使用场景来看, 认为他们不可交互比较好.
+  # 保留这个列表以备不时之需.
+  # - "minecraft:cauldron
+  # - "minecraft:composter
+  # - "minecraft:beehive
+  # - "minecraft:bee_nest
+  # - "minecraft:suspicious_sand
+  # - "minecraft:suspicious_gravel
+  # - "minecraft:campfire
+  # - "minecraft:chiseled_bookshelf
+  # - "minecraft:spawner
+  # - "minecraft:jukebox
+  # - "minecraft:trial_spawner
+  # - "minecraft:vault
 
 # 关于调试模式
 debug:
