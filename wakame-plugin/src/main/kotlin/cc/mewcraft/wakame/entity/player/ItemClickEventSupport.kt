@@ -13,7 +13,6 @@ import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
-import org.bukkit.craftbukkit.block.CraftBlockState
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
@@ -22,6 +21,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.vehicle.VehicleDamageEvent
 import xyz.xenondevs.commons.provider.map
 
 /**
@@ -47,8 +47,6 @@ internal object ItemClickEventSupport : Listener {
 
     /**
      * 可以右键交互的方块类型.
-     * 大部分情况已经通过判断 [org.bukkit.block.BlockState] 被过滤掉了.
-     * 这里仅需要指定一些无法通过判断 [org.bukkit.block.BlockState] 来过滤掉的.
      */
     @JvmStatic
     private val RL_INTERACTABLE_BLOCK_TYPES: HashSet<BlockType> by MAIN_CONFIG
@@ -82,9 +80,13 @@ internal object ItemClickEventSupport : Listener {
                 if (haveRightClicked.add(player)) {
                     if (
                         event.useInteractedBlock() != Event.Result.DENY &&
+                        !player.isSneaking &&
                         isRightClickInteractable(event.clickedBlock)
                     ) {
-                        return // 如果 interacted_block 已被其他代码显式禁用的话, 物品应该就可以无条件 right_click 了
+                        // 如果 interacted_block 已被其他代码显式禁用
+                        // 或者玩家是潜行点击
+                        // 物品可以无条件 right_click 了
+                        return
                     }
                     PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
                 }
@@ -97,10 +99,6 @@ internal object ItemClickEventSupport : Listener {
     private fun isRightClickInteractable(block: Block?): Boolean {
         val block = block ?: return false
 
-        // 绝大部分 BlockState 的实现类都是可右键交互的方块
-        // 注意: 这里不能用 is 因为 CraftBlockState 是所有 BlockState 实现的 superclass
-        if (block.getState(false).javaClass != CraftBlockState::class.java) return true
-        // 部分方块的 BlockState 返回的是 CraftBlockState, 但仍然可以右键交互, 进一步排除
         if (block.type.asBlockType() in RL_INTERACTABLE_BLOCK_TYPES) return true
 
         // TODO 引入家具系统后, 这里需要补充逻辑
@@ -108,10 +106,20 @@ internal object ItemClickEventSupport : Listener {
         return false
     }
 
-    // 注意: 手持物品左键 Boat/Minecart 不会触发 EntityDamageEvent
     @EventHandler
     fun on(event: EntityDamageEvent) {
         val player = event.damageSource.directEntity as? Player ?: return
+        val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        if (haveLeftClicked.add(player)) {
+            PlayerItemLeftClickEvent(player, itemInMainHand).callEvent()
+        }
+    }
+
+    // 手持物品左键 Boat/Minecart 不会触发 EntityDamageEvent.
+    // 需使用 VehicleDamageEvent 实现.
+    @EventHandler
+    fun on(event: VehicleDamageEvent) {
+        val player = event.attacker as? Player ?: return
         val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         if (haveLeftClicked.add(player)) {
             PlayerItemLeftClickEvent(player, itemInMainHand).callEvent()
