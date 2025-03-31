@@ -31,7 +31,6 @@ import org.bukkit.Location
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.util.Vector
 import org.joml.Vector3f
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -240,90 +239,54 @@ internal object DamageDisplay : Listener {
     @EventHandler
     fun on(event: NekoPostprocessDamageEvent) {
         val damagee = event.damagee as? LivingEntity ?: return
-        val criticalState = event.getCriticalState()
+        val damageeLoc = damagee.location
+        val css = event.getCriticalState()
+        val hologramLoc = calculateHologramLocation1(damagee = damagee)
         val hologramText = settings.finalText(event)
-        val offset = randomOffset(damagee.height)
+
         for (viewer in damagee.trackedBy) {
-            val hologram = Hologram(
-                data = TextHologramData(
-                    location = damagee.location.add(offset),
-                    text = hologramText,
-                    background = BACKGROUND,
-                    hasTextShadow = true,
-                    textAlignment = TextDisplay.TextAlignment.CENTER,
-                    isSeeThrough = viewer.location.distanceSquared(damagee.location) < 512.0
-                ).apply {
-                    this.brightness = BRIGHTNESS
-                }
-            )
-
-            for (animation in settings.animations) {
-                runTaskLater(animation.delay) {
-                    val hologramData = hologram.data<TextHologramData>()
-
-                    // 根据 animation 更新 hologram
-                    when (criticalState) {
-                        CriticalStrikeState.NONE -> animation.normalData
-                        CriticalStrikeState.POSITIVE -> animation.positiveData
-                        CriticalStrikeState.NEGATIVE -> animation.negativeData
-                    }.applyTo(hologramData)
-
-                    if (animation.delay == 0L) {
-                        // delay = 0 表示需要发送创建 hologram 的封包
-                        hologram.show(viewer)
-                    } else {
-                        // 否则只需要更新
-                        hologram.update()
-                        hologram.refresh(viewer)
-                    }
-                }
-            }
-
-            // 发送隐藏 hologram 的封包
-            // 注意需要手动确保在“动画”播放完毕后再隐藏
-            runTaskLater(settings.animationDuration) {
-                hologram.hide(viewer)
-            }
+            showHologram(viewer, css, damageeLoc, hologramLoc, hologramText)
         }
     }
 
-    private fun sendDamageHologram(
-        viewers: Set<Player>,
-        criticalStrikeState: CriticalStrikeState,
-        hologramDataProvider: (Player) -> TextHologramData,
+    private fun showHologram(
+        viewer: Player,
+        css: CriticalStrikeState,
+        damageeLoc: Location,
+        hologramLoc: Location,
+        hologramText: Component,
     ) {
-        val holograms = viewers.map { it to hologramDataProvider(it) }.associateBy { Hologram(it.second) }
-        displayHolograms(holograms, criticalStrikeState)
-    }
+        val hologram = Hologram(
+            data = TextHologramData(
+                location = hologramLoc,
+                text = hologramText,
+                background = BACKGROUND,
+                hasTextShadow = true,
+                textAlignment = TextDisplay.TextAlignment.CENTER,
+                isSeeThrough = viewer.location.distanceSquared(damageeLoc) < 512.0
+            ).apply {
+                this.brightness = BRIGHTNESS
+            }
+        )
 
-    private fun displayHolograms(
-        holograms: Map<Hologram, Pair<Player, TextHologramData>>,
-        criticalStrikeState: CriticalStrikeState,
-    ) {
-        // 遍历播放所有动画
         for (animation in settings.animations) {
             runTaskLater(animation.delay) {
-                for ((hologram, pair) in holograms) {
-                    val (viewer, hologramData) = pair
-                    hologramData.apply {
-                        val animationData = when (criticalStrikeState) {
-                            CriticalStrikeState.NONE -> animation.normalData
-                            CriticalStrikeState.POSITIVE -> animation.positiveData
-                            CriticalStrikeState.NEGATIVE -> animation.negativeData
-                        }
-                        this.startInterpolation = animationData.startInterpolation
-                        this.interpolationDuration = animationData.interpolationDuration
-                        this.translation = animationData.translation
-                        this.scale = animationData.scale
-                    }
-                    if (animation.delay == 0L) {
-                        // 发送创建 hologram 的封包
-                        hologram.show(viewer)
-                    } else {
-                        // 更新动画
-                        hologram.update()
-                        hologram.refresh(viewer)
-                    }
+                val hologramData = hologram.data<TextHologramData>()
+
+                // 根据 animation 更新 hologram
+                when (css) {
+                    CriticalStrikeState.NONE -> animation.normalData
+                    CriticalStrikeState.POSITIVE -> animation.positiveData
+                    CriticalStrikeState.NEGATIVE -> animation.negativeData
+                }.applyTo(hologramData)
+
+                if (animation.delay == 0L) {
+                    // delay = 0 表示需要发送创建 hologram 的封包
+                    hologram.show(viewer)
+                } else {
+                    // 否则只需要更新
+                    hologram.update()
+                    hologram.refresh(viewer)
                 }
             }
         }
@@ -331,29 +294,35 @@ internal object DamageDisplay : Listener {
         // 发送隐藏 hologram 的封包
         // 注意需要手动确保在“动画”播放完毕后再隐藏
         runTaskLater(settings.animationDuration) {
-            for ((hologram, pair) in holograms) {
-                val (viewer, _) = pair
-                hologram.hide(viewer)
-            }
+            hologram.hide(viewer)
         }
     }
 
-    private fun randomOffset(damageeHeight: Double, radius: Double = 1.0): Vector {
+    /**
+     * 计算一个坐标 `C`, 使其落在 [受伤实体][damagee] 的周围.
+     */
+    private fun calculateHologramLocation1(
+        damagee: LivingEntity,
+        radius: Double = 1.0,
+    ): Location {
+        // 生成随机变量
         val random = ThreadLocalRandom.current()
         val theta = random.nextDouble(0.0, 2 * Math.PI)
         val r = random.nextDouble(0.2, radius)
 
-        val x = (r * cos(theta))
-        val y = damageeHeight
-        val z = (r * sin(theta))
+        // 计算 offset
+        val x = r * cos(theta)
+        val y = damagee.height
+        val z = r * sin(theta)
 
-        return Vector(x, y, z)
+        val result = damagee.location.apply { add(x, y, z) }
+
+        return result
     }
 
     /**
-     * 计算一个坐标 `C`, 使其落在 [玩家][damager] 的眼睛与 [受伤实体][damagee]
-     * 的眼睛的连线 `AB` 上, 并且与玩家的 [眼睛][Player.getEyeLocation]
-     * 的距离为 [distance].
+     * 计算一个坐标 `C`, 使其落在 [start] 与 [end] 的连线 `AB` 上,
+     * 并且坐标 `C` 与 [start] 的距离为 [distance].
      *
      * 具体来说, 我们先找到一个平面 `P`, 使得平面垂直于 `AB` 向量.
      * 平面 `P` 与点 `A` (眼睛) 之间的距离由参数 [distance] 决定.
@@ -363,13 +332,13 @@ internal object DamageDisplay : Listener {
      * - 即使玩家零距离攻击怪物, 也能够清晰的看到伤害信息
      * - 无论玩家以什么角度发起攻击, 伤害信息始终都在正前方
      */
-    private fun calculateHologramLocation(
-        damager: Player,
-        damagee: LivingEntity,
+    private fun calculateHologramLocation2(
+        start: Location,
+        end: Location,
         distance: Float,
     ): Location {
-        val a = damager.eyeLocation.toVector3f()
-        val b = damagee.eyeLocation.toVector3f().apply { y -= damagee.height.toFloat() / 3f } // 降低一点高度, 让数字落在屏幕正中间
+        val a = start.toVector3f()
+        val b = end.toVector3f()
         val ab = (b - a).normalize()
         val c0 = a + (ab mul distance)
 
@@ -387,7 +356,7 @@ internal object DamageDisplay : Listener {
         // 计算 C
         val c = c0 + (v1 mul r1) + (v2 mul r2)
 
-        return c.toLocation(damager.world)
+        return c.toLocation(end.world)
     }
 }
 

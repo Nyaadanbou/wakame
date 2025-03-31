@@ -21,9 +21,9 @@ interface HologramData {
     }
 }
 
-abstract class DisplayHologramData(
-    final override val type: HologramData.Type,
-    final override val location: Location,
+sealed class DisplayHologramData(
+    override val type: HologramData.Type,
+    override val location: Location,
 ) : HologramData {
     @JvmField
     var billboard: Billboard = DEFAULT_BILLBOARD
@@ -78,12 +78,8 @@ class TextHologramData(
 class ItemHologramData(
     location: Location,
 ) : DisplayHologramData(HologramData.Type.ITEM, location) {
+    @JvmField
     var item: ItemStack = DEFAULT_ITEM
-        set(item) {
-            if (field != item) {
-                field = item
-            }
-        }
 
     companion object {
         @JvmField
