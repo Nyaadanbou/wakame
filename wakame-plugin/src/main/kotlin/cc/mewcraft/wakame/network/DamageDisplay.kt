@@ -8,12 +8,7 @@ import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
-import cc.mewcraft.wakame.extensions.cross
-import cc.mewcraft.wakame.extensions.minus
-import cc.mewcraft.wakame.extensions.mul
-import cc.mewcraft.wakame.extensions.plus
-import cc.mewcraft.wakame.extensions.toLocation
-import cc.mewcraft.wakame.extensions.toVector3f
+import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.AnimationData
 import cc.mewcraft.wakame.hologram.Hologram
 import cc.mewcraft.wakame.hologram.TextHologramData
@@ -33,11 +28,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Formatter
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Color
 import org.bukkit.Location
-import org.bukkit.entity.Display
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.TextDisplay
+import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.bukkit.util.Vector
 import org.joml.Vector3f
@@ -260,7 +251,7 @@ internal object DamageDisplay {
                     background = Color.fromARGB(0),
                     hasTextShadow = true,
                     textAlignment = TextDisplay.TextAlignment.CENTER,
-                    isSeeThrough = viewer.location.distance(damagee.location) < 10
+                    isSeeThrough = viewer.location.distanceSquared(damagee.location) < 64
                 ).apply {
                     this.brightness = Display.Brightness(15, 0)
                 }
