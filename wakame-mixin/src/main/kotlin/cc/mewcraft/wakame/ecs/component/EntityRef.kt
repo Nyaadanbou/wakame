@@ -4,6 +4,6 @@ import cc.mewcraft.wakame.ecs.Fleks
 import com.github.quillraven.fleks.Entity
 
 abstract class EntityRef(private val entity: Entity) {
-    private val entityOrNull: Entity? get() = entity.takeIf<Entity>(Fleks.world::contains)
+    private val entityOrNull: Entity? get() = entity.takeIf<Entity>(Fleks.INSTANCE.world::contains)
     operator fun invoke(): Entity? = entityOrNull
 }

@@ -43,7 +43,7 @@ object ElementStackManager {
             return
         }
 
-        val elementStackEntity = Fleks.createEntity {
+        val elementStackEntity = Fleks.INSTANCE.createEntity {
             it += CastBy(target.unwrap())
             it += TargetTo(target.unwrap())
             it += ElementComponent(element)
@@ -64,7 +64,7 @@ object ElementStackManager {
         return elementEntity != null
     }
 
-    private fun addElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>, amount: Int) = with(Fleks.world) {
+    private fun addElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>, amount: Int) = with(Fleks.INSTANCE.world) {
         require(amount > 0) { "Amount must be greater than 0" }
         val stack = entity[ElementStackContainer][element] ?: return@with
         stack[ElementStackComponent].amount += amount

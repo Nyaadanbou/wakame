@@ -2,36 +2,13 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.component.AbilityContainer
-import cc.mewcraft.wakame.ability2.system.AbilityAddSystem
-import cc.mewcraft.wakame.ability2.system.AbilityInitSystem
-import cc.mewcraft.wakame.ability2.system.AbilityManaCostSystem
-import cc.mewcraft.wakame.ability2.system.AbilityRemoveSystem
-import cc.mewcraft.wakame.ability2.system.AbilityStatePhaseSystem
-import cc.mewcraft.wakame.ability2.system.AbilityTickResultSystem
-import cc.mewcraft.wakame.ability2.system.BlackholeSystem
-import cc.mewcraft.wakame.ability2.system.BlinkSystem
-import cc.mewcraft.wakame.ability2.system.DashSystem
-import cc.mewcraft.wakame.ability2.system.MultiJumpSystem
+import cc.mewcraft.wakame.ability2.system.*
 import cc.mewcraft.wakame.ecs.KoishFleks.world
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.ecs.system.AttributeMapSystem
-import cc.mewcraft.wakame.ecs.system.BossBarVisibleManager
-import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
-import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
-import cc.mewcraft.wakame.ecs.system.EntityInfoBossBar
-import cc.mewcraft.wakame.ecs.system.ManaHudSystem
-import cc.mewcraft.wakame.ecs.system.ManaSystem
-import cc.mewcraft.wakame.ecs.system.ParticleSystem
-import cc.mewcraft.wakame.ecs.system.TickCountSystem
+import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentAntigravShotSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentAttributeSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentBlastMiningSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentEffectApplier
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentFragileSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentSmelterSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentVeinminerSystem
+import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -39,11 +16,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityCreateContext
-import com.github.quillraven.fleks.EntityUpdateContext
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -153,7 +126,7 @@ internal object KoishFleks : Listener, Fleks {
 
     @InitFun
     fun init() {
-        Fleks.init(this)
+        Fleks.register(this)
         registerEvents() // 静态注册以提高性能
     }
 

@@ -1,11 +1,6 @@
 package cc.mewcraft.wakame.ability2
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityContainer
-import cc.mewcraft.wakame.ability2.component.AtSlot
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.ManaCost
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.Fleks
@@ -27,7 +22,7 @@ object AbilityEcsBridge {
         slot: ItemSlot?,
     ) {
         val metaType = ability.meta.type
-        val entity = Fleks.createEntity { entity ->
+        val entity = Fleks.INSTANCE.createEntity { entity ->
             entity += AbilityComponent(
                 metaType = metaType,
                 phase = phase,
@@ -56,7 +51,7 @@ object AbilityEcsBridge {
         phase: StatePhase,
     ) {
         val metaType = abilityMeta.type
-        val entity = Fleks.createEntity { entity ->
+        val entity = Fleks.INSTANCE.createEntity { entity ->
             entity += AbilityComponent(
                 metaType = metaType,
                 phase = phase,

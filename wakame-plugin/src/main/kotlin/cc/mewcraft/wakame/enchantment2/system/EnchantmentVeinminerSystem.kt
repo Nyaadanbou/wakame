@@ -90,7 +90,7 @@ object EnchantmentVeinminerSystem : ListenableIteratingSystem(
         val allowedBlockTypes = veinminer.allowedBlockTypes
         if (block.type !in allowedBlockTypes) return
 
-        Fleks.createEntity {
+        Fleks.INSTANCE.createEntity {
             it += EntityPlayer(playerEntity)
             it += BukkitPlayerComponent(player)
             it += veinminer

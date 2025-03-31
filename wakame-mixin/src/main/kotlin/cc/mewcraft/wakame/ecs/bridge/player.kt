@@ -18,7 +18,7 @@ fun BukkitPlayer.koishify(): KoishEntity {
     val metadataMap = Metadata.provide(this)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_PLAYER_ENTITY_ID) {
         KoishEntity(
-            Fleks.createEntity {
+            Fleks.INSTANCE.createEntity {
                 it += BukkitPlayerComponent(this@koishify)
                 it += BukkitObject
             }
