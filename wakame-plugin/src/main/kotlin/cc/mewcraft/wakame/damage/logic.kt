@@ -468,7 +468,7 @@ internal object DamageManager : DamageManagerApi {
     // 可以返回 null, 意为取消本次伤害
     private fun createPlayerDirectAttackDamageMetadata(context: DamageContext): DamageMetadata? {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
-        val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
+        val itemstack = player.inventory.itemInMainHand.wrap() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         return attack.attackType.generateDamageMetadata(player, itemstack)
     }
@@ -478,8 +478,8 @@ internal object DamageManager : DamageManagerApi {
         // TODO 横扫的临时实现, 等待麻将的组件化
         // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
-        val itemstack = player.inventory.itemInMainHand.wrap() ?: error("No koish item in player main hand.")
-        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return null
+        val itemstack = player.inventory.itemInMainHand.wrap() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
+        val attack = itemstack.templates.get(ItemTemplateTypes.ATTACK) ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         if (attack.attackType !is SwordAttack) return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
         val playerAttributes = player.attributeContainer
         val damageBundle = damageBundle(playerAttributes) {
