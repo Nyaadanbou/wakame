@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util;
 
-import cc.mewcraft.wakame.KoishHolder;
+import cc.mewcraft.wakame.PluginHolder;
 import cc.mewcraft.wakame.util.exception.HelperExceptions;
 import cc.mewcraft.wakame.util.interfaces.Delegate;
 import cc.mewcraft.wakame.util.promise.ThreadContext;
@@ -123,7 +123,7 @@ public final class Schedulers {
         public Task runRepeating(Consumer<Task> consumer, long delayTicks, long intervalTicks) {
             Objects.requireNonNull(consumer, "consumer");
             HelperTask task = new HelperTask(consumer);
-            task.runTaskTimer(KoishHolder.INSTANCE, delayTicks, intervalTicks);
+            task.runTaskTimer(PluginHolder.getInstance(), delayTicks, intervalTicks);
             return task;
         }
 
@@ -149,7 +149,7 @@ public final class Schedulers {
         public Task runRepeating(Consumer<Task> consumer, long delayTicks, long intervalTicks) {
             Objects.requireNonNull(consumer, "consumer");
             HelperTask task = new HelperTask(consumer);
-            task.runTaskTimerAsynchronously(KoishHolder.INSTANCE, delayTicks, intervalTicks);
+            task.runTaskTimerAsynchronously(PluginHolder.getInstance(), delayTicks, intervalTicks);
             return task;
         }
 

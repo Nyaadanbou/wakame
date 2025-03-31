@@ -25,7 +25,7 @@
 
 package cc.mewcraft.wakame.util.scheduler.threadlock;
 
-import cc.mewcraft.wakame.KoishHolder;
+import cc.mewcraft.wakame.PluginHolder;
 import cc.mewcraft.wakame.util.promise.ThreadContext;
 import org.bukkit.Bukkit;
 
@@ -47,7 +47,7 @@ final class ServerThreadLockImpl implements ServerThreadLock {
         }
 
         // synchronize with the main thread, then countdown
-        Bukkit.getScheduler().scheduleSyncDelayedTask(KoishHolder.INSTANCE, this::signal);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(PluginHolder.getInstance(), this::signal);
 
         // wait for the main thread to become synchronized
         await();

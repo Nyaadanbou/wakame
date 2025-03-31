@@ -22,9 +22,6 @@ val Player.kizamiContainer: KizamiMap
 val Player.attributeContainer: AttributeMap
     get() = toUser().attributeMap
 
-val Player.resourceContainer: ResourceMap
-    get() = toUser().resourceMap
-
 val Player.combo: PlayerCombo
     get() = toUser().combo
 

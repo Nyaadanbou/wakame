@@ -25,8 +25,7 @@
 
 package cc.mewcraft.wakame.util.metadata;
 
-import cc.mewcraft.wakame.KoishHolder;
-import cc.mewcraft.wakame.api.Koish;
+import cc.mewcraft.wakame.PluginHolder;
 import cc.mewcraft.wakame.util.event.Events;
 import cc.mewcraft.wakame.util.metadata.type.BlockMetadataRegistry;
 import cc.mewcraft.wakame.util.metadata.type.EntityMetadataRegistry;
@@ -71,7 +70,7 @@ public final class Metadata {
                     .handler(e -> StandardMetadataRegistries.PLAYER.remove(e.getPlayer().getUniqueId()));
 
             // cache housekeeping task
-            Bukkit.getScheduler().runTaskTimer(KoishHolder.INSTANCE, () -> {
+            Bukkit.getScheduler().runTaskTimer(PluginHolder.getInstance(), () -> {
                 for (MetadataRegistry<?> registry : StandardMetadataRegistries.values()) {
                     registry.cleanup();
                 }

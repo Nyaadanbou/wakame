@@ -29,12 +29,12 @@ internal var PLUGIN_READY: Boolean = false
 internal object Koish : JavaPlugin(), IKoish {
 
     override fun onEnable() {
+        PluginHolder.register(this)
         InvUI.getInstance().setPlugin(this) // https://docs.xen.cx/invui/#paper-plugin
         WindowManager.getInstance() // 初始化 static blocks
         Initializer.registerEvents()
         ItemXBootstrap.init()
         KoishProvider.register(this)
-        KoishHolder.INSTANCE = this
 
         LIFECYCLE_MANAGER = lifecycleManager
         PLUGIN_READY = true
