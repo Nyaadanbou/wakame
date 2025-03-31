@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
-import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.adventure.extra.kotlin.join
@@ -29,7 +29,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.bukkit.Color
 import org.bukkit.Location
 import org.bukkit.entity.*
-import org.bukkit.event.EventPriority
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 import org.bukkit.util.Vector
 import org.joml.Vector3f
 import org.spongepowered.configurate.ConfigurationNode
@@ -176,10 +177,10 @@ internal object DamageDisplayAnimationSerializer : TypeSerializer<DamageDisplayA
      * 方便函数.
      */
     private fun buildData(parentData: AnimationData, node: ConfigurationNode): AnimationData {
-        val startInterpolation: Int? = node.node("start_interpolation").get()
-        val interpolationDuration: Int? = node.node("interpolation_duration").get()
-        val translation: Vector3f? = node.node("translation").get()
-        val scale: Vector3f? = node.node("scale").get()
+        val startInterpolation = node.node("start_interpolation").get<Int>()
+        val interpolationDuration = node.node("interpolation_duration").get<Int>()
+        val translation = node.node("translation").get<Vector3f>()
+        val scale = node.node("scale").get<Vector3f>()
         return AnimationData(parentData, startInterpolation, interpolationDuration, translation, scale)
     }
 
@@ -212,7 +213,7 @@ internal object DamageDisplaySettingsSerializer : TypeSerializer<DamageDisplaySe
  * 以悬浮文字显示玩家造成的伤害.
  */
 @Init(stage = InitStage.POST_WORLD)
-internal object DamageDisplay {
+internal object DamageDisplay : Listener {
 
     // 这些 Vector3f 实例都是可变的, 请注意副作用 !!!
     private val ZERO = Vector3f(0f, 0f, 0f)
@@ -224,60 +225,83 @@ internal object DamageDisplay {
     // 用于辅助生成*伪随机*的伤害悬浮文字的坐标位置
     private val RADIAL_POINT_CYCLE = RadialPointCycle(8, 1f)
 
+    // 用于构建 Display 的常量
+    private val BACKGROUND = Color.fromARGB(0)
+    private val BRIGHTNESS = Display.Brightness(15, 0)
+
     // 当前使用的伤害显示配置
     private val settings by DISPLAY_CONFIG.entry<DamageDisplaySettings>("mode")
 
     @InitFun
-    private fun init() {
-        registerListeners()
+    fun init() {
+        registerEvents()
     }
 
-    private fun registerListeners() {
-        event<NekoPostprocessDamageEvent>(EventPriority.MONITOR, true) { event ->
-            val damagee = event.damagee as? LivingEntity ?: return@event
-            val criticalState = event.getCriticalState()
-            val hologramText = settings.finalText(event)
-            val offset = randomOffset(damagee.height)
-
-            sendDamageHologram(
-                viewers = damagee.trackedBy,
-                hologramAnimations = settings.animations,
-                hologramDuration = settings.animationDuration,
-                criticalStrikeState = criticalState
-            ) { viewer ->
-                TextHologramData(
-                    location = damagee.location.clone().add(offset),
+    @EventHandler
+    fun on(event: NekoPostprocessDamageEvent) {
+        val damagee = event.damagee as? LivingEntity ?: return
+        val criticalState = event.getCriticalState()
+        val hologramText = settings.finalText(event)
+        val offset = randomOffset(damagee.height)
+        for (viewer in damagee.trackedBy) {
+            val hologram = Hologram(
+                data = TextHologramData(
+                    location = damagee.location.add(offset),
                     text = hologramText,
-                    background = Color.fromARGB(0),
+                    background = BACKGROUND,
                     hasTextShadow = true,
                     textAlignment = TextDisplay.TextAlignment.CENTER,
-                    isSeeThrough = viewer.location.distanceSquared(damagee.location) < 64
+                    isSeeThrough = viewer.location.distanceSquared(damagee.location) < 512.0
                 ).apply {
-                    this.brightness = Display.Brightness(15, 0)
+                    this.brightness = BRIGHTNESS
                 }
+            )
+
+            for (animation in settings.animations) {
+                runTaskLater(animation.delay) {
+                    val hologramData = hologram.data<TextHologramData>()
+
+                    // 根据 animation 更新 hologram
+                    when (criticalState) {
+                        CriticalStrikeState.NONE -> animation.normalData
+                        CriticalStrikeState.POSITIVE -> animation.positiveData
+                        CriticalStrikeState.NEGATIVE -> animation.negativeData
+                    }.applyTo(hologramData)
+
+                    if (animation.delay == 0L) {
+                        // delay = 0 表示需要发送创建 hologram 的封包
+                        hologram.show(viewer)
+                    } else {
+                        // 否则只需要更新
+                        hologram.update()
+                        hologram.refresh(viewer)
+                    }
+                }
+            }
+
+            // 发送隐藏 hologram 的封包
+            // 注意需要手动确保在“动画”播放完毕后再隐藏
+            runTaskLater(settings.animationDuration) {
+                hologram.hide(viewer)
             }
         }
     }
 
     private fun sendDamageHologram(
         viewers: Set<Player>,
-        hologramAnimations: List<DamageDisplayAnimation>,
-        hologramDuration: Long,
         criticalStrikeState: CriticalStrikeState,
         hologramDataProvider: (Player) -> TextHologramData,
     ) {
         val holograms = viewers.map { it to hologramDataProvider(it) }.associateBy { Hologram(it.second) }
-        displayHolograms(holograms, hologramAnimations, hologramDuration, criticalStrikeState)
+        displayHolograms(holograms, criticalStrikeState)
     }
 
     private fun displayHolograms(
         holograms: Map<Hologram, Pair<Player, TextHologramData>>,
-        hologramAnimations: List<DamageDisplayAnimation>,
-        hologramDuration: Long,
         criticalStrikeState: CriticalStrikeState,
     ) {
         // 遍历播放所有动画
-        for (animation in hologramAnimations) {
+        for (animation in settings.animations) {
             runTaskLater(animation.delay) {
                 for ((hologram, pair) in holograms) {
                     val (viewer, hologramData) = pair
@@ -306,7 +330,7 @@ internal object DamageDisplay {
 
         // 发送隐藏 hologram 的封包
         // 注意需要手动确保在“动画”播放完毕后再隐藏
-        runTaskLater(hologramDuration) {
+        runTaskLater(settings.animationDuration) {
             for ((hologram, pair) in holograms) {
                 val (viewer, _) = pair
                 hologram.hide(viewer)

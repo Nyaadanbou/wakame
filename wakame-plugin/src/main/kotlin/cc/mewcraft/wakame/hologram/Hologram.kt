@@ -8,12 +8,7 @@ import me.lucko.shadow.shadow
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.Packet
-import net.minecraft.network.protocol.game.ClientGamePacketListener
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
-import net.minecraft.network.protocol.game.ClientboundBundlePacket
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
-import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
-import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket
+import net.minecraft.network.protocol.game.*
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.Brightness
@@ -42,14 +37,19 @@ class Hologram(
 ) {
     companion object {
         private const val LINE_WIDTH = 1000
-        private val TRANSPARENT: Color = Color.fromARGB(0)
+        private val TRANSPARENT = Color.fromARGB(0)
     }
 
     private val viewers: MutableSet<UUID> = HashSet()
     private var display: MojangDisplay? = null
 
     val displayEntity: BukkitDisplay?
-        get() = display?.let { it.bukkitEntity as BukkitDisplay }
+        get() = display?.bukkitEntity as? BukkitDisplay
+
+    fun <T : HologramData> data(): T {
+        @Suppress("UNCHECKED_CAST")
+        return data as T // check at runtime
+    }
 
     fun create() {
         val location = data.location
@@ -60,8 +60,8 @@ class Hologram(
 
         display = when (data.type) {
             HologramData.Type.TEXT -> MojangDisplay.TextDisplay(EntityType.TEXT_DISPLAY, world)
-            HologramData.Type.BLOCK -> MojangDisplay.BlockDisplay(EntityType.BLOCK_DISPLAY, world)
             HologramData.Type.ITEM -> MojangDisplay.ItemDisplay(EntityType.ITEM_DISPLAY, world)
+            HologramData.Type.BLOCK -> MojangDisplay.BlockDisplay(EntityType.BLOCK_DISPLAY, world)
         }
 
         update()
@@ -134,7 +134,7 @@ class Hologram(
             display.textOpacity = data.opacity
         } else if (display is MojangDisplay.ItemDisplay && data is ItemHologramData) {
             // item
-            display.itemStack = MojangStack.fromBukkitCopy(data.itemStack)
+            display.itemStack = MojangStack.fromBukkitCopy(data.item)
         } else if (display is MojangDisplay.BlockDisplay && data is BlockHologramData) {
             val block = BuiltInRegistries.BLOCK.get(ResourceLocation.bySeparator("minecraft:" + data.block.name.lowercase(), ':')).get().value()
             display.blockState = block.defaultBlockState()
