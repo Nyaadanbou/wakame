@@ -1,3 +1,5 @@
+@file:JvmName("Objects")
+
 package cc.mewcraft.wakame
 
 import net.kyori.adventure.text.minimessage.MiniMessage
