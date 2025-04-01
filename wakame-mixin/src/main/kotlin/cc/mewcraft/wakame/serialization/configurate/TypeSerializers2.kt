@@ -21,8 +21,10 @@ import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import io.papermc.paper.registry.RegistryKey
+import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import kotlin.reflect.KClass
 
 
 /**
@@ -69,24 +71,75 @@ val KOISH_CONFIGURATE_SERIALIZERS_2: TypeSerializerCollection = TypeSerializerCo
 object TypeSerializers {
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
      */
-    inline fun <reified K : Any, reified V : Any> dispatching(
-        noinline typeInfoLookup: (V) -> K,
-        noinline decodingLookup: (K) -> TypeToken<out V>,
+    inline fun <reified K : Any, reified V : Any> dispatchPartial(
+        decodingMap: Map<K, KClass<out V>>,
     ): TypeSerializer<V> {
-        return dispatching("type", typeInfoLookup, decodingLookup)
+        return dispatchPartial("type", decodingMap)
+    }
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatchPartial(
+        typeKey: String,
+        decodingMap: Map<K, KClass<out V>>,
+    ): TypeSerializer<V> {
+        return dispatchPartial<K, V>(typeKey) { key ->
+            decodingMap[key]?.let { TypeToken.get(it.java) }
+                ?: throw SerializationException("No type mapping found for key: $key (type: ${key::class})")
+        }
+    }
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatchPartial(
+        noinline decodingMap: (K) -> TypeToken<out V>,
+    ): TypeSerializer<V> {
+        return dispatchPartial("type", decodingMap)
+    }
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatchPartial(
+        typeKey: String,
+        noinline decodingMap: (K) -> TypeToken<out V>,
+    ): TypeSerializer<V> {
+        return DispatchingTypeSerializer(
+            typeKey,
+            typeTokenOf<K>(),
+            { throw UnsupportedOperationException("Serialization is not supported") },
+            decodingMap
+        )
     }
 
     /**
      * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
      */
-    inline fun <reified K : Any, reified V : Any> dispatching(
+    inline fun <reified K : Any, reified V : Any> dispatch(
         typeKey: String,
-        noinline typeInfoLookup: (V) -> K,
-        noinline decodingLookup: (K) -> TypeToken<out V>,
+        noinline encodingMap: (V) -> K,
+        noinline decodingMap: (K) -> TypeToken<out V>,
     ): TypeSerializer<V> {
-        return DispatchingTypeSerializer(typeKey, typeTokenOf(), typeInfoLookup, decodingLookup)
+        return DispatchingTypeSerializer(
+            typeKey,
+            typeTokenOf<K>(),
+            encodingMap,
+            decodingMap
+        )
+    }
+
+    /**
+     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     */
+    inline fun <reified K : Any, reified V : Any> dispatch(
+        noinline encodingMap: (V) -> K,
+        noinline decodingMap: (K) -> TypeToken<out V>,
+    ): TypeSerializer<V> {
+        return dispatch("type", encodingMap, decodingMap)
     }
 
 }

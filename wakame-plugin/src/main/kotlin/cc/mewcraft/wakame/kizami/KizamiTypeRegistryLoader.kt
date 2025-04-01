@@ -56,7 +56,7 @@ internal object KizamiTypeRegistryLoader : RegistryLoader {
             withDefaults()
             serializers {
                 register<KizamiType>(KizamiTypeSerializer)
-                register<KizamiEffect>(TypeSerializers.dispatching(KizamiEffect::type, KizamiEffectType<*>::type))
+                register<KizamiEffect>(TypeSerializers.dispatch(KizamiEffect::type, KizamiEffectType<*>::type))
                 register(KizamiEffectType.REGISTRY.valueByNameTypeSerializer())
                 register<KizamiEffectAttributeModifier>(KizamiEffectAttributeModifier.SERIALIZER)
             }

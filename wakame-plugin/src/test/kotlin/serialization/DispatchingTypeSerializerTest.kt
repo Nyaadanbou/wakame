@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
@@ -45,7 +46,7 @@ class DispatchingTypeSerializerTest {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.registerAnnotatedObjects(objectMapperFactory())
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(TypeSerializers.dispatching(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(TypeSerializers.dispatch(Animal::type, AnimalType<*>::type))
         })
 
         assertNode(node)
@@ -55,12 +56,56 @@ class DispatchingTypeSerializerTest {
     fun `using type serializer`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(TypeSerializers.dispatching(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(TypeSerializers.dispatch(Animal::type, AnimalType<*>::type))
             builder.register<Cat>(CatSerializer)
             builder.register<Dog>(DogSerializer)
         })
 
         assertNode(node)
+    }
+
+    @Test
+    fun `deserialize only`() {
+        val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
+            builder.register<Animal>(
+                TypeSerializers.dispatchPartial<String, Animal>(
+                    mapOf(
+                        "cat" to Cat::class,
+                        "dog" to Dog::class,
+                    )
+                )
+            )
+            builder.register<Cat>(CatSerializer)
+            builder.register<Dog>(DogSerializer)
+        })
+
+        val animals = listOf(
+            Cat("black"),
+            Dog(25)
+        )
+
+        // Serialize - should throw an exception
+        assertThrows<UnsupportedOperationException> {
+            node.node("animals").typedSet<List<Animal>>(animals)
+        }
+
+        // Deserialize
+        node.node("animals").apply {
+            appendListNode().apply {
+                node("type").set("cat")
+                node("color").set("black")
+            }
+            appendListNode().apply {
+                node("type").set("dog")
+                node("weight").set(25)
+            }
+        }
+        val deserialized = node.node("animals").getList<Animal>(emptyList())
+
+        // Assertions
+        assertEquals(animals.size, deserialized.size)
+        assertEquals(animals[0], deserialized[0])
+        assertEquals(animals[1], deserialized[1])
     }
 }
 
