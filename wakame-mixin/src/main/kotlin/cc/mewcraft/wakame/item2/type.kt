@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.util.Identifier
@@ -43,14 +44,6 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
-    /**
-     * 该物品类型的名字, 可用于展示给玩家.
-     *
-     * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
-     */
-    val name: Component
-        get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
-
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
@@ -58,6 +51,16 @@ open class KoishItem(
     override fun toString(): String = toSimpleString()
 
 }
+
+/**
+ * 该物品类型的名字, 可用于展示给玩家.
+ *
+ * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
+ */
+val KoishItem.name get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+fun <T> KoishItem.hasProperty(type: ItemPropertyType<T>): Boolean = properties.has(type)
+fun <T> KoishItem.getProperty(type: ItemPropertyType<out T>): T? = properties[type]
+fun <T> KoishItem.getPropertyOrDefault(type: ItemPropertyType<T>, default: T): T = properties.getOrDefault(type, default)
 
 /**
  * 表示一个套皮物品(由配置文件创建).

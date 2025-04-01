@@ -43,6 +43,12 @@ fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? =
 fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
 
+var ItemStack.isNetworkRewrite: Boolean
+    get() = toNMS().isNetworkRewrite
+    set(value) {
+        toNMS().isNetworkRewrite = value
+    }
+
 // ------------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 Koish 数据
 // ------------------
@@ -124,12 +130,23 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T?
  *
  * 警告: 该函数无法(也不应该)修改套皮物品的数据.
  * 如果该物品堆叠是套皮物品, 该函数没有实际效果.
+ *
+ * @see setData
  */
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     val oldVal = builder.set(type, value)
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
+}
+
+/**
+ * 向物品堆叠写入 Koish 数据 [Unit].
+ *
+ * @see setData
+ */
+fun MojangStack.setData(type: ItemDataType<Unit>): Boolean {
+    return setData(type, Unit) != null
 }
 
 /**
@@ -144,6 +161,16 @@ fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
 }
+
+/**
+ * 设置该物品堆叠是否应该在网络发包时重写.
+ */
+var MojangStack.isNetworkRewrite: Boolean
+    get() = !hasData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    set(value) {
+        if (value) removeData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+        else setData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    }
 
 // -----------------
 // 内部实现
