@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
-import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
-import cc.mewcraft.wakame.item2.config.property.impl.Lore
+import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
+import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
+import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
@@ -68,6 +66,19 @@ data object ItemPropertyTypes {
     val ABILITY: ItemPropertyType<AbilityOnItem> = typeOf("ability") {
         serializers {
             register(AbilityTriggerVariant.SERIALIZER)
+        }
+    }
+
+    @JvmField
+    val SLOT_DISPLAY_DICT: ItemPropertyType<SlotDisplayDictData> = typeOf("slot_display_dict")
+
+    @JvmField
+    val SLOT_DISPLAY_NAME: ItemPropertyType<SlotDisplayNameData> = typeOf("slot_display_name")
+
+    @JvmField
+    val SLOT_DISPLAY_LORE: ItemPropertyType<SlotDisplayLoreData> = typeOf("slot_display_lore") {
+        serializers {
+            register(SlotDisplayLoreData.SERIALIZER)
         }
     }
 
