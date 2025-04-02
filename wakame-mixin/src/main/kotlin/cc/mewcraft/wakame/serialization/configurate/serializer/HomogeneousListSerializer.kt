@@ -1,9 +1,10 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.applyIfNull
+import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import io.papermc.paper.registry.tag.TagKey
 import org.bukkit.Keyed
@@ -39,8 +40,8 @@ sealed class HomogeneousTypeListTypeSerializer<T : Keyed>(
         val registry = getRegistry()
 
         return registry.getTag(tagKey)
-            ?.resolve(registry)
-            ?.toList()
+            .resolve(registry)
+            .toList()
             .applyIfNull { logTagError(tagName) }
             .orEmpty()
     }
@@ -49,11 +50,8 @@ sealed class HomogeneousTypeListTypeSerializer<T : Keyed>(
         return getRegistry().get(Identifier.key(entry)).applyIfNull { logEntryError(entry) }
     }
 
-    private fun getRegistry(): Registry<T> = when (registryKey) {
-        RegistryKey.BLOCK -> Registry.BLOCK as Registry<T>
-        RegistryKey.ITEM -> Registry.ITEM as Registry<T>
-        else -> throw IllegalArgumentException("Unsupported registry: $registryKey")
-    }
+    private fun getRegistry(): Registry<T> =
+        RegistryAccess.registryAccess().getRegistry(registryKey)
 
     private fun logTagError(tagName: String) {
         LOGGER.error("Unknown ${registryType()} tag: #$tagName")

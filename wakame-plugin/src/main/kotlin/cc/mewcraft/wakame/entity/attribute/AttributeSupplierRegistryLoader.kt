@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.yamlLoader
 
 // TODO 把 Attribute 迁移到该 package 下
 
@@ -38,7 +38,7 @@ internal object AttributeSupplierRegistryLoader : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, AttributeSupplier) -> Unit) {
-        val loader = buildYamlConfigLoader { withDefaults() }
+        val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText()).node("entity_attributes")
         val dataMap = AttributeSupplierSerializer.deserialize(rootNode)
         dataMap.forEach { (k, v) ->

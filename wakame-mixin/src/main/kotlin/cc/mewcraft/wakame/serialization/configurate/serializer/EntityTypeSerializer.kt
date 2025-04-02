@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.EnumLookup

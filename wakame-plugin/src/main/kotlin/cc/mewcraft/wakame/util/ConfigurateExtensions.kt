@@ -1,7 +1,9 @@
+@file:JvmName("Configurtes")
+
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_SERIALIZERS
 import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import org.spongepowered.configurate.yaml.NodeStyle
@@ -13,37 +15,37 @@ import java.io.BufferedWriter
 // Builder extensions
 
 
-internal fun buildYamlConfigLoader(block: YamlConfigLoaderDSL.() -> Unit): YamlConfigurationLoader.Builder {
-    return YamlConfigLoaderDSL().apply(block).builder
+internal fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
+    return YamlLoaderDsl().apply(block).builder
 }
 
-internal fun buildGsonConfigLoader(block: GsonConfigLoaderDSL.() -> Unit): GsonConfigurationLoader.Builder {
-    return GsonConfigLoaderDSL().apply(block).builder
+internal fun gsonLoader(block: GsonLoaderDsl.() -> Unit): GsonConfigurationLoader.Builder {
+    return GsonLoaderDsl().apply(block).builder
 }
 
-internal class YamlConfigLoaderDSL {
+internal class YamlLoaderDsl {
     /* private */ val builder: YamlConfigurationLoader.Builder = YamlConfigurationLoader.builder()
 
     // 应用默认设置的逻辑
-    fun withDefaults(): YamlConfigLoaderDSL {
+    fun withDefaults(): YamlLoaderDsl {
         builder.withDefaultEverything()
         return this
     }
 
     // 注册序列化器的逻辑
-    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): YamlConfigLoaderDSL {
+    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): YamlLoaderDsl {
         builder.defaultOptions { options -> options.serializers(block) }
         return this
     }
 
     // 定义数据来源的逻辑
-    fun source(reader: () -> BufferedReader): YamlConfigLoaderDSL {
+    fun source(reader: () -> BufferedReader): YamlLoaderDsl {
         builder.source(reader)
         return this
     }
 
     // 定义数据去向的逻辑
-    fun sink(writer: () -> BufferedWriter): YamlConfigLoaderDSL {
+    fun sink(writer: () -> BufferedWriter): YamlLoaderDsl {
         builder.sink(writer)
         return this
     }
@@ -53,25 +55,24 @@ internal class YamlConfigLoaderDSL {
     }
 }
 
-internal class GsonConfigLoaderDSL {
+internal class GsonLoaderDsl {
     /* private */ val builder: GsonConfigurationLoader.Builder = GsonConfigurationLoader.builder()
 
-    fun withDefaults(): GsonConfigLoaderDSL {
-        // TODO GsonConfig 默认的设置 (可能也不需要?)
+    fun withDefaults(): GsonLoaderDsl {
         return this
     }
 
-    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): GsonConfigLoaderDSL {
+    fun serializers(block: TypeSerializerCollection.Builder.() -> Unit): GsonLoaderDsl {
         builder.defaultOptions { options -> options.serializers(block) }
         return this
     }
 
-    fun source(reader: () -> BufferedReader): GsonConfigLoaderDSL {
+    fun source(reader: () -> BufferedReader): GsonLoaderDsl {
         builder.source(reader)
         return this
     }
 
-    fun sink(writer: () -> BufferedWriter): GsonConfigLoaderDSL {
+    fun sink(writer: () -> BufferedWriter): GsonLoaderDsl {
         builder.sink(writer)
         return this
     }
@@ -95,18 +96,18 @@ internal fun YamlConfigurationLoader.Builder.withDefaultConfigOptions(): YamlCon
     }
 }
 
-internal fun YamlConfigurationLoader.Builder.withDefaultTypeSerializers(): YamlConfigurationLoader.Builder {
-    return this.defaultOptions { options ->
-        options.serializers { collection ->
-            collection.registerAnnotatedObjects(ObjectMappers.DEFAULT)
-            collection.registerAll(KOISH_CONFIGURATE_SERIALIZERS)
-        }
-    }
+private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
+    .registerAll(KOISH_SERIALIZERS)
+    .registerAll(STANDARD_SERIALIZERS)
+    .build()
+
+internal fun YamlConfigurationLoader.Builder.withDefaultSerializers(): YamlConfigurationLoader.Builder {
+    return this.defaultOptions { options -> options.serializers(SERIALIZERS) }
 }
 
 /**
  * Apply all default settings to the builder.
  */
 internal fun YamlConfigurationLoader.Builder.withDefaultEverything(): YamlConfigurationLoader.Builder {
-    return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultTypeSerializers()
+    return withDefaultYamlConfigs().withDefaultConfigOptions().withDefaultSerializers()
 }

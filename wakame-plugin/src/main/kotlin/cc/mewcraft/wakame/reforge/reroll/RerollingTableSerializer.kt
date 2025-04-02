@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import java.io.File
@@ -70,7 +70,7 @@ internal object RerollingTableSerializer {
         val tableMainConfigFile = tableDir.resolve("config.yml")
         val tableItemsDirectory = tableDir.resolve("items")
 
-        val tableMainConfigNode = buildYamlConfigLoader {
+        val tableMainConfigNode = yamlLoader {
             withDefaults()
             serializers {
                 register<RerollingTable.TableCurrencyCost>(TableCurrencyCostSerializer)
@@ -91,7 +91,7 @@ internal object RerollingTableSerializer {
                 val itemId = Key.key(it.namespace, it.path)
                 val itemRule = run {
                     val text = it.file.readText()
-                    val itemRuleNode = buildYamlConfigLoader {
+                    val itemRuleNode = yamlLoader {
                         withDefaults()
                         serializers {
                             register<RerollingTable.CellRule>(CellRuleSerializer)

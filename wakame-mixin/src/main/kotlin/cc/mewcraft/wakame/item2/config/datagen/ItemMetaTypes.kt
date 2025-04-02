@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
@@ -44,7 +45,11 @@ data object ItemMetaTypes {
     // 开发日记: 数据类型 V 不一定需要封装类 (如 ItemLevel), 只需要可以被序列化.
     //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
     @JvmField
-    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
+    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name") {
+        serializers {
+            register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+        }
+    }
 
     @JvmField
     val RARITY: ItemMetaType<MetaRarity, RegistryEntry<Rarity>> = typeOf("rarity") {

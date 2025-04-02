@@ -3,8 +3,8 @@ package serialization
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.SimpleRegistry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializers
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -46,7 +46,7 @@ class DispatchingTypeSerializerTest {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.registerAnnotatedObjects(objectMapperFactory())
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(TypeSerializers.dispatch(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType<*>::type))
         })
 
         assertNode(node)
@@ -56,7 +56,7 @@ class DispatchingTypeSerializerTest {
     fun `using type serializer`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(TypeSerializers.dispatch(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType<*>::type))
             builder.register<Cat>(CatSerializer)
             builder.register<Dog>(DogSerializer)
         })
@@ -68,7 +68,7 @@ class DispatchingTypeSerializerTest {
     fun `deserialize only`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.register<Animal>(
-                TypeSerializers.dispatchPartial<String, Animal>(
+                DispatchingSerializer.createPartial<String, Animal>(
                     mapOf(
                         "cat" to Cat::class,
                         "dog" to Dog::class,

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import org.spongepowered.configurate.ConfigurationNode

@@ -1,3 +1,5 @@
+@file:JvmName("ConfigurateNodeExtra")
+
 package cc.mewcraft.wakame.util
 
 import org.spongepowered.configurate.ConfigurationNode

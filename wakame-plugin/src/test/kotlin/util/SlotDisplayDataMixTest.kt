@@ -1,7 +1,7 @@
 package util
 
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
 import cc.mewcraft.wakame.util.*
 import commonEnv
 import net.kyori.adventure.text.Component.text
@@ -43,7 +43,7 @@ class SlotDisplayDataMixTest : KoinTest {
     @Test
     fun `mix case 1`() {
         val options = ConfigurationOptions.defaults().serializers {
-            it.registerAnnotatedObjects(ObjectMappers.DEFAULT)
+            it.registerAnnotatedObjects(KoishObjectMapper.INSTANCE)
             it.register<SlotDisplayLoreData>(SlotDisplayLoreDataSerializer)
         }
         val dictNode = BasicConfigurationNode.root<RuntimeException>(options) { node ->

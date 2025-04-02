@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.yamlLoader
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
@@ -35,7 +35,7 @@ internal object EntityTypeHolderRegistryLoader : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, EntityTypeHolder) -> Unit) {
-        val loader = buildYamlConfigLoader { withDefaults() }
+        val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("entity_type_holders").childrenMap()) {
             val entry = parseEntry(nodeKey, node)

@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializers
+import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -17,7 +17,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<MetaRarity> = TypeSerializers.dispatchPartial<String, MetaRarity>(
+        val SERIALIZER: TypeSerializer2<MetaRarity> = DispatchingSerializer.createPartial<String, MetaRarity>(
             mapOf(
                 "static" to Static::class,
                 "dynamic" to Dynamic::class,

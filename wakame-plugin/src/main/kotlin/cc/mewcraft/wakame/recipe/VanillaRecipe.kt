@@ -509,7 +509,7 @@ enum class RecipeType(
         )
     });
 
-    fun deserialize(node: ConfigurationNode): VanillaRecipe {
+    fun deserialize(node: ConfigurationNode): VanillaRecipe? {
         val typeToken = bridge.typeToken
         val serializer = bridge.serializer
         return serializer.deserialize(typeToken.type, node)
@@ -549,7 +549,7 @@ internal object VanillaRecipeSerializer : TypeSerializer<VanillaRecipe> {
      * (剩下的取决于 Recipe 具体实现)
      * ```
      */
-    override fun deserialize(type: Type, node: ConfigurationNode): VanillaRecipe {
+    override fun deserialize(type: Type, node: ConfigurationNode): VanillaRecipe? {
         val recipeType = node.node("type").require<RecipeType>()
         val recipe = recipeType.deserialize(node)
         return recipe

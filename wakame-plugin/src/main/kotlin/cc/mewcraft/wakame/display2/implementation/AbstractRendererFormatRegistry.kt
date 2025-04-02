@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.display2.RendererFormat
 import cc.mewcraft.wakame.display2.RendererFormatRegistry
 import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.display2.TextMetaFactoryRegistry
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import xyz.xenondevs.commons.provider.MutableProvider
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.mutableProvider
@@ -46,7 +46,7 @@ internal abstract class AbstractRendererFormatRegistry(
     fun initialize(formatPath: Path) {
         textMetaFactoryRegistry.reset()
 
-        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(formatPath.readText())
+        val rootNode = yamlLoader { withDefaults() }.buildAndLoadString(formatPath.readText())
         val relativeTo = formatPath.relativeTo(KoishDataPaths.CONFIGS)
         for ((id, type) in typeIdToRendererFormatType) {
             val node = rootNode.node(id)

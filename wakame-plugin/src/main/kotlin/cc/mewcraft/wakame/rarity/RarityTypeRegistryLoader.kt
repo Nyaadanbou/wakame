@@ -10,8 +10,8 @@ import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
@@ -44,7 +44,7 @@ internal object RarityTypeRegistryLoader : RegistryLoader {
         // 获取稀有度的实例数据文件夹
         val entryDataDirectory = rootDirectory.resolve("entries/")
 
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers {
                 register(GlowColorSerializer)

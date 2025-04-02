@@ -62,7 +62,7 @@ object MinecraftRecipeRegistryDataLoader {
                 val fileText = file.readText()
                 val key = Key.key(namespace, path)
 
-                val recipeNode = buildYamlConfigLoader {
+                val recipeNode = yamlLoader {
                     withDefaults()
                     serializers {
                         register<VanillaRecipe>(VanillaRecipeSerializer)

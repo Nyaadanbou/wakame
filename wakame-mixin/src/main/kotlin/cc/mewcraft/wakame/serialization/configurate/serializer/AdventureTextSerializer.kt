@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -14,8 +14,7 @@ import java.util.function.Predicate
 
 /*internal*/ object ComponentSerializer : ScalarSerializer<Component>(typeTokenOf()) {
     override fun deserialize(type: Type, obj: Any): Component {
-        val message = obj.toString().replace("§", "")
-        return MM.deserialize(message)
+        return MM.deserialize(obj.toString().replace("§", ""))
     }
 
     override fun serialize(item: Component, typeSupported: Predicate<Class<*>>?): Any {

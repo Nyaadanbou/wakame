@@ -65,7 +65,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
     }
 
     private fun consumeData(consumer: (Identifier, KoishItem) -> Unit) {
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers { registerAll(SERIALIZERS) }
         }
@@ -122,7 +122,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
     }
 
     private fun consumeData(consumer: (Identifier, KoishItemProxy) -> Unit) {
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers { registerAll(SERIALIZERS) }
         }

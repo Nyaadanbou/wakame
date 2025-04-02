@@ -6,9 +6,9 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.*
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.collections.associateNotNull
@@ -73,7 +73,7 @@ internal object ModdingTableSerializer {
         val tableItemsDirectory = tableDir.resolve("items")
 
         // config.yml 的配置节点
-        val tableMainConfigNode = buildYamlConfigLoader {
+        val tableMainConfigNode = yamlLoader {
             withDefaults()
             serializers {
                 register(TableCurrencyCost)
@@ -96,7 +96,7 @@ internal object ModdingTableSerializer {
                 try {
                     val itemId = Key.key(namespace, path)
                     val fileText = file.readText()
-                    val itemNode = buildYamlConfigLoader {
+                    val itemNode = yamlLoader {
                         withDefaults()
                         serializers {
                             register<ModdingTable.CellRule>(CellRule)

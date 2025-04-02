@@ -5,8 +5,8 @@ import cc.mewcraft.wakame.feature.Feature
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.lifecycle.reloader.InternalReload
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_CONFIGURATE_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_SERIALIZERS
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
@@ -194,11 +194,11 @@ object Configs {
             .nodeStyle(NodeStyle.BLOCK)
             .indent(2)
             .defaultOptions { opts ->
-                opts.serializers { builder ->
-                    builder.registerAnnotatedObjects(ObjectMappers.DEFAULT)
-                    builder.registerAll(KOISH_CONFIGURATE_SERIALIZERS)
-                    customSerializers[namespace]?.build()?.let(builder::registerAll)
-                }
+                opts.serializers(TypeSerializerCollection.builder().apply {
+                    customSerializers[namespace]?.build()?.let(::registerAll)
+                    registerAll(KOISH_SERIALIZERS)
+                    registerAll(STANDARD_SERIALIZERS)
+                }.build())
             }
     }
 

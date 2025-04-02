@@ -29,7 +29,7 @@ internal object LevelRarityMappingRegistryLoader : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, LevelRarityMapping) -> Unit) {
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers {
                 register<LevelRarityMapping>(LevelRarityMappingSerializer)

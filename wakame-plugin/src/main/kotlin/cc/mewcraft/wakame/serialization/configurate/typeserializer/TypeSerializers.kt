@@ -5,33 +5,29 @@ package cc.mewcraft.wakame.serialization.configurate.typeserializer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.serializer.*
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register
 import io.papermc.paper.registry.RegistryKey
-import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 // FIXME #350: 迁移到 wakame-mixin
 /**
- * 本集合包含会在项目多个地方使用的 [TypeSerializer].
- *
- * 如果一个 [TypeSerializer] 只会在一个地方使用, 那么它应该直接在使用它的
- * [org.spongepowered.configurate.loader.ConfigurationLoader] 中注册.
+ * 这些序列化器可以处理 Koish 内部的数据类型.
  */
-val KOISH_CONFIGURATE_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    // Kotlin Object
-    .register(UnitSerializer)
-    // Koish Object
+val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
+    // Koish
     .register(AttributeModifierSerializer)
     .register(RandomizedValueSerializer)
     .register(ExpressionSerializer)
-    // Adventure Text
+    // Text
     .register(ComponentSerializer)
     .register(StyleSerializer)
     .register(StyleBuilderApplicableSerializer)
+    // Guava
     .register(IntRangeSerializer)
     // Namespaced
-    .register(KeySerializer)
+    .register(IdentifierSerializer)
     .register(NamespacedKeySerializer)
     // Math
     .register(Vector3fSerializer)

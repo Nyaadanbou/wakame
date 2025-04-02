@@ -8,9 +8,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import org.jetbrains.annotations.VisibleForTesting
 
 @Init(
@@ -59,7 +59,7 @@ internal object CraftingStationRegistry {
                 try {
                     val fileText = file.readText()
                     val stationId = file.nameWithoutExtension
-                    val stationNode = buildYamlConfigLoader {
+                    val stationNode = yamlLoader {
                         withDefaults()
                         serializers {
                             register(StationSerializer)

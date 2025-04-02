@@ -1,25 +1,25 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import net.kyori.adventure.key.InvalidKeyException
-import net.kyori.adventure.key.Key
 import org.bukkit.NamespacedKey
 import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.function.Predicate
 
-/*internal*/ object KeySerializer : ScalarSerializer<Key>(Key::class.java) {
-    override fun deserialize(type: Type, obj: Any): Key {
+/*internal*/ object IdentifierSerializer : ScalarSerializer<Identifier>(Identifier::class.java) {
+    override fun deserialize(type: Type, obj: Any): Identifier {
         return try {
-            Identifiers.of(obj.toString()) // 默认使用 koish 命名空间
+            Identifiers.of(obj.toString()) // 默认使用 "koish" 命名空间
         } catch (e: InvalidKeyException) {
             throw SerializationException(type, "Invalid key: '$obj'", e)
         }
     }
 
-    override fun serialize(item: Key, typeSupported: Predicate<Class<*>>?): Any {
+    override fun serialize(item: Identifier, typeSupported: Predicate<Class<*>>?): Any {
         return item.toString()
     }
 }

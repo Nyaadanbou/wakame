@@ -1,3 +1,4 @@
+@file:JvmName("ConfigurateSerializerExtra")
 package cc.mewcraft.wakame.util
 
 import org.spongepowered.configurate.serialize.TypeSerializer

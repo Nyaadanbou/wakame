@@ -12,8 +12,8 @@ import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import org.spongepowered.configurate.ConfigurationNode
@@ -48,7 +48,7 @@ internal object ElementTypeRegistryLoader : RegistryLoader {
         // 获取元素的实例数据文件夹
         val entryDataDirectory = rootDirectory.resolve("entries/")
 
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
         }
 

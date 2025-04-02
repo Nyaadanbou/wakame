@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.typeTokenOf

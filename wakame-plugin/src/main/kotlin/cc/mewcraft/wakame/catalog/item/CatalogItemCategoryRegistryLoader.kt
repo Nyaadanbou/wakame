@@ -35,7 +35,7 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
         for (file in dir.walk().filter { it.extension == "yml" }) {
             try {
                 val id = Identifiers.of(file.nameWithoutExtension)
-                val loader = buildYamlConfigLoader {
+                val loader = yamlLoader {
                     withDefaults()
                     serializers {
                         register<CatalogItemCategory>(CategorySerializer)

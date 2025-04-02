@@ -10,9 +10,9 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.key.Key
@@ -73,7 +73,7 @@ object GlobalTranslations : RegistryLoader {
     private fun loadDataIntoRegistry() {
         // Load translation
         val dataDirectory = getFileInDataDirectory(DIR_PATH)
-        val loaderBuilder = buildYamlConfigLoader {
+        val loaderBuilder = yamlLoader {
             withDefaults()
             serializers {
                 register(AudienceMessageGroupSerializer)

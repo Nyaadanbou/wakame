@@ -10,12 +10,12 @@ import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
-import cc.mewcraft.wakame.serialization.configurate.TypeSerializers
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.yamlLoader
 import org.spongepowered.configurate.kotlin.extensions.get
 
 @Init(
@@ -52,11 +52,11 @@ internal object KizamiTypeRegistryLoader : RegistryLoader {
         // 获取铭刻的实例数据文件夹
         val entryDataDirectory = rootDirectory.resolve("entries/")
 
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers {
                 register<KizamiType>(KizamiTypeSerializer)
-                register<KizamiEffect>(TypeSerializers.dispatch(KizamiEffect::type, KizamiEffectType<*>::type))
+                register<KizamiEffect>(DispatchingSerializer.create(KizamiEffect::type, KizamiEffectType<*>::type))
                 register(KizamiEffectType.REGISTRY.valueByNameTypeSerializer())
                 register<KizamiEffectAttributeModifier>(KizamiEffectAttributeModifier.SERIALIZER)
             }

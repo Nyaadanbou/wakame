@@ -6,8 +6,8 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 
 internal object BlacksmithStationSerializer {
     private const val DATA_DIR = "blacksmith"
@@ -18,7 +18,7 @@ internal object BlacksmithStationSerializer {
             .resolve(DATA_DIR)
             .toFile()
 
-        val yamlLoader = buildYamlConfigLoader {
+        val yamlLoader = yamlLoader {
             withDefaults()
         }
 

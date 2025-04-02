@@ -1,4 +1,6 @@
-package cc.mewcraft.wakame.serialization.configurate.typeserializer
+@file:JvmName("TypedKeySerializer")
+
+package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.javaTypeOf

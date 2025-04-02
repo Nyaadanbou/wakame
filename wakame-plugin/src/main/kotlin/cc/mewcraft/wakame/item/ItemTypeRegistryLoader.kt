@@ -14,8 +14,8 @@ import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.yamlLoader
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
@@ -71,7 +71,7 @@ internal object ItemTypeRegistryLoader : RegistryLoader {
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, NekoItem) -> Unit) {
-        val loader = buildYamlConfigLoader {
+        val loader = yamlLoader {
             withDefaults()
             serializers {
                 registerAll(SERIALIZERS)

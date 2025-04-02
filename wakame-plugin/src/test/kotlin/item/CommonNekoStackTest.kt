@@ -20,7 +20,7 @@ import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.yamlLoader
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
@@ -82,7 +82,7 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
 
     val key = Key.key(namespace, path)
     val relPath = itemFile.toPath()
-    val loader = buildYamlConfigLoader {
+    val loader = yamlLoader {
         withDefaults()
         serializers { registerAll(ItemTypeRegistryLoader.SERIALIZERS) }
     }
