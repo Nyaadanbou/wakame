@@ -34,16 +34,16 @@ internal object KizamiRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         KoishRegistries2.KIZAMI.resetRegistry()
-        consumeEntry(KoishRegistries2.KIZAMI::add)
+        consumeData(KoishRegistries2.KIZAMI::add)
         KoishRegistries2.KIZAMI.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeEntry(KoishRegistries2.KIZAMI::update)
+        consumeData(KoishRegistries2.KIZAMI::update)
     }
 
-    private fun consumeEntry(registryAction: (Identifier, Kizami) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, Kizami) -> Unit) {
         val rootDirectory = getFileInConfigDirectory("kizami/")
 
         // 获取铭刻的全局设置文件

@@ -2,5 +2,5 @@
 version: 1
 
 binary_index: 3
-display_name: "<color:#24ffa0>风"
+name: "<color:#24ffa0>风"
 styles: "<color:#24ffa0>"

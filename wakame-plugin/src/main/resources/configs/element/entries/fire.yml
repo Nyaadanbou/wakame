@@ -2,5 +2,5 @@
 version: 1
 
 binary_index: 1
-display_name: "<color:#ff4419>火"
+name: "<color:#ff4419>火"
 styles: "<color:#ff4419>"

@@ -27,16 +27,16 @@ internal object RarityRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         KoishRegistries2.RARITY.resetRegistry()
-        applyDataToRegistry(KoishRegistries2.RARITY::add)
+        consumeData(KoishRegistries2.RARITY::add)
         KoishRegistries2.RARITY.freeze()
     }
 
     @InitFun
     fun reload() {
-        applyDataToRegistry(KoishRegistries2.RARITY::update)
+        consumeData(KoishRegistries2.RARITY::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, Rarity) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, Rarity) -> Unit) {
         val rootDirectory = getFileInConfigDirectory("rarity/")
 
         // 获取稀有度的全局配置文件
@@ -77,7 +77,7 @@ internal object RarityRegistryLoader : RegistryLoader {
      */
     private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, Rarity> {
         val id = Identifiers.of(nodeKey.toString())
-        val name = node.node("name").get<Component>(Component.text(id.toString()))
+        val name = node.node("name").get<Component>(Component.text(id.asString()))
         val styles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
         val weight = node.node("weight").get<Int>(0)
         val color = node.node("color").get<NamedTextColor>()

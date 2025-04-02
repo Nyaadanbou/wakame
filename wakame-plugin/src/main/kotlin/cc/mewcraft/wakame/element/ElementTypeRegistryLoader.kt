@@ -26,7 +26,7 @@ internal object ElementTypeRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         KoishRegistries.ELEMENT.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ELEMENT::add)
+        consumeData(KoishRegistries.ELEMENT::add)
         KoishRegistries.ELEMENT.freeze()
 
         // register the provider
@@ -36,10 +36,10 @@ internal object ElementTypeRegistryLoader : RegistryLoader {
     @ReloadFun
     fun reload() {
         // update existing registry
-        applyDataToRegistry(KoishRegistries.ELEMENT::update)
+        consumeData(KoishRegistries.ELEMENT::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, ElementType) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, ElementType) -> Unit) {
         val rootDirectory = KoishDataPaths.CONFIGS.resolve("element/").toFile()
 
         // 获取元素的全局配置文件
@@ -69,7 +69,7 @@ internal object ElementTypeRegistryLoader : RegistryLoader {
         val id = Identifiers.of(nodeKey.toString())
         val stringId = id.asMinimalStringKoish()
         val integerId = node.node("binary_index").require<Int>()
-        val displayName = node.node("display_name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
+        val displayName = node.node("name").get<Component>(Component.text(stringId.replaceFirstChar(Char::titlecase)))
         val displayStyles = node.node("styles").get<Array<StyleBuilderApplicable>>(emptyArray())
         val stackEffect = node.node("stack_effects").get<StackEffect>()
 

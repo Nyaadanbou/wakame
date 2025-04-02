@@ -8,7 +8,7 @@ version: 1
 # 禁止修改这里的节点: `binary_index`
 
 binary_index: 0
-display_name: "<color:#faff69>中立"
+name: "<color:#faff69>中立"
 styles: "<color:#faff69>"
 
 # 元素叠层效果
