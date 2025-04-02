@@ -37,7 +37,7 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
                 val mana = user.resourceMap.current(ResourceTypeRegistry.MANA)
                 val maxMana = user.resourceMap.maximum(ResourceTypeRegistry.MANA)
                 return if (maxMana > 0) {
-                    (mana / maxMana * 100).toString()
+                    (mana.toDouble() / maxMana * 100).toString()
                 } else {
                     .0.toString()
                 }
