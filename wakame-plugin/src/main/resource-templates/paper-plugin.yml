@@ -12,6 +12,9 @@ dependencies:
     AdventureLevel:
       required: false
       load: BEFORE # Koish 需要访问其事件
+    BetterHud:
+      required: false
+      load: OMIT
     ChestSort:
       required: false
       load: OMIT

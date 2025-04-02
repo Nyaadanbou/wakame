@@ -28,6 +28,7 @@ rootProject.name = "wakame"
 include(":wakame-api")
 include(":wakame-common")
 include(":wakame-hooks:wakame-hook-adventurelevel")
+include(":wakame-hooks:wakame-hook-betterhud")
 include(":wakame-hooks:wakame-hook-chestsort")
 include(":wakame-hooks:wakame-hook-economy")
 include(":wakame-hooks:wakame-hook-economybridge")

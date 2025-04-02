@@ -23,6 +23,7 @@ dependencies {
     compileOnlyApi(project(":wakame-mixin")) // 同上
     compileOnly(project(":wakame-mixin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))

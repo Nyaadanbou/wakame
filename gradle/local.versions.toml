@@ -30,6 +30,8 @@ shadow-bukkit = "1.21.3-SNAPSHOT"
 # Plugin deps
 helper = "6.0.0"
 adventurelevel = "2.0.0"
+betterhud = "1.12"
+bettercommand = "1.4.3"
 mythicmobs = "5.8.0-SNAPSHOT"
 economy = "2.2.0"
 chestsort = "13.0.0-SNAPSHOT"
@@ -92,6 +94,9 @@ shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "
 helper = { group = "me.lucko", name = "helper", version.ref = "helper" }
 mythicmobs = { group = "io.lumine", name = "Mythic-Dist", version.ref = "mythicmobs" }
 adventurelevel = { group = "cc.mewcraft.adventurelevel", name = "api", version.ref = "adventurelevel" }
+betterhud-api = { group = "io.github.toxicity188", name = "BetterHud-standard-api", version.ref = "betterhud" }
+betterhud-bukkit = { group = "io.github.toxicity188", name = "BetterHud-bukkit-api", version.ref = "betterhud" }
+bettercommand = { group = "io.github.toxicity188", name = "BetterCommand", version.ref = "bettercommand" }
 economy = { group = "cc.mewcraft.economy", name = "api", version.ref = "economy" }
 chestsort = { group = "de.jeff_media", name = "ChestSortAPI", version.ref = "chestsort" }
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard" }
