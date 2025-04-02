@@ -33,10 +33,10 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
                 return maximum.toString()
             }
             "mana_percentage" -> {
-                val mana = user.resourceMap.current(ResourceTypeRegistry.MANA)
-                val maxMana = user.resourceMap.maximum(ResourceTypeRegistry.MANA)
-                return if (maxMana > 0) {
-                    (mana.toDouble() / maxMana * 100).toString()
+                val current = player.koishify()[Mana].current
+                val maximum = player.koishify()[Mana].maximum
+                return if (maximum > 0) {
+                    (current.toDouble() / maximum * 100).toString()
                 } else {
                     .0.toString()
                 }
