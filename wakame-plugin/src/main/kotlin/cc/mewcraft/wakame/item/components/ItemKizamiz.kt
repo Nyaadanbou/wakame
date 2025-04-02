@@ -5,20 +5,22 @@ import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.data.getByteArrayOrNull
+import cc.mewcraft.wakame.util.data.ListTag
+import cc.mewcraft.wakame.util.data.NbtUtils
+import cc.mewcraft.wakame.util.data.getListOrNull
 import it.unimi.dsi.fastutil.objects.ObjectArraySet
 import net.kyori.examination.Examinable
-import xyz.xenondevs.commons.collections.mapToByteArray
+import net.minecraft.nbt.StringTag
 
 
 data class ItemKizamiz(
     /**
      * 所有的铭刻.
      */
-    val kizamiz: Set<RegistryEntry<KizamiType>>,
+    val kizamiz: Set<RegistryEntry<Kizami>>,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemKizamiz> {
@@ -30,14 +32,14 @@ data class ItemKizamiz(
         /**
          * 构建一个 [ItemKizamiz] 的实例.
          */
-        fun of(kizamiz: Collection<RegistryEntry<KizamiType>>): ItemKizamiz {
+        fun of(kizamiz: Collection<RegistryEntry<Kizami>>): ItemKizamiz {
             return ItemKizamiz(ObjectArraySet(kizamiz))
         }
 
         /**
          * 构建一个 [ItemKizamiz] 的实例.
          */
-        fun of(vararg kizamiz: RegistryEntry<KizamiType>): ItemKizamiz {
+        fun of(vararg kizamiz: RegistryEntry<Kizami>): ItemKizamiz {
             return of(kizamiz.toList())
         }
 
@@ -51,17 +53,19 @@ data class ItemKizamiz(
     ) : ItemComponentType<ItemKizamiz> {
         override fun read(holder: ItemComponentHolder): ItemKizamiz? {
             val tag = holder.getNbt() ?: return null
-            val kizamiSet = tag.getByteArrayOrNull(TAG_VALUE)
-                ?.mapTo(ObjectArraySet(8)) { KoishRegistries.KIZAMI.getEntryOrThrow(it.toInt()) }
+            val values = tag.getListOrNull(TAG_VALUE, NbtUtils.TAG_STRING)
+                ?.mapTo(ObjectArraySet(8)) { KoishRegistries2.KIZAMI.getEntryOrThrow(it.asString) }
                 ?: return null
-            return ItemKizamiz(kizamiSet)
+            return ItemKizamiz(values)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemKizamiz) {
             require(value.kizamiz.isNotEmpty()) { "The set of kizami must be not empty" }
             holder.editNbt { tag ->
-                val byteArray = value.kizamiz.mapToByteArray { it.value.integerId.toByte() }
-                tag.putByteArray(TAG_VALUE, byteArray)
+                val ids = value.kizamiz.map { it.unwrap().key().asString() }
+                tag.put(TAG_VALUE, ListTag {
+                    ids.forEach { add(StringTag.valueOf(it)) }
+                })
             }
         }
 

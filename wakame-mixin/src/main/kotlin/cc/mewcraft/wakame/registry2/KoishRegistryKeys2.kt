@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
 
@@ -51,6 +52,9 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val RARITY = createRegistryKey<Rarity>("rarity")
+
+    @JvmField
+    val KIZAMI = createRegistryKey<Kizami>("kizami")
 
     ///
 

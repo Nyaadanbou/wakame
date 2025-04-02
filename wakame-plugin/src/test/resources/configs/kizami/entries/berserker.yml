@@ -1,7 +1,6 @@
-binary_index: 1
-display_name: <green>狂战士之血
+name: <green>狂战士之血
 styles: ""
-effects: { } # 测试环境无法加载 RegistryAccess, 因此不能加载所有需要 RegistryAccess 的对象
+effects: { } # 测试环境无法加载 RegistryAccess, 因此不能加载任何需要 RegistryAccess 的对象
 #  1:
 #    - type: "player_ability"
 #      id: "buff/potion_remove"

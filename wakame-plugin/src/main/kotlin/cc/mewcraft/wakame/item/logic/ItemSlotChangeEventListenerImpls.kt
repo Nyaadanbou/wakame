@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.kizami.KizamiMap
-import cc.mewcraft.wakame.kizami.KizamiType
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.toUser
@@ -111,13 +111,13 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeEventListener() {
         kizamiMap.applyAllEffects()
     }
 
-    private fun modifyKizamiAmount(player: Player, nekoStack: NekoStack?, update: (KizamiMap, Set<RegistryEntry<KizamiType>>) -> Unit) {
+    private fun modifyKizamiAmount(player: Player, nekoStack: NekoStack?, update: (KizamiMap, Set<RegistryEntry<Kizami>>) -> Unit) {
         val kizamiSet = nekoStack?.getKizamiz() ?: return
         val kizamiMap = player.toUser().kizamiMap
         update(kizamiMap, kizamiSet)
     }
 
-    private fun NekoStack.getKizamiz(): Set<RegistryEntry<KizamiType>>? {
+    private fun NekoStack.getKizamiz(): Set<RegistryEntry<Kizami>>? {
         return components.get(ItemComponentTypes.KIZAMIZ)?.kizamiz
     }
 }

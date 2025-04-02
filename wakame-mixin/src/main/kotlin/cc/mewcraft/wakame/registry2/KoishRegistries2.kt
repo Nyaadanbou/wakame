@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
@@ -103,6 +104,12 @@ object KoishRegistries2 {
      */
     @JvmField
     val RARITY: WritableDefaultedRegistry<Rarity> = registerDefaulted(KoishRegistryKeys2.RARITY, "common")
+
+    /**
+     * 铭刻的类型.
+     */
+    @JvmField
+    val KIZAMI: WritableRegistry<Kizami> = registerSimple(KoishRegistryKeys2.KIZAMI)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

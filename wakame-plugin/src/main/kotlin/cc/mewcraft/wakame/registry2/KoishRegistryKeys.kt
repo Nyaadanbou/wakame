@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
@@ -48,9 +47,6 @@ object KoishRegistryKeys {
 
     @JvmField
     val ITEM_CATEGORY = createRegistryKey<CatalogItemCategory>("item_category")
-
-    @JvmField
-    val KIZAMI = createRegistryKey<KizamiType>("kizami")
 
     @JvmField
     val LEVEL_RARITY_MAPPING = createRegistryKey<LevelRarityMapping>("level_rarity_mapping")

@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
@@ -83,12 +82,6 @@ object KoishRegistries {
      */
     @JvmField
     val ITEM_CATEGORY: WritableRegistry<CatalogItemCategory> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
-
-    /**
-     * 铭刻.
-     */
-    @JvmField
-    val KIZAMI: WritableRegistry<KizamiType> = registerSimple(KoishRegistryKeys.KIZAMI)
 
     /**
      * 等级>稀有度映射.

@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
+import cc.mewcraft.wakame.kizami.KizamiRegistryLoader
 import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityRegistryLoader
 import cc.mewcraft.wakame.util.yamlLoader
@@ -54,7 +54,7 @@ object CommonNekoStackTest {
         ElementTypeRegistryLoader.init()
         AttributeBundleFacadeRegistryLoader.init()
         AbilityRegistryLoader.init()
-        KizamiTypeRegistryLoader.init()
+        KizamiRegistryLoader.init()
         RarityRegistryLoader.init()
         LevelRarityMappingRegistryLoader.init()
         EntityTypeHolderRegistryLoader.init()

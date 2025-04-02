@@ -706,8 +706,8 @@ class CustomKoishStackTest : KoinTest {
             val kizamiz = it.kizamiz
             assertEquals(2, kizamiz.size)
             val possibleKizamiz = setOf(
-                KoishRegistries.KIZAMI.getEntryOrThrow("inner/wind_lace"),
-                KoishRegistries.KIZAMI.getEntryOrThrow("antigravity"),
+                KoishRegistries2.KIZAMI.getEntryOrThrow("inner/wind_lace"),
+                KoishRegistries2.KIZAMI.getEntryOrThrow("antigravity"),
             )
             assertTrue(kizamiz.all { it in possibleKizamiz })
         }

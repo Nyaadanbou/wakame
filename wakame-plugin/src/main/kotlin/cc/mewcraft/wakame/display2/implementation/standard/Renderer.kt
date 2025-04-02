@@ -184,7 +184,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
 
     @JvmField
     val KIZAMIZ: RenderingHandler<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
-        format.render(data.kizamiz) { it.value.displayName }
+        format.render(data.kizamiz) { it.unwrap().displayName }
     }
 
     @JvmField
