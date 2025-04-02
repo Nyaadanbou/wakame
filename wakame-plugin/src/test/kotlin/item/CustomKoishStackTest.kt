@@ -22,6 +22,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.world.TimeControl
@@ -433,7 +434,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
+        val common = KoishRegistries2.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -666,7 +667,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = KoishRegistries.RARITY.getEntryOrThrow("common")
+        val common = KoishRegistries2.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -696,7 +697,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val rarity = KoishRegistries.RARITY.getEntryOrThrow("rare")
+        val rarity = KoishRegistries2.RARITY.getEntryOrThrow("rare")
         context {
             it.rarity = rarity // 假设稀有度
         }
