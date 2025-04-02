@@ -10,7 +10,6 @@ import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
-import java.util.Collections.emptyList
 import java.util.stream.Stream
 
 /**

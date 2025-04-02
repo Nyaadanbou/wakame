@@ -44,6 +44,22 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
+    companion object {
+
+        ///**
+        // * 代表一个不存在的 [KoishItem].
+        // */
+        //@JvmField
+        //internal val EMPTY: KoishItem = KoishItem(Identifiers.of("__empty__"), ItemMetaContainer.EMPTY, ItemPropertyContainer.EMPTY, ItemBehaviorContainer.EMPTY)
+        //
+        ///**
+        // * 代表一个不存在的 [KoishItem].
+        // */
+        //@JvmField
+        //internal val EMPTY_ENTRY: RegistryEntry<KoishItem> = KoishRegistries2.ITEM.add("__empty__", EMPTY)
+
+    }
+
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
     )
@@ -57,7 +73,8 @@ open class KoishItem(
  *
  * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
  */
-val KoishItem.name get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+val KoishItem.name: Component get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+//val KoishItem.isEmpty: Boolean get() = this === KoishItem.EMPTY
 fun <T> KoishItem.hasProperty(type: ItemPropertyType<T>): Boolean = properties.has(type)
 fun <T> KoishItem.getProperty(type: ItemPropertyType<out T>): T? = properties[type]
 fun <T> KoishItem.getPropertyOrDefault(type: ItemPropertyType<T>, default: T): T = properties.getOrDefault(type, default)

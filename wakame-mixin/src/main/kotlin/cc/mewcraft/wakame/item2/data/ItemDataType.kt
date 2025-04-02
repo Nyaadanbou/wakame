@@ -1,19 +1,12 @@
 package cc.mewcraft.wakame.item2.data
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import io.leangen.geantyref.TypeToken
-import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 sealed interface ItemDataType<T> {
 
     companion object {
-
-        fun makeSerializer(): ScalarSerializer<ItemDataType<*>> {
-            return KoishRegistries2.ITEM_DATA_TYPE.valueByNameTypeSerializer()
-        }
 
         fun <T> builder(typeToken: TypeToken<T>): Builder<T> {
             return Builder(typeToken)
