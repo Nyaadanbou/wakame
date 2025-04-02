@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.serialization.configurate.typeserializer
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.format.TextDecoration
@@ -55,5 +56,16 @@ import java.util.function.Predicate
     override fun serialize(item: Array<StyleBuilderApplicable>, typeSupported: Predicate<Class<*>>?): Any {
         val component = Component.text().style { builder -> item.forEach(builder::apply) }.build()
         return MM.serialize(component)
+    }
+}
+
+object NamedTextColorSerializer : ScalarSerializer<NamedTextColor>(typeTokenOf()) {
+    override fun deserialize(type: Type, obj: Any): NamedTextColor {
+        return NamedTextColor.NAMES.value(obj.toString().lowercase())
+            ?: throw IllegalArgumentException("Unknown color: $obj")
+    }
+
+    override fun serialize(item: NamedTextColor, typeSupported: Predicate<Class<*>>?): Any {
+        return NamedTextColor.NAMES.keyOrThrow(item)
     }
 }
