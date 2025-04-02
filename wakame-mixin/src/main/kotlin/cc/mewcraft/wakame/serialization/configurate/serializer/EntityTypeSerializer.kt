@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.bukkit.entity.EntityType
@@ -9,11 +8,8 @@ import java.lang.reflect.Type
 import java.util.function.Predicate
 
 /*internal*/ object EntityTypeSerializer : ScalarSerializer<EntityType>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): EntityType {
-        return EnumLookup.lookup<EntityType>(obj.toString()).getOrElse {
-            LOGGER.error("No such entity type: '$obj', fallback to ARMOR_STAND")
-            EntityType.ARMOR_STAND
-        }
+    override fun deserialize(type: Type, obj: Any): EntityType? {
+        return EnumLookup.lookup<EntityType>(obj.toString()).getOrNull()
     }
 
     override fun serialize(item: EntityType, typeSupported: Predicate<Class<*>>?): Any {

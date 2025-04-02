@@ -71,7 +71,7 @@ internal object DamageTypeDamageMappings {
             file.readText()
         )
         mappings.putAll(
-            rootNode.require<MutableMap<DamageType, DamageTypeMapper>>()
+            rootNode.require<Map<DamageType, DamageTypeMapper>>()
         )
     }
 }

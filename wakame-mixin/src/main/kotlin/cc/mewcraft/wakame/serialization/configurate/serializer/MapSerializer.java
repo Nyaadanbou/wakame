@@ -71,6 +71,9 @@ public class MapSerializer implements TypeSerializer.Annotated<Map<?, ?>> {
             final BasicConfigurationNode keyNode = BasicConfigurationNode.root(node.options());
             final Set<Object> keysToClear = new HashSet<>();
             for (Map.Entry<Object, ? extends ConfigurationNode> ent : node.childrenMap().entrySet()) {
+                if (Objects.equals(ent.getKey(), "version")) {
+                    continue; // always skip version key
+                }
                 final @Nullable Object deserializedKey = deserialize(key, keySerializer, "key", keyNode.set(ent.getKey()), node.path());
                 final @Nullable Object deserializedValue = deserialize(value, valueSerializer, "value", ent.getValue(), ent.getValue().path());
                 if (deserializedKey == null || deserializedValue == null) {
