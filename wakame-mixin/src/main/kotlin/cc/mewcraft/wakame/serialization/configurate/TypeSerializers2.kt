@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate
 
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.typeserializer.AttributeModifierSerializer
@@ -42,6 +43,8 @@ val KOISH_CONFIGURATE_SERIALIZERS_2: TypeSerializerCollection = TypeSerializerCo
     .register(ComponentSerializer)
     .register(StyleSerializer)
     .register(StyleBuilderApplicableSerializer)
+    .register(NamedTextColorSerializer)
+    // Math
     .register(IntRangeSerializer)
     // Namespaced
     .register(KeySerializer)
@@ -66,6 +69,7 @@ val KOISH_CONFIGURATE_SERIALIZERS_2: TypeSerializerCollection = TypeSerializerCo
     .register(KoishRegistries2.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .register(KoishRegistries2.ITEM.holderByNameTypeSerializer())
     .register(KoishRegistries2.ITEM_PROXY.holderByNameTypeSerializer())
+    .register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
     .build()
 
 object TypeSerializers {
@@ -75,17 +79,17 @@ object TypeSerializers {
      */
     inline fun <reified K : Any, reified V : Any> dispatchPartial(
         decodingMap: Map<K, KClass<out V>>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return dispatchPartial("type", decodingMap)
     }
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
      */
     inline fun <reified K : Any, reified V : Any> dispatchPartial(
         typeKey: String,
         decodingMap: Map<K, KClass<out V>>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return dispatchPartial<K, V>(typeKey) { key ->
             decodingMap[key]?.let { TypeToken.get(it.java) }
                 ?: throw SerializationException("No type mapping found for key: $key (type: ${key::class})")
@@ -93,21 +97,21 @@ object TypeSerializers {
     }
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
      */
     inline fun <reified K : Any, reified V : Any> dispatchPartial(
         noinline decodingMap: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return dispatchPartial("type", decodingMap)
     }
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+     * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
      */
     inline fun <reified K : Any, reified V : Any> dispatchPartial(
         typeKey: String,
         noinline decodingMap: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return DispatchingTypeSerializer(
             typeKey,
             typeTokenOf<K>(),
@@ -117,13 +121,13 @@ object TypeSerializers {
     }
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     * 创建一个 [TypeSerializer2] 用于处理多态类型的序列化/反序列化.
      */
     inline fun <reified K : Any, reified V : Any> dispatch(
         typeKey: String,
         noinline encodingMap: (V) -> K,
         noinline decodingMap: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return DispatchingTypeSerializer(
             typeKey,
             typeTokenOf<K>(),
@@ -133,12 +137,12 @@ object TypeSerializers {
     }
 
     /**
-     * 创建一个 [TypeSerializer] 用于处理多态类型的序列化/反序列化.
+     * 创建一个 [TypeSerializer2] 用于处理多态类型的序列化/反序列化.
      */
     inline fun <reified K : Any, reified V : Any> dispatch(
         noinline encodingMap: (V) -> K,
         noinline decodingMap: (K) -> TypeToken<out V>,
-    ): TypeSerializer<V> {
+    ): TypeSerializer2<V> {
         return dispatch("type", encodingMap, decodingMap)
     }
 

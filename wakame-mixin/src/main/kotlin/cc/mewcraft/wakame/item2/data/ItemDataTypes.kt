@@ -2,7 +2,9 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -43,6 +45,9 @@ data object ItemDataTypes {
 
     @JvmField
     val LEVEL: ItemDataType<ItemLevel> = typeOf("level")
+
+    @JvmField
+    val RARITY: ItemDataType<RegistryEntry<Rarity>> = typeOf("rarity")
 
     // ------------
     // 方便函数

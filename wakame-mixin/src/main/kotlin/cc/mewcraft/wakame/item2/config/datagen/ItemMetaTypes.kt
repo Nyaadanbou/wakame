@@ -2,9 +2,12 @@ package cc.mewcraft.wakame.item2.config.datagen
 
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaRarity
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
@@ -42,6 +45,13 @@ data object ItemMetaTypes {
     //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
     @JvmField
     val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
+
+    @JvmField
+    val RARITY: ItemMetaType<MetaRarity, RegistryEntry<Rarity>> = typeOf("rarity") {
+        serializers {
+            register(MetaRarity.SERIALIZER)
+        }
+    }
 
     // ------------
     // 方便函数

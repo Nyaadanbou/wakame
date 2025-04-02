@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
 
@@ -97,6 +98,12 @@ object KoishRegistries2 {
     @JvmField
     val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerDefaulted(KoishRegistryKeys2.ITEM_REF_HANDLER, "minecraft")
 
+    /**
+     * 稀有度的类型.
+     */
+    @JvmField
+    val RARITY: WritableRegistry<Rarity> = registerSimple(KoishRegistryKeys2.RARITY)
+
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER
     init {
@@ -129,6 +136,9 @@ object KoishRegistries2 {
         return internalRegister(key, SimpleDefaultedFuzzyRegistry(defaultId, key), initializer)
     }
 
+    /**
+     * 创建一个 [R].
+     */
     private fun <T, R : WritableRegistry<T>> internalRegister(key: RegistryKey<out Registry<T>>, registry: R, initializer: (Registry<T>) -> Unit = {}): R {
         ACCESS.add(key, registry).also { INITIALIZERS += { initializer(it) } }
         return registry

@@ -316,8 +316,13 @@ private open class SimpleItemDataContainer(
                 // 注意: 该 node key 所对应的 type 必须存在
                 val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: continue
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
-                val dataValue = itemDataNode.get(dataType.typeToken) ?: run {
-                    LOGGER.error("Failed to deserialize $dataType. Skipped.")
+                val dataValue = try {
+                    itemDataNode.get(dataType.typeToken) ?: run {
+                        LOGGER.error("Decoded item data value to null for $dataType. Skipped.")
+                        continue
+                    }
+                } catch (ex: Throwable) {
+                    LOGGER.error("An exception occurred while deserializing $dataType. Skipped. Reason: ${ex.message}")
                     continue
                 }
                 builder.setUnsafe(dataType, dataValue)
@@ -336,8 +341,12 @@ private open class SimpleItemDataContainer(
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
                 val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: continue
-                // 这里写入的 map key 省略了命名空间 "koish"
-                node.node(dataTypeId.value()).set(dataValue)
+                val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
+                val entryNode = node.node(mapKey)
+                entryNode.set(
+                    dataType.typeToken.type, // 不能用 ConfigurationNode.set(Object). 必须传入该数据的 TypeToken, 否则不支持带参数的数据类型
+                    dataValue
+                )
             }
         }
     }
