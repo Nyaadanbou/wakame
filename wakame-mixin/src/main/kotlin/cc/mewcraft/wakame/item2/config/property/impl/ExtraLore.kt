@@ -5,7 +5,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
-data class Lore(
+data class ExtraLore(
     @Setting(nodeFromParent = true)
     val lore: List<Component>,
 )

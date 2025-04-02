@@ -60,7 +60,7 @@ data object ItemPropertyTypes {
     val GLOWABLE: ItemPropertyType<Unit> = typeOf("glowable")
 
     @JvmField
-    val LORE: ItemPropertyType<Lore> = typeOf("lore")
+    val LORE: ItemPropertyType<ExtraLore> = typeOf("lore")
 
     @JvmField
     val ABILITY: ItemPropertyType<AbilityOnItem> = typeOf("ability") {
