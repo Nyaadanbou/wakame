@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
-import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
@@ -58,9 +57,6 @@ object KoishRegistryKeys {
 
     @JvmField
     val LOOT_TABLE_RECIPE = createRegistryKey<CatalogItemLootTableRecipe>("loot_table_recipe")
-
-    @JvmField
-    val RARITY = createRegistryKey<RarityType>("rarity")
 
     ///
 

@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
 import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -135,7 +135,7 @@ private constructor(
     private fun initializeContext(
         itemId: Key,
         itemLevel: Int,
-        itemRarity: RegistryEntry<RarityType>,
+        itemRarity: RegistryEntry<Rarity>,
         itemElements: Set<RegistryEntry<ElementType>>,
         itemKizamiz: Set<RegistryEntry<KizamiType>>,
         itemCells: ItemCells,

@@ -5,8 +5,9 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -19,7 +20,7 @@ data class ItemRarity(
     /**
      * The default rarity held in this schema.
      */
-    private val static: RegistryEntry<RarityType>? = null,
+    private val static: RegistryEntry<Rarity>? = null,
     /**
      * The mappings used to generate the rarity.
      */
@@ -47,7 +48,7 @@ data class ItemRarity(
             LOGGER.warn("Failed to generate ${ItemComponentTypes.RARITY} for item '${context.target}' because no ${ItemComponentTypes.LEVEL} was found in the generation context")
         }
 
-        val rarity: RegistryEntry<RarityType>?
+        val rarity: RegistryEntry<Rarity>?
 
         when {
             // use static rarity
@@ -59,7 +60,7 @@ data class ItemRarity(
             dynamic != null -> {
                 val level = context.level
                 if (level != null) {
-                    rarity = dynamic.value.pick(level.toInt(), context.random)
+                    rarity = dynamic.unwrap().pick(level.toInt(), context.random)
                 } else {
                     rarity = null
                     warnNullItemLevel()
@@ -70,7 +71,7 @@ data class ItemRarity(
             else -> {
                 val level = context.level
                 if (level != null) {
-                    rarity = KoishRegistries.LEVEL_RARITY_MAPPING.getDefaultEntry().value.pick(level.toInt(), context.random)
+                    rarity = KoishRegistries.LEVEL_RARITY_MAPPING.getDefaultEntry().unwrap().pick(level.toInt(), context.random)
                 } else {
                     rarity = null
                     warnNullItemLevel()
@@ -123,7 +124,7 @@ data class ItemRarity(
                 )
 
                 string.startsWith(RARITY_PREFIX) -> ItemRarity(
-                    static = KoishRegistries.RARITY.createEntry(string.substringAfter(RARITY_PREFIX))
+                    static = KoishRegistries2.RARITY.createEntry(string.substringAfter(RARITY_PREFIX))
                 )
 
                 else -> throw SerializationException("Can't parse rarity value '$string'")

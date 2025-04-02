@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.require
 import com.google.common.collect.Range
@@ -46,7 +46,7 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
             }
 
             RarityFilter.TYPE -> {
-                val rarity = node.node("rarity").require<RegistryEntry<RarityType>>()
+                val rarity = node.node("rarity").require<RegistryEntry<Rarity>>()
                 RarityFilter(inverted, rarity)
             }
 

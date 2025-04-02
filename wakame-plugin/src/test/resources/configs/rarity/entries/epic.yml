@@ -1,5 +1,4 @@
 version: 1
-binary_index: 3
-display_name: "Epic"
+name: "Epic"
 styles: "<white>"
-glow_color: DARK_PURPLE
+color: DARK_PURPLE

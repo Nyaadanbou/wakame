@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.jetbrains.annotations.ApiStatus
 import java.util.stream.Stream
 
 /**
@@ -20,11 +21,13 @@ import java.util.stream.Stream
  * @property weight 稀有度的权重
  * @property color 稀有度的颜色, 目前仅用于高亮掉落物
  */
-class Rarity internal constructor(
+class Rarity
+@ApiStatus.Internal
+constructor(
     override val displayName: Component,
     override val displayStyles: Array<StyleBuilderApplicable>,
     val weight: Int,
-    val color: NamedTextColor,
+    val color: NamedTextColor?,
 ) : Keyed, Examinable, PlayerFriendlyNamed, Comparable<Rarity> {
 
     override fun key(): Key {

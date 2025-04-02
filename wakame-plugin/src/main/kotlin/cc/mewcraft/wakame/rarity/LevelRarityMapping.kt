@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.rarity
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry
 import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry.Companion.build
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.RangeParser
@@ -47,7 +47,7 @@ internal constructor(
      * @return a random rarity
      * @throws IllegalArgumentException
      */
-    fun pick(lvl: Int, random: Random): RegistryEntry<RarityType> {
+    fun pick(lvl: Int, random: Random): RegistryEntry<Rarity> {
         val rarityMapping = requireNotNull(rangeMap[lvl]) { "$lvl is not within the span ${rangeMap.span()}" }
         return rarityMapping.pick(random)
     }
@@ -60,12 +60,12 @@ internal constructor(
     class Entry
     private constructor(
         /**
-         * A weight map, where the `map key` is [RarityType] and `map value` is
+         * A weight map, where the `map key` is [Rarity] and `map value` is
          * corresponding weight.
          */
-        private val weight: Map<RegistryEntry<RarityType>, Double>,
+        private val weight: Map<RegistryEntry<Rarity>, Double>,
     ) {
-        private val selector: RandomSelector<RegistryEntry<RarityType>> = RandomSelector.weighted(weight.keys) {
+        private val selector: RandomSelector<RegistryEntry<Rarity>> = RandomSelector.weighted(weight.keys) {
             checkNotNull(weight[it]) { "Rarity '$it' does not have weight" }
         }
 
@@ -74,7 +74,7 @@ internal constructor(
          * `this` is applicable to your input level, otherwise you might get a
          * rarity that does not apply to your input level.
          */
-        fun pick(random: Random): RegistryEntry<RarityType> {
+        fun pick(random: Random): RegistryEntry<Rarity> {
             return selector.pick(random.asJavaRandom())
         }
 
@@ -82,12 +82,12 @@ internal constructor(
          * The builder of [LevelRarityMapping.Entry].
          */
         interface Builder {
-            val weight: MutableMap<RegistryEntry<RarityType>, Double>
+            val weight: MutableMap<RegistryEntry<Rarity>, Double>
             fun build(): Entry
         }
 
         private class BuilderImpl : Builder {
-            override val weight: MutableMap<RegistryEntry<RarityType>, Double> = LinkedHashMap()
+            override val weight: MutableMap<RegistryEntry<Rarity>, Double> = LinkedHashMap()
             override fun build(): Entry {
                 return Entry(weight)
             }
@@ -135,7 +135,7 @@ internal object LevelRarityMappingSerializer : TypeSerializer<LevelRarityMapping
             val levelMapping = build {
                 for ((nodeKey2, node2) in weightNode.childrenMap()) {
                     val rarityTypeId = Identifiers.of(nodeKey2.toString())
-                    val rarityType = KoishRegistries.RARITY.createEntry(rarityTypeId)
+                    val rarityType = KoishRegistries2.RARITY.createEntry(rarityTypeId)
                     val rarityWeight = node2.require<Double>()
                     weight[rarityType] = rarityWeight
                 }

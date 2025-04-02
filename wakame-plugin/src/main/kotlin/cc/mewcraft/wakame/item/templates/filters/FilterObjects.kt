@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
@@ -193,7 +193,7 @@ data class MarkFilter(
  */
 data class RarityFilter(
     override val invert: Boolean,
-    private val rarity: RegistryEntry<RarityType>,
+    private val rarity: RegistryEntry<Rarity>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "rarity")

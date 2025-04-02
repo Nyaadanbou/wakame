@@ -12,8 +12,8 @@ import cc.mewcraft.wakame.item.components.ItemRarity
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.rarity.RarityType
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.customName
 import cc.mewcraft.wakame.util.item.damage
@@ -108,7 +108,7 @@ fun NekoStack.hideUnbreakable() = this.bukkitStack.hideUnbreakable()
 // 用于快速访问 Koish 物品数据的扩展函数
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
-var NekoStack.rarity: RegistryEntry<RarityType> by mapped(ItemComponentTypes.RARITY, KoishRegistries.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
+var NekoStack.rarity: RegistryEntry<Rarity> by mapped(ItemComponentTypes.RARITY, KoishRegistries2.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
 var NekoStack.elements: Set<RegistryEntry<ElementType>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
 var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)

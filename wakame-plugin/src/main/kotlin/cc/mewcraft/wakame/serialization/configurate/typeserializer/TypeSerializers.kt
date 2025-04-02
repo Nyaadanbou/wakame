@@ -56,5 +56,5 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(KoishRegistries.ITEM_SKIN.holderByNameTypeSerializer())
     .register(KoishRegistries.KIZAMI.holderByNameTypeSerializer())
     .register(KoishRegistries.LEVEL_RARITY_MAPPING.holderByNameTypeSerializer())
-    .register(KoishRegistries.RARITY.holderByNameTypeSerializer())
+    .register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
     .build()

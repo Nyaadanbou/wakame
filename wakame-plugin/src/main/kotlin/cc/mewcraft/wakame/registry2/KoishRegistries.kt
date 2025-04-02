@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.kizami.KizamiType
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
-import cc.mewcraft.wakame.rarity.RarityType
 import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistries {
@@ -102,12 +101,6 @@ object KoishRegistries {
      */
     @JvmField
     val LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableRecipe> = registerSimple(KoishRegistryKeys.LOOT_TABLE_RECIPE)
-
-    /**
-     * 稀有度.
-     */
-    @JvmField
-    val RARITY: WritableDefaultedRegistry<RarityType> = registerDefaulted(KoishRegistryKeys.RARITY, "common") // = koish:common
 
     ///
 

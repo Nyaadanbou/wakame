@@ -1,7 +1,6 @@
 # 不要修改!
 version: 1
 
-binary_index: 2
-display_name: "<color:#708fff>稀有"
+name: "<color:#708fff>稀有"
 styles: "<color:#708fff>"
-glow_color: AQUA
+color: AQUA

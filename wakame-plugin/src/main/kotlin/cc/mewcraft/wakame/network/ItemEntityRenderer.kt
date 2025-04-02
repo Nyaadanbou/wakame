@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundRemoveEntitiesEve
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import cc.mewcraft.wakame.network.event.registerPacketListener
 import cc.mewcraft.wakame.network.event.unregisterPacketListener
-import cc.mewcraft.wakame.rarity.GlowColor
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
@@ -22,6 +21,7 @@ import cc.mewcraft.wakame.util.item.itemName
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
+import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.ChatFormatting
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
 import net.minecraft.network.syncher.SynchedEntityData
@@ -97,17 +97,17 @@ internal object ItemEntityRenderer : PacketListener {
 
     private fun sendGlowColorPacket(player: Player, entity: Item) {
         val koishStack = entity.itemStack.wrap() ?: return
-        val rarityColor = koishStack.rarity.value.glowColor.takeIf { it != GlowColor.empty() } ?: return
+        val rarityColor = koishStack.rarity.unwrap().color ?: return
         val teamPacket = buildCreateTeamPacket(entity, rarityColor)
         entityId2EntityUniqueId[entity.entityId] = entity.uniqueId
         player.connection.send(teamPacket)
     }
 
-    private fun buildCreateTeamPacket(itemEntity: Item, color: GlowColor): ClientboundSetPlayerTeamPacket {
+    private fun buildCreateTeamPacket(itemEntity: Item, color: NamedTextColor): ClientboundSetPlayerTeamPacket {
         val entityUniqueId = itemEntity.uniqueId
         return ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(
             /* team = */ PlayerTeam(Scoreboard(), "glow_item_$entityUniqueId").apply {
-                this.color = PaperAdventure.asVanilla(color.color) ?: ChatFormatting.RESET
+                this.color = PaperAdventure.asVanilla(color) ?: ChatFormatting.RESET
                 this.players += entityUniqueId.toString()
             },
             /* updatePlayers = */ true

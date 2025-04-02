@@ -102,7 +102,7 @@ object KoishRegistries2 {
      * 稀有度的类型.
      */
     @JvmField
-    val RARITY: WritableRegistry<Rarity> = registerSimple(KoishRegistryKeys2.RARITY)
+    val RARITY: WritableDefaultedRegistry<Rarity> = registerDefaulted(KoishRegistryKeys2.RARITY, "common")
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

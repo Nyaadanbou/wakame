@@ -33,9 +33,20 @@ interface RegistryEntry<T> {
      *
      * @throws IllegalStateException 如果数据还未绑定
      */
+    @Deprecated("Use unwrap() instead", ReplaceWith("unwrap()"))
     val value: T
+        get() = unwrap()
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    /**
+     * 返回容器里的数据.
+     *
+     * 通常在所有注册表已完全加载后的场景里使用.
+     *
+     * @throws IllegalStateException 如果数据还未绑定
+     */
+    fun unwrap(): T
+
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = unwrap()
 
     /**
      * 检查该容器是否已经绑定了数据.
@@ -111,9 +122,15 @@ interface RegistryEntry<T> {
     // RegistryEntry.Direct 封装的是没有与 Registry 相关联的数据
     class Direct<T>
     @ApiStatus.Internal
-    constructor(override val value: T) : RegistryEntry<T> {
+    constructor(
+        private val _value: T,
+    ) : RegistryEntry<T> {
         override val type: Type
             get() = Type.DIRECT
+
+        override fun unwrap(): T {
+            return _value
+        }
 
         override val hasValue: Boolean
             get() = true
@@ -122,16 +139,16 @@ interface RegistryEntry<T> {
 
         @Synchronized
         override fun reactive(): ReactiveRegistryEntry<T> {
-            return reactive ?: provider(value).also { reactive = it }
+            return reactive ?: provider(_value).also { reactive = it }
         }
 
         override fun matchesId(id: Identifier): Boolean = false
         override fun matchesKey(key: RegistryKey<T>): Boolean = false
-        override fun matches(entry: RegistryEntry<T>): Boolean = this.value == entry.value
-        override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.right(this.value)
+        override fun matches(entry: RegistryEntry<T>): Boolean = this._value == entry.value
+        override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.right(this._value)
         override fun getKey(): RegistryKey<T>? = null
         override fun ownerEquals(owner: RegistryEntryOwner<T>) = true
-        override fun toString(): String = "Direct[${this.value}]"
+        override fun toString(): String = "Direct[${this._value}]"
     }
 
     // RegistryEntry.Reference 的设计目的:
@@ -170,8 +187,9 @@ interface RegistryEntry<T> {
         override val hasValue: Boolean
             get() = _value != null
 
-        override val value: T
-            get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry '${this.owner}'")
+        override fun unwrap(): T {
+            return _value ?: throw IllegalStateException("Trying to access unbound value '${this.owner}' from registry '${this.owner}'")
+        }
 
         override val type: RegistryEntry.Type = RegistryEntry.Type.REFERENCE
 

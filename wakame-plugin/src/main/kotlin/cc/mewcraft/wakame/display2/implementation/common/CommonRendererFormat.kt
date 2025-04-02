@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.removeItalic
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
@@ -92,23 +92,23 @@ internal data class RarityRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun renderSimple(rarity: RegistryEntry<RarityType>): IndexedText {
+    fun renderSimple(rarity: RegistryEntry<Rarity>): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     simple,
-                    component("rarity_display_name", rarity.value.displayName)
+                    component("rarity_display_name", rarity.unwrap().displayName)
                 )
             )
         )
     }
 
-    fun renderComplex(rarity: RegistryEntry<RarityType>, modCount: Int): IndexedText {
+    fun renderComplex(rarity: RegistryEntry<Rarity>, modCount: Int): IndexedText {
         return SimpleIndexedText(
             index, listOf(
                 MM.deserialize(
                     complex,
-                    component("rarity_display_name", rarity.value.displayName),
+                    component("rarity_display_name", rarity.unwrap().displayName),
                     component("reforge_mod_count", Component.text(modCount.toString()))
                 )
             )
