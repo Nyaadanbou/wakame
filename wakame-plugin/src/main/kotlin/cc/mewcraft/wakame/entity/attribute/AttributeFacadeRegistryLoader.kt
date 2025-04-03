@@ -43,7 +43,7 @@ import kotlin.reflect.KClass
         Attributes::class,
     ]
 )
-internal object AttributeBundleFacadeRegistryLoader : RegistryLoader {
+internal object AttributeFacadeRegistryLoader : RegistryLoader {
     const val CONFIG_ID: String = "attributes"
     const val FILE_PATH: String = "attributes.yml"
 
@@ -71,7 +71,7 @@ internal object AttributeBundleFacadeRegistryLoader : RegistryLoader {
     }
 
     /**
-     * Registers all [AttributeBundleFacade].
+     * Registers all [AttributeFacade].
      */
     private fun addAll() {
         +build("attack_damage").ranged().element().bind(Attributes.MIN_ATTACK_DAMAGE, Attributes.MAX_ATTACK_DAMAGE)
@@ -112,9 +112,9 @@ internal object AttributeBundleFacadeRegistryLoader : RegistryLoader {
         +build("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
     }
 
-    private operator fun AttributeBundleFacade<*, *>.unaryPlus() {
+    private operator fun AttributeFacade<*, *>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
-        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.add(Identifier.key(KOISH_NAMESPACE, id), this as AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>)
+        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.add(Identifier.key(KOISH_NAMESPACE, id), this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
     }
 }
 
@@ -124,7 +124,7 @@ internal object AttributeBundleFacadeRegistryLoader : RegistryLoader {
  * @param T [ConstantAttributeBundle] 的一个子类
  * @param S [VariableAttributeBundle] 的一个子类
  */
-interface AttributeBundleFacade<T : ConstantAttributeBundle, S : VariableAttributeBundle> : Keyed {
+interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBundle> : Keyed {
     /**
      * 本实例的全局配置文件.
      */
@@ -228,7 +228,7 @@ private interface RangedSelection : AttributeBinderR {
 private interface AttributeBinderS {
     fun bind(
         component: Attribute,
-    ): AttributeBundleFacade<ConstantAttributeBundleS, VariableAttributeBundleS>
+    ): AttributeFacade<ConstantAttributeBundleS, VariableAttributeBundleS>
 }
 
 /**
@@ -238,7 +238,7 @@ private interface AttributeBinderR {
     fun bind(
         component1: Attribute,
         component2: Attribute,
-    ): AttributeBundleFacade<ConstantAttributeBundleR, VariableAttributeBundleR>
+    ): AttributeFacade<ConstantAttributeBundleR, VariableAttributeBundleR>
 }
 
 /**
@@ -247,7 +247,7 @@ private interface AttributeBinderR {
 private interface AttributeBinderSE {
     fun bind(
         component: AttributeGetter,
-    ): AttributeBundleFacade<ConstantAttributeBundleSE, VariableAttributeBundleSE>
+    ): AttributeFacade<ConstantAttributeBundleSE, VariableAttributeBundleSE>
 }
 
 /**
@@ -257,7 +257,7 @@ private interface AttributeBinderRE {
     fun bind(
         component1: AttributeGetter,
         component2: AttributeGetter,
-    ): AttributeBundleFacade<ConstantAttributeBundleRE, VariableAttributeBundleRE>
+    ): AttributeFacade<ConstantAttributeBundleRE, VariableAttributeBundleRE>
 }
 
 
@@ -268,9 +268,9 @@ private interface AttributeBinderRE {
 
 //<editor-fold desc="Implementations">
 /**
- * A mutable [AttributeBundleFacade] (except the property [id]).
+ * A mutable [AttributeFacade] (except the property [id]).
  */
-private class AttributeBundleFacadeImpl<T : ConstantAttributeBundle, S : VariableAttributeBundle>(
+private class AttributeFacadeImpl<T : ConstantAttributeBundle, S : VariableAttributeBundle>(
     override val config: Provider<ConfigurationNode>,
     override val id: String,
     override val bundleTrait: AttributeBundleTraitSet,
@@ -280,7 +280,7 @@ private class AttributeBundleFacadeImpl<T : ConstantAttributeBundle, S : Variabl
     override val convertNbtToConstant: (CompoundTag) -> T,
     override val createTooltipName: (T) -> Component,
     override val createTooltipLore: (T) -> List<Component>,
-) : AttributeBundleFacade<T, S> {
+) : AttributeFacade<T, S> {
     override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
 }
 
@@ -420,8 +420,8 @@ private class SingleSelectionImpl(
     /**
      * Components: Operation, Single
      */
-    override fun bind(component: Attribute): AttributeBundleFacade<ConstantAttributeBundleS, VariableAttributeBundleS> {
-        return AttributeBundleFacadeImpl(
+    override fun bind(component: Attribute): AttributeFacade<ConstantAttributeBundleS, VariableAttributeBundleS> {
+        return AttributeFacadeImpl(
             config = config,
             id = id,
             bundleTrait = AttributeBundleTraitSet(
@@ -477,8 +477,8 @@ private class RangedSelectionImpl(
     override fun bind(
         component1: Attribute,
         component2: Attribute,
-    ): AttributeBundleFacade<ConstantAttributeBundleR, VariableAttributeBundleR> {
-        return AttributeBundleFacadeImpl(
+    ): AttributeFacade<ConstantAttributeBundleR, VariableAttributeBundleR> {
+        return AttributeFacadeImpl(
             config = config,
             id = id,
             bundleTrait = AttributeBundleTraitSet(
@@ -531,8 +531,8 @@ private class AttributeBinderSEImpl(
     /**
      * Components: Operation, Single, Element
      */
-    override fun bind(component: AttributeGetter): AttributeBundleFacade<ConstantAttributeBundleSE, VariableAttributeBundleSE> {
-        return AttributeBundleFacadeImpl(
+    override fun bind(component: AttributeGetter): AttributeFacade<ConstantAttributeBundleSE, VariableAttributeBundleSE> {
+        return AttributeFacadeImpl(
             config = config,
             id = id,
             bundleTrait = AttributeBundleTraitSet(
@@ -588,8 +588,8 @@ private class AttributeBinderREImpl(
     override fun bind(
         component1: AttributeGetter,
         component2: AttributeGetter,
-    ): AttributeBundleFacade<ConstantAttributeBundleRE, VariableAttributeBundleRE> {
-        return AttributeBundleFacadeImpl(
+    ): AttributeFacade<ConstantAttributeBundleRE, VariableAttributeBundleRE> {
+        return AttributeFacadeImpl(
             config = config,
             id = id,
             bundleTrait = AttributeBundleTraitSet(

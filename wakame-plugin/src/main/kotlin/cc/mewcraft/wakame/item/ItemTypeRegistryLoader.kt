@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -28,7 +28,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
+        AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据
         AbilityTriggerRegistryLoader::class
     ]
 )

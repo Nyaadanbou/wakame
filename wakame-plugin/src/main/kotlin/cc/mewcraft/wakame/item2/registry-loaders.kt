@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
@@ -19,10 +19,10 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.IdentifierTools
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.runTask
+import cc.mewcraft.wakame.util.yamlLoader
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode
@@ -40,7 +40,7 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据
+        AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据
         AbilityTriggerRegistryLoader::class
     ]
 )

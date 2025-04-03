@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item.NekoItem
@@ -52,7 +52,7 @@ object CommonNekoStackTest {
 
         // 按依赖顺序, 初始化注册表
         ElementTypeRegistryLoader.init()
-        AttributeBundleFacadeRegistryLoader.init()
+        AttributeFacadeRegistryLoader.init()
         AbilityRegistryLoader.init()
         KizamiRegistryLoader.init()
         RarityRegistryLoader.init()

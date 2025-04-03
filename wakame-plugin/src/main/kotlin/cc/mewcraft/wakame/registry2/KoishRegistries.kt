@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
+import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
@@ -42,7 +42,7 @@ object KoishRegistries {
      * 属性块的 Facade.
      */
     @JvmField
-    val ATTRIBUTE_BUNDLE_FACADE: WritableRegistry<AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
+    val ATTRIBUTE_BUNDLE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
 
     /**
      * 元素.

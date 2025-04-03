@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -20,7 +20,7 @@ import java.util.stream.Stream
 
 internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
 
-internal val GLOBAL_ATTRIBUTE_CONFIG = Configs[AttributeBundleFacadeRegistryLoader.CONFIG_ID]
+internal val GLOBAL_ATTRIBUTE_CONFIG = Configs[AttributeFacadeRegistryLoader.CONFIG_ID]
 
 /**
  * An attribute type with a numerical default value.

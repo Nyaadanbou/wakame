@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.kizami2.KizamiEffect
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -25,7 +25,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须在其之后
+        AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须在其之后
     ]
 )
 @Reload

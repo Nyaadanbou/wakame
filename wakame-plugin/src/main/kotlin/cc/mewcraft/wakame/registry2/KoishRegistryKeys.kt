@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
+import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
@@ -27,7 +27,7 @@ object KoishRegistryKeys {
     val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField
-    val ATTRIBUTE_BUNDLE_FACADE = createRegistryKey<AttributeBundleFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_bundle_facade")
+    val ATTRIBUTE_BUNDLE_FACADE = createRegistryKey<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_bundle_facade")
 
     @JvmField
     val ELEMENT = createRegistryKey<ElementType>("element")
