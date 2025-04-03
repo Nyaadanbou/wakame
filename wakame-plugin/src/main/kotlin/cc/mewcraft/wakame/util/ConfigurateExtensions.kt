@@ -102,7 +102,9 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     .build()
 
 internal fun YamlConfigurationLoader.Builder.withDefaultSerializers(): YamlConfigurationLoader.Builder {
-    return this.defaultOptions { options -> options.serializers(SERIALIZERS) }
+    return defaultOptions { options ->
+        options.serializers(SERIALIZERS)
+    }
 }
 
 /**

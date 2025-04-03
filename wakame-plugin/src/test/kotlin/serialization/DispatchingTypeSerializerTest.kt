@@ -1,14 +1,12 @@
 package serialization
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.SimpleRegistry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.typeTokenOf
-import io.leangen.geantyref.TypeToken
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -20,6 +18,8 @@ import org.spongepowered.configurate.kotlin.extensions.typedSet
 import org.spongepowered.configurate.kotlin.objectMapperFactory
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import java.lang.reflect.Type
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 class DispatchingTypeSerializerTest {
 
@@ -46,7 +46,7 @@ class DispatchingTypeSerializerTest {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.registerAnnotatedObjects(objectMapperFactory())
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
         })
 
         assertNode(node)
@@ -56,7 +56,7 @@ class DispatchingTypeSerializerTest {
     fun `using type serializer`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType<*>::type))
+            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
             builder.register<Cat>(CatSerializer)
             builder.register<Dog>(DogSerializer)
         })
@@ -112,14 +112,14 @@ class DispatchingTypeSerializerTest {
 // 定义一个 interface: Animal
 interface Animal {
     // 接口必须可以返回一个代表自己类型的实例 (AnimalType)
-    val type: AnimalType<*>
+    val type: AnimalType
 }
 
 // 定义一个 class, 用于表示 impl 的 *类型*
-class AnimalType<E : Animal>(val type: TypeToken<E>) {
+class AnimalType(val kotlinType: KType /* KType<E> */) {
     companion object {
         // 创建一个注册表, 用于存放所有 Animal 的 *类型* (AnimalType)
-        val REGISTRY: SimpleRegistry<AnimalType<*>> = Registry.of("animal_type")
+        val REGISTRY: SimpleRegistry<AnimalType> = Registry.of("animal_type")
     }
 }
 
@@ -127,24 +127,24 @@ class AnimalType<E : Animal>(val type: TypeToken<E>) {
 // 尽量使用 @ConfigSerializable 注解, 这样可以省掉 TypeSerializer
 @ConfigSerializable
 data class Cat(val color: String) : Animal {
-    override val type: AnimalType<*> = AnimalTypes.CAT
+    override val type: AnimalType = AnimalTypes.CAT
 }
 
 // 定义一个 impl: Dog
 // 尽量使用 @ConfigSerializable 注解, 这样可以省掉 TypeSerializer
 @ConfigSerializable
 data class Dog(val weight: Int) : Animal {
-    override val type: AnimalType<*> = AnimalTypes.DOG
+    override val type: AnimalType = AnimalTypes.DOG
 }
 
 // 定一个单例, 用于存放所有实现的 *类型*
 object AnimalTypes {
-    val CAT: AnimalType<Cat> = register("cat") // 这里的字符串 id 将成为配置文件中 `type: ...` 字段的值
-    val DOG: AnimalType<Dog> = register("dog")
+    val CAT: AnimalType = register<Cat>("cat") // 这里的字符串 id 将成为配置文件中 `type: ...` 字段的值
+    val DOG: AnimalType = register<Dog>("dog")
 
     // 定义一个方便函数, 减少重复代码
-    private inline fun <reified E : Animal> register(id: String): AnimalType<E> {
-        return Registry.register(AnimalType.REGISTRY, id, AnimalType(typeTokenOf()))
+    private inline fun <reified E : Animal> register(id: String): AnimalType {
+        return Registry.register(AnimalType.REGISTRY, id, AnimalType(typeOf<E>()))
     }
 }
 
@@ -155,7 +155,7 @@ object AnimalTypes {
 // 1) 给实现类写好 TypeSerializer, 然后分别在 ConfigurationOptions 里注册
 
 // Cat 的 TypeSerializer
-object CatSerializer : TypeSerializer<Cat> {
+object CatSerializer : TypeSerializer2<Cat> {
     override fun deserialize(type: Type, node: ConfigurationNode): Cat {
         return Cat(node.node("color").require<String>())
     }
@@ -166,7 +166,7 @@ object CatSerializer : TypeSerializer<Cat> {
 }
 
 // Dog 的 TypeSerializer
-object DogSerializer : TypeSerializer<Dog> {
+object DogSerializer : TypeSerializer2<Dog> {
     override fun deserialize(type: Type, node: ConfigurationNode): Dog {
         return Dog(node.node("weight").require<Int>())
     }

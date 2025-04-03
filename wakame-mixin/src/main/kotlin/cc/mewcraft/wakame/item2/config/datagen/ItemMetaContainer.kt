@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
@@ -116,7 +117,7 @@ private class SimpleItemMetaContainer(
             for ((rawNodeKey, node) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 val dataType = KoishRegistries2.ITEM_META_TYPE[nodeKey] ?: continue
-                val dataValue = node.get(dataType.typeToken) ?: run {
+                val dataValue = node.get(dataType.kotlinType) ?: run {
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue
                 }

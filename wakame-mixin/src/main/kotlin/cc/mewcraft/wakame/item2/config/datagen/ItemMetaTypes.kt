@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -74,7 +73,7 @@ data object ItemMetaTypes {
      * @param block 用于配置 [ItemMetaType]
      */
     private inline fun <reified U, V> typeOf(id: String, block: ItemMetaType.Builder<U, V>.() -> Unit = {}): ItemMetaType<U, V> {
-        val type = ItemMetaType.builder<U, V>(typeTokenOf<U>()).apply(block).build()
+        val type = ItemMetaType.builder<U, V>().apply(block).build()
         return type.also { KoishRegistries2.ITEM_META_TYPE.add(id, it) }
     }
 

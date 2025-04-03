@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * 代表一个*持久化数据类型*的元数据的类型. 在这里“元数据”意为“如何生成数据”.
@@ -13,12 +14,12 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 sealed interface ItemMetaType<U, V> {
 
     companion object {
-        fun <U, V> builder(typeToken: TypeToken<U>): Builder<U, V> {
-            return Builder(typeToken)
+        inline fun <reified U, V> builder(): Builder<U, V> {
+            return Builder(typeOf<U>())
         }
     }
 
-    val typeToken: TypeToken<U>
+    val kotlinType: KType
 
     /**
      * 返回空表示数据类型 [U] 可以直接使用现有的 [TypeSerializerCollection] 来完成序列化操作.
@@ -31,7 +32,7 @@ sealed interface ItemMetaType<U, V> {
      * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
      */
     class Builder<U, V>(
-        private val typeToken: TypeToken<U>,
+        private val kotlinType: KType, // KType<U>
     ) {
         private var serializers: TypeSerializerCollection? = null
 
@@ -46,15 +47,15 @@ sealed interface ItemMetaType<U, V> {
         }
 
         fun build(): ItemMetaType<U, V> {
-            return Simple(typeToken, serializers)
+            return Simple(kotlinType, serializers)
         }
 
         private class Simple<U, V>(
-            override val typeToken: TypeToken<U>,
+            override val kotlinType: KType, // KType<U>
             override val serializers: TypeSerializerCollection?,
         ) : ItemMetaType<U, V> {
             override fun toString(): String {
-                return "ItemMetaType(type=${typeToken.type}, serializers=$serializers)"
+                return "ItemMetaType(type=${kotlinType}, serializers=$serializers)"
             }
         }
     }
