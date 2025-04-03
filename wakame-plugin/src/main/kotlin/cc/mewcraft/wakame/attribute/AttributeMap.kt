@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -15,7 +16,6 @@ import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -59,7 +59,7 @@ fun AttributeMap(user: User<Player>): AttributeMap {
  * @return a new instance of [AttributeMap]
  */
 fun AttributeMap(entity: LivingEntity): AttributeMap {
-    val key = AttributeMapSupport.ENTITY_KEY_LOOKUP.get(entity)
+    val key = AttributeMapSupport.ENTITY_REF_LOOKUP.get(entity)
     val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
     return EntityAttributeMap(default, entity)
 }
@@ -123,7 +123,7 @@ object ImaginaryAttributeMaps {
 
 private object AttributeMapSupport {
     val PLAYER_KEY: Key = EntityType.PLAYER.key()
-    val ENTITY_KEY_LOOKUP: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
+    val ENTITY_REF_LOOKUP: EntityRefLookup by Injector.inject<EntityRefLookup>()
 }
 
 /**

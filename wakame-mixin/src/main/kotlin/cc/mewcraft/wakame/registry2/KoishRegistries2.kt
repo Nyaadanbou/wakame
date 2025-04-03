@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -110,6 +111,12 @@ object KoishRegistries2 {
      */
     @JvmField
     val KIZAMI: WritableRegistry<Kizami> = registerSimple(KoishRegistryKeys2.KIZAMI)
+
+    /**
+     * 实体类型的引用.
+     */
+    @JvmField
+    val ENTITY_REF: WritableRegistry<EntityRef> = registerSimple(KoishRegistryKeys2.ENTITY_REF)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

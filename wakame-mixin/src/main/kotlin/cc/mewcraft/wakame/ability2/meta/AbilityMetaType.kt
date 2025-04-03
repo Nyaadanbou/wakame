@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.ability2.meta
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.valueByNameTypeSerializer
 import com.github.quillraven.fleks.Component
 import io.leangen.geantyref.TypeToken
-import org.spongepowered.configurate.serialize.ScalarSerializer
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -19,10 +16,6 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 sealed interface AbilityMetaType<T : Component<T>> {
 
     companion object {
-
-        fun makeSerializer(): ScalarSerializer<AbilityMetaType<*>> {
-            return KoishRegistries2.ABILITY_META_TYPE.valueByNameTypeSerializer()
-        }
 
         fun <T : Component<T>> builder(typeToken: TypeToken<T>): Builder<T> {
             return Builder(typeToken)

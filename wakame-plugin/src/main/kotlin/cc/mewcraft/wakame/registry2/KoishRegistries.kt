@@ -12,7 +12,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
-import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
@@ -50,12 +49,6 @@ object KoishRegistries {
      */
     @JvmField
     val ELEMENT: WritableDefaultedRegistry<ElementType> = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral") // = koish:neutral
-
-    /**
-     * 实体类型集合.
-     */
-    @JvmField
-    val ENTITY_TYPE_HOLDER: WritableRegistry<EntityTypeHolder> = registerSimple(KoishRegistryKeys.ENTITY_TYPE_HOLDER)
 
     /**
      * 虚构的属性映射.

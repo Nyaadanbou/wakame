@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.item.StatisticsConstants
 import cc.mewcraft.wakame.util.data.CompoundTag
-import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import net.kyori.adventure.key.Key
@@ -22,7 +22,7 @@ class TrackEntityKills(
 
     companion object : TrackType<TrackEntityKills> {
 
-        private val entityKeyLookup: EntityKeyLookup by Injector.inject<EntityKeyLookup>()
+        private val entityRefLookup: EntityRefLookup by Injector.inject<EntityRefLookup>()
 
         override val id: String = StatisticsConstants.ENTITY_KILLS
 
@@ -33,7 +33,7 @@ class TrackEntityKills(
         fun fromNbt(nbt: CompoundTag): TrackEntityKills {
             val map = if (nbt.size() < 8) Object2IntArrayMap<Key>() else Object2IntOpenHashMap()
             for (tagKey in nbt.allKeys) {
-                val entityKey = Key.key(tagKey).takeIf { entityKeyLookup.validate(it) } ?: continue // 直接跳过无效的 key
+                val entityKey = Key.key(tagKey).takeIf { entityRefLookup.validate(it) } ?: continue // 直接跳过无效的 key
                 val kills = nbt.getInt(tagKey)
                 map[entityKey] = kills
             }

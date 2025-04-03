@@ -13,7 +13,6 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 
 object KoishRegistryKeys {
     @JvmField
@@ -32,9 +31,6 @@ object KoishRegistryKeys {
 
     @JvmField
     val ELEMENT = createRegistryKey<ElementType>("element")
-
-    @JvmField
-    val ENTITY_TYPE_HOLDER = createRegistryKey<EntityTypeHolder>("entity_type_holder")
 
     @JvmField
     val IMAGINARY_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("imaginary_attribute_map")
@@ -57,6 +53,6 @@ object KoishRegistryKeys {
     ///
 
     private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
-        return RegistryKey.Companion.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
+        return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
     }
 }

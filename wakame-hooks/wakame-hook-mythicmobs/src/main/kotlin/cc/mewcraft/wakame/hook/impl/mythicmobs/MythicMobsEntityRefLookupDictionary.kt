@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.world.entity.EntityKeyLookup
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import io.lumine.mythic.bukkit.MythicBukkit
 import net.kyori.adventure.key.InvalidKeyException
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import kotlin.jvm.optionals.getOrElse
 
-class MythicMobsEntityKeyLookupDictionary : EntityKeyLookup.Dictionary {
+class MythicMobsEntityRefLookupDictionary : EntityRefLookup.Dictionary {
 
     private val mythicApi: MythicBukkit by lazy { MythicBukkit.inst() }
 

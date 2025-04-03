@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.entity
+package cc.mewcraft.wakame.entity.typeref
 
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity
 /**
  * A simple data structure holding a set of entity types.
  */
-interface EntityTypeHolder {
+interface EntityRef {
     /**
      * The keys of the objects in this holder.
      */

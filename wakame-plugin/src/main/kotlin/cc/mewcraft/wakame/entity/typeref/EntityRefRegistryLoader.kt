@@ -1,40 +1,37 @@
-package cc.mewcraft.wakame.entity.typeholder
+package cc.mewcraft.wakame.entity.typeref
 
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.yamlLoader
-import cc.mewcraft.wakame.world.entity.EntityTypeHolder
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.getList
 
-@Init(
-    stage = InitStage.PRE_WORLD
-)
+@Init(stage = InitStage.PRE_WORLD)
 @Reload
-internal object EntityTypeHolderRegistryLoader : RegistryLoader {
-    const val FILE_PATH = "entities.yml"
+internal object EntityRefRegistryLoader : RegistryLoader {
+    private const val FILE_PATH = "entities.yml"
 
     @InitFun
     fun init() {
-        KoishRegistries.ENTITY_TYPE_HOLDER.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::add)
-        KoishRegistries.ENTITY_TYPE_HOLDER.freeze()
+        KoishRegistries2.ENTITY_REF.resetRegistry()
+        consumeData(KoishRegistries2.ENTITY_REF::add)
+        KoishRegistries2.ENTITY_REF.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        applyDataToRegistry(KoishRegistries.ENTITY_TYPE_HOLDER::update)
+        consumeData(KoishRegistries2.ENTITY_REF::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, EntityTypeHolder) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, EntityRef) -> Unit) {
         val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText())
         for ((nodeKey, node) in rootNode.node("entity_type_holders").childrenMap()) {
@@ -43,9 +40,9 @@ internal object EntityTypeHolderRegistryLoader : RegistryLoader {
         }
     }
 
-    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, EntityTypeHolder> {
+    private fun parseEntry(nodeKey: Any, node: ConfigurationNode): Pair<Identifier, EntityRef> {
         val resourceLocation = Identifiers.of(nodeKey.toString())
         val keySet = node.getList<Key>(emptyList()).toSet()
-        return Pair(resourceLocation, EntityTypeHolderImpl(keySet))
+        return Pair(resourceLocation, EntityRefImpl(keySet))
     }
 }

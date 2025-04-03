@@ -1,10 +1,10 @@
-package cc.mewcraft.wakame.world.entity
+package cc.mewcraft.wakame.entity.typeref
 
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
 import org.jetbrains.annotations.ApiStatus
 
-interface EntityKeyLookup {
+interface EntityRefLookup {
 
     /**
      * Gets the key of [entity].
@@ -23,7 +23,7 @@ interface EntityKeyLookup {
     fun validate(key: Key): Boolean
 
     /**
-     * This interface is to form the implementation of [EntityKeyLookup]
+     * This interface is to form the implementation of [EntityRefLookup]
      * which consists of zero or more instances of [Dictionary]s.
      */
     @ApiStatus.Internal

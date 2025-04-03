@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability.AbilityRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
-import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryLoader
+import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
@@ -57,7 +57,7 @@ object CommonNekoStackTest {
         KizamiRegistryLoader.init()
         RarityRegistryLoader.init()
         LevelRarityMappingRegistryLoader.init()
-        EntityTypeHolderRegistryLoader.init()
+        EntityRefRegistryLoader.init()
 
         // 初始化所有 random3.Node 相关的实现
         ElementSampleNodeFacade.init()

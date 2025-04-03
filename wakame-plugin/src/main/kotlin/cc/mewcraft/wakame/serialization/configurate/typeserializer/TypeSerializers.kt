@@ -50,7 +50,7 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(KoishRegistries2.ABILITY_TRIGGER.valueByNameTypeSerializer())
     .register(KoishRegistries.ATTRIBUTE.holderByNameTypeSerializer())
     .register(KoishRegistries.ELEMENT.holderByNameTypeSerializer())
-    .register(KoishRegistries.ENTITY_TYPE_HOLDER.holderByNameTypeSerializer())
+    .register(KoishRegistries2.ENTITY_REF.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM_CATEGORY.holderByNameTypeSerializer())
     .register(KoishRegistries.ITEM_SKIN.holderByNameTypeSerializer())

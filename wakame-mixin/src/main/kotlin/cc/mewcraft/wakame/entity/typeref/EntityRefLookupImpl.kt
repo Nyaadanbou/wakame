@@ -1,14 +1,13 @@
-package cc.mewcraft.wakame.entity
+package cc.mewcraft.wakame.entity.typeref
 
-import cc.mewcraft.wakame.entity.MinecraftEntityKeyLookupDictionary.get
-import cc.mewcraft.wakame.world.entity.EntityKeyLookup
+import cc.mewcraft.wakame.entity.typeref.MinecraftEntityRefLookupDictionary.get
 import net.kyori.adventure.key.Key
 import org.bukkit.Registry
 import org.bukkit.entity.Entity
 
-internal class EntityKeyLookupImpl(
-    private val lookupList: List<EntityKeyLookup.Dictionary>,
-) : EntityKeyLookup {
+class EntityRefLookupImpl(
+    private val lookupList: List<EntityRefLookup.Dictionary>,
+) : EntityRefLookup {
     override fun get(entity: Entity): Key {
         for (lookup in lookupList) {
             val key = lookup.get(entity)
@@ -18,7 +17,7 @@ internal class EntityKeyLookupImpl(
         }
 
         // fallback
-        return MinecraftEntityKeyLookupDictionary.get(entity)
+        return MinecraftEntityRefLookupDictionary.get(entity)
     }
 
     override fun validate(key: Key): Boolean {
@@ -34,7 +33,7 @@ internal class EntityKeyLookupImpl(
  * So, you should call other implementation first, and this implementation
  * should always be the last to be called.
  */
-private object MinecraftEntityKeyLookupDictionary : EntityKeyLookup.Dictionary {
+private object MinecraftEntityRefLookupDictionary : EntityRefLookup.Dictionary {
     override fun get(entity: Entity): Key =
         entity.type.key
 

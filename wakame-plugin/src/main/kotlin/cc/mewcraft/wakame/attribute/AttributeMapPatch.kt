@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.util.data.*
 import cc.mewcraft.wakame.util.event
-import cc.mewcraft.wakame.world.entity.EntityKeyLookup
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
@@ -141,7 +141,7 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
 @Init(stage = InitStage.POST_WORLD)
 internal object AttributeMapPatchAccess {
 
-    private val entityKeyLookup: EntityKeyLookup by Injector.inject()
+    private val entityRefLookup: EntityRefLookup by Injector.inject()
     private val uuidToPatch = Object2ObjectOpenHashMap<UUID, AttributeMapPatch>()
 
     fun get(attributable: UUID): AttributeMapPatch? {
@@ -210,7 +210,7 @@ internal object AttributeMapPatchAccess {
                 if (entity !is LivingEntity) return@forEach
 
                 val patch = get(entity.uniqueId) ?: return@forEach
-                val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityKeyLookup.get(entity))
+                val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
 
                 // 把跟默认属性一样的属性移除
                 patch.trimBy(default)
@@ -237,7 +237,7 @@ internal object AttributeMapPatchAccess {
         if (entity !is LivingEntity) return
 
         val patch = get(entity.uniqueId) ?: return
-        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityKeyLookup.get(entity))
+        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
 
         // 把跟默认属性一样的属性移除
         patch.trimBy(default)
