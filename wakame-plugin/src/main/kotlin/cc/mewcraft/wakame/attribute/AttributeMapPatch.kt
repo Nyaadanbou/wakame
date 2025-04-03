@@ -1,20 +1,12 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeInstance
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.util.data.*
-import cc.mewcraft.wakame.util.event
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
-import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.util.Codec
@@ -22,24 +14,15 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.NbtAccounter
 import org.bukkit.NamespacedKey
-import org.bukkit.World
 import org.bukkit.attribute.Attributable
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.event.EventPriority
-import org.bukkit.event.entity.CreatureSpawnEvent
-import org.bukkit.event.world.EntitiesLoadEvent
-import org.bukkit.event.world.EntitiesUnloadEvent
 import org.bukkit.persistence.PersistentDataAdapterContext
 import org.bukkit.persistence.PersistentDataHolder
 import org.bukkit.persistence.PersistentDataType
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.IOException
-import java.util.*
 
-internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
+class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
 
     companion object Constants {
         private val PDC_KEY = NamespacedKey.fromString("wakame:attributes") ?: error("Spoogot")
@@ -123,7 +106,7 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
     /**
      * 过滤掉所有 [Attribute] 与 [AttributeInstance] 不满足 [predicate] 的元素.
      */
-    fun filter(predicate: (Attribute, AttributeInstance) -> Boolean) {
+    fun removeIf(predicate: (Attribute, AttributeInstance) -> Boolean) {
         val iterator = data.reference2ObjectEntrySet().iterator()
         while (iterator.hasNext()) {
             val entry = iterator.next()
@@ -135,126 +118,6 @@ internal class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstan
 
     override fun iterator(): Iterator<Map.Entry<Attribute, AttributeInstance>> {
         return data.reference2ObjectEntrySet().iterator()
-    }
-}
-
-@Init(stage = InitStage.POST_WORLD)
-internal object AttributeMapPatchAccess {
-
-    private val entityRefLookup: EntityRefLookup by Injector.inject()
-    private val uuidToPatch = Object2ObjectOpenHashMap<UUID, AttributeMapPatch>()
-
-    fun get(attributable: UUID): AttributeMapPatch? {
-        return uuidToPatch[attributable]
-    }
-
-    fun getOrCreate(attributable: UUID): AttributeMapPatch {
-        return uuidToPatch.computeIfAbsent(attributable, Object2ObjectFunction { AttributeMapPatch() })
-    }
-
-    fun put(attributable: UUID, patch: AttributeMapPatch) {
-        uuidToPatch[attributable] = patch
-    }
-
-    fun remove(attributable: UUID) {
-        uuidToPatch.remove(attributable)
-    }
-
-    @InitFun
-    fun init() {
-        registerListeners()
-    }
-
-    @DisableFun
-    fun close() {
-        SERVER.worlds.flatMap(World::getEntities).forEach(::onEntityUnload)
-    }
-
-    private fun registerListeners() {
-
-        // 当实体加载时, 读取 PDC 中的 AttributeMapPatch
-        event<EntitiesLoadEvent>(EventPriority.LOWEST) { event ->
-            for (entity in event.entities) {
-                if (entity is Player) continue
-                if (entity !is LivingEntity) continue
-
-                val patch = AttributeMapPatch.decode(entity)
-
-                put(entity.uniqueId, patch)
-
-                // 触发 AttributeMap 的初始化, 例如应用原版属性
-                AttributeMapAccess.INSTANCE.get(entity).onFailure {
-                    LOGGER.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
-                }
-            }
-        }
-
-        event<CreatureSpawnEvent>(EventPriority.HIGHEST, true) { event ->
-            // Note: 玩家在世界中的生成不会触发 CreaturesSpawnEvent
-
-            // 触发 AttributeMap 的初始化, 例如应用原版属性
-            val entity = event.entity
-            val attributeMap = AttributeMapAccess.INSTANCE.get(entity)
-                .onFailure { LOGGER.error("Failed to initialize the attribute map for entity $entity: ${it.message}") }
-                .getOrNull() ?: return@event
-
-            // 将生物血量设置到最大血量
-            val maxHealth = attributeMap.getValue(Attributes.MAX_HEALTH)
-            entity.health = maxHealth
-        }
-
-        // 当实体卸载时, 将 AttributeMapPatch 保存到 PDC
-        event<EntitiesUnloadEvent> { event ->
-            event.entities.forEach { entity ->
-                if (entity is Player) return@forEach
-                if (entity !is LivingEntity) return@forEach
-
-                val patch = get(entity.uniqueId) ?: return@forEach
-                val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
-
-                // 把跟默认属性一样的属性移除
-                patch.trimBy(default)
-
-                // 把原版属性移除, 这部分由 nms 自己处理
-                patch.filter { attribute, _ -> !attribute.vanilla }
-
-                // 如果经过以上操作后的 patch 为空, 表示生物并没有 patch, 移除 PDC
-                if (patch.isEmpty()) {
-                    patch.removeFrom(entity)
-                    remove(entity.uniqueId)
-                    return@forEach
-                }
-
-                patch.saveTo(entity)
-
-                remove(entity.uniqueId)
-            }
-        }
-    }
-
-    private fun onEntityUnload(entity: Entity) {
-        if (entity is Player) return
-        if (entity !is LivingEntity) return
-
-        val patch = get(entity.uniqueId) ?: return
-        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
-
-        // 把跟默认属性一样的属性移除
-        patch.trimBy(default)
-
-        // 把原版属性移除, 这部分由 nms 自己处理
-        patch.filter { attribute, _ -> !attribute.vanilla }
-
-        // 如果经过以上操作后的 patch 为空, 表示生物并没有 patch, 移除 PDC
-        if (patch.isEmpty()) {
-            patch.removeFrom(entity)
-            remove(entity.uniqueId)
-            return
-        }
-
-        patch.saveTo(entity)
-
-        remove(entity.uniqueId)
     }
 }
 
@@ -304,7 +167,7 @@ private object AttributeMapPatchType {
             override fun fromPrimitive(primitive: ByteArray, context: PersistentDataAdapterContext): AttributeMapPatch {
                 val inputStream = DataInputStream(FastByteArrayInputStream(primitive))
                 val listTag = ListTag.TYPE.load(inputStream, NbtAccounter.unlimitedHeap())
-                require(listTag.size != 0) { "list is empty" }
+                require(!listTag.isEmpty()) { "list is empty" }
                 require(listTag.elementType == NbtUtils.TAG_COMPOUND.toByte()) { "element type is not compound" }
                 val patch = AttributeMapPatch()
                 for (tag in listTag) {

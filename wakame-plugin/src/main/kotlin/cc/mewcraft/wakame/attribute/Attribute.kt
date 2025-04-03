@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
@@ -133,7 +134,7 @@ protected constructor(
  * An [Attribute] type with bounded values.
  *
  * The [minValue] and [maxValue] put a threshold on the final value of this attribute
- * after all [AttributeModifier]s have been applied.
+ * after all [cc.mewcraft.wakame.entity.attribute.AttributeModifier]s have been applied.
  */
 open class RangedAttribute
 /**

@@ -3,13 +3,8 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.lifecycle.reloader.Reload
-import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.User
@@ -23,6 +18,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.jetbrains.annotations.ApiStatus
 import java.lang.ref.WeakReference
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -65,14 +61,8 @@ fun AttributeMap(entity: LivingEntity): AttributeMap {
 }
 
 /**
- * 用于直接获取 [ImaginaryAttributeMap] 的实例.
+ * 用于直接获取 [cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap] 的实例.
  */
-@Init(
-    stage = InitStage.POST_WORLD, // init 只负责添加 intrusive registry entry
-)
-@Reload(
-    runAfter = [AttributeSupplierRegistryLoader::class]
-)
 object ImaginaryAttributeMaps {
     // 通过硬编码注册的 id, 但不确定对应的配置文件是否存在
     private val intrusiveRegisteredIds = HashSet<String>()
@@ -80,17 +70,18 @@ object ImaginaryAttributeMaps {
     @JvmField
     val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("minecraft:arrow")
 
-    @InitFun
+    @ApiStatus.Internal
     fun init() {
-        applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::add)
+        // init 只负责添加 intrusive registry entry
+        consumeData(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::add)
     }
 
-    @ReloadFun
+    @ApiStatus.Internal
     fun reload() {
-        applyDataToRegistry(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::update)
+        consumeData(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
         intrusiveRegisteredIds.forEach { registeredId ->
             val entryId = Identifiers.of(registeredId)
             val entryVal = createData(registeredId)
@@ -141,7 +132,7 @@ private object AttributeMapSupport {
  * in the [patch] map. This saves us a lot of memory for the object. However, if we need
  * to write data, for example adding a modifier, we write it into the [patch] map.
  */
-private class PlayerAttributeMap(
+class PlayerAttributeMap(
     /**
      * The fallback values if an attribute is not present in the [patch] map.
      */
@@ -261,7 +252,7 @@ private class PlayerAttributeMap(
  * The underlying attribute data is stored in the entity's NBT storage, so it's persistent
  * over server restarts.
  */
-private class EntityAttributeMap : AttributeMap {
+class EntityAttributeMap : AttributeMap {
     constructor(default: AttributeSupplier, entity: LivingEntity) {
         validateEntity(entity)
 
@@ -296,7 +287,7 @@ private class EntityAttributeMap : AttributeMap {
      * Returns the patch that are patched onto the [default] or creates a new one if it does not exist.
      */
     private val patch: AttributeMapPatch
-        get() = AttributeMapPatchAccess.getOrCreate(entity.uniqueId)
+        get() = AttributeMapPatches.getOrCreate(entity.uniqueId)
 
     @Suppress("DuplicatedCode")
     override fun getSnapshot(): AttributeMapSnapshot {
@@ -439,7 +430,7 @@ private class ImaginaryAttributeMapImpl(
 // 中是 VanillaAttributeInstance, 它在 AttributeMapSnapshot
 // 中也得转换成 WakameAttributeInstance.
 
-private class AttributeMapSnapshotImpl(
+class AttributeMapSnapshotImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
     @Suppress("DuplicatedCode")

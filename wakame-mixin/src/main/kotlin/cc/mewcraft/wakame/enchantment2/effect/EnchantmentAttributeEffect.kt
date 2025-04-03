@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.enchantment2.effect
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.util.Identifier

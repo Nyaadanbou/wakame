@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key

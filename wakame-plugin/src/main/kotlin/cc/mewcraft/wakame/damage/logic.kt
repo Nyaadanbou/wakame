@@ -4,7 +4,8 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
 import cc.mewcraft.wakame.damage.DamageManager.calculateDamageBeforeDefense
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamage
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamageMap
@@ -17,6 +18,9 @@ import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
 import cc.mewcraft.wakame.damage.mapping.NullCausingDamageMappings
 import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -620,7 +624,7 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
-     * 包含已注册的 [Projectile] 的 [AttributeMapSnapshot], 用于在弹射物刚被创建时就固定其伤害(减免前).
+     * 包含已注册的 [Projectile] 的 [cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot], 用于在弹射物刚被创建时就固定其伤害(减免前).
      *
      * 不要跟 [registeredCustomDamageMetadata] 搞混了, 这里的属性快照仅仅用于实现弹射物的伤害计算.
      * 这样设计可以让弹射物的属性在*打中*实体时被拦截和修改, 允许代码根据受伤实体的状态来修改属性;

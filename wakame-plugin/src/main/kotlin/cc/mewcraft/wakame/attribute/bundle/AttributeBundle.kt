@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attribute.bundle
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 
 /**
@@ -49,15 +49,15 @@ sealed interface AttributeBundleTrait {
  *
  * ## 玩家看到的"属性"不一定只是一个
  *
- * 首先要明确的是, 技术上所说的属性就是 [cc.mewcraft.wakame.attribute.Attribute] 以及对应的
- * [cc.mewcraft.wakame.attribute.AttributeInstance]. 但玩家看到的单个“属性”并不一定只有单个
- * [cc.mewcraft.wakame.attribute.Attribute] 和 [cc.mewcraft.wakame.attribute.AttributeInstance].
+ * 首先要明确的是, 技术上所说的属性就是 [cc.mewcraft.wakame.entity.attribute.Attribute] 以及对应的
+ * [cc.mewcraft.wakame.entity.attribute.AttributeInstance]. 但玩家看到的单个“属性”并不一定只有单个
+ * [cc.mewcraft.wakame.entity.attribute.Attribute] 和 [cc.mewcraft.wakame.entity.attribute.AttributeInstance].
  *
- * 例如, 玩家看到的物品“攻击力”属性, 实际上是由两个 [cc.mewcraft.wakame.attribute.Attribute] 组成的.
+ * 例如, 玩家看到的物品“攻击力”属性, 实际上是由两个 [cc.mewcraft.wakame.entity.attribute.Attribute] 组成的.
  * 一个是 [cc.mewcraft.wakame.attribute.Attributes.MIN_ATTACK_DAMAGE], 另一个是
  * [cc.mewcraft.wakame.attribute.Attributes.MAX_ATTACK_DAMAGE].
  *
- * 因此我们需要这么一个类, 将这两个 [cc.mewcraft.wakame.attribute.Attribute] 组合成一个玩家眼中的“属性”.
+ * 因此我们需要这么一个类, 将这两个 [cc.mewcraft.wakame.entity.attribute.Attribute] 组合成一个玩家眼中的“属性”.
  *
  * ## 属性本身不仅有数值, 还有其他部分
  *

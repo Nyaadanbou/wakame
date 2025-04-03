@@ -2,10 +2,10 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.AttributeMapLike
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
+import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.math.absoluteValue

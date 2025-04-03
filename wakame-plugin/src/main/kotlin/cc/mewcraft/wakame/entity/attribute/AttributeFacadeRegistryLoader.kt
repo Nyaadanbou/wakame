@@ -3,14 +3,16 @@ package cc.mewcraft.wakame.entity.attribute
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.attribute.*
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.attribute.AttributeGetter
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.GLOBAL_ATTRIBUTE_CONFIG
 import cc.mewcraft.wakame.attribute.bundle.*
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle.Quality
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -38,9 +40,8 @@ import java.util.stream.Stream
 import kotlin.reflect.KClass
 
 @Init(
-    stage = InitStage.PRE_WORLD,
-    runAfter = [
-        Attributes::class,
+    stage = InitStage.PRE_WORLD, runAfter = [
+        AttributeBootstrap2.Pre::class,
     ]
 )
 internal object AttributeFacadeRegistryLoader : RegistryLoader {
@@ -112,9 +113,12 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
         +build("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
     }
 
-    private operator fun AttributeFacade<*, *>.unaryPlus() {
+    private operator fun <T : ConstantAttributeBundle, S : VariableAttributeBundle> AttributeFacade<T, S>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
-        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.add(Identifier.key(KOISH_NAMESPACE, id), this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
+        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.add(
+            id = Identifier.key(KOISH_NAMESPACE, id),
+            value = (this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
+        )
     }
 }
 

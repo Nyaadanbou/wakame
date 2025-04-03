@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
@@ -35,9 +34,9 @@ internal sealed interface DamageMetadataBuilder<T> {
 
     //
 
-    private object Serializer : TypeSerializer<DamageMetadataBuilder<*>> {
+    private object Serializer : TypeSerializer2<DamageMetadataBuilder<*>> {
 
-        // FIXME 使用 DispatchingTypeSerializer 替代该实现
+        // FIXME 使用 DispatchingSerializer 替代该实现
         private val TYPE_MAPPING: Map<String, KType> = mapOf(
             "direct" to typeOf<DirectDamageMetadataBuilder>(),
             "vanilla" to typeOf<VanillaDamageMetadataBuilder>(),
@@ -157,7 +156,7 @@ internal data class VanillaDamageMetadataBuilder(
 }
 
 /**
- * 依赖攻击实体的 [cc.mewcraft.wakame.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
+ * 依赖攻击实体的 [cc.mewcraft.wakame.entity.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
 internal data class AttributeDamageMetadataBuilder(

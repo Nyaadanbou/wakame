@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.AttributeProvider
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill

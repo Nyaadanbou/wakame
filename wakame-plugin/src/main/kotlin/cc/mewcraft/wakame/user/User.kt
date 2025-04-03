@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.ability2.combo.PlayerCombo
-import cc.mewcraft.wakame.attribute.AttributeMap
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
 import java.util.*

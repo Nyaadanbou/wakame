@@ -13,11 +13,8 @@ import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.yamlLoader
 
-// TODO 把 Attribute 迁移到该 package 下
-
 @Init(
-    stage = InitStage.PRE_WORLD,
-    runAfter = [
+    stage = InitStage.PRE_WORLD, runAfter = [
         ElementTypeRegistryLoader::class, // deps: 反序列化时必须知道所有已知的元素类型
     ]
 )
@@ -28,16 +25,16 @@ internal object AttributeSupplierRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         KoishRegistries.ATTRIBUTE_SUPPLIER.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::add)
+        consumeData(KoishRegistries.ATTRIBUTE_SUPPLIER::add)
         KoishRegistries.ATTRIBUTE_SUPPLIER.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        applyDataToRegistry(KoishRegistries.ATTRIBUTE_SUPPLIER::update)
+        consumeData(KoishRegistries.ATTRIBUTE_SUPPLIER::update)
     }
 
-    private fun applyDataToRegistry(registryAction: (Identifier, AttributeSupplier) -> Unit) {
+    private fun consumeData(registryAction: (Identifier, AttributeSupplier) -> Unit) {
         val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(getFileInConfigDirectory(FILE_PATH).readText()).node("entity_attributes")
         val dataMap = AttributeSupplierSerializer.deserialize(rootNode)

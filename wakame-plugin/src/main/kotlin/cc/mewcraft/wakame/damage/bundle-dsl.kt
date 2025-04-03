@@ -3,8 +3,12 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.attribute.AttributeGetter
+import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.contracts.ExperimentalContracts
@@ -276,7 +280,7 @@ class DamagePacketDSL(
         // 除了“标准”以外, 如果还有其他会大量用到的重复计算方式, 可以进一步扩展 DSL.
 
         /**
-         * 获取指定的 [Attribute] 的值.
+         * 获取指定的 [cc.mewcraft.wakame.entity.attribute.Attribute] 的值.
          */
         fun value(attribute: Attribute): Double {
             return attrMap.getValue(attribute)

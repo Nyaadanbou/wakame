@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key

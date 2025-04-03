@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
@@ -26,7 +26,7 @@ import kotlin.random.Random
  * @property operation the operation of the attribute to check with
  * @property element the element of the attribute to check with
  *
- * @see cc.mewcraft.wakame.attribute.Attribute
+ * @see cc.mewcraft.wakame.entity.attribute.Attribute
  */
 data class AttributeFilter(
     override val invert: Boolean,

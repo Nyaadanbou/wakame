@@ -1,25 +1,22 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
+import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * The container that holds all [Attribute] instances.
+ * The container that holds all [cc.mewcraft.wakame.entity.attribute.Attribute] instances.
  *
  * The attribute instances in this singleton object are primarily served as
  * "lookup index" for other code in this project. The numeric values passing to the
  * attribute constructors are just fallback values when the config provides nothing.
  */
-@Init(
-    stage = InitStage.PRE_WORLD
-)
 object Attributes : AttributeProvider {
     //<editor-fold desc="原版属性">
 
@@ -80,19 +77,19 @@ object Attributes : AttributeProvider {
     //</editor-fold>
 
     /**
-     * Gets all [Attribute.id] of known attributes.
+     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.id] of known attributes.
      */
     val simpleIds: Set<String>
-        get() = AttributeProviderInternals.simpleIds + SimpleAttributeGetter.simpleIds
+        get() = AttributeProviderInternals.simpleIds + AttributeGetterImpl.simpleIds
 
     /**
-     * Gets all [Attribute.bundleId] of known vanilla-backed attributes.
+     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.bundleId] of known vanilla-backed attributes.
      */
     val vanillaAttributeNames: Collection<String>
-        get() = AttributeNamesHolder.vanillaAttributeNames
+        get() = AttributeNames.vanillaAttributeNames
 
     /**
-     * Gets all [Attribute.bundleId] of known element attributes.
+     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.bundleId] of known element attributes.
      *
      * 返回的集合中包含两种名字: 一种是不带元素的名字, 一种是带元素的名字.
      * 例如对于 `defense` 这个属性, 会有两种名字包含在返回的集合中:
@@ -100,18 +97,18 @@ object Attributes : AttributeProvider {
      * - `defense/fire` (带了元素的名字)
      */
     val elementAttributeNames: Collection<String>
-        get() = AttributeNamesHolder.elementAttributeNames
+        get() = AttributeNames.elementAttributeNames
 
     /**
      * 初始化 [Attributes].
      */
-    @InitFun
+    @ApiStatus.Internal
     fun init() {
-        SimpleAttributeGetter.init()
+        AttributeGetterImpl.init()
     }
 
     override fun get(id: String): Attribute? {
-        return AttributeProviderInternals.get(id) ?: SimpleAttributeGetter.get(id)
+        return AttributeProviderInternals.get(id) ?: AttributeGetterImpl.get(id)
     }
 
     override fun getList(id: String): Collection<Attribute> {
@@ -119,11 +116,11 @@ object Attributes : AttributeProvider {
     }
 
     override fun isElementalById(id: String): Boolean {
-        return id in SimpleAttributeGetter.simpleIds
+        return id in AttributeGetterImpl.simpleIds
     }
 
     override fun isElementalByBundleId(bundleId: String): Boolean {
-        return bundleId in SimpleAttributeGetter.bundleIds
+        return bundleId in AttributeGetterImpl.bundleIds
     }
 
     //////
@@ -134,7 +131,7 @@ object Attributes : AttributeProvider {
 
     // "lazy" 意为不立马创建 ElementAttribute, 而仅仅是规定好如何创建 ElementAttribute.
     private fun registerLazy(creator: (RegistryEntry<ElementType>) -> ElementAttribute): AttributeGetter {
-        return SimpleAttributeGetter(creator)
+        return AttributeGetterImpl(creator)
     }
 }
 
@@ -192,7 +189,7 @@ interface AttributeGetter {
 /* Internals */
 
 
-private class SimpleAttributeGetter(
+private class AttributeGetterImpl(
     private val creator: (RegistryEntry<ElementType>) -> ElementAttribute,
 ) : AttributeGetter {
 
@@ -224,7 +221,7 @@ private class SimpleAttributeGetter(
     /**
      * 本伴生对象主要充当 [AttributeGetter] 的对象池, 以及存放需要在所有对象之间共享的数据.
      */
-    companion object Shared {
+    companion object {
         private val INSTANCES: HashSet<AttributeGetter> = HashSet()
 
         // simple id -> element attribute
@@ -255,7 +252,7 @@ private class SimpleAttributeGetter(
             SIMPLE_ID_TO_ATTRIBUTE[simpleId] = attribute
             BUNDLE_ID_TO_ATTRIBUTE_SET.computeIfAbsent(bundleId) { _ -> HashSet() }.add(attribute)
 
-            AttributeNamesHolder.register(attribute)
+            AttributeNames.register(attribute)
 
             return attribute
         }
@@ -296,7 +293,7 @@ private object AttributeProviderInternals {
     fun <T : Attribute> register(attribute: T): T {
         SIMPLE_ID_TO_ATTRIBUTE[attribute.id] = attribute
         BUNDLE_ID_TO_ATTRIBUTE_SET.put(attribute.bundleId, attribute)
-        AttributeNamesHolder.register(attribute)
+        AttributeNames.register(attribute)
         return attribute
     }
 
@@ -309,12 +306,12 @@ private object AttributeProviderInternals {
         if (bundleIds.isNotEmpty()) {
             return bundleIds
         }
-        return SimpleAttributeGetter.getList(id)
+        return AttributeGetterImpl.getList(id)
     }
 }
 
 // 封装了一些内部状态, 以提供更简洁的接口
-private object AttributeNamesHolder {
+private object AttributeNames {
     private val vanillaAttributeNameSet: HashSet<String> = HashSet()
     private val elementAttributeNameSet: HashSet<String> = HashSet()
 

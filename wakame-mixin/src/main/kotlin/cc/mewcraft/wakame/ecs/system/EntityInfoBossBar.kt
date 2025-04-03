@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.attribute.AttributeProvider
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.BukkitComponent
 import cc.mewcraft.wakame.ecs.bridge.koishify
@@ -10,6 +9,7 @@ import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
+import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.util.toStableFloat
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
@@ -92,7 +92,7 @@ class EntityInfoBossBar : IteratingSystem(
         val elementStackMessage = BukkitComponent.text()
 
         for ((elementEntry, entity) in container) {
-            val element = elementEntry.value
+            val element = elementEntry.unwrap()
             val stack = entity[ElementStackComponent]
 
             elementStackMessage.append(
@@ -107,8 +107,8 @@ class EntityInfoBossBar : IteratingSystem(
     }
 
     private fun getMaxHealth(entity: Entity): Double? {
-        val attributeMap = entity[AttributeMapComponent].invoke()
-        val maxHealth = AttributeProvider.instance().get("max_health") ?: return null
+        val attributeMap = entity[AttributeMapComponent]()
+        val maxHealth = AttributeProvider.INSTANCE.get("max_health") ?: return null
         return attributeMap.getInstance(maxHealth)?.getValue()
     }
 

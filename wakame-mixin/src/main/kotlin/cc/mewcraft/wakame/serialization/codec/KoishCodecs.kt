@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.serialization.codec
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.attribute.AttributeProvider
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.StringIdentifiable
 import com.mojang.serialization.Codec

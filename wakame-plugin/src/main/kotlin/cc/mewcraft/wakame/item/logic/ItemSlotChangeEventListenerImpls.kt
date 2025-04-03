@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.attribute.AttributeInstance
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.AttributeInstance
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -42,7 +42,7 @@ internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeEventListener(
 /**
  * 属性.
  *
- * 物品发生变化时, 根据物品核孔, 修改玩家的 [cc.mewcraft.wakame.attribute.AttributeMap].
+ * 物品发生变化时, 根据物品核孔, 修改玩家的 [cc.mewcraft.wakame.entity.attribute.AttributeMap].
  */
 internal object AttributeItemSlotChangeListener : ItemSlotChangeEventListener() {
 

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import net.kyori.adventure.key.Key
 

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import org.jetbrains.annotations.ApiStatus
 
@@ -9,21 +9,19 @@ interface AttributeProvider {
 
     companion object Holder {
 
-        private var instance: AttributeProvider? = null
+        @get:JvmName("getInstance")
+        @get:JvmStatic
+        lateinit var INSTANCE: AttributeProvider private set
 
+        @Deprecated("Use AttributeProvider.INSTANCE instead", replaceWith = ReplaceWith("INSTANCE"))
         @JvmStatic
         fun instance(): AttributeProvider {
-            return instance ?: error("AttributeProvider has not been initialized")
+            return INSTANCE
         }
 
         @ApiStatus.Internal
         fun register(provider: AttributeProvider) {
-            instance = provider
-        }
-
-        @ApiStatus.Internal
-        fun unregister() {
-            instance = null
+            INSTANCE = provider
         }
 
     }

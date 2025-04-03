@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.isEmpty

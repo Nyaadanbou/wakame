@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import com.google.common.collect.ImmutableBiMap
-import cc.mewcraft.wakame.attribute.Attribute as NekoAttribute
-import cc.mewcraft.wakame.attribute.AttributeModifier as NekoAttributeModifier
+import cc.mewcraft.wakame.entity.attribute.Attribute as NekoAttribute
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier as NekoAttributeModifier
 import org.bukkit.attribute.Attribute as BukkitAttribute
 import org.bukkit.attribute.AttributeModifier as BukkitAttributeModifier
 

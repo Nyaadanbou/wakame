@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.rarity2.Rarity

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.util.StringIdentifiable
 import it.unimi.dsi.fastutil.objects.Object2ReferenceArrayMap
