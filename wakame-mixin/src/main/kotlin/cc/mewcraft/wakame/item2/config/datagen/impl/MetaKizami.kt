@@ -5,19 +5,19 @@ import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
-import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
-interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
+interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
 
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer2<MetaRarity> = DispatchingSerializer.createPartial<String, MetaRarity>(
+        val SERIALIZER: TypeSerializer2<MetaKizami> = DispatchingSerializer.createPartial<String, MetaKizami>(
             mapOf(
                 "static" to Static::class,
                 "dynamic" to Dynamic::class,
@@ -26,31 +26,35 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
 
     }
 
-    override fun write(value: RegistryEntry<Rarity>, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.RARITY, value)
+    // Hint:
+    // 尽管 MetaKizami 有多个实现, 但其 write 函数体都是一样的.
+    // 因此可以直接在接口定义 write 函数的实现,
+    // 其余的实现类只需要重写 make 函数即可.
+    override fun write(value: Set<RegistryEntry<Kizami>>, itemstack: MojangStack) {
+        itemstack.ensureSetData(ItemDataTypes.KIZAMI, value)
     }
 
     @ConfigSerializable
     data class Static(
         @Setting("value")
-        val entry: RegistryEntry<Rarity>,
-    ) : MetaRarity {
+        val entries: Set<RegistryEntry<Kizami>>,
+    ) : MetaKizami {
 
-        override fun make(context: Context): ItemMetaResult<RegistryEntry<Rarity>> {
-            return ItemMetaResult.of(entry)
+        override fun make(context: Context): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
+            return ItemMetaResult.of(entries)
         }
 
     }
 
-    // TODO #373: 迁移 LevelRarityMapping (需要先迁移 helper, 等技能合并
+    // TODO #373: 实现动态生成
 
     @ConfigSerializable
     data class Dynamic(
         @Setting("value")
-        val mapper: Nothing,
-    ) : MetaRarity {
+        val selector: Nothing,
+    ) : MetaKizami {
 
-        override fun make(context: Context): ItemMetaResult<RegistryEntry<Rarity>> {
+        override fun make(context: Context): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
             TODO("Not yet implemented")
         }
 

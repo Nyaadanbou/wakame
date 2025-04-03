@@ -2,9 +2,11 @@ package cc.mewcraft.wakame.item2.config.datagen
 
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaRarity
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
@@ -45,16 +47,21 @@ data object ItemMetaTypes {
     // 开发日记: 数据类型 V 不一定需要封装类 (如 ItemLevel), 只需要可以被序列化.
     //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
     @JvmField
-    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name") {
-        serializers {
-            register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
-        }
-    }
+    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
 
     @JvmField
     val RARITY: ItemMetaType<MetaRarity, RegistryEntry<Rarity>> = typeOf("rarity") {
         serializers {
             register(MetaRarity.SERIALIZER)
+            register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val KIZAMI: ItemMetaType<MetaKizami, Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
+        serializers {
+            register(MetaKizami.SERIALIZER)
+            register(KoishRegistries2.KIZAMI.holderByNameTypeSerializer())
         }
     }
 

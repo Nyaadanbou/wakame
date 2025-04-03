@@ -2,9 +2,11 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -47,7 +49,18 @@ data object ItemDataTypes {
     val LEVEL: ItemDataType<ItemLevel> = typeOf("level")
 
     @JvmField
-    val RARITY: ItemDataType<RegistryEntry<Rarity>> = typeOf("rarity")
+    val RARITY: ItemDataType<RegistryEntry<Rarity>> = typeOf("rarity") {
+        serializers {
+            register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val KIZAMI: ItemDataType<Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
+        serializers {
+            register(KoishRegistries2.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
 
     // ------------
     // 方便函数
