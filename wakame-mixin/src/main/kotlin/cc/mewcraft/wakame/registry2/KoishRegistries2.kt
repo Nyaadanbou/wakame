@@ -1,5 +1,9 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
+import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
+import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -22,6 +26,24 @@ object KoishRegistries2 {
     // ------------
     // 注册表
     // ------------
+
+    /**
+     * 技能配置.
+     */
+    @JvmField
+    val ABILITY_META: WritableRegistry<AbilityMeta> = registerSimple(KoishRegistryKeys2.ABILITY_META)
+
+    /**
+     * 技能配置的类型.
+     */
+    @JvmField
+    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(KoishRegistryKeys2.ABILITY_META_TYPE) { AbilityMetaTypes }
+
+    /**
+     * 技能触发器.
+     */
+    @JvmField
+    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(KoishRegistryKeys2.ABILITY_TRIGGER)
 
     /**
      * 自定义物品的类型.

@@ -1,9 +1,3 @@
-displays:
-  name: "位移"
-  tooltips:
-    - "<red>位移！"
-
-# 技能模板的 type
 type: blink
 
 # 冲刺距离

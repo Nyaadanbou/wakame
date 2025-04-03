@@ -47,7 +47,7 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    implementation(libs.mocha)
+    compileOnly(libs.mocha)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供

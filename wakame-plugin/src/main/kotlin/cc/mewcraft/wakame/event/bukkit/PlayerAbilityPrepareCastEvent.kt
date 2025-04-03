@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.ItemStack
 
 class PlayerAbilityPrepareCastEvent(
-    ability: Ability,
+    ability: AbilityMeta,
     val caster: Player,
     val target: KoishEntity?,
     val item: ItemStack?

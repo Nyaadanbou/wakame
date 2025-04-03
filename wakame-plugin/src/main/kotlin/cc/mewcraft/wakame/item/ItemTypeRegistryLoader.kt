@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerRegistryLoader
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init

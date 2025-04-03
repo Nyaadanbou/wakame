@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.NekoStack
@@ -9,6 +8,7 @@ import cc.mewcraft.wakame.item.extension.damage
 import cc.mewcraft.wakame.item.extension.isDamageable
 import cc.mewcraft.wakame.item.extension.maxDamage
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.player.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import org.bukkit.entity.Player
@@ -180,19 +180,19 @@ internal abstract class ItemSlotChangeEventListener {
         val newNekoStack = newItemStack?.wrap()
 
         onBegin(player)
-
-        if (oldItemStack != null &&
-            testSlot(player, slot, oldItemStack, oldNekoStack) // 移除物品效果时, 只检查 item slot 是否满足
-        ) {
-            // 移除物品效果时, 只检查 item slot 是否满足.
-            // 这样可以保证在一些特殊情况下 (例如强制降低冒险等级),
-            // 玩家的物品效果仍然能够被正确移除.
-            handlePreviousItem(player, slot, oldItemStack, oldNekoStack)
-        }
-
-        if (newItemStack != null && test(player, slot, newItemStack, newNekoStack)) {
-            handleCurrentItem(player, slot, newItemStack, newNekoStack)
-        }
+          // TODO 支持新的 ItemSlot
+//        if (oldItemStack != null &&
+//            testSlot(player, slot, oldItemStack, oldNekoStack) // 移除物品效果时, 只检查 item slot 是否满足
+//        ) {
+//            // 移除物品效果时, 只检查 item slot 是否满足.
+//            // 这样可以保证在一些特殊情况下 (例如强制降低冒险等级),
+//            // 玩家的物品效果仍然能够被正确移除.
+//            handlePreviousItem(player, slot, oldItemStack, oldNekoStack)
+//        }
+//
+//        if (newItemStack != null && test(player, slot, newItemStack, newNekoStack)) {
+//            handleCurrentItem(player, slot, newItemStack, newNekoStack)
+//        }
 
         onEnd(player)
     }

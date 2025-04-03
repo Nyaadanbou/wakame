@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.ability.PlayerAbility
 import cc.mewcraft.wakame.attribute.Attribute
 import cc.mewcraft.wakame.attribute.AttributeModifier
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
@@ -12,7 +11,6 @@ import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
-import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.serialize.SerializationException
 
 /**
@@ -40,37 +38,10 @@ class KizamiEffectType<T : KizamiEffect>(val type: TypeToken<T>) {
  * 铭刻效果类型的注册表.
  */
 internal object KizamiEffectTypes {
-    val PLAYER_ABILITY = register<KizamiEffectPlayerAbility>("player_ability")
     val ATTRIBUTE_MODIFIER = register<KizamiEffectAttributeModifier>("attribute_modifier")
 
     private inline fun <reified T : KizamiEffect> register(id: String): KizamiEffectType<T> {
         return Registry.register(KizamiEffectType.REGISTRY, id, KizamiEffectType(typeTokenOf()))
-    }
-}
-
-/**
- * 铭刻效果：玩家技能.
- */
-internal class KizamiEffectPlayerAbility(
-    private val ability: PlayerAbility,
-) : KizamiEffect {
-    override val type: KizamiEffectType<*> = KizamiEffectTypes.PLAYER_ABILITY
-
-    override fun apply(user: User<*>) {
-        ability.cast(user.player(), null)
-    }
-
-    override fun remove(user: User<*>) {
-        // do nothing
-    }
-
-    companion object {
-        val SERIALIZER = TypeSerializer<KizamiEffectPlayerAbility> { type, node ->
-            val id = node.node("id").require<Key>()
-            val ability = PlayerAbility(id, node)
-
-            KizamiEffectPlayerAbility(ability)
-        }
     }
 }
 

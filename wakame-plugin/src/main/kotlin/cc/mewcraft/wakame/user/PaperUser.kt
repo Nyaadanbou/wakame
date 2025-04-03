@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.user
 
-import cc.mewcraft.wakame.ability.combo.PlayerCombo
+import cc.mewcraft.wakame.ability2.combo.PlayerCombo
 import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.resource.ResourceMap
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
@@ -22,9 +21,6 @@ val Player.kizamiContainer: KizamiMap
 
 val Player.attributeContainer: AttributeMap
     get() = toUser().attributeMap
-
-val Player.resourceContainer: ResourceMap
-    get() = toUser().resourceMap
 
 val Player.combo: PlayerCombo
     get() = toUser().combo
@@ -59,8 +55,6 @@ class PaperUser(
     override val kizamiMap: KizamiMap = KizamiMap(this)
 
     override val attributeMap: AttributeMap = AttributeMap(this)
-
-    override val resourceMap: ResourceMap = ResourceMap(this)
 
     override val combo: PlayerCombo = PlayerCombo(this.uniqueId)
 

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.ability.Ability
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 
 abstract class AbilityPrepareCastEvent(
-    val ability: Ability,
+    val ability: AbilityMeta,
 ) : Event(), Cancellable {
 
     private var cancel: Boolean = false

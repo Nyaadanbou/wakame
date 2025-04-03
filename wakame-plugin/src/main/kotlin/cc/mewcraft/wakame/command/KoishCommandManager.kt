@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.command
 
 import cc.mewcraft.wakame.command.command.*
-import cc.mewcraft.wakame.command.parser.AbilityParser
+import cc.mewcraft.wakame.command.parser.AbilityMetaParser
 import cc.mewcraft.wakame.command.parser.Item2Parser
 import cc.mewcraft.wakame.command.parser.ItemPathParser
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -33,7 +33,7 @@ internal object KoishCommandManager {
             setNativeNumberSuggestions(true)
 
             // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
-            registerMapping(typeTokenOf<AbilityParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+            registerMapping(typeTokenOf<AbilityMetaParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
             registerMapping(typeTokenOf<ItemPathParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
             registerMapping(typeTokenOf<Item2Parser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
         }

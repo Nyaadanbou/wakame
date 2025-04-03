@@ -1,11 +1,5 @@
-displays:
-  name: "二段跳"
-  tooltips:
-    - "<red>二段跳"
-
 # 技能模板的 type
 type: multi_jump
-
 # 跳跃次数
 count: 2
 

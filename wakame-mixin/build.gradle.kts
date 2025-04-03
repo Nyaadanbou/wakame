@@ -34,6 +34,7 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+    implementation(libs.mocha)
     implementation(local.shadow.bukkit)
     implementation(local.commons.collections)
     implementation(local.commons.gson) {

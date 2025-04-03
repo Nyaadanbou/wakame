@@ -3,15 +3,15 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability.AbilityEntryPointHandler
+import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventListenerRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.player.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.toUser
@@ -207,18 +207,16 @@ object ItemListener {
             val itemStack = event.item ?: return@event
             val koishStack = itemStack.wrap() ?: return@event
 
-            koishStack.handleAbilityPrepareCast(player, itemStack, koishStack, event.ability, event)
+//            koishStack.handleAbilityPrepareCast(player, itemStack, koishStack, event.ability, event) // TODO 支持新的技能系统
         }
     }
 
     private fun registerAbilityEntryPointListeners() {
         event<PlayerInteractEvent> { event ->
-            val slot = event.hand ?: return@event
+            event.hand ?: return@event
             val player = event.player
             if (!player.isHandleableByKoish) return@event
-            val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-            val koishStack = itemStack.wrap() ?: return@event
-            if (!koishStack.slotGroup.test(slot)) return@event
+            player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
 
             when (event.action) {
                 Action.LEFT_CLICK_BLOCK -> AbilityEntryPointHandler.onLeftClickBlock(player, event)

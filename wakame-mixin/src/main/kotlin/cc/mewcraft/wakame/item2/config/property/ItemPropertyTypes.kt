@@ -1,6 +1,12 @@
 package cc.mewcraft.wakame.item2.config.property
 
-import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
+import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.Lore
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
@@ -57,6 +63,13 @@ data object ItemPropertyTypes {
 
     @JvmField
     val LORE: ItemPropertyType<Lore> = typeOf("lore")
+
+    @JvmField
+    val ABILITY: ItemPropertyType<AbilityOnItem> = typeOf("ability") {
+        serializers {
+            register(AbilityTriggerVariant.SERIALIZER)
+        }
+    }
 
     // ------------
     // 方便函数

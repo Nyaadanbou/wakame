@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.ability.trigger.AbilityTriggerRegistryLoader
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.Context
@@ -17,7 +17,12 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.IdentifierTools
+import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.runTask
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode

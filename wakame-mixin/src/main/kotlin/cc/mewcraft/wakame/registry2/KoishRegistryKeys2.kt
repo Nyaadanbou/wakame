@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.registry2
 
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
+import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
+import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -14,6 +17,15 @@ object KoishRegistryKeys2 {
     val ROOT_REGISTRY_NAME = Identifiers.of("root_2")
 
     ///
+
+    @JvmField
+    val ABILITY_META = createRegistryKey<AbilityMeta>("ability_meta")
+
+    @JvmField
+    val ABILITY_META_TYPE = createRegistryKey<AbilityMetaType<*>>("ability_meta")
+
+    @JvmField
+    val ABILITY_TRIGGER = createRegistryKey<AbilityTrigger>("ability_trigger")
 
     @JvmField
     val ITEM = createRegistryKey<KoishItem>("item")

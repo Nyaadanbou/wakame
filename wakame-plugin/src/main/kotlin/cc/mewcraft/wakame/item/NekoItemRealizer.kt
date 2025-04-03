@@ -3,7 +3,13 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.extension.makeItemModelKey
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationContexts
+import cc.mewcraft.wakame.item.template.ItemGenerationTrigger
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.item.toNMS
 
@@ -188,7 +194,6 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
         generate(ItemTemplateTypes.PORTABLE_CORE)
         generate(ItemTemplateTypes.CELLS)
         generate(ItemTemplateTypes.CRATE)
-        generate(ItemTemplateTypes.PLAYER_ABILITY)
 
         return koishstack
     }
