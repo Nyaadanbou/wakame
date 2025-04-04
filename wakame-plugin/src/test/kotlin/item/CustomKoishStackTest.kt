@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.attack.SpearAttack
 import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
 import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.HideAdditionalTooltip
@@ -21,7 +21,6 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
@@ -245,7 +244,7 @@ class CustomKoishStackTest : KoinTest {
                 val core = cell.core as? AttributeCore
                 assertNotNull(core)
 
-                fun assert(element: RegistryEntry<ElementType>, expectedMin: Double, expectedMax: Double) {
+                fun assert(element: RegistryEntry<Element>, expectedMin: Double, expectedMax: Double) {
                     val modMap = core.data.createAttributeModifiers(ZERO_KEY)
                     val modMin = modMap[Attributes.MIN_ATTACK_DAMAGE.of(element)]
                     val modMax = modMap[Attributes.MAX_ATTACK_DAMAGE.of(element)]
@@ -255,8 +254,8 @@ class CustomKoishStackTest : KoinTest {
                     assertEquals(expectedMax, modMax.amount)
                 }
 
-                val fire = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
-                val water = KoishRegistries.ELEMENT.getEntryOrThrow("water")
+                val fire = KoishRegistries2.ELEMENT.getEntryOrThrow("fire")
+                val water = KoishRegistries2.ELEMENT.getEntryOrThrow("water")
                 when (val actual = core.data.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
@@ -516,10 +515,10 @@ class CustomKoishStackTest : KoinTest {
         unboxed {
             val elements = it.elements
             val possibleElements = setOf(
-                KoishRegistries.ELEMENT.getEntryOrThrow("neutral"),
-                KoishRegistries.ELEMENT.getEntryOrThrow("water"),
-                KoishRegistries.ELEMENT.getEntryOrThrow("fire"),
-                KoishRegistries.ELEMENT.getEntryOrThrow("wind"),
+                KoishRegistries2.ELEMENT.getEntryOrThrow("neutral"),
+                KoishRegistries2.ELEMENT.getEntryOrThrow("water"),
+                KoishRegistries2.ELEMENT.getEntryOrThrow("fire"),
+                KoishRegistries2.ELEMENT.getEntryOrThrow("wind"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })

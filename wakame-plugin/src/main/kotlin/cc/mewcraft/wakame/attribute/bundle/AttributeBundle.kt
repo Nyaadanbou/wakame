@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.bundle
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 
@@ -19,7 +19,7 @@ sealed interface AttributeBundleTrait {
      * 元素.
      */
     interface Element : AttributeBundleTrait {
-        val element: RegistryEntry<ElementType>
+        val element: RegistryEntry<cc.mewcraft.wakame.element.Element>
     }
 
     /**
@@ -117,7 +117,7 @@ interface AttributeBundleR<T> : AttributeBundle, AttributeBundleTrait.Ranged<T> 
  */
 interface AttributeBundleSE<T> : AttributeBundle, AttributeBundleTrait.Scalar<T>, AttributeBundleTrait.Element {
     override val value: T
-    override val element: RegistryEntry<ElementType>
+    override val element: RegistryEntry<Element>
 }
 
 /**
@@ -131,5 +131,5 @@ interface AttributeBundleSE<T> : AttributeBundle, AttributeBundleTrait.Scalar<T>
 interface AttributeBundleRE<T> : AttributeBundle, AttributeBundleTrait.Ranged<T>, AttributeBundleTrait.Element {
     override val lower: T
     override val upper: T
-    override val element: RegistryEntry<ElementType>
+    override val element: RegistryEntry<Element>
 }

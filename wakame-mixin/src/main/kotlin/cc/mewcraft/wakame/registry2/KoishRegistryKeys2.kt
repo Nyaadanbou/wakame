@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.registry2
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -59,6 +60,9 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val ENTITY_REF = createRegistryKey<EntityRef>("entity_ref")
+
+    @JvmField
+    val ELEMENT = createRegistryKey<Element>("element")
 
     ///
 

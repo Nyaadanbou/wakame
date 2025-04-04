@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
@@ -67,7 +67,7 @@ internal interface DamageTagsBuilder {
  * 从配置文件反序列化得到的能够构建 [DamagePacket] 的构造器.
  */
 internal interface DamagePacketBuilder<T> {
-    val element: RegistryEntry<ElementType>
+    val element: RegistryEntry<Element>
     val min: T
     val max: T
     val rate: T
@@ -110,7 +110,7 @@ internal data class DirectDamageMetadataBuilder(
     private fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
-            val element: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getEntry(xelement) ?: KoishRegistries.ELEMENT.getDefaultEntry()
+            val element: RegistryEntry<Element> = KoishRegistries2.ELEMENT.getEntry(xelement) ?: KoishRegistries2.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(::DamageBundle)
@@ -132,7 +132,7 @@ internal data class VanillaDamageMetadataBuilder(
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
-    val element: RegistryEntry<ElementType>,
+    val element: RegistryEntry<Element>,
     val rate: Double = 1.0,
     val defensePenetration: Double = 0.0,
     val defensePenetrationRate: Double = 0.0,
@@ -198,7 +198,7 @@ internal data class DirectDamageTagsBuilder(
 internal data class DirectDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
     @Required
     override val min: Double,
     @Required
@@ -244,7 +244,7 @@ internal data class MolangDamageMetadataBuilder(
     fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
-            val element: RegistryEntry<ElementType> = KoishRegistries.ELEMENT.getEntry(xelement) ?: KoishRegistries.ELEMENT.getDefaultEntry()
+            val element: RegistryEntry<Element> = KoishRegistries2.ELEMENT.getEntry(xelement) ?: KoishRegistries2.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(::DamageBundle)
@@ -257,7 +257,7 @@ internal data class MolangDamageMetadataBuilder(
 internal data class MolangDamagePacketBuilder(
     @NodeKey
     @Required
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
     @Required
     override val min: Expression,
     @Required

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
@@ -17,7 +17,7 @@ import kotlin.random.Random
  * 创建一个 [DamageBundle].
  */
 fun DamageBundle(
-    packets: Map<RegistryEntry<ElementType>, DamagePacket> = emptyMap(),
+    packets: Map<RegistryEntry<Element>, DamagePacket> = emptyMap(),
 ): DamageBundle {
     return DamageBundleImpl(packets)
 }
@@ -47,7 +47,7 @@ interface DamageBundle {
     /**
      * 从伤害捆绑包中移除元素伤害包.
      */
-    fun remove(element: RegistryEntry<ElementType>): DamagePacket?
+    fun remove(element: RegistryEntry<Element>): DamagePacket?
 
     /**
      * 从伤害捆绑包中移除元素伤害包.
@@ -59,7 +59,7 @@ interface DamageBundle {
     /**
      * 从伤害捆绑包中获取元素伤害包.
      */
-    fun get(element: RegistryEntry<ElementType>): DamagePacket?
+    fun get(element: RegistryEntry<Element>): DamagePacket?
 
     /**
      * 从伤害捆绑包中获取元素伤害包.
@@ -82,7 +82,7 @@ interface DamageBundleFactory {
     /**
      * 创建一个 [DamageBundle].
      */
-    fun create(data: Map<RegistryEntry<ElementType>, DamagePacket>): DamageBundle
+    fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle
 
     /**
      * 创建一个 [DamageBundle].
@@ -112,7 +112,7 @@ interface DamageBundleFactory {
             instance = null
         }
 
-        override fun create(data: Map<RegistryEntry<ElementType>, DamagePacket>): DamageBundle {
+        override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
             return instance().create(data)
         }
 
@@ -134,7 +134,7 @@ fun DamagePacket(
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
     return DamagePacket(
-        element = KoishRegistries.ELEMENT.getEntryOrThrow(elementId),
+        element = KoishRegistries2.ELEMENT.getEntryOrThrow(elementId),
         min = min,
         max = max,
         rate = rate,
@@ -150,7 +150,7 @@ data class DamagePacket(
     /**
      * 伤害的元素类型.
      */
-    val element: RegistryEntry<ElementType>,
+    val element: RegistryEntry<Element>,
 
     /**
      * 伤害的最小值.
@@ -202,7 +202,7 @@ data class DamagePacket(
 
 internal object DefaultDamageBundleFactory : DamageBundleFactory {
     override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
-        val packets = mutableMapOf<RegistryEntry<ElementType>, DamagePacket>()
+        val packets = mutableMapOf<RegistryEntry<Element>, DamagePacket>()
         for ((id, packet) in data) {
             val element = getElementById(id)
             if (element != null) {
@@ -212,17 +212,17 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
         return DamageBundle(packets)
     }
 
-    override fun create(data: Map<RegistryEntry<ElementType>, DamagePacket>): DamageBundle {
+    override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
         return DamageBundle(data)
     }
 }
 
-private fun getElementById(id: String): RegistryEntry<ElementType>? {
-    return KoishRegistries.ELEMENT.getEntry(id)
+private fun getElementById(id: String): RegistryEntry<Element>? {
+    return KoishRegistries2.ELEMENT.getEntry(id)
 }
 
 private class DamageBundleImpl(
-    packets: Map<RegistryEntry<ElementType>, DamagePacket>,
+    packets: Map<RegistryEntry<Element>, DamagePacket>,
 ) : DamageBundle, Examinable {
     private val packets = Reference2ObjectArrayMap(packets)
 
@@ -242,7 +242,7 @@ private class DamageBundleImpl(
         packets.putIfAbsent(packet.element, packet)
     }
 
-    override fun remove(element: RegistryEntry<ElementType>): DamagePacket? {
+    override fun remove(element: RegistryEntry<Element>): DamagePacket? {
         return packets.remove(element)
     }
 
@@ -251,7 +251,7 @@ private class DamageBundleImpl(
         return packets.remove(element)
     }
 
-    override fun get(element: RegistryEntry<ElementType>): DamagePacket? {
+    override fun get(element: RegistryEntry<Element>): DamagePacket? {
         return packets[element]
     }
 

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -117,6 +118,12 @@ object KoishRegistries2 {
      */
     @JvmField
     val ENTITY_REF: WritableRegistry<EntityRef> = registerSimple(KoishRegistryKeys2.ENTITY_REF)
+
+    /**
+     * 元素的类型.
+     */
+    @JvmField
+    val ELEMENT: WritableDefaultedRegistry<Element> = registerDefaulted(KoishRegistryKeys2.ELEMENT, "neutral") // = koish:neutral
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

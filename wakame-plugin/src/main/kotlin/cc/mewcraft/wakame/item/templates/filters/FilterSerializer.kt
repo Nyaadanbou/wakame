@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
@@ -15,7 +15,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>> {
+internal object FilterSerializer : TypeSerializer2<Filter<ItemGenerationContext>> {
     const val NAMESPACE_FILTER = "item"
 
     override fun deserialize(type: Type, node: ConfigurationNode): Filter<ItemGenerationContext> {
@@ -26,12 +26,12 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
             AttributeFilter.TYPE -> {
                 val id = node.node("attribute").require<String>()
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<RegistryEntry<ElementType>>() // optional
+                val element = node.node("element").get<RegistryEntry<Element>>() // optional
                 AttributeFilter(inverted, id, operation, element)
             }
 
             ElementFilter.TYPE -> {
-                val element = node.node("element").require<RegistryEntry<ElementType>>()
+                val element = node.node("element").require<RegistryEntry<Element>>()
                 ElementFilter(inverted, element)
             }
 

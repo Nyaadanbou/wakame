@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.event.bukkit
 
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.damage.DamageMetadata
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
@@ -30,7 +30,7 @@ typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
 class NekoPostprocessDamageEvent
 internal constructor(
     val damageMetadata: DamageMetadata,
-    private val finalDamageMap: Reference2DoubleMap<RegistryEntry<ElementType>>,
+    private val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
     private val bukkitEvent: EntityDamageEvent,
 ) : Event(), Cancellable {
 
@@ -57,7 +57,7 @@ internal constructor(
     /**
      * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 `null`.
      */
-    fun getFinalDamage(element: RegistryEntry<ElementType>): Double? {
+    fun getFinalDamage(element: RegistryEntry<Element>): Double? {
         if (!finalDamageMap.containsKey(element)) return null
         return finalDamageMap.getDouble(element)
     }
@@ -72,7 +72,7 @@ internal constructor(
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      */
-    fun getFinalDamageMap(): Map<RegistryEntry<ElementType>, Double> {
+    fun getFinalDamageMap(): Map<RegistryEntry<Element>, Double> {
         return finalDamageMap
     }
 

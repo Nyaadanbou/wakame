@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeInstance
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeInstance
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.ImmutableMap
@@ -364,7 +364,7 @@ internal object AttributeSupplierSerializer {
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            if (!KoishRegistries.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
+                            if (!KoishRegistries2.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
                             val bundleIdWithElement = "$bundleId/${elementId.replace(':', '.')}"
                             val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNodeInMap)
@@ -373,7 +373,7 @@ internal object AttributeSupplierSerializer {
                         // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
-                        for (elementType in KoishRegistries.ELEMENT.entrySequence) {
+                        for (elementType in KoishRegistries2.ELEMENT.entrySequence) {
                             val bundleIdWithElement = "$bundleId/${elementType.getIdAsString().replace(':', '.')}"
                             val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNode)

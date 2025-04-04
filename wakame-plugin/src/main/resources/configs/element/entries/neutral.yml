@@ -4,10 +4,7 @@ version: 1
 # 该文件负责设置「默认元素」
 # 当游戏尝试寻找一个元素但不存在时将使用该元素
 # id 为 "neutral" 的元素将自动作为默认元素
-#
-# 禁止修改这里的节点: `binary_index`
 
-binary_index: 0
 name: "<color:#faff69>中立"
 styles: "<color:#faff69>"
 

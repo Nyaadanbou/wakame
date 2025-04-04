@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.attribute.bundle
 
 import cc.mewcraft.wakame.attribute.AttributeModifierSource
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.getByteOrNull
 import net.kyori.adventure.key.Key
@@ -16,7 +17,7 @@ import org.spongepowered.configurate.ConfigurationNode
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val ConstantAttributeBundle.element: RegistryEntry<ElementType>?
+val ConstantAttributeBundle.element: RegistryEntry<Element>?
     get() = (this as? AttributeBundleTrait.Element)?.element
 
 /**
@@ -251,7 +252,7 @@ internal data class ConstantAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleSE<Double> {
     constructor(
@@ -281,7 +282,7 @@ internal data class ConstantAttributeBundleRE(
     override val operation: Operation,
     override val lower: Double,
     override val upper: Double,
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleRE<Double> {
     constructor(
@@ -308,11 +309,10 @@ internal data class ConstantAttributeBundleRE(
     }
 }
 
-private fun CompoundTag.readElement(): RegistryEntry<ElementType> {
-    val id = getByte(ELEMENT_TYPE_FIELD).toInt()
-    // FIXME 临时实现
-    return KoishRegistries.ELEMENT.entrySequence.firstOrNull { type -> type.value.integerId == id }
-        ?: KoishRegistries.ELEMENT.getDefaultEntry()
+private fun CompoundTag.readElement(): RegistryEntry<Element> {
+    val id = getString(ELEMENT_TYPE_FIELD)
+    return KoishRegistries2.ELEMENT.getEntry(id)
+        ?: KoishRegistries2.ELEMENT.getDefaultEntry()
 }
 
 private fun CompoundTag.readOperation(): Operation {
@@ -333,11 +333,9 @@ private fun CompoundTag.writeNumber(key: String, value: Double) {
     putDouble(key, value)
 }
 
-private fun CompoundTag.writeElement(element: RegistryEntry<ElementType>) {
-    val value = element.value
-    // FIXME 临时实现
-    //val id = KoishRegistries.ELEMENT.getRawId(value).toByte()
-    putByte(ELEMENT_TYPE_FIELD, value.integerId.toByte())
+private fun CompoundTag.writeElement(element: RegistryEntry<Element>) {
+    val id = element.getIdAsString()
+    putString(ELEMENT_TYPE_FIELD, id)
 }
 
 private fun CompoundTag.writeOperation(operation: Operation) {

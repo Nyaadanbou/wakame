@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle.Quality
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -645,8 +645,8 @@ private class AttributeBinderREImpl(
 private val ConfigurationNode.operation: Operation
     get() = node("operation").string?.let(Operation.Companion::byName) ?: Operation.ADD
 
-private val ConfigurationNode.element: RegistryEntry<ElementType>
-    get() = node("element").require<RegistryEntry<ElementType>>()
+private val ConfigurationNode.element: RegistryEntry<Element>
+    get() = node("element").require<RegistryEntry<Element>>()
 
 private val ConfigurationNode.scalar: Double
     get() = node("value").require<Double>()

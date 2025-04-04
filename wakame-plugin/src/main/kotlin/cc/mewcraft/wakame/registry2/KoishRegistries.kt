@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.element.ElementType
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
@@ -43,12 +42,6 @@ object KoishRegistries {
      */
     @JvmField
     val ATTRIBUTE_BUNDLE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
-
-    /**
-     * 元素.
-     */
-    @JvmField
-    val ELEMENT: WritableDefaultedRegistry<ElementType> = registerDefaulted(KoishRegistryKeys.ELEMENT, "neutral") // = koish:neutral
 
     /**
      * 虚构的属性映射.

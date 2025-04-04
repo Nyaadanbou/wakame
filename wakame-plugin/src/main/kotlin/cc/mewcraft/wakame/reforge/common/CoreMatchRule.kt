@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
@@ -65,9 +65,9 @@ interface CoreMatchRule : Examinable {
  * [CoreMatchRule] 的序列化器.
  *
  * 依赖的序列化器:
- * - [cc.mewcraft.wakame.ability.TriggerVariantSerializer]
+ * - [cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariantSerializer]
  */
-internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
+internal object CoreMatchRuleSerializer : TypeSerializer2<CoreMatchRule> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRule {
         val typeNode = node.node("type")
         val rawType = typeNode.string ?: throw SerializationException(typeNode, javaTypeOf<String>(), "Missing key: 'type'")
@@ -96,7 +96,7 @@ internal object CoreMatchRuleSerializer : TypeSerializer<CoreMatchRule> {
         when (namespace) {
             Namespaces.ATTRIBUTE -> {
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<RegistryEntry<ElementType>>()
+                val element = node.node("element").get<RegistryEntry<Element>>()
                 return CoreMatchRuleAttribute(pattern, operation, element)
             }
 
@@ -151,7 +151,7 @@ private data object CoreMatchRuleAny : CoreMatchRule {
 private class CoreMatchRuleAttribute(
     override val path: Pattern,
     val operation: AttributeModifier.Operation?,
-    val element: RegistryEntry<ElementType>?,
+    val element: RegistryEntry<Element>?,
 ) : CoreMatchRule {
     override val priority: Int = 1
 

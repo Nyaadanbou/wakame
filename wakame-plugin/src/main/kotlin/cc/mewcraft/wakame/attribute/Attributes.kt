@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeProvider
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
@@ -130,7 +130,7 @@ object Attributes : AttributeProvider {
     }
 
     // "lazy" 意为不立马创建 ElementAttribute, 而仅仅是规定好如何创建 ElementAttribute.
-    private fun registerLazy(creator: (RegistryEntry<ElementType>) -> ElementAttribute): AttributeGetter {
+    private fun registerLazy(creator: (RegistryEntry<Element>) -> ElementAttribute): AttributeGetter {
         return AttributeGetterImpl(creator)
     }
 }
@@ -144,13 +144,13 @@ object Attributes : AttributeProvider {
  *
  * ### 设计哲学
  * 首先要了解 [ElementAttribute] 跟 [RangedAttribute] 的区别.
- * [RangedAttribute] 的字段都是原始类型, 而 [ElementAttribute] 还带有一个 [ElementType] 的字段.
- * 也就是说, 想要创建 [ElementAttribute] 必须得先有一个 [ElementType] 实例, 这种依赖关系使得代码变得复杂.
- * 这就直接导致了, 比如说, 客户端代码想要获取一个 [ElementAttribute], 那么它必须得先有一个 [ElementType] 实例.
+ * [RangedAttribute] 的字段都是原始类型, 而 [ElementAttribute] 还带有一个 [Element] 的字段.
+ * 也就是说, 想要创建 [ElementAttribute] 必须得先有一个 [Element] 实例, 这种依赖关系使得代码变得复杂.
+ * 这就直接导致了, 比如说, 客户端代码想要获取一个 [ElementAttribute], 那么它必须得先有一个 [Element] 实例.
  *
- * 而在很多时候, 客户端代码并不关心 [ElementType] 实例是什么, 它只是想要指定一个*任意元素*的 [ElementAttribute] 实例.
+ * 而在很多时候, 客户端代码并不关心 [Element] 实例是什么, 它只是想要指定一个*任意元素*的 [ElementAttribute] 实例.
  * 为了解决这个问题, 我们引入了 [AttributeGetter] 这个“中间对象”.
- * 这个中间对象相当于是一个 `[ElementType] -> [ElementAttribute]` 的函数, 而不是一个直接的 [ElementAttribute] 实例.
+ * 这个中间对象相当于是一个 `[Element] -> [ElementAttribute]` 的函数, 而不是一个直接的 [ElementAttribute] 实例.
  *
  * 事实证明这种设计极大了降低了代码的重复度, 我们不需要在 [Attributes] 的字段里为每一种可能的元素都声明一个 [ElementAttribute] 实例.
  * 而是只需要创建一个 [AttributeGetter] 实例, 然后通过这个实例来获取 [ElementAttribute] 实例即可.
@@ -159,7 +159,7 @@ object Attributes : AttributeProvider {
 interface AttributeGetter {
     /**
      * 获取 [ElementAttribute] 实例.
-     * 如果传入的 [id] 无法找到对应的 [ElementType] 实例, 则返回 `null`.
+     * 如果传入的 [id] 无法找到对应的 [Element] 实例, 则返回 `null`.
      * 对于同一个 [id] 的字符串值, 该函数始终会返回同一个 [ElementAttribute] 实例.
      *
      * @param id 元素类型的唯一标识
@@ -169,20 +169,20 @@ interface AttributeGetter {
     /**
      * 获取 [ElementAttribute] 实例.
      * 该函数始终会返回一个 [ElementAttribute] 实例.
-     * 对于同一个 [ElementType] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
+     * 对于同一个 [Element] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
      *
      * @param element 元素类型
      */
-    fun of(element: ElementType): ElementAttribute
+    fun of(element: Element): ElementAttribute
 
     /**
      * 获取 [ElementAttribute] 实例.
      * 该函数始终会返回一个 [ElementAttribute] 实例.
-     * 对于同一个 [ElementType] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
+     * 对于同一个 [Element] 实例, 该函数始终会返回同一个 [ElementAttribute] 实例.
      *
      * @param element 元素类型
      */
-    fun of(element: RegistryEntry<ElementType>): ElementAttribute
+    fun of(element: RegistryEntry<Element>): ElementAttribute
 }
 
 
@@ -190,7 +190,7 @@ interface AttributeGetter {
 
 
 private class AttributeGetterImpl(
-    private val creator: (RegistryEntry<ElementType>) -> ElementAttribute,
+    private val creator: (RegistryEntry<Element>) -> ElementAttribute,
 ) : AttributeGetter {
 
     init {
@@ -198,21 +198,21 @@ private class AttributeGetterImpl(
     }
 
     // element -> element attribute
-    private val mappings: ConcurrentHashMap<RegistryEntry<ElementType>, ElementAttribute> = ConcurrentHashMap()
+    private val mappings: ConcurrentHashMap<RegistryEntry<Element>, ElementAttribute> = ConcurrentHashMap()
 
     override fun of(id: String): ElementAttribute? {
-        val elem = KoishRegistries.ELEMENT.getEntry(id)
+        val elem = KoishRegistries2.ELEMENT.getEntry(id)
         if (elem == null) {
             return null
         }
         return of(elem)
     }
 
-    override fun of(element: ElementType): ElementAttribute {
-        return of(KoishRegistries.ELEMENT.wrapAsEntry(element))
+    override fun of(element: Element): ElementAttribute {
+        return of(KoishRegistries2.ELEMENT.wrapAsEntry(element))
     }
 
-    override fun of(element: RegistryEntry<ElementType>): ElementAttribute {
+    override fun of(element: RegistryEntry<Element>): ElementAttribute {
         return mappings.computeIfAbsent(element) { k ->
             registerAttribute(creator(k))
         }
@@ -261,7 +261,7 @@ private class AttributeGetterImpl(
         fun init() {
             // 初始化每一个 AttributeGetter 的每一种 Element
             for (getter: AttributeGetter in INSTANCES) {
-                for (element in KoishRegistries.ELEMENT.entrySequence) {
+                for (element in KoishRegistries2.ELEMENT.entrySequence) {
                     getter.of(element)
                 }
             }

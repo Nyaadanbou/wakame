@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.attribute.bundle
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.registry2.KoishRegistries
@@ -14,7 +14,7 @@ import kotlin.math.min
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
  */
-val VariableAttributeBundle.element: RegistryEntry<ElementType>?
+val VariableAttributeBundle.element: RegistryEntry<Element>?
     get() = (this as? AttributeBundleTrait.Element)?.element
 
 /**
@@ -76,7 +76,7 @@ internal data class VariableAttributeBundleRE(
     override val operation: Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
 ) : VariableAttributeBundle, AttributeBundleRE<RandomizedValue> {
     override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
@@ -116,7 +116,7 @@ internal data class VariableAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
     override val value: RandomizedValue,
-    override val element: RegistryEntry<ElementType>,
+    override val element: RegistryEntry<Element>,
 ) : VariableAttributeBundle, AttributeBundleSE<RandomizedValue> {
     override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
         populateContextWithDefault(context)

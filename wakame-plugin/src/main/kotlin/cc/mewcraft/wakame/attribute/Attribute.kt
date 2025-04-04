@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries
@@ -234,7 +234,7 @@ protected constructor(
 }
 
 /**
- * An [Attribute] type with an [ElementType].
+ * An [Attribute] type with an [Element].
  */
 open class ElementAttribute
 protected constructor(
@@ -243,7 +243,7 @@ protected constructor(
     defaultValue: Provider<Double>,
     minValue: Provider<Double>,
     maxValue: Provider<Double>,
-    val element: RegistryEntry<ElementType>,
+    val element: RegistryEntry<Element>,
     vanilla: Boolean = false,
 ) : RangedAttribute(
     id + ELEMENT_SEPARATOR + element.getIdAsString(),
@@ -279,7 +279,7 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: RegistryEntry<ElementType>,
+        element: RegistryEntry<Element>,
         vanilla: Boolean = false,
     ) : this(
         id = id,
@@ -296,7 +296,7 @@ protected constructor(
         defaultValue: Double,
         minValue: Double,
         maxValue: Double,
-        element: RegistryEntry<ElementType>,
+        element: RegistryEntry<Element>,
         vanilla: Boolean = false,
     ) : this(
         id = descriptionId,

@@ -17,7 +17,7 @@ import cc.mewcraft.wakame.damage.mapping.AttackCharacteristicDamageMappings
 import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
 import cc.mewcraft.wakame.damage.mapping.NullCausingDamageMappings
 import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
@@ -300,7 +300,7 @@ internal object DamageManager : DamageManagerApi {
     fun calculateFinalDamageMap(
         damageMetadata: DamageMetadata,
         damagee: LivingEntity,
-    ): Reference2DoubleMap<RegistryEntry<ElementType>> {
+    ): Reference2DoubleMap<RegistryEntry<Element>> {
         val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
             error("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
         }
@@ -316,14 +316,14 @@ internal object DamageManager : DamageManagerApi {
     private fun calculateFinalDamageMap(
         damageMetadata: DamageMetadata,
         damageeAttributes: AttributeMap,
-    ): Reference2DoubleMap<RegistryEntry<ElementType>> {
+    ): Reference2DoubleMap<RegistryEntry<Element>> {
         val damagePackets = damageMetadata.damageBundle.packets()
         if (damagePackets.isEmpty()) {
             // 记录空伤害包以方便定位问题
             LOGGER.warn("Empty damage bundle!", IllegalStateException())
             return Reference2DoubleMaps.emptyMap()
         } else {
-            val res = Reference2DoubleOpenHashMap<RegistryEntry<ElementType>>()
+            val res = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
             damagePackets.forEach { damagePacket ->
                 val elementType = damagePacket.element
                 val criticalStrikeMetadata = damageMetadata.criticalStrikeMetadata

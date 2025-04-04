@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.extension
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -80,7 +80,7 @@ fun NekoStack.hideUnbreakable() = this.bukkitStack.hideUnbreakable()
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
 var NekoStack.rarity: RegistryEntry<Rarity> by mapped(ItemComponentTypes.RARITY, KoishRegistries2.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
-var NekoStack.elements: Set<RegistryEntry<ElementType>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
+var NekoStack.elements: Set<RegistryEntry<Element>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
 var NekoStack.kizamiz: Set<RegistryEntry<Kizami>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)

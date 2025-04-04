@@ -3,10 +3,10 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -133,7 +133,7 @@ internal object VanillaDamageMetadata {
         )
     }
 
-    operator fun invoke(element: RegistryEntry<ElementType>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
+    operator fun invoke(element: RegistryEntry<Element>, damageValue: Double, defensePenetration: Double, defensePenetrationRate: Double): DamageMetadata {
         return invoke(
             damageBundle {
                 single(element) {
@@ -148,7 +148,7 @@ internal object VanillaDamageMetadata {
     }
 
     operator fun invoke(damageValue: Double): DamageMetadata {
-        return invoke(KoishRegistries.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
+        return invoke(KoishRegistries2.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
     }
 }
 

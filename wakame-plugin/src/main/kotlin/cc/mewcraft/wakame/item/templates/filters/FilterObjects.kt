@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
@@ -32,7 +32,7 @@ data class AttributeFilter(
     override val invert: Boolean,
     private val id: String,
     private val operation: Operation?,
-    private val element: RegistryEntry<ElementType>?,
+    private val element: RegistryEntry<Element>?,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "attribute")
@@ -79,7 +79,7 @@ data class AttributeFilter(
  */
 data class ElementFilter(
     override val invert: Boolean,
-    private val element: RegistryEntry<ElementType>,
+    private val element: RegistryEntry<Element>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "element")

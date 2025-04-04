@@ -3,10 +3,11 @@ package attribute
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
+import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import io.mockk.mockk
 import org.bukkit.attribute.Attributable
 import org.junit.jupiter.api.AfterAll
@@ -43,7 +44,7 @@ class DefaultAttributeSerializationTest : KoinTest {
 
             KoishDataPaths.initialize()
 
-            ElementTypeRegistryLoader.init()
+            ElementRegistryLoader.init()
             Attributes.init()
             AttributeFacadeRegistryLoader.init()
             AttributeSupplierRegistryLoader.init()
@@ -57,9 +58,9 @@ class DefaultAttributeSerializationTest : KoinTest {
     }
 
     // 测试用的元素
-    private val defaultElement = KoishRegistries.ELEMENT.getDefaultEntry()
-    private val fireElement = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
-    private val windElement = KoishRegistries.ELEMENT.getEntryOrThrow("wind")
+    private val defaultElement = KoishRegistries2.ELEMENT.getDefaultEntry()
+    private val fireElement = KoishRegistries2.ELEMENT.getEntryOrThrow("fire")
+    private val windElement = KoishRegistries2.ELEMENT.getEntryOrThrow("wind")
 
     // 测试用的属性
     private val lifesteal = Attributes.LIFESTEAL

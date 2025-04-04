@@ -33,9 +33,9 @@ object ElementStackManager {
      * @param element 元素效果的元素
      * @param amount 应用层数
      */
-    fun applyElementStack(element: RegistryEntry<ElementType>, amount: Int, target: KoishEntity) {
-        require(amount > 0) { "Amount must be greater than 0" }
-        val stackEffect = element.value.stackEffect
+    fun applyElementStack(element: RegistryEntry<Element>, amount: Int, target: KoishEntity) {
+        require(amount > 0) { "amount > 0" }
+        val stackEffect = element.unwrap().stackEffect
         if (stackEffect == null)
             return
         if (containsElementStack(target, element)) {
@@ -57,15 +57,15 @@ object ElementStackManager {
         target[ElementStackContainer][element] = elementStackEntity
     }
 
-    fun containsElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>): Boolean {
+    fun containsElementStack(entity: KoishEntity, element: RegistryEntry<Element>): Boolean {
         if (!entity.contains(ElementStackContainer))
             return false
         val elementEntity = entity[ElementStackContainer][element]
         return elementEntity != null
     }
 
-    private fun addElementStack(entity: KoishEntity, element: RegistryEntry<ElementType>, amount: Int) = with(Fleks.INSTANCE.world) {
-        require(amount > 0) { "Amount must be greater than 0" }
+    private fun addElementStack(entity: KoishEntity, element: RegistryEntry<Element>, amount: Int) = with(Fleks.INSTANCE.world) {
+        require(amount > 0) { "amount > 0" }
         val stack = entity[ElementStackContainer][element] ?: return@with
         stack[ElementStackComponent].amount += amount
         stack[TickCountComponent].tick = 0

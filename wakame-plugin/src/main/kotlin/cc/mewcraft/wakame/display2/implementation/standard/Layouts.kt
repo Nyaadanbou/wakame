@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -37,7 +38,7 @@ internal data class AttributeCoreTextMeta(
     ) {
         init { // validate values
             this.operationIndex.forEach { Operation.byName(it) ?: error("'$it' is not a valid attribute modifier operation, check your renderer config") }
-            this.elementIndex.forEach { if (!KoishRegistries.ELEMENT.containsId(it)) error("'$it' is not a valid element type, check your renderer config") }
+            this.elementIndex.forEach { if (!KoishRegistries2.ELEMENT.containsId(it)) error("'$it' is not a valid element type, check your renderer config") }
         }
     }
 }

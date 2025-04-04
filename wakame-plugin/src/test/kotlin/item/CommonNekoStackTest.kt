@@ -2,9 +2,10 @@ package item
 
 import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.ability.AbilityRegistryLoader
+import cc.mewcraft.wakame.ability2.AbilityMetaRegistryLoader
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
+import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
@@ -51,9 +52,10 @@ object CommonNekoStackTest {
         KoishDataPaths.initialize()
 
         // 按依赖顺序, 初始化注册表
-        ElementTypeRegistryLoader.init()
+        ElementRegistryLoader.init()
         AttributeFacadeRegistryLoader.init()
-        AbilityRegistryLoader.init()
+        AbilityMetaRegistryLoader.init()
+        AbilityTriggerRegistryLoader.init()
         KizamiRegistryLoader.init()
         RarityRegistryLoader.init()
         LevelRarityMappingRegistryLoader.init()

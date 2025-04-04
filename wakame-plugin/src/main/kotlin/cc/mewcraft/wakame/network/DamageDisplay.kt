@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.require
@@ -118,7 +118,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
         val damageMap = context.getFinalDamageMap()
         val elementType = damageMap.maxWithOrNull(
             compareBy { it.value }
-        )?.key ?: KoishRegistries.ELEMENT.getDefaultEntry()
+        )?.key ?: KoishRegistries2.ELEMENT.getDefaultEntry()
         val damageValueText = MM.deserialize(
             damageValueText,
             Placeholder.component("element_name", elementType.value.displayName),
