@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.item2.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.*
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData.Companion.SERIALIZER
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import io.papermc.paper.datacomponent.DataComponentTypes

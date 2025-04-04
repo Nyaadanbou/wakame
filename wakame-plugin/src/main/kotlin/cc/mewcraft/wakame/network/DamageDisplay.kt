@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.network
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
@@ -16,6 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.require

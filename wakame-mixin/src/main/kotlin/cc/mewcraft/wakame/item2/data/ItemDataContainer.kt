@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec

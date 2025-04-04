@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus

@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -70,7 +70,7 @@ data object HandAttack : AttackType
 /**
  * [AttackType] 的序列化器.
  */
-internal object AttackTypeSerializer : TypeSerializer<AttackType> {
+internal object AttackTypeSerializer : TypeSerializer2<AttackType> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): AttackType {
         return HandAttack // 默认的攻击类型
     }

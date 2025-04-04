@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer.Builder
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.kyori.examination.Examinable

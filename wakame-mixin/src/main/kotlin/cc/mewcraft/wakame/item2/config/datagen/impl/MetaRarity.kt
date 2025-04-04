@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
@@ -9,6 +8,7 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable

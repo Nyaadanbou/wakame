@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -90,7 +90,7 @@ internal class SimpleRecipe(
 /**
  * [Recipe] 的序列化器.
  */
-internal object StationRecipeSerializer : TypeSerializer<Recipe> {
+internal object StationRecipeSerializer : TypeSerializer2<Recipe> {
     val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
 
     override fun deserialize(type: Type, node: ConfigurationNode): Recipe {

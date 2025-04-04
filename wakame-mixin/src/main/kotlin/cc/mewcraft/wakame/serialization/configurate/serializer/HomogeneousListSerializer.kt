@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.applyIfNull
 import io.papermc.paper.registry.RegistryAccess

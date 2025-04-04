@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.damage.mapping
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable

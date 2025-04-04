@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability2.meta
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import com.github.quillraven.fleks.Component
 import org.spongepowered.configurate.ConfigurationNode

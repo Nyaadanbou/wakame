@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.data.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE

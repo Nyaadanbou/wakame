@@ -2,11 +2,11 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -127,21 +127,21 @@ internal object RerollingTableSerializer {
         )
     }
 
-    private object TableCurrencyCostSerializer : TypeSerializer<RerollingTable.TableCurrencyCost> {
+    private object TableCurrencyCostSerializer : TypeSerializer2<RerollingTable.TableCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.TableCurrencyCost {
             val code = node.require<String>()
             return SimpleRerollingTable.TableCurrencyCost(code)
         }
     }
 
-    private object CellCurrencyCostSerializer : TypeSerializer<RerollingTable.CellCurrencyCost> {
+    private object CellCurrencyCostSerializer : TypeSerializer2<RerollingTable.CellCurrencyCost> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellCurrencyCost {
             val code = node.require<String>()
             return SimpleRerollingTable.CellCurrencyCost(code)
         }
     }
 
-    private object CellRuleSerializer : TypeSerializer<RerollingTable.CellRule> {
+    private object CellRuleSerializer : TypeSerializer2<RerollingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellRule {
             val currencyCost = node.node("currency_cost").require<RerollingTable.CellCurrencyCost>()
             return SimpleRerollingTable.CellRule(currencyCost)

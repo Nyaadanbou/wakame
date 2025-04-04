@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.util
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.StyleBuilderApplicable
 import net.kyori.adventure.text.minimessage.tag.Tag
@@ -285,7 +285,7 @@ data class SlotDisplayLoreData(
                     }
 
                     data class Result(
-                        val resolver: TagResolver, val preprocess: Preprocess
+                        val resolver: TagResolver, val preprocess: Preprocess,
                     )
 
                     @ApiStatus.Internal
@@ -430,7 +430,7 @@ data class SlotDisplayLoreData(
     }
 }
 
-internal object SlotDisplayLoreDataSerializer : TypeSerializer<SlotDisplayLoreData> {
+internal object SlotDisplayLoreDataSerializer : TypeSerializer2<SlotDisplayLoreData> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): SlotDisplayLoreData {
         val rawTextList = node.getList<String>(emptyList())

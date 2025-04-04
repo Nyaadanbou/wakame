@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
 import cc.mewcraft.wakame.util.item.itemNameOrType
@@ -19,7 +19,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 import java.util.stream.Stream
-import kotlin.collections.set
 
 /**
  * 合成站的一项输入要求.
@@ -178,7 +177,7 @@ internal data class ExpChoice(
 /**
  * [RecipeChoice] 的序列化器.
  */
-internal object StationChoiceSerializer : TypeSerializer<RecipeChoice> {
+internal object StationChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val choiceType = node.node("type").require<String>()
         when (choiceType) {

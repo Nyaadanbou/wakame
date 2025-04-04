@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.kizami2.KizamiEffect
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.user.attributeContainer
 import cc.mewcraft.wakame.util.require
 import org.bukkit.entity.Player

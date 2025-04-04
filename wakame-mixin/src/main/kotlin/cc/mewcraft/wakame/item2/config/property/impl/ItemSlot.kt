@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item2.config.property.impl
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.require

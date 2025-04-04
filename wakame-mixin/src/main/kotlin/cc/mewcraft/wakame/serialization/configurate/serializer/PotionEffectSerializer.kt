@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType

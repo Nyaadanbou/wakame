@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.toKotlinRange

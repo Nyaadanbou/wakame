@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.joml.Vector3f
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get

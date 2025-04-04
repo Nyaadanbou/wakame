@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.templates.components.cells
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CellArchetypeSerializer.HINT_NODE_SELECTORS
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.random3.GroupSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
@@ -26,7 +26,7 @@ interface CellArchetype {
  * [CellArchetype] 的标准实现.
  */
 internal class SimpleCellArchetype(
-    override val core: Group<CoreArchetype, ItemGenerationContext>
+    override val core: Group<CoreArchetype, ItemGenerationContext>,
 ) : CellArchetype
 
 /**
@@ -42,7 +42,7 @@ internal class SimpleCellArchetype(
  *   core: group_b # 这只是一个到指定节点的 *路径*
  * ```
  */
-internal object CellArchetypeSerializer : TypeSerializer<CellArchetype> {
+internal object CellArchetypeSerializer : TypeSerializer2<CellArchetype> {
     val HINT_NODE_SELECTORS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_selectors", typeTokenOf())
 
     /**

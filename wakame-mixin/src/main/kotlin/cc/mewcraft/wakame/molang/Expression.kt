@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.molang
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get

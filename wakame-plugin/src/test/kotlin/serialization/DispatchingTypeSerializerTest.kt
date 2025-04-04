@@ -1,8 +1,8 @@
 package serialization
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.SimpleRegistry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register

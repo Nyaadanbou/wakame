@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
@@ -527,21 +527,21 @@ private fun ConfigurationNode.getRecipeKey(): Key {
  */
 internal class RecipeTypeBridge<T : VanillaRecipe>(
     val typeToken: TypeToken<T>,
-    val serializer: TypeSerializer<T>,
+    val serializer: TypeSerializer2<T>,
 ) {
     constructor(
         typeToken: TypeToken<T>,
         serializer: (Type, ConfigurationNode) -> T,
     ) : this(
         typeToken,
-        TypeSerializer<T> { type, node -> serializer(type, node) }
+        TypeSerializer2<T> { type, node -> serializer(type, node) }
     )
 }
 
 /**
  * [VanillaRecipe] 的序列化器.
  */
-internal object VanillaRecipeSerializer : TypeSerializer<VanillaRecipe> {
+internal object VanillaRecipeSerializer : TypeSerializer2<VanillaRecipe> {
     /**
      * ## Node structure
      * ```yaml

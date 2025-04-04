@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key

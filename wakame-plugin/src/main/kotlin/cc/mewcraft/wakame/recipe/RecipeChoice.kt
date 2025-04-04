@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -74,7 +74,7 @@ data class MultiRecipeChoice(
 /**
  * [RecipeChoice] 的序列化器.
  */
-internal object RecipeChoiceSerializer : TypeSerializer<RecipeChoice> {
+internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
         val itemXList = node.getList<ItemX>(emptyList())
         return when (itemXList.size) {

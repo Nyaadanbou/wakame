@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item2.config.property.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.item.toNMS

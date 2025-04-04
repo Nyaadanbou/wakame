@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.random3
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.spongepowered.configurate.ConfigurationNode
@@ -8,7 +8,7 @@ import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.contains
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.Collections
+import java.util.*
 
 /**
  * [Group] 是一个包含了若干 [Pool] 的集合
@@ -108,7 +108,7 @@ interface Group<S, C : RandomSelectorContext> {
  * @param V the type of content
  * @param C the type of context
  */
-abstract class GroupSerializer<V, C : RandomSelectorContext> : TypeSerializer<Group<V, C>> {
+abstract class GroupSerializer<V, C : RandomSelectorContext> : TypeSerializer2<Group<V, C>> {
     companion object Constants {
         val HINT_NODE_SHARED_POOLS: RepresentationHint<ConfigurationNode> = RepresentationHint.of("node_shared_pools", typeTokenOf<ConfigurationNode>())
         private const val PATH_FILTERS = "filters"

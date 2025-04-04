@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable

@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.require
@@ -18,7 +18,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.*
 import java.util.stream.Stream
 
 
@@ -117,7 +116,7 @@ data class CustomItemSlot(
 /**
  * [ItemSlot] 的序列化器.
  */
-object ItemSlotSerializer : TypeSerializer<ItemSlot> {
+object ItemSlotSerializer : TypeSerializer2<ItemSlot> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemSlot {
         return ItemSlot.empty()
     }

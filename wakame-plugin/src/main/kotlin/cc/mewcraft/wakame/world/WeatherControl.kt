@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.world
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.cooldown.Cooldown
 import cc.mewcraft.wakame.util.javaTypeOf
 import cc.mewcraft.wakame.util.require
@@ -68,7 +68,7 @@ object WeatherControl {
 
 // type serializer
 
-internal object WeatherControlActionSerializer : TypeSerializer<WeatherControl.Action> {
+internal object WeatherControlActionSerializer : TypeSerializer2<WeatherControl.Action> {
     private val TYPE_MAPPINGS: Map<WeatherControl.ActionType, KType> = mapOf(
         WeatherControl.ActionType.SET_STORM to typeOf<SetStorm>(),
         WeatherControl.ActionType.SET_WEATHER_DURATION to typeOf<SetWeatherDuration>(),
