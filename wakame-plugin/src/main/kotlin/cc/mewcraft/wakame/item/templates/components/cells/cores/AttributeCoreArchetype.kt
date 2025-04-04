@@ -20,7 +20,7 @@ fun AttributeCoreArchetype(
     id: Key,
     node: ConfigurationNode,
 ): AttributeCoreArchetype = SimpleAttributeCoreArchetype(
-    id = id, data = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNodeToVariable(node)
+    id = id, data = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToVariable(node)
 )
 
 /**

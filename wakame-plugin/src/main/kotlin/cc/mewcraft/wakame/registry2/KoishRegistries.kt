@@ -16,7 +16,7 @@ object KoishRegistries {
     ///
 
     /**
-     * 属性.
+     * 属性的类型.
      */
     @JvmField
     val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys.ATTRIBUTE)
@@ -36,10 +36,10 @@ object KoishRegistries {
     val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
-     * 属性块的 Facade.
+     * 属性块 [cc.mewcraft.wakame.attribute.bundle.AttributeBundle] 的外观, 用于访问属性块相关的数据和逻辑.
      */
     @JvmField
-    val ATTRIBUTE_BUNDLE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
+    val ATTRIBUTE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_BUNDLE_FACADE)
 
     /**
      * 虚构的属性映射.

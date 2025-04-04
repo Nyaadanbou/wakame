@@ -181,7 +181,7 @@ data class AttributeCore(
          * @see ConstantAttributeBundle 了解 NBT 结构
          */
         fun fromNbt(id: Key, nbt: CompoundTag): AttributeCore {
-            val data = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNbtToConstant(nbt)
+            val data = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNbtToConstant(nbt)
             return AttributeCore(id, data)
         }
 
@@ -194,7 +194,7 @@ data class AttributeCore(
          * @see ConstantAttributeBundle 了解 Node 结构
          */
         fun fromNode(id: Key, node: ConfigurationNode): AttributeCore {
-            val data = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id.value()).convertNodeToConstant(node)
+            val data = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToConstant(node)
             return AttributeCore(id, data)
         }
 

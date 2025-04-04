@@ -22,7 +22,7 @@ val VariableAttributeBundle.element: RegistryEntry<Element>?
  */
 fun VariableAttributeBundle(
     type: String, node: ConfigurationNode,
-): VariableAttributeBundle = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(type).convertNodeToVariable(node)
+): VariableAttributeBundle = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(type).convertNodeToVariable(node)
 
 /**
  * 代表一个数值可以变化的 [AttributeBundle].

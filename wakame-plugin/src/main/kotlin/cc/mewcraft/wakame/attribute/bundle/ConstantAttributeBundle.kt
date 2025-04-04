@@ -64,7 +64,7 @@ val ConstantAttributeBundle.element: RegistryEntry<Element>?
 fun ConstantAttributeBundle(
     id: String, tag: CompoundTag,
 ): ConstantAttributeBundle {
-    return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
+    return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
 }
 
 /**
@@ -115,7 +115,7 @@ fun ConstantAttributeBundle(
 fun ConstantAttributeBundle(
     id: String, node: ConfigurationNode,
 ): ConstantAttributeBundle {
-    return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).convertNodeToConstant(node)
+    return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
 }
 
 /**
@@ -137,9 +137,9 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract val quality: Quality?
 
     val displayName: Component
-        get() = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createTooltipName(this)
+        get() = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
     val description: List<Component>
-        get() = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createTooltipLore(this)
+        get() = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
 
     /**
      * 属性核心的“数值质量”.
@@ -182,7 +182,7 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract fun saveNbt(): CompoundTag
 
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
-        return KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
+        return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
     }
 }
 

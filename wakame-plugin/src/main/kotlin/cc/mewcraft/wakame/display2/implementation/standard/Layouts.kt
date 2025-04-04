@@ -26,7 +26,7 @@ internal data class AttributeCoreTextMeta(
         val sourceId = sourceIndex.value()
         val combiner = StringCombiner(sourceId, ".") {
             addList(derivation.operationIndex)
-            addList(derivation.elementIndex, KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.getOrThrow(sourceId).bundleTrait.has<AttributeBundleTrait.Element>())
+            addList(derivation.elementIndex, KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(sourceId).bundleTrait.has<AttributeBundleTrait.Element>())
         }
         val combinations = combiner.combine()
         return combinations.map { Key.key(sourceNamespace, it) }

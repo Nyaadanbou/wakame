@@ -50,9 +50,9 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.resetRegistry()
+        KoishRegistries.ATTRIBUTE_FACADE.resetRegistry()
         addAll()
-        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.freeze()
+        KoishRegistries.ATTRIBUTE_FACADE.freeze()
     }
 
     /**
@@ -115,7 +115,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
 
     private operator fun <T : ConstantAttributeBundle, S : VariableAttributeBundle> AttributeFacade<T, S>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
-        KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.add(
+        KoishRegistries.ATTRIBUTE_FACADE.add(
             id = Identifier.key(KOISH_NAMESPACE, id),
             value = (this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
         )

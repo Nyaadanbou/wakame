@@ -58,7 +58,7 @@ class CheckMissingAttributeConfigTest : KoinTest {
         val config = Configs[AttributeFacadeRegistryLoader.CONFIG_ID]
 
         val rootNode = config.get()
-        val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.ids
+        val idsPresentInRegistry = KoishRegistries.ATTRIBUTE_FACADE.ids
         val idsPresentInConfig = rootNode.childrenMap().keys.map(Any::toString).map(Identifiers::of)
         val missingIdsInConfig = idsPresentInRegistry subtract idsPresentInConfig.toSet()
 

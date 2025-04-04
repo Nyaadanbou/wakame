@@ -60,7 +60,7 @@ internal data class CellularAttributeRendererFormat(
     private val diffFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.containsId(id) }
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries.ATTRIBUTE_FACADE.containsId(id) }
 
     /**
      * @param id 核孔的 id
