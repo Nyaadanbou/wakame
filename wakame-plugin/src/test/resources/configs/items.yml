@@ -119,14 +119,6 @@ components:
     enabled: true
     display_name: "Reforge History"
 
-  skin:
-    enabled: true
-    display_name: "Skin"
-
-  skin_owner:
-    enabled: true
-    display_name: "Skin Owner"
-
   stored_enchantments:
     enabled: true
     display_name: "Stored Enchantments"

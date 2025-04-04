@@ -74,8 +74,6 @@ object ItemConstants {
     const val PORTABLE_CORE = "portable_core"
     const val RARITY = "rarity"
     const val REFORGE_HISTORY = "reforge_history"
-    const val SKIN = "skin"
-    const val SKIN_OWNER = "skin_owner"
     const val STANDALONE_CELL = "standalone_cell"
     const val STORED_ENCHANTMENTS = "stored_enchantments"
     const val TOOL = "tool"

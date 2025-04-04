@@ -820,16 +820,6 @@ class CustomKoishStackTest : KoinTest {
     }
 
     @Test
-    fun `component - skin`() {
-
-    }
-
-    @Test
-    fun `component - skin_owner`() {
-
-    }
-
-    @Test
     fun `component - stored_enchantments`() {
         val prototype = readCustomPrototype("data", "stored_enchantments")
         val template = prototype.templates.get(ItemTemplateTypes.STORED_ENCHANTMENTS)

@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.components.ItemSkin
 
 object KoishRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
@@ -55,12 +54,6 @@ object KoishRegistries {
      */
     @JvmField
     val ITEM: WritableDefaultedFuzzyRegistry<NekoItem> = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, "internal:unknown")
-
-    /**
-     * 物品皮肤.
-     */
-    @JvmField
-    val ITEM_SKIN: WritableRegistry<ItemSkin> = registerSimple(KoishRegistryKeys.ITEM_SKIN)
 
     /**
      * 物品图鉴中物品的类别.

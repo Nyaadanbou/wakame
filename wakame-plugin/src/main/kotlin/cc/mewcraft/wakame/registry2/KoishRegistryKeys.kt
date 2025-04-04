@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.components.ItemSkin
 import cc.mewcraft.wakame.util.Identifiers
 
 object KoishRegistryKeys {
@@ -32,9 +31,6 @@ object KoishRegistryKeys {
 
     @JvmField
     val ITEM = createRegistryKey<NekoItem>("item")
-
-    @JvmField
-    val ITEM_SKIN = createRegistryKey<ItemSkin>("item_skin")
 
     @JvmField
     val ITEM_CATEGORY = createRegistryKey<CatalogItemCategory>("item_category")
