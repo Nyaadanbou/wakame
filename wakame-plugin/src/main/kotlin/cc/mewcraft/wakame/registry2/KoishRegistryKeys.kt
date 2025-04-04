@@ -17,9 +17,6 @@ object KoishRegistryKeys {
     ///
 
     @JvmField
-    val ATTRIBUTE = createRegistryKey<Attribute>("attribute")
-
-    @JvmField
     val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField

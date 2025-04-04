@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -131,6 +132,12 @@ object KoishRegistries2 {
      */
     @JvmField
     val LEVEL_TO_RARITY_MAPPING: WritableDefaultedRegistry<LevelToRarityMapping> = registerDefaulted(KoishRegistryKeys2.LEVEL_TO_RARITY_MAPPING, "__default__") // = koish:__default__
+
+    /**
+     * 属性的类型.
+     */
+    @JvmField
+    val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys2.ATTRIBUTE)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

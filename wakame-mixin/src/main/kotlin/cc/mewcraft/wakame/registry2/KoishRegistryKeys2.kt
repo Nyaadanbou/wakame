@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -67,6 +68,9 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val LEVEL_TO_RARITY_MAPPING = createRegistryKey<LevelToRarityMapping>("level_to_rarity_mapping")
+
+    @JvmField
+    val ATTRIBUTE = createRegistryKey<Attribute>("attribute")
 
     ///
 

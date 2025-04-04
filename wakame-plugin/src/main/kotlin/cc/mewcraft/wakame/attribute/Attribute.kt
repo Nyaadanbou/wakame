@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -54,7 +54,7 @@ protected constructor(
 ) : Examinable, Attribute {
 
     init {
-        KoishRegistries.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
+        KoishRegistries2.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
     }
 
     // 需要注意 (kotlin 委托基础)
