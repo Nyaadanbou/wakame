@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.adventure
 
-import cc.mewcraft.wakame.KOISH_NAME
-import cc.mewcraft.wakame.KOISH_VERSION
+import cc.mewcraft.wakame.BootstrapContextStore
 import cc.mewcraft.wakame.SERVER
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
@@ -24,9 +23,9 @@ object BuiltInMessages {
 
     val STARTUP_BANNER: Args0 = Args0 {
         val infoLine1: Component = Component.text()
-            .append(Component.text(KOISH_NAME, PRIMARY_COLOR))  // 使用主色
+            .append(Component.text(BootstrapContextStore.PLUGIN_NAME, PRIMARY_COLOR))  // 使用主色
             .appendSpace()
-            .append(Component.text("v$KOISH_VERSION", SECONDARY_COLOR))  // 使用次色
+            .append(Component.text("v${BootstrapContextStore.PLUGIN_VERSION}", SECONDARY_COLOR))  // 使用次色
             .build()
         val infoLine2: Component = Component.text()
             .color(INFO_COLOR)  // 使用辅助色

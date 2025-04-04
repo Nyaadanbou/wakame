@@ -459,7 +459,7 @@ internal object DamageManager : DamageManagerApi {
         if (!itemstack.templates.has(ItemTemplateTypes.ARROW)) return null
         val itemcells = itemstack.components.get(ItemComponentTypes.CELLS) ?: return null
         val modifiersOnArrow = itemcells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-        val arrowAttributes = ImaginaryAttributeMaps.ARROW.value.getSnapshot()
+        val arrowAttributes = ImaginaryAttributeMaps.ARROW.unwrap().getSnapshot()
         arrowAttributes.addTransientModifiers(modifiersOnArrow)
         val damageBundle = damageBundle(arrowAttributes) {
             every {

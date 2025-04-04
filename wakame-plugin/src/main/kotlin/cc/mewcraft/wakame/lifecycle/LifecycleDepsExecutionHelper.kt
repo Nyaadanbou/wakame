@@ -1,4 +1,4 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage") @file:JvmName("LifecycleExecutionHelperKt")
 
 package cc.mewcraft.wakame.lifecycle
 

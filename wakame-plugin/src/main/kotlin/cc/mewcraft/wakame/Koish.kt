@@ -36,7 +36,9 @@ internal object Koish : JavaPlugin(), IKoish {
         ItemXBootstrap.init()
         KoishProvider.register(this)
 
-        LIFECYCLE_MANAGER = lifecycleManager
+        // LifecycleManager 此时已发生变化, 重新注册
+        BootstrapContextStore.registerLifecycleManager(lifecycleManager)
+
         PLUGIN_READY = true
     }
 

@@ -16,7 +16,6 @@ import cc.mewcraft.wakame.world.worldModule
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
-import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -25,26 +24,16 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext.startKoin
-import java.nio.file.Path
 
 private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.3")..Version("1.21.3")
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
-internal val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
-
-internal lateinit var BOOTSTRAPPER: KoishBootstrapper private set
-internal lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*>
-
-lateinit var KOISH_AUTHORS: List<String> private set
-lateinit var KOISH_NAME: String private set
-lateinit var KOISH_VERSION: Version private set
-lateinit var KOISH_JAR: Path private set
 
 @PublishedApi
 internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
 internal class KoishBootstrapper : PluginBootstrap {
     init {
-        BOOTSTRAPPER = this
+        BootstrapContextStore.registerBootstrap(this)
     }
 
     // See: https://docs.papermc.io/paper/dev/getting-started/paper-plugins#bootstrapper
@@ -64,14 +53,17 @@ internal class KoishBootstrapper : PluginBootstrap {
             )
         }
 
-        LIFECYCLE_MANAGER = context.lifecycleManager
+        BootstrapContextStore.registerLifecycleManager(context.lifecycleManager)
+        BootstrapContextStore.registerAuthors(context.pluginMeta.authors)
+        BootstrapContextStore.registerName(context.pluginMeta.name)
+        BootstrapContextStore.registerVersion(Version(context.pluginMeta.version))
+        BootstrapContextStore.registerPluginJar(context.pluginSource)
         KoishLoggerProvider.set(context.logger)
-        KOISH_AUTHORS = context.pluginMeta.authors
-        KOISH_NAME = context.pluginMeta.name
-        KOISH_VERSION = Version(context.pluginMeta.version)
-        KOISH_JAR = context.pluginSource
 
-        if (IS_DEV_SERVER) {
+        // FIXME #373: remove it before merge
+        LOGGER.error("Registered Mod JAR: ${BootstrapContextStore.MOD_JAR}")
+
+        if (BootstrapContextStore.IS_DEV_SERVER) {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
         }
 
@@ -80,7 +72,7 @@ internal class KoishBootstrapper : PluginBootstrap {
             throw Exception(
                 """
                 Koish is not compatible with this version of Minecraft.
-                Koish v$KOISH_VERSION only runs on $REQUIRED_SERVER_VERSION.
+                Koish v${BootstrapContextStore.PLUGIN_VERSION} only runs on $REQUIRED_SERVER_VERSION.
                 """.trimIndent()
             )
         }
@@ -99,7 +91,7 @@ internal class KoishBootstrapper : PluginBootstrap {
                 LegacyDataMigrator.migrate()
             }
 
-            if (IS_DEV_SERVER) {
+            if (BootstrapContextStore.IS_DEV_SERVER) {
                 DebugProbes.install()
                 DebugProbes.enableCreationStackTraces = true
             }

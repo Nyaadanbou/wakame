@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
-import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.BootstrapContextStore
 import cc.mewcraft.wakame.Koish
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
@@ -42,7 +42,7 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryExecute {
-        collectAndRegisterTasks(KOISH_JAR.toFile(), this.javaClass.classLoader)
+        collectAndRegisterTasks(BootstrapContextStore.PLUGIN_JAR.toFile(), this.javaClass.classLoader)
         initPreWorld()
     }
 

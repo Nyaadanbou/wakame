@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.config
 
-import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.BootstrapContextStore
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.util.data.useZip
 import kotlin.io.path.*
@@ -47,7 +47,7 @@ internal object ConfigExtractor {
 
     @OptIn(ExperimentalPathApi::class)
     fun extractDefaults() {
-        KOISH_JAR.useZip { zip ->
+        BootstrapContextStore.PLUGIN_JAR.useZip { zip ->
             val srcRootDir = zip.resolve("configs/")
             val dstRootDir = KoishDataPaths.CONFIGS.also { it.createDirectories() }
 
