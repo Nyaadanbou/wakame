@@ -84,7 +84,7 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
 
     override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {
         val type = getInternalType(id)
-        val item = KoishStackGenerator.generate(type, Context())
+        val item = KoishStackGenerator.generate(type, Context(type))
         return item
     }
 

@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.rarity.LevelRarityMapping
 import cc.mewcraft.wakame.util.Identifiers
 
 object KoishRegistryKeys {
@@ -39,9 +38,6 @@ object KoishRegistryKeys {
 
     @JvmField
     val ITEM_CATEGORY = createRegistryKey<CatalogItemCategory>("item_category")
-
-    @JvmField
-    val LEVEL_RARITY_MAPPING = createRegistryKey<LevelRarityMapping>("level_rarity_mapping")
 
     @JvmField
     val LOOT_TABLE_RECIPE = createRegistryKey<CatalogItemLootTableRecipe>("loot_table_recipe")

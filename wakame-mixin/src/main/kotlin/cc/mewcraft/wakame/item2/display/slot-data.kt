@@ -32,7 +32,7 @@ class SlotDisplay private constructor(
     private val koishItem: RegistryEntry<KoishItem>,
 ) {
 
-    private val itemStack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, Context()) }
+    private val itemStack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, Context(koishItem)) }
 
     companion object {
 

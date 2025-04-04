@@ -53,6 +53,7 @@ data object ItemMetaTypes {
         serializers {
             register(MetaRarity.SERIALIZER)
             register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+            register(KoishRegistries2.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
         }
     }
 

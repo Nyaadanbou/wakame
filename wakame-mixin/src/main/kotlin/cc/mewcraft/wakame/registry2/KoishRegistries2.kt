@@ -18,6 +18,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
@@ -124,6 +125,12 @@ object KoishRegistries2 {
      */
     @JvmField
     val ELEMENT: WritableDefaultedRegistry<Element> = registerDefaulted(KoishRegistryKeys2.ELEMENT, "neutral") // = koish:neutral
+
+    /**
+     * 等级->稀有度的映射.
+     */
+    @JvmField
+    val LEVEL_TO_RARITY_MAPPING: WritableDefaultedRegistry<LevelToRarityMapping> = registerDefaulted(KoishRegistryKeys2.LEVEL_TO_RARITY_MAPPING, "__default__") // = koish:__default__
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

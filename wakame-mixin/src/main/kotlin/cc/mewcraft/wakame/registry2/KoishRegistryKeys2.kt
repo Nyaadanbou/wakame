@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
 
@@ -63,6 +64,9 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val ELEMENT = createRegistryKey<Element>("element")
+
+    @JvmField
+    val LEVEL_TO_RARITY_MAPPING = createRegistryKey<LevelToRarityMapping>("level_to_rarity_mapping")
 
     ///
 

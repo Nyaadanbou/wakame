@@ -42,7 +42,7 @@ private constructor(
     companion object {
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
+         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             decodingMap: Map<K, KClass<out V>>,
@@ -51,7 +51,7 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
+         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             typeKey: String,
@@ -64,7 +64,7 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
+         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             noinline decodingMap: (K) -> KType, // KType<V>
@@ -73,7 +73,7 @@ private constructor(
         }
 
         /**
-         * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
+         * 创建一个 [TypeSerializer2] 用于处理多态类型的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             typeKey: String,

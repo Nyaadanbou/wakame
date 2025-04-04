@@ -19,7 +19,7 @@ import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
 import cc.mewcraft.wakame.kizami.KizamiRegistryLoader
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
+import cc.mewcraft.wakame.rarity.LevelToRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityRegistryLoader
 import cc.mewcraft.wakame.util.yamlLoader
 import cc.mewcraft.wakame.world.worldModule
@@ -58,7 +58,7 @@ object CommonNekoStackTest {
         AbilityTriggerRegistryLoader.init()
         KizamiRegistryLoader.init()
         RarityRegistryLoader.init()
-        LevelRarityMappingRegistryLoader.init()
+        LevelToRarityMappingRegistryLoader.init()
         EntityRefRegistryLoader.init()
 
         // 初始化所有 random3.Node 相关的实现

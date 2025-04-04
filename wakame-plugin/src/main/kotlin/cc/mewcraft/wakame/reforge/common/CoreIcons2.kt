@@ -24,7 +24,7 @@ internal object CoreIcons2 {
             is EmptyCore -> KoishRegistries2.ITEM["$ICON_ID_PREFIX/empty"]
             else -> KoishRegistries2.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
-        val stack = KoishStackGenerator.generate(item, Context())
+        val stack = KoishStackGenerator.generate(item, Context(item))
         return stack
     }
 

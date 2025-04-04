@@ -1,27 +1,19 @@
-package cc.mewcraft.wakame.rarity
+package cc.mewcraft.wakame.rarity2
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.rarity.LevelRarityMapping.Entry.Companion.build
-import cc.mewcraft.wakame.rarity2.Rarity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.rarity2.LevelToRarityMapping.Entry.Companion.build
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.Identifiers
-import cc.mewcraft.wakame.util.RangeParser
 import cc.mewcraft.wakame.util.random.RandomSelector
-import cc.mewcraft.wakame.util.require
-import com.google.common.collect.ImmutableRangeMap
 import com.google.common.collect.RangeMap
-import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.serialize.SerializationException
-import java.lang.reflect.Type
+import org.jetbrains.annotations.ApiStatus
 import kotlin.random.Random
 import kotlin.random.asJavaRandom
 
 /**
  * Represents a group of "level -> rarity" mappings.
  */
-class LevelRarityMapping
-internal constructor(
+class LevelToRarityMapping
+@ApiStatus.Internal
+constructor(
     /**
      * A RangeMap holding all the rarity mappings. The `map key` is the range
      * of levels to which the corresponding [Entry] applies, and the
@@ -79,7 +71,7 @@ internal constructor(
         }
 
         /**
-         * The builder of [LevelRarityMapping.Entry].
+         * The builder of [LevelToRarityMapping.Entry].
          */
         interface Builder {
             val weight: MutableMap<RegistryEntry<Rarity>, Double>
@@ -98,52 +90,5 @@ internal constructor(
                 return BuilderImpl().apply(builder).build()
             }
         }
-    }
-}
-
-/**
- * ## Node structure
- *
- * ```yaml
- * <node>:
- *   tier_1:
- *     level: "[0,20)"
- *     weight:
- *       common: 10.0
- *       uncommon: 5.0
- *       ...
- *   tier_2:
- *     level: "[20,40)"
- *     weight:
- *       common: 8.0
- *       uncommon: 6.0
- *       ...
- *   tier_N:
- *     ...
- * ```
- */
-internal object LevelRarityMappingSerializer : TypeSerializer<LevelRarityMapping> {
-    override fun deserialize(type: Type, node: ConfigurationNode): LevelRarityMapping {
-        val rangeMapBuilder = ImmutableRangeMap.builder<Int, LevelRarityMapping.Entry>()
-        for ((_, node1) in node.childrenMap()) {
-            val levelNode = node1.node("level").require<String>()
-            val weightNode = node1.node("weight").takeIf { it.isMap }
-                ?: throw SerializationException("`weight` node must be a map")
-
-            // deserialize weight for each rarity
-            val levelRange = RangeParser.parseIntRange(levelNode)
-            val levelMapping = build {
-                for ((nodeKey2, node2) in weightNode.childrenMap()) {
-                    val rarityTypeId = Identifiers.of(nodeKey2.toString())
-                    val rarityType = KoishRegistries2.RARITY.createEntry(rarityTypeId)
-                    val rarityWeight = node2.require<Double>()
-                    weight[rarityType] = rarityWeight
-                }
-            }
-
-            rangeMapBuilder.put(levelRange, levelMapping)
-        }
-
-        return LevelRarityMapping(rangeMapBuilder.build())
     }
 }

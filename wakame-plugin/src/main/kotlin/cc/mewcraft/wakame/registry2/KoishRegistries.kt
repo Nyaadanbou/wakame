@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.components.ItemSkin
-import cc.mewcraft.wakame.rarity.LevelRarityMapping
 
 object KoishRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
@@ -68,12 +67,6 @@ object KoishRegistries {
      */
     @JvmField
     val ITEM_CATEGORY: WritableRegistry<CatalogItemCategory> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
-
-    /**
-     * 等级>稀有度映射.
-     */
-    @JvmField
-    val LEVEL_RARITY_MAPPING: WritableDefaultedRegistry<LevelRarityMapping> = registerDefaulted(KoishRegistryKeys.LEVEL_RARITY_MAPPING, "__default__") // = koish:__default__
 
     /**
      * 物品图鉴中的战利品表配方.
