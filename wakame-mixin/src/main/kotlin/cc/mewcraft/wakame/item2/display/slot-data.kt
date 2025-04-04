@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.item2.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.*
 import cc.mewcraft.wakame.item2.config.datagen.Context
@@ -235,7 +234,7 @@ data class SlotDisplayLoreData(
         }
     }
 
-    private object Serializer : TypeSerializer<SlotDisplayLoreData> {
+    private object Serializer : TypeSerializer2<SlotDisplayLoreData> {
 
         override fun deserialize(type: Type, node: ConfigurationNode): SlotDisplayLoreData {
             val rawTextList = node.getList<String>(emptyList())

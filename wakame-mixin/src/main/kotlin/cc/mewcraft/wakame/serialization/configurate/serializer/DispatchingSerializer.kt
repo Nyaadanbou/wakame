@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -43,7 +42,7 @@ private constructor(
     companion object {
 
         /**
-         * 创建一个 [TypeSerializer] 用于处理多态类的反序列化.
+         * 创建一个 [TypeSerializer2] 用于处理多态类的反序列化.
          */
         inline fun <reified K : Any, reified V : Any> createPartial(
             decodingMap: Map<K, KClass<out V>>,

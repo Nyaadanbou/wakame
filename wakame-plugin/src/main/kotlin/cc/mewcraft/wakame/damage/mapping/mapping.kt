@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.damage.mapping
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.damage.DamageMetadata
@@ -66,7 +65,7 @@ internal data class DamagePredicateMapper(
 
     //
 
-    private object Serializer : TypeSerializer<DamagePredicateMapper> {
+    private object Serializer : TypeSerializer2<DamagePredicateMapper> {
 
         override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicateMapper {
             val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }

@@ -6,7 +6,7 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import java.lang.reflect.AnnotatedType
 import java.lang.reflect.Type
 
-@Deprecated("Use TypeSerializer2 instead", ReplaceWith("TypeSerializer2<T>"))
+@Deprecated("Use TypeSerializer2 instead", ReplaceWith("TypeSerializer2<T>", "cc.mewcraft.wakame.config.configurate.TypeSerializer2"))
 typealias TypeSerializer<T> = TypeSerializer2<T>
 
 fun interface TypeSerializer2<T> : TypeSerializer<T> {

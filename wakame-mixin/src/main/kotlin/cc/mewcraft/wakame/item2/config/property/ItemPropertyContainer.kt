@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -24,7 +24,7 @@ sealed interface ItemPropertyContainer {
         @JvmField
         val EMPTY: ItemPropertyContainer = EmptyItemPropertyContainer
 
-        fun makeSerializers(): TypeSerializerCollection {
+        fun makeDirectSerializers(): TypeSerializerCollection {
             val collection = TypeSerializerCollection.builder()
             collection.register<ItemPropertyContainer>(SimpleItemPropertyContainer.Serializer)
             collection.registerAll(ItemPropertyTypes.directSerializers())
@@ -123,7 +123,7 @@ private class SimpleItemPropertyContainer(
         return if (propertyMap.isEmpty()) ItemPropertyContainer.EMPTY else this
     }
 
-    object Serializer : TypeSerializer<ItemPropertyContainer> {
+    object Serializer : TypeSerializer2<ItemPropertyContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemPropertyContainer {
             val builder = ItemPropertyContainer.builder()
             for ((rawNodeKey, node) in node.childrenMap()) {

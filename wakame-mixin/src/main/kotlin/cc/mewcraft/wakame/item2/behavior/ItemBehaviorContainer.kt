@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer.Builder
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -26,9 +26,9 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
         val EMPTY: ItemBehaviorContainer = EmptyItemBehaviorContainer
 
         /**
-         * 获取一个 [TypeSerializer] 用于序列化 [ItemBehaviorContainer].
+         * 获取一个 [TypeSerializer2] 用于序列化 [ItemBehaviorContainer].
          */
-        fun makeSerializer(): TypeSerializer<ItemBehaviorContainer> {
+        fun makeDirectSerializer(): TypeSerializer2<ItemBehaviorContainer> {
             return SimpleItemBehaviorContainer.Serializer
         }
 
@@ -118,7 +118,7 @@ private class SimpleItemBehaviorContainer(
 
     override fun toString(): String = toSimpleString()
 
-    object Serializer : TypeSerializer<ItemBehaviorContainer> {
+    object Serializer : TypeSerializer2<ItemBehaviorContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemBehaviorContainer {
             val builder = ItemBehaviorContainer.builder()
             for ((rawNodeKey, _) in node.childrenMap()) {

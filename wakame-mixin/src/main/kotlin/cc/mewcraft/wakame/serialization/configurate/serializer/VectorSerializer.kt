@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import org.joml.Vector3f
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -8,7 +8,7 @@ import org.spongepowered.configurate.kotlin.extensions.typedSet
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-/*internal*/ object Vector3fSerializer : TypeSerializer<Vector3f> {
+/*internal*/ object Vector3fSerializer : TypeSerializer2<Vector3f> {
     override fun deserialize(type: Type, node: ConfigurationNode): Vector3f {
         val floats = node.get<FloatArray>() ?: throw SerializationException(node, type, "Vector3f must be an array of 3 floats")
         require(floats.size == 3) { "Vector3f must exactly have 3 floats" }

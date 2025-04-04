@@ -17,21 +17,16 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.IdentifierTools
-import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.require
-import cc.mewcraft.wakame.util.runTask
-import cc.mewcraft.wakame.util.yamlLoader
+import cc.mewcraft.wakame.util.*
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-    .register<ItemBehaviorContainer>(ItemBehaviorContainer.makeSerializer())
-    .registerAll(ItemPropertyContainer.makeSerializers())
-    .registerAll(ItemMetaContainer.makeSerializers())
+    .register<ItemBehaviorContainer>(ItemBehaviorContainer.makeDirectSerializer())
+    .registerAll(ItemPropertyContainer.makeDirectSerializers())
+    .registerAll(ItemMetaContainer.makeDirectSerializers())
     .build()
 
 /**

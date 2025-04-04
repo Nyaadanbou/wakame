@@ -2,7 +2,6 @@
 
 package cc.mewcraft.wakame.damage.mapping
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
@@ -28,7 +27,7 @@ internal sealed interface DamagePredicate {
 
     //
 
-    private object Serializer : TypeSerializer<DamagePredicate> {
+    private object Serializer : TypeSerializer2<DamagePredicate> {
         override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicate {
             // FIXME 使用 DispatchingTypeSerializer 替代
             // FIXME 这里没有使用单独的 Node 来指定 type, 而是用的 Node 本身的 key 来指定 type

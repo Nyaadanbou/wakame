@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.KOISH_CONFIGURATE_SERIALIZERS_2
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap
 import org.jetbrains.annotations.ApiStatus
@@ -29,9 +28,8 @@ sealed interface ItemMetaContainer {
         @JvmField
         val EMPTY: ItemMetaContainer = EmptyItemMetaContainer
 
-        fun makeSerializers(): TypeSerializerCollection {
+        fun makeDirectSerializers(): TypeSerializerCollection {
             val collection = TypeSerializerCollection.builder()
-            collection.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
             collection.register<ItemMetaContainer>(SimpleItemMetaContainer.Serializer)
             collection.registerAll(ItemMetaTypes.directSerializers())
             return collection.build()

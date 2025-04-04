@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item2.data.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
@@ -24,7 +24,7 @@ private constructor(
     companion object {
 
         @JvmField
-        val SERIALIZER: TypeSerializer<ItemId> = Serializer
+        val SERIALIZER: TypeSerializer2<ItemId> = Serializer
 
         private val POOL: HashMap<Identifier, ItemId> = HashMap<Identifier, ItemId>()
 
@@ -42,7 +42,7 @@ private constructor(
     }
 
     // 该序列化操作使用对象池来返回 ItemId 的实例
-    private object Serializer : TypeSerializer<ItemId> {
+    private object Serializer : TypeSerializer2<ItemId> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemId {
             return of(node.require<Identifier>())
         }

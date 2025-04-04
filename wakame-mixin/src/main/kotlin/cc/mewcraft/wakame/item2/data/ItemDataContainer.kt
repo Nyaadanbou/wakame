@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
@@ -306,7 +306,7 @@ private open class SimpleItemDataContainer(
         }}"
     }
 
-    object Serializer : TypeSerializer<ItemDataContainer> {
+    object Serializer : TypeSerializer2<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             val builder = ItemDataContainer.builder()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {

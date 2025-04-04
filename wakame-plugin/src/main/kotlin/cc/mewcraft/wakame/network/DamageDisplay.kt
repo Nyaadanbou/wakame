@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.network
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
@@ -161,7 +161,7 @@ internal data class DamageDisplayAnimation(
 )
 
 @Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplayAnimationSerializer : TypeSerializer<DamageDisplayAnimation> {
+internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplayAnimation> {
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
         val delay = node.node("delay").require<Long>()
 
@@ -184,7 +184,7 @@ internal object DamageDisplayAnimationSerializer : TypeSerializer<DamageDisplayA
     }
 
     @InitFun
-    private fun init() {
+    fun init() {
         Configs.registerSerializer(KOISH_NAMESPACE, this)
     }
 }
@@ -194,7 +194,7 @@ internal enum class DamageDisplayMode {
 }
 
 @Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplaySettingsSerializer : TypeSerializer<DamageDisplaySettings> {
+internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplaySettings> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
         DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
@@ -202,7 +202,7 @@ internal object DamageDisplaySettingsSerializer : TypeSerializer<DamageDisplaySe
     }
 
     @InitFun
-    private fun init() {
+    fun init() {
         Configs.registerSerializer(KOISH_NAMESPACE, this)
     }
 
