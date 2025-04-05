@@ -1,15 +1,14 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.BootstrapContextStore
-import cc.mewcraft.wakame.Koish
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.config.PermanentStorage
-import cc.mewcraft.wakame.lifecycle.LifecycleExecutionHelper.tryExecute
+import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
+import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyExecution
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer.start
-import cc.mewcraft.wakame.lifecycle.withLifecycleDependencyExecution
 import cc.mewcraft.wakame.util.data.JarUtils
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
@@ -197,7 +196,7 @@ internal object Initializer : Listener {
             isDone = true
             KoishLoadDataEvent().callEvent()
 
-            PermanentStorage.store("last_version", Koish.pluginMeta.version)
+            PermanentStorage.store("last_version", BootstrapContextStore.PLUGIN_VERSION.toString())
             // setGlobalIngredients()
             // setupMetrics()
             BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)

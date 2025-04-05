@@ -1,7 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.lifecycle
+package cc.mewcraft.wakame.lifecycle.helper
 
+import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CompletableDeferred
 import org.objectweb.asm.Type

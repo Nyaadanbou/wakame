@@ -20,10 +20,10 @@ object KoishRegistryKeys {
     val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
 
     @JvmField
-    val ATTRIBUTE_FACADE = createRegistryKey<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_bundle_facade")
+    val ATTRIBUTE_FACADE = createRegistryKey<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_facade")
 
     @JvmField
-    val IMAGINARY_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("imaginary_attribute_map")
+    val IMG_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("img_attribute_map")
 
     @JvmField
     val ITEM = createRegistryKey<NekoItem>("item")

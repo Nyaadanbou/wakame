@@ -38,7 +38,7 @@ object KoishRegistries {
      * 虚构的属性映射.
      */
     @JvmField
-    val IMAGINARY_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys.IMAGINARY_ATTRIBUTE_MAP)
+    val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys.IMG_ATTRIBUTE_MAP)
 
     /**
      * 标准物品类型.

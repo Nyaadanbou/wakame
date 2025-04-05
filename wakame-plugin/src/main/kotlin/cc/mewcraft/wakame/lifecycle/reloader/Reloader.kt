@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.lifecycle.reloader
 import cc.mewcraft.wakame.BootstrapContextStore
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
-import cc.mewcraft.wakame.lifecycle.LifecycleExecutionHelper.tryExecute
+import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
+import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyExecution
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
-import cc.mewcraft.wakame.lifecycle.withLifecycleDependencyExecution
 import cc.mewcraft.wakame.util.data.JarUtils
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.GraphBuilder

@@ -1,13 +1,14 @@
 @file:Suppress("UnstableApiUsage")
 
-package cc.mewcraft.wakame.lifecycle
+package cc.mewcraft.wakame.lifecycle.helper
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.lifecycle.LifecycleException
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import java.lang.reflect.InvocationTargetException
 
-internal object LifecycleExecutionHelper {
+internal object TryExecution {
 
     /**
      * Wraps [run] in a try-catch block with error logging specific to lifecycle.

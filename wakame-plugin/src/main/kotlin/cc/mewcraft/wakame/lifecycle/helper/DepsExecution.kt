@@ -1,6 +1,6 @@
-@file:Suppress("UnstableApiUsage") @file:JvmName("LifecycleExecutionHelperKt")
+@file:Suppress("UnstableApiUsage") @file:JvmName("TryExecutionKt")
 
-package cc.mewcraft.wakame.lifecycle
+package cc.mewcraft.wakame.lifecycle.helper
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG

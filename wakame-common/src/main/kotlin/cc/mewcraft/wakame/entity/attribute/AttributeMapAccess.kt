@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -9,17 +11,11 @@ import org.jetbrains.annotations.ApiStatus
  */
 interface AttributeMapAccess {
 
-    companion object Holder {
+    companion object {
 
+        @get:JvmStatic
         @get:JvmName("getInstance()")
-        lateinit var INSTANCE: AttributeMapAccess
-            private set
-
-        @Deprecated("", replaceWith = ReplaceWith("INSTANCE"))
-        @JvmStatic
-        fun instance(): AttributeMapAccess {
-            return INSTANCE
-        }
+        lateinit var INSTANCE: AttributeMapAccess private set
 
         @ApiStatus.Internal
         fun register(provider: AttributeMapAccess) {
@@ -29,8 +25,13 @@ interface AttributeMapAccess {
     }
 
     /**
-     * Gets the [AttributeMap] for the specified subject.
+     * Gets the [AttributeMap] for the specified player.
      */
-    fun get(subject: Any): Result<AttributeMap>
+    fun get(player: Player): Result<AttributeMap>
+
+    /**
+     * Gets the [AttributeMap] for the specified entity.
+     */
+    fun get(entity: Entity): Result<AttributeMap>
 
 }

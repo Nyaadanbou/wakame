@@ -167,7 +167,7 @@ internal data class AttributeDamageMetadataBuilder(
 
     override fun build(context: DamageContext): DamageMetadata {
         val damager = context.damageSource.causingEntity ?: throw IllegalStateException(
-            "Failed to build damage metadata by attribute map because the damager is null"
+            "Failed to build damage metadata by attribute map because the damager is null."
         )
         val attributeMap = AttributeMapAccess.INSTANCE.get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")

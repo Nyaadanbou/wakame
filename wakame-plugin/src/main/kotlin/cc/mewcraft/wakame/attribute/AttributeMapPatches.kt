@@ -64,7 +64,7 @@ object AttributeMapPatches : Listener {
             put(entity.uniqueId, patch)
 
             // 触发 AttributeMap 的初始化, 例如应用原版属性
-            AttributeMapAccess.Holder.INSTANCE.get(entity).onFailure {
+            AttributeMapAccess.INSTANCE.get(entity).onFailure {
                 LOGGER.error("Failed to initialize the attribute map for entity ${entity}: ${it.message}")
             }
         }
@@ -76,7 +76,7 @@ object AttributeMapPatches : Listener {
 
         // 触发 AttributeMap 的初始化, 例如应用原版属性
         val entity = event.entity
-        val attributeMap = AttributeMapAccess.Holder.INSTANCE.get(entity).getOrElse {
+        val attributeMap = AttributeMapAccess.INSTANCE.get(entity).getOrElse {
             LOGGER.error("Failed to initialize the attribute map for entity $entity: ${it.message}")
             return
         }

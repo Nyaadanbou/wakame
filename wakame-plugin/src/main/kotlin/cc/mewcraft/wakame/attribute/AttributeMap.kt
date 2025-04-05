@@ -2,120 +2,20 @@
 
 package cc.mewcraft.wakame.attribute
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.entity.attribute.*
-import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.user.toUser
-import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.jetbrains.annotations.ApiStatus
 import java.lang.ref.WeakReference
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
-// FIXME #366: 搞点合适的构造函数, 还有 user#attributemap 的扩展函数
-/**
- * A constructor function of [AttributeMap].
- *
- * @param player the player to which this map is bound
- * @return an existing instance of [AttributeMap]
- */
-fun AttributeMap(player: Player): AttributeMap {
-    // 返回 User 中已经存在的 AttributeMap
-    return player.toUser().attributeMap
-}
-
-/**
- * A constructor function of [AttributeMap].
- *
- * @param user the user to which this map is bound
- * @return a new instance of [AttributeMap]
- */
-fun AttributeMap(user: User<Player>): AttributeMap {
-    // 创建一个全新的 AttributeMap
-    val key = AttributeMapSupport.PLAYER_KEY
-    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
-    return PlayerAttributeMap(default, user.player())
-}
-
-/**
- * A constructor function of [AttributeMap].
- *
- * @param entity the living entity to which this map is bound
- * @return a new instance of [AttributeMap]
- */
-fun AttributeMap(entity: LivingEntity): AttributeMap {
-    val key = AttributeMapSupport.ENTITY_REF_LOOKUP.get(entity)
-    val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
-    return EntityAttributeMap(default, entity)
-}
-
-/**
- * 用于直接获取 [cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap] 的实例.
- */
-object ImaginaryAttributeMaps {
-    // 通过硬编码注册的 id, 但不确定对应的配置文件是否存在
-    private val intrusiveRegisteredIds = HashSet<String>()
-
-    @JvmField
-    val ARROW: RegistryEntry<ImaginaryAttributeMap> = createEntry("minecraft:arrow")
-
-    @ApiStatus.Internal
-    fun init() {
-        // init 只负责添加 intrusive registry entry
-        consumeData(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::add)
-    }
-
-    @ApiStatus.Internal
-    fun reload() {
-        consumeData(KoishRegistries.IMAGINARY_ATTRIBUTE_MAP::update)
-    }
-
-    private fun consumeData(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
-        intrusiveRegisteredIds.forEach { registeredId ->
-            val entryId = Identifiers.of(registeredId)
-            val entryVal = createData(registeredId)
-            registryAction(entryId, entryVal)
-        }
-    }
-
-    private fun createData(id: String): ImaginaryAttributeMap {
-        val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(id)
-        val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
-        for (attribute in default.attributes) {
-            val instance = default.createImaginaryInstance(attribute) ?: continue
-            val snapshot = instance.getSnapshot()
-            val imaginary = snapshot.toImaginary()
-            data[attribute] = imaginary
-        }
-        return ImaginaryAttributeMapImpl(data)
-    }
-
-    private fun createEntry(id: String): RegistryEntry<ImaginaryAttributeMap> {
-        val notExisted = intrusiveRegisteredIds.add(id)
-        if (!notExisted) throw IllegalArgumentException("The id $id has already been registered!")
-        return KoishRegistries.IMAGINARY_ATTRIBUTE_MAP.createEntry(id)
-    }
-}
-
 
 /* Implementations */
 
-
-private object AttributeMapSupport {
-    val PLAYER_KEY: Key = EntityType.PLAYER.key()
-    val ENTITY_REF_LOOKUP: EntityRefLookup by Injector.inject<EntityRefLookup>()
-}
 
 /**
  * This is a live object.
@@ -132,7 +32,7 @@ private object AttributeMapSupport {
  * in the [patch] map. This saves us a lot of memory for the object. However, if we need
  * to write data, for example adding a modifier, we write it into the [patch] map.
  */
-class PlayerAttributeMap(
+internal class PlayerAttributeMap(
     /**
      * The fallback values if an attribute is not present in the [patch] map.
      */
@@ -149,15 +49,19 @@ class PlayerAttributeMap(
      */
     val patch: Reference2ObjectOpenHashMap<Attribute, AttributeInstance> = Reference2ObjectOpenHashMap()
 
-    init {
-        // VanillaAttributeInstance must synchronize with the world state.
-        //
-        // Otherwise, if wakame has changed the value of a vanilla attribute,
-        // the value would not be actually applied to the world state
-        // unless the getInstance() is specifically invoked.
-        //
-        // The following code performs the synchronization logic.
-        default.attributes.filter(Attribute::vanilla).forEach(::getInstance)
+    /**
+     * VanillaAttributeInstance must synchronize with the world state.
+     *
+     * Otherwise, if wakame has changed the value of a vanilla attribute,
+     * the value would not be actually applied to the world state
+     * unless the getInstance() is specifically invoked.
+     *
+     * The following code performs the synchronization logic.
+     */
+    fun syncToMinecraft() {
+        default.attributes
+            .filter { attr -> attr.vanilla }
+            .forEach { attr -> getInstance(attr) }
     }
 
     @Suppress("DuplicatedCode")
@@ -252,12 +156,18 @@ class PlayerAttributeMap(
  * The underlying attribute data is stored in the entity's NBT storage, so it's persistent
  * over server restarts.
  */
-class EntityAttributeMap : AttributeMap {
+internal class EntityAttributeMap : AttributeMap {
     constructor(default: AttributeSupplier, entity: LivingEntity) {
         validateEntity(entity)
 
         this.default = default
         this.entityRef = WeakReference(entity)
+    }
+
+    /**
+     * @see PlayerAttributeMap.syncToMinecraft
+     */
+    fun syncToMinecraft() {
         default.attributes
             .filter { attr -> attr.vanilla }
             .forEach { attr -> getInstance(attr) }
@@ -378,7 +288,7 @@ class EntityAttributeMap : AttributeMap {
 // AttributeMapSnapshot 的实现,
 // 只不过不允许任何写入操作.
 
-private class ImaginaryAttributeMapImpl(
+internal class ImaginaryAttributeMapImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>,
 ) : ImaginaryAttributeMap {
     @Suppress("DuplicatedCode")
@@ -430,7 +340,7 @@ private class ImaginaryAttributeMapImpl(
 // 中是 VanillaAttributeInstance, 它在 AttributeMapSnapshot
 // 中也得转换成 WakameAttributeInstance.
 
-class AttributeMapSnapshotImpl(
+private class AttributeMapSnapshotImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, AttributeInstanceSnapshot>,
 ) : AttributeMapSnapshot {
     @Suppress("DuplicatedCode")

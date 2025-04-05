@@ -5,7 +5,6 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attack.SwordAttack
 import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ImaginaryAttributeMaps
 import cc.mewcraft.wakame.damage.DamageManager.calculateDamageBeforeDefense
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamage
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamageMap
@@ -26,6 +25,7 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.attributeContainer
 import cc.mewcraft.wakame.util.RecursionGuard
@@ -459,7 +459,10 @@ internal object DamageManager : DamageManagerApi {
         if (!itemstack.templates.has(ItemTemplateTypes.ARROW)) return null
         val itemcells = itemstack.components.get(ItemComponentTypes.CELLS) ?: return null
         val modifiersOnArrow = itemcells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-        val arrowAttributes = ImaginaryAttributeMaps.ARROW.unwrap().getSnapshot()
+        val arrowAttributes = KoishRegistries.IMG_ATTRIBUTE_MAP["minecraft:arrow"]?.getSnapshot() ?: run {
+            LOGGER.warn("Could not find imaginary attribute map \"minecraft:arrow\" for context: $this. Returning null damage metadata.")
+            return null
+        }
         arrowAttributes.addTransientModifiers(modifiersOnArrow)
         val damageBundle = damageBundle(arrowAttributes) {
             every {
