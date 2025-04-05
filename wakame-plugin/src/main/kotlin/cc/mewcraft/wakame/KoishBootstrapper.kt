@@ -64,9 +64,6 @@ internal class KoishBootstrapper : PluginBootstrap {
         BootstrapContextStore.registerPluginJar(context.pluginSource)
         KoishLoggerProvider.set(context.logger)
 
-        // FIXME #373: remove it before merge
-        LOGGER.error("Registered Mod JAR: ${BootstrapContextStore.MOD_JAR}")
-
         if (BootstrapContextStore.IS_DEV_SERVER) {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
         }

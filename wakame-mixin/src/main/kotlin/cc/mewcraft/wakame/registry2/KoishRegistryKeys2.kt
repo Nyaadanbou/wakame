@@ -5,6 +5,11 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
+import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -18,6 +23,7 @@ import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
 
+// FIXME #373: rename to BuiltInRegistryKeys
 object KoishRegistryKeys2 {
     @JvmField
     val ROOT_REGISTRY_NAME = Identifiers.of("root_2")
@@ -71,6 +77,15 @@ object KoishRegistryKeys2 {
 
     @JvmField
     val ATTRIBUTE = createRegistryKey<Attribute>("attribute")
+
+    @JvmField
+    val ATTRIBUTE_SUPPLIER = createRegistryKey<AttributeSupplier>("attribute_supplier")
+
+    @JvmField
+    val ATTRIBUTE_FACADE = createRegistryKey<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>>("attribute_facade")
+
+    @JvmField
+    val IMG_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("img_attribute_map")
 
     ///
 

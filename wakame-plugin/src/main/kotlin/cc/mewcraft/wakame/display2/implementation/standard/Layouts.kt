@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.display2.implementation.standard
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.StringCombiner
 import net.kyori.adventure.key.Key
@@ -26,7 +25,7 @@ internal data class AttributeCoreTextMeta(
         val sourceId = sourceIndex.value()
         val combiner = StringCombiner(sourceId, ".") {
             addList(derivation.operationIndex)
-            addList(derivation.elementIndex, KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(sourceId).bundleTrait.has<AttributeBundleTrait.Element>())
+            addList(derivation.elementIndex, KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(sourceId).bundleTrait.has<AttributeBundleTrait.Element>())
         }
         val combinations = combiner.combine()
         return combinations.map { Key.key(sourceNamespace, it) }

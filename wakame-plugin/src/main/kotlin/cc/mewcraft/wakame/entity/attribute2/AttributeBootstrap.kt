@@ -23,8 +23,8 @@ internal interface AttributeBootstrap2 {
         fun init() {
             Attributes.init()
             AttributeProvider.Holder.register(Attributes)
-            AttributeMapFactory.Companion.register(AttributeMapFactoryImpl)
-            AttributeMapAccess.Companion.register(AttributeMapAccessImpl)
+            AttributeMapFactory.register(AttributeMapFactoryImpl)
+            AttributeMapAccess.register(AttributeMapAccessImpl)
         }
 
     }

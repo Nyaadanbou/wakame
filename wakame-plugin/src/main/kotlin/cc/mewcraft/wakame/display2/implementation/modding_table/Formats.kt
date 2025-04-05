@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.display2.implementation.common.*
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -54,7 +54,7 @@ internal data class CellularAttributeRendererFormat(
     private val diffFormats: ModdingDifferenceFormats,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries.ATTRIBUTE_FACADE.containsId(id) }
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries2.ATTRIBUTE_FACADE.containsId(id) }
 
     /**
      * @param id 核孔的 id

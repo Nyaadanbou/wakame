@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
-import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.getByteOrNull
@@ -64,7 +63,7 @@ val ConstantAttributeBundle.element: RegistryEntry<Element>?
 fun ConstantAttributeBundle(
     id: String, tag: CompoundTag,
 ): ConstantAttributeBundle {
-    return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
+    return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
 }
 
 /**
@@ -115,7 +114,7 @@ fun ConstantAttributeBundle(
 fun ConstantAttributeBundle(
     id: String, node: ConfigurationNode,
 ): ConstantAttributeBundle {
-    return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
+    return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
 }
 
 /**
@@ -137,9 +136,9 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract val quality: Quality?
 
     val displayName: Component
-        get() = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
+        get() = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
     val description: List<Component>
-        get() = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
+        get() = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
 
     /**
      * 属性核心的“数值质量”.
@@ -182,7 +181,7 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract fun saveNbt(): CompoundTag
 
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
-        return KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
+        return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
     }
 }
 
@@ -193,7 +192,7 @@ private const val ELEMENT_TYPE_FIELD = "elem"
 private const val OPERATION_TYPE_FIELD = "op"
 private const val QUALITY_FIELD = "qual"
 
-internal data class ConstantAttributeBundleS(
+data class ConstantAttributeBundleS(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
@@ -219,7 +218,7 @@ internal data class ConstantAttributeBundleS(
     }
 }
 
-internal data class ConstantAttributeBundleR(
+data class ConstantAttributeBundleR(
     override val id: String,
     override val operation: Operation,
     override val lower: Double,
@@ -248,7 +247,7 @@ internal data class ConstantAttributeBundleR(
     }
 }
 
-internal data class ConstantAttributeBundleSE(
+data class ConstantAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
     override val value: Double,
@@ -277,7 +276,7 @@ internal data class ConstantAttributeBundleSE(
     }
 }
 
-internal data class ConstantAttributeBundleRE(
+data class ConstantAttributeBundleRE(
     override val id: String,
     override val operation: Operation,
     override val lower: Double,

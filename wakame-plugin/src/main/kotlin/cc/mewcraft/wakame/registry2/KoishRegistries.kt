@@ -2,43 +2,12 @@ package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
-import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
-import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
-import cc.mewcraft.wakame.entity.attribute2.AttributeFacade
 import cc.mewcraft.wakame.item.NekoItem
 
 object KoishRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
 
     ///
-
-    /**
-     * 实体的默认属性.
-     *
-     * 1. 包含所有原版实体(包括玩家)的默认属性.
-     * 2. MythicMobs 生物的属性不由这里提供.
-     *
-     * ### Notes
-     * Using [RegistryKey] to identify the "type" of living entities because we want the whole
-     * attribute system to be compatible with 3rd party mob system such as MythicMobs,
-     * in which case the enum type is not enough to express all types.
-     */
-    @JvmField
-    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys.ATTRIBUTE_SUPPLIER)
-
-    /**
-     * 属性块 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 的外观, 用于访问属性块相关的数据和逻辑.
-     */
-    @JvmField
-    val ATTRIBUTE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys.ATTRIBUTE_FACADE)
-
-    /**
-     * 虚构的属性映射.
-     */
-    @JvmField
-    val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys.IMG_ATTRIBUTE_MAP)
 
     /**
      * 标准物品类型.

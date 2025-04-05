@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.user.attributeContainer
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -8,10 +8,10 @@ import org.bukkit.entity.Player
 /**
  * Provides the access to the [AttributeMap] of a specific subject.
  */
-internal object AttributeMapAccessImpl : AttributeMapAccess {
+object AttributeMapAccessImpl : AttributeMapAccess {
 
     override fun get(player: Player): Result<AttributeMap> {
-        return Result.success(player.attributeContainer)
+        return Result.success(player.koishify()[AttributeMap])
     }
 
     override fun get(entity: Entity): Result<AttributeMap> {

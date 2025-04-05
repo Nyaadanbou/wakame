@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.entity.attribute2
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
@@ -14,11 +13,14 @@ import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Qualit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.RandomizedValue
+import cc.mewcraft.wakame.util.ReloadableProperty
 import cc.mewcraft.wakame.util.adventure.toSimpleString
+import cc.mewcraft.wakame.util.require
 import com.google.common.collect.ImmutableMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import net.kyori.adventure.key.Key
@@ -35,7 +37,6 @@ import xyz.xenondevs.commons.provider.orElse
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
-import kotlin.reflect.KClass
 
 @Init(
     stage = InitStage.PRE_WORLD, runAfter = [
@@ -43,14 +44,12 @@ import kotlin.reflect.KClass
     ]
 )
 internal object AttributeFacadeRegistryLoader : RegistryLoader {
-    const val CONFIG_ID: String = "attributes"
-    const val FILE_PATH: String = "attributes.yml"
 
     @InitFun
     fun init() {
-        KoishRegistries.ATTRIBUTE_FACADE.resetRegistry()
+        KoishRegistries2.ATTRIBUTE_FACADE.resetRegistry()
         addAll()
-        KoishRegistries.ATTRIBUTE_FACADE.freeze()
+        KoishRegistries2.ATTRIBUTE_FACADE.freeze()
     }
 
     /**
@@ -111,88 +110,12 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
         +build("water_movement_efficiency").single().bind(Attributes.WATER_MOVEMENT_EFFICIENCY)
     }
 
-    private operator fun <T : ConstantAttributeBundle, S : VariableAttributeBundle> AttributeFacade<T, S>.unaryPlus() {
+    private operator fun AttributeFacade<out ConstantAttributeBundle, out VariableAttributeBundle>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
-        KoishRegistries.ATTRIBUTE_FACADE.add(
-            id = Identifier.key(KOISH_NAMESPACE, id),
+        KoishRegistries2.ATTRIBUTE_FACADE.add(
+            id = Identifiers.of(id),
             value = (this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
         )
-    }
-}
-
-/**
- * 包含了一个 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 所相关的各种字段和操作.
- *
- * @param T [ConstantAttributeBundle] 的一个子类
- * @param S [VariableAttributeBundle] 的一个子类
- */
-interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBundle> : Keyed {
-    /**
-     * 本实例的全局配置文件.
-     */
-    val config: Provider<ConfigurationNode>
-
-    /**
-     * [属性块][cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle]的唯一标识.
-     *
-     * 属性块的唯一标识与单个[属性][cc.mewcraft.wakame.entity.attribute.Attribute]的唯一标识不一定相同,
-     * 当属性块是由多个属性构成时(例如攻击力),
-     * 它们的唯一标识就不一样.
-     */
-    val id: String
-
-    /**
-     * Holds metadata about the attribute components.
-     */
-    val bundleTrait: AttributeBundleTraitSet
-
-    /**
-     * A creator for attribute modifiers.
-     */
-    val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
-
-    /**
-     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype].
-     */
-    val convertNodeToVariable: (ConfigurationNode) -> S
-
-    /**
-     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
-     */
-    val convertNodeToConstant: (ConfigurationNode) -> T
-
-    /**
-     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
-     */
-    val convertNbtToConstant: (CompoundTag) -> T
-
-    /**
-     * A creator for tooltip name.
-     */
-    val createTooltipName: (T) -> Component
-
-    /**
-     * A creator for tooltip lore.
-     */
-    val createTooltipLore: (T) -> List<Component>
-}
-
-/**
- * 一个属性的组件相关信息.
- */
-class AttributeBundleTraitSet private constructor(
-    val components: Set<KClass<out AttributeBundleTrait>>,
-) {
-    constructor(vararg components: KClass<out AttributeBundleTrait>) : this(components.toHashSet())
-
-    /**
-     * 查询该属性是否有指定的组件.
-     *
-     * @param T 组件的类型
-     * @return 如果该属性拥有该组件，则返回 `true`
-     */
-    inline fun <reified T : AttributeBundleTrait> has(): Boolean {
-        return T::class in components
     }
 }
 
@@ -283,7 +206,7 @@ private class AttributeFacadeImpl<T : ConstantAttributeBundle, S : VariableAttri
     override val createTooltipName: (T) -> Component,
     override val createTooltipLore: (T) -> List<Component>,
 ) : AttributeFacade<T, S> {
-    override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
+    override fun key(): Key = Key.key(Namespaces.ATTRIBUTE, id)
 }
 
 private object AttributeConfigFallback {
@@ -561,13 +484,13 @@ private class AttributeBinderSEImpl(
                 ConstantAttributeBundleSE(id, tag)
             },
             createTooltipName = {
-                val resolver = Placeholder.component("element", it.element.value.displayName)
+                val resolver = Placeholder.component("element", it.element.unwrap().displayName)
                 MM.deserialize(displayName, resolver)
             },
             createTooltipLore = { data ->
                 val input = tooltips.line(data.operation)
                 val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
-                val resolver2 = tooltips.component("element", data.element.value.displayName)
+                val resolver2 = tooltips.component("element", data.element.unwrap().displayName)
                 val resolver3 = tooltips.component("quality", quality.translate(data.quality))
                 listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
             },
@@ -621,14 +544,14 @@ private class AttributeBinderREImpl(
                 ConstantAttributeBundleRE(id, tag)
             },
             createTooltipName = {
-                val resolver = Placeholder.component("element", it.element.value.displayName)
+                val resolver = Placeholder.component("element", it.element.unwrap().displayName)
                 MM.deserialize(displayName, resolver)
             },
             createTooltipLore = { data ->
                 val input = tooltips.line(data.operation)
                 val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
                 val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
-                val resolver3 = tooltips.component("element", data.element.value.displayName)
+                val resolver3 = tooltips.component("element", data.element.unwrap().displayName)
                 val resolver4 = tooltips.component("quality", quality.translate(data.quality))
                 listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
             },
@@ -641,7 +564,7 @@ private class AttributeBinderREImpl(
 
 
 private val ConfigurationNode.operation: Operation
-    get() = node("operation").string?.let(Operation.Companion::byName) ?: Operation.ADD
+    get() = node("operation").string?.let(Operation::byName) ?: Operation.ADD
 
 private val ConfigurationNode.element: RegistryEntry<Element>
     get() = node("element").require<RegistryEntry<Element>>()

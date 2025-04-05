@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalContracts::class)
-
 package cc.mewcraft.wakame.entity.attribute
 
 import com.google.common.collect.Multimap
@@ -172,6 +170,7 @@ internal class EntityAttributeMap : AttributeMap {
             .forEach { attr -> getInstance(attr) }
     }
 
+    @OptIn(ExperimentalContracts::class)
     private fun validateEntity(entity: Entity?) {
         contract { returns() implies (entity != null) }
         requireNotNull(entity) { "The entity ref no longer exists" }
@@ -287,7 +286,7 @@ internal class EntityAttributeMap : AttributeMap {
 // AttributeMapSnapshot 的实现,
 // 只不过不允许任何写入操作.
 
-internal class ImaginaryAttributeMapImpl(
+class ImaginaryAttributeMapImpl(
     val data: Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>,
 ) : ImaginaryAttributeMap {
     @Suppress("DuplicatedCode")

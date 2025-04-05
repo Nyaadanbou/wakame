@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.templates.filters
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.item.template.AttributeContextData
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter

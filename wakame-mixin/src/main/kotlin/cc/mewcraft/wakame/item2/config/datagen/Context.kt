@@ -8,15 +8,20 @@ import kotlin.random.Random
 /**
  * 从 [KoishItem] 生成一个物品堆叠时的上下文.
  *
- * 该实例的生命周期仅存在于物品生成时, 生成完成后便不应该再使用.
+ * 该实例的生命周期仅存在于物品生成时. 当一个物品生成完成后该实例便不应该再使用.
+ *
+ * @property koishItem 物品类型
  */
-class Context(
+data class Context(
     val koishItem: KoishItem,
-) {
-
+) : LevelContext {
     constructor(koishItem: RegistryEntry<KoishItem>) : this(koishItem.unwrap())
 
     val random: Random = Random
-    var level: Int = 1
+    override var level: Int = 1
 
+}
+
+interface LevelContext {
+    var level: Int
 }

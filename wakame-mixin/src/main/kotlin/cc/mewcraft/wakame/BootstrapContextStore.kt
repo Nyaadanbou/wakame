@@ -35,7 +35,7 @@ object BootstrapContextStore {
     lateinit var PLUGIN_JAR: Path private set
 
     @get:JvmName("getModJar")
-    lateinit var MOD_JAR: Path private set // TODO actually implement it - we need to find a way to get the mod jar path
+    lateinit var MOD_JAR: Path private set
 
     @ApiStatus.Internal
     fun registerBootstrap(bootstrap: PluginBootstrap) {

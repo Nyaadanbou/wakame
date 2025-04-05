@@ -1,18 +1,16 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.bundle.AttributeGenerationContext
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContext
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.ObservableDelegates
-import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
-import net.kyori.examination.ExaminableProperty
 import java.util.concurrent.ThreadLocalRandom
-import java.util.stream.Stream
 import kotlin.random.Random
 
 
@@ -24,7 +22,7 @@ import kotlin.random.Random
  *
  * 该接口所有函数和变量均为非线程安全!
  */
-interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationContext {
+interface ItemGenerationContext : RandomSelectorContext, AttributeContext {
 
     // 继承的 RandomSelectorContext
     override val seed: Long
@@ -32,7 +30,7 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
     override val marks: MutableCollection<Mark>
 
     // 继承的 AttributeGenerationContext
-    override var level: Int?
+    override var level: Int
     override val attributes: MutableCollection<AttributeContextData>
 
     /**
@@ -59,11 +57,6 @@ interface ItemGenerationContext : RandomSelectorContext, AttributeGenerationCont
      * 已经生成的物品铭刻.
      */
     val kizamiz: MutableCollection<RegistryEntry<Kizami>>
-
-    /**
-     * 已经生成的物品技能.
-     */
-    val abilities: MutableCollection<AbilityContextData>
 }
 
 /**
@@ -88,33 +81,16 @@ object ItemGenerationContexts {
 /* Implementations */
 
 
-private class SimpleItemGenerationContext(
+private data class SimpleItemGenerationContext(
     override val trigger: ItemGenerationTrigger,
     override val target: Key,
     override val seed: Long,
 ) : ItemGenerationContext {
     override val random: Random = Random(seed)
     override val marks: MutableCollection<Mark> by ObservableDelegates.set(HashSet())
-    override var level: Int? by ObservableDelegates.reference(null)
+    override var level: Int by ObservableDelegates.reference(1)
     override var rarity: RegistryEntry<Rarity>? by ObservableDelegates.reference(null)
     override val elements: MutableCollection<RegistryEntry<Element>> by ObservableDelegates.set(HashSet())
     override val kizamiz: MutableCollection<RegistryEntry<Kizami>> by ObservableDelegates.set(HashSet())
-    override val abilities: MutableCollection<AbilityContextData> by ObservableDelegates.set(HashSet())
     override val attributes: MutableCollection<AttributeContextData> by ObservableDelegates.set(HashSet())
-
-    override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("trigger", trigger),
-        ExaminableProperty.of("target", target),
-        ExaminableProperty.of("seed", seed),
-        ExaminableProperty.of("level", level),
-        ExaminableProperty.of("rarity", rarity),
-        ExaminableProperty.of("elements", elements),
-        ExaminableProperty.of("kizamiz", kizamiz),
-        ExaminableProperty.of("ability", abilities),
-        ExaminableProperty.of("attributes", attributes),
-    )
-
-    override fun toString(): String {
-        return toSimpleString()
-    }
 }

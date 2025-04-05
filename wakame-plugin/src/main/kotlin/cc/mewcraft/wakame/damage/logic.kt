@@ -25,7 +25,7 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.user.attributeContainer
 import cc.mewcraft.wakame.util.RecursionGuard
@@ -459,7 +459,7 @@ internal object DamageManager : DamageManagerApi {
         if (!itemstack.templates.has(ItemTemplateTypes.ARROW)) return null
         val itemcells = itemstack.components.get(ItemComponentTypes.CELLS) ?: return null
         val modifiersOnArrow = itemcells.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-        val arrowAttributes = KoishRegistries.IMG_ATTRIBUTE_MAP["minecraft:arrow"]?.getSnapshot() ?: run {
+        val arrowAttributes = KoishRegistries2.IMG_ATTRIBUTE_MAP["minecraft:arrow"]?.getSnapshot() ?: run {
             LOGGER.warn("Could not find imaginary attribute map \"minecraft:arrow\" for context: $this. Returning null damage metadata.")
             return null
         }

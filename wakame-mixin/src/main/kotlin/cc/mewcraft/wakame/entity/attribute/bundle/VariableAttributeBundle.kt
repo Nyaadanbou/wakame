@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.entity.attribute.bundle
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.item.template.AttributeContextData
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
+import cc.mewcraft.wakame.item2.config.datagen.LevelContext
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,43 +22,44 @@ val VariableAttributeBundle.element: RegistryEntry<Element>?
  */
 fun VariableAttributeBundle(
     type: String, node: ConfigurationNode,
-): VariableAttributeBundle = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(type).convertNodeToVariable(node)
+): VariableAttributeBundle = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(type).convertNodeToVariable(node)
 
 /**
  * 代表一个数值可以变化的 [AttributeBundle].
  */
 interface VariableAttributeBundle : AttributeBundle {
-    fun generate(context: AttributeGenerationContext): ConstantAttributeBundle
+    fun generate(context: AttributeContext): ConstantAttributeBundle
 }
 
 /**
  * 代表一个生成 [AttributeBundle] 的上下文.
  */
-interface AttributeGenerationContext {
-    /**
-     * 当前已生成的等级.
-     */
-    var level: Int?
-
-    /**
-     * 当前已生成的属性.
-     */
+interface AttributeContext : LevelContext {
     val attributes: MutableCollection<AttributeContextData>
 }
+
+/**
+ * 代表一个生成 [AttributeBundle] 的上下文数据.
+ */
+data class AttributeContextData(
+    val id: String,
+    val operation: AttributeModifier.Operation?,
+    val element: RegistryEntry<Element>?,
+)
 
 
 /* Implementations */
 
 
-internal data class VariableAttributeBundleR(
+data class VariableAttributeBundleR(
     override val id: String,
-    override val operation: Operation,
+    override val operation: AttributeModifier.Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
 ) : VariableAttributeBundle, AttributeBundleR<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
+    override fun generate(context: AttributeContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
-        val factor = context.level ?: 0
+        val factor = context.level
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
         return ConstantAttributeBundleR(
@@ -71,16 +72,16 @@ internal data class VariableAttributeBundleR(
     }
 }
 
-internal data class VariableAttributeBundleRE(
+data class VariableAttributeBundleRE(
     override val id: String,
-    override val operation: Operation,
+    override val operation: AttributeModifier.Operation,
     override val lower: RandomizedValue,
     override val upper: RandomizedValue,
     override val element: RegistryEntry<Element>,
 ) : VariableAttributeBundle, AttributeBundleRE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
+    override fun generate(context: AttributeContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
-        val factor = context.level ?: 0
+        val factor = context.level
         val (lower, score1) = lower.calculate(factor)
         val (upper, score2) = upper.calculate(factor)
         return ConstantAttributeBundleRE(
@@ -94,14 +95,14 @@ internal data class VariableAttributeBundleRE(
     }
 }
 
-internal data class VariableAttributeBundleS(
+data class VariableAttributeBundleS(
     override val id: String,
-    override val operation: Operation,
+    override val operation: AttributeModifier.Operation,
     override val value: RandomizedValue,
 ) : VariableAttributeBundle, AttributeBundleS<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
+    override fun generate(context: AttributeContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
-        val factor = context.level ?: 0
+        val factor = context.level
         val (value, score) = value.calculate(factor)
         return ConstantAttributeBundleS(
             id,
@@ -112,15 +113,15 @@ internal data class VariableAttributeBundleS(
     }
 }
 
-internal data class VariableAttributeBundleSE(
+data class VariableAttributeBundleSE(
     override val id: String,
-    override val operation: Operation,
+    override val operation: AttributeModifier.Operation,
     override val value: RandomizedValue,
     override val element: RegistryEntry<Element>,
 ) : VariableAttributeBundle, AttributeBundleSE<RandomizedValue> {
-    override fun generate(context: AttributeGenerationContext): ConstantAttributeBundle {
+    override fun generate(context: AttributeContext): ConstantAttributeBundle {
         populateContextWithDefault(context)
-        val factor = context.level ?: 0
+        val factor = context.level
         val (value, score) = value.calculate(factor)
         return ConstantAttributeBundleSE(
             id,
@@ -132,6 +133,6 @@ internal data class VariableAttributeBundleSE(
     }
 }
 
-private fun VariableAttributeBundle.populateContextWithDefault(context: AttributeGenerationContext) {
+private fun VariableAttributeBundle.populateContextWithDefault(context: AttributeContext) {
     context.attributes += AttributeContextData(id, operation, element)
 }

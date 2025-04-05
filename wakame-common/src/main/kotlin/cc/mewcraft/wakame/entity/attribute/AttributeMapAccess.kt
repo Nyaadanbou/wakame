@@ -27,6 +27,7 @@ interface AttributeMapAccess {
     /**
      * Gets the [AttributeMap] for the specified player.
      */
+    // TODO #373: 直接返回 AttributeMap
     fun get(player: Player): Result<AttributeMap>
 
     /**

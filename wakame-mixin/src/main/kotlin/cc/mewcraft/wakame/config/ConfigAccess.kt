@@ -8,7 +8,11 @@ import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
+import java.nio.file.Path
+
+val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess.INSTANCE["config"]
 
 /**
  * 注册自定义 [serializer] 用于 [feature] 的配置文件.
@@ -112,5 +116,15 @@ interface ConfigAccess {
      * 注册自定义 [serializer] 用于 [namespace] 的配置文件.
      */
     fun <T> registerSerializer(namespace: String, type: TypeToken<T>, serializer: TypeSerializer<T>)
+
+    // ------------
+    // Internal API
+    // ------------
+
+    @ApiStatus.Internal
+    fun createBuilder(namespace: String): YamlConfigurationLoader.Builder
+
+    @ApiStatus.Internal
+    fun createLoader(namespace: String, path: Path): YamlConfigurationLoader
 
 }

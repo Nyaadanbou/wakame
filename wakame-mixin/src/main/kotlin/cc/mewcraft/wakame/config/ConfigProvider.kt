@@ -1,9 +1,8 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package cc.mewcraft.wakame.config
 
 import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.util.Identifier
+import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ScopedConfigurationNode
@@ -425,9 +424,9 @@ private fun Provider<ConfigurationNode>.findFilePath(): String? {
     return null
 }
 
+@ApiStatus.Internal
 @OptIn(UnstableProviderApi::class)
-internal class RootConfigProvider
-internal constructor(
+class RootConfigProvider(
     val path: Path,
     val configId: Identifier,
 ) : AbstractProvider<CommentedConfigurationNode>(ReentrantLock()) {
@@ -458,11 +457,11 @@ internal constructor(
         }
 
         // empty placeholder that is replaced by the actual node when the config is (re)loaded
-        return Configs.createBuilder(configId.namespace()).build().createNode()
+        return ConfigAccess.INSTANCE.createBuilder(configId.namespace()).build().createNode()
     }
 
     private fun loadNode(): CommentedConfigurationNode {
-        return Configs.createLoader(configId.namespace(), path).load()
+        return ConfigAccess.INSTANCE.createLoader(configId.namespace(), path).load()
     }
 
 }

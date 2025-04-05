@@ -6,6 +6,11 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
+import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -24,6 +29,7 @@ import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
 
+// FIXME #373: rename to BuiltInRegistries
 object KoishRegistries2 {
 
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
@@ -138,6 +144,32 @@ object KoishRegistries2 {
      */
     @JvmField
     val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys2.ATTRIBUTE)
+
+    /**
+     * 实体的默认属性.
+     *
+     * 1. 包含所有原版实体(包括玩家)的默认属性.
+     * 2. MythicMobs 生物的属性不由这里提供.
+     *
+     * ### Notes
+     * Using [RegistryKey] to identify the "type" of living entities because we want the whole
+     * attribute system to be compatible with 3rd party mob system such as MythicMobs,
+     * in which case the enum type is not enough to express all types.
+     */
+    @JvmField
+    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys2.ATTRIBUTE_SUPPLIER)
+
+    /**
+     * 属性块 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 的外观, 用于访问属性块相关的数据和逻辑.
+     */
+    @JvmField
+    val ATTRIBUTE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys2.ATTRIBUTE_FACADE)
+
+    /**
+     * 虚构的属性映射.
+     */
+    @JvmField
+    val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys2.IMG_ATTRIBUTE_MAP)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

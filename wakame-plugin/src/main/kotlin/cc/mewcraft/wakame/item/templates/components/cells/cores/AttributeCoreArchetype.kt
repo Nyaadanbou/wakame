@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.KoishRegistries2
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 
@@ -20,7 +20,7 @@ fun AttributeCoreArchetype(
     id: Key,
     node: ConfigurationNode,
 ): AttributeCoreArchetype = SimpleAttributeCoreArchetype(
-    id = id, data = KoishRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToVariable(node)
+    id = id, data = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToVariable(node)
 )
 
 /**

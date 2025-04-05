@@ -24,10 +24,6 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 
-private val DEFAULT_CONFIG_ID = Identifier.key("koish", "config")
-
-val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess.INSTANCE[DEFAULT_CONFIG_ID]
-
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 @InternalReload
 internal object Configs : ConfigAccess {
@@ -44,7 +40,7 @@ internal object Configs : ConfigAccess {
 
     fun initialize() {
         // 先提取必要的文件到插件数据目录, 否则接下来 reload 会读取到空文件
-        ConfigExtractor.extractDefaults()
+        ConfigsExtractor.extractDefaults()
 
         // 更新一开始的特殊值为当前时间戳
         lastReload = System.currentTimeMillis()
@@ -139,7 +135,7 @@ internal object Configs : ConfigAccess {
         customSerializers.getOrPut(namespace, TypeSerializerCollection::builder).register(type, serializer)
     }
 
-    internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder {
+    override fun createBuilder(namespace: String): YamlConfigurationLoader.Builder {
         return YamlConfigurationLoader.builder()
             .nodeStyle(NodeStyle.BLOCK)
             .indent(2)
@@ -152,7 +148,7 @@ internal object Configs : ConfigAccess {
             }
     }
 
-    internal fun createLoader(namespace: String, path: Path): YamlConfigurationLoader {
+    override fun createLoader(namespace: String, path: Path): YamlConfigurationLoader {
         return createBuilder(namespace).path(path).build()
     }
 

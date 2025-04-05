@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -18,9 +17,9 @@ import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.orElse
 import java.util.stream.Stream
 
-internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
+const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
 
-internal val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess.INSTANCE[AttributeFacadeRegistryLoader.CONFIG_ID]
+val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess.INSTANCE["attributes"]
 
 /**
  * An attribute type with a numerical default value.
@@ -320,12 +319,12 @@ protected constructor(
         if (this === other)
             return true
         if (other is ElementAttribute)
-            return this@ElementAttribute.id == other.id /* && element == other.element */
+            return this.id == other.id /* && element == other.element */
         return false
     }
 
     override fun hashCode(): Int {
-        val result = this@ElementAttribute.id.hashCode()
+        val result = this.id.hashCode()
         // result = (31 * result) + element.hashCode()
         return result
     }
