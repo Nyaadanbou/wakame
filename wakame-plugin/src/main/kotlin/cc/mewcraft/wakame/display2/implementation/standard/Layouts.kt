@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
-import cc.mewcraft.wakame.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.StringCombiner

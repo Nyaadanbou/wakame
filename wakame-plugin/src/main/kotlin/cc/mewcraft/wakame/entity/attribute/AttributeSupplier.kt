@@ -1,8 +1,5 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.AttributeInstance
-import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeInstance
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.Identifier
@@ -17,8 +14,8 @@ import org.spongepowered.configurate.kotlin.extensions.get
  *
  * It may **not** always provide default values for every attribute type!
  *
- * @property prototypes The available [cc.mewcraft.wakame.entity.attribute.AttributeInstance]s in this supplier.
- * @property attributes The available [cc.mewcraft.wakame.entity.attribute.Attribute]s in this supplier.
+ * @property prototypes The available [AttributeInstance]s in this supplier.
+ * @property attributes The available [Attribute]s in this supplier.
  */
 class AttributeSupplier
 internal constructor(
@@ -52,7 +49,7 @@ internal constructor(
     }
 
     /**
-     * Creates a new [cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeInstance] from this supplier.
+     * Creates a new [ImaginaryAttributeInstance] from this supplier.
      */
     fun createImaginaryInstance(type: Attribute): ImaginaryAttributeInstance? {
         val prototype = prototypes[type] ?: return null

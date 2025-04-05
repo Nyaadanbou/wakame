@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.bundle
+package cc.mewcraft.wakame.entity.attribute.bundle
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
@@ -54,8 +54,8 @@ sealed interface AttributeBundleTrait {
  * [cc.mewcraft.wakame.entity.attribute.Attribute] 和 [cc.mewcraft.wakame.entity.attribute.AttributeInstance].
  *
  * 例如, 玩家看到的物品“攻击力”属性, 实际上是由两个 [cc.mewcraft.wakame.entity.attribute.Attribute] 组成的.
- * 一个是 [cc.mewcraft.wakame.attribute.Attributes.MIN_ATTACK_DAMAGE], 另一个是
- * [cc.mewcraft.wakame.attribute.Attributes.MAX_ATTACK_DAMAGE].
+ * 一个是 [cc.mewcraft.wakame.entity.attribute.Attributes.MIN_ATTACK_DAMAGE], 另一个是
+ * [cc.mewcraft.wakame.entity.attribute.Attributes.MAX_ATTACK_DAMAGE].
  *
  * 因此我们需要这么一个类, 将这两个 [cc.mewcraft.wakame.entity.attribute.Attribute] 组合成一个玩家眼中的“属性”.
  *

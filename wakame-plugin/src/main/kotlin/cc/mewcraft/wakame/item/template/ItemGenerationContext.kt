@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.template
 
-import cc.mewcraft.wakame.attribute.bundle.AttributeGenerationContext
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeGenerationContext
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.random3.Mark
 import cc.mewcraft.wakame.random3.RandomSelectorContext

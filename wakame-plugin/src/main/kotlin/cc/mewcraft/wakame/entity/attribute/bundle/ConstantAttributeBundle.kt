@@ -1,10 +1,10 @@
-package cc.mewcraft.wakame.attribute.bundle
+package cc.mewcraft.wakame.entity.attribute.bundle
 
-import cc.mewcraft.wakame.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry

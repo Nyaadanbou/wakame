@@ -1,4 +1,4 @@
-import cc.mewcraft.wakame.attribute.AttributeLegacyMappings
+import cc.mewcraft.wakame.entity.attribute.AttributeLegacyMappings
 import net.kyori.adventure.key.Key
 import kotlin.test.Test
 import kotlin.test.assertEquals

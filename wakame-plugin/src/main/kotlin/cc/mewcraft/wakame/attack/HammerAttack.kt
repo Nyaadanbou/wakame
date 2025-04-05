@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -23,8 +23,8 @@ import org.bukkit.inventory.EquipmentSlot
  * 自定义锤攻击.
  * 对直接攻击到的实体造成面板伤害.
  * 对 锤击范围 内的实体造成 锤击威力*面板 的伤害.
- * 锤击范围由属性 [cc.mewcraft.wakame.attribute.Attributes.HAMMER_DAMAGE_RANGE] 决定.
- * 锤击威力由属性 [cc.mewcraft.wakame.attribute.Attributes.HAMMER_DAMAGE_RATIO] 决定.
+ * 锤击范围由属性 [Attributes.HAMMER_DAMAGE_RANGE] 决定.
+ * 锤击威力由属性 [Attributes.HAMMER_DAMAGE_RATIO] 决定.
  *
  * ## Node structure
  * ```yaml

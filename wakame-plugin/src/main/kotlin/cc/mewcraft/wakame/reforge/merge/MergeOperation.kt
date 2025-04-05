@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore

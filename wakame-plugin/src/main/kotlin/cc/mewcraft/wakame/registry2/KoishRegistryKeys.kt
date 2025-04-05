@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.registry2
 
-import cc.mewcraft.wakame.attribute.AttributeSupplier
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.entity.attribute.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacade
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.util.Identifiers
 

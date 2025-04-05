@@ -5,10 +5,10 @@ package item
 import assertAny
 import cc.mewcraft.wakame.attack.HandAttack
 import cc.mewcraft.wakame.attack.SpearAttack
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundleS
-import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.element
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.HideAdditionalTooltip

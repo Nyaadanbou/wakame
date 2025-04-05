@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.kizami
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.kizami2.KizamiEffect
 import cc.mewcraft.wakame.lifecycle.initializer.Init

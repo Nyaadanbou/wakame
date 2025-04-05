@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute.bundle
+package cc.mewcraft.wakame.entity.attribute.bundle
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation

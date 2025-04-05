@@ -1,9 +1,9 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import net.kyori.adventure.key.Key
-import java.util.UUID
+import java.util.*
 
 /**
  * 一个临时的实现, 用于将 [Key] 映射到 [UUID], 或者反过来.

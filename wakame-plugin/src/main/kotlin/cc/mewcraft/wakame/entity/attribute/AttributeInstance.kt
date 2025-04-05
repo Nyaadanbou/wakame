@@ -1,7 +1,6 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import com.google.common.collect.ImmutableSet
 import it.unimi.dsi.fastutil.objects.*
@@ -15,7 +14,7 @@ import java.util.*
 import org.bukkit.attribute.AttributeInstance as BukkitAttributeInstance
 
 /**
- * 用于创建各种类型的 [cc.mewcraft.wakame.entity.attribute.AttributeInstance].
+ * 用于创建各种类型的 [AttributeInstance].
  */
 object AttributeInstanceFactory {
     /**

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.item.NekoStack
@@ -23,7 +23,7 @@ import org.joml.Vector3f
 /**
  * 自定义矛攻击.
  * 左键后对玩家视线所指方向的所有生物进行攻击.
- * 攻击的距离上限由属性 [cc.mewcraft.wakame.attribute.Attributes.ENTITY_INTERACTION_RANGE] 决定.
+ * 攻击的距离上限由属性 [Attributes.ENTITY_INTERACTION_RANGE] 决定.
  *
  * ## Node structure
  * ```yaml

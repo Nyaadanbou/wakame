@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.kizami
 
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.kizami2.KizamiEffect
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2

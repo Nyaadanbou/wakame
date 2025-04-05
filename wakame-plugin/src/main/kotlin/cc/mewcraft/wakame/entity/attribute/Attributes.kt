@@ -1,8 +1,6 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
@@ -11,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * The container that holds all [cc.mewcraft.wakame.entity.attribute.Attribute] instances.
+ * The container that holds all [Attribute] instances.
  *
  * The attribute instances in this singleton object are primarily served as
  * "lookup index" for other code in this project. The numeric values passing to the
@@ -77,19 +75,19 @@ object Attributes : AttributeProvider {
     //</editor-fold>
 
     /**
-     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.id] of known attributes.
+     * Gets all [Attribute.id] of known attributes.
      */
     val simpleIds: Set<String>
         get() = AttributeProviderInternals.simpleIds + AttributeGetterImpl.simpleIds
 
     /**
-     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.bundleId] of known vanilla-backed attributes.
+     * Gets all [Attribute.bundleId] of known vanilla-backed attributes.
      */
     val vanillaAttributeNames: Collection<String>
         get() = AttributeNames.vanillaAttributeNames
 
     /**
-     * Gets all [cc.mewcraft.wakame.entity.attribute.Attribute.bundleId] of known element attributes.
+     * Gets all [Attribute.bundleId] of known element attributes.
      *
      * 返回的集合中包含两种名字: 一种是不带元素的名字, 一种是带元素的名字.
      * 例如对于 `defense` 这个属性, 会有两种名字包含在返回的集合中:

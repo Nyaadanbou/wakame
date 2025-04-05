@@ -3,12 +3,8 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.attribute.AttributeGetter
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.ElementAttribute
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
+import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.contracts.ExperimentalContracts

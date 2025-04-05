@@ -1,13 +1,12 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -134,7 +133,7 @@ protected constructor(
  * An [Attribute] type with bounded values.
  *
  * The [minValue] and [maxValue] put a threshold on the final value of this attribute
- * after all [cc.mewcraft.wakame.entity.attribute.AttributeModifier]s have been applied.
+ * after all [AttributeModifier]s have been applied.
  */
 open class RangedAttribute
 /**

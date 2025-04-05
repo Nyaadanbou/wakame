@@ -1,8 +1,8 @@
-package cc.mewcraft.wakame.entity.attribute
+package cc.mewcraft.wakame.entity.attribute2
 
-import cc.mewcraft.wakame.attribute.AttributeSupplier
-import cc.mewcraft.wakame.attribute.AttributeSupplierSerializer
 import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierSerializer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

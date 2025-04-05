@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
 import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

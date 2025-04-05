@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.registry2.KoishRegistries2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf

@@ -4,7 +4,6 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.attack.SwordAttack
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.DamageManager.calculateDamageBeforeDefense
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamage
 import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamageMap
@@ -20,6 +19,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes

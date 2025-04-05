@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer

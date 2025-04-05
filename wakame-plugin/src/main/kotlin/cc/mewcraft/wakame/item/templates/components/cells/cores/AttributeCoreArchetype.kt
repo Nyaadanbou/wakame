@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.templates.components.cells.cores
 
-import cc.mewcraft.wakame.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype

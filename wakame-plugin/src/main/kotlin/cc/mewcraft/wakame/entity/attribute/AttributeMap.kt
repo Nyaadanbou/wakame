@@ -1,8 +1,7 @@
 @file:OptIn(ExperimentalContracts::class)
 
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.entity.attribute.*
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.kyori.adventure.key.Key

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability2.AbilityMetaRegistryLoader
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item.NekoItem

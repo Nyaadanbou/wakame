@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.bundle.element
+import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype

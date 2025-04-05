@@ -1,9 +1,6 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.AttributeInstance
-import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.util.data.*
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream

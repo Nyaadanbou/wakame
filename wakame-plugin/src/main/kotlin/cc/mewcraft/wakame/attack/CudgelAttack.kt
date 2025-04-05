@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -23,7 +23,7 @@ import org.bukkit.inventory.EquipmentSlot
 /**
  * 自定义棍攻击.
  * 左键后对以玩家为中心的长方体区域内的所有生物进行攻击.
- * 长方体区域 x 轴 和 z 轴边长由属性 [cc.mewcraft.wakame.attribute.Attributes.ENTITY_INTERACTION_RANGE] 决定.
+ * 长方体区域 x 轴 和 z 轴边长由属性 [Attributes.ENTITY_INTERACTION_RANGE] 决定.
  *
  * ## Node structure
  * ```yaml

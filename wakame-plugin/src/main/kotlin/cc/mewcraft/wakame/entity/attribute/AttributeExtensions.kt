@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import com.google.common.collect.ImmutableBiMap

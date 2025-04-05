@@ -1,18 +1,16 @@
-package cc.mewcraft.wakame.entity.attribute
+package cc.mewcraft.wakame.entity.attribute2
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.adventure.key.Keyed
-import cc.mewcraft.wakame.attribute.AttributeGetter
-import cc.mewcraft.wakame.attribute.Attributes
-import cc.mewcraft.wakame.attribute.GLOBAL_ATTRIBUTE_CONFIG
-import cc.mewcraft.wakame.attribute.bundle.*
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle.Quality
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.entity.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Quality
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -123,7 +121,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
 }
 
 /**
- * 包含了一个 [cc.mewcraft.wakame.attribute.bundle.AttributeBundle] 所相关的各种字段和操作.
+ * 包含了一个 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 所相关的各种字段和操作.
  *
  * @param T [ConstantAttributeBundle] 的一个子类
  * @param S [VariableAttributeBundle] 的一个子类
@@ -135,9 +133,9 @@ interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBund
     val config: Provider<ConfigurationNode>
 
     /**
-     * [属性块][cc.mewcraft.wakame.attribute.bundle.AttributeBundle]的唯一标识.
+     * [属性块][cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle]的唯一标识.
      *
-     * 属性块的唯一标识与单个[属性][Attribute]的唯一标识不一定相同,
+     * 属性块的唯一标识与单个[属性][cc.mewcraft.wakame.entity.attribute.Attribute]的唯一标识不一定相同,
      * 当属性块是由多个属性构成时(例如攻击力),
      * 它们的唯一标识就不一样.
      */

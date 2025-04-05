@@ -1,8 +1,6 @@
-package cc.mewcraft.wakame.attribute
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.registry2.KoishRegistries
 import org.bukkit.entity.Entity

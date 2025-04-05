@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.attribute.bundle.element
+import cc.mewcraft.wakame.entity.attribute.bundle.element
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.NekoStackDelegates
@@ -33,9 +33,6 @@ import java.util.*
 import java.util.Collections.emptyList
 import java.util.Collections.emptySet
 import java.util.stream.Stream
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

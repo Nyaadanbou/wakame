@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.item.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.registry2.KoishRegistries

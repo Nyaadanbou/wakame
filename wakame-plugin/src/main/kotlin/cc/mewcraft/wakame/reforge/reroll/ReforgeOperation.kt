@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.attribute.bundle.element
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.bundle.element
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.extension.*
