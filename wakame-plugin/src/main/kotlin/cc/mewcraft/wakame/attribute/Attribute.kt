@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.attribute
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
@@ -21,7 +21,7 @@ import java.util.stream.Stream
 
 internal const val ATTRIBUTE_ID_PATTERN_STRING = "[a-z0-9_./]+"
 
-internal val GLOBAL_ATTRIBUTE_CONFIG = Configs[AttributeFacadeRegistryLoader.CONFIG_ID]
+internal val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess.INSTANCE[AttributeFacadeRegistryLoader.CONFIG_ID]
 
 /**
  * An attribute type with a numerical default value.

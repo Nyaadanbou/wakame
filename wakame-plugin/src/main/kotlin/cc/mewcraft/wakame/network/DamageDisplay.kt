@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.network
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
+import cc.mewcraft.wakame.config.registerSerializer
 import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
 import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
@@ -43,7 +44,7 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
-private val DAMAGE_CONFIG = Configs["damage/config"]
+private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
 private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
 private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
 private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
@@ -185,7 +186,7 @@ internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplay
 
     @InitFun
     fun init() {
-        Configs.registerSerializer(KOISH_NAMESPACE, this)
+        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
     }
 }
 
@@ -203,7 +204,7 @@ internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplayS
 
     @InitFun
     fun init() {
-        Configs.registerSerializer(KOISH_NAMESPACE, this)
+        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
     }
 
 }

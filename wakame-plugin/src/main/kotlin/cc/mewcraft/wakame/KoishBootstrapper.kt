@@ -2,6 +2,7 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.command.KoishCommandManager
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
 import cc.mewcraft.wakame.entity.entityModule
@@ -42,6 +43,9 @@ internal class KoishBootstrapper : PluginBootstrap {
     // 1) 加载 NMS 的 classes (因此可以在这里对服务端代码进行 patching)
     // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
+        // 最先注册配置文件实例, 因为 Koin 说不定会用到
+        ConfigAccess.register(Configs)
+
         startKoin {
             modules(
                 // submodules (按字母顺序)

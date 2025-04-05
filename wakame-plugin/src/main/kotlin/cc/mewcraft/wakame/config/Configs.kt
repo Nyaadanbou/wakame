@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.serialization.configurate.typeserializer.KOISH_SERIALI
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
-import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -27,14 +26,11 @@ import kotlin.io.path.getLastModifiedTime
 
 private val DEFAULT_CONFIG_ID = Identifier.key("koish", "config")
 
-val MAIN_CONFIG: Provider<CommentedConfigurationNode> = Configs[DEFAULT_CONFIG_ID]
+val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess.INSTANCE[DEFAULT_CONFIG_ID]
 
-/**
- * The object that manages the configuration providers.
- */
 @InternalInit(stage = InternalInitStage.PRE_WORLD)
 @InternalReload
-object Configs {
+internal object Configs : ConfigAccess {
 
     private val customSerializers = HashMap<String, TypeSerializerCollection.Builder>()
     private val configProviders = HashMap<Identifier, RootConfigProvider>()
@@ -94,32 +90,15 @@ object Configs {
         return reloadedConfigs
     }
 
-    /**
-     * 返回指定配置文件的 [Provider].
-     *
-     * 传入的 [id] 可以是以下形式, 将转译成具体的文件路径:
-     * - `"koish:items"` -> `configs/items.yml`
-     * - `"koish:recipe/dirt"` -> `configs/recipe/dirt.yml`
-     * - `"koish:enchantment/agility"` -> `configs/enchantment/agility.yml`
-     *
-     * @param id 配置文件的 id, 必须是 `namespace:path` 的形式. 如果省略 `namespace`, 则默认为 `koish`
-     */
-    operator fun get(id: String): Provider<CommentedConfigurationNode> {
+    override operator fun get(id: String): Provider<CommentedConfigurationNode> {
         return get(Identifiers.of(id))
     }
 
-    /**
-     * @param feature 对应的 [Feature] (仅取其命名空间)
-     * @param path 相对于 [feature] 文件夹的文件路径
-     */
-    operator fun get(feature: Feature, path: String): Provider<CommentedConfigurationNode> {
+    override operator fun get(feature: Feature, path: String): Provider<CommentedConfigurationNode> {
         return get(Identifier.key(feature.namespace, path))
     }
 
-    /**
-     * @param id 配置文件的 id, 必须是 `namespace:path` 的形式
-     */
-    operator fun get(id: Identifier): Provider<CommentedConfigurationNode> {
+    override operator fun get(id: Identifier): Provider<CommentedConfigurationNode> {
         return configProviders.getOrPut(id) {
             RootConfigProvider(resolveConfigPath(id), id).also { provider ->
                 if (lastReload > UNINITIALIZED_LAST_RELOAD) provider.reload()
@@ -127,66 +106,37 @@ object Configs {
         }
     }
 
-    fun getOrNull(id: String): CommentedConfigurationNode? {
+    override fun getOrNull(id: String): CommentedConfigurationNode? {
         return getOrNull(Identifiers.of(id))
     }
 
-    fun getOrNull(id: Identifier): CommentedConfigurationNode? {
+    override fun getOrNull(id: Identifier): CommentedConfigurationNode? {
         return configProviders[id]?.takeIf(RootConfigProvider::loaded)?.get()
     }
 
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("向现有的文件写入内容永远都是一件需要小心的事情")
-    fun save(id: String) {
+    override fun save(id: String) {
         save(Identifiers.of(id))
     }
 
-    @Deprecated("向现有的文件写入内容永远都是一件需要小心的事情")
-    fun save(id: Identifier) {
+    override fun save(id: Identifier) {
         val config = getOrNull(id) ?: return
         createLoader(id.namespace(), resolveConfigPath(id)).save(config)
     }
 
-    /**
-     * Registers custom [serializers] for configs of [feature].
-     */
-    fun registerSerializer(feature: Feature, serializers: TypeSerializerCollection) {
+    override fun registerSerializer(feature: Feature, serializers: TypeSerializerCollection) {
         registerSerializer(feature.namespace, serializers)
     }
 
-    /**
-     * Registers custom [serializer] for configs of [feature].
-     */
-    fun <T> registerSerializer(feature: Feature, type: TypeToken<T>, serializer: TypeSerializer<T>) {
+    override fun <T> registerSerializer(feature: Feature, type: TypeToken<T>, serializer: TypeSerializer<T>) {
         registerSerializer(feature.namespace, type, serializer)
     }
 
-    /**
-     * Registers custom [serializer] for configs of [feature].
-     */
-    inline fun <reified T> registerSerializer(feature: Feature, serializer: TypeSerializer<T>) {
-        registerSerializer(feature, typeTokenOf(), serializer)
-    }
-
-    /**
-     * Registers custom [serializers] for configs of [namespace].
-     */
-    fun registerSerializer(namespace: String, serializers: TypeSerializerCollection) {
+    override fun registerSerializer(namespace: String, serializers: TypeSerializerCollection) {
         customSerializers.getOrPut(namespace, TypeSerializerCollection::builder).registerAll(serializers)
     }
 
-    /**
-     * Registers custom [serializer] for configs of [namespace].
-     */
-    fun <T> registerSerializer(namespace: String, type: TypeToken<T>, serializer: TypeSerializer<T>) {
+    override fun <T> registerSerializer(namespace: String, type: TypeToken<T>, serializer: TypeSerializer<T>) {
         customSerializers.getOrPut(namespace, TypeSerializerCollection::builder).register(type, serializer)
-    }
-
-    /**
-     * Registers custom [serializer] for configs of [namespace].
-     */
-    inline fun <reified T> registerSerializer(namespace: String, serializer: TypeSerializer<T>) {
-        registerSerializer(namespace, typeTokenOf(), serializer)
     }
 
     internal fun createBuilder(namespace: String): YamlConfigurationLoader.Builder {
