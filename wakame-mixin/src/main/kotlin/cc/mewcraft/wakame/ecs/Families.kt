@@ -28,7 +28,7 @@ object Families {
     val BUKKIT_ENTITY: Family = family { all(BukkitObject, BukkitEntity) }
 
     @JvmField
-    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitPlayer) }
+    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitEntity, BukkitPlayer) }
 
     // ------------------------------
     // 其余 family 为任意系统的具体实现, 其具体定义应该参考具体的文档
