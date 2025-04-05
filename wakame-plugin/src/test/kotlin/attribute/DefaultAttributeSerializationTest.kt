@@ -3,9 +3,9 @@ package attribute
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.entity.attribute2.AttributeFacadeRegistryLoader
-import cc.mewcraft.wakame.entity.attribute2.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import io.mockk.mockk
 import org.bukkit.attribute.Attributable

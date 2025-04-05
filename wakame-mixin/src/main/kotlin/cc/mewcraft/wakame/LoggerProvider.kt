@@ -4,10 +4,10 @@ import net.kyori.adventure.text.logger.slf4j.ComponentLogger
 import kotlin.reflect.KProperty
 
 @get:JvmName("getLogger")
-val LOGGER: ComponentLogger by KoishLoggerProvider
+val LOGGER: ComponentLogger by LoggerProvider
 
 // 为了让代码在单元测试环境里也能直接使用 LOGGER, 我们创建该容器来装载不同环境下的 Logger 实例
-object KoishLoggerProvider {
+object LoggerProvider {
     private var LOGGER: ComponentLogger? = null
 
     init {

@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.world.player.death
+package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
@@ -6,12 +6,14 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.util.event
+import cc.mewcraft.wakame.util.registerEvents
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.RemovalCause
 import org.bukkit.entity.EntityType
+import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.ItemStack
@@ -27,14 +29,12 @@ import java.util.concurrent.TimeUnit
  * 未来的功能:
  * - 兼容其他系统???
  */
-@Init(
-    stage = InitStage.POST_WORLD,
-)
-internal object PlayerDeathProtect {
+@Init(stage = InitStage.POST_WORLD)
+internal object SimpleDeathDropProtect : Listener {
 
     @InitFun
     fun init() {
-        registerListeners()
+        registerEvents()
     }
 
     // 记录了将要掉落的物品堆叠, 以及物品对应的所有者
@@ -52,46 +52,43 @@ internal object PlayerDeathProtect {
 
     private val onlyOwnerCanPickupDeathDrops: Boolean by MAIN_CONFIG.entry<Boolean>("only_owner_can_pickup_death_drops")
 
-    private fun registerListeners() {
-
-        // 在玩家死亡的时候, 记录掉落的物品堆叠, 以及物品对应的所有者
-        event<PlayerDeathEvent>(EventPriority.MONITOR, true) { event->
-            if (!onlyOwnerCanPickupDeathDrops) {
-                return@event
-            }
-
-            if (event.keepInventory) {
-                return@event
-            }
-
-            val player = event.player
-            val drops = event.drops
-            for (drop in drops) {
-                deathDropRecords.put(drop, player.uniqueId)
-            }
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    fun on(event: PlayerDeathEvent) {
+        if (!onlyOwnerCanPickupDeathDrops) {
+            return
         }
 
-        // 在物品掉落时, 设置物品的所有者, 并移除记录
-        event<ItemSpawnEvent>(EventPriority.HIGHEST, true) { event->
-            if (!onlyOwnerCanPickupDeathDrops) {
-                return@event
-            }
-
-            val entityType = event.entityType
-            if (entityType != EntityType.ITEM) {
-                return@event
-            }
-
-            val item = event.entity
-            val itemStack = item.itemStack
-            val ownerUuid = deathDropRecords.getIfPresent(itemStack) ?: return@event
-
-            // 设置物品的所有者
-            item.owner = ownerUuid
-
-            // 移除记录
-           deathDropRecords.invalidate(itemStack)
+        val player = event.player
+        if (event.keepInventory) {
+            return
         }
+
+        val drops = event.drops
+        for (drop in drops) {
+            deathDropRecords.put(drop, player.uniqueId)
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun on(event: ItemSpawnEvent) {
+        if (!onlyOwnerCanPickupDeathDrops) {
+            return
+        }
+
+        val entityType = event.entityType
+        if (entityType != EntityType.ITEM) {
+            return
+        }
+
+        val item = event.entity
+        val itemStack = item.itemStack
+        val ownerUuid = deathDropRecords.getIfPresent(itemStack) ?: return
+
+        // 设置物品的所有者
+        item.owner = ownerUuid
+
+        // 移除记录
+        deathDropRecords.invalidate(itemStack)
     }
 
 }

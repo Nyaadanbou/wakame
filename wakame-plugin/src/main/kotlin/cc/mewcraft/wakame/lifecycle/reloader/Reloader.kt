@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lifecycle.reloader
 
-import cc.mewcraft.wakame.BootstrapContextStore
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
 import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
@@ -27,7 +27,7 @@ internal object Reloader {
 
     @InitFun
     fun collectAndRegisterTasks() = tryExecute {
-        registerTasks(collectTasks(BootstrapContextStore.PLUGIN_JAR.toFile(), this.javaClass.classLoader))
+        registerTasks(collectTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader))
     }
 
     private fun collectTasks(file: File, classLoader: ClassLoader): List<Reloadable> {

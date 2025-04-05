@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.BootstrapContextStore
+import cc.mewcraft.wakame.BootstrapContexts
 import org.incendo.cloud.Command
 import org.incendo.cloud.CommandFactory
 import org.incendo.cloud.CommandManager
@@ -22,7 +22,7 @@ internal interface KoishCommandFactory<C : Any> : CommandFactory<C> {
         private val commandManager: CommandManager<C>,
     ) {
         private val commandList: ArrayList<Command<C>> = ArrayList()
-        private val pluginName = BootstrapContextStore.PLUGIN_NAME.lowercase()
+        private val pluginName = BootstrapContexts.PLUGIN_NAME.lowercase()
 
         /**
          * 创建一个 [Command] 并添加到 [commandList].

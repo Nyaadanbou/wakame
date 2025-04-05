@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.papi
 
-import cc.mewcraft.wakame.BootstrapContextStore
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.integration.Hook
@@ -14,10 +14,10 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
         register()
     }
 
-    override fun getIdentifier(): String = BootstrapContextStore.PLUGIN_NAME.lowercase()
-    override fun getAuthor(): String = BootstrapContextStore.PLUGIN_AUTHORS.joinToString()
-    override fun getVersion(): String = BootstrapContextStore.PLUGIN_VERSION.toString()
-    override fun getRequiredPlugin(): String = BootstrapContextStore.PLUGIN_NAME
+    override fun getIdentifier(): String = BootstrapContexts.PLUGIN_NAME.lowercase()
+    override fun getAuthor(): String = BootstrapContexts.PLUGIN_AUTHORS.joinToString()
+    override fun getVersion(): String = BootstrapContexts.PLUGIN_VERSION.toString()
+    override fun getRequiredPlugin(): String = BootstrapContexts.PLUGIN_NAME
     override fun persist(): Boolean = true
 
     override fun onPlaceholderRequest(player: Player, params: String): String? {

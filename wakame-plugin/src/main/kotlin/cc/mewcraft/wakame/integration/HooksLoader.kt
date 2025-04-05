@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.integration
 
-import cc.mewcraft.wakame.BootstrapContextStore
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
@@ -49,7 +49,7 @@ internal object HooksLoader {
     @Suppress("UNCHECKED_CAST")
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            BootstrapContextStore.PLUGIN_JAR.toFile(),
+            BootstrapContexts.PLUGIN_JAR.toFile(),
             listOf(Hook::class), emptyList(),
             "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->

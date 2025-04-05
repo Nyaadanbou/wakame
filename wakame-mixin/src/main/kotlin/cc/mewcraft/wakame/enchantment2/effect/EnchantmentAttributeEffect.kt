@@ -7,12 +7,10 @@ import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.HashMultimap
-import com.mojang.logging.LogUtils
 import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.world.item.enchantment.LevelBasedValue
 import org.bukkit.entity.Player
-import org.slf4j.Logger
 
 @JvmRecord
 data class EnchantmentAttributeEffect(
@@ -34,22 +32,14 @@ data class EnchantmentAttributeEffect(
             ).apply(instance, ::EnchantmentAttributeEffect)
         }
 
-        private val LOGGER: Logger = LogUtils.getLogger()
-
     }
 
     fun apply(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.INSTANCE.get(player).fold(
-            { map -> map.addTransientModifiers(makeAttributeMap(level, slot)) },
-            { ex -> LOGGER.error("Failed to apply attribute modifier to player: ${ex.message}") }
-        )
+        AttributeMapAccess.INSTANCE.get(player).addTransientModifiers(makeAttributeMap(level, slot))
     }
 
     fun remove(player: Player, level: Int, slot: ItemSlot) {
-        AttributeMapAccess.INSTANCE.get(player).fold(
-            { map -> map.removeModifiers(makeAttributeMap(level, slot)) },
-            { ex -> LOGGER.error("Failed to remove attribute modifier from player: ${ex.message}") }
-        )
+        AttributeMapAccess.INSTANCE.get(player).removeModifiers(makeAttributeMap(level, slot))
     }
 
     private fun getModifierId(suffix: String): Identifier {

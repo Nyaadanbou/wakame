@@ -34,7 +34,7 @@ internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob
 
 internal class KoishBootstrapper : PluginBootstrap {
     init {
-        BootstrapContextStore.registerBootstrap(this)
+        BootstrapContexts.registerBootstrap(this)
     }
 
     // See: https://docs.papermc.io/paper/dev/getting-started/paper-plugins#bootstrapper
@@ -43,12 +43,12 @@ internal class KoishBootstrapper : PluginBootstrap {
     // 1) 加载 NMS 的 classes (因此可以在这里对服务端代码进行 patching)
     // 2) 创建 JavaPlugin 实例 (因此可以直接用 object 来实现 JavaPlugin)
     override fun bootstrap(context: BootstrapContext) {
-        // 最先注册配置文件实例, 因为 Koin 说不定会用到
-        ConfigAccess.register(Configs)
+        LoggerProvider.set(context.logger)
+        ConfigAccess.register(Configs) // 配置文件 API 实例趁早注册
 
         startKoin {
             modules(
-                // submodules (按字母顺序)
+                // (按字母顺序)
                 adventureModule(),
                 entityModule(),
                 guiModule(),
@@ -57,14 +57,13 @@ internal class KoishBootstrapper : PluginBootstrap {
             )
         }
 
-        BootstrapContextStore.registerLifecycleManager(context.lifecycleManager)
-        BootstrapContextStore.registerAuthors(context.pluginMeta.authors)
-        BootstrapContextStore.registerName(context.pluginMeta.name)
-        BootstrapContextStore.registerVersion(Version(context.pluginMeta.version))
-        BootstrapContextStore.registerPluginJar(context.pluginSource)
-        KoishLoggerProvider.set(context.logger)
+        BootstrapContexts.registerLifecycleManager(context.lifecycleManager)
+        BootstrapContexts.registerAuthors(context.pluginMeta.authors)
+        BootstrapContexts.registerName(context.pluginMeta.name)
+        BootstrapContexts.registerVersion(Version(context.pluginMeta.version))
+        BootstrapContexts.registerPluginJar(context.pluginSource)
 
-        if (BootstrapContextStore.IS_DEV_SERVER) {
+        if (BootstrapContexts.IS_DEV_SERVER) {
             LOGGER.warn("Running in dev mode! Never use this on a production server!")
         }
 
@@ -73,7 +72,7 @@ internal class KoishBootstrapper : PluginBootstrap {
             throw Exception(
                 """
                 Koish is not compatible with this version of Minecraft.
-                Koish v${BootstrapContextStore.PLUGIN_VERSION} only runs on $REQUIRED_SERVER_VERSION.
+                Koish v${BootstrapContexts.PLUGIN_VERSION} only runs on $REQUIRED_SERVER_VERSION.
                 """.trimIndent()
             )
         }
@@ -92,7 +91,7 @@ internal class KoishBootstrapper : PluginBootstrap {
                 LegacyDataMigrator.migrate()
             }
 
-            if (BootstrapContextStore.IS_DEV_SERVER) {
+            if (BootstrapContexts.IS_DEV_SERVER) {
                 DebugProbes.install()
                 DebugProbes.enableCreationStackTraces = true
             }

@@ -1,9 +1,5 @@
-package cc.mewcraft.wakame.entity.attribute2
+package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.entity.attribute.Attribute
-import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeInstance
-import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
-import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMapImpl
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

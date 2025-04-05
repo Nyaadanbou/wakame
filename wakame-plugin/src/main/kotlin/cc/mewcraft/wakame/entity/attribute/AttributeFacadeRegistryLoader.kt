@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.entity.attribute2
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.Namespaces
@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.bundle.*
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Quality

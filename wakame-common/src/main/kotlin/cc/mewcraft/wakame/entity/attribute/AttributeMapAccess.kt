@@ -25,13 +25,14 @@ interface AttributeMapAccess {
     }
 
     /**
-     * Gets the [AttributeMap] for the specified player.
+     * 返回指定 [player] 的 [AttributeMap].
      */
-    // TODO #373: 直接返回 AttributeMap
-    fun get(player: Player): Result<AttributeMap>
+    fun get(player: Player): AttributeMap
 
     /**
-     * Gets the [AttributeMap] for the specified entity.
+     * 返回指定 [entity] 的 [AttributeMap].
+     *
+     * 如果 [entity] 实际上是 [Player] 类型则会自动调用 `get(Player)`.
      */
     fun get(entity: Entity): Result<AttributeMap>
 

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.configurate.serializer;
 
-import cc.mewcraft.wakame.KoishLoggerProviderKt;
+import cc.mewcraft.wakame.LoggerProviderKt;
 import io.leangen.geantyref.TypeToken;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class MapSerializer implements TypeSerializer.Annotated<Map<?, ?>> {
 
     public static final TypeToken<Map<?, ?>> TYPE = new TypeToken<>() {};
 
-    private static final Logger LOGGER = KoishLoggerProviderKt.getLogger();
+    private static final Logger LOGGER = LoggerProviderKt.getLogger();
 
     private final boolean clearInvalids;
     private final TypeSerializer<Map<?, ?>> fallback;

@@ -1,7 +1,6 @@
-package cc.mewcraft.wakame.entity.attribute2
+package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.element.ElementRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun

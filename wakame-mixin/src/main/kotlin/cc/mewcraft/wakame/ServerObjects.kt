@@ -1,4 +1,4 @@
-@file:JvmName("Objects")
+@file:JvmName("ServerObjects")
 
 package cc.mewcraft.wakame
 

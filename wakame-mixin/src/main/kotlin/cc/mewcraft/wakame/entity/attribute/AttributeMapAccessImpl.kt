@@ -10,16 +10,16 @@ import org.bukkit.entity.Player
  */
 object AttributeMapAccessImpl : AttributeMapAccess {
 
-    override fun get(player: Player): Result<AttributeMap> {
-        return Result.success(player.koishify()[AttributeMap])
+    override fun get(player: Player): AttributeMap {
+        return player.koishify()[AttributeMap]
     }
 
     override fun get(entity: Entity): Result<AttributeMap> {
         if (entity is Player) {
-            return get(entity) // need to redirect to get(Player)
+            return Result.success(get(entity)) // redirect to get(Player)
         }
 
-        // TODO #373: 从 ecs 读取
+        // TODO #373: 从 ecs 读取, 而不是每次都创建新的
         if (entity !is LivingEntity) {
             return Result.failure(
                 IllegalArgumentException("Only LivingEntity has AttributeMap!")

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
-import cc.mewcraft.wakame.BootstrapContextStore
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
@@ -41,7 +41,7 @@ internal object Initializer : Listener {
      * Stats the initialization process.
      */
     fun start() = tryExecute {
-        collectAndRegisterTasks(BootstrapContextStore.PLUGIN_JAR.toFile(), this.javaClass.classLoader)
+        collectAndRegisterTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader)
         initPreWorld()
     }
 
@@ -196,7 +196,7 @@ internal object Initializer : Listener {
             isDone = true
             KoishLoadDataEvent().callEvent()
 
-            PermanentStorage.store("last_version", BootstrapContextStore.PLUGIN_VERSION.toString())
+            PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
             // setGlobalIngredients()
             // setupMetrics()
             BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)

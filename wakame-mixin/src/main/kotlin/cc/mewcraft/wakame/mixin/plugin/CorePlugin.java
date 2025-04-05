@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.plugin;
 
-import cc.mewcraft.wakame.BootstrapContextStore;
+import cc.mewcraft.wakame.BootstrapContexts;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -16,7 +16,7 @@ public class CorePlugin implements IMixinConfigPlugin {
         // Register the mod jar to the bootstrap context store
         var container = Ignite.mods().container("wakame").orElseThrow();
         var modPath = container.resource().path();
-        BootstrapContextStore.INSTANCE.registerModJar(modPath);
+        BootstrapContexts.INSTANCE.registerModJar(modPath);
     }
 
     @Override

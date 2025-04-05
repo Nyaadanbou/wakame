@@ -11,7 +11,7 @@ import java.nio.file.Path
  *
  * 创建该类完全是为了能够让 mixin 模块的代码能够读取到 plugin 模块中写入的数据.
  */
-object BootstrapContextStore {
+object BootstrapContexts {
 
     @JvmField
     val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
