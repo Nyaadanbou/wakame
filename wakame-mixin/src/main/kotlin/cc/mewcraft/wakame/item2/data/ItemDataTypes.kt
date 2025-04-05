@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
@@ -51,14 +51,14 @@ data object ItemDataTypes {
     @JvmField
     val RARITY: ItemDataType<RegistryEntry<Rarity>> = typeOf("rarity") {
         serializers {
-            register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+            register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())
         }
     }
 
     @JvmField
     val KIZAMI: ItemDataType<Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
         serializers {
-            register(KoishRegistries2.KIZAMI.holderByNameTypeSerializer())
+            register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
         }
     }
 
@@ -72,7 +72,7 @@ data object ItemDataTypes {
      */
     private inline fun <reified T> typeOf(id: String, block: ItemDataType.Builder<T>.() -> Unit = {}): ItemDataType<T> {
         val type = ItemDataType.builder(typeTokenOf<T>()).apply(block).build()
-        return type.also { KoishRegistries2.ITEM_DATA_TYPE.add(id, it) }
+        return type.also { BuiltInRegistries.ITEM_DATA_TYPE.add(id, it) }
     }
 
     // ------------
@@ -90,7 +90,7 @@ data object ItemDataTypes {
         val collection = TypeSerializerCollection.builder()
 
         // 添加每一个 “Item Data” 的 TypeSerializer
-        KoishRegistries2.ITEM_DATA_TYPE.fold(collection) { acc, type ->
+        BuiltInRegistries.ITEM_DATA_TYPE.fold(collection) { acc, type ->
             val serializers = type.serializers
             if (serializers != null) acc.registerAll(serializers) else acc
         }

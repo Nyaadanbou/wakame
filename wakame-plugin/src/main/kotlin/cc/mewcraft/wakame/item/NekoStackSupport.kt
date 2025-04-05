@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -270,7 +270,7 @@ internal object ImaginaryKoishStackRegistry {
     private fun realizeAndStore() {
         // CACHE.clear() // 由于 Registry 的 Entry 不会减少, 所以不需要手动 clear, 键名相同的会自动替换掉
 
-        for (prototype in KoishRegistries.ITEM.filter { it.id.namespace() == Identifier.MINECRAFT_NAMESPACE }) {
+        for (prototype in DynamicRegistries.ITEM.filter { it.id.namespace() == Identifier.MINECRAFT_NAMESPACE }) {
             val id = prototype.id
             val stack = VanillaNekoItemRealizer.realize(prototype)
             CACHE[id] = stack
@@ -338,12 +338,12 @@ internal object KoishStackImplementations {
     }
 
     fun getArchetype(itemstack: MojangStack): NekoItem? {
-        return getId(itemstack)?.let(KoishRegistries.ITEM::get)
+        return getId(itemstack)?.let(DynamicRegistries.ITEM::get)
     }
 
     fun getArchetypeOrThrow(itemstack: MojangStack): NekoItem {
         val id = getIdOrThrow(itemstack)
-        return requireNotNull(KoishRegistries.ITEM[id]) { "Cannot find item prototype by id '$id'" }
+        return requireNotNull(DynamicRegistries.ITEM[id]) { "Cannot find item prototype by id '$id'" }
     }
 
     fun getMutableDataContainer(itemstack: MojangStack): ItemComponentMap {

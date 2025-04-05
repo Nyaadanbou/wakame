@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
@@ -32,13 +32,13 @@ class Item2Parser<C : Any> : ArgumentParser<C, KoishItem>, BlockingSuggestionPro
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<KoishItem> {
         val peekString = commandInput.peekString()
-        val itemType = KoishRegistries2.ITEM[peekString] ?: return ArgumentParseResult.failure(Item2ParseException(commandContext))
+        val itemType = BuiltInRegistries.ITEM[peekString] ?: return ArgumentParseResult.failure(Item2ParseException(commandContext))
         commandInput.readString() // consume token
         return ArgumentParseResult.success(itemType)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return KoishRegistries2.ITEM.ids.map(Identifier::asString)
+        return BuiltInRegistries.ITEM.ids.map(Identifier::asString)
     }
 }
 

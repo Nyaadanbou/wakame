@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
 import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -92,7 +92,7 @@ data object ItemPropertyTypes {
      */
     private inline fun <reified T> typeOf(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
         val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
-        return type.also { KoishRegistries2.ITEM_PROPERTY_TYPE.add(id, it) }
+        return type.also { BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it) }
     }
 
     // ------------
@@ -109,7 +109,7 @@ data object ItemPropertyTypes {
     internal fun directSerializers(): TypeSerializerCollection {
         val collection = TypeSerializerCollection.builder()
 
-        KoishRegistries2.ITEM_PROPERTY_TYPE.fold(collection) { acc, type ->
+        BuiltInRegistries.ITEM_PROPERTY_TYPE.fold(collection) { acc, type ->
             val serializers = type.serializers
             if (serializers != null) acc.registerAll(serializers) else acc
         }

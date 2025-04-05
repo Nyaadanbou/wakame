@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Qualit
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifiers
@@ -47,9 +47,9 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ATTRIBUTE_FACADE.resetRegistry()
+        BuiltInRegistries.ATTRIBUTE_FACADE.resetRegistry()
         addAll()
-        KoishRegistries2.ATTRIBUTE_FACADE.freeze()
+        BuiltInRegistries.ATTRIBUTE_FACADE.freeze()
     }
 
     /**
@@ -112,7 +112,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
 
     private operator fun AttributeFacade<out ConstantAttributeBundle, out VariableAttributeBundle>.unaryPlus() {
         @Suppress("UNCHECKED_CAST")
-        KoishRegistries2.ATTRIBUTE_FACADE.add(
+        BuiltInRegistries.ATTRIBUTE_FACADE.add(
             id = Identifiers.of(id),
             value = (this as AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>)
         )

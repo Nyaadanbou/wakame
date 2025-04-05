@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
@@ -53,7 +53,7 @@ internal class ResourcePackManager(
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
                 resourcePack = resourcePack,
-                itemModelInfos = KoishRegistries.ITEM
+                itemModelInfos = DynamicRegistries.ITEM
                     .filter { it.id.namespace() != Identifier.MINECRAFT_NAMESPACE }
                     .map { ItemModelInfo(it.id, it.base.type.key()) }
             )

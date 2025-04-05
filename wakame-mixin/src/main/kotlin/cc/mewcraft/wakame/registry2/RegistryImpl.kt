@@ -31,7 +31,7 @@ open class SimpleRegistry<T>(
         val entry = keyToEntry[key]
         if (entry != null) {
             // 获取旧数据
-            val oldValue = entry.value
+            val oldValue = entry.unwrap()
 
             // 更新映射 toId
             val id = entryToRawId.getInt(oldValue)
@@ -106,9 +106,9 @@ open class SimpleRegistry<T>(
         }
     }
 
-    override fun get(index: Int): T? = rawIdToEntry.getOrNull(index)?.value
-    override fun get(key: RegistryKey<T>): T? = keyToEntry[key]?.value
-    override fun get(id: Identifier): T? = idToEntry[id]?.value
+    override fun get(index: Int): T? = rawIdToEntry.getOrNull(index)?.unwrap()
+    override fun get(key: RegistryKey<T>): T? = keyToEntry[key]?.unwrap()
+    override fun get(id: Identifier): T? = idToEntry[id]?.unwrap()
 
     override fun getRawId(value: T): Int = entryToRawId.getInt(value)
     override fun getKey(value: T): RegistryKey<T>? = valueToEntry[value]?.getKey()
@@ -122,7 +122,7 @@ open class SimpleRegistry<T>(
     override val keys: Set<RegistryKey<T>>
         get() = keyToEntry.keys
     override val entrySet: Set<Map.Entry<RegistryKey<T>, T>>
-        get() = keyToEntry.mapValues { (_, ref) -> ref.value }.entries
+        get() = keyToEntry.mapValues { (_, ref) -> ref.unwrap() }.entries
     override val entrySequence: Sequence<RegistryEntry.Reference<T>>
         get() = rawIdToEntry.asSequence()
 
@@ -174,7 +174,7 @@ open class SimpleRegistry<T>(
     }
 
     override fun iterator(): Iterator<T> {
-        return rawIdToEntry.asSequence().map(RegistryEntry<T>::value).iterator()
+        return rawIdToEntry.asSequence().map(RegistryEntry<T>::unwrap).iterator()
     }
 
     override fun toString(): String {
@@ -203,19 +203,19 @@ open class SimpleDefaultedRegistry<T>(
 
     override fun getRawId(value: T): Int {
         val i = super.getRawId(value)
-        return if (i == -1) super.getRawId(this.defaultEntry.value) else i
+        return if (i == -1) super.getRawId(defaultEntry.unwrap()) else i
     }
 
     override fun getOrDefault(id: Identifier): T {
-        return super<SimpleRegistry>.get(id) ?: this.defaultEntry.value
+        return super<SimpleRegistry>.get(id) ?: defaultEntry.unwrap()
     }
 
     override fun getOrDefault(key: RegistryKey<T>): T {
-        return super<SimpleRegistry>.get(key) ?: this.defaultEntry.value
+        return super<SimpleRegistry>.get(key) ?: defaultEntry.unwrap()
     }
 
     override fun getOrDefault(id: String): T {
-        return super<SimpleRegistry>.get(id) ?: this.defaultEntry.value
+        return super<SimpleRegistry>.get(id) ?: defaultEntry.unwrap()
     }
 
     override fun getIdOrDefault(value: T): Identifier {
@@ -227,7 +227,7 @@ open class SimpleDefaultedRegistry<T>(
     }
 
     override fun getOrDefault(rawId: Int): T {
-        return super<SimpleRegistry>.get(rawId) ?: this.defaultEntry.value
+        return super<SimpleRegistry>.get(rawId) ?: defaultEntry.unwrap()
     }
 
     override fun getDefaultEntry(): RegistryEntry.Reference<T> {

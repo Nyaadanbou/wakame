@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.item2.ItemRef.Companion.checkAll
 import cc.mewcraft.wakame.item2.ItemRef.Companion.uncheckedItemRef
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.item.toJsonString
 import net.kyori.adventure.text.Component
@@ -300,13 +300,13 @@ private object ItemRefManager {
     // 返回符合 predicate 条件的 ItemRefHandler
     private inline fun getHandler(predicate: (ItemRefHandler<*>) -> Boolean): ItemRefHandler<*>? {
         // 先从由外部注册的实例中寻找支持的 handler
-        for (handler in KoishRegistries2.ITEM_REF_HANDLER) {
+        for (handler in BuiltInRegistries.ITEM_REF_HANDLER) {
             if (predicate(handler)) {
                 return handler
             }
         }
         // 再从 Koish 内置的实例中寻找支持的 handler
-        for (handler in KoishRegistries2.INTERNAL_ITEM_REF_HANDLER) {
+        for (handler in BuiltInRegistries.INTERNAL_ITEM_REF_HANDLER) {
             if (predicate(handler)) {
                 return handler
             }

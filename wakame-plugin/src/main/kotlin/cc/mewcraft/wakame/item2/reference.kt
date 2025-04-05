@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
@@ -20,9 +20,9 @@ internal object ItemRefBootstrapper {
     @InitFun
     fun init() {
         // 注册内置的 ItemRefHandler 实例 ( 兜底的放在最后注册 )
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("koish", KoishItemRefHandler)
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("minecraft", MinecraftItemRefHandler)
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.freeze()
+        BuiltInRegistries.INTERNAL_ITEM_REF_HANDLER.add("koish", KoishItemRefHandler)
+        BuiltInRegistries.INTERNAL_ITEM_REF_HANDLER.add("minecraft", MinecraftItemRefHandler)
+        BuiltInRegistries.INTERNAL_ITEM_REF_HANDLER.freeze()
     }
 
 }
@@ -68,7 +68,7 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
     override val systemName: String = "Koish"
 
     override fun accepts(id: Identifier): Boolean {
-        return KoishRegistries2.ITEM.containsId(id)
+        return BuiltInRegistries.ITEM.containsId(id)
     }
 
     override fun getId(stack: ItemStack): Identifier? {
@@ -89,7 +89,7 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
     }
 
     override fun getInternalType(id: Identifier): KoishItem {
-        return KoishRegistries2.ITEM[id] ?: throwItemTypeNotFound(id)
+        return BuiltInRegistries.ITEM[id] ?: throwItemTypeNotFound(id)
     }
 
 }

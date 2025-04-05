@@ -3,8 +3,8 @@
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
 import cc.mewcraft.wakame.molang.ExpressionSerializer
-import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.serialization.configurate.serializer.*
 import cc.mewcraft.wakame.util.RandomizedValueSerializer
 import cc.mewcraft.wakame.util.register
@@ -45,15 +45,15 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RegistryKey.ITEM.valueByNameTypeSerializer())
     .register(RegistryKey.MOB_EFFECT.valueByNameTypeSerializer())
     // Koish Registry
-    .register(KoishRegistries2.ABILITY_META.holderByNameTypeSerializer())
-    .register(KoishRegistries2.ABILITY_META_TYPE.valueByNameTypeSerializer())
-    .register(KoishRegistries2.ABILITY_TRIGGER.valueByNameTypeSerializer())
-    .register(KoishRegistries2.ATTRIBUTE.holderByNameTypeSerializer())
-    .register(KoishRegistries2.ELEMENT.holderByNameTypeSerializer())
-    .register(KoishRegistries2.ENTITY_REF.holderByNameTypeSerializer())
-    .register(KoishRegistries.ITEM.holderByNameTypeSerializer())
-    .register(KoishRegistries.ITEM_CATEGORY.holderByNameTypeSerializer())
-    .register(KoishRegistries2.KIZAMI.holderByNameTypeSerializer())
-    .register(KoishRegistries2.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
-    .register(KoishRegistries2.RARITY.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.ABILITY_META.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.ABILITY_META_TYPE.valueByNameTypeSerializer())
+    .register(BuiltInRegistries.ABILITY_TRIGGER.valueByNameTypeSerializer())
+    .register(BuiltInRegistries.ATTRIBUTE.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.ENTITY_REF.holderByNameTypeSerializer())
+    .register(DynamicRegistries.ITEM.holderByNameTypeSerializer())
+    .register(DynamicRegistries.ITEM_CATEGORY.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
+    .register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())
     .build()

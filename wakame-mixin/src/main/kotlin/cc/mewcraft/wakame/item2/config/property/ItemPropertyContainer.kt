@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -128,7 +128,7 @@ private class SimpleItemPropertyContainer(
             val builder = ItemPropertyContainer.builder()
             for ((rawNodeKey, node) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
-                val dataType = KoishRegistries2.ITEM_PROPERTY_TYPE[nodeKey] ?: continue
+                val dataType = BuiltInRegistries.ITEM_PROPERTY_TYPE[nodeKey] ?: continue
                 val dataValue = node.get(dataType.typeToken) ?: run {
                     LOGGER.error("Failed to deserialize $dataType. Skipped.")
                     continue

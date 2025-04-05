@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -148,7 +148,7 @@ internal object VanillaDamageMetadata {
     }
 
     operator fun invoke(damageValue: Double): DamageMetadata {
-        return invoke(KoishRegistries2.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
+        return invoke(BuiltInRegistries.ELEMENT.getDefaultEntry(), damageValue, 0.0, 0.0)
     }
 }
 

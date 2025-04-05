@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer.Builder
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
@@ -124,7 +124,7 @@ private class SimpleItemBehaviorContainer(
             for ((rawNodeKey, _) in node.childrenMap()) {
                 // 实现上只要 Node 存在那么 ItemBehavior 就存在
                 val nodeKey = rawNodeKey.toString()
-                val dataValue = KoishRegistries2.ITEM_BEHAVIOR[nodeKey] ?: continue
+                val dataValue = BuiltInRegistries.ITEM_BEHAVIOR[nodeKey] ?: continue
                 builder += dataValue
             }
             return builder.build()

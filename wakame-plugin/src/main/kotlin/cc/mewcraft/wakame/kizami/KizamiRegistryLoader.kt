@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
@@ -33,14 +33,14 @@ internal object KizamiRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.KIZAMI.resetRegistry()
-        consumeData(KoishRegistries2.KIZAMI::add)
-        KoishRegistries2.KIZAMI.freeze()
+        BuiltInRegistries.KIZAMI.resetRegistry()
+        consumeData(BuiltInRegistries.KIZAMI::add)
+        BuiltInRegistries.KIZAMI.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.KIZAMI::update)
+        consumeData(BuiltInRegistries.KIZAMI::update)
     }
 
     private fun consumeData(registryAction: (Identifier, Kizami) -> Unit) {

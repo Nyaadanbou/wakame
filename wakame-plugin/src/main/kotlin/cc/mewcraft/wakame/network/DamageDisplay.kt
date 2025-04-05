@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.registerEvents
@@ -119,11 +119,11 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
         val damageMap = context.getFinalDamageMap()
         val elementType = damageMap.maxWithOrNull(
             compareBy { it.value }
-        )?.key ?: KoishRegistries2.ELEMENT.getDefaultEntry()
+        )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
         val damageValueText = MM.deserialize(
             damageValueText,
-            Placeholder.component("element_name", elementType.value.displayName),
-            Placeholder.styling("element_style", *elementType.value.displayStyles),
+            Placeholder.component("element_name", elementType.unwrap().displayName),
+            Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
             Formatter.number("damage_value", context.getFinalDamage())
         )
         return damageValueText
@@ -141,8 +141,8 @@ internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDi
         val damageValueText = damageMap.map { (elementType, damageValue) ->
             MM.deserialize(
                 damageValueText,
-                Placeholder.component("element_name", elementType.value.displayName),
-                Placeholder.styling("element_style", *elementType.value.displayStyles),
+                Placeholder.component("element_name", elementType.unwrap().displayName),
+                Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
                 Formatter.number("damage_value", damageValue)
             )
         }.join(JoinConfiguration.separator(separator))

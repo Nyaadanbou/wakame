@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.rarity2.Rarity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.serializer.NamedTextColorSerializer
 import cc.mewcraft.wakame.util.Identifier
@@ -26,14 +26,14 @@ internal object RarityRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.RARITY.resetRegistry()
-        consumeData(KoishRegistries2.RARITY::add)
-        KoishRegistries2.RARITY.freeze()
+        BuiltInRegistries.RARITY.resetRegistry()
+        consumeData(BuiltInRegistries.RARITY::add)
+        BuiltInRegistries.RARITY.freeze()
     }
 
     @InitFun
     fun reload() {
-        consumeData(KoishRegistries2.RARITY::update)
+        consumeData(BuiltInRegistries.RARITY::update)
     }
 
     private fun consumeData(registryAction: (Identifier, Rarity) -> Unit) {

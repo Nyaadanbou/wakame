@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.google.common.collect.MultimapBuilder
 import com.google.common.collect.SetMultimap
@@ -199,7 +199,7 @@ private class AttributeGetterImpl(
     private val mappings: ConcurrentHashMap<RegistryEntry<Element>, ElementAttribute> = ConcurrentHashMap()
 
     override fun of(id: String): ElementAttribute? {
-        val elem = KoishRegistries2.ELEMENT.getEntry(id)
+        val elem = BuiltInRegistries.ELEMENT.getEntry(id)
         if (elem == null) {
             return null
         }
@@ -207,7 +207,7 @@ private class AttributeGetterImpl(
     }
 
     override fun of(element: Element): ElementAttribute {
-        return of(KoishRegistries2.ELEMENT.wrapAsEntry(element))
+        return of(BuiltInRegistries.ELEMENT.wrapAsEntry(element))
     }
 
     override fun of(element: RegistryEntry<Element>): ElementAttribute {
@@ -259,7 +259,7 @@ private class AttributeGetterImpl(
         fun init() {
             // 初始化每一个 AttributeGetter 的每一种 Element
             for (getter: AttributeGetter in INSTANCES) {
-                for (element in KoishRegistries2.ELEMENT.entrySequence) {
+                for (element in BuiltInRegistries.ELEMENT.entrySequence) {
                     getter.of(element)
                 }
             }

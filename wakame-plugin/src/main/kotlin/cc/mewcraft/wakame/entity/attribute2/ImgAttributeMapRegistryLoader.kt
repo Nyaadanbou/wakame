@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -29,13 +29,13 @@ internal object ImgAttributeMapRegistryLoader {
     @InitFun
     fun init() {
         // init 只负责添加 intrusive registry entry
-        consumeData(KoishRegistries2.IMG_ATTRIBUTE_MAP::add)
+        consumeData(BuiltInRegistries.IMG_ATTRIBUTE_MAP::add)
     }
 
     @ApiStatus.Internal
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.IMG_ATTRIBUTE_MAP::update)
+        consumeData(BuiltInRegistries.IMG_ATTRIBUTE_MAP::update)
     }
 
     private fun consumeData(registryAction: (Identifier, ImaginaryAttributeMap) -> Unit) {
@@ -47,7 +47,7 @@ internal object ImgAttributeMapRegistryLoader {
     }
 
     private fun createData(id: String): ImaginaryAttributeMap {
-        val default = KoishRegistries2.ATTRIBUTE_SUPPLIER.getOrThrow(id)
+        val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(id)
         val data = Reference2ObjectOpenHashMap<Attribute, ImaginaryAttributeInstance>()
         for (attribute in default.attributes) {
             val instance = default.createImaginaryInstance(attribute) ?: continue
@@ -61,6 +61,6 @@ internal object ImgAttributeMapRegistryLoader {
     private fun createEntry(id: String): RegistryEntry<ImaginaryAttributeMap> {
         val notExisted = intrusiveRegisteredIds.add(id)
         if (!notExisted) throw IllegalArgumentException("The id $id has already been registered!")
-        return KoishRegistries2.IMG_ATTRIBUTE_MAP.createEntry(id)
+        return BuiltInRegistries.IMG_ATTRIBUTE_MAP.createEntry(id)
     }
 }

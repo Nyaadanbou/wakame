@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.data.impl
 
 import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
@@ -36,8 +36,8 @@ private constructor(
 
     // 将 RegistryEntry 设置为成员, 以省去运行时从 Registry 查询的性能开销
     val itemType: KoishItem by when (id.namespace()) {
-        KOISH_NAMESPACE -> KoishRegistries2.ITEM.createEntry(id)
-        MINECRAFT_NAMESPACE -> KoishRegistries2.ITEM_PROXY.createEntry(id)
+        KOISH_NAMESPACE -> BuiltInRegistries.ITEM.createEntry(id)
+        MINECRAFT_NAMESPACE -> BuiltInRegistries.ITEM_PROXY.createEntry(id)
         else -> error("Unrecognized namespace of item type: $id")
     }
 

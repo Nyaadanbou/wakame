@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
@@ -60,14 +60,14 @@ internal object ItemTypeRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries.ITEM.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ITEM::add)
-        KoishRegistries.ITEM.freeze()
+        DynamicRegistries.ITEM.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.ITEM::add)
+        DynamicRegistries.ITEM.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        applyDataToRegistry(KoishRegistries.ITEM::update)
+        applyDataToRegistry(DynamicRegistries.ITEM::update)
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, NekoItem) -> Unit) {

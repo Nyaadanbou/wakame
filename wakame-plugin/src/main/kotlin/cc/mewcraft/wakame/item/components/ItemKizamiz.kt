@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.kizami2.Kizami
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.ListTag
 import cc.mewcraft.wakame.util.data.NbtUtils
@@ -54,7 +54,7 @@ data class ItemKizamiz(
         override fun read(holder: ItemComponentHolder): ItemKizamiz? {
             val tag = holder.getNbt() ?: return null
             val values = tag.getListOrNull(TAG_VALUE, NbtUtils.TAG_STRING)
-                ?.mapTo(ObjectArraySet(8)) { KoishRegistries2.KIZAMI.getEntryOrThrow(it.asString) }
+                ?.mapTo(ObjectArraySet(8)) { BuiltInRegistries.KIZAMI.getEntryOrThrow(it.asString) }
                 ?: return null
             return ItemKizamiz(values)
         }

@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.components.tracks
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.StatisticsConstants
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.data.CompoundTag
 import cc.mewcraft.wakame.util.data.keySet
@@ -26,7 +26,7 @@ class TrackPeakDamage(
         fun fromNbt(nbt: CompoundTag): TrackPeakDamage {
             val map = if (nbt.size() < 8) Reference2DoubleArrayMap<Element>() else Reference2DoubleOpenHashMap()
             for (tagKey: String in nbt.keySet()) {
-                val element = KoishRegistries2.ELEMENT[tagKey] ?: continue // 直接跳过无效的元素
+                val element = BuiltInRegistries.ELEMENT[tagKey] ?: continue // 直接跳过无效的元素
                 val damage = nbt.getDouble(tagKey)
                 map[element] = damage
             }

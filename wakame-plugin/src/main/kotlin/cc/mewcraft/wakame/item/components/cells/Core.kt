@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -181,7 +181,7 @@ data class AttributeCore(
          * @see ConstantAttributeBundle 了解 NBT 结构
          */
         fun fromNbt(id: Key, nbt: CompoundTag): AttributeCore {
-            val data = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNbtToConstant(nbt)
+            val data = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNbtToConstant(nbt)
             return AttributeCore(id, data)
         }
 
@@ -194,7 +194,7 @@ data class AttributeCore(
          * @see ConstantAttributeBundle 了解 Node 结构
          */
         fun fromNode(id: Key, node: ConfigurationNode): AttributeCore {
-            val data = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToConstant(node)
+            val data = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id.value()).convertNodeToConstant(node)
             return AttributeCore(id, data)
         }
 

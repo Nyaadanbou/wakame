@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
@@ -53,7 +53,7 @@ class ItemPathParser<C : Any> : ArgumentParser<C, String>, BlockingSuggestionPro
 
     private fun getPathByNamespace(namespace: String?): List<String>? {
         if (namespace == null) return null
-        return KoishRegistries.ITEM.ids
+        return DynamicRegistries.ITEM.ids
             .filter { id -> id.namespace() == namespace }
             .map(Identifier::value)
             .takeIf { list -> list.isNotEmpty() }

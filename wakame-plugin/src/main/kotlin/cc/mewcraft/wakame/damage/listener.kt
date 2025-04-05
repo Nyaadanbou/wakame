@@ -81,7 +81,7 @@ internal object DamageListener : Listener {
                 text("点伤害")
             ).hoverEvent(
                 damageMetadata.damageBundle.packets()
-                    .map { packet -> LinearComponents.linear(packet.element.value.displayName, text(": "), text(packet.packetDamage)) }
+                    .map { packet -> LinearComponents.linear(packet.element.unwrap().displayName, text(": "), text(packet.packetDamage)) }
                     .join(JoinConfiguration.newlines())
                     .let { component ->
                         HoverEvent.showText(

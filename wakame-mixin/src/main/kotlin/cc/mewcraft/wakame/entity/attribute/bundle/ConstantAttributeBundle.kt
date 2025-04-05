@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.getByteOrNull
 import net.kyori.adventure.key.Key
@@ -63,7 +63,7 @@ val ConstantAttributeBundle.element: RegistryEntry<Element>?
 fun ConstantAttributeBundle(
     id: String, tag: CompoundTag,
 ): ConstantAttributeBundle {
-    return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
+    return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
 }
 
 /**
@@ -114,7 +114,7 @@ fun ConstantAttributeBundle(
 fun ConstantAttributeBundle(
     id: String, node: ConfigurationNode,
 ): ConstantAttributeBundle {
-    return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
+    return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
 }
 
 /**
@@ -136,9 +136,9 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract val quality: Quality?
 
     val displayName: Component
-        get() = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
+        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
     val description: List<Component>
-        get() = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
+        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
 
     /**
      * 属性核心的“数值质量”.
@@ -181,7 +181,7 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract fun saveNbt(): CompoundTag
 
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
-        return KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
+        return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
     }
 }
 
@@ -310,8 +310,8 @@ data class ConstantAttributeBundleRE(
 
 private fun CompoundTag.readElement(): RegistryEntry<Element> {
     val id = getString(ELEMENT_TYPE_FIELD)
-    return KoishRegistries2.ELEMENT.getEntry(id)
-        ?: KoishRegistries2.ELEMENT.getDefaultEntry()
+    return BuiltInRegistries.ELEMENT.getEntry(id)
+        ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
 }
 
 private fun CompoundTag.readOperation(): Operation {

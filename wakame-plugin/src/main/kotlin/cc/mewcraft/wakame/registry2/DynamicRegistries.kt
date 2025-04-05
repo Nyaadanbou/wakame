@@ -4,7 +4,11 @@ import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.item.NekoItem
 
-object KoishRegistries {
+/**
+ * 这些 [Registry] 内的注册项是 *可变的* - 可以在游戏运行时添加或删除注册项.
+ */
+// TODO #373: actually make it dynamic
+object DynamicRegistries {
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
 
     ///
@@ -15,19 +19,19 @@ object KoishRegistries {
      * 玩家可以直接获得/使用的物品类型.
      */
     @JvmField
-    val ITEM: WritableDefaultedFuzzyRegistry<NekoItem> = registerDefaultedFuzzy(KoishRegistryKeys.ITEM, "internal:unknown")
+    val ITEM: WritableDefaultedFuzzyRegistry<NekoItem> = registerDefaultedFuzzy(DynamicRegistryKeys.ITEM, "internal:unknown")
 
     /**
      * 物品图鉴中物品的类别.
      */
     @JvmField
-    val ITEM_CATEGORY: WritableRegistry<CatalogItemCategory> = registerSimple(KoishRegistryKeys.ITEM_CATEGORY)
+    val ITEM_CATEGORY: WritableRegistry<CatalogItemCategory> = registerSimple(DynamicRegistryKeys.ITEM_CATEGORY)
 
     /**
      * 物品图鉴中的战利品表配方.
      */
     @JvmField
-    val LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableRecipe> = registerSimple(KoishRegistryKeys.LOOT_TABLE_RECIPE)
+    val LOOT_TABLE_RECIPE: WritableRegistry<CatalogItemLootTableRecipe> = registerSimple(DynamicRegistryKeys.LOOT_TABLE_RECIPE)
 
     ///
 

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -70,7 +70,7 @@ data class ItemRarity(
             else -> {
                 val level = context.level
                 if (level != null) {
-                    rarity = KoishRegistries2.LEVEL_TO_RARITY_MAPPING.getDefaultEntry().unwrap().pick(level.toInt(), context.random)
+                    rarity = BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.getDefaultEntry().unwrap().pick(level.toInt(), context.random)
                 } else {
                     rarity = null
                     warnNullItemLevel()
@@ -119,11 +119,11 @@ data class ItemRarity(
             val string = node.require<String>()
             return when {
                 string.startsWith(MAPPING_PREFIX) -> ItemRarity(
-                    dynamic = KoishRegistries2.LEVEL_TO_RARITY_MAPPING.createEntry(string.substringAfter(MAPPING_PREFIX)),
+                    dynamic = BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.createEntry(string.substringAfter(MAPPING_PREFIX)),
                 )
 
                 string.startsWith(RARITY_PREFIX) -> ItemRarity(
-                    static = KoishRegistries2.RARITY.createEntry(string.substringAfter(RARITY_PREFIX))
+                    static = BuiltInRegistries.RARITY.createEntry(string.substringAfter(RARITY_PREFIX))
                 )
 
                 else -> throw SerializationException("Can't parse rarity value '$string'")

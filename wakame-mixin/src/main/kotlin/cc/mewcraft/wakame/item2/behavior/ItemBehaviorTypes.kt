@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
  * 该 `object` 包含了所有可用的 [ItemBehavior].
@@ -30,7 +30,7 @@ data object ItemBehaviorTypes {
     // ------------
 
     private fun typeOf(id: String, type: ItemBehavior): ItemBehavior {
-        return type.also { KoishRegistries2.ITEM_BEHAVIOR.add(id, it) }
+        return type.also { BuiltInRegistries.ITEM_BEHAVIOR.add(id, it) }
     }
 
 }

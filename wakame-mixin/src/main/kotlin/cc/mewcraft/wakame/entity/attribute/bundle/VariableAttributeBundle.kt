@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.entity.attribute.bundle
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item2.config.datagen.LevelContext
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.RandomizedValue
 import org.spongepowered.configurate.ConfigurationNode
@@ -22,7 +22,7 @@ val VariableAttributeBundle.element: RegistryEntry<Element>?
  */
 fun VariableAttributeBundle(
     type: String, node: ConfigurationNode,
-): VariableAttributeBundle = KoishRegistries2.ATTRIBUTE_FACADE.getOrThrow(type).convertNodeToVariable(node)
+): VariableAttributeBundle = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(type).convertNodeToVariable(node)
 
 /**
  * 代表一个数值可以变化的 [AttributeBundle].

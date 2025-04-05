@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
@@ -134,7 +134,7 @@ fun DamagePacket(
     defensePenetrationRate: Double = .0,
 ): DamagePacket {
     return DamagePacket(
-        element = KoishRegistries2.ELEMENT.getEntryOrThrow(elementId),
+        element = BuiltInRegistries.ELEMENT.getEntryOrThrow(elementId),
         min = min,
         max = max,
         rate = rate,
@@ -218,7 +218,7 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
 }
 
 private fun getElementById(id: String): RegistryEntry<Element>? {
-    return KoishRegistries2.ELEMENT.getEntry(id)
+    return BuiltInRegistries.ELEMENT.getEntry(id)
 }
 
 private class DamageBundleImpl(

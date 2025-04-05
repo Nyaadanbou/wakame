@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishStackGenerator
 import cc.mewcraft.wakame.item2.config.datagen.Context
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -20,18 +20,18 @@ internal object CoreIcons2 {
     fun getItemStack(core: Core): ItemStack {
         val coreId = core.id.value() // 核心 id, 但去掉 namespace
         val item = when (core) {
-            is AttributeCore -> KoishRegistries2.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
-            is EmptyCore -> KoishRegistries2.ITEM["$ICON_ID_PREFIX/empty"]
-            else -> KoishRegistries2.ITEM[DEFAULT_ICON_ID]
+            is AttributeCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
+            is EmptyCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/empty"]
+            else -> BuiltInRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
         val stack = KoishStackGenerator.generate(item, Context(item))
         return stack
     }
 
     private fun getDefaultIcon(): KoishItem {
-        return KoishRegistries2.ITEM[DEFAULT_ICON_ID] ?: run {
+        return BuiltInRegistries.ITEM[DEFAULT_ICON_ID] ?: run {
             LOGGER.error("Default core icon not found! Please fix your config by add a item with id '$DEFAULT_ICON_ID'")
-            KoishRegistries2.ITEM.getDefaultEntry().value
+            BuiltInRegistries.ITEM.getDefaultEntry().unwrap()
         }
     }
 }

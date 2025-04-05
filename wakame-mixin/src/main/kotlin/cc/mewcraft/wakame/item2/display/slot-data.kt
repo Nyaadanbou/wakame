@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item2.*
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData.Companion.SERIALIZER
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
@@ -53,13 +53,13 @@ class SlotDisplay private constructor(
          * @param id 有效的 [KoishItem.id]
          */
         fun get(id: Identifier): SlotDisplay {
-            if (!KoishRegistries2.ITEM.containsId(id)) {
+            if (!BuiltInRegistries.ITEM.containsId(id)) {
                 // 不缓存不存在的物品 id, 始终记录错误并返回新的 SlotDisplay
                 LOGGER.error("'$id' not found in the item registry, fallback to default one")
-                return SlotDisplay(KoishRegistries2.ITEM.getDefaultEntry())
+                return SlotDisplay(BuiltInRegistries.ITEM.getDefaultEntry())
             }
             return pool.computeIfAbsent(id) { xid ->
-                SlotDisplay(KoishRegistries2.ITEM.getEntryOrThrow(xid))
+                SlotDisplay(BuiltInRegistries.ITEM.getEntryOrThrow(xid))
             }
         }
 
@@ -71,7 +71,7 @@ class SlotDisplay private constructor(
      * 该对象包含了可以单独使用的 `minecraft:item_name`, `minecraft:lore` 等有用的数据.
      */
     fun resolve(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): Resolved {
-        val koishItem = koishItem.value
+        val koishItem = koishItem.unwrap()
         val dict = koishItem.getPropertyOrDefault(ItemPropertyTypes.SLOT_DISPLAY_DICT, SlotDisplayDictData())
         val conf = SlotDisplayLoreData.LineConfig.Builder(dict).apply(dsl).build()
         val name = koishItem.getProperty(ItemPropertyTypes.SLOT_DISPLAY_NAME)?.resolve(conf.getPlaceholders())

@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.rarity2.Rarity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.data.getStringOrNull
 import net.kyori.examination.Examinable
@@ -36,7 +36,7 @@ data class ItemRarity(
         override fun read(holder: ItemComponentHolder): ItemRarity? {
             val tag = holder.getNbt() ?: return null
             val raw = tag.getStringOrNull(TAG_VALUE)
-                ?.let { KoishRegistries2.RARITY.getEntry(it) } ?: return null
+                ?.let { BuiltInRegistries.RARITY.getEntry(it) } ?: return null
             return ItemRarity(rarity = raw)
         }
 

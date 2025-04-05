@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.*
 import io.papermc.paper.registry.RegistryAccess
@@ -49,14 +49,14 @@ internal object CustomItemRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ITEM.resetRegistry()
-        consumeData(KoishRegistries2.ITEM::add)
-        KoishRegistries2.ITEM.freeze()
+        BuiltInRegistries.ITEM.resetRegistry()
+        consumeData(BuiltInRegistries.ITEM::add)
+        BuiltInRegistries.ITEM.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.ITEM::update)
+        consumeData(BuiltInRegistries.ITEM::update)
     }
 
     private fun consumeData(consumer: (Identifier, KoishItem) -> Unit) {
@@ -103,9 +103,9 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ITEM_PROXY.resetRegistry()
-        consumeData(KoishRegistries2.ITEM_PROXY::add)
-        KoishRegistries2.ITEM_PROXY.freeze()
+        BuiltInRegistries.ITEM_PROXY.resetRegistry()
+        consumeData(BuiltInRegistries.ITEM_PROXY::add)
+        BuiltInRegistries.ITEM_PROXY.freeze()
 
         // 检查配置文件是否都是有效的原版物品, 并给出警告
         runTask(::validateItemProxies)
@@ -113,7 +113,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.ITEM_PROXY::update)
+        consumeData(BuiltInRegistries.ITEM_PROXY::update)
     }
 
     private fun consumeData(consumer: (Identifier, KoishItemProxy) -> Unit) {
@@ -152,7 +152,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
     }
 
     private fun validateItemProxies() {
-        for (itemType in KoishRegistries2.ITEM_PROXY) {
+        for (itemType in BuiltInRegistries.ITEM_PROXY) {
             if (!isMinecraftItem(itemType.id)) {
                 LOGGER.error("Found a non-Minecraft proxy item config: ${itemType.id}. The config will be effectively ignored.")
             }

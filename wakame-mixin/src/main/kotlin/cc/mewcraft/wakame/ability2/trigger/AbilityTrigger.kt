@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability2.trigger
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -44,7 +44,7 @@ enum class AbilitySingleTrigger(
     ;
 
     init {
-        KoishRegistries2.ABILITY_TRIGGER.add(id, this)
+        BuiltInRegistries.ABILITY_TRIGGER.add(id, this)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
@@ -84,7 +84,7 @@ enum class AbilitySequenceTrigger(
     override val id: String = "combo/${triggers.map { it.char }.joinToString("")}"
 
     init {
-        KoishRegistries2.ABILITY_TRIGGER.add(id, this)
+        BuiltInRegistries.ABILITY_TRIGGER.add(id, this)
     }
 
     companion object {

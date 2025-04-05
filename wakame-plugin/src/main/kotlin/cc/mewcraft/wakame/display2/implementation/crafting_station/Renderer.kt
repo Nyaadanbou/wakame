@@ -140,7 +140,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
         val allPossibleElements = selector.allPossibleSamples
         val maximumElementAmount = selector.maximumSampleAmount
         val resolver = Placeholder.component("count", Component.text(maximumElementAmount))
-        format.render(allPossibleElements, { it.value.displayName }, resolver)
+        format.render(allPossibleElements, { it.unwrap().displayName }, resolver)
     }
 
     @JvmField

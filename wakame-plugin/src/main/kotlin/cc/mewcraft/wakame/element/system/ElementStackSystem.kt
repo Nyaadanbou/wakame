@@ -52,7 +52,7 @@ class ElementStackSystem : ListenableIteratingSystem(
             if (elementStackComponent.amount < requiredAmount)
                 continue
             for (ability in abilities) {
-                AbilityCastUtils.castPoint(ability.value, entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
+                AbilityCastUtils.castPoint(ability.unwrap(), entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
             }
             elementStackComponent.triggeredLevels.add(requiredAmount)
         }

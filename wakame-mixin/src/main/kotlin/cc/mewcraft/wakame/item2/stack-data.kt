@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
@@ -28,7 +28,7 @@ val ItemStack.typeId: Identifier get() = toNMS().typeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
-val Material.koishProxy: KoishItemProxy? get() = KoishRegistries2.ITEM_PROXY[key()]
+val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 
 //// Property
 

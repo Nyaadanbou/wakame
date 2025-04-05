@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.molang.Expression
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
@@ -110,7 +110,7 @@ internal data class DirectDamageMetadataBuilder(
     private fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
-            val element: RegistryEntry<Element> = KoishRegistries2.ELEMENT.getEntry(xelement) ?: KoishRegistries2.ELEMENT.getDefaultEntry()
+            val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(::DamageBundle)
@@ -244,7 +244,7 @@ internal data class MolangDamageMetadataBuilder(
     fun build(): DamageMetadata {
         val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
-            val element: RegistryEntry<Element> = KoishRegistries2.ELEMENT.getEntry(xelement) ?: KoishRegistries2.ELEMENT.getDefaultEntry()
+            val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(::DamageBundle)

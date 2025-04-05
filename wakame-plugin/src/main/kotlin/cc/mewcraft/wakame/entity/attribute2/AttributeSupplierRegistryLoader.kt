@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.Identifier
@@ -27,14 +27,14 @@ internal object AttributeSupplierRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ATTRIBUTE_SUPPLIER.resetRegistry()
-        consumeData(KoishRegistries2.ATTRIBUTE_SUPPLIER::add)
-        KoishRegistries2.ATTRIBUTE_SUPPLIER.freeze()
+        BuiltInRegistries.ATTRIBUTE_SUPPLIER.resetRegistry()
+        consumeData(BuiltInRegistries.ATTRIBUTE_SUPPLIER::add)
+        BuiltInRegistries.ATTRIBUTE_SUPPLIER.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.ATTRIBUTE_SUPPLIER::update)
+        consumeData(BuiltInRegistries.ATTRIBUTE_SUPPLIER::update)
     }
 
     private fun consumeData(registryAction: (Identifier, AttributeSupplier) -> Unit) {
@@ -178,7 +178,7 @@ private object AttributeSupplierSerializer {
 
                         val valueNodeMap = valueNode.childrenMap().mapKeys { (key, _) -> key.toString() }
                         for ((elementId, valueNodeInMap) in valueNodeMap) {
-                            if (!KoishRegistries2.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
+                            if (!BuiltInRegistries.ELEMENT.containsId(elementId)) error("Invalid element id: '$elementId'")
                             val bundleIdWithElement = "$bundleId/${elementId.replace(':', '.')}"
                             val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNodeInMap)
@@ -187,7 +187,7 @@ private object AttributeSupplierSerializer {
                         // not a map - then we assume it's a scalar, so
                         // the value node is used for every single element available in the system
 
-                        for (elementType in KoishRegistries2.ELEMENT.entrySequence) {
+                        for (elementType in BuiltInRegistries.ELEMENT.entrySequence) {
                             val bundleIdWithElement = "$bundleId/${elementType.getIdAsString().replace(':', '.')}"
                             val attributes = Attributes.getList(bundleIdWithElement)
                             builder.add(attributes, valueNode)

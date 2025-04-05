@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -21,14 +21,14 @@ internal object EntityRefRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ENTITY_REF.resetRegistry()
-        consumeData(KoishRegistries2.ENTITY_REF::add)
-        KoishRegistries2.ENTITY_REF.freeze()
+        BuiltInRegistries.ENTITY_REF.resetRegistry()
+        consumeData(BuiltInRegistries.ENTITY_REF::add)
+        BuiltInRegistries.ENTITY_REF.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.ENTITY_REF::update)
+        consumeData(BuiltInRegistries.ENTITY_REF::update)
     }
 
     private fun consumeData(registryAction: (Identifier, EntityRef) -> Unit) {

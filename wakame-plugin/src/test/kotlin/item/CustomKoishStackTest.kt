@@ -21,7 +21,7 @@ import cc.mewcraft.wakame.item.template.ItemTemplate
 import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.world.TimeControl
@@ -254,8 +254,8 @@ class CustomKoishStackTest : KoinTest {
                     assertEquals(expectedMax, modMax.amount)
                 }
 
-                val fire = KoishRegistries2.ELEMENT.getEntryOrThrow("fire")
-                val water = KoishRegistries2.ELEMENT.getEntryOrThrow("water")
+                val fire = BuiltInRegistries.ELEMENT.getEntryOrThrow("fire")
+                val water = BuiltInRegistries.ELEMENT.getEntryOrThrow("water")
                 when (val actual = core.data.element) {
                     fire -> assert(actual, 15.0, 20.0)
                     water -> assert(actual, 20.0, 25.0)
@@ -433,7 +433,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = KoishRegistries2.RARITY.getEntryOrThrow("common")
+        val common = BuiltInRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -446,7 +446,7 @@ class CustomKoishStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("Foo", it.content())
 
-            val expectedStyle = Style.style(*common.value.displayStyles)
+            val expectedStyle = Style.style(*common.unwrap().displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -515,10 +515,10 @@ class CustomKoishStackTest : KoinTest {
         unboxed {
             val elements = it.elements
             val possibleElements = setOf(
-                KoishRegistries2.ELEMENT.getEntryOrThrow("neutral"),
-                KoishRegistries2.ELEMENT.getEntryOrThrow("water"),
-                KoishRegistries2.ELEMENT.getEntryOrThrow("fire"),
-                KoishRegistries2.ELEMENT.getEntryOrThrow("wind"),
+                BuiltInRegistries.ELEMENT.getEntryOrThrow("neutral"),
+                BuiltInRegistries.ELEMENT.getEntryOrThrow("water"),
+                BuiltInRegistries.ELEMENT.getEntryOrThrow("fire"),
+                BuiltInRegistries.ELEMENT.getEntryOrThrow("wind"),
             )
             assertEquals(2, elements.size)
             assertTrue(elements.all { it in possibleElements })
@@ -666,7 +666,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val common = KoishRegistries2.RARITY.getEntryOrThrow("common")
+        val common = BuiltInRegistries.RARITY.getEntryOrThrow("common")
         context {
             it.rarity = common // 假设稀有度为 "common"
         }
@@ -679,7 +679,7 @@ class CustomKoishStackTest : KoinTest {
             assertIs<TextComponent>(it)
             assertEquals("Common", it.content())
 
-            val expectedStyle = Style.style(*common.value.displayStyles)
+            val expectedStyle = Style.style(*common.unwrap().displayStyles)
             val actualStyle = it.style().edit { builder ->
                 // 把 italic 显式设置为 false, 剩下的 style 应该跟稀有度的完全一致
                 builder.decoration(TextDecoration.ITALIC, TextDecoration.State.NOT_SET)
@@ -696,7 +696,7 @@ class CustomKoishStackTest : KoinTest {
             assertNotNull(it)
         }
 
-        val rarity = KoishRegistries2.RARITY.getEntryOrThrow("rare")
+        val rarity = BuiltInRegistries.RARITY.getEntryOrThrow("rare")
         context {
             it.rarity = rarity // 假设稀有度
         }
@@ -705,8 +705,8 @@ class CustomKoishStackTest : KoinTest {
             val kizamiz = it.kizamiz
             assertEquals(2, kizamiz.size)
             val possibleKizamiz = setOf(
-                KoishRegistries2.KIZAMI.getEntryOrThrow("inner/wind_lace"),
-                KoishRegistries2.KIZAMI.getEntryOrThrow("antigravity"),
+                BuiltInRegistries.KIZAMI.getEntryOrThrow("inner/wind_lace"),
+                BuiltInRegistries.KIZAMI.getEntryOrThrow("antigravity"),
             )
             assertTrue(kizamiz.all { it in possibleKizamiz })
         }

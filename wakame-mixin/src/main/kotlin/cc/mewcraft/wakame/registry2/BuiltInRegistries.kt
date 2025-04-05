@@ -29,8 +29,10 @@ import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
 
-// FIXME #373: rename to BuiltInRegistries
-object KoishRegistries2 {
+/**
+ * 这些 [Registry] 内的注册项是 *不可变的* - 无法在游戏运行时添加或删除注册项.
+ */
+object BuiltInRegistries {
 
     private val ACCESS: MutableRegistryAccess = MutableRegistryAccess()
     private val INITIALIZERS = mutableListOf<() -> Unit>()
@@ -43,63 +45,63 @@ object KoishRegistries2 {
      * 技能配置.
      */
     @JvmField
-    val ABILITY_META: WritableRegistry<AbilityMeta> = registerSimple(KoishRegistryKeys2.ABILITY_META)
+    val ABILITY_META: WritableRegistry<AbilityMeta> = registerSimple(BuiltInRegistryKeys.ABILITY_META)
 
     /**
      * 技能配置的类型.
      */
     @JvmField
-    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(KoishRegistryKeys2.ABILITY_META_TYPE) { AbilityMetaTypes }
+    val ABILITY_META_TYPE: WritableRegistry<AbilityMetaType<*>> = registerSimple(BuiltInRegistryKeys.ABILITY_META_TYPE) { AbilityMetaTypes }
 
     /**
      * 技能触发器.
      */
     @JvmField
-    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(KoishRegistryKeys2.ABILITY_TRIGGER)
+    val ABILITY_TRIGGER: WritableRegistry<AbilityTrigger> = registerSimple(BuiltInRegistryKeys.ABILITY_TRIGGER)
 
     /**
      * 自定义物品的类型.
      */
     @JvmField
-    val ITEM: WritableDefaultedFuzzyRegistry<KoishItem> = registerDefaultedFuzzy(KoishRegistryKeys2.ITEM, "internal/error")
+    val ITEM: WritableDefaultedFuzzyRegistry<KoishItem> = registerDefaultedFuzzy(BuiltInRegistryKeys.ITEM, "internal/error")
 
     /**
      * 套皮物品堆叠的实例.
      */
     @JvmField
-    val ITEM_PROXY: WritableRegistry<KoishItemProxy> = registerSimple(KoishRegistryKeys2.ITEM_PROXY)
+    val ITEM_PROXY: WritableRegistry<KoishItemProxy> = registerSimple(BuiltInRegistryKeys.ITEM_PROXY)
 
     /**
      * "Item Data" 的类型.
      */
     @JvmField
-    val ITEM_DATA_TYPE: WritableRegistry<ItemDataType<*>> = registerSimple(KoishRegistryKeys2.ITEM_DATA_TYPE) { ItemDataTypes }
+    val ITEM_DATA_TYPE: WritableRegistry<ItemDataType<*>> = registerSimple(BuiltInRegistryKeys.ITEM_DATA_TYPE) { ItemDataTypes }
 
     /**
      * "Item Meta" 的类型.
      * "Item Meta" 相当于 "Item Data" 的配置文件.
      */
     @JvmField
-    val ITEM_META_TYPE: WritableRegistry<ItemMetaType<*, *>> = registerSimple(KoishRegistryKeys2.ITEM_META_TYPE) { ItemMetaTypes }
+    val ITEM_META_TYPE: WritableRegistry<ItemMetaType<*, *>> = registerSimple(BuiltInRegistryKeys.ITEM_META_TYPE) { ItemMetaTypes }
 
     /**
      * "Item Property" 的类型.
      */
     @JvmField
-    val ITEM_PROPERTY_TYPE: WritableRegistry<ItemPropertyType<*>> = registerSimple(KoishRegistryKeys2.ITEM_PROPERTY_TYPE) { ItemPropertyTypes }
+    val ITEM_PROPERTY_TYPE: WritableRegistry<ItemPropertyType<*>> = registerSimple(BuiltInRegistryKeys.ITEM_PROPERTY_TYPE) { ItemPropertyTypes }
 
     /**
      * "Item Behavior" 的类型.
      */
     @JvmField
-    val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(KoishRegistryKeys2.ITEM_BEHAVIOR) { ItemBehaviorTypes }
+    val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(BuiltInRegistryKeys.ITEM_BEHAVIOR) { ItemBehaviorTypes }
 
     /**
      * [ItemRefHandler] 的实例.
      * 存放来自第三方插件的 [ItemRefHandler].
      */
     @JvmField
-    val ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(KoishRegistryKeys2.ITEM_REF_HANDLER)
+    val ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(BuiltInRegistryKeys.ITEM_REF_HANDLER)
 
     /**
      * [ItemRefHandler] 的内置实例.
@@ -107,43 +109,43 @@ object KoishRegistries2 {
      */
     @ApiStatus.Internal
     @JvmField
-    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerDefaulted(KoishRegistryKeys2.ITEM_REF_HANDLER, "minecraft")
+    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerDefaulted(BuiltInRegistryKeys.ITEM_REF_HANDLER, "minecraft")
 
     /**
      * 稀有度的类型.
      */
     @JvmField
-    val RARITY: WritableDefaultedRegistry<Rarity> = registerDefaulted(KoishRegistryKeys2.RARITY, "common")
+    val RARITY: WritableDefaultedRegistry<Rarity> = registerDefaulted(BuiltInRegistryKeys.RARITY, "common")
 
     /**
      * 铭刻的类型.
      */
     @JvmField
-    val KIZAMI: WritableRegistry<Kizami> = registerSimple(KoishRegistryKeys2.KIZAMI)
+    val KIZAMI: WritableRegistry<Kizami> = registerSimple(BuiltInRegistryKeys.KIZAMI)
 
     /**
      * 实体类型的引用.
      */
     @JvmField
-    val ENTITY_REF: WritableRegistry<EntityRef> = registerSimple(KoishRegistryKeys2.ENTITY_REF)
+    val ENTITY_REF: WritableRegistry<EntityRef> = registerSimple(BuiltInRegistryKeys.ENTITY_REF)
 
     /**
      * 元素的类型.
      */
     @JvmField
-    val ELEMENT: WritableDefaultedRegistry<Element> = registerDefaulted(KoishRegistryKeys2.ELEMENT, "neutral") // = koish:neutral
+    val ELEMENT: WritableDefaultedRegistry<Element> = registerDefaulted(BuiltInRegistryKeys.ELEMENT, "neutral") // = koish:neutral
 
     /**
      * 等级->稀有度的映射.
      */
     @JvmField
-    val LEVEL_TO_RARITY_MAPPING: WritableDefaultedRegistry<LevelToRarityMapping> = registerDefaulted(KoishRegistryKeys2.LEVEL_TO_RARITY_MAPPING, "__default__") // = koish:__default__
+    val LEVEL_TO_RARITY_MAPPING: WritableDefaultedRegistry<LevelToRarityMapping> = registerDefaulted(BuiltInRegistryKeys.LEVEL_TO_RARITY_MAPPING, "__default__") // = koish:__default__
 
     /**
      * 属性的类型.
      */
     @JvmField
-    val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(KoishRegistryKeys2.ATTRIBUTE)
+    val ATTRIBUTE: WritableRegistry<Attribute> = registerSimple(BuiltInRegistryKeys.ATTRIBUTE)
 
     /**
      * 实体的默认属性.
@@ -157,19 +159,19 @@ object KoishRegistries2 {
      * in which case the enum type is not enough to express all types.
      */
     @JvmField
-    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(KoishRegistryKeys2.ATTRIBUTE_SUPPLIER)
+    val ATTRIBUTE_SUPPLIER: WritableRegistry<AttributeSupplier> = registerSimple(BuiltInRegistryKeys.ATTRIBUTE_SUPPLIER)
 
     /**
      * 属性块 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 的外观, 用于访问属性块相关的数据和逻辑.
      */
     @JvmField
-    val ATTRIBUTE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(KoishRegistryKeys2.ATTRIBUTE_FACADE)
+    val ATTRIBUTE_FACADE: WritableRegistry<AttributeFacade<ConstantAttributeBundle, VariableAttributeBundle>> = registerSimple(BuiltInRegistryKeys.ATTRIBUTE_FACADE)
 
     /**
      * 虚构的属性映射.
      */
     @JvmField
-    val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(KoishRegistryKeys2.IMG_ATTRIBUTE_MAP)
+    val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(BuiltInRegistryKeys.IMG_ATTRIBUTE_MAP)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

@@ -12,6 +12,9 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
 import java.nio.file.Path
 
+/**
+ * 插件的主要 `config.yml`.
+ */
 val MAIN_CONFIG: Provider<CommentedConfigurationNode> = ConfigAccess.INSTANCE["config"]
 
 /**

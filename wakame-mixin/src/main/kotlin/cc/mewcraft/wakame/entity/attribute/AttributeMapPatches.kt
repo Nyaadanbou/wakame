@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.registerEvents
 import it.unimi.dsi.fastutil.objects.Object2ObjectFunction
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
@@ -93,7 +93,7 @@ object AttributeMapPatches : Listener {
             if (entity !is LivingEntity) continue
 
             val patch = get(entity.uniqueId) ?: continue
-            val default = KoishRegistries2.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
+            val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
 
             // 把跟默认属性一样的属性移除
             patch.trimBy(default)
@@ -119,7 +119,7 @@ object AttributeMapPatches : Listener {
         if (entity !is LivingEntity) return
 
         val patch = get(entity.uniqueId) ?: return
-        val default = KoishRegistries2.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
+        val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
 
         // 把跟默认属性一样的属性移除
         patch.trimBy(default)

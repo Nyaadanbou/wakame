@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
@@ -301,7 +301,7 @@ private open class SimpleItemDataContainer(
                 prefix = "(",
                 postfix = ")",
             ) { (key, value) ->
-                "${KoishRegistries2.ITEM_DATA_TYPE.getId(key)!!.value()}=$value"
+                "${BuiltInRegistries.ITEM_DATA_TYPE.getId(key)!!.value()}=$value"
             }
         }}"
     }
@@ -312,7 +312,7 @@ private open class SimpleItemDataContainer(
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 // 注意: 该 node key 所对应的 type 必须存在
-                val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: continue
+                val dataType = BuiltInRegistries.ITEM_DATA_TYPE[nodeKey] ?: continue
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
                 val dataValue = try {
                     itemDataNode.get(dataType.typeToken) ?: run {
@@ -338,7 +338,7 @@ private open class SimpleItemDataContainer(
             val iter = obj.fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
-                val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: continue
+                val dataTypeId = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType) ?: continue
                 val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
                 val entryNode = node.node(mapKey)
                 entryNode.set(

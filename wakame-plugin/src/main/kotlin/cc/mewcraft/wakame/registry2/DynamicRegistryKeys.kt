@@ -5,9 +5,9 @@ import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.util.Identifiers
 
-object KoishRegistryKeys {
+object DynamicRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.of("root")
+    val ROOT_REGISTRY_NAME = Identifiers.of("dynamic")
 
     ///
 

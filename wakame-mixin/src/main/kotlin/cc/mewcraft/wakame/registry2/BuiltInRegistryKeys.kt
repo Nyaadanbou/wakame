@@ -23,10 +23,9 @@ import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
 
-// FIXME #373: rename to BuiltInRegistryKeys
-object KoishRegistryKeys2 {
+object BuiltInRegistryKeys {
     @JvmField
-    val ROOT_REGISTRY_NAME = Identifiers.of("root_2")
+    val ROOT_REGISTRY_NAME = Identifiers.of("built_in")
 
     ///
 

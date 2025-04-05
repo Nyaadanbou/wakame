@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
@@ -52,7 +52,7 @@ protected constructor(
 ) : Examinable, Attribute {
 
     init {
-        KoishRegistries2.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
+        BuiltInRegistries.ATTRIBUTE.add(id, this) // 添加到 KoishRegistries
     }
 
     // 需要注意 (kotlin 委托基础)

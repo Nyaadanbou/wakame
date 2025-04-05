@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent
@@ -26,7 +26,7 @@ class AbilityMetaParser<C : Any> : ArgumentParser<C, AbilityMeta>, BlockingSugge
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<AbilityMeta> {
         val peekString = commandInput.peekString()
-        val ability = KoishRegistries2.ABILITY_META[peekString]
+        val ability = BuiltInRegistries.ABILITY_META[peekString]
         if (ability == null) {
             return ArgumentParseResult.failure(AbilityParseException(commandContext))
         }
@@ -36,7 +36,7 @@ class AbilityMetaParser<C : Any> : ArgumentParser<C, AbilityMeta>, BlockingSugge
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return KoishRegistries2.ABILITY_META.keys.map { it.value.value() }
+        return BuiltInRegistries.ABILITY_META.keys.map { it.value.value() }
     }
 }
 

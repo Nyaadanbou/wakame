@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.rarity2
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.PlayerFriendlyNamed
 import cc.mewcraft.wakame.util.adventure.plain
@@ -31,7 +31,7 @@ constructor(
 ) : Keyed, Examinable, PlayerFriendlyNamed, Comparable<Rarity> {
 
     override fun key(): Key {
-        return KoishRegistries2.RARITY.getId(this) ?: Identifiers.of("unregistered")
+        return BuiltInRegistries.RARITY.getId(this) ?: Identifiers.of("unregistered")
     }
 
     override fun compareTo(other: Rarity): Int {

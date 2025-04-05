@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.damage
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.*
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.contracts.ExperimentalContracts
 
@@ -41,7 +41,7 @@ fun damagePacket(element: RegistryEntry<Element>, block: DamagePacketDSL.() -> U
  * 开始构建一个 [DamagePacket], 使用默认的元素, 不依赖任何 [AttributeMapLike].
  */
 fun damagePacket(block: DamagePacketDSL.() -> Unit): DamagePacket {
-    return DamagePacketDSL(KoishRegistries2.ELEMENT.getDefaultEntry()).apply(block).build()
+    return DamagePacketDSL(BuiltInRegistries.ELEMENT.getDefaultEntry()).apply(block).build()
 }
 
 /**
@@ -60,14 +60,14 @@ class DamageBundleDSL(
     private val bundle: DamageBundle = DamageBundle()
 
     private fun getElementById(id: String): RegistryEntry<Element>? {
-        return KoishRegistries2.ELEMENT.getEntry(id)
+        return BuiltInRegistries.ELEMENT.getEntry(id)
     }
 
     /**
      * 为每种已知的元素构建 [DamagePacket].
      */
     fun every(block: DamagePacketDSL.() -> Unit) {
-        for (element in KoishRegistries2.ELEMENT.entrySequence) {
+        for (element in BuiltInRegistries.ELEMENT.entrySequence) {
             // every() 只添加先前不存在的元素伤害包, 使其永远成为一个 "fallback".
             // 这样无论 DSL 的调用顺序是怎样的, 都可以让 single() 拥有更高优先级.
             bundle.addIfAbsent(DamagePacketDSL(element, attrMap).apply(block).build())
@@ -78,7 +78,7 @@ class DamageBundleDSL(
      * 为默认的元素构建 [DamagePacket].
      */
     fun default(block: DamagePacketDSL.() -> Unit) {
-        val element = KoishRegistries2.ELEMENT.getDefaultEntry()
+        val element = BuiltInRegistries.ELEMENT.getDefaultEntry()
         bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
     }
 

@@ -68,7 +68,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     // 用于序列化, 例如注册表数据之间的依赖, NBT读写, Web系统 等只需要储存键名的地方
     val valueByNameCodec: Codec<T>
         get() = referenceEntryCodec.flatComapMap(
-            { entry -> entry.value },
+            { entry -> entry.unwrap() },
             { value -> this.safeCastToReference(this.wrapAsEntry(value)) }
         )
 
@@ -118,7 +118,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
 
     val entrySequence: Sequence<RegistryEntry.Reference<T>>
     val valueSequence: Sequence<T>
-        get() = entrySequence.map(RegistryEntry.Reference<T>::value)
+        get() = entrySequence.map(RegistryEntry.Reference<T>::unwrap)
 
     fun containsKey(key: RegistryKey<T>): Boolean
     fun containsId(id: Identifier): Boolean
@@ -142,7 +142,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
      * 由于是 [RegistryEntry] 所以外部可以选择仅仅把引用存起来, 或者如果需要转换数据的话
      * 那么可以使用 [RegistryEntry.reactive] 来进行一系列响应式的数据操作(lazy).
      *
-     * 返回的 [RegistryEntry] 在一开始没有绑定的数据, 也就是说直接调用 [RegistryEntry.value] 会抛异常.
+     * 返回的 [RegistryEntry] 在一开始没有绑定的数据, 也就是说直接调用 [RegistryEntry.unwrap] 会抛异常.
      * 当注册表里的数据全部加载完毕后, 此时 [RegistryEntry] 中的数据会被填充, 所有数据将正常返回.
      *
      * [WritableRegistry.add] 与 [Registry.createEntry] 的关系:
@@ -177,7 +177,7 @@ interface Registry<T> : RegistryEntryOwner<T>, Keyable, IndexedIterable<T> {
     fun getIndexedEntries(): IndexedIterable<RegistryEntry<T>> {
         return object : IndexedIterable<RegistryEntry<T>> {
             override fun getRawId(value: RegistryEntry<T>): Int {
-                return this@Registry.getRawId(value.value)
+                return this@Registry.getRawId(value.unwrap())
             }
 
             override fun get(index: Int): RegistryEntry<T>? {
@@ -211,6 +211,12 @@ interface WritableRegistry<T> : Registry<T> {
     fun resetRegistry()
 
     val isEmpty: Boolean
+}
+
+interface DynamicRegistry<T> : WritableRegistry<T> {
+    fun remove(key: RegistryKey<T>): RegistryEntry.Reference<T>
+    fun remove(id: Identifier): RegistryEntry.Reference<T> = remove(RegistryKey.of(this.key, id))
+    fun remove(id: String): RegistryEntry.Reference<T> = remove(Identifiers.of(id))
 }
 
 interface DefaultedRegistry<T> : Registry<T> {

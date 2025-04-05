@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.*
 
@@ -30,15 +30,15 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries2.ABILITY_META.resetRegistry()
+        BuiltInRegistries.ABILITY_META.resetRegistry()
 
-        consumeData(KoishRegistries2.ABILITY_META::add)
-        KoishRegistries2.ABILITY_META.freeze()
+        consumeData(BuiltInRegistries.ABILITY_META::add)
+        BuiltInRegistries.ABILITY_META.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        consumeData(KoishRegistries2.ABILITY_META::update)
+        consumeData(BuiltInRegistries.ABILITY_META::update)
     }
 
     private fun consumeData(consumer: (Identifier, AbilityMeta) -> Unit) {

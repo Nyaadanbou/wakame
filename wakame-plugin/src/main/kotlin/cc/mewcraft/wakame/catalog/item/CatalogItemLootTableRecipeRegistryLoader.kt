@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
@@ -37,15 +37,15 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         reloadMinecraftLootTables()
-        KoishRegistries.LOOT_TABLE_RECIPE.resetRegistry()
-        applyDataToRegistry(KoishRegistries.LOOT_TABLE_RECIPE::add)
-        KoishRegistries.LOOT_TABLE_RECIPE.freeze()
+        DynamicRegistries.LOOT_TABLE_RECIPE.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.LOOT_TABLE_RECIPE::add)
+        DynamicRegistries.LOOT_TABLE_RECIPE.freeze()
     }
 
     @ReloadFun
     fun reload() {
         reloadMinecraftLootTables()
-        applyDataToRegistry(KoishRegistries.LOOT_TABLE_RECIPE::update)
+        applyDataToRegistry(DynamicRegistries.LOOT_TABLE_RECIPE::update)
     }
 
     // 重新读取服务端上的 Minecraft Loot Tables
@@ -104,7 +104,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
 
         // 根据对应的菜单布局和图标, 注册战利品表配方
         lootTableIds.forEach { lootTableId ->
-            val icon = lootTableIdToIconId[lootTableId] ?: KoishRegistries.ITEM.defaultId
+            val icon = lootTableIdToIconId[lootTableId] ?: DynamicRegistries.ITEM.defaultId
             val menuSettings = lootTableIdToMenuId[lootTableId]?.let(CatalogItemMenuSettings::getMenuSettings)
                 ?: BasicMenuSettings(Component.text("Untitled"), emptyArray(), hashMapOf())
 
