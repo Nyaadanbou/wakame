@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.user.attributeContainer
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -14,8 +14,7 @@ import org.bukkit.entity.Player
 internal object AttributeMapAccessImpl : AttributeMapAccess {
 
     override fun get(player: Player): Result<AttributeMap> {
-        // TODO #373: 从 ecs 读取
-        return Result.success(player.toUser().attributeMap)
+        return Result.success(player.attributeContainer)
     }
 
     override fun get(entity: Entity): Result<AttributeMap> {
@@ -30,7 +29,11 @@ internal object AttributeMapAccessImpl : AttributeMapAccess {
             )
         }
 
-        return Result.success(AttributeMapFactory.INSTANCE.create(entity))
+        val value = AttributeMapFactory.INSTANCE.create(entity) ?: return Result.failure(
+            IllegalArgumentException("Entity $entity has no AttributeMap!")
+        )
+
+        return Result.success(value)
     }
 
 }

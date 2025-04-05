@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item.logic
 
+import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeInstance
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -65,7 +67,7 @@ internal object AttributeItemSlotChangeListener : ItemSlotChangeEventListener() 
             return
         val cells = nekoStack.components.get(ItemComponentTypes.CELLS) ?: return
         val attributeModifiers = cells.collectAttributeModifiers(nekoStack, slot)
-        val attributeMap = player.toUser().attributeMap
+        val attributeMap = player.koishify()[AttributeMap]
         attributeModifiers.forEach { type, modifier ->
             val instance = attributeMap.getInstance(type)
             if (instance != null)

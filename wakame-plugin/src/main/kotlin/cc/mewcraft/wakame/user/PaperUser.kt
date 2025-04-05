@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.ability2.combo.PlayerCombo
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
 import cc.mewcraft.wakame.kizami.KizamiMap
@@ -14,30 +13,6 @@ import org.bukkit.entity.Player
 import java.util.*
 import java.util.stream.Stream
 
-val Player.koishLevel: Int
-    get() = toUser().level
-
-val Player.kizamiContainer: KizamiMap
-    get() = toUser().kizamiMap
-
-val Player.attributeContainer: AttributeMap
-    get() = toUser().attributeMap
-
-val Player.combo: PlayerCombo
-    get() = toUser().combo
-
-val Player.attackSpeed: AttackSpeed
-    get() = toUser().attackSpeed
-
-val Player.isInventoryListenable: Boolean
-    get() = toUser().isInventoryListenable
-
-/**
- * Adapts the [Player] into [NekoPlayer][User].
- */
-fun Player.toUser(): User<Player> {
-    return PlayerAdapters.get<Player>().adapt(this)
-}
 
 /**
  * A wakame player in Paper platform.
@@ -45,22 +20,32 @@ fun Player.toUser(): User<Player> {
  * @property player the [paper player][Player]
  */
 class PaperUser(
-    override val player: Player,
+    private val player: Player,
 ) : User<Player>, Examinable {
+
+    override fun <T> player(): T {
+        return player as T // let the runtime check the type
+    }
+
     override val uniqueId: UUID
         get() = player.uniqueId
 
     override val level: Int
         get() = PlayerLevelManager.getOrDefault(uniqueId, 1)
 
+    // TODO #373: move to ecs
     override val kizamiMap: KizamiMap = KizamiMap(this)
 
-    override val attributeMap: AttributeMap = AttributeMapFactory.INSTANCE.create(player)
+    override val attributeMap: AttributeMap
+        get() = player.attributeContainer // moved to ecs
 
+    // TODO #373: move to ecs
     override val combo: PlayerCombo = PlayerCombo(this.uniqueId)
 
+    // TODO #373: move to ecs
     override val attackSpeed: AttackSpeed = AttackSpeed(this)
 
+    // TODO #373: move to ecs
     @Volatile
     override var isInventoryListenable: Boolean = false
 

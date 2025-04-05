@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.component.AttributeMapComponent
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
@@ -15,12 +15,15 @@ class AttributeMapSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) = Unit
 
     override fun onAddEntity(entity: Entity) {
-        val attributable = when {
-            entity.has(BukkitPlayerComponent) -> entity[BukkitPlayerComponent].bukkitPlayer
-            entity.has(BukkitEntityComponent) -> entity[BukkitEntityComponent].bukkitEntity
-            else -> return
-        }
+        // 获取 bukkit entity
+        val bukkitEntity = entity.getOrNull(BukkitPlayerComponent)?.bukkitPlayer
+            ?: entity[BukkitEntityComponent].bukkitEntity
 
-        entity.configure { it += AttributeMapComponent(attributable) }
+        // 创建 attribute container
+        val attributeContainer = AttributeMapFactory.INSTANCE.create(bukkitEntity)
+            ?: return
+
+        // 添加到 ecs entity
+        entity.configure { it += attributeContainer }
     }
 }

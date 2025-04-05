@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.ecs.system
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.BukkitComponent
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.AttributeMapComponent
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import cc.mewcraft.wakame.util.toStableFloat
 import com.github.quillraven.fleks.Entity
@@ -107,9 +107,9 @@ class EntityInfoBossBar : IteratingSystem(
     }
 
     private fun getMaxHealth(entity: Entity): Double? {
-        val attributeMap = entity[AttributeMapComponent]()
-        val maxHealth = AttributeProvider.INSTANCE.get("max_health") ?: return null
-        return attributeMap.getInstance(maxHealth)?.getValue()
+        val attributeContainer = entity[AttributeMap]
+        val maxHealthAttribute = AttributeProvider.INSTANCE.get("max_health") ?: return null
+        return attributeContainer.getInstance(maxHealthAttribute)?.getValue()
     }
 
     override fun onAddEntity(entity: Entity) {

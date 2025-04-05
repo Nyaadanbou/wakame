@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.jetbrains.annotations.ApiStatus
 
@@ -44,11 +44,12 @@ interface AttributeMapFactory {
 
     /**
      * 基于实体 [entity] 创建一个新的 [AttributeMap] 对象.
+     * 如果 [entity] 不支持 [AttributeMap], 函数会返回空.
      *
      * 该函数本身会对 [entity] 产生副作用, 详见实现.
      *
      * @see AttributeMapAccess
      */
-    fun create(entity: LivingEntity): AttributeMap
+    fun create(entity: Entity): AttributeMap?
 
 }

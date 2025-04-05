@@ -24,14 +24,7 @@ interface User<P> {
     /**
      * The backing player.
      */
-    val player: P
-
-    /**
-     * The backing player.
-     */
-    fun <T> player(): T {
-        return player as T // let the runtime check the type
-    }
+    fun <T> player(): T
 
     /**
      * The UUID of the user.

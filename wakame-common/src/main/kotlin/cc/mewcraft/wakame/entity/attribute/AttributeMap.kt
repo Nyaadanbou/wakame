@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
+import com.github.quillraven.fleks.Component
+import com.github.quillraven.fleks.ComponentType
 import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
 
@@ -76,7 +78,7 @@ interface AttributeMapSnapshotable {
  * 该对象在实现上必须与一个主体绑定, 例如玩家, 怪物等.
  * **任何对该对象的修改都应该实时反应到绑定的主体上!**
  */
-interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
+interface AttributeMap : Component<AttributeMap>, AttributeMapLike, AttributeMapSnapshotable, Iterable<Map.Entry<Attribute, AttributeInstance>> {
     /**
      * 获取指定 [attribute] 的 [AttributeInstance].
      *
@@ -98,6 +100,12 @@ interface AttributeMap : AttributeMapLike, AttributeMapSnapshotable, Iterable<Ma
      * 注册指定 [attribute]. 这将覆盖任何已存在的 [AttributeInstance].
      */
     fun registerInstance(attribute: Attribute)
+
+    // Fleks
+
+    override fun type(): ComponentType<AttributeMap> = AttributeMap
+
+    companion object : ComponentType<AttributeMap>()
 }
 
 /**

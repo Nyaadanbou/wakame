@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.registry2.KoishRegistries
+import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -17,15 +18,20 @@ internal object AttributeMapFactoryImpl : AttributeMapFactory {
         val key = EntityType.PLAYER.key // a bit faster than `player.type.key`
         val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
         return PlayerAttributeMap(default, player).apply {
-            syncToMinecraft() // apply side effects
+            syncToMinecraft() // 同步到世界
         }
     }
 
-    override fun create(entity: LivingEntity): AttributeMap {
+    override fun create(entity: Entity): AttributeMap? {
+        if (entity is Player)
+            return create(entity) // need to redirect to create(Player)
+        if (entity !is LivingEntity)
+            return null // atm only living entity has attribute map
+
         val key = entityRefLookup.get(entity)
         val default = KoishRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
         return EntityAttributeMap(default, entity).apply {
-            syncToMinecraft() // apply side effects
+            syncToMinecraft() // 同步到世界
         }
     }
 
