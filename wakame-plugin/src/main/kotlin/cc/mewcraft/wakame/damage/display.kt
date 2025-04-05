@@ -1,12 +1,10 @@
-package cc.mewcraft.wakame.network
+package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.registerSerializer
-import cc.mewcraft.wakame.damage.CriticalStrikeMetadata
-import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.hologram.AnimationData

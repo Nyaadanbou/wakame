@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.network
+package cc.mewcraft.wakame.item2.network
 
 import cc.mewcraft.wakame.item.extension.rarity
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap
  * 修改 [Item].
  */
 @Init(stage = InitStage.POST_WORLD)
-internal object ItemEntityRenderer : PacketListener {
+internal object ItemEntityRender : PacketListener {
 
     private val shadowEntity: ShadowEntity = BukkitShadowFactory.global().staticShadow<ShadowEntity>()
 
