@@ -41,6 +41,9 @@ dependencies:
     PlaceholderAPI:
       required: false
       load: OMIT
+    QuickShop:
+      required: false
+      load: OMIT
     Towny:
       required: false
       load: OMIT
