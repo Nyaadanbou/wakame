@@ -18,6 +18,10 @@ repositories {
 
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
+    compileOnlyApi(local.fleks) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
 }
 
 publishing {
