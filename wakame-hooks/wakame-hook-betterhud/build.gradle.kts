@@ -13,6 +13,10 @@ repositories {
 dependencies {
     // internal
     compileOnly(project(":wakame-plugin"))
+    compileOnly(local.fleks) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
