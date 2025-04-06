@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.hook.impl.papi
 
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.ecs.component.AttributeMapComponent
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.integration.Hook
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
@@ -21,7 +22,8 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
     override fun persist(): Boolean = true
 
     override fun onPlaceholderRequest(player: Player, params: String): String? {
-        when (params) {
+        val paramsList = params.lowercase().split("_", limit = 2)
+        when (paramsList[0]) {
             "mana" -> {
                 val current = player.koishify()[Mana].current
                 return current.toString()
@@ -40,6 +42,13 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
                 } else {
                     .0.toString()
                 }
+            }
+            "attribute" -> {
+                if (paramsList.size < 2)
+                    return null
+                val attributeMap = player.koishify()[AttributeMapComponent]()
+                val attribute = Attributes.get(paramsList[1]) ?: return null
+                return attributeMap.getValue(attribute).toString()
             }
         }
         return null
