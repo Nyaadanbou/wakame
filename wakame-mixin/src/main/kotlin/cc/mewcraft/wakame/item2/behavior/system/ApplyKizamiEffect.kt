@@ -24,7 +24,7 @@ object ApplyKizamiEffect : IteratingSystem(
 
         // 更新铭刻的数量
         var changed = false
-        for ((slot, curr, prev) in slotChanges.changingItems) {
+        slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 val kizami = prev.getData(ItemDataTypes.KIZAMI)
                 if (kizami != null) {

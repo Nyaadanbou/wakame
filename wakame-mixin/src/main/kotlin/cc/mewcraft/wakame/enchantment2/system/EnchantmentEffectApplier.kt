@@ -20,7 +20,7 @@ object EnchantmentEffectApplier : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
-        for ((slot, curr, prev) in slotChanges.changingItems) {
+        slotChanges.forEachChangingEntry { slot, curr, prev ->
 
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 prev.koishEnchantments.forEach { (enchant, level) ->
@@ -41,7 +41,6 @@ object EnchantmentEffectApplier : IteratingSystem(
                     }
                 }
             }
-
         }
     }
 

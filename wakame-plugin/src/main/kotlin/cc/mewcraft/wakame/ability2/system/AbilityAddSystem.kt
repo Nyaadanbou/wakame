@@ -18,13 +18,13 @@ class AbilityAddSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
-        for ((slot, curr) in slotChanges.changingItems) {
+        slotChanges.forEachChangingEntry { slot, curr, _ ->
             if (curr != null &&
                 ItemSlotChanges.testSlot(slot, curr) &&
                 ItemSlotChanges.testLevel(player, curr) &&
                 ItemSlotChanges.testDurability(curr)
             ) {
-                val ability = curr.getProperty(ItemPropertyTypes.ABILITY) ?: continue
+                val ability = curr.getProperty(ItemPropertyTypes.ABILITY) ?: return@forEachChangingEntry
                 AbilityCastUtils.idle(ability, player, player, slot)
             }
         }

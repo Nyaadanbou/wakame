@@ -19,7 +19,9 @@ object ApplyAttributeEffect : IteratingSystem(
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
         val attributeContainer = entity[AttributeMap]
-        for ((slot, curr, prev) in slotChanges.changingItems) {
+
+        // 更新属性的状态
+        slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 // TODO #373: 移除属性
                 LOGGER.info("Removing attribute modifier from ${slot.id}")

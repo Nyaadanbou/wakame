@@ -51,7 +51,6 @@ internal object KoishFleks : Listener, Fleks {
         systems {
             add(BukkitEntityBridge()) // 移除无效 bukkit entity 所映射的 ecs entity
             add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
-            add(ItemSlotChangeMonitor2()) // 监听背包物品变化
 
             // ------------
             // 属性
@@ -64,6 +63,7 @@ internal object KoishFleks : Listener, Fleks {
             // 物品
             // ------------
 
+            add(ItemSlotChangeMonitor2()) // 监听背包物品变化
             add(ApplyAttributeEffect)
             add(ApplyKizamiEffect)
 

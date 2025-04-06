@@ -14,9 +14,12 @@ import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.*
+import it.unimi.dsi.fastutil.objects.ObjectIterator
+import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.ApiStatus
 
 
 // ------------
@@ -38,19 +41,15 @@ class ItemSlotChangeMonitor2 : IteratingSystem(
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
-        //if (!entity.has(InventoryListenable)) {
-        //    // 当玩家的背包不可监听时, 跳过扫描, 跳过触发事件.
-        //    // 换句话说, 在 isInventoryListenable 为 false 时, ItemSlotChanges 永远不会更新.
-        //    // 直到当 isInventoryListenable 为 true 时, ItemSlotChanges 才会开始更新.
-        //    return
-        //}
-
         for (slot in ItemSlotRegistry.all()) {
             val curr = slot.getItem(player)
-            val entry = entity[ItemSlotChanges][slot]
-            entry.update(curr) // TODO 优化这里的性能
+            val slotChanges = entity[ItemSlotChanges]
+            val entry = slotChanges[slot]
+            entry.update(curr)
             if (entry.changing) {
-                 PlayerItemSlotChangeEvent(player, slot, entry.previous, entry.current).callEvent()
+                if (!PlayerItemSlotChangeEvent.getHandlerList().registeredListeners.isEmpty()) {
+                    PlayerItemSlotChangeEvent(player, slot, entry.previous, entry.current).callEvent()
+                }
             }
         }
     }
@@ -61,7 +60,9 @@ class ItemSlotChangeMonitor2 : IteratingSystem(
 }
 
 data class ItemSlotChanges(
-    private val items: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
+    @ApiStatus.Internal
+    @JvmField
+    val entries: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
 ) : Component<ItemSlotChanges> {
 
     companion object : ComponentType<ItemSlotChanges>() {
@@ -114,11 +115,29 @@ data class ItemSlotChanges(
 
     override fun type(): ComponentType<ItemSlotChanges> = ItemSlotChanges
 
-    val changingItems: Collection<Entry>
-        get() = items.values.filter(Entry::changing)
+    @Deprecated("使用 forEachChangingEntry 以避免 Array 的创建")
+    val changingEntries: Collection<Entry>
+        get() = entries.values.filter(Entry::changing)
+
+    fun fastIterator(): ObjectIterator<Reference2ObjectMap.Entry<ItemSlot, Entry>> {
+        return entries.reference2ObjectEntrySet().fastIterator()
+    }
+
+    /**
+     * 遍历所有在当前 tick 发生了变化的物品槽位.
+     */
+    inline fun forEachChangingEntry(
+        action: (slot: ItemSlot, curr: ItemStack?, prev: ItemStack?) -> Unit,
+    ) {
+        for ((slot, entry) in fastIterator()) {
+            if (entry.changing) {
+                action(slot, entry.current, entry.previous)
+            }
+        }
+    }
 
     operator fun get(itemSlot: ItemSlot): Entry {
-        return items.computeIfAbsent(itemSlot, ::Entry)
+        return entries.computeIfAbsent(itemSlot, ::Entry)
     }
 
     /**
@@ -164,6 +183,10 @@ data class ItemSlotChanges(
 
         internal fun update(current: ItemStack?) {
             require(current?.isEmpty != true) { "current cannot be empty" }
+
+            if (current == null && this.current == null && this.previous == null) {
+                return // 都为空则可以直接返回, 不执行写操作以提升性能
+            }
 
             this.current = current?.clone().also { this.previous = this.current }
             this.changing = this.current != this.previous

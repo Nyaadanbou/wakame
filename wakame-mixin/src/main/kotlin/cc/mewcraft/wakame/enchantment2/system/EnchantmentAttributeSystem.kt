@@ -20,12 +20,12 @@ object EnchantmentAttributeSystem : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
-        for ((slot, curr, prev) in slotChanges.changingItems) {
+        slotChanges.forEachChangingEntry { slot, curr, prev ->
 
             // 返回的 slot 一定都是在当前 tick 发生了变化的,
             // 因此这个 if-block 不可能执行, 写在这里仅供参考
             if (prev == null && curr == null) {
-                continue
+                return@forEachChangingEntry
             }
 
             // 对于 prev (变化之前的物品), 我们需要从玩家身上 <移除> 其属性修饰器
@@ -49,7 +49,6 @@ object EnchantmentAttributeSystem : IteratingSystem(
                     }
                 }
             }
-
         }
     }
 

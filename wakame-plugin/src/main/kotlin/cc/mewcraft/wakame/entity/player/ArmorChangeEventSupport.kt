@@ -24,17 +24,18 @@ internal object ArmorChangeEventSupport : Listener {
     // 否则物品会在事件被取消时 *直接消失*, 而非当前的操作被取消.
     @EventHandler
     fun on(event: ArmorChangeEvent) {
-        if (event.isCancelled)
+        if (!event.isCancelled)
             return
         if (event.action == ArmorChangeEvent.Action.UNEQUIP)
             return
 
+        val slot = event.slot
         val player = event.player
         val current = event.current!! // if this is null then this is a bug
 
         // 某些代码会直接设置盔甲, 例如原版的 /minecraft:item modify 指令.
         // 这里再次设置为 null 以确保直接设置的物品不会驻留在玩家身上.
-        player.equipment.setItem(event.slot, null)
+        player.equipment.setItem(slot, null)
 
         player.giveItemStack(current)
     }
