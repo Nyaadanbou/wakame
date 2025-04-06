@@ -4,14 +4,14 @@ import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeInstance
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.player.AttackSpeedLevel
+import cc.mewcraft.wakame.entity.player.kizamiContainer
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.kizami.KizamiMap
 import cc.mewcraft.wakame.kizami2.Kizami
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
+import cc.mewcraft.wakame.kizami2.KizamiMap
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.user.toUser
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
@@ -93,9 +93,8 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeEventListener() {
     // 我们将重新计算铭刻数量, 并将新的铭刻效果
     // (基于新的铭刻数量)应用到玩家身上.
     override fun onBegin(player: Player) {
-        val user = player.toUser()
-        val kizamiMap = user.kizamiMap
-        kizamiMap.removeAllEffects()
+        val kizamiContainer = player.kizamiContainer
+        kizamiContainer.removeAllEffects(player)
     }
 
     override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
@@ -108,15 +107,14 @@ internal object KizamiItemSlotChangeListener : ItemSlotChangeEventListener() {
 
     // 基于当前铭刻数量, 将新的铭刻效果应用到玩家身上.
     override fun onEnd(player: Player) {
-        val user = player.toUser()
-        val kizamiMap = user.kizamiMap
-        kizamiMap.applyAllEffects()
+        val kizamiContainer = player.kizamiContainer
+        kizamiContainer.applyAllEffects(player)
     }
 
     private fun modifyKizamiAmount(player: Player, nekoStack: NekoStack?, update: (KizamiMap, Set<RegistryEntry<Kizami>>) -> Unit) {
         val kizamiSet = nekoStack?.getKizamiz() ?: return
-        val kizamiMap = player.toUser().kizamiMap
-        update(kizamiMap, kizamiSet)
+        val kizamiContainer = player.kizamiContainer
+        update(kizamiContainer, kizamiSet)
     }
 
     private fun NekoStack.getKizamiz(): Set<RegistryEntry<Kizami>>? {

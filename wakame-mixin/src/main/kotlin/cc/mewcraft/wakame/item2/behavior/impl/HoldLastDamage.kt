@@ -57,10 +57,6 @@ data object HoldLastDamage : ItemBehavior {
         tryCancelEvent(itemstack, player, event)
     }
 
-    //override fun handleAbilityPrepareCast(player: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
-    //    tryCancelEvent(itemstack,player, event)
-    //}
-
     private fun tryCancelEvent(itemstack: ItemStack, player: Player, event: Cancellable) {
         val damage = itemstack.damage
         val maxDamage = itemstack.maxDamage

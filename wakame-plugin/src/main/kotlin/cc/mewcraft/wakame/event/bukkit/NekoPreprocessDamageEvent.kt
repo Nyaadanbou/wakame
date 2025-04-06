@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.event.bukkit
 
 import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
-import cc.mewcraft.wakame.user.attributeContainer
+import cc.mewcraft.wakame.entity.player.attributeContainer
 import org.bukkit.damage.DamageSource
 import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity

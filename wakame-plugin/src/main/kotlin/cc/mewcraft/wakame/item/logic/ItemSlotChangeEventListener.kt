@@ -1,5 +1,7 @@
 package cc.mewcraft.wakame.item.logic
 
+import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.NekoStack
@@ -8,8 +10,6 @@ import cc.mewcraft.wakame.item.extension.damage
 import cc.mewcraft.wakame.item.extension.isDamageable
 import cc.mewcraft.wakame.item.extension.maxDamage
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.player.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -118,7 +118,7 @@ internal abstract class ItemSlotChangeEventListener {
             return true // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
         }
 
-        val playerLevel = player.toUser().level
+        val playerLevel = player.koishLevel
         return itemLevel <= playerLevel
     }
 
@@ -180,7 +180,7 @@ internal abstract class ItemSlotChangeEventListener {
         val newNekoStack = newItemStack?.wrap()
 
         onBegin(player)
-          // TODO 支持新的 ItemSlot
+        // TODO 支持新的 ItemSlot
 //        if (oldItemStack != null &&
 //            testSlot(player, slot, oldItemStack, oldNekoStack) // 移除物品效果时, 只检查 item slot 是否满足
 //        ) {

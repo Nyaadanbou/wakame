@@ -109,7 +109,7 @@ object BuiltInRegistries {
      */
     @ApiStatus.Internal
     @JvmField
-    val INTERNAL_ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerDefaulted(BuiltInRegistryKeys.ITEM_REF_HANDLER, "minecraft")
+    val ITEM_REF_HANDLER_INTERNAL: WritableDefaultedRegistry<ItemRefHandler<*>> = registerDefaulted(BuiltInRegistryKeys.ITEM_REF_HANDLER_INTERNAL, "minecraft")
 
     /**
      * 稀有度的类型.

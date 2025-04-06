@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import team.unnamed.mocha.MochaEngine
 
 object AbilityEcsBridge {

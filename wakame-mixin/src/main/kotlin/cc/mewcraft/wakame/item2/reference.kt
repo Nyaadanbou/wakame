@@ -306,7 +306,7 @@ private object ItemRefManager {
             }
         }
         // 再从 Koish 内置的实例中寻找支持的 handler
-        for (handler in BuiltInRegistries.INTERNAL_ITEM_REF_HANDLER) {
+        for (handler in BuiltInRegistries.ITEM_REF_HANDLER_INTERNAL) {
             if (predicate(handler)) {
                 return handler
             }

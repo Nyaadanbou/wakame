@@ -17,6 +17,8 @@ import kotlin.reflect.KProperty
 class PlayerCombo(
     private val uniqueId: UUID,
 ) : Examinable {
+    constructor(player: Player) : this(player.uniqueId)
+
     companion object {
         private val COOLDOWN_TRIGGERS: List<AbilitySingleTrigger> =
             listOf(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK)
@@ -58,7 +60,7 @@ class PlayerCombo(
 }
 
 private class ComboDisplayProvider(
-    private val initializer: () -> PlayerComboInfo
+    private val initializer: () -> PlayerComboInfo,
 ) : ReadWriteProperty<Any, PlayerComboInfo> {
     private var stateInfo: PlayerComboInfo? = null
 

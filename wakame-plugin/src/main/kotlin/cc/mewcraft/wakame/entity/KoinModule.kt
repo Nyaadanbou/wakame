@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity
 
-import cc.mewcraft.wakame.Koish
+import cc.mewcraft.wakame.KoishPlugin
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookupImpl
 import org.koin.core.module.Module
@@ -13,7 +13,7 @@ internal fun entityModule(): Module = module {
             implementations: MutableList<EntityRefLookup.Dictionary>,
             implementationCreator: () -> EntityRefLookup.Dictionary,
         ) {
-            if (Koish.isPluginPresent(requiredPlugin)) {
+            if (KoishPlugin.isPluginPresent(requiredPlugin)) {
                 implementations.add(implementationCreator())
             }
         }

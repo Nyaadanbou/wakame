@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.kizami2.KizamiEffect
+import cc.mewcraft.wakame.kizami2.KizamiEffectAttributeModifier
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage

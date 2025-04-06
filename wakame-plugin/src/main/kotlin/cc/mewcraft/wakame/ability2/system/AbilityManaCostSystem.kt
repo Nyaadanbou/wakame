@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
@@ -27,7 +27,7 @@ class AbilityManaCostSystem : IteratingSystem(
         val caster = entity[CastBy].caster
         if (caster !in Families.BUKKIT_PLAYER)
             return
-        val bukkitPlayer = caster[BukkitPlayerComponent].bukkitPlayer
+        val player = caster[BukkitPlayer].unwrap()
         val mana = caster[Mana]
         val penalty = entity[ManaCost].penalty
         val engine = entity[AbilityComponent].mochaEngine.also {
@@ -35,11 +35,11 @@ class AbilityManaCostSystem : IteratingSystem(
         }
         val manaCost = entity[ManaCost].manaCost.evaluate(engine).toInt()
         if (!mana.costMana(manaCost)) {
-            PlayerNotEnoughManaEvent(bukkitPlayer, manaCost).callEvent()
+            PlayerNotEnoughManaEvent(player, manaCost).callEvent()
             entity[AbilityTickResultComponent].result = TickResult.RESET_STATE
         } else {
             penalty.resetCooldown.reset()
-            PlayerManaConsumeEvent(bukkitPlayer, manaCost).callEvent()
+            PlayerManaConsumeEvent(player, manaCost).callEvent()
         }
     }
 }

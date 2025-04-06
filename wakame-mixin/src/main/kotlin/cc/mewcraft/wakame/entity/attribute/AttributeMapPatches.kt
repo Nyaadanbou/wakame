@@ -58,7 +58,7 @@ object AttributeMapPatches : Listener {
             if (entity is Player) continue
             if (entity !is LivingEntity) continue
 
-            val patch = AttributeMapPatch.Constants.decode(entity)
+            val patch = AttributeMapPatch.decode(entity)
 
             put(entity.uniqueId, patch)
 

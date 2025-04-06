@@ -47,168 +47,8 @@ private val DISPLAY_CONFIG = DAMAGE_CONFIG.node("display")
 private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
 private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 
-internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
-
-    fun finalText(context: NekoPostprocessDamageEvent): Component {
-        val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
-        val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
-        val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
-
-        val finalText = MM.deserialize(
-            MergedDamageDisplaySettings.finalText,
-            Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
-            Placeholder.component("critical_strike_text", criticalStrikeText),
-            Placeholder.component("damage_value_text", damageValueText(context)),
-        )
-
-        return finalText
-    }
-
-    fun damageValueText(context: NekoPostprocessDamageEvent): Component
-
-    fun criticalStrikeStyle(context: CriticalStrikeMetadata): Array<StyleBuilderApplicable> = when (context.state) {
-        CriticalStrikeState.NONE -> criticalStrikeStyleNone
-        CriticalStrikeState.POSITIVE -> criticalStrikeStylePositive
-        CriticalStrikeState.NEGATIVE -> criticalStrikeStyleNegative
-    }
-
-    fun criticalStrikeText(context: CriticalStrikeMetadata): Component = when (context.state) {
-        CriticalStrikeState.NONE -> criticalStrikeTextNone
-        CriticalStrikeState.POSITIVE -> criticalStrikeTextPositive
-        CriticalStrikeState.NEGATIVE -> criticalStrikeTextNegative
-    }
-
-}
-
-internal interface DamageDisplaySettingsFields {
-
-    val animations: List<DamageDisplayAnimation>
-    val animationDuration: Long
-    val finalText: String
-    val criticalStrikeStylePositive: Array<StyleBuilderApplicable>
-    val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>
-    val criticalStrikeStyleNone: Array<StyleBuilderApplicable>
-    val criticalStrikeTextPositive: Component
-    val criticalStrikeTextNegative: Component
-    val criticalStrikeTextNone: Component
-
-}
-
-internal class DamageDisplaySettingsCommonFields(
-    config: Provider<ConfigurationNode>,
-) : DamageDisplaySettingsFields {
-    override val animations: List<DamageDisplayAnimation> by config.entry("animations")
-    override val animationDuration: Long by config.entry("animation_duration")
-    override val finalText: String by config.entry("final_text")
-    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "positive")
-    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "negative")
-    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "none")
-    override val criticalStrikeTextPositive: Component by config.entry("critical_strike_text", "positive")
-    override val criticalStrikeTextNegative: Component by config.entry("critical_strike_text", "negative")
-    override val criticalStrikeTextNone: Component by config.entry("critical_strike_text", "none")
-
-}
-
-internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(MERGED_DISPLAY_CONFIG) {
-
-    val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
-
-    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
-        val damageMap = context.getFinalDamageMap()
-        val elementType = damageMap.maxWithOrNull(
-            compareBy { it.value }
-        )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
-        val damageValueText = MM.deserialize(
-            damageValueText,
-            Placeholder.component("element_name", elementType.unwrap().displayName),
-            Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
-            Formatter.number("damage_value", context.getFinalDamage())
-        )
-        return damageValueText
-    }
-
-}
-
-internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(SEPARATED_DISPLAY_CONFIG) {
-
-    val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
-    val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
-
-    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
-        val damageMap = context.getFinalDamageMap()
-        val damageValueText = damageMap.map { (elementType, damageValue) ->
-            MM.deserialize(
-                damageValueText,
-                Placeholder.component("element_name", elementType.unwrap().displayName),
-                Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
-                Formatter.number("damage_value", damageValue)
-            )
-        }.join(JoinConfiguration.separator(separator))
-        return damageValueText
-    }
-
-}
-
 /**
- * 伤害显示中文本展示实体的单次动画.
- */
-internal data class DamageDisplayAnimation(
-    val delay: Long,
-    val normalData: AnimationData,
-    val positiveData: AnimationData,
-    val negativeData: AnimationData,
-)
-
-@Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplayAnimation> {
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
-        val delay = node.node("delay").require<Long>()
-
-        val normalData = buildData(AnimationData.DEFAULT, node.node("normal"))
-        val positiveData = buildData(normalData, node.node("positive_critical_strike"))
-        val negativeData = buildData(normalData, node.node("negative_critical_strike"))
-
-        return DamageDisplayAnimation(delay, normalData, positiveData, negativeData)
-    }
-
-    /**
-     * 方便函数.
-     */
-    private fun buildData(parentData: AnimationData, node: ConfigurationNode): AnimationData {
-        val startInterpolation = node.node("start_interpolation").get<Int>()
-        val interpolationDuration = node.node("interpolation_duration").get<Int>()
-        val translation = node.node("translation").get<Vector3f>()
-        val scale = node.node("scale").get<Vector3f>()
-        return AnimationData(parentData, startInterpolation, interpolationDuration, translation, scale)
-    }
-
-    @InitFun
-    fun init() {
-        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
-    }
-}
-
-internal enum class DamageDisplayMode {
-    MERGED, SEPARATED
-}
-
-@Init(stage = InitStage.PRE_CONFIG)
-internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplaySettings> {
-
-    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
-        DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
-        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplaySettings
-    }
-
-    @InitFun
-    fun init() {
-        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
-    }
-
-}
-
-/**
- * 以悬浮文字显示玩家造成的伤害.
+ * 实现了以悬浮文字显示实体受到的伤害的功能.
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object DamageDisplay : Listener {
@@ -280,7 +120,7 @@ internal object DamageDisplay : Listener {
                 }.applyTo(hologramData)
 
                 if (animation.delay == 0L) {
-                    // delay = 0 表示需要发送创建 hologram 的封包
+                    // delay = 0 表示需要发送 [创建] hologram 的封包
                     hologram.show(viewer)
                 } else {
                     // 否则只需要更新
@@ -290,8 +130,8 @@ internal object DamageDisplay : Listener {
             }
         }
 
-        // 发送隐藏 hologram 的封包
-        // 注意需要手动确保在“动画”播放完毕后再隐藏
+        // 发送 [隐藏] hologram 的封包
+        // 配置文件需要手动确保在“动画”播放完毕后再隐藏
         runTaskLater(settings.animationDuration) {
             hologram.hide(viewer)
         }
@@ -426,4 +266,169 @@ internal class RadialPointCycle {
             return ret
         }
     }
+}
+
+
+// ------------
+// 配置文件的实现
+// ------------
+
+
+internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
+
+    fun finalText(context: NekoPostprocessDamageEvent): Component {
+        val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
+        val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
+        val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
+
+        val finalText = MM.deserialize(
+            MergedDamageDisplaySettings.finalText,
+            Placeholder.styling("critical_strike_style", *criticalStrikeStyle),
+            Placeholder.component("critical_strike_text", criticalStrikeText),
+            Placeholder.component("damage_value_text", damageValueText(context)),
+        )
+
+        return finalText
+    }
+
+    fun damageValueText(context: NekoPostprocessDamageEvent): Component
+
+    fun criticalStrikeStyle(context: CriticalStrikeMetadata): Array<StyleBuilderApplicable> = when (context.state) {
+        CriticalStrikeState.NONE -> criticalStrikeStyleNone
+        CriticalStrikeState.POSITIVE -> criticalStrikeStylePositive
+        CriticalStrikeState.NEGATIVE -> criticalStrikeStyleNegative
+    }
+
+    fun criticalStrikeText(context: CriticalStrikeMetadata): Component = when (context.state) {
+        CriticalStrikeState.NONE -> criticalStrikeTextNone
+        CriticalStrikeState.POSITIVE -> criticalStrikeTextPositive
+        CriticalStrikeState.NEGATIVE -> criticalStrikeTextNegative
+    }
+
+}
+
+internal interface DamageDisplaySettingsFields {
+
+    val animations: List<DamageDisplayAnimation>
+    val animationDuration: Long
+    val finalText: String
+    val criticalStrikeStylePositive: Array<StyleBuilderApplicable>
+    val criticalStrikeStyleNegative: Array<StyleBuilderApplicable>
+    val criticalStrikeStyleNone: Array<StyleBuilderApplicable>
+    val criticalStrikeTextPositive: Component
+    val criticalStrikeTextNegative: Component
+    val criticalStrikeTextNone: Component
+
+}
+
+internal class DamageDisplaySettingsCommonFields(
+    config: Provider<ConfigurationNode>,
+) : DamageDisplaySettingsFields {
+    override val animations: List<DamageDisplayAnimation> by config.entry("animations")
+    override val animationDuration: Long by config.entry("animation_duration")
+    override val finalText: String by config.entry("final_text")
+    override val criticalStrikeStylePositive: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "positive")
+    override val criticalStrikeStyleNegative: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "negative")
+    override val criticalStrikeStyleNone: Array<StyleBuilderApplicable> by config.entry("critical_strike_style", "none")
+    override val criticalStrikeTextPositive: Component by config.entry("critical_strike_text", "positive")
+    override val criticalStrikeTextNegative: Component by config.entry("critical_strike_text", "negative")
+    override val criticalStrikeTextNone: Component by config.entry("critical_strike_text", "none")
+}
+
+internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(MERGED_DISPLAY_CONFIG) {
+
+    val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
+
+    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
+        val damageMap = context.getFinalDamageMap()
+        val elementType = damageMap.maxWithOrNull(
+            compareBy { it.value }
+        )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
+        val damageValueText = MM.deserialize(
+            damageValueText,
+            Placeholder.component("element_name", elementType.unwrap().displayName),
+            Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
+            Formatter.number("damage_value", context.getFinalDamage())
+        )
+        return damageValueText
+    }
+
+}
+
+internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDisplaySettingsFields by DamageDisplaySettingsCommonFields(SEPARATED_DISPLAY_CONFIG) {
+
+    val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
+    val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
+
+    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
+        val damageMap = context.getFinalDamageMap()
+        val damageValueText = damageMap.map { (elementType, damageValue) ->
+            MM.deserialize(
+                damageValueText,
+                Placeholder.component("element_name", elementType.unwrap().displayName),
+                Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
+                Formatter.number("damage_value", damageValue)
+            )
+        }.join(JoinConfiguration.separator(separator))
+        return damageValueText
+    }
+
+}
+
+/**
+ * 伤害显示中文本展示实体的单次动画.
+ */
+internal data class DamageDisplayAnimation(
+    val delay: Long,
+    val normalData: AnimationData,
+    val positiveData: AnimationData,
+    val negativeData: AnimationData,
+)
+
+@Init(stage = InitStage.PRE_CONFIG)
+internal object DamageDisplayAnimationSerializer : TypeSerializer2<DamageDisplayAnimation> {
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplayAnimation {
+        val delay = node.node("delay").require<Long>()
+
+        val normalData = buildData(AnimationData.DEFAULT, node.node("normal"))
+        val positiveData = buildData(normalData, node.node("positive_critical_strike"))
+        val negativeData = buildData(normalData, node.node("negative_critical_strike"))
+
+        return DamageDisplayAnimation(delay, normalData, positiveData, negativeData)
+    }
+
+    /**
+     * 方便函数.
+     */
+    private fun buildData(parentData: AnimationData, node: ConfigurationNode): AnimationData {
+        val startInterpolation = node.node("start_interpolation").get<Int>()
+        val interpolationDuration = node.node("interpolation_duration").get<Int>()
+        val translation = node.node("translation").get<Vector3f>()
+        val scale = node.node("scale").get<Vector3f>()
+        return AnimationData(parentData, startInterpolation, interpolationDuration, translation, scale)
+    }
+
+    @InitFun
+    fun init() {
+        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
+    }
+}
+
+internal enum class DamageDisplayMode {
+    MERGED, SEPARATED
+}
+
+@Init(stage = InitStage.PRE_CONFIG)
+internal object DamageDisplaySettingsSerializer : TypeSerializer2<DamageDisplaySettings> {
+
+    override fun deserialize(type: Type, node: ConfigurationNode): DamageDisplaySettings = when (node.require<DamageDisplayMode>()) {
+        DamageDisplayMode.MERGED -> MergedDamageDisplaySettings
+        DamageDisplayMode.SEPARATED -> SeparatedDamageDisplaySettings
+    }
+
+    @InitFun
+    fun init() {
+        ConfigAccess.INSTANCE.registerSerializer(KOISH_NAMESPACE, this)
+    }
+
 }

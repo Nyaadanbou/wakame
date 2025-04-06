@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
-import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitEntity
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.EntityComponentContext
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 
 data class CastBy(
     var caster: FleksEntity,
@@ -17,21 +17,21 @@ data class CastBy(
     override fun type(): ComponentType<CastBy> = CastBy
 
     context(EntityComponentContext)
-    fun player(): BukkitPlayer {
-        return caster[BukkitPlayerComponent.Companion].bukkitPlayer
+    fun player(): Player {
+        return caster[BukkitPlayer].unwrap()
     }
 
     context(EntityComponentContext)
-    fun entity(): BukkitEntity {
-        return caster[BukkitEntityComponent.Companion].bukkitEntity
+    fun entity(): Entity {
+        return caster[BukkitEntity].unwrap()
     }
 
     context(EntityComponentContext)
-    fun entityOrPlayer(): BukkitEntity {
-        return if (caster.has(BukkitPlayerComponent.Companion)) {
-            caster[BukkitPlayerComponent.Companion].bukkitPlayer
+    fun entityOrPlayer(): Entity {
+        return if (caster.has(BukkitPlayer)) {
+            caster[BukkitPlayer].unwrap()
         } else {
-            caster[BukkitEntityComponent.Companion].bukkitEntity
+            caster[BukkitEntity].unwrap()
         }
     }
 }

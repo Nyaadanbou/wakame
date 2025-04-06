@@ -4,12 +4,12 @@ import cc.mewcraft.adventurelevel.event.AdventureLevelDataLoadEvent
 import cc.mewcraft.adventurelevel.level.category.LevelCategory
 import cc.mewcraft.adventurelevel.plugin.AdventureLevelProvider
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.entity.resource.ResourceSynchronizer
+import cc.mewcraft.wakame.entity.player.PlayerResourceFixHandler
+import cc.mewcraft.wakame.entity.player.ResourceSynchronizer
+import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelIntegration
 import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
-import cc.mewcraft.wakame.user.PlayerResourceFixExternalHandler
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.concurrent.isServerThread
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.runTask
@@ -21,7 +21,7 @@ import java.util.*
  * *adventure level* (i.e., the level from our AdventureLevel plugin).
  */
 @Hook(plugins = ["AdventureLevel"])
-object AdventureLevelHook : PlayerLevelIntegration, PlayerResourceFixExternalHandler {
+object AdventureLevelHook : PlayerLevelIntegration, PlayerResourceFixHandler {
 
     override val type: PlayerLevelType = PlayerLevelType.ADVENTURE
 
@@ -33,7 +33,7 @@ object AdventureLevelHook : PlayerLevelIntegration, PlayerResourceFixExternalHan
         return primaryLevel.level
     }
 
-    override fun run() {
+    override fun invoke() {
 
         // 冒险等级插件的数据是异步加载, 需要处理一下线程同步问题.
         event<AdventureLevelDataLoadEvent> { event ->
@@ -47,12 +47,9 @@ object AdventureLevelHook : PlayerLevelIntegration, PlayerResourceFixExternalHan
                     LOGGER.warn("Player ${data.uuid} is not online, skipping resource synchronization")
                     return
                 }
-                val user = player.toUser()
 
                 // 标记玩家的背包可以被监听了
-                if (!user.isInventoryListenable) {
-                    user.isInventoryListenable = true
-                }
+                player.isInventoryListenable = true
 
                 ResourceSynchronizer.load(player)
             }

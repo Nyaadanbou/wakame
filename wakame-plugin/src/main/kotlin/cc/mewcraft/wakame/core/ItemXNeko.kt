@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.registry2.DynamicRegistries
-import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -36,7 +35,7 @@ class ItemXNeko(
             )
             return archetype.realize(context).bukkitStack
         } else {
-            return archetype.realize(player.toUser()).bukkitStack
+            return archetype.realize(player).bukkitStack
         }
     }
 

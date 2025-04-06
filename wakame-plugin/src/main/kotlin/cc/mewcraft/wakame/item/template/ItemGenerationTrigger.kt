@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.item.template
 
 import cc.mewcraft.wakame.crate.Crate
+import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.user.User
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
+import org.bukkit.entity.Player
 import java.util.stream.Stream
 
 /**
@@ -44,13 +45,13 @@ object ItemGenerationTriggers {
     }
 
     /**
-     * Wraps a user into a trigger.
+     * Wraps a player into a trigger.
      *
-     * @param user the user
+     * @param player the player
      * @return the created trigger
      */
-    fun wrap(user: User<*>): ItemGenerationTrigger {
-        return DirectItemGenerationTrigger(user.level)
+    fun wrap(player: Player): ItemGenerationTrigger {
+        return DirectItemGenerationTrigger(player.koishLevel)
     }
 
     /**

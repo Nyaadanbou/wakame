@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item2.behavior
 
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
@@ -43,7 +45,7 @@ interface ItemBehavior {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 
-    //fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
+    fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 
     fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
@@ -70,7 +72,5 @@ interface ItemBehavior {
     fun handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) = Unit
 
     fun handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) = Unit
-
-    //fun handleAbilityPrepareCast(player: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) = Unit
 
 }

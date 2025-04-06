@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item.components
 
+import cc.mewcraft.wakame.entity.player.AttackSpeedLevel
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
 import net.kyori.examination.Examinable
 
 data class ItemAttackSpeed(

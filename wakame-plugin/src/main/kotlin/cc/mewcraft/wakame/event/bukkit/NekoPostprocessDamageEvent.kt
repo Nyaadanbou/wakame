@@ -13,7 +13,7 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 
-@Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessEntityDamageEvent"))
+@Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessDamageEvent"))
 typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
 
 /**

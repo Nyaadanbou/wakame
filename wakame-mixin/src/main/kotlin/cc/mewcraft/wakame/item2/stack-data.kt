@@ -34,12 +34,13 @@ val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[ke
 
 fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
 fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
+fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropertyOrDefault(type, fallback)
 
 //// ItemData
 
 fun ItemStack.hasData(type: ItemDataType<*>): Boolean = toNMS().hasData(type)
 fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
-fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = toNMS().getDataOrDefault(type, fallback)
+fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T = toNMS().getDataOrDefault(type, fallback)
 fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
 
@@ -114,6 +115,9 @@ fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
 fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
     koishItem?.properties?.has(type) == true
 
+fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+    koishItem?.properties?.getOrDefault(type, fallback)
+
 //// ItemData
 
 fun MojangStack.hasData(type: ItemDataType<*>): Boolean =
@@ -122,8 +126,8 @@ fun MojangStack.hasData(type: ItemDataType<*>): Boolean =
 fun <T> MojangStack.getData(type: ItemDataType<out T>): T? =
     koishData(true)?.get(type)
 
-fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? =
-    koishData(true)?.getOrDefault(type, fallback)
+fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T =
+    koishData(true)?.getOrDefault(type, fallback) ?: fallback
 
 /**
  * 向物品堆叠写入 Koish 数据 [T].

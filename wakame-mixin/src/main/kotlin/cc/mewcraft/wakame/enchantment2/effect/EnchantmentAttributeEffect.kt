@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.enchantment2.effect
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.util.Identifier
 import com.google.common.collect.HashMultimap
@@ -48,7 +48,7 @@ data class EnchantmentAttributeEffect(
 
     private fun getModifier(value: Int, suffix: ItemSlot): AttributeModifier {
         return AttributeModifier(
-            this.getModifierId(suffix.slotIndex.toString()),
+            this.getModifierId(suffix.index.toString()),
             this.amount.calculate(value).toDouble(),
             this.operation
         )

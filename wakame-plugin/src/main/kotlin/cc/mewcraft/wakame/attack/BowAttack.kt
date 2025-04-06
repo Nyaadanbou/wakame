@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.attack
 
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.Player
 import org.bukkit.event.Event

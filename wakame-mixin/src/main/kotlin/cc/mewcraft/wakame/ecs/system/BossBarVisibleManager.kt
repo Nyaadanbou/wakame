@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
@@ -13,7 +13,7 @@ class BossBarVisibleManager : IteratingSystem(
 ), FamilyOnAdd {
 
     override fun onTickEntity(entity: Entity) {
-        val player = entity[BukkitPlayerComponent].bukkitPlayer
+        val player = entity[BukkitPlayer].unwrap()
         val bossBarVisible = entity[BossBarVisible]
         bossBarVisible.tickAndRemoveExpiredBossBars(player)
         if (bossBarVisible.bossBar2DurationTick.isEmpty()) return

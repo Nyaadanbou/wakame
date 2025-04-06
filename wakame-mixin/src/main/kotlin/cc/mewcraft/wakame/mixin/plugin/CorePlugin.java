@@ -13,7 +13,7 @@ public class CorePlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(final String s) {
 
-        // Register the mod jar to the bootstrap context store
+        // Register the mod jar path to the bootstrap context store
         var container = Ignite.mods().container("wakame").orElseThrow();
         var modPath = container.resource().path();
         BootstrapContexts.INSTANCE.registerModJar(modPath);

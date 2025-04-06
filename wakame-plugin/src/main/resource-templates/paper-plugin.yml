@@ -1,7 +1,7 @@
 name: Wakame
 version: "{{ version }}"
-main: cc.mewcraft.wakame.Koish
-bootstrapper: cc.mewcraft.wakame.KoishBootstrapper
+main: cc.mewcraft.wakame.KoishPlugin
+bootstrapper: cc.mewcraft.wakame.KoishBootstrap
 loader: cc.mewcraft.wakame.KoishLoader
 description: "{{ description }}"
 api-version: 1.21

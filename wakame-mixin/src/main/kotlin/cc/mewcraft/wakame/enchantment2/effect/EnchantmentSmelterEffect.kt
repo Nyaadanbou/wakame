@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.enchantment2.effect
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.enchantment2.component.Smelter
-import cc.mewcraft.wakame.item.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.BukkitCodecs
 import cc.mewcraft.wakame.serialization.codec.KoishCodecs
 import cc.mewcraft.wakame.serialization.codec.setOf

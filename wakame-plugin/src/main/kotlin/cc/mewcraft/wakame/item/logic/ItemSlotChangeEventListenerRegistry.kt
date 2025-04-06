@@ -1,9 +1,5 @@
 package cc.mewcraft.wakame.item.logic
 
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-
 /**
  * 储存了所有 [ItemSlotChangeEventListener] 实例.
  *
@@ -14,7 +10,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
  *
  * 注意不要重复添加同一个实例.
  */
-@Init(stage = InitStage.PRE_WORLD)
+//@Init(stage = InitStage.PRE_WORLD)
 internal object ItemSlotChangeEventListenerRegistry {
 
     /**
@@ -24,7 +20,7 @@ internal object ItemSlotChangeEventListenerRegistry {
      */
     val listeners: MutableList<ItemSlotChangeEventListener> = mutableListOf()
 
-    @InitFun
+    //@InitFun
     fun init() {
         listeners += AttackSpeedItemSlotChangeListener
         listeners += AttributeItemSlotChangeListener

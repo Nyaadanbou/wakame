@@ -60,6 +60,9 @@ object BuiltInRegistryKeys {
     val ITEM_REF_HANDLER = createRegistryKey<ItemRefHandler<*>>("item_ref_handler")
 
     @JvmField
+    val ITEM_REF_HANDLER_INTERNAL = createRegistryKey<ItemRefHandler<*>>("item_ref_handler_internal")
+
+    @JvmField
     val RARITY = createRegistryKey<Rarity>("rarity")
 
     @JvmField

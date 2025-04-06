@@ -21,7 +21,7 @@ import java.io.IOException
 
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
 
-    companion object Constants {
+    companion object {
         private val PDC_KEY = NamespacedKey.fromString("wakame:attributes") ?: error("Spoogot")
 
         fun decode(owner: Attributable): AttributeMapPatch {

@@ -16,6 +16,10 @@ object BootstrapContexts {
     @JvmField
     val IS_DEV_SERVER: Boolean = System.getProperty("KoishDev") != null
 
+    @get:JvmName("isPluginReady")
+    var PLUGIN_READY: Boolean = false
+        private set
+
     @get:JvmName("getBootstrap")
     lateinit var BOOTSTRAP: PluginBootstrap private set
 
@@ -36,6 +40,11 @@ object BootstrapContexts {
 
     @get:JvmName("getModJar")
     lateinit var MOD_JAR: Path private set
+
+    @ApiStatus.Internal
+    fun setPluginReady(ready: Boolean) {
+        this.PLUGIN_READY = ready
+    }
 
     @ApiStatus.Internal
     fun registerBootstrap(bootstrap: PluginBootstrap) {

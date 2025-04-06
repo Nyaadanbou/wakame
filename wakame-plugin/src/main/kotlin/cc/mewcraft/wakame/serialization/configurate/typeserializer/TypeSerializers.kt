@@ -36,8 +36,8 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     // Bukkit Enum
     .register(EntityTypeSerializer)
     .register(MaterialSerializer)
-    .register(BlockTypeListTypeSerializer)
-    .register(ItemTypeListTypeSerializer)
+    .register(BlockTypeListSerializer)
+    .register(ItemTypeListSerializer)
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())

@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.BukkitComponent
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
+import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
@@ -27,7 +27,7 @@ class EntityInfoBossBar : IteratingSystem(
 ), FamilyOnAdd, FamilyOnRemove {
 
     override fun onTickEntity(entity: Entity) {
-        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
+        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return
         val bossBar = entity[EntityInfoBossBarComponent].bossBar
 
         val progress = getEntityHealthProgress(entity)
@@ -59,14 +59,14 @@ class EntityInfoBossBar : IteratingSystem(
     }
 
     private fun getEntityHealthProgress(entity: Entity): Float {
-        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return 0f
+        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return 0f
         val entityMaxHealth = getMaxHealth(entity) ?: return 0f
         val progress = bukkitEntity.health / entityMaxHealth
         return progress.toStableFloat()
     }
 
     private fun getEntityHealthCompoment(entity: Entity): BukkitComponent {
-        val bukkitEntity = entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return BukkitComponent.empty()
+        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return BukkitComponent.empty()
         val entityMaxHealth = getMaxHealth(entity) ?: return BukkitComponent.empty()
         return BukkitComponent.text()
             .append(
@@ -113,7 +113,7 @@ class EntityInfoBossBar : IteratingSystem(
     }
 
     override fun onAddEntity(entity: Entity) {
-        entity[BukkitEntityComponent].bukkitEntity as? LivingEntity ?: return
+        entity[BukkitEntity].unwrap() as? LivingEntity ?: return
         entity.configure {
             it += EntityInfoBossBarComponent()
         }

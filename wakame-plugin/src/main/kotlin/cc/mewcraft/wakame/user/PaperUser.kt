@@ -2,16 +2,10 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.ability2.combo.PlayerCombo
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelManager
-import cc.mewcraft.wakame.integration.playerlevel.PlayerLevelType
-import cc.mewcraft.wakame.kizami.KizamiMap
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeed
-import cc.mewcraft.wakame.util.adventure.toSimpleString
-import net.kyori.examination.Examinable
-import net.kyori.examination.ExaminableProperty
+import cc.mewcraft.wakame.entity.player.*
+import cc.mewcraft.wakame.kizami2.KizamiMap
 import org.bukkit.entity.Player
 import java.util.*
-import java.util.stream.Stream
 
 
 /**
@@ -21,7 +15,7 @@ import java.util.stream.Stream
  */
 class PaperUser(
     private val player: Player,
-) : User<Player>, Examinable {
+) : User<Player> {
 
     override fun <T> player(): T {
         return player as T // let the runtime check the type
@@ -31,43 +25,31 @@ class PaperUser(
         get() = player.uniqueId
 
     override val level: Int
-        get() = PlayerLevelManager.getOrDefault(uniqueId, 1)
+        get() = player.koishLevel
 
-    // TODO #373: move to ecs
-    override val kizamiMap: KizamiMap = KizamiMap(this)
+    override val kizamiMap: KizamiMap
+        get() = player.kizamiContainer
 
     override val attributeMap: AttributeMap
         get() = player.attributeContainer // moved to ecs
 
     // TODO #373: move to ecs
-    override val combo: PlayerCombo = PlayerCombo(this.uniqueId)
+    override val combo: PlayerCombo = PlayerCombo(player)
 
     // TODO #373: move to ecs
-    override val attackSpeed: AttackSpeed = AttackSpeed(this)
+    override val attackSpeed: AttackSpeed = AttackSpeed(player)
 
-    // TODO #373: move to ecs
-    @Volatile
-    override var isInventoryListenable: Boolean = false
-
-    init {
-        // FIXME 临时方案. 让服务端不安装 AdventureLevel 也能够正常读取玩家等级
-        if (PlayerLevelManager.integration?.type == PlayerLevelType.VANILLA) {
-            isInventoryListenable = true
+    override var isInventoryListenable: Boolean
+        get() = player.isInventoryListenable
+        set(value) {
+            player.isInventoryListenable = value
         }
-    }
 
     override fun cleanup() {
         combo.cleanup()
     }
 
-    override fun examinableProperties(): Stream<out ExaminableProperty> {
-        return Stream.of(
-            ExaminableProperty.of("uniqueId", uniqueId),
-            ExaminableProperty.of("level", level)
-        )
-    }
-
     override fun toString(): String {
-        return toSimpleString()
+        return "PaperUser(uniqueId=$uniqueId)"
     }
 }

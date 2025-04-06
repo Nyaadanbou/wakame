@@ -1,3 +1,5 @@
+@file:JvmName("IdentifierUtils")
+
 package cc.mewcraft.wakame.util
 
 import com.mojang.serialization.Codec

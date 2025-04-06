@@ -14,7 +14,7 @@ class KoishEntity(
     fun unwrap(): FleksEntity =
         entity
 
-    fun invalidate() =
+    fun remove() =
         with(Fleks.INSTANCE.world) { entity.remove() }
 
     inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T =

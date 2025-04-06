@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ecs.bridge
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -25,12 +26,14 @@ object BukkitPlayerBridge : Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         event.player.koishify()
+        LOGGER.info("[ECS] Entity created for ${event.player.name}")
     }
 
     // 在玩家退出服务器时, 移除他对应的 ECS Entity
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        event.player.koishify().invalidate()
+        event.player.koishify().remove()
+        LOGGER.info("[ECS] Entity removed for ${event.player.name}")
     }
 
 }

@@ -4,17 +4,13 @@ package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
+import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventListenerRegistry
-import cc.mewcraft.wakame.lifecycle.initializer.Init
-import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.player.PlayerItemSlotChangeEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.event
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toJsonString
@@ -31,19 +27,13 @@ import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.PlayerInteractAtEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.ItemStack
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+//@Init(stage = InitStage.POST_WORLD)
 object ItemListener {
 
-    @InitFun
+    //@InitFun
     fun init() {
         registerItemChangeListeners()
         registerItemBehaviorListeners()
@@ -200,15 +190,6 @@ object ItemListener {
 
             koishStack.handleConsume(player, itemStack, koishStack, event)
         }
-
-        event<PlayerAbilityPrepareCastEvent>(EventPriority.HIGHEST, true) { event ->
-            val player = event.caster
-            if (!player.isHandleableByKoish) return@event
-            val itemStack = event.item ?: return@event
-            val koishStack = itemStack.wrap() ?: return@event
-
-//            koishStack.handleAbilityPrepareCast(player, itemStack, koishStack, event.ability, event) // TODO 支持新的技能系统
-        }
     }
 
     private fun registerAbilityEntryPointListeners() {
@@ -239,7 +220,7 @@ object ItemListener {
      * 此时, 玩家背包内的任何物品都应该看作是空气, 不提供任何效果.
      */
     private val Player.isHandleableByKoish: Boolean
-        get() = toUser().isInventoryListenable
+        get() = isInventoryListenable
 
 
     private val Projectile.itemStack: ItemStack?

@@ -13,6 +13,8 @@ import kotlin.reflect.typeOf
 
 /**
  * Generic Dispatching TypeSerializer for handling polymorphic types in Configurate.
+ *
+ * 关于本 class 具体的使用方式, 请参考单元测试中的代码.
  */
 class DispatchingSerializer<K : Any, V : Any>
 private constructor(
