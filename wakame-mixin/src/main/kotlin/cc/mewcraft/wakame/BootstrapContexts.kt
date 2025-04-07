@@ -3,8 +3,14 @@ package cc.mewcraft.wakame
 import cc.mewcraft.wakame.util.data.Version
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.jetbrains.annotations.ApiStatus
 import java.nio.file.Path
+
+@JvmField
+val PLUGIN_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
 /**
  * 用于存放 Koish 的 [io.papermc.paper.plugin.bootstrap.BootstrapContext].

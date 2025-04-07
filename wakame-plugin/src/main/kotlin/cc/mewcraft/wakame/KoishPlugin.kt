@@ -43,7 +43,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
         BootstrapContexts.setPluginReady(false)
         KoishProvider.unregister()
         Initializer.disable()
-        KOISH_SCOPE.cancel("Plugin disabled")
+        PLUGIN_SCOPE.cancel("Koish Plugin has been disabled")
         stopKoin()
 
         if (ServerUtils.isReload()) {

@@ -16,9 +16,6 @@ import cc.mewcraft.wakame.util.data.VersionRange
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.debug.DebugProbes
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
@@ -27,9 +24,6 @@ import org.koin.core.context.GlobalContext.startKoin
 
 private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.3")..Version("1.21.3")
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
-
-@PublishedApi
-internal val KOISH_SCOPE = CoroutineScope(CoroutineName("Koish") + SupervisorJob())
 
 internal class KoishBootstrap : PluginBootstrap {
     init {
