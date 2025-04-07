@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.attribute.AttributeProvider
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.util.toStableFloat
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
@@ -108,8 +108,7 @@ class EntityInfoBossBar : IteratingSystem(
 
     private fun getMaxHealth(entity: Entity): Double? {
         val attributeContainer = entity[AttributeMap]
-        val maxHealthAttribute = AttributeProvider.INSTANCE.get("max_health") ?: return null
-        return attributeContainer.getInstance(maxHealthAttribute)?.getValue()
+        return attributeContainer.getInstance(Attributes.MAX_HEALTH)?.getValue()
     }
 
     override fun onAddEntity(entity: Entity) {

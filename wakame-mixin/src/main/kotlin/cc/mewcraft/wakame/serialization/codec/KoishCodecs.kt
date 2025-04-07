@@ -27,7 +27,7 @@ object KoishCodecs {
     @JvmField
     val ATTRIBUTE: Codec<Attribute> = Codec.STRING.comapFlatMap({ id ->
         try {
-            DataResult.success(AttributeProvider.instance().get(id) ?: throw IllegalArgumentException())
+            DataResult.success(AttributeProvider.INSTANCE.get(id) ?: throw IllegalArgumentException())
         } catch (e: Exception) {
             DataResult.error { "Unknown attribute id: $id (${e.message})" }
         }

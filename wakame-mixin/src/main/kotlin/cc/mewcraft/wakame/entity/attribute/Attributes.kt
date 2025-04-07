@@ -20,18 +20,31 @@ object Attributes : AttributeProvider {
 
     // 这些属性需要原版属性作为后端才能在游戏中生效.
 
+    @JvmField
     val ATTACK_KNOCKBACK = RangedAttribute("attack_knockback", .0, .0, 5.0, true).register()
+    @JvmField
     val BLOCK_INTERACTION_RANGE = RangedAttribute("block_interaction_range", 4.5, 1.0, 64.0, true).register()
+    @JvmField
     val ENTITY_INTERACTION_RANGE = RangedAttribute("entity_interaction_range", 3.0, 1.0, 64.0, true).register()
+    @JvmField
     val KNOCKBACK_RESISTANCE = RangedAttribute("knockback_resistance", .0, .0, 1.0, true).register()
+    @JvmField
     val MAX_ABSORPTION = RangedAttribute("max_absorption", .0, .0, 2048.0, true).register()
+    @JvmField
     val MAX_HEALTH = RangedAttribute("max_health", 20.0, 1.0, 16384.0, true).register()
+    @JvmField
     val MINING_EFFICIENCY = RangedAttribute("mining_efficiency", .0, .0, 1024.0, true).register()
+    @JvmField
     val MOVEMENT_SPEED = RangedAttribute("movement_speed", .0, -1.0, 4.0, true).register()
+    @JvmField
     val SAFE_FALL_DISTANCE = RangedAttribute("safe_fall_distance", 3.0, -1024.0, 1024.0, true).register()
+    @JvmField
     val SCALE = RangedAttribute("scale", 1.0, 0.0625, 16.0, true).register()
+    @JvmField
     val STEP_HEIGHT = RangedAttribute("step_height", 0.6, .0, 10.0, true).register()
+    @JvmField
     val SWEEPING_DAMAGE_RATIO = RangedAttribute("sweeping_damage_ratio", 0.1, .0, 1.0, true).register()
+    @JvmField
     val WATER_MOVEMENT_EFFICIENCY = RangedAttribute("water_movement_efficiency", .0, .0, 1.0, true).register()
     //</editor-fold>
 
@@ -40,23 +53,41 @@ object Attributes : AttributeProvider {
     // 这些属性需要我们自己实现才能在游戏中生效. 所谓“自己实现”,
     // 就是说, 我们需要通过自定义监听器或调度器等方式来实现它们.
 
+    @JvmField
     val ATTACK_EFFECT_CHANCE = RangedAttribute("attack_effect_chance", 0.01, .0, 1.0).register()
+    @JvmField
     val CRITICAL_STRIKE_CHANCE = RangedAttribute("critical_strike_chance", .0, -1.0, 1.0).register()
+    @JvmField
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 16384.0).register()
+    @JvmField
     val HAMMER_DAMAGE_RANGE = RangedAttribute("hammer_damage_range", .0, .0, 64.0).register()
+    @JvmField
     val HAMMER_DAMAGE_RATIO = RangedAttribute("hammer_damage_ratio", .0, .0, 1.0).register()
+    @JvmField
     val HEALTH_REGENERATION = RangedAttribute("health_regeneration", 1.0, .0, 16384.0).register()
+    @JvmField
     val LIFESTEAL = RangedAttribute("lifesteal", .0, .0, 16384.0).register()
+    @JvmField
     val MANASTEAL = RangedAttribute("manasteal", .0, .0, 16384.0).register()
+    @JvmField
     val MANA_CONSUMPTION_RATE = RangedAttribute("mana_consumption_rate", 1.0, .0, 5.0).register()
+    @JvmField
     val MANA_REGENERATION = RangedAttribute("mana_regeneration", 1.0, .0, 16384.0).register()
+    @JvmField
     val MAX_MANA = RangedAttribute("max_mana", 100.0, .0, 16384.0).register()
+    @JvmField
     val NEGATIVE_CRITICAL_STRIKE_POWER = RangedAttribute("negative_critical_strike_power", 1.0, .0, 16384.0).register()
+    @JvmField
     val NONE_CRITICAL_STRIKE_POWER = RangedAttribute("none_critical_strike_power", 1.0, .0, 16384.0).register()
+    @JvmField
     val UNIVERSAL_DEFENSE = RangedAttribute("universal_defense", .0, -16384.0, 16384.0).register()
+    @JvmField
     val UNIVERSAL_DEFENSE_PENETRATION = RangedAttribute("universal_defense_penetration", .0, -16384.0, 16384.0).register()
+    @JvmField
     val UNIVERSAL_DEFENSE_PENETRATION_RATE = RangedAttribute("universal_defense_penetration_rate", .0, .0, 1.0).register()
+    @JvmField
     val UNIVERSAL_MAX_ATTACK_DAMAGE = RangedAttribute("universal_max_attack_damage", "universal_attack_damage", .0, .0, 16384.0).register()
+    @JvmField
     val UNIVERSAL_MIN_ATTACK_DAMAGE = RangedAttribute("universal_min_attack_damage", "universal_attack_damage", .0, .0, 16384.0).register()
     //</editor-fold>
 
@@ -65,12 +96,19 @@ object Attributes : AttributeProvider {
     // 跟上面的萌芽属性一样, 只不过不是 Attribute 实例, 而是一个“中间对象”.
     // 客户端需要再指定一次元素才可以获取到最终的 (Element)Attribute 实例.
 
+    @JvmField
     val DEFENSE = registerLazy { element -> ElementAttribute("defense", .0, -16384.0, 16384.0, element) }
+    @JvmField
     val DEFENSE_PENETRATION = registerLazy { element -> ElementAttribute("defense_penetration", .0, -16384.0, 16384.0, element) }
+    @JvmField
     val DEFENSE_PENETRATION_RATE = registerLazy { element -> ElementAttribute("defense_penetration_rate", .0, .0, 1.0, element) }
+    @JvmField
     val MAX_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("max_attack_damage", "attack_damage", .0, .0, 16384.0, element) }
+    @JvmField
     val MIN_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("min_attack_damage", "attack_damage", .0, .0, 16384.0, element) }
+    @JvmField
     val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
+    @JvmField
     val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
     //</editor-fold>
 

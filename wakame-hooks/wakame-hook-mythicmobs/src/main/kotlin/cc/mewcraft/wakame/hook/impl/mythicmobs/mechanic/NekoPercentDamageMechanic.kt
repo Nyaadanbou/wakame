@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.entity.attribute.AttributeProvider
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -72,7 +72,7 @@ class NekoPercentDamageMechanic(
             val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
                 target.health * percent
             } else {
-                val maxHealthAttribute = requireNotNull(AttributeProvider.instance().get("max_health")) { "Max health attribute is Null!" }
+                val maxHealthAttribute = requireNotNull(Attributes.MAX_HEALTH) { "\"max_health\" attribute is null!" }
                 val maxHealth = AttributeMapAccess.INSTANCE.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }

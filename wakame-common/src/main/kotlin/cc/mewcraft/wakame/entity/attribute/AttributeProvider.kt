@@ -7,17 +7,11 @@ import org.jetbrains.annotations.ApiStatus
  */
 interface AttributeProvider {
 
-    companion object Holder {
+    companion object {
 
         @get:JvmName("getInstance")
         @get:JvmStatic
         lateinit var INSTANCE: AttributeProvider private set
-
-        @Deprecated("Use AttributeProvider.INSTANCE instead", replaceWith = ReplaceWith("INSTANCE"))
-        @JvmStatic
-        fun instance(): AttributeProvider {
-            return INSTANCE
-        }
 
         @ApiStatus.Internal
         fun register(provider: AttributeProvider) {
