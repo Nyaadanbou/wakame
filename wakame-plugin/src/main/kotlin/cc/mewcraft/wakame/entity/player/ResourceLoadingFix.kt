@@ -14,15 +14,15 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 
-/** 该接口允许外部代码实现一个 [PlayerResourceFixBootstrap] 的具体逻辑, 以此来避免 CNF 异常. */
-fun interface PlayerResourceFixHandler {
+/** 该接口允许外部代码实现一个 [ResourceLoadingFixBootstrap] 的具体逻辑, 以此来避免 CNF 异常. */
+fun interface ResourceLoadingFixHandler {
 
     /** 实现该函数来执行必要的逻辑, 例如注册 Event Handler. */
     operator fun invoke()
 
     companion object {
         // 当前所使用的实例
-        internal var CURRENT_HANDLER: PlayerResourceFixHandler = PlayerResourceFixHandler {
+        internal var CURRENT_HANDLER: ResourceLoadingFixHandler = ResourceLoadingFixHandler {
             LOGGER.error("The current PlayerResourceFixHandler is a no-op but it's being called. This is a bug!", Error())
         }
     }
@@ -35,7 +35,7 @@ fun interface PlayerResourceFixHandler {
         HooksLoader::class, // 依赖于 PlayerLevelManager
     ]
 )
-internal object PlayerResourceFixBootstrap {
+internal object ResourceLoadingFixBootstrap {
 
     @InitFun
     fun init() {
@@ -60,7 +60,7 @@ internal object PlayerResourceFixBootstrap {
             }
 
             // 其余的情况则使用 Hook 的具体实现.
-            else -> PlayerResourceFixHandler.CURRENT_HANDLER.invoke()
+            else -> ResourceLoadingFixHandler.CURRENT_HANDLER.invoke()
         }
     }
 

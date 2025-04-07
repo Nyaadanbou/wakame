@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.entity.player.PlayerResourceFixHandler
+import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.integration.economy.EconomyType
@@ -113,8 +113,8 @@ internal object HooksLoader {
             PermissionManager.integrations += hook
         }
 
-        if (hook is PlayerResourceFixHandler) {
-            PlayerResourceFixHandler.CURRENT_HANDLER = hook
+        if (hook is ResourceLoadingFixHandler) {
+            ResourceLoadingFixHandler.CURRENT_HANDLER = hook
         }
 
         if (hook is PlayerLevelIntegration && selectedPlayerLevelIntegration == hook.type) {

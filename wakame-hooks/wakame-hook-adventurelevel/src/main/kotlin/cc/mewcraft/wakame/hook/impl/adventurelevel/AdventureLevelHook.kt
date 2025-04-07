@@ -5,7 +5,7 @@ import cc.mewcraft.adventurelevel.level.category.LevelCategory
 import cc.mewcraft.adventurelevel.plugin.AdventureLevelProvider
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.entity.player.PlayerResourceFixHandler
+import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.entity.player.ResourceSynchronizer
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.integration.Hook
@@ -21,7 +21,7 @@ import java.util.*
  * *adventure level* (i.e., the level from our AdventureLevel plugin).
  */
 @Hook(plugins = ["AdventureLevel"])
-object AdventureLevelHook : PlayerLevelIntegration, PlayerResourceFixHandler {
+object AdventureLevelHook : PlayerLevelIntegration, ResourceLoadingFixHandler {
 
     override val type: PlayerLevelType = PlayerLevelType.ADVENTURE
 
