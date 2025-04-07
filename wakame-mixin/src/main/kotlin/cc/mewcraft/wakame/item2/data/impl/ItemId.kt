@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.KOISH_NAMESPACE
 import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
@@ -49,7 +50,7 @@ private constructor(
 
         override fun serialize(type: Type, obj: ItemId?, node: ConfigurationNode) {
             if (obj == null) return
-            else node.set(obj.id)
+            else node.set(obj.id.asMinimalStringKoish())
         }
     }
 

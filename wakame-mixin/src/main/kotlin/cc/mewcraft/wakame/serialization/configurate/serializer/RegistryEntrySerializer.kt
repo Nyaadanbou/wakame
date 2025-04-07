@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.bukkit.Keyed
@@ -31,7 +32,7 @@ internal class RegistryValueEntrySerializer<T : Any>(
 
     override fun serialize(type: Type, obj: T?, node: ConfigurationNode) {
         if (obj == null) return
-        val id = registry.getId(obj)?.toString() ?: throw SerializationException("No such value '$obj' in registry '${registry.key}'")
+        val id = registry.getId(obj)?.asMinimalStringKoish() ?: throw SerializationException("No such value '$obj' in registry '${registry.key}'")
         node.set(id)
     }
 }
@@ -46,7 +47,7 @@ internal class RegistryHolderEntrySerializer<T : Any>(
 
     override fun serialize(type: Type, obj: RegistryEntry<T>?, node: ConfigurationNode) {
         if (obj == null) return
-        val id = obj.getKeyOrThrow().value.toString()
+        val id = obj.getKeyOrThrow().value.asMinimalStringKoish()
         node.set(id)
     }
 }

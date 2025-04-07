@@ -25,9 +25,9 @@ object ApplyAttributeEffect : IteratingSystem(
         // 更新属性的状态
         slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
-                LOGGER.info("Removing attribute modifier from ${slot.id}")
                 val coreContainer = prev.getData(ItemDataTypes.CORE_CONTAINER)
                 if (coreContainer != null) {
+                    LOGGER.info("Removing attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(prev, slot)
                     attributeContainer.removeModifiers(attrModifiers)
                 }
@@ -37,9 +37,9 @@ object ApplyAttributeEffect : IteratingSystem(
                 ItemSlotChanges.testLevel(player, curr) &&
                 ItemSlotChanges.testDurability(curr)
             ) {
-                LOGGER.info("Adding attribute modifier from ${slot.id}")
                 val coreContainer = curr.getData(ItemDataTypes.CORE_CONTAINER)
                 if (coreContainer != null) {
+                    LOGGER.info("Adding attribute modifier from ${slot.id}")
                     val attrModifiers = coreContainer.collectAttributeModifiers(curr, slot)
                     attributeContainer.addTransientModifiers(attrModifiers)
                 }
