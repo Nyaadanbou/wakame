@@ -223,8 +223,6 @@ data object EmptyCore : Core {
                 node.set(null)
                 return
             }
-
-            node.node("value").set(null) // 防止节点 "detached"
         }
     }
 
