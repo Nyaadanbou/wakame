@@ -2,9 +2,11 @@ package cc.mewcraft.wakame.hook.impl.betterhud
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.attribute.Attributes
+import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.AttributeMapComponent
 import cc.mewcraft.wakame.ecs.component.Mana
+import cc.mewcraft.wakame.ecs.system.ManaHudSystem
 import cc.mewcraft.wakame.integration.Hook
 import kr.toxicity.hud.api.BetterHud
 import kr.toxicity.hud.api.BetterHudAPI
@@ -18,6 +20,7 @@ object BetterHudHook {
 
     init {
         registerPlaceholders()
+        Fleks.INSTANCE.world.remove(ManaHudSystem) // 移除原有的 ManaHudSystem
     }
 
     private fun registerPlaceholders() {
