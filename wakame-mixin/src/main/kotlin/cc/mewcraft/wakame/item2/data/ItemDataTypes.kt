@@ -1,5 +1,8 @@
 package cc.mewcraft.wakame.item2.data
 
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
 import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.kizami2.Kizami
@@ -59,6 +62,21 @@ data object ItemDataTypes {
     val KIZAMI: ItemDataType<Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
         serializers {
             register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val ELEMENT: ItemDataType<RegistryEntry<Element>> = typeOf("element") {
+        serializers {
+            register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val CORE_CONTAINER: ItemDataType<CoreContainer> = typeOf("cores") {
+        serializers {
+            register(CoreContainer.SERIALIZER)
+            registerAll(Core.makeDirectSerializers())
         }
     }
 

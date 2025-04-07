@@ -207,10 +207,8 @@ private data object EmptyItemDataContainer : ItemDataContainer {
 
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
 private open class SimpleItemDataContainer(
-    @JvmField
-    var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
-    @JvmField
-    var copyOnWrite: Boolean, // 用于优化 copy() 的性能
+    private var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
+    private var copyOnWrite: Boolean, // 用于优化 copy() 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
     override val types: Set<ItemDataType<*>>
         get() = dataMap.keys
@@ -301,7 +299,7 @@ private open class SimpleItemDataContainer(
                 prefix = "(",
                 postfix = ")",
             ) { (key, value) ->
-                "${BuiltInRegistries.ITEM_DATA_TYPE.getId(key)!!.value()}=$value"
+                "${BuiltInRegistries.ITEM_DATA_TYPE.getId(key)?.value() ?: "$key(unregistered)"}=$value"
             }
         }}"
     }

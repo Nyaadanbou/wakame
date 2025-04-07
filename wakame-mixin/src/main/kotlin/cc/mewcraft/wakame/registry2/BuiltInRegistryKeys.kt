@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleType
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
@@ -18,6 +19,7 @@ import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
+import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
@@ -88,6 +90,12 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val IMG_ATTRIBUTE_MAP = createRegistryKey<ImaginaryAttributeMap>("img_attribute_map")
+
+    @JvmField
+    val CORE_TYPE = createRegistryKey<CoreType>("core_type")
+
+    @JvmField
+    val VAL_ATTRIBUTE_BUNDLE_TYPE = createRegistryKey<ConstantAttributeBundleType>("val_attribute_bundle_type")
 
     ///
 

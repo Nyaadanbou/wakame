@@ -71,7 +71,7 @@ internal object LevelToRarityMappingRegistryLoader : RegistryLoader {
 
             // deserialize weight for each rarity
             val levelRange = RangeParser.parseIntRange(levelNode)
-            val levelMapping = LevelToRarityMapping.Entry.Companion.build {
+            val levelMapping = LevelToRarityMapping.Entry.build {
                 for ((nodeKey2, node2) in weightNode.childrenMap()) {
                     val rarityTypeId = Identifiers.of(nodeKey2.toString())
                     val rarityType = BuiltInRegistries.RARITY.createEntry(rarityTypeId)

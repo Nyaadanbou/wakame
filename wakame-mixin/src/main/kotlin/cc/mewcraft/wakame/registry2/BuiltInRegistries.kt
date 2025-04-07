@@ -8,9 +8,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
-import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
-import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.*
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -23,6 +21,8 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.CoreType
+import cc.mewcraft.wakame.item2.data.impl.CoreTypes
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
@@ -172,6 +172,15 @@ object BuiltInRegistries {
      */
     @JvmField
     val IMG_ATTRIBUTE_MAP: WritableRegistry<ImaginaryAttributeMap> = registerSimple(BuiltInRegistryKeys.IMG_ATTRIBUTE_MAP)
+
+    /**
+     * 核心的类型.
+     */
+    @JvmField
+    val CORE_TYPE: WritableRegistry<CoreType> = registerSimple(BuiltInRegistryKeys.CORE_TYPE) { CoreTypes }
+
+    @JvmField
+    val VAL_ATTRIBUTE_BUNDLE_TYPE: WritableRegistry<ConstantAttributeBundleType> = registerSimple(BuiltInRegistryKeys.VAL_ATTRIBUTE_BUNDLE_TYPE) { ConstantAttributeBundleTypes }
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

@@ -6,12 +6,20 @@ import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.data.getByteOrNull
+import cc.mewcraft.wakame.util.register
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * 该属性核心的元素种类. 如果该属性核心没有元素, 则返回 `null`.
@@ -117,11 +125,45 @@ fun ConstantAttributeBundle(
     return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNodeToConstant(node)
 }
 
+class ConstantAttributeBundleType(val kotlinType: KType)
+
+// TODO #373: 更好的实现
+//  “type” 的字面值是不是可以直接是 attribute facade 的 id???
+object ConstantAttributeBundleTypes {
+    @JvmField
+    val S = register<ConstantAttributeBundleS>("s")
+    @JvmField
+    val R = register<ConstantAttributeBundleR>("r")
+    @JvmField
+    val SE = register<ConstantAttributeBundleSE>("se")
+    @JvmField
+    val RE = register<ConstantAttributeBundleRE>("re")
+
+    private inline fun <reified E : ConstantAttributeBundle> register(id: String): ConstantAttributeBundleType {
+        return Registry.register(BuiltInRegistries.VAL_ATTRIBUTE_BUNDLE_TYPE, id, ConstantAttributeBundleType(typeOf<E>()))
+    }
+}
+
 /**
  * 代表一个数值恒定的 [AttributeBundle].
  */
 sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource {
 
+    companion object {
+        @JvmField
+        val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
+            .register(BuiltInRegistries.VAL_ATTRIBUTE_BUNDLE_TYPE.valueByNameTypeSerializer())
+            .register(DispatchingSerializer.create(ConstantAttributeBundle::type, ConstantAttributeBundleType::kotlinType))
+            .build()
+    }
+
+    abstract val type: ConstantAttributeBundleType
+
+    val displayName: Component
+        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
+
+    val description: List<Component>
+        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
     /**
      * 数值的质量, 通常以正态分布的 Z-score 转换而来.
      *
@@ -135,10 +177,24 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
      */
     abstract val quality: Quality?
 
-    val displayName: Component
-        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipName(this)
-    val description: List<Component>
-        get() = BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createTooltipLore(this)
+    /**
+     * 检查两个 [ConstantAttributeBundle] 是否拥有一样的:
+     * - 运算模式
+     * - 数值结构
+     * - 元素类型 (如果有)
+     *
+     * 该函数不会检查任何数值的相等性.
+     */
+    abstract fun similarTo(other: ConstantAttributeBundle): Boolean
+
+    /**
+     * 序列化为 NBT 标签. 请注意这并不包含 [id] 的信息.
+     */
+    abstract fun saveNbt(): CompoundTag
+
+    override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
+        return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
+    }
 
     /**
      * 属性核心的“数值质量”.
@@ -164,25 +220,6 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
             }
         }
     }
-
-    /**
-     * 检查两个 [ConstantAttributeBundle] 是否拥有一样的:
-     * - 运算模式
-     * - 数值结构
-     * - 元素类型 (如果有)
-     *
-     * 该函数不会检查任何数值的相等性.
-     */
-    abstract fun similarTo(other: ConstantAttributeBundle): Boolean
-
-    /**
-     * 序列化为 NBT 标签. 请注意这并不包含 [id] 的信息.
-     */
-    abstract fun saveNbt(): CompoundTag
-
-    override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
-        return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).createAttributeModifiers(modifierId, this)
-    }
 }
 
 private const val SINGLE_VALUE_FIELD = "val"
@@ -192,6 +229,7 @@ private const val ELEMENT_TYPE_FIELD = "elem"
 private const val OPERATION_TYPE_FIELD = "op"
 private const val QUALITY_FIELD = "qual"
 
+@ConfigSerializable
 data class ConstantAttributeBundleS(
     override val id: String,
     override val operation: Operation,
@@ -207,6 +245,9 @@ data class ConstantAttributeBundleS(
         compound.readQuality(),
     )
 
+    override val type: ConstantAttributeBundleType
+        get() = ConstantAttributeBundleTypes.S
+
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleS && other.id == id && other.operation == operation
     }
@@ -218,6 +259,7 @@ data class ConstantAttributeBundleS(
     }
 }
 
+@ConfigSerializable
 data class ConstantAttributeBundleR(
     override val id: String,
     override val operation: Operation,
@@ -235,6 +277,9 @@ data class ConstantAttributeBundleR(
         compound.readQuality(),
     )
 
+    override val type: ConstantAttributeBundleType
+        get() = ConstantAttributeBundleTypes.R
+
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleR && other.id == id && other.operation == operation
     }
@@ -247,6 +292,7 @@ data class ConstantAttributeBundleR(
     }
 }
 
+@ConfigSerializable
 data class ConstantAttributeBundleSE(
     override val id: String,
     override val operation: Operation,
@@ -264,6 +310,9 @@ data class ConstantAttributeBundleSE(
         compound.readQuality(),
     )
 
+    override val type: ConstantAttributeBundleType
+        get() = ConstantAttributeBundleTypes.SE
+
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleSE && other.id == id && other.operation == operation && other.element == element
     }
@@ -276,6 +325,7 @@ data class ConstantAttributeBundleSE(
     }
 }
 
+@ConfigSerializable
 data class ConstantAttributeBundleRE(
     override val id: String,
     override val operation: Operation,
@@ -294,6 +344,9 @@ data class ConstantAttributeBundleRE(
         compound.readElement(),
         compound.readQuality(),
     )
+
+    override val type: ConstantAttributeBundleType
+        get() = ConstantAttributeBundleTypes.RE
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleRE && other.id == id && other.operation == operation && other.element == element

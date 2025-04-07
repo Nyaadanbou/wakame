@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaRarity
+import cc.mewcraft.wakame.item2.config.datagen.impl.*
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
@@ -62,6 +61,15 @@ data object ItemMetaTypes {
         serializers {
             register(MetaKizami.SERIALIZER)
             register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val CORE_CONTAINER: ItemMetaType<MetaCoreContainer, CoreContainer> = typeOf("cores") {
+        serializers {
+            register(MetaCoreContainer.SERIALIZER)
+            register(CoreContainer.SERIALIZER)
+            registerAll(Core.makeDirectSerializers())
         }
     }
 
