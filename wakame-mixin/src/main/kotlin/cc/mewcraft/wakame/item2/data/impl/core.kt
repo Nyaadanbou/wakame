@@ -34,7 +34,7 @@ import kotlin.reflect.typeOf
  *
  * 该接口的所有函数都不会修改容器本身.
  */
-interface CoreContainer : Iterable<Map.Entry<String, Core>> {
+sealed interface CoreContainer : Iterable<Map.Entry<String, Core>> {
 
     companion object {
 
@@ -102,7 +102,7 @@ interface CoreContainer : Iterable<Map.Entry<String, Core>> {
     /**
      * [CoreContainer] 的生成器.
      */
-    interface Builder {
+    sealed interface Builder {
 
         /**
          * 将核心 [core] 写入到 [id] 核孔. 将覆盖已有的核心.
@@ -366,7 +366,7 @@ private class SimpleCoreContainer(
 
     override fun toBuilder(): CoreContainer.Builder {
         copyOnWrite = true
-        return SimpleCoreContainer(dataMap, copyOnWrite = true)
+        return SimpleCoreContainer(dataMap = dataMap, copyOnWrite = true)
     }
 
     // Builder
