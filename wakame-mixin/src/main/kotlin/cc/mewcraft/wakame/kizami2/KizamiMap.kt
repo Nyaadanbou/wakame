@@ -22,12 +22,24 @@ import org.bukkit.entity.Player
  * - [removeAllEffects]
  * - [applyAllEffects]
  */
-interface KizamiMap : KizamiMapView, MutableIterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component<KizamiMap> {
+interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component<KizamiMap> {
 
     /**
-     * Get a snapshot of the current kizami map.
+     * Returns a copy of this map.
      */
-    fun getSnapshot(): KizamiMapSnapshot
+    fun copy(): KizamiMap
+
+    /**
+     * Returns `true` if this map contains no entries.
+     */
+    fun isEmpty(): Boolean
+
+    /**
+     * Get the amount of specific kizami the player owns.
+     *
+     * The return value is always greater or equal to zero.
+     */
+    fun getAmount(kizami: RegistryEntry<Kizami>): Int
 
     /**
      * Increment the amount of each kizami in the [kizami] by one.
@@ -91,35 +103,13 @@ interface KizamiMap : KizamiMapView, MutableIterable<Map.Entry<RegistryEntry<Kiz
          * 创建一个新的 [KizamiMap].
          */
         fun create(): KizamiMap {
-            return KizamiMapImpl()
+            return KizamiMapImpl(copyOnWrite = false)
         }
 
     }
 
     override fun type(): ComponentType<KizamiMap> = KizamiMap
 }
-
-/**
- * Represents a view of the kizami map. This interface is used to provide a read-only view of the kizami map.
- */
-interface KizamiMapView : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>> {
-    /**
-     * Returns `true` if this map contains no entries.
-     */
-    fun isEmpty(): Boolean
-
-    /**
-     * Get the amount of specific kizami the player owns.
-     *
-     * The return value is always greater or equal to zero.
-     */
-    fun getAmount(kizami: RegistryEntry<Kizami>): Int
-}
-
-/**
- * Represents a snapshot of the kizami map. No methods on this interface mutates the map.
- */
-interface KizamiMapSnapshot : KizamiMapView
 
 
 // ------------
@@ -132,43 +122,58 @@ interface KizamiMapSnapshot : KizamiMapView
  *
  * This class records the number of kizami each owned by a player.
  */
-private class KizamiMapImpl : KizamiMap {
-    private val amountMap = Object2IntOpenHashMap<RegistryEntry<Kizami>>().apply { defaultReturnValue(0) }
+private class KizamiMapImpl(
+    private var dataMap: Object2IntOpenHashMap<RegistryEntry<Kizami>> = Object2IntOpenHashMap<RegistryEntry<Kizami>>().apply { defaultReturnValue(0) },
+    private var copyOnWrite: Boolean,
+) : KizamiMap {
+    private fun ensureContainerOwnership() {
+        if (copyOnWrite) {
+            dataMap = Object2IntOpenHashMap<RegistryEntry<Kizami>>(dataMap).apply { defaultReturnValue(0) }
+            copyOnWrite = false
+        }
+    }
+
+    override fun copy(): KizamiMap {
+        copyOnWrite = true
+        return KizamiMapImpl(dataMap = dataMap, copyOnWrite = true)
+    }
 
     override fun isEmpty(): Boolean {
-        return amountMap.isEmpty()
+        return dataMap.isEmpty()
     }
 
     override fun getAmount(kizami: RegistryEntry<Kizami>): Int {
-        return amountMap.getInt(kizami)
-    }
-
-    override fun getSnapshot(): KizamiMapSnapshot {
-        return KizamiMapSnapshotImpl(amountMap.clone())
+        return dataMap.getInt(kizami)
     }
 
     override fun addOneEach(kizami: Iterable<RegistryEntry<Kizami>>) {
+        ensureContainerOwnership()
         kizami.forEach(this::addOne)
     }
 
     override fun addOne(kizami: RegistryEntry<Kizami>) {
-        amountMap.mergeInt(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
+        ensureContainerOwnership()
+        dataMap.mergeInt(kizami, 1) { oldAmount, _ -> oldAmount + 1 }
     }
 
     override fun add(kizami: RegistryEntry<Kizami>, amount: Int) {
-        amountMap.mergeInt(kizami, amount) { oldAmount: Int, givenAmount: Int -> oldAmount + givenAmount }
+        ensureContainerOwnership()
+        dataMap.mergeInt(kizami, amount) { oldAmount: Int, givenAmount: Int -> oldAmount + givenAmount }
     }
 
     override fun subtractOneEach(kizami: Iterable<RegistryEntry<Kizami>>) {
+        ensureContainerOwnership()
         kizami.forEach(::subtractOne)
     }
 
     override fun subtractOne(kizami: RegistryEntry<Kizami>) {
-        amountMap.mergeInt(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
+        ensureContainerOwnership()
+        dataMap.mergeInt(kizami, 0) { oldAmount, _ -> (oldAmount - 1).coerceAtLeast(0) }
     }
 
     override fun subtract(kizami: RegistryEntry<Kizami>, amount: Int) {
-        amountMap.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
+        ensureContainerOwnership()
+        dataMap.mergeInt(kizami, 0) { oldAmount, givenAmount -> (oldAmount - givenAmount).coerceAtLeast(0) }
     }
 
     override fun removeAllEffects(player: Player) {
@@ -184,22 +189,25 @@ private class KizamiMapImpl : KizamiMap {
     }
 
     override fun iterator(): MutableIterator<Map.Entry<RegistryEntry<Kizami>, Int>> {
-        return amountMap.object2IntEntrySet().fastIterator()
-    }
-}
-
-private class KizamiMapSnapshotImpl(
-    private val amountMap: Object2IntOpenHashMap<RegistryEntry<Kizami>>,
-) : KizamiMapSnapshot {
-    override fun isEmpty(): Boolean {
-        return amountMap.isEmpty()
+        return dataMap.object2IntEntrySet().fastIterator()
     }
 
-    override fun getAmount(kizami: RegistryEntry<Kizami>): Int {
-        return amountMap.getInt(kizami)
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KizamiMapImpl) return false
+        if (dataMap != other.dataMap) return false
+        return true
     }
 
-    override fun iterator(): Iterator<Map.Entry<RegistryEntry<Kizami>, Int>> {
-        return amountMap.object2IntEntrySet().fastIterator()
+    override fun hashCode(): Int {
+        return dataMap.hashCode()
+    }
+
+    override fun toString(): String {
+        return "{${
+            dataMap.object2IntEntrySet().joinToString(
+                separator = ",", prefix = "(", postfix = ")"
+            ) { "${it.key.getIdAsString()}=${it.intValue}" }
+        }}"
     }
 }

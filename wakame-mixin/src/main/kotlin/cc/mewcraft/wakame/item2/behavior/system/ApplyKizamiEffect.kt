@@ -20,7 +20,10 @@ object ApplyKizamiEffect : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
-        val kizamiContainer = entity[KizamiMap]
+        val liveKizamiContainer = entity[KizamiMap]
+
+        // 优化: 保存变化前的铭刻状态, 用作之后铭刻效果的移除
+        val prevKizamiContainer = liveKizamiContainer.copy()
 
         // 更新铭刻的数量
         var changed = false
@@ -28,9 +31,9 @@ object ApplyKizamiEffect : IteratingSystem(
             if (prev != null && ItemSlotChanges.testSlot(slot, prev)) {
                 val kizami = prev.getData(ItemDataTypes.KIZAMI)
                 if (kizami != null) {
-                    changed = true
                     LOGGER.info("Decrementing kizami count from ${slot.id}")
-                    kizamiContainer.subtractOneEach(kizami)
+                    liveKizamiContainer.subtractOneEach(kizami)
+                    changed = true
                 }
             }
             if (curr != null &&
@@ -40,9 +43,9 @@ object ApplyKizamiEffect : IteratingSystem(
             ) {
                 val kizami = curr.getData(ItemDataTypes.KIZAMI)
                 if (kizami != null) {
-                    changed = true
                     LOGGER.info("Incrementing kizami count from ${slot.id}")
-                    kizamiContainer.addOneEach(kizami)
+                    liveKizamiContainer.addOneEach(kizami)
+                    changed = true
                 }
             }
         }
@@ -50,6 +53,8 @@ object ApplyKizamiEffect : IteratingSystem(
         // 更新铭刻的效果
         if (changed) {
             LOGGER.info("Updating kizami effects for ${player.name}")
+            prevKizamiContainer.removeAllEffects(player)
+            liveKizamiContainer.applyAllEffects(player)
         }
     }
 }
