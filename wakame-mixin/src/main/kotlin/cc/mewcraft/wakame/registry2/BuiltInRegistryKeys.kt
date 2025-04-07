@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
-import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleType
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
@@ -93,9 +92,6 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val CORE_TYPE = createRegistryKey<CoreType>("core_type")
-
-    @JvmField
-    val VAL_ATTRIBUTE_BUNDLE_TYPE = createRegistryKey<ConstantAttributeBundleType>("val_attribute_bundle_type")
 
     ///
 

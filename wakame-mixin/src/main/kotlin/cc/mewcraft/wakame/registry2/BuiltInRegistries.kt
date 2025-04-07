@@ -8,7 +8,9 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
 import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
-import cc.mewcraft.wakame.entity.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -178,9 +180,6 @@ object BuiltInRegistries {
      */
     @JvmField
     val CORE_TYPE: WritableRegistry<CoreType> = registerSimple(BuiltInRegistryKeys.CORE_TYPE) { CoreTypes }
-
-    @JvmField
-    val VAL_ATTRIBUTE_BUNDLE_TYPE: WritableRegistry<ConstantAttributeBundleType> = registerSimple(BuiltInRegistryKeys.VAL_ATTRIBUTE_BUNDLE_TYPE) { ConstantAttributeBundleTypes }
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

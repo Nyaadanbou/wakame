@@ -36,6 +36,8 @@ import xyz.xenondevs.commons.provider.orElse
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.stream.Stream
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 @Init(
     stage = InitStage.PRE_WORLD, runAfter = [
@@ -197,6 +199,8 @@ private interface AttributeBinderRE {
 private class AttributeFacadeImpl<T : ConstantAttributeBundle, S : VariableAttributeBundle>(
     override val config: Provider<ConfigurationNode>,
     override val id: String,
+    override val valueType: KType, // KType<T>
+    override val sourceType: KType, // KType<S>
     override val bundleTrait: AttributeBundleTraitSet,
     override val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>,
     override val convertNodeToVariable: (ConfigurationNode) -> S,
@@ -348,6 +352,8 @@ private class SingleSelectionImpl(
         return AttributeFacadeImpl(
             config = config,
             id = id,
+            valueType = typeOf<ConstantAttributeBundleS>(),
+            sourceType = typeOf<VariableAttributeBundleS>(),
             bundleTrait = AttributeBundleTraitSet(
                 AttributeBundleTrait.Operation::class, AttributeBundleTrait.Scalar::class
             ),
@@ -405,6 +411,8 @@ private class RangedSelectionImpl(
         return AttributeFacadeImpl(
             config = config,
             id = id,
+            valueType = typeOf<ConstantAttributeBundleR>(),
+            sourceType = typeOf<VariableAttributeBundleR>(),
             bundleTrait = AttributeBundleTraitSet(
                 AttributeBundleTrait.Operation::class, AttributeBundleTrait.Ranged::class
             ),
@@ -459,6 +467,8 @@ private class AttributeBinderSEImpl(
         return AttributeFacadeImpl(
             config = config,
             id = id,
+            valueType = typeOf<ConstantAttributeBundleSE>(),
+            sourceType = typeOf<VariableAttributeBundleSE>(),
             bundleTrait = AttributeBundleTraitSet(
                 AttributeBundleTrait.Operation::class, AttributeBundleTrait.Scalar::class, AttributeBundleTrait.Element::class
             ),
@@ -516,6 +526,8 @@ private class AttributeBinderREImpl(
         return AttributeFacadeImpl(
             config = config,
             id = id,
+            valueType = typeOf<ConstantAttributeBundleRE>(),
+            sourceType = typeOf<VariableAttributeBundleRE>(),
             bundleTrait = AttributeBundleTraitSet(
                 AttributeBundleTrait.Operation::class, AttributeBundleTrait.Ranged::class, AttributeBundleTrait.Element::class
             ),

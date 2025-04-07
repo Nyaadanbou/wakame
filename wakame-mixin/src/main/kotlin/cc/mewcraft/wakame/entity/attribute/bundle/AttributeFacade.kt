@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 /**
  * 包含了一个 [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle] 所相关的各种字段和操作.
@@ -30,6 +31,10 @@ interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBund
      * 它们的唯一标识就不一样.
      */
     val id: String
+
+    val valueType: KType // KType<T>
+
+    val sourceType: KType // KType<S>
 
     /**
      * Holds metadata about the attribute components.
