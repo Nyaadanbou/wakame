@@ -41,6 +41,10 @@ internal object BukkitDamageApplier : DamageApplier {
 }
 
 internal object DefaultDamageBundleFactory : DamageBundleFactory {
+    override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
+        return DamageBundle.damageBundleOf(data)
+    }
+
     override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
         val packets = mutableMapOf<RegistryEntry<Element>, DamagePacket>()
         for ((id, packet) in data) {
@@ -49,10 +53,6 @@ internal object DefaultDamageBundleFactory : DamageBundleFactory {
                 packets[element] = packet
             }
         }
-        return DamageBundle(packets)
-    }
-
-    override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
-        return DamageBundle(data)
+        return DamageBundle.damageBundleOf(packets)
     }
 }

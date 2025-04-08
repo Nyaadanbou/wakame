@@ -12,40 +12,40 @@ import kotlin.contracts.ExperimentalContracts
 /**
  * 开始构建一个 [DamageBundle].
  */
-fun damageBundle(attrMap: AttributeMapLike, block: DamageBundleDSL.() -> Unit): DamageBundle {
-    return DamageBundleDSL(attrMap).apply(block).get()
+fun damageBundle(attrMap: AttributeMapLike, block: DamageBundleDsl.() -> Unit): DamageBundle {
+    return DamageBundleDsl(attrMap).apply(block).get()
 }
 
 /**
  * 开始构建一个 [DamageBundle], 不依赖任何 [AttributeMapLike].
  */
-fun damageBundle(block: DamageBundleDSL.() -> Unit): DamageBundle {
-    return DamageBundleDSL().apply(block).get()
+fun damageBundle(block: DamageBundleDsl.() -> Unit): DamageBundle {
+    return DamageBundleDsl().apply(block).get()
 }
 
 /**
  * 开始构建一个 [DamagePacket].
  */
-fun damagePacket(element: RegistryEntry<Element>, attrMap: AttributeMapLike, block: DamagePacketDSL.() -> Unit): DamagePacket {
-    return DamagePacketDSL(element, attrMap).apply(block).build()
+fun damagePacket(element: RegistryEntry<Element>, attrMap: AttributeMapLike, block: DamagePacketDsl.() -> Unit): DamagePacket {
+    return DamagePacketDsl(element, attrMap).apply(block).build()
 }
 
 /**
  * 开始构建一个 [DamagePacket], 不依赖任何 [AttributeMapLike].
  */
-fun damagePacket(element: RegistryEntry<Element>, block: DamagePacketDSL.() -> Unit): DamagePacket {
-    return DamagePacketDSL(element).apply(block).build()
+fun damagePacket(element: RegistryEntry<Element>, block: DamagePacketDsl.() -> Unit): DamagePacket {
+    return DamagePacketDsl(element).apply(block).build()
 }
 
 /**
  * 开始构建一个 [DamagePacket], 使用默认的元素, 不依赖任何 [AttributeMapLike].
  */
-fun damagePacket(block: DamagePacketDSL.() -> Unit): DamagePacket {
-    return DamagePacketDSL(BuiltInRegistries.ELEMENT.getDefaultEntry()).apply(block).build()
+fun damagePacket(block: DamagePacketDsl.() -> Unit): DamagePacket {
+    return DamagePacketDsl(BuiltInRegistries.ELEMENT.getDefaultEntry()).apply(block).build()
 }
 
 /**
- * 用于标记 [DamageBundleDSL] 和 [DamagePacketDSL] 的 DSL.
+ * 用于标记 [DamageBundleDsl] 和 [DamagePacketDsl] 的 DSL.
  */
 @DslMarker
 annotation class DamagePacketBundleDsl
@@ -54,10 +54,10 @@ annotation class DamagePacketBundleDsl
  * [DamageBundle] 的 DSL.
  */
 @DamagePacketBundleDsl
-class DamageBundleDSL(
+class DamageBundleDsl(
     private val attrMap: AttributeMapLike? = null,
 ) {
-    private val bundle: DamageBundle = DamageBundle()
+    private val bundle: DamageBundle.Builder = DamageBundle.builder()
 
     private fun getElementById(id: String): RegistryEntry<Element>? {
         return BuiltInRegistries.ELEMENT.getEntry(id)
@@ -66,39 +66,39 @@ class DamageBundleDSL(
     /**
      * 为每种已知的元素构建 [DamagePacket].
      */
-    fun every(block: DamagePacketDSL.() -> Unit) {
+    fun every(block: DamagePacketDsl.() -> Unit) {
         for (element in BuiltInRegistries.ELEMENT.entrySequence) {
             // every() 只添加先前不存在的元素伤害包, 使其永远成为一个 "fallback".
             // 这样无论 DSL 的调用顺序是怎样的, 都可以让 single() 拥有更高优先级.
-            bundle.addIfAbsent(DamagePacketDSL(element, attrMap).apply(block).build())
+            bundle.addIfAbsent(DamagePacketDsl(element, attrMap).apply(block).build())
         }
     }
 
     /**
      * 为默认的元素构建 [DamagePacket].
      */
-    fun default(block: DamagePacketDSL.() -> Unit) {
+    fun default(block: DamagePacketDsl.() -> Unit) {
         val element = BuiltInRegistries.ELEMENT.getDefaultEntry()
-        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
+        bundle.add(DamagePacketDsl(element, attrMap).apply(block).build())
     }
 
     /**
      * 为指定的元素构建 [DamagePacket].
      */
-    fun single(elementId: String, block: DamagePacketDSL.() -> Unit) {
+    fun single(elementId: String, block: DamagePacketDsl.() -> Unit) {
         val element = getElementById(elementId)
         if (element == null) {
             LOGGER.warn("Element '$elementId' not found while building damage packet bundle. The damage packet will not be added.")
             return
         }
-        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
+        bundle.add(DamagePacketDsl(element, attrMap).apply(block).build())
     }
 
     /**
      * 为指定的元素构建 [DamagePacket].
      */
-    fun single(element: RegistryEntry<Element>, block: DamagePacketDSL.() -> Unit) {
-        bundle.add(DamagePacketDSL(element, attrMap).apply(block).build())
+    fun single(element: RegistryEntry<Element>, block: DamagePacketDsl.() -> Unit) {
+        bundle.add(DamagePacketDsl(element, attrMap).apply(block).build())
     }
 
     /**
@@ -112,7 +112,7 @@ class DamageBundleDSL(
      * 返回构建好的 [DamageBundle].
      */
     fun get(): DamageBundle {
-        return bundle
+        return bundle.build()
     }
 }
 
@@ -120,7 +120,7 @@ class DamageBundleDSL(
  * [DamagePacket] 的 DSL.
  */
 @DamagePacketBundleDsl
-class DamagePacketDSL(
+class DamagePacketDsl(
     private val element: RegistryEntry<Element>,
     private val attrMap: AttributeMapLike? = null,
 ) {
@@ -138,62 +138,52 @@ class DamagePacketDSL(
         // 如果 ElementDamagePacket 的代码改动,
         // 并且有不止一个地方调用了 standard(),
         // 那么只需要改动这一个地方即可.
-        min {
-            standard()
-        }
-        max {
-            standard()
-        }
-        rate {
-            standard()
-        }
-        defensePenetration {
-            standard()
-        }
-        defensePenetrationRate {
-            standard()
-        }
+        min(MinDamageDsl::standard)
+        max(MaxDamageDsl::standard)
+        rate(DamageRateDsl::standard)
+        defensePenetration(DefensePenetrationDsl::standard)
+        defensePenetrationRate(DefensePenetrationRateDsl::standard)
     }
 
-    fun min(block: MinDamageDSL.() -> Double) {
+    fun min(block: MinDamageDsl.() -> Double) {
         requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
-        min = block(MinDamageDSL(element, attrMap))
+        min = block(MinDamageDsl(element, attrMap))
     }
 
     fun min(value: Double) {
         min = value
     }
 
-    fun max(block: MaxDamageDSL.() -> Double) {
+    fun max(block: MaxDamageDsl.() -> Double) {
         requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
-        max = block(MaxDamageDSL(element, attrMap))
+        max = block(MaxDamageDsl(element, attrMap))
     }
 
     fun max(value: Double) {
         max = value
     }
 
-    fun rate(block: DamageRateDSL.() -> Double) {
+    fun rate(block: DamageRateDsl.() -> Double) {
         requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
-        rate = block(DamageRateDSL(element, attrMap))
+        rate = block(DamageRateDsl(element, attrMap))
     }
 
     fun rate(value: Double) {
         rate = value
     }
 
-    fun defensePenetration(block: DefensePenetrationDSL.() -> Double) {
+    fun defensePenetration(block: DefensePenetrationDsl.() -> Double) {
         requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
-        defensePenetration = block(DefensePenetrationDSL(element, attrMap))
+        defensePenetration = block(DefensePenetrationDsl(element, attrMap))
     }
 
     fun defensePenetration(value: Double) {
         defensePenetration = value
     }
 
-    fun defensePenetrationRate(block: DefensePenetrationRateDSL.() -> Double) {
+    fun defensePenetrationRate(block: DefensePenetrationRateDsl.() -> Double) {
         requireNotNull(attrMap) { "AttributeMapLike must not be null to use this DSL" }
-        defensePenetrationRate = block(DefensePenetrationRateDSL(element, attrMap))
+        defensePenetrationRate = block(DefensePenetrationRateDsl(element, attrMap))
     }
 
     fun defensePenetrationRate(value: Double) {
@@ -217,51 +207,51 @@ class DamagePacketDSL(
     }
 
     @DamagePacketBundleDsl
-    class MinDamageDSL(
+    class MinDamageDsl(
         override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
-    ) : ValueDSL() {
+    ) : ValueDsl() {
         override fun standard(): Double {
             return (value(Attributes.MIN_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MIN_ATTACK_DAMAGE)).coerceAtLeast(0.0)
         }
     }
 
     @DamagePacketBundleDsl
-    class MaxDamageDSL(
+    class MaxDamageDsl(
         override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
-    ) : ValueDSL() {
+    ) : ValueDsl() {
         override fun standard(): Double {
             return (value(Attributes.MAX_ATTACK_DAMAGE) + value(Attributes.UNIVERSAL_MAX_ATTACK_DAMAGE)).coerceAtLeast(0.0)
         }
     }
 
     @DamagePacketBundleDsl
-    class DamageRateDSL(
+    class DamageRateDsl(
         override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
-    ) : ValueDSL() {
+    ) : ValueDsl() {
         override fun standard(): Double {
             return value(Attributes.ATTACK_DAMAGE_RATE)
         }
     }
 
     @DamagePacketBundleDsl
-    class DefensePenetrationDSL(
+    class DefensePenetrationDsl(
         override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
-    ) : ValueDSL() {
+    ) : ValueDsl() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION)).coerceAtLeast(0.0)
         }
     }
 
     @DamagePacketBundleDsl
-    class DefensePenetrationRateDSL(
+    class DefensePenetrationRateDsl(
         override val element: RegistryEntry<Element>, override val attrMap: AttributeMapLike,
-    ) : ValueDSL() {
+    ) : ValueDsl() {
         override fun standard(): Double {
             return (value(Attributes.DEFENSE_PENETRATION_RATE) + value(Attributes.UNIVERSAL_DEFENSE_PENETRATION_RATE)).coerceAtLeast(0.0)
         }
     }
 
-    abstract class ValueDSL {
+    abstract class ValueDsl {
         abstract val element: RegistryEntry<Element>
         abstract val attrMap: AttributeMapLike
 

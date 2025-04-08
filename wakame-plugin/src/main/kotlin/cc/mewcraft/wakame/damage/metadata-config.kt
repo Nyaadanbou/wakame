@@ -113,7 +113,7 @@ internal data class DirectDamageMetadataBuilder(
             val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
-        }.toMap().let(::DamageBundle)
+        }.toMap().let(DamageBundle::damageBundleOf)
         val criticalStrikeMetadata = criticalStrikeMetadata.build()
         return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
     }
@@ -247,7 +247,7 @@ internal data class MolangDamageMetadataBuilder(
             val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
-        }.toMap().let(::DamageBundle)
+        }.toMap().let(DamageBundle::damageBundleOf)
         val criticalStrikeState = criticalStrikeMetadata.build()
         return DamageMetadata(damageTags, damageBundle, criticalStrikeState)
     }

@@ -35,7 +35,7 @@ class NekoBaseDamageMechanic(
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata) -> DamageBundle {
         return { data ->
-            DamageBundleFactory.createUnsafe(
+            DamageBundleFactory.INSTANCE.createUnsafe(
                 origin.associate { rawPacketString ->
                     val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
                         ?.value // 提取括号内的内容 (包括括号)

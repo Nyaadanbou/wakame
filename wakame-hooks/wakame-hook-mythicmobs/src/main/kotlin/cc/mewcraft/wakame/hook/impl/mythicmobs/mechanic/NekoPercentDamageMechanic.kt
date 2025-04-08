@@ -38,7 +38,7 @@ class NekoPercentDamageMechanic(
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata, AbstractEntity) -> DamageBundle {
         return { data, target ->
-            DamageBundleFactory.createUnsafe(
+            DamageBundleFactory.INSTANCE.createUnsafe(
                 origin.associate { rawPacketString ->
                     val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
                         ?.value // 提取括号内的内容 (包括括号)
@@ -55,22 +55,9 @@ class NekoPercentDamageMechanic(
                         // 配置文件内指定 element, min, max, rate
                         4 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data])
                         // 配置文件内指定 element, min, max, rate, defense_penetration
-                        5 -> split[0] to DamagePacket(
-                            split[0],
-                            split[1].toHealthPercentDouble().invoke(data, target),
-                            split[2].toHealthPercentDouble().invoke(data, target),
-                            split[3].toPlaceholderDouble()[data],
-                            split[4].toPlaceholderDouble()[data]
-                        )
+                        5 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data])
                         // 配置文件内指定 element, min, max, rate, defense_penetration, defense_penetration_rate
-                        6 -> split[0] to DamagePacket(
-                            split[0],
-                            split[1].toHealthPercentDouble().invoke(data, target),
-                            split[2].toHealthPercentDouble().invoke(data, target),
-                            split[3].toPlaceholderDouble()[data],
-                            split[4].toPlaceholderDouble()[data],
-                            split[5].toPlaceholderDouble()[data]
-                        )
+                        6 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data], split[5].toPlaceholderDouble()[data])
 
                         else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
                     }
