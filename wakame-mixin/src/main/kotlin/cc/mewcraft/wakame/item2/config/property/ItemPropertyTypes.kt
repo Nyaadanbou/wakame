@@ -1,11 +1,14 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
 import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -60,7 +63,7 @@ data object ItemPropertyTypes {
     val GLOWABLE: ItemPropertyType<Unit> = typeOf("glowable")
 
     @JvmField
-    val LORE: ItemPropertyType<ExtraLore> = typeOf("lore")
+    val EXTRA_LORE: ItemPropertyType<ExtraLore> = typeOf("extra_lore")
 
     @JvmField
     val ABILITY: ItemPropertyType<AbilityOnItem> = typeOf("ability") {
@@ -79,6 +82,13 @@ data object ItemPropertyTypes {
     val SLOT_DISPLAY_LORE: ItemPropertyType<SlotDisplayLoreData> = typeOf("slot_display_lore") {
         serializers {
             register(SlotDisplayLoreData.SERIALIZER)
+        }
+    }
+
+    @JvmField
+    val ATTACK_SPEED: ItemPropertyType<RegistryEntry<AttackSpeed>> = typeOf("attack_speed") {
+        serializers {
+            register(BuiltInRegistries.ATTACK_SPEED.holderByNameTypeSerializer())
         }
     }
 

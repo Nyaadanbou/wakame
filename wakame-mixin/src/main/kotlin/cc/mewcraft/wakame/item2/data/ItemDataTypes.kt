@@ -73,15 +73,15 @@ data object ItemDataTypes {
     }
 
     @JvmField
+    val CORE: ItemDataType<Core> = typeOf("core")
+
+    @JvmField
     val CORE_CONTAINER: ItemDataType<CoreContainer> = typeOf("cores") {
         serializers {
             register(CoreContainer.SERIALIZER)
             registerAll(Core.serializers())
         }
     }
-
-    @JvmField
-    val CORE: ItemDataType<Core> = typeOf("core")
 
     // ------------
     // 方便函数

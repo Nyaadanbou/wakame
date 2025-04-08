@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.item2.data.impl.ItemId
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import cc.mewcraft.wakame.util.item.toBukkit
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -51,7 +52,7 @@ object KoishStackGenerator {
      */
     fun generate(type: KoishItem, context: Context): ItemStack {
         val result = measureTimedValue { generate0(type, context) }
-        LOGGER.info(Component.text("Generated item in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
+        LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
         return result.value
     }
 
