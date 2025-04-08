@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.ecs.bridge
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.MetadataKeys
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.BukkitObject
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.util.metadata.Metadata
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -17,16 +19,24 @@ import org.bukkit.entity.Player
  * 当本函数返回后, 如果 [BukkitEntity] 变为`无效`, 那么与之对应的 [KoishEntity] 也将变为无效.
  */
 fun Entity.koishify(): KoishEntity {
-    if (this is Player) error("Do not call BukkitEntity.koishify() if the concrete object is a BukkitPlayer. Use BukkitPlayer.koishify() instead.")
-    if (!this.isValid) error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid. See BukkitEntity.isValid().")
-    val metadataMap = Metadata.provide(this)
+    val entity = this // make your life easier
+    if (!entity.isValid && (entity !is Player || !entity.isConnected)) {
+        // 对于玩家, 使用 isConnected 来判断是否创建 EEntity 更合适
+        error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid.")
+    }
+    val metadataMap = Metadata.provide(entity)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_ENTITY_ENTITY_ID) {
         KoishEntity(
             Fleks.INSTANCE.createEntity {
-                it += BukkitEntity(this@koishify)
                 it += BukkitObject
+                it += BukkitEntity(entity)
+                if (entity is Player) {
+                    it += BukkitPlayer(entity)
+                }
             }
-        )
+        ).also {
+            LOGGER.info("[ECS] $it created for ${entity.name} (${entity.uniqueId})")
+        }
     }
     return koishEntity
 }

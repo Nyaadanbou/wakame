@@ -2,13 +2,9 @@
 
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityContainer
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.MultiJump
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -87,11 +83,11 @@ class MultiJumpSystem : ListenableIteratingSystem(
         }
     }
 
-    private fun playParticle(player: Player, entity: FleksEntity) {
+    private fun playParticle(player: Player, entity: EEntity) {
         // 设置粒子特效
         entity.configure {
             it += ParticleEffectComponent(
-                bukkitWorld = player.world,
+                world = player.world,
                 ParticleConfiguration(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.END_ROD)

@@ -1,12 +1,8 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability2.component.Blackhole
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
@@ -34,7 +30,7 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blackhole = entity[Blackhole]
 
@@ -48,7 +44,7 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
         val caster = entity[CastBy].entityOrPlayer()
         val blackhole = entity[Blackhole]
         val mochaEngine = entity[AbilityComponent].mochaEngine
@@ -78,7 +74,7 @@ class BlackholeSystem : IteratingSystem(
         if (tickCount % 10 == 0) {
             // 每 10 tick 生成一个粒子效果
             entity += ParticleEffectComponent(
-                bukkitWorld = targetLocation.world,
+                world = targetLocation.world,
                 ParticleConfiguration(
                     builderProvider = { loc ->
                         ParticleBuilder(Particle.DUST_COLOR_TRANSITION)
@@ -117,12 +113,12 @@ class BlackholeSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickBackswing(tickCount: Int, entity: EEntity): TickResult {
         return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickReset(tickCount: Int, entity: EEntity): TickResult {
         val blackhole = entity[Blackhole]
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null

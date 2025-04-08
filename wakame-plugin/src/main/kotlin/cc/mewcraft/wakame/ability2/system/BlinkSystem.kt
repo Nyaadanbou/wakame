@@ -2,13 +2,9 @@
 
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability2.component.Blink
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
@@ -36,7 +32,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity
 
         // 如果玩家面前方块过近, 无法传送
@@ -48,7 +44,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
         val blink = entity[Blink]
         val location = bukkitEntity.location.clone()
@@ -82,7 +78,7 @@ class BlinkSystem : IteratingSystem(
         bukkitEntity.fallDistance = 0f
 
         entity += ParticleEffectComponent(
-            bukkitWorld = target.world,
+            world = target.world,
             ParticleConfiguration(
                 builderProvider = { loc ->
                     ParticleBuilder(Particle.END_ROD)
@@ -103,7 +99,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickBackswing(tickCount: Int, entity: EEntity): TickResult {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
         val blink = entity[Blink]
         if (!blink.isTeleported) {
@@ -118,7 +114,7 @@ class BlinkSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickReset(tickCount: Int, entity: EEntity): TickResult {
         val blink = entity[Blink]
         blink.isTeleported = false
         entity -= ParticleEffectComponent

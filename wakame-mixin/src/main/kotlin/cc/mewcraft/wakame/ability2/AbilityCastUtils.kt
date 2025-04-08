@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.ability2
 
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
-import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
@@ -23,8 +22,8 @@ object AbilityCastUtils {
         caster: Entity,
         target: Entity,
     ) {
-        val caster = getKoishfiedEntity(caster)
-        val target = getKoishfiedEntity(target)
+        val caster = caster.koishify()
+        val target = target.koishify()
         AbilityEcsBridge.createEcsEntities(ability, caster, target, StatePhase.CAST_POINT)
     }
 
@@ -39,16 +38,8 @@ object AbilityCastUtils {
         target: Entity,
         slot: ItemSlot,
     ) {
-        val target = getKoishfiedEntity(target)
+        val target = target.koishify()
         AbilityEcsBridge.createEcsEntities(ability, caster.koishify(), target, StatePhase.IDLE, slot)
-    }
-
-    private fun getKoishfiedEntity(entity: Entity): KoishEntity {
-        return if (entity is Player) {
-            entity.koishify()
-        } else {
-            entity.koishify()
-        }
     }
 
 }

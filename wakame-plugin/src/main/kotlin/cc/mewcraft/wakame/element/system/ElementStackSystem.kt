@@ -63,21 +63,10 @@ class ElementStackSystem : ListenableIteratingSystem(
         val damagee = event.damagee
         val damagePackets = event.damageMetadata.damageBundle.packets()
         val causingEntity = event.damageSource.causingEntity
-
-        val target = if (damagee is Player) {
-            damagee.koishify()
-        } else {
-            damagee.koishify()
-        }
-
+        val target = damagee.koishify()
         for (damagePacket in damagePackets) {
             val element = damagePacket.element
-
-            if (damagee is Player) {
-                ElementStackManager.applyElementStack(element, 1, target)
-            } else {
-                ElementStackManager.applyElementStack(element, 1, target)
-            }
+            ElementStackManager.applyElementStack(element, 1, target)
         }
 
         if (causingEntity != null && causingEntity is Player) {

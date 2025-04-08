@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ecs.component
 
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 
-class EntityBlock(entity: FleksEntity) : EntityRef(entity), Component<EntityBlock> {
+class EntityBlock(entity: EEntity) : EntityRef(entity), Component<EntityBlock> {
 
     companion object : ComponentType<EntityBlock>()
 
