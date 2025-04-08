@@ -1,4 +1,4 @@
-@file:JvmName("PlayerExtensions")
+@file:JvmName("PlayerExt")
 
 package cc.mewcraft.wakame.entity.player
 
@@ -20,10 +20,10 @@ val Player.koishLevel: Int
     get() = PlayerLevelManager.getOrDefault(uniqueId, 1)
 
 /**
- * 玩家的攻速状态.
+ * 玩家的物品冷却.
  */
-val Player.attackCooldownContainer: AttackCooldownContainer
-    get() = koishify()[AttackCooldownContainer]
+val Player.itemCooldownContainer: ItemCooldownContainer
+    get() = koishify()[ItemCooldownContainer]
 
 /**
  * 玩家的属性容器.

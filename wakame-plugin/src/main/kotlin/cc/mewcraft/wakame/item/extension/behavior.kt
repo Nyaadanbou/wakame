@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item.extension
 
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item2.ItemDamageEventMarker
@@ -14,7 +14,7 @@ fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
     val attackSpeedLevel = itemAttackSpeed.level
     // 设置实际冷却
-    player.attackCooldownContainer.activate(this.id, attackSpeedLevel)
+    player.itemCooldownContainer.activate(this.id, attackSpeedLevel)
     // 应用视觉冷却 (即末影珍珠使用后的白色覆盖层特效)
     player.setCooldown(this.itemType, attackSpeedLevel.cooldown)
 }

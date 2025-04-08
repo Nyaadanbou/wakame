@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.element.system.InitElementStackContainer
 import cc.mewcraft.wakame.element.system.TickElementStack
 import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
-import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
+import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
 import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffects
@@ -41,7 +41,7 @@ internal object KoishFleks : Listener, Fleks {
             // ------------
 
             add(InitAbilityContainer)
-            add(InitAttackSpeedContainer)
+            add(InitItemCooldownContainer)
             add(InitAttributeContainer)
             add(InitElementStackContainer)
             add(InitKizamiContainer)

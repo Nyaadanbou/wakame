@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
@@ -46,7 +46,7 @@ class CudgelAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -68,7 +68,7 @@ class CudgelAttack(
             return
         }
 
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -82,7 +82,7 @@ class CudgelAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) return
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 

@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -38,7 +38,7 @@ class SwordAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -56,7 +56,7 @@ class SwordAttack(
     }
 
     override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 

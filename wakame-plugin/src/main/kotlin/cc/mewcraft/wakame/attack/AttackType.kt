@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
@@ -46,7 +46,7 @@ sealed interface AttackType {
      */
     fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (!player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (!player.itemCooldownContainer.isActive(nekoStack.id)) {
             // 没有左键到生物时, 也应该应用攻击冷却
             nekoStack.applyAttackCooldown(player)
         }

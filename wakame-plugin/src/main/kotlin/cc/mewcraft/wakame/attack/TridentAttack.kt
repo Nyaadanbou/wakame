@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageTag
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
@@ -42,7 +42,7 @@ class TridentAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -64,7 +64,7 @@ class TridentAttack(
             return
         }
 
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -76,12 +76,12 @@ class TridentAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (action.isLeftClick) {
-            if (!player.attackCooldownContainer.isActive(nekoStack.id)) {
+            if (!player.itemCooldownContainer.isActive(nekoStack.id)) {
                 // 没有左键到生物时, 也应该应用攻击冷却
                 nekoStack.applyAttackCooldown(player)
             }
         } else if (action.isRightClick) {
-            if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+            if (player.itemCooldownContainer.isActive(nekoStack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用三叉戟
