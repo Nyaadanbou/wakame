@@ -15,6 +15,11 @@ import kotlin.math.max
 /**
  * 封装了一名玩家的物品冷却的状态.
  *
+ * 当我们说一个冷却是“激活”状态时, 意味着玩家“无法使用”物品.
+ * 当我们说一个冷却是“未激活”状态时, 意味着玩家“可以使用”物品.
+ *
+ * 注意: 本接口并不控制玩家能否使用物品, 这部分逻辑应该由其他代码实现.
+ *
  * @see Player.itemCooldownContainer 访问该对象
  */
 sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
@@ -41,32 +46,34 @@ sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
     override fun type(): EComponentType<ItemCooldownContainer> = ItemCooldownContainer
 
     /**
-     * “激活”指定的冷却. 如果已存在将覆盖原有的冷却状态.
+     * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
      */
     fun activate(id: Identifier, ticks: Int)
 
     /**
-     * “激活”指定的冷却. 如果已存在将覆盖原有的冷却状态.
+     * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
      */
     fun activate(id: Identifier, entry: AttackSpeed)
 
     /**
-     * 查询指定的冷却是否为“激活”状态.
+     * 查询指定冷却是否为“激活”状态.
      */
     fun isActive(id: Identifier): Boolean
 
     /**
-     * 返回指定的冷却的 *未完成冷却时长* 占 *总冷却时长* 的比例.
+     * 返回指定冷却的剩余冷却时间与总冷却时间的比例 (0.0-1.0).
+     * 值为 1.0 表示冷却刚刚激活, 值为 0.0 表示冷却已成未激活.
      */
-    fun getPercent(id: Identifier): Float
+    fun getRemainingRatio(id: Identifier): Float
 
     /**
-     * 查询离冷却变为“未激活”状态的剩余时间, 单位: tick.
+     * 获取指定冷却的剩余时间, 单位: tick.
+     * 即: 离冷却变为“未激活”状态的剩余时间.
      */
     fun getRemainingTicks(id: Identifier): Int
 
     /**
-     * 重置指定冷却的状态, 使其变为“未激活”.
+     * 重置指定冷却的状态, 使其直接变为“未激活”.
      */
     fun reset(id: Identifier)
 }
@@ -96,10 +103,10 @@ private class MinecraftItemCooldownContainer(
     }
 
     override fun isActive(id: Identifier): Boolean {
-        return getPercent(id) > 0f
+        return getRemainingRatio(id) > 0f
     }
 
-    override fun getPercent(id: Identifier): Float {
+    override fun getRemainingRatio(id: Identifier): Float {
         val resLoc = PaperAdventure.asVanilla(id)
         val cooldownMap = delegate
         val cooldownInst = cooldownMap.cooldowns[resLoc]
@@ -152,7 +159,7 @@ private class StandaloneItemCooldownContainer : ItemCooldownContainer {
         return inactiveTimestamps.getInt(key) > Bukkit.getServer().currentTick
     }
 
-    override fun getPercent(id: Identifier): Float {
+    override fun getRemainingRatio(id: Identifier): Float {
         val remainingTicks = getRemainingTicks(id)
         val totalCooldown = inactiveTimestamps.getInt(id) - Bukkit.getServer().currentTick + remainingTicks
         return if (totalCooldown <= 0) 0f else remainingTicks.toFloat() / totalCooldown

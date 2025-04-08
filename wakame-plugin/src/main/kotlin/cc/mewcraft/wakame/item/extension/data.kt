@@ -64,7 +64,7 @@ fun NekoStack.isOnCooldown(player: Player): Boolean {
  * 获取物品 **未完成冷却时长** 占 **总冷却时长** 的比例.
  */
 fun NekoStack.getCooldownPercent(player: Player): Float {
-    return player.itemCooldownContainer.getPercent(id)
+    return player.itemCooldownContainer.getRemainingRatio(id)
 }
 
 /**
