@@ -4,12 +4,12 @@ import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import org.bukkit.entity.Player
 import team.unnamed.mocha.MochaEngine
 
 object AbilityEcsBridge {
@@ -70,7 +70,7 @@ object AbilityEcsBridge {
         }
     }
 
-    fun getPlayerAllSingleAbilities(bukkitPlayer: BukkitPlayer): List<AbilityInfo> {
-        return bukkitPlayer.koishify()[AbilityContainer].convertToSingleAbilityList()
+    fun getPlayerAllSingleAbilities(player: Player): List<AbilityInfo> {
+        return player.koishify()[AbilityContainer].convertToSingleAbilityList()
     }
 }

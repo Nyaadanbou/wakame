@@ -12,7 +12,7 @@ class ParticleSystem : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]
-        for (particleInfo in particleEffectComponent.particleConfigurations) {
+        for (particleInfo in particleEffectComponent.configs) {
             val builderProvider = particleInfo.builderProvider
             val particlePath = particleInfo.particlePath
             val particleAmount = particleInfo.amount
@@ -33,7 +33,7 @@ class ParticleSystem : IteratingSystem(
                 val position = particlePath.positionAtProgress(progress)
 
                 // 使用 ParticleBuilder 生成粒子效果
-                builderProvider.invoke(position.toLocation(particleEffectComponent.bukkitWorld)).spawn()
+                builderProvider.invoke(position.toLocation(particleEffectComponent.world)).spawn()
             }
 
             // 触发成功生成粒子效果后，减少剩余次数

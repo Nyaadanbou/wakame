@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ecs
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.component.AbilityContainer
 import cc.mewcraft.wakame.ability2.system.*
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
@@ -122,14 +122,14 @@ internal object KoishFleks : Listener, Fleks {
     }
 
     /**
-     * 创建一个 [cc.mewcraft.wakame.ecs.bridge.FleksEntity].
+     * 创建一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
      */
-    override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): FleksEntity = world.entity {
+    override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): EEntity = world.entity {
         configuration.invoke(this, it)
     }
 
     /**
-     * 修改一个 [cc.mewcraft.wakame.ecs.bridge.FleksEntity].
+     * 修改一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
      */
     override fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) = with(world) {
         if (!contains(entity)) error("Trying to edit entity ($entity) that does not exist in the world")

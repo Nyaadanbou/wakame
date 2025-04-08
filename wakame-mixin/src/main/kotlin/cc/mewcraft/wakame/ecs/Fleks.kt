@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityCreateContext
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -22,7 +22,7 @@ interface Fleks {
 
     val world: World
 
-    fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit = {}): FleksEntity
+    fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit = {}): EEntity
 
     fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit)
 }

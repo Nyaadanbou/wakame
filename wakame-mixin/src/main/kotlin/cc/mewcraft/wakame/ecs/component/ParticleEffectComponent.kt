@@ -2,23 +2,23 @@
 
 package cc.mewcraft.wakame.ecs.component
 
-import cc.mewcraft.wakame.ecs.bridge.BukkitWorld
+import cc.mewcraft.wakame.ecs.bridge.EComponent
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
-import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+import org.bukkit.World
 
 /**
- * 在指定的 [BukkitWorld] 上显示粒子效果.
+ * 在指定的 [World] 上显示粒子效果.
  *
  * @see cc.mewcraft.wakame.ecs.system.ParticleSystem
  */
 data class ParticleEffectComponent(
-    var bukkitWorld: BukkitWorld,
-    val particleConfigurations: MutableList<ParticleConfiguration>,
-) : Component<ParticleEffectComponent> {
-    companion object : ComponentType<ParticleEffectComponent>()
+    var world: World,
+    val configs: MutableList<ParticleConfiguration>,
+) : EComponent<ParticleEffectComponent> {
+    constructor(world: World, vararg particleConfigurations: ParticleConfiguration) : this(world, particleConfigurations.toMutableList())
 
-    constructor(bukkitWorld: BukkitWorld, vararg particleConfigurations: ParticleConfiguration) : this(bukkitWorld, particleConfigurations.toMutableList())
+    companion object : EComponentType<ParticleEffectComponent>()
 
-    override fun type(): ComponentType<ParticleEffectComponent> = ParticleEffectComponent
+    override fun type(): EComponentType<ParticleEffectComponent> = ParticleEffectComponent
 }

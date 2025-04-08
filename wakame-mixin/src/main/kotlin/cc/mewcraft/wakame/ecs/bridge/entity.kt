@@ -32,10 +32,11 @@ fun Entity.koishify(): KoishEntity {
                 it += BukkitEntity(entity)
                 if (entity is Player) {
                     it += BukkitPlayer(entity)
-                    LOGGER.info("[ECS] Entity created for ${entity.name}")
                 }
             }
-        )
+        ).also {
+            LOGGER.info("[ECS] $it created for ${entity.name} (${entity.uniqueId})")
+        }
     }
     return koishEntity
 }

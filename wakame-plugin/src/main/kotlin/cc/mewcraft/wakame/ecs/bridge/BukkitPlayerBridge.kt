@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
 /**
- * 负责管理 [BukkitPlayer] 对应的 [FleksEntity] 的生命周期
+ * 负责管理 [org.bukkit.entity.Player] 对应的 [EEntity] 的生命周期
  */
 @Init(stage = InitStage.POST_WORLD)
 object BukkitPlayerBridge : Listener {
@@ -26,14 +26,14 @@ object BukkitPlayerBridge : Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     fun onPlayerJoin(event: PlayerJoinEvent) {
         event.player.koishify()
-        LOGGER.info("[ECS] Entity created for ${event.player.name}")
     }
 
     // 在玩家退出服务器时, 移除他对应的 ECS Entity
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onPlayerQuit(event: PlayerQuitEvent) {
-        event.player.koishify().remove()
-        LOGGER.info("[ECS] Entity removed for ${event.player.name}")
+        val player = event.player
+        val koishify = player.koishify().apply { remove() }
+        LOGGER.info("[ECS] $koishify removed for ${player.name} (${player.uniqueId})")
     }
 
 }

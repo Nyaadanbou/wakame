@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.ability2.system
 import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import com.github.quillraven.fleks.EntityUpdateContext
 
@@ -13,7 +13,7 @@ interface ActiveAbilitySystem {
      * 一般不会在技能中直接进行 [StatePhase.IDLE] 的转换.
      */
     context(EntityUpdateContext)
-    fun tickIdle(tickCount: Int, entity: FleksEntity): TickResult {
+    fun tickIdle(tickCount: Int, entity: EEntity): TickResult {
         // 默认将技能标记为准备移除.
         entity[AbilityComponent].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
@@ -23,32 +23,32 @@ interface ActiveAbilitySystem {
      * 执行此技能施法前摇逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult =
+    fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult =
         TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的施法时逻辑.
      */
     context(EntityUpdateContext)
-    fun tickCast(tickCount: Int, entity: FleksEntity): TickResult =
+    fun tickCast(tickCount: Int, entity: EEntity): TickResult =
         TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
-    fun tickBackswing(tickCount: Int, entity: FleksEntity): TickResult =
+    fun tickBackswing(tickCount: Int, entity: EEntity): TickResult =
         TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
-    fun tickReset(tickCount: Int, entity: FleksEntity): TickResult =
+    fun tickReset(tickCount: Int, entity: EEntity): TickResult =
         TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
 
     context(EntityUpdateContext)
-    fun tick(tickCount: Int, entity: FleksEntity): TickResult {
+    fun tick(tickCount: Int, entity: EEntity): TickResult {
         try {
             val state = entity[AbilityComponent]
             var tickResult = TickResult.CONTINUE_TICK

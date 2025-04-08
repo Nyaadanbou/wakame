@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.bridge.BukkitComponent
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
@@ -16,6 +16,7 @@ import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.FamilyOnRemove
 import com.github.quillraven.fleks.IteratingSystem
 import net.kyori.adventure.bossbar.BossBar
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
@@ -26,16 +27,16 @@ class EntityInfoBossBar : IteratingSystem(
     family = Families.BUKKIT_ENTITY
 ), FamilyOnAdd, FamilyOnRemove {
 
-    override fun onTickEntity(entity: Entity) {
-        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return
-        val bossBar = entity[EntityInfoBossBarComponent].bossBar
+    override fun onTickEntity(eentity: EEntity) {
+        val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return
+        val bossBar = eentity[EntityInfoBossBarComponent].bossBar
 
-        val progress = getEntityHealthProgress(entity)
-        val bossBarName = bukkitEntity.name()
+        val progress = getEntityHealthProgress(eentity)
+        val bossBarName = entity.name()
             .appendSpace()
-            .append(getEntityHealthCompoment(entity))
+            .append(getEntityHealthComponent(eentity))
             .appendSpace()
-            .append(getElementStackComponent(entity))
+            .append(getElementStackComponent(eentity))
 
         when {
             progress < 0.25f -> {
@@ -58,45 +59,45 @@ class EntityInfoBossBar : IteratingSystem(
         bossBar.name(bossBarName)
     }
 
-    private fun getEntityHealthProgress(entity: Entity): Float {
-        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return 0f
-        val entityMaxHealth = getMaxHealth(entity) ?: return 0f
-        val progress = bukkitEntity.health / entityMaxHealth
+    private fun getEntityHealthProgress(eentity: EEntity): Float {
+        val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return 0f
+        val entityMaxHealth = getMaxHealth(eentity) ?: return 0f
+        val progress = entity.health / entityMaxHealth
         return progress.toStableFloat()
     }
 
-    private fun getEntityHealthCompoment(entity: Entity): BukkitComponent {
-        val bukkitEntity = entity[BukkitEntity].unwrap() as? LivingEntity ?: return BukkitComponent.empty()
-        val entityMaxHealth = getMaxHealth(entity) ?: return BukkitComponent.empty()
-        return BukkitComponent.text()
+    private fun getEntityHealthComponent(eentity: EEntity): Component {
+        val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return Component.empty()
+        val entityMaxHealth = getMaxHealth(eentity) ?: return Component.empty()
+        return Component.text()
             .append(
-                BukkitComponent.text()
-                    .content("${bukkitEntity.health.toInt()}")
+                Component.text()
+                    .content("${entity.health.toInt()}")
                     .color(TextColor.color(0xFFC0CB))
             )
             .append(
-                BukkitComponent.text()
+                Component.text()
                     .content("/")
                     .color(NamedTextColor.GRAY)
             )
             .append(
-                BukkitComponent.text()
+                Component.text()
                     .content("${entityMaxHealth.toInt()}")
                     .color(TextColor.color(0xFFF1CB))
             )
             .build()
     }
 
-    private fun getElementStackComponent(entity: Entity): BukkitComponent {
-        val container = entity.getOrNull(ElementStackContainer)?.elementStacks() ?: return BukkitComponent.empty()
-        val elementStackMessage = BukkitComponent.text()
+    private fun getElementStackComponent(eentity: EEntity): Component {
+        val container = eentity.getOrNull(ElementStackContainer)?.elementStacks() ?: return Component.empty()
+        val elementStackMessage = Component.text()
 
         for ((elementEntry, entity) in container) {
             val element = elementEntry.unwrap()
             val stack = entity[ElementStackComponent]
 
             elementStackMessage.append(
-                BukkitComponent.text()
+                Component.text()
                     .content("${stack.amount} ")
                     .append(element.displayName)
                     .style(Style.style(*element.displayStyles))
@@ -106,20 +107,21 @@ class EntityInfoBossBar : IteratingSystem(
         return elementStackMessage.build()
     }
 
-    private fun getMaxHealth(entity: Entity): Double? {
-        val attributeContainer = entity[AttributeMap]
+    private fun getMaxHealth(eentity: EEntity): Double? {
+        val attributeContainer = eentity[AttributeMap]
         return attributeContainer.getInstance(Attributes.MAX_HEALTH)?.getValue()
     }
 
-    override fun onAddEntity(entity: Entity) {
-        entity[BukkitEntity].unwrap() as? LivingEntity ?: return
-        entity.configure {
+    override fun onAddEntity(eentity: Entity) {
+        eentity[BukkitEntity].unwrap() as? LivingEntity ?: return
+        eentity.configure {
             it += EntityInfoBossBarComponent()
         }
     }
 
-    override fun onRemoveEntity(entity: Entity) {
-        val bossBar = entity[EntityInfoBossBarComponent].bossBar
+    override fun onRemoveEntity(eentity: EEntity) {
+        // FIXME #375: Caused by: cc.mewcraft.wakame.shaded.fleks.FleksNoSuchEntityComponentException: Entity 'Entity(id=0, version=0)' has no component of type 'BossBarVisible'.
+        val bossBar = eentity[EntityInfoBossBarComponent].bossBar
         for (viewer in bossBar.viewers()) {
             (viewer as Player).koishify()[BossBarVisible].bossBar2DurationTick[bossBar] = 0
         }

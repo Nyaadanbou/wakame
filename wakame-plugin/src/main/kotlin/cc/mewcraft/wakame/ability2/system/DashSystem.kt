@@ -2,12 +2,8 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.Dash
-import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ecs.bridge.FleksEntity
+import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -36,12 +32,12 @@ class DashSystem : IteratingSystem(
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
         return TickResult.ADVANCE_TO_NEXT_STATE
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: FleksEntity): TickResult {
+    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
         val dash = entity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
@@ -87,7 +83,7 @@ class DashSystem : IteratingSystem(
         return TickResult.CONTINUE_TICK
     }
 
-    private fun affectEntityNearby(casterEntity: BukkitEntity, entity: FleksEntity): Boolean {
+    private fun affectEntityNearby(casterEntity: BukkitEntity, entity: EEntity): Boolean {
         val dash = entity[Dash]
         val bukkitEntities = casterEntity.getNearbyEntities(2.0, 1.0, 2.0)
         if (bukkitEntities.isEmpty()) {
