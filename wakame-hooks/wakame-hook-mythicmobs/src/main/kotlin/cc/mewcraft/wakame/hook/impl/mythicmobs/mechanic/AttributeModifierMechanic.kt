@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.*
+import cc.mewcraft.wakame.entity.attribute.*
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.*
@@ -26,7 +26,7 @@ class AttributeModifierMechanic(
     }
 
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.instance().get(parsed) }
+        ?.let { parsed -> AttributeProvider.INSTANCE.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
     private val name: PlaceholderString = mlc.getPlaceholderString(arrayOf("name"), null, *emptyArray())
         ?: throw IllegalArgumentException("Invalid attribute modifier name from line: $line")

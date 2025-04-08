@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.user.toUser
 import net.kyori.adventure.extra.kotlin.text
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack
 
 interface LevelBarrier : ItemBehavior {
     private object Default : LevelBarrier {
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
             tryCancelEvent(itemStack, koishStack, player, event)
         }
 
@@ -55,7 +55,7 @@ interface LevelBarrier : ItemBehavior {
 
         private fun tryCancelEvent(itemStack: ItemStack, koishStack: NekoStack, player: Player, e: Cancellable) {
             val itemLevel = koishStack.level
-            val playerLevel = player.toUser().level
+            val playerLevel = player.koishLevel
             if (itemLevel > playerLevel) {
                 player.sendMessage(text { content("你的冒险等级不足以使用这个物品") })
                 e.isCancelled = true

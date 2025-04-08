@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import java.lang.reflect.Type
 import kotlin.reflect.typeOf
 
-object PriceModifierSerializer : TypeSerializer<PriceModifier> {
+object PriceModifierSerializer : TypeSerializer2<PriceModifier> {
     private val TYPE_MAPPINGS = mapOf(
         DamagePriceModifier.NAME to typeOf<DamagePriceModifier>(),
         LevelPriceModifier.NAME to typeOf<LevelPriceModifier>(),

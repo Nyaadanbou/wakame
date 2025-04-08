@@ -1,44 +1,15 @@
 package cc.mewcraft.wakame.item.extension
 
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.ItemCells
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemKizamiz
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.rarity.RarityType
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.item.components.*
+import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.util.item.customName
-import cc.mewcraft.wakame.util.item.damage
-import cc.mewcraft.wakame.util.item.fastLore
-import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
-import cc.mewcraft.wakame.util.item.hideAll
-import cc.mewcraft.wakame.util.item.hideAttributeModifiers
-import cc.mewcraft.wakame.util.item.hideCanBreak
-import cc.mewcraft.wakame.util.item.hideCanPlaceOn
-import cc.mewcraft.wakame.util.item.hideDyedColor
-import cc.mewcraft.wakame.util.item.hideEnchantments
-import cc.mewcraft.wakame.util.item.hideJukeboxPlayable
-import cc.mewcraft.wakame.util.item.hideStoredEnchantments
-import cc.mewcraft.wakame.util.item.hideTrim
-import cc.mewcraft.wakame.util.item.hideUnbreakable
-import cc.mewcraft.wakame.util.item.isDamageable
-import cc.mewcraft.wakame.util.item.isDamaged
-import cc.mewcraft.wakame.util.item.itemName
-import cc.mewcraft.wakame.util.item.itemNameOrType
-import cc.mewcraft.wakame.util.item.maxDamage
-import cc.mewcraft.wakame.util.item.removeNBT
-import cc.mewcraft.wakame.util.item.setNBT
-import cc.mewcraft.wakame.util.item.shouldBreak
-import cc.mewcraft.wakame.util.item.toHoverableComponent
-import cc.mewcraft.wakame.util.item.willBreakNextUse
+import cc.mewcraft.wakame.util.item.*
 import io.papermc.paper.datacomponent.DataComponentBuilder
 import io.papermc.paper.datacomponent.DataComponentType
 import net.kyori.adventure.text.Component
@@ -108,9 +79,9 @@ fun NekoStack.hideUnbreakable() = this.bukkitStack.hideUnbreakable()
 // 用于快速访问 Koish 物品数据的扩展函数
 
 var NekoStack.level: Int by mapped(ItemComponentTypes.LEVEL, ItemLevel::minimumLevel, ::ItemLevel, ItemLevel::level)
-var NekoStack.rarity: RegistryEntry<RarityType> by mapped(ItemComponentTypes.RARITY, KoishRegistries.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
-var NekoStack.elements: Set<RegistryEntry<ElementType>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
-var NekoStack.kizamiz: Set<RegistryEntry<KizamiType>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
+var NekoStack.rarity: RegistryEntry<Rarity> by mapped(ItemComponentTypes.RARITY, BuiltInRegistries.RARITY::getDefaultEntry, ::ItemRarity, ItemRarity::rarity)
+var NekoStack.elements: Set<RegistryEntry<Element>> by mapped(ItemComponentTypes.ELEMENTS, ::emptySet, ::ItemElements, ItemElements::elements)
+var NekoStack.kizamiz: Set<RegistryEntry<Kizami>> by mapped(ItemComponentTypes.KIZAMIZ, ::emptySet, ::ItemKizamiz, ItemKizamiz::kizamiz)
 var NekoStack.reforgeHistory: ReforgeHistory by direct(ItemComponentTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)
 var NekoStack.cells: ItemCells? by direct(ItemComponentTypes.CELLS)
 var NekoStack.portableCore: PortableCore? by direct(ItemComponentTypes.PORTABLE_CORE)

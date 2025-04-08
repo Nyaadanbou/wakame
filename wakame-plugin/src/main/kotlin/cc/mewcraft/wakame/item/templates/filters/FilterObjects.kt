@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.item.template.AttributeContextData
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.filters.FilterSerializer.NAMESPACE_FILTER
 import cc.mewcraft.wakame.random3.Filter
 import cc.mewcraft.wakame.random3.Mark
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.toStableInt
@@ -26,13 +26,13 @@ import kotlin.random.Random
  * @property operation the operation of the attribute to check with
  * @property element the element of the attribute to check with
  *
- * @see cc.mewcraft.wakame.attribute.Attribute
+ * @see cc.mewcraft.wakame.entity.attribute.Attribute
  */
 data class AttributeFilter(
     override val invert: Boolean,
     private val id: String,
     private val operation: Operation?,
-    private val element: RegistryEntry<ElementType>?,
+    private val element: RegistryEntry<Element>?,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "attribute")
@@ -79,7 +79,7 @@ data class AttributeFilter(
  */
 data class ElementFilter(
     override val invert: Boolean,
-    private val element: RegistryEntry<ElementType>,
+    private val element: RegistryEntry<Element>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "element")
@@ -193,7 +193,7 @@ data class MarkFilter(
  */
 data class RarityFilter(
     override val invert: Boolean,
-    private val rarity: RegistryEntry<RarityType>,
+    private val rarity: RegistryEntry<Rarity>,
 ) : Filter<ItemGenerationContext>, Examinable {
     companion object {
         val TYPE = Key.key(NAMESPACE_FILTER, "rarity")

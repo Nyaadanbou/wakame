@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.ItemParser
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,7 +49,7 @@ internal object ItemCommand : KoishCommandFactory<Source> {
         val itemStackMap = recipients.associateWith { player ->
             buildList(amount) {
                 repeat(amount) {
-                    add(item.realize(player.toUser()).bukkitStack)
+                    add(item.realize(player).bukkitStack)
                 }
             }
         }.mapValues { (_, items) ->

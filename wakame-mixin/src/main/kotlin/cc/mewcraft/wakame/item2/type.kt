@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.util.Identifier
@@ -34,7 +35,7 @@ import java.util.stream.Stream
 /**
  * 代表一个物品类型(由配置文件创建).
  *
- * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM 包含本类型实例的注册表
+ * @see cc.mewcraft.wakame.registry2.BuiltInRegistries.ITEM 包含本类型实例的注册表
  */
 open class KoishItem(
     val id: Identifier,
@@ -43,13 +44,21 @@ open class KoishItem(
     val behaviors: ItemBehaviorContainer,
 ) : Examinable {
 
-    /**
-     * 该物品类型的名字, 可用于展示给玩家.
-     *
-     * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
-     */
-    val name: Component
-        get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+    companion object {
+
+        ///**
+        // * 代表一个不存在的 [KoishItem].
+        // */
+        //@JvmField
+        //internal val EMPTY: KoishItem = KoishItem(Identifiers.of("__empty__"), ItemMetaContainer.EMPTY, ItemPropertyContainer.EMPTY, ItemBehaviorContainer.EMPTY)
+        //
+        ///**
+        // * 代表一个不存在的 [KoishItem].
+        // */
+        //@JvmField
+        //internal val EMPTY_ENTRY: RegistryEntry<KoishItem> = KoishRegistries2.ITEM.add("__empty__", EMPTY)
+
+    }
 
     override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
         ExaminableProperty.of("id", id),
@@ -60,12 +69,23 @@ open class KoishItem(
 }
 
 /**
+ * 该物品类型的名字, 可用于展示给玩家.
+ *
+ * 该物品类型的配置文件必须指定了 [ItemPropertyTypes.NAME], 否则将使用物品 ID 作为返回值.
+ */
+val KoishItem.name: Component get() = properties.getOrDefault(ItemPropertyTypes.NAME, Component.text(id.asString()))
+//val KoishItem.isEmpty: Boolean get() = this === KoishItem.EMPTY
+fun <T> KoishItem.hasProperty(type: ItemPropertyType<T>): Boolean = properties.has(type)
+fun <T> KoishItem.getProperty(type: ItemPropertyType<out T>): T? = properties[type]
+fun <T> KoishItem.getPropertyOrDefault(type: ItemPropertyType<T>, default: T): T = properties.getOrDefault(type, default)
+
+/**
  * 表示一个套皮物品(由配置文件创建).
  *
  * 一个套皮物品需要一个最基本的物品类型 (即 [KoishItem], 这也是为什么这个类继承自 [KoishItem])
  * 以及在一开始就确定好的自定义数据 (即 [ItemDataContainer], 对应这个类的 [data] 字段).
  *
- * @see cc.mewcraft.wakame.registry2.KoishRegistries2.ITEM_PROXY 包含本类型实例的注册表
+ * @see cc.mewcraft.wakame.registry2.BuiltInRegistries.ITEM_PROXY 包含本类型实例的注册表
  */
 class KoishItemProxy(
     id: Identifier,

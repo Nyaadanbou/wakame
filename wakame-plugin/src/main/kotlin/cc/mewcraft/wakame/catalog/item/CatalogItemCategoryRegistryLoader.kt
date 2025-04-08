@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.util.*
@@ -20,14 +20,14 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
 
     @InitFun
     fun init() {
-        KoishRegistries.ITEM_CATEGORY.resetRegistry()
-        applyDataToRegistry(KoishRegistries.ITEM_CATEGORY::add)
-        KoishRegistries.ITEM_CATEGORY.freeze()
+        DynamicRegistries.ITEM_CATEGORY.resetRegistry()
+        applyDataToRegistry(DynamicRegistries.ITEM_CATEGORY::add)
+        DynamicRegistries.ITEM_CATEGORY.freeze()
     }
 
     @ReloadFun
     fun reload() {
-        applyDataToRegistry(KoishRegistries.ITEM_CATEGORY::update)
+        applyDataToRegistry(DynamicRegistries.ITEM_CATEGORY::update)
     }
 
     private fun applyDataToRegistry(registryAction: (Identifier, CatalogItemCategory) -> Unit) {
@@ -35,7 +35,7 @@ internal object CatalogItemCategoryRegistryLoader : RegistryLoader {
         for (file in dir.walk().filter { it.extension == "yml" }) {
             try {
                 val id = Identifiers.of(file.nameWithoutExtension)
-                val loader = buildYamlConfigLoader {
+                val loader = yamlLoader {
                     withDefaults()
                     serializers {
                         register<CatalogItemCategory>(CategorySerializer)

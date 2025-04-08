@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.*
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import java.io.File
 
 internal object MergingTableSerializer {
@@ -51,7 +51,7 @@ internal object MergingTableSerializer {
         require(tableDir.isDirectory) { "Not a directory: '$tableDir'" }
 
         val tableMainConfigFile = tableDir.resolve("config.yml")
-        val tableMainConfigNode = buildYamlConfigLoader {
+        val tableMainConfigNode = yamlLoader {
             withDefaults()
             serializers {
                 register<CoreMatchRule>(CoreMatchRuleSerializer)

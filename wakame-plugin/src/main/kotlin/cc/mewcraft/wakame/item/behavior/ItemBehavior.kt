@@ -1,10 +1,9 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -57,7 +56,7 @@ interface ItemBehavior : ItemBehaviorHolder {
 
     fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
     fun handleInteractAtEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
-    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) = Unit
     fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
     fun handleItemProjectileHit(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
     fun handleBreakBlock(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: BlockBreakEvent) = Unit
@@ -69,7 +68,6 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleInventoryHotbarSwap(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: InventoryClickEvent) = Unit
     fun handleRelease(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerStopUsingItemEvent) = Unit
     fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) = Unit
-    fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerAbilityPrepareCastEvent) = Unit
 }
 
 interface ItemBehaviorType<T : ItemBehavior> : ItemBehaviorHolder {

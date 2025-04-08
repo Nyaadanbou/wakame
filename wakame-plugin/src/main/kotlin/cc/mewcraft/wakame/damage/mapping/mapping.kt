@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.damage.mapping
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
 import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DamageMetadataBuilder
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import org.spongepowered.configurate.objectmapping.meta.Required
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import java.lang.reflect.Type
 
@@ -28,7 +28,7 @@ internal interface DamageMapper {
  */
 @ConfigSerializable
 internal data class DamageTypeMapper(
-    @Setting("damage_metadata")
+    @Required @Setting("damage_metadata")
     val builder: DamageMetadataBuilder<*>,
 ) : DamageMapper {
     override fun generate(context: DamageContext): DamageMetadata {
@@ -65,7 +65,7 @@ internal data class DamagePredicateMapper(
 
     //
 
-    private object Serializer : TypeSerializer<DamagePredicateMapper> {
+    private object Serializer : TypeSerializer2<DamagePredicateMapper> {
 
         override fun deserialize(type: Type, node: ConfigurationNode): DamagePredicateMapper {
             val tests = node.node("predicates").childrenMap().values.map { it.require<DamagePredicate>() }

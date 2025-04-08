@@ -1,5 +1,8 @@
+@file:JvmName("IdentifierUtils")
+
 package cc.mewcraft.wakame.util
 
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import net.kyori.adventure.key.InvalidKeyException
@@ -23,7 +26,7 @@ typealias Identifiers = IdentifierTools
 object IdentifierTools {
 
     @JvmField
-    val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::toString)
+    val CODEC: Codec<Identifier> = Codec.STRING.comapFlatMap(Identifiers::validate, Identifier::asMinimalStringKoish)
 
     /**
      * 从形如 `player`, `foo:player` 的字符串创建一个 [Identifier].

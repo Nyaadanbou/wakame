@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.AttributeProvider
 import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ITargetedEntitySkill
@@ -38,7 +38,7 @@ class NekoPercentDamageMechanic(
 
     private fun parseDamageBundle(origin: List<String>): (SkillMetadata, AbstractEntity) -> DamageBundle {
         return { data, target ->
-            DamageBundleFactory.createUnsafe(
+            DamageBundleFactory.INSTANCE.createUnsafe(
                 origin.associate { rawPacketString ->
                     val split = DAMAGE_BUNDLE_PATTERN.find(rawPacketString)
                         ?.value // 提取括号内的内容 (包括括号)
@@ -72,7 +72,7 @@ class NekoPercentDamageMechanic(
             val damage = if (this@NekoPercentDamageMechanic.currentHealth) {
                 target.health * percent
             } else {
-                val maxHealthAttribute = requireNotNull(AttributeProvider.instance().get("max_health")) { "Max health attribute is Null!" }
+                val maxHealthAttribute = requireNotNull(Attributes.MAX_HEALTH) { "\"max_health\" attribute is null!" }
                 val maxHealth = AttributeMapAccess.INSTANCE.get(target.bukkitEntity).getOrNull()?.getValue(maxHealthAttribute) ?: .0
                 maxHealth * percent
             }
@@ -86,9 +86,9 @@ class NekoPercentDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.INSTANCE.create()
+            return DamageTags()
         }
-        return DamageTagsFactory.INSTANCE.create(origin.map { DamageTag.valueOf(it) })
+        return DamageTags(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {

@@ -1,5 +1,4 @@
 version: 1
-binary_index: 1
-display_name: "Uncommon"
+name: "Uncommon"
 styles: "<white>"
-glow_color: GREEN
+color: GREEN

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.command.parser
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
 import org.incendo.cloud.component.CommandComponent

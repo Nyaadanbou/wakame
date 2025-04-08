@@ -3,13 +3,17 @@ package cc.mewcraft.wakame.ecs
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.component.AbilityContainer
 import cc.mewcraft.wakame.ability2.system.*
-import cc.mewcraft.wakame.ecs.KoishFleks.world
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
 import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
 import cc.mewcraft.wakame.enchantment2.system.*
-import cc.mewcraft.wakame.item.logic.ItemSlotChangeMonitor
+import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
+import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
+import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
+import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffect
+import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffect
+import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -29,31 +33,42 @@ internal object KoishFleks : Listener, Fleks {
 
             Families.bootstrap()
 
+            // TODO #373: 把这两个 onAdd 移到各自的 system#onAddEntity 里面去
             onAdd(Families.BUKKIT_PLAYER) { entity ->
                 entity.configure {
                     it += AbilityContainer()
                     it += ElementStackContainer()
                 }
             }
-
             onAdd(Families.BUKKIT_ENTITY) { entity ->
                 entity.configure {
                     it += AbilityContainer()
                     it += ElementStackContainer()
                 }
             }
+
         }
 
         systems {
             add(BukkitEntityBridge()) // 移除无效 bukkit entity 所映射的 ecs entity
             add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
-            add(ItemSlotChangeMonitor()) // 监听背包物品变化
 
             // ------------
             // 属性
             // ------------
 
-            add(AttributeMapSystem())
+            add(InitAttackSpeedContainer)
+            add(InitAttributeContainer)
+            add(InitKizamiContainer)
+            add(InitPlayerCombo)
+
+            // ------------
+            // 物品
+            // ------------
+
+            add(ItemSlotChangeMonitor2()) // 监听背包物品变化
+            add(ApplyAttributeEffect)
+            add(ApplyKizamiEffect)
 
             // -------------
             // 带“移除”的系统 ???
@@ -109,20 +124,17 @@ internal object KoishFleks : Listener, Fleks {
     /**
      * 创建一个 [cc.mewcraft.wakame.ecs.bridge.FleksEntity].
      */
-    override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): FleksEntity =
-        world.entity {
-            configuration.invoke(this, it)
-        }
+    override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): FleksEntity = world.entity {
+        configuration.invoke(this, it)
+    }
 
     /**
      * 修改一个 [cc.mewcraft.wakame.ecs.bridge.FleksEntity].
      */
-    override fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) =
-        with(world) {
-            if (!contains(entity))
-                error("Trying to edit entity ($entity) that does not exist in the world")
-            entity.configure(configuration)
-        }
+    override fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) = with(world) {
+        if (!contains(entity)) error("Trying to edit entity ($entity) that does not exist in the world")
+        entity.configure(configuration)
+    }
 
     @InitFun
     fun init() {
@@ -135,10 +147,17 @@ internal object KoishFleks : Listener, Fleks {
         world.dispose()
     }
 
-    /**
-     * 更新一次 [world].
-     */
-    private fun tick() {
+    @EventHandler
+    fun on(event: ServerTickStartEvent) {
+        // 开发日记 24/12/14
+        // 关于实现 Blink 技能时遇到的问题: 如果在这里使用 ServerTickEndEvent,
+        // 那么在 tick 函数内调用 Player#setVelocity 后玩家的加速度会被服务端的内部逻辑覆盖, 导致玩家会在瞬移到空中后自由落体.
+        // 解决方法: 在这里使用 ServerTickStartEvent, 让服务端内部的逻辑在 tick 函数返回之后执行.
+
+        //
+        // 更新一次世界
+        //
+
         try {
             // 我们是纯服务端开发, 因此 Fleks world 的更新频率应该和服务端 tick 的保持一致.
             // 这里将 world 的 deltaTime 始终设置为 1f 以忽略其“客户端方面”的作用(如动画).
@@ -151,15 +170,6 @@ internal object KoishFleks : Listener, Fleks {
         } catch (e: Exception) {
             LOGGER.error("在 ECS 更新时发生错误", e)
         }
-    }
-
-    @EventHandler
-    private fun onServerTickStart(event: ServerTickStartEvent) {
-        // 开发日记 24/12/14
-        // 关于实现 Blink 技能时遇到的问题: 如果在这里使用 ServerTickEndEvent,
-        // 那么在 tick 函数内调用 Player#setVelocity 后玩家的加速度会被服务端的内部逻辑覆盖, 导致玩家会在瞬移到空中后自由落体.
-        // 解决方法: 在这里使用 ServerTickStartEvent, 让服务端内部的逻辑在 tick 函数返回之后执行.
-        tick()
     }
 
 }

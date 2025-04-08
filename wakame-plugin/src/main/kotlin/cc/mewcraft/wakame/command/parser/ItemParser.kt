@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -50,7 +50,7 @@ class ItemParser<C : Any> : AggregateParser<C, NekoItem> {
             }
 
             val path = aggregateCommandContext.get<String>("path")
-            val item = KoishRegistries.ITEM["$namespace:$path"]
+            val item = DynamicRegistries.ITEM["$namespace:$path"]
             if (item == null) {
                 return@agg ArgumentParseResult.failureFuture(ItemParseException(commandContext))
             } else {

@@ -9,6 +9,7 @@ version = "0.0.1"
 dependencies {
     // internal
     compileOnly(project(":wakame-plugin"))
+    compileOnly(project(":wakame-mixin"))
     compileOnly(local.fleks) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")

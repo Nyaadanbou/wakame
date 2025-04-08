@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.random3
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.javaTypeOf
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
@@ -101,7 +101,7 @@ abstract class NodeFacade<T> {
             throw IllegalArgumentException("'dataDir' must be a relative path to the plugin data directory")
         }
 
-        val loadBuilder = buildYamlConfigLoader {
+        val loadBuilder = yamlLoader {
             withDefaults()
             serializers { registerAll(serializers) }
         }

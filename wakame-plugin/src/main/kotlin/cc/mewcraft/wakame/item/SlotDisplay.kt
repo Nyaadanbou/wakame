@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item.extension.hideAll
 import cc.mewcraft.wakame.item.extension.removeNbt
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
@@ -51,13 +51,13 @@ private constructor(
          * @return 一个 [SlotDisplay]
          */
         fun get(id: Identifier): SlotDisplay {
-            if (!KoishRegistries.ITEM.containsId(id)) {
+            if (!DynamicRegistries.ITEM.containsId(id)) {
                 LOGGER.error("'$id' not found in the item registry, fallback to default one")
                 // 不缓存不存在的物品 id, 始终记录错误并返回新的 SlotDisplay
-                return SlotDisplay(KoishRegistries.ITEM.getDefaultEntry())
+                return SlotDisplay(DynamicRegistries.ITEM.getDefaultEntry())
             }
             return instances.computeIfAbsent(id) { k ->
-                SlotDisplay(KoishRegistries.ITEM.getEntryOrThrow(k))
+                SlotDisplay(DynamicRegistries.ITEM.getEntryOrThrow(k))
             }
         }
     }
@@ -69,7 +69,7 @@ private constructor(
      * 解析得到一个 [Resolved], 该对象包含了可以单独使用的 `minecraft:item_name`, `minecraft:lore` 等有用的数据.
      */
     fun resolveEverything(dsl: SlotDisplayLoreData.LineConfig.Builder.() -> Unit = {}): Resolved {
-        return archetype.value.resolveSlotDisplay(dsl)
+        return archetype.unwrap().resolveSlotDisplay(dsl)
     }
 
     /**

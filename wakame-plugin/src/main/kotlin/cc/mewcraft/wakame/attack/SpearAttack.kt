@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
-import cc.mewcraft.wakame.user.attributeContainer
+import cc.mewcraft.wakame.item2.ItemDamageEventMarker
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.*
 import org.bukkit.entity.LivingEntity
@@ -23,7 +23,7 @@ import org.joml.Vector3f
 /**
  * 自定义矛攻击.
  * 左键后对玩家视线所指方向的所有生物进行攻击.
- * 攻击的距离上限由属性 [cc.mewcraft.wakame.attribute.Attributes.ENTITY_INTERACTION_RANGE] 决定.
+ * 攻击的距离上限由属性 [Attributes.ENTITY_INTERACTION_RANGE] 决定.
  *
  * ## Node structure
  * ```yaml
@@ -48,7 +48,7 @@ data class SpearAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -65,12 +65,12 @@ data class SpearAttack(
         return damageMeta
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
         if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
             return
         }
 
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -84,7 +84,7 @@ data class SpearAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackSpeed.isActive(nekoStack.id)) return
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) return
 
         applySpearAttack(player)
 

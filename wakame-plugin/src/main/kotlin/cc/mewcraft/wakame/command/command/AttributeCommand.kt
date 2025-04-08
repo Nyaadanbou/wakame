@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.AttributeModifierOperationParser
 import cc.mewcraft.wakame.command.parser.AttributeParser
+import cc.mewcraft.wakame.entity.attribute.*
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.text.mini
 import kotlinx.coroutines.Dispatchers

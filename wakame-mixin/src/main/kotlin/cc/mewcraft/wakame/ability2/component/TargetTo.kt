@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ecs.bridge.BukkitEntity
-import cc.mewcraft.wakame.ecs.bridge.BukkitPlayer
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitEntity
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import com.github.quillraven.fleks.Component
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.EntityComponentContext
+import org.bukkit.entity.Entity
+import org.bukkit.entity.Player
 
 data class TargetTo(
-    var target: FleksEntity
+    var target: FleksEntity,
 ) : Component<TargetTo> {
     companion object : ComponentType<TargetTo>()
 
@@ -18,21 +18,21 @@ data class TargetTo(
 
 
     context(EntityComponentContext)
-    fun player(): BukkitPlayer {
-        return target[BukkitPlayerComponent.Companion].bukkitPlayer
+    fun player(): Player {
+        return target[BukkitPlayer].unwrap()
     }
 
     context(EntityComponentContext)
-    fun entity(): BukkitEntity {
-        return target[BukkitEntityComponent.Companion].bukkitEntity
+    fun entity(): Entity {
+        return target[BukkitEntity].unwrap()
     }
 
     context(EntityComponentContext)
-    fun entityOrPlayer(): BukkitEntity {
-        return if (target.has(BukkitPlayerComponent.Companion)) {
-            target[BukkitPlayerComponent.Companion].bukkitPlayer
+    fun entityOrPlayer(): Entity {
+        return if (target.has(BukkitPlayer)) {
+            target[BukkitPlayer].unwrap()
         } else {
-            target[BukkitEntityComponent.Companion].bukkitEntity
+            target[BukkitEntity].unwrap()
         }
     }
 }

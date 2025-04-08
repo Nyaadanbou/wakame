@@ -3,15 +3,9 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.extension.makeItemModelKey
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationContexts
-import cc.mewcraft.wakame.item.template.ItemGenerationTrigger
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.template.ItemTemplate
-import cc.mewcraft.wakame.item.template.ItemTemplateType
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.item.template.*
 import cc.mewcraft.wakame.util.item.toNMS
+import org.bukkit.entity.Player
 
 /**
  * Realizes [NekoItem] into an item which then can be added to the game world.
@@ -30,10 +24,10 @@ interface NekoItemRealizer {
      * Realizes an item template from an online player.
      *
      * @param prototype the item template
-     * @param user the player on which the realization is based
+     * @param player the player on which the realization is based
      * @return a one-off NekoStack
      */
-    fun realize(prototype: NekoItem, user: User<*>): NekoStack
+    fun realize(prototype: NekoItem, player: Player): NekoStack
 
     /**
      * Realizes an item template from a crate.
@@ -56,7 +50,7 @@ interface NekoItemRealizer {
 }
 
 internal object VanillaNekoItemRealizer : NekoItemRealizer {
-    override fun realize(prototype: NekoItem, user: User<*>): ImaginaryKoishStack {
+    override fun realize(prototype: NekoItem, player: Player): ImaginaryKoishStack {
         return realize(prototype)
     }
 
@@ -110,8 +104,8 @@ internal object StandardNekoItemRealizer : NekoItemRealizer {
         return realizeByTrigger(prototype, ItemGenerationTriggers.empty())
     }
 
-    override fun realize(prototype: NekoItem, user: User<*>): NekoStack {
-        return realizeByTrigger(prototype, ItemGenerationTriggers.wrap(user))
+    override fun realize(prototype: NekoItem, player: Player): NekoStack {
+        return realizeByTrigger(prototype, ItemGenerationTriggers.wrap(player))
     }
 
     override fun realize(prototype: NekoItem, crate: Crate): NekoStack {

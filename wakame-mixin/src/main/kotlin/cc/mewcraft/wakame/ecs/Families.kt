@@ -4,11 +4,7 @@ import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.BukkitBlockComponent
-import cc.mewcraft.wakame.ecs.component.BukkitEntityComponent
-import cc.mewcraft.wakame.ecs.component.BukkitObject
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.*
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import com.github.quillraven.fleks.Family
@@ -26,13 +22,13 @@ object Families {
     // ------------------------------
 
     @JvmField
-    val BUKKIT_BLOCK: Family = family { all(BukkitObject, BukkitBlockComponent) }
+    val BUKKIT_BLOCK: Family = family { all(BukkitObject, BukkitBlock) }
 
     @JvmField
-    val BUKKIT_ENTITY: Family = family { all(BukkitObject, BukkitEntityComponent) }
+    val BUKKIT_ENTITY: Family = family { all(BukkitObject, BukkitEntity) }
 
     @JvmField
-    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitPlayerComponent) }
+    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitPlayer) }
 
     // ------------------------------
     // 其余 family 为任意系统的具体实现, 其具体定义应该参考具体的文档

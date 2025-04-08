@@ -2,10 +2,11 @@ package cc.mewcraft.wakame.ability2.combo
 
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
-import cc.mewcraft.wakame.user.PlayerAdapters
-import cc.mewcraft.wakame.user.User
+import cc.mewcraft.wakame.ecs.bridge.EComponent
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.cooldown.Cooldown
+import com.github.quillraven.fleks.ComponentType
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -16,8 +17,10 @@ import kotlin.reflect.KProperty
 
 class PlayerCombo(
     private val uniqueId: UUID,
-) : Examinable {
-    companion object {
+) : Examinable, EComponent<PlayerCombo> {
+    constructor(player: Player) : this(player.uniqueId)
+
+    companion object : EComponentType<PlayerCombo>() {
         private val COOLDOWN_TRIGGERS: List<AbilitySingleTrigger> =
             listOf(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK)
     }
@@ -26,8 +29,6 @@ class PlayerCombo(
 
     private val player: Player
         get() = requireNotNull(SERVER.getPlayer(uniqueId))
-    val user: User<Player>
-        get() = PlayerAdapters.get<Player>().adapt(uniqueId)
 
     private var comboDisplay: PlayerComboInfo by ComboDisplayProvider { PlayerComboInfo(player) }
 
@@ -46,6 +47,8 @@ class PlayerCombo(
         comboDisplay.cleanup()
     }
 
+    override fun type(): ComponentType<PlayerCombo> = PlayerCombo
+
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(
             ExaminableProperty.of("uniqueId", uniqueId)
@@ -58,7 +61,7 @@ class PlayerCombo(
 }
 
 private class ComboDisplayProvider(
-    private val initializer: () -> PlayerComboInfo
+    private val initializer: () -> PlayerComboInfo,
 ) : ReadWriteProperty<Any, PlayerComboInfo> {
     private var stateInfo: PlayerComboInfo? = null
 

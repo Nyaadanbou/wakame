@@ -29,7 +29,7 @@ class VanillaRecipeSerializationTest : KoinTest {
             KoishDataPaths.initialize()
 
             ItemXBootstrap.init()
-            MinecraftRecipeRegistryDataLoader.load()
+            MinecraftRecipeRegistryLoader.load()
         }
 
         @JvmStatic
@@ -56,7 +56,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `blasting recipe serialization`() {
         key = Key.key("test:blasting")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<BlastingRecipe>(recipe)
 
@@ -101,7 +101,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `campfire recipe serialization`() {
         key = Key.key("test:campfire")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<CampfireRecipe>(recipe)
 
@@ -125,7 +125,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `furnace recipe serialization`() {
         key = Key.key("test:furnace")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<FurnaceRecipe>(recipe)
 
@@ -149,7 +149,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `shaped recipe serialization`() {
         key = Key.key("test:shaped")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapedRecipe>(recipe)
 
@@ -186,7 +186,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `shapeless recipe serialization`() {
         key = Key.key("test:shapeless")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
@@ -223,7 +223,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smithing transform recipe serialization`() {
         key = Key.key("test:smithing_transform")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTransformRecipe>(recipe)
 
@@ -255,7 +255,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smithing trim recipe serialization`() {
         key = Key.key("test:smithing_trim")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmithingTrimRecipe>(recipe)
 
@@ -314,7 +314,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `smoking recipe serialization`() {
         key = Key.key("test:smoking")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<SmokingRecipe>(recipe)
 
@@ -338,7 +338,7 @@ class VanillaRecipeSerializationTest : KoinTest {
     fun `stonecutting recipe serialization`() {
         key = Key.key("test:stonecutting")
 
-        val recipe = MinecraftRecipeRegistryDataLoader.uncheckedRecipes[key]
+        val recipe = MinecraftRecipeRegistryLoader.uncheckedRecipes[key]
         assertNotNull(recipe)
         assertIs<StonecuttingRecipe>(recipe)
 

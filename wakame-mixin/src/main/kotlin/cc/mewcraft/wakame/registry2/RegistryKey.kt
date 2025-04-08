@@ -36,7 +36,7 @@ private constructor(
 
         // 创建的 ResourceKey 位于 koish:root
         fun <T> ofRegistry(registryName: Identifier): RegistryKey<T> {
-            return of(KoishRegistryKeys2.ROOT_REGISTRY_NAME, registryName)
+            return of(BuiltInRegistryKeys.ROOT_REGISTRY_NAME, registryName)
         }
     }
 

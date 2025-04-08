@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.*
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.collections.associateNotNull
@@ -73,7 +73,7 @@ internal object ModdingTableSerializer {
         val tableItemsDirectory = tableDir.resolve("items")
 
         // config.yml 的配置节点
-        val tableMainConfigNode = buildYamlConfigLoader {
+        val tableMainConfigNode = yamlLoader {
             withDefaults()
             serializers {
                 register(TableCurrencyCost)
@@ -96,7 +96,7 @@ internal object ModdingTableSerializer {
                 try {
                     val itemId = Key.key(namespace, path)
                     val fileText = file.readText()
-                    val itemNode = buildYamlConfigLoader {
+                    val itemNode = yamlLoader {
                         withDefaults()
                         serializers {
                             register<ModdingTable.CellRule>(CellRule)
@@ -132,7 +132,7 @@ internal object ModdingTableSerializer {
         )
     }
 
-    private object TableCurrencyCost : TypeSerializer<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>> {
+    private object TableCurrencyCost : TypeSerializer2<ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction>> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.TableTotalFunction> {
             val code = node.require<String>()
             val function = SimpleModdingTable.TableTotalFunction(code)
@@ -140,7 +140,7 @@ internal object ModdingTableSerializer {
         }
     }
 
-    private object CellCurrencyCost : TypeSerializer<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>> {
+    private object CellCurrencyCost : TypeSerializer2<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
             val code = node.require<String>()
             val function = SimpleModdingTable.CellTotalFunction(code)
@@ -148,7 +148,7 @@ internal object ModdingTableSerializer {
         }
     }
 
-    private object CellRule : TypeSerializer<ModdingTable.CellRule> {
+    private object CellRule : TypeSerializer2<ModdingTable.CellRule> {
         override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CellRule {
             val currencyCost = node.node("currency_cost").require<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>()
             val requireElementMatch = node.node("require_element_match").getBoolean(false)

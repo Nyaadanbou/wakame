@@ -2,15 +2,14 @@
 
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerAbilityPrepareCastEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.extension.damage
 import cc.mewcraft.wakame.item.extension.isDamageable
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.maxDamage
 import net.kyori.adventure.text.Component.text
@@ -26,7 +25,7 @@ import org.bukkit.inventory.ItemStack
 
 interface HoldLastDamage : ItemBehavior {
     private object Default : HoldLastDamage {
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
             tryCancelEvent(itemStack, koishStack, player, event)
         }
 
@@ -61,10 +60,6 @@ interface HoldLastDamage : ItemBehavior {
         }
 
         override fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
-            tryCancelEvent(itemStack, koishStack, player, event)
-        }
-
-        override fun handleAbilityPrepareCast(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerAbilityPrepareCastEvent) {
             tryCancelEvent(itemStack, koishStack, player, event)
         }
 

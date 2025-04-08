@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.integration
 
-import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.entity.player.ResourceLoadingFixHandler
 import cc.mewcraft.wakame.integration.economy.EconomyIntegration
 import cc.mewcraft.wakame.integration.economy.EconomyManager
 import cc.mewcraft.wakame.integration.economy.EconomyType
@@ -19,7 +20,6 @@ import cc.mewcraft.wakame.integration.townflight.TownFlightManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.user.PlayerResourceFixExternalHandler
 import cc.mewcraft.wakame.util.data.JarUtils
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -27,9 +27,7 @@ import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import kotlin.reflect.KClass
 
-@Init(
-    stage = InitStage.POST_WORLD,
-)
+@Init(stage = InitStage.POST_WORLD)
 internal object HooksLoader {
 
     /** 用户指定的玩家等级系统. */
@@ -49,7 +47,7 @@ internal object HooksLoader {
     @Suppress("UNCHECKED_CAST")
     private fun loadHooks() {
         JarUtils.findAnnotatedClasses(
-            KOISH_JAR.toFile(),
+            BootstrapContexts.PLUGIN_JAR.toFile(),
             listOf(Hook::class), emptyList(),
             "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
@@ -115,8 +113,8 @@ internal object HooksLoader {
             PermissionManager.integrations += hook
         }
 
-        if (hook is PlayerResourceFixExternalHandler) {
-            PlayerResourceFixExternalHandler.CURRENT_HANDLER = hook
+        if (hook is ResourceLoadingFixHandler) {
+            ResourceLoadingFixHandler.CURRENT_HANDLER = hook
         }
 
         if (hook is PlayerLevelIntegration && selectedPlayerLevelIntegration == hook.type) {

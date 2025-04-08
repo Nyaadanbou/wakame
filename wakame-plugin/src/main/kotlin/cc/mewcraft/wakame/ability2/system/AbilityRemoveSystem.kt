@@ -1,12 +1,8 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
-import cc.mewcraft.wakame.ability2.component.AbilityContainer
-import cc.mewcraft.wakame.ability2.component.AtSlot
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.item.logic.ItemSlotChanges
+import cc.mewcraft.wakame.item2.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
@@ -26,20 +22,16 @@ class AbilityRemoveSystem : IteratingSystem(
             return
         }
 
-        // 还是有效的技能才判断逻辑
-
         if (!abilityComponent.isReadyToRemove)
-            return
+            return // 还是有效的技能才继续执行
 
         val slot = entity.getOrNull(AtSlot)?.slot
         if (slot != null && caster in Families.BUKKIT_PLAYER) {
-            val itemSlotChanges = caster[ItemSlotChanges]
             // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
-
-            val itemSlotChangesEntry = itemSlotChanges[slot]
-            if (!itemSlotChangesEntry.changing) {
-                // 如果玩家栏位无变化, 则不进行移除.
-                return
+            val slotChanges = caster[ItemSlotChanges]
+            val entry = slotChanges[slot]
+            if (!entry.changing) {
+                return // 如果玩家栏位无变化, 则不进行移除.
             }
         }
 

@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.integration.permission.PermissionManager
 import cc.mewcraft.wakame.item.SlotDisplay
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
@@ -57,7 +57,7 @@ internal class CatalogItemMainMenu(
         builder.addIngredient('x', Markers.CONTENT_LIST_SLOT_HORIZONTAL)
         // 对 CategoryItem 进行缓存
         // TODO 权限检查代码美化
-        builder.setContent(KoishRegistries.ITEM_CATEGORY.filter { category ->
+        builder.setContent(DynamicRegistries.ITEM_CATEGORY.filter { category ->
             if (category.permission == null) return@filter true
             PermissionManager.hasPermission(viewer.world, viewer.uniqueId, category.permission).get()
         }.map { category ->

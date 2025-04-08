@@ -1,5 +1,5 @@
 plugins {
-    id("wakame-conventions.java")
+    id("wakame-conventions.kotlin")
     id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }

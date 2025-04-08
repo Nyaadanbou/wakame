@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.item.logic
 
+import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
@@ -40,7 +40,7 @@ data class ItemSlotChanges(
                 return true // 如果物品没有等级, 那么玩家的等级一定高于该物品 (0)
             }
 
-            val playerLevel = player.toUser().level
+            val playerLevel = player.koishLevel
             return itemLevel <= playerLevel
         }
 

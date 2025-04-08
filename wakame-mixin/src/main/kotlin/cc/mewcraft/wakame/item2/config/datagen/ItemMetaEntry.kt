@@ -32,7 +32,7 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureSetData(type: ItemDataType<in T>, value: T): T? {
-        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
+        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.set(type, value)
         set(ExtraDataComponents.DATA_CONTAINER, builder.build())
@@ -45,7 +45,7 @@ interface ItemMetaEntry<V> {
      * @return 原有的值, 如果没有则返回 `null`
      */
     fun <T> MojangStack.ensureRemoveData(type: ItemDataType<out T>): T? {
-        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.Companion.EMPTY)
+        val container = getOrDefault(ExtraDataComponents.DATA_CONTAINER, ItemDataContainer.EMPTY)
         val builder = container.toBuilder()
         val oldVal = builder.remove(type)
         set(ExtraDataComponents.DATA_CONTAINER, builder.build())

@@ -2,9 +2,8 @@ package cc.mewcraft.wakame.item.templates.components.cells
 
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.bundle.element
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype
@@ -19,12 +18,12 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.random3.*
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
 import net.kyori.adventure.key.Key
-import org.koin.core.qualifier.named
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.serialize.SerializationException
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -59,7 +58,7 @@ interface CoreArchetype {
 /**
  * [CoreArchetype] 的序列化器.
  */
-internal object CoreArchetypeSerializer : TypeSerializer<CoreArchetype> {
+internal object CoreArchetypeSerializer : TypeSerializer2<CoreArchetype> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreArchetype {
         val type1 = node.node("type").require<Key>()
         val core = when {
@@ -165,7 +164,7 @@ internal object CoreArchetypeGroupSerializer : GroupSerializer<CoreArchetype, It
 @Init(
     stage = InitStage.PRE_WORLD,
     runAfter = [
-        AttributeBundleFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须指定依赖
+        AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据, 必须指定依赖
     ],
 )
 @Reload

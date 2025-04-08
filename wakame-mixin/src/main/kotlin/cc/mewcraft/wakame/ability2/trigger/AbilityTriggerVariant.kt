@@ -23,7 +23,8 @@ interface AbilityTriggerVariant {
 
     companion object {
 
-        val SERIALIZER: ScalarSerializer<AbilityTriggerVariant> = AbilityTriggerVariantSerializer
+        @JvmField
+        val SERIALIZER: ScalarSerializer<AbilityTriggerVariant> = Serializer
 
         /**
          * 返回一个代表任意 [AbilityTriggerVariant] 的实例.
@@ -47,27 +48,24 @@ interface AbilityTriggerVariant {
     private data object Any : AbilityTriggerVariant {
         override val id: Int = -1 // magic value
     }
-}
 
-/**
- * [AbilityTriggerVariant] 的序列化器.
- */
-private object AbilityTriggerVariantSerializer : ScalarSerializer<AbilityTriggerVariant>(typeTokenOf()) {
-    override fun deserialize(type: Type, obj: Any): AbilityTriggerVariant {
-        val value = obj.toString()
+    private object Serializer : ScalarSerializer<AbilityTriggerVariant>(typeTokenOf()) {
+        override fun deserialize(type: Type, obj: kotlin.Any): AbilityTriggerVariant {
+            val value = obj.toString()
 
-        try {
-            return AbilityTriggerVariant.of(value.toInt())
-        } catch (ex: NumberFormatException) {
-            throw SerializationException(ex)
+            try {
+                return of(value.toInt())
+            } catch (ex: NumberFormatException) {
+                throw SerializationException(ex)
+            }
         }
-    }
 
-    override fun serialize(item: AbilityTriggerVariant, typeSupported: Predicate<Class<*>>): Any {
-        return item.id.toString()
-    }
+        override fun serialize(item: AbilityTriggerVariant, typeSupported: Predicate<Class<*>>): kotlin.Any {
+            return item.id.toString()
+        }
 
-    override fun emptyValue(specificType: Type, options: ConfigurationOptions): AbilityTriggerVariant {
-        return AbilityTriggerVariant.any()
+        override fun emptyValue(specificType: Type, options: ConfigurationOptions): AbilityTriggerVariant {
+            return any()
+        }
     }
 }

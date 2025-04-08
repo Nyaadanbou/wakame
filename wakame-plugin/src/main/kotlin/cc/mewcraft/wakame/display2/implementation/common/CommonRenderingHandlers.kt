@@ -3,20 +3,8 @@
 
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.display2.IndexedDataRenderer
-import cc.mewcraft.wakame.display2.IndexedDataRenderer2
-import cc.mewcraft.wakame.display2.IndexedDataRenderer3
-import cc.mewcraft.wakame.display2.IndexedDataRenderer4
-import cc.mewcraft.wakame.display2.IndexedDataRenderer5
-import cc.mewcraft.wakame.display2.IndexedDataRenderer6
-import cc.mewcraft.wakame.display2.RendererFormat
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler4
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler5
-import cc.mewcraft.wakame.display2.implementation.RenderingHandler6
-import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.implementation.*
 import cc.mewcraft.wakame.item.components.ItemElements
 import cc.mewcraft.wakame.item.components.ItemLevel
 import cc.mewcraft.wakame.item.components.ItemRarity
@@ -38,7 +26,7 @@ internal object CommonRenderingHandlers {
 
     @JvmField
     val ELEMENTS: RenderingHandlerRegistry.() -> RenderingHandler<ItemElements, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
-        format.render(data.elements) { it.value.displayName }
+        format.render(data.elements) { it.unwrap().displayName }
     }
 
     @JvmField

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping

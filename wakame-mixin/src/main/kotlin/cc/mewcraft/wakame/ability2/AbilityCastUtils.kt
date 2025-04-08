@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.ability2
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 

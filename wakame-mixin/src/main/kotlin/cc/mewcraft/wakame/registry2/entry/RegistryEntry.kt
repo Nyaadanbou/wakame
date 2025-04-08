@@ -33,9 +33,10 @@ interface RegistryEntry<T> {
      *
      * @throws IllegalStateException 如果数据还未绑定
      */
-    val value: T
+    fun unwrap(): T
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T =
+        unwrap()
 
     /**
      * 检查该容器是否已经绑定了数据.
@@ -111,9 +112,15 @@ interface RegistryEntry<T> {
     // RegistryEntry.Direct 封装的是没有与 Registry 相关联的数据
     class Direct<T>
     @ApiStatus.Internal
-    constructor(override val value: T) : RegistryEntry<T> {
+    constructor(
+        private val value: T,
+    ) : RegistryEntry<T> {
         override val type: Type
             get() = Type.DIRECT
+
+        override fun unwrap(): T {
+            return value
+        }
 
         override val hasValue: Boolean
             get() = true
@@ -127,7 +134,7 @@ interface RegistryEntry<T> {
 
         override fun matchesId(id: Identifier): Boolean = false
         override fun matchesKey(key: RegistryKey<T>): Boolean = false
-        override fun matches(entry: RegistryEntry<T>): Boolean = this.value == entry.value
+        override fun matches(entry: RegistryEntry<T>): Boolean = this.value == entry.unwrap()
         override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.right(this.value)
         override fun getKey(): RegistryKey<T>? = null
         override fun ownerEquals(owner: RegistryEntryOwner<T>) = true
@@ -148,7 +155,7 @@ interface RegistryEntry<T> {
         private val owner: RegistryEntryOwner<T>,
         /*val*/ referenceType: Type, // 目前仅仅是标记, 无实际用途
         private val key: RegistryKey<T>,
-        private var _value: T? = null,
+        private var value: T? = null,
     ) : RegistryEntry<T> {
         companion object {
             fun <T> standalone(owner: RegistryEntryOwner<T>, key: RegistryKey<T>, value: T): Reference<T> {
@@ -164,14 +171,15 @@ interface RegistryEntry<T> {
 
         @Synchronized
         override fun reactive(): ReactiveRegistryEntry<T> {
-            return reactive ?: mutableProvider(this::value).also { reactive = it }
+            return reactive ?: mutableProvider(this::unwrap).also { reactive = it }
         }
 
         override val hasValue: Boolean
-            get() = _value != null
+            get() = value != null
 
-        override val value: T
-            get() = _value ?: throw IllegalStateException("Trying to access unbound value '${this.key}' from registry '${this.owner}'")
+        override fun unwrap(): T {
+            return value ?: throw IllegalStateException("Trying to access unbound value '${this.owner}' from registry '${this.owner}'")
+        }
 
         override val type: RegistryEntry.Type = RegistryEntry.Type.REFERENCE
 
@@ -181,7 +189,7 @@ interface RegistryEntry<T> {
         // 2) 配置文件发生重载
         @ApiStatus.Internal
         fun setValue(value: T): Reference<T> {
-            _value = value
+            this@Reference.value = value
 
             // 如果存在 reactive, 也要更新 reactive 链上的所有数据
             reactive?.set(value)
@@ -206,7 +214,7 @@ interface RegistryEntry<T> {
         override fun getKeyOrValue(): Either<RegistryKey<T>, T> = Either.left(this.key)
         override fun getKey(): RegistryKey<T> = this.key
         override fun ownerEquals(owner: RegistryEntryOwner<T>) = this.owner.ownerEquals(owner)
-        override fun toString(): String = "Reference[${this.key}=${this.value}]"
+        override fun toString(): String = "Reference[${this.key}=${unwrap()}]"
 
         enum class Type {
             /**

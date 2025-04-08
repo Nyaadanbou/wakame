@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.NekoStack
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable

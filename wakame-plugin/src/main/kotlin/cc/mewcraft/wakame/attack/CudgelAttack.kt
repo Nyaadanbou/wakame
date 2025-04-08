@@ -1,15 +1,15 @@
 package cc.mewcraft.wakame.attack
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.*
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
-import cc.mewcraft.wakame.user.attributeContainer
+import cc.mewcraft.wakame.item2.ItemDamageEventMarker
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Particle
 import org.bukkit.Sound
@@ -23,7 +23,7 @@ import org.bukkit.inventory.EquipmentSlot
 /**
  * 自定义棍攻击.
  * 左键后对以玩家为中心的长方体区域内的所有生物进行攻击.
- * 长方体区域 x 轴 和 z 轴边长由属性 [cc.mewcraft.wakame.attribute.Attributes.ENTITY_INTERACTION_RANGE] 决定.
+ * 长方体区域 x 轴 和 z 轴边长由属性 [Attributes.ENTITY_INTERACTION_RANGE] 决定.
  *
  * ## Node structure
  * ```yaml
@@ -46,7 +46,7 @@ class CudgelAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -63,12 +63,12 @@ class CudgelAttack(
         return damageMeta
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
         if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
             return
         }
 
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -82,7 +82,7 @@ class CudgelAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackSpeed.isActive(nekoStack.id)) return
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 

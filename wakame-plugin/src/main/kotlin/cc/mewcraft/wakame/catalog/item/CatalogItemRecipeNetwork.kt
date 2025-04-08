@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.eventbus.MapEventBus
 import com.google.common.graph.ImmutableNetwork
 import com.google.common.graph.MutableNetwork
@@ -77,7 +77,7 @@ object CatalogItemRecipeNetwork {
         }
 
         // 战利品表配方
-        for (lootTableRecipe in KoishRegistries.LOOT_TABLE_RECIPE) {
+        for (lootTableRecipe in DynamicRegistries.LOOT_TABLE_RECIPE) {
             network.addRecipe(lootTableRecipe)
         }
 
@@ -136,7 +136,7 @@ object CatalogItemRecipeNetwork {
      * 输入输出存在空时仅跳过.
      */
     private fun MutableNetwork<ItemX, CatalogRecipeEdge>.addRecipe(
-        catalogRecipe: CatalogRecipe
+        catalogRecipe: CatalogRecipe,
     ) {
         val lookupInputs = catalogRecipe.getLookupInputs()
         val lookupOutputs = catalogRecipe.getLookupOutputs()

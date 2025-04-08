@@ -8,13 +8,13 @@ import com.github.quillraven.fleks.UniqueId
 
 class KoishEntity(
     @PublishedApi
-    internal val entity: FleksEntity,
+    internal val entity: EEntity,
 ) {
 
-    fun unwrap(): FleksEntity =
+    fun unwrap(): EEntity =
         entity
 
-    fun invalidate() =
+    fun remove() =
         with(Fleks.INSTANCE.world) { entity.remove() }
 
     inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T =

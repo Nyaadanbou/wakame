@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
-import cc.mewcraft.wakame.registry2.KoishRegistries2
-import cc.mewcraft.wakame.serialization.configurate.KOISH_CONFIGURATE_SERIALIZERS_2
-import cc.mewcraft.wakame.serialization.configurate.mapperfactory.ObjectMappers
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -46,16 +46,14 @@ sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             // 因此这里需要再明确的添加一些潜在依赖的序列化操作.
 
             // 添加显式声明的 TypeSerializer
-            serials.registerAll(makeSerializers())
-            // 添加 Koish 常用的 TypeSerializer
-            serials.registerAll(KOISH_CONFIGURATE_SERIALIZERS_2)
-            // 添加 @ConfigSerializable 的 TypeSerializer
-            serials.registerAnnotatedObjects(ObjectMappers.DEFAULT)
+            serials.registerAll(makeDirectSerializers())
+            // 添加间接依赖的 TypeSerializer (注册新的物品数据类型时, 如果有间接依赖的类型, 在这里添加即可)
+            serials.register(IdentifierSerializer)
             // 添加 Configurate 内置的 TypeSerializer.
             // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照 注册 TypeSerializer 的顺序 进行的.
             // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
             // 内置的 ObjectMapper 将被优先使用, 导致无法反序列化 Kotlin 的 data class.
-            serials.registerAll(TypeSerializerCollection.defaults())
+            serials.registerAll(STANDARD_SERIALIZERS)
 
             val codec = DfuSerializers.codec(typeTokenOf<ItemDataContainer>(), serials.build())
             requireNotNull(codec) { "Cannot find an appropriate TypeSerializer for ${ItemDataContainer::class}" }
@@ -64,7 +62,7 @@ sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
         }
 
         @JvmStatic
-        fun makeSerializers(): TypeSerializerCollection {
+        fun makeDirectSerializers(): TypeSerializerCollection {
             val serials = TypeSerializerCollection.builder()
 
             // 添加 ItemDataContainer 的 TypeSerializer
@@ -209,10 +207,8 @@ private data object EmptyItemDataContainer : ItemDataContainer {
 
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
 private open class SimpleItemDataContainer(
-    @JvmField
-    var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
-    @JvmField
-    var copyOnWrite: Boolean, // 用于优化 copy() 的性能
+    private var dataMap: Reference2ObjectOpenHashMap<ItemDataType<*>, Any> = Reference2ObjectOpenHashMap(),
+    private var copyOnWrite: Boolean, // 用于优化 copy() 的性能
 ) : ItemDataContainer, ItemDataContainer.Builder {
     override val types: Set<ItemDataType<*>>
         get() = dataMap.keys
@@ -303,21 +299,26 @@ private open class SimpleItemDataContainer(
                 prefix = "(",
                 postfix = ")",
             ) { (key, value) ->
-                "${KoishRegistries2.ITEM_DATA_TYPE.getId(key)!!.value()}=$value"
+                "${BuiltInRegistries.ITEM_DATA_TYPE.getId(key)?.value() ?: "$key(unregistered)"}=$value"
             }
         }}"
     }
 
-    object Serializer : TypeSerializer<ItemDataContainer> {
+    object Serializer : TypeSerializer2<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
             val builder = ItemDataContainer.builder()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()
                 // 注意: 该 node key 所对应的 type 必须存在
-                val dataType = KoishRegistries2.ITEM_DATA_TYPE[nodeKey] ?: continue
+                val dataType = BuiltInRegistries.ITEM_DATA_TYPE[nodeKey] ?: continue
                 // 该 loader 必须加载了能够 deserialize 该类型的 TypeSerializer
-                val dataValue = itemDataNode.get(dataType.typeToken) ?: run {
-                    LOGGER.error("Failed to deserialize $dataType. Skipped.")
+                val dataValue = try {
+                    itemDataNode.get(dataType.typeToken) ?: run {
+                        LOGGER.error("Decoded item data value to null for $dataType. Skipped.")
+                        continue
+                    }
+                } catch (ex: Throwable) {
+                    LOGGER.error("An exception occurred while deserializing $dataType. Skipped. Reason: ${ex.message}")
                     continue
                 }
                 builder.setUnsafe(dataType, dataValue)
@@ -335,9 +336,13 @@ private open class SimpleItemDataContainer(
             val iter = obj.fastIterator()
             while (iter.hasNext()) {
                 val (dataType, dataValue) = iter.next()
-                val dataTypeId = KoishRegistries2.ITEM_DATA_TYPE.getId(dataType) ?: continue
-                // 这里写入的 map key 省略了命名空间 "koish"
-                node.node(dataTypeId.value()).set(dataValue)
+                val dataTypeId = BuiltInRegistries.ITEM_DATA_TYPE.getId(dataType) ?: continue
+                val mapKey = dataTypeId.value() // 这里写入的 map key 省略了命名空间 "koish"
+                val entryNode = node.node(mapKey)
+                entryNode.set(
+                    dataType.typeToken.type, // 不能用 ConfigurationNode.set(Object). 必须传入该数据的 TypeToken, 否则不支持带参数的数据类型
+                    dataValue
+                )
             }
         }
     }

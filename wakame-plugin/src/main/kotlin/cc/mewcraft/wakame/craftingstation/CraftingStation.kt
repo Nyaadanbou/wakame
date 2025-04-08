@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.craftingstation
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SharedConstants
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.key.Key
@@ -62,7 +62,7 @@ internal class SimpleCraftingStation(
 /**
  * [CraftingStation] 的序列化器.
  */
-internal object StationSerializer : TypeSerializer<CraftingStation> {
+internal object StationSerializer : TypeSerializer2<CraftingStation> {
     val HINT_NODE: RepresentationHint<String> = RepresentationHint.of("id", typeTokenOf<String>())
     override fun deserialize(type: Type, node: ConfigurationNode): CraftingStation {
         val id = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station id is not present")

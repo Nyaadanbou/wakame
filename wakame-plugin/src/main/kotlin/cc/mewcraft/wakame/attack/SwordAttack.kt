@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
-import cc.mewcraft.wakame.player.itemdamage.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
-import cc.mewcraft.wakame.user.attributeContainer
+import cc.mewcraft.wakame.item2.ItemDamageEventMarker
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerItemDamageEvent
@@ -38,7 +38,7 @@ class SwordAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -55,8 +55,8 @@ class SwordAttack(
         return damageMeta
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 

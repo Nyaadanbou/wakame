@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item.logic
 
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
+import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import cc.mewcraft.wakame.item.ItemSlotRegistry
-import cc.mewcraft.wakame.user.toUser
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
@@ -22,8 +22,7 @@ class ItemSlotChangeMonitor : IteratingSystem(
     family = Families.BUKKIT_PLAYER
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {
-        val bukkitPlayer = entity[BukkitPlayerComponent].bukkitPlayer
-        if (!bukkitPlayer.toUser().isInventoryListenable) {
+        if (!entity.has(InventoryListenable)) {
             // 当玩家的背包不可监听时, 跳过扫描, 跳过触发事件.
             // 换句话说, 在 isInventoryListenable 为 false 时,
             // ItemSlotChanges 永远不会更新, 并且 isEmpty 为 true.
@@ -32,13 +31,13 @@ class ItemSlotChangeMonitor : IteratingSystem(
             return
         }
 
+        val player = entity[BukkitPlayer].unwrap()
         for (slot in ItemSlotRegistry.all()) {
-            val curr = slot.getItem(bukkitPlayer)
+            val curr = slot.getItem(player)
             val entry = entity[ItemSlotChanges][slot]
-            entry.update(curr) // TODO 优化这里的性能
+            entry.update(curr)
             if (entry.changing) {
-                // TODO: 支持新的 ItemSlot
-                // PlayerItemSlotChangeEvent(bukkitPlayer, slot, entry.previous, entry.current).callEvent()
+                //PlayerItemSlotChangeEvent(player, slot, entry.previous, entry.current).callEvent()
             }
         }
     }

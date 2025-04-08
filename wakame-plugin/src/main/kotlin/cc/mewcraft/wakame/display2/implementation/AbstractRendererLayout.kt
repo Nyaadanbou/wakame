@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.argument.StringArgumentQueue
 import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.util.yamlLoader
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
@@ -59,7 +59,7 @@ internal abstract class AbstractRendererLayout(
     fun initialize(layoutPath: Path) {
         reset()
 
-        val rootNode = buildYamlConfigLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
+        val rootNode = yamlLoader { withDefaults() }.buildAndLoadString(layoutPath.readText())
 
         val unprocessedPrimary = rootNode.node("primary").getList<String>(listOf())
 

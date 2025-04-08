@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -73,7 +73,7 @@ private object EmptyCoreMatchRuleContainer : CoreMatchRuleContainer {
  * 依赖的序列化器:
  * - [CoreMatchRuleSerializer]
  */
-internal object CoreMatchRuleContainerSerializer : TypeSerializer<CoreMatchRuleContainer> {
+internal object CoreMatchRuleContainerSerializer : TypeSerializer2<CoreMatchRuleContainer> {
     override fun deserialize(type: Type, node: ConfigurationNode): CoreMatchRuleContainer {
         val rules = node.getList<CoreMatchRule>(emptyList())
         return CoreMatchRuleContainer.simple(rules)

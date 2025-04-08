@@ -8,8 +8,8 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.text.Component
 import kotlin.io.path.readText
 
@@ -40,7 +40,7 @@ internal object CatalogItemMenuSettings {
     }
 
     private fun loadMenuSettings() {
-        val loader = buildYamlConfigLoader { withDefaults() }
+        val loader = yamlLoader { withDefaults() }
         val rootNode = loader.buildAndLoadString(KoishDataPaths.CONFIGS.resolve("catalog/item/menu_settings.yml").readText())
         MENU_SETTING_MAP.clear()
         MENU_SETTING_MAP.putAll(

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
@@ -30,7 +30,7 @@ data class CatalogItemCategory(
 /**
  * [CatalogItemCategory] 的序列化器.
  */
-internal object CategorySerializer : TypeSerializer<CatalogItemCategory>, KoinComponent {
+internal object CategorySerializer : TypeSerializer2<CatalogItemCategory>, KoinComponent {
 
     override fun deserialize(type: Type, node: ConfigurationNode): CatalogItemCategory {
         val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(

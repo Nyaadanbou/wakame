@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lang
 
-import cc.mewcraft.wakame.KOISH_JAR
+import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.util.data.useZip
 import kotlin.io.path.*
@@ -8,7 +8,7 @@ import kotlin.io.path.*
 internal object LanguageExtractor {
 
     fun extractDefaults() {
-        KOISH_JAR.useZip { zip ->
+        BootstrapContexts.PLUGIN_JAR.useZip { zip ->
             val srcRootDir = zip.resolve("lang/")
             val dstRootDir = KoishDataPaths.LANG.also { it.createDirectories() }
 

@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
@@ -28,20 +28,27 @@ val ItemStack.typeId: Identifier get() = toNMS().typeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
-val Material.koishProxy: KoishItemProxy? get() = KoishRegistries2.ITEM_PROXY[key()]
+val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 
 //// Property
 
 fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
 fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
+fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropertyOrDefault(type, fallback)
 
 //// ItemData
 
 fun ItemStack.hasData(type: ItemDataType<*>): Boolean = toNMS().hasData(type)
 fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
-fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? = toNMS().getDataOrDefault(type, fallback)
+fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T = toNMS().getDataOrDefault(type, fallback)
 fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
+
+var ItemStack.isNetworkRewrite: Boolean
+    get() = toNMS().isNetworkRewrite
+    set(value) {
+        toNMS().isNetworkRewrite = value
+    }
 
 // ------------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 Koish 数据
@@ -108,6 +115,9 @@ fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
 fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
     koishItem?.properties?.has(type) == true
 
+fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+    koishItem?.properties?.getOrDefault(type, fallback)
+
 //// ItemData
 
 fun MojangStack.hasData(type: ItemDataType<*>): Boolean =
@@ -116,20 +126,31 @@ fun MojangStack.hasData(type: ItemDataType<*>): Boolean =
 fun <T> MojangStack.getData(type: ItemDataType<out T>): T? =
     koishData(true)?.get(type)
 
-fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T? =
-    koishData(true)?.getOrDefault(type, fallback)
+fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T =
+    koishData(true)?.getOrDefault(type, fallback) ?: fallback
 
 /**
  * 向物品堆叠写入 Koish 数据 [T].
  *
  * 警告: 该函数无法(也不应该)修改套皮物品的数据.
  * 如果该物品堆叠是套皮物品, 该函数没有实际效果.
+ *
+ * @see setData
  */
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
     val builder = koishData(false)?.toBuilder() ?: return null
     val oldVal = builder.set(type, value)
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
+}
+
+/**
+ * 向物品堆叠写入 Koish 数据 [Unit].
+ *
+ * @see setData
+ */
+fun MojangStack.setData(type: ItemDataType<Unit>): Boolean {
+    return setData(type, Unit) != null
 }
 
 /**
@@ -144,6 +165,16 @@ fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
 }
+
+/**
+ * 设置该物品堆叠是否应该在网络发包时重写.
+ */
+var MojangStack.isNetworkRewrite: Boolean
+    get() = !hasData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    set(value) {
+        if (value) removeData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+        else setData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    }
 
 // -----------------
 // 内部实现

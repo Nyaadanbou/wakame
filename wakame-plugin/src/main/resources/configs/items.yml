@@ -133,14 +133,6 @@ components:
     enabled: true
     display_name: "<!i><white>重铸历史"
 
-  skin:
-    enabled: true
-    display_name: "<!i><white>皮肤"
-
-  skin_owner:
-    enabled: true
-    display_name: "<!i><white>皮肤所有者"
-
   stored_enchantments:
     enabled: true
     display_name: "<!i><white>存储的附魔"

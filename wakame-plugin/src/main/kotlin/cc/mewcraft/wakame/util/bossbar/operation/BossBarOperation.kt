@@ -30,10 +30,10 @@ abstract class BossBarOperation {
             
             val type = when (operation.javaClass) {
                 AddBossBarOperation.ADD_OPERATION -> Type.ADD
-                UpdateProgressBossBarOperation.Companion.UPDATE_PROGRESS_OPERATION -> Type.UPDATE_PROGRESS
-                UpdateNameBossBarOperation.Companion.UPDATE_NAME_OPERATION -> Type.UPDATE_NAME
-                UpdateStyleBossBarOperation.Companion.UPDATE_STYLE_OPERATION -> Type.UPDATE_STYLE
-                UpdatePropertiesBossBarOperation.Companion.UPDATE_PROPERTIES_OPERATION -> Type.UPDATE_PROPERTIES
+                UpdateProgressBossBarOperation.UPDATE_PROGRESS_OPERATION -> Type.UPDATE_PROGRESS
+                UpdateNameBossBarOperation.UPDATE_NAME_OPERATION -> Type.UPDATE_NAME
+                UpdateStyleBossBarOperation.UPDATE_STYLE_OPERATION -> Type.UPDATE_STYLE
+                UpdatePropertiesBossBarOperation.UPDATE_PROPERTIES_OPERATION -> Type.UPDATE_PROPERTIES
                 else -> Type.REMOVE // anonymous class
             }
             
@@ -49,10 +49,10 @@ abstract class BossBarOperation {
         companion object {
             val ADD = AddBossBarOperation
             val REMOVE = RemoveBossBarOperation
-            val UPDATE_PROGRESS = UpdateProgressBossBarOperation.Companion
-            val UPDATE_NAME = UpdateNameBossBarOperation.Companion
-            val UPDATE_STYLE = UpdateStyleBossBarOperation.Companion
-            val UPDATE_PROPERTIES = UpdatePropertiesBossBarOperation.Companion
+            val UPDATE_PROGRESS = UpdateProgressBossBarOperation
+            val UPDATE_NAME = UpdateNameBossBarOperation
+            val UPDATE_STYLE = UpdateStyleBossBarOperation
+            val UPDATE_PROPERTIES = UpdatePropertiesBossBarOperation
         }
         
     }

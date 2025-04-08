@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.mechanic
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeInstance
-import cc.mewcraft.wakame.attribute.AttributeMapAccess
-import cc.mewcraft.wakame.attribute.AttributeProvider
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeInstance
+import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
+import cc.mewcraft.wakame.entity.attribute.AttributeProvider
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.*
@@ -28,7 +28,7 @@ class AttributeMechanic(
     private val amount: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("amount", "amt", "a"), 0.0, *arrayOfNulls(0))
     private val duration: PlaceholderInt = mlc.getPlaceholderInteger(arrayOf("duration", "dur"), 0, *arrayOfNulls(0))
     private val attribute: Attribute = mlc.getString(arrayOf("attribute", "attr"))
-        ?.let { parsed -> AttributeProvider.instance().get(parsed) }
+        ?.let { parsed -> AttributeProvider.INSTANCE.get(parsed) }
         ?: throw IllegalArgumentException("Invalid attribute from line: $line")
 
     override fun cast(data: SkillMetadata): SkillResult {

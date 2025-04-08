@@ -7,22 +7,24 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.KOISH_NAMESPACE
+import cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Init(stage = InitStage.PRE_WORLD)
-internal object ItemRefBootstrapper {
+internal object ItemRefBootstrap {
 
     @InitFun
     fun init() {
         // 注册内置的 ItemRefHandler 实例 ( 兜底的放在最后注册 )
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("koish", KoishItemRefHandler)
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.add("minecraft", MinecraftItemRefHandler)
-        KoishRegistries2.INTERNAL_ITEM_REF_HANDLER.freeze()
+        BuiltInRegistries.ITEM_REF_HANDLER_INTERNAL.add(KOISH_NAMESPACE, KoishItemRefHandler)
+        BuiltInRegistries.ITEM_REF_HANDLER_INTERNAL.add(MINECRAFT_NAMESPACE, MinecraftItemRefHandler)
+        BuiltInRegistries.ITEM_REF_HANDLER_INTERNAL.freeze()
     }
 
 }
@@ -31,7 +33,7 @@ internal object ItemRefBootstrapper {
 // ItemRefHandler 的内置实现
 // ------------
 
-// 实现注意事项: 其他物品系统(如盲盒与酿酒)的实现应该放在 hooks 模块里
+// 实现注意事项: 其他物品系统(如盲盒与酿酒)的代码实现应该放在 hooks 模块里
 
 private data object MinecraftItemRefHandler : ItemRefHandler<Material> {
 
@@ -68,7 +70,7 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
     override val systemName: String = "Koish"
 
     override fun accepts(id: Identifier): Boolean {
-        return KoishRegistries2.ITEM.containsId(id)
+        return BuiltInRegistries.ITEM.containsId(id)
     }
 
     override fun getId(stack: ItemStack): Identifier? {
@@ -84,12 +86,12 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
 
     override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {
         val type = getInternalType(id)
-        val item = KoishStackGenerator.generate(type, Context())
+        val item = KoishStackGenerator.generate(type, Context(type))
         return item
     }
 
     override fun getInternalType(id: Identifier): KoishItem {
-        return KoishRegistries2.ITEM[id] ?: throwItemTypeNotFound(id)
+        return BuiltInRegistries.ITEM[id] ?: throwItemTypeNotFound(id)
     }
 
 }

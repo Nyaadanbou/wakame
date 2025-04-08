@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.components.ShownInTooltip
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.serialization.configurate.typeserializer.requireTypedKey
+import cc.mewcraft.wakame.serialization.configurate.serializer.requireTypedKey
 import cc.mewcraft.wakame.util.paper.getValueOrThrow
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken

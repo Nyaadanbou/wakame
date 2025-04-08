@@ -1,7 +1,6 @@
 # 不要修改!
 version: 1
 
-binary_index: 1
-display_name: "<color:#4ce64c>罕见"
+name: "<color:#4ce64c>罕见"
 styles: "<color:#4ce64c>"
-glow_color: GREEN
+color: GREEN

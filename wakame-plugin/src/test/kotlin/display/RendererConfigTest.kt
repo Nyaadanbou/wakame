@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.molang.molangModule
 import cc.mewcraft.wakame.rarity.rarityModule
 import cc.mewcraft.wakame.registry.*
 import cc.mewcraft.wakame.ability.abilityModule
-import cc.mewcraft.wakame.skin.skinModule
 import cc.mewcraft.wakame.util.Key
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.text.Component
@@ -59,7 +58,6 @@ class RendererConfigTest : KoinTest {
                     registryModule(),
                     rarityModule(),
                     abilityModule(),
-                    skinModule(),
                     worldModule()
                 )
             }

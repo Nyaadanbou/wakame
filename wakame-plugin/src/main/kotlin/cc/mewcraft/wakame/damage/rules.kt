@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.config.Configs
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.util.bindInstance
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.binding.Binding
 
-private val DAMAGE_CONFIG = Configs["damage/config"]
+private val DAMAGE_CONFIG = ConfigAccess.INSTANCE["damage/config"]
 private val RULES_CONFIG = DAMAGE_CONFIG.node("rules")
 
 /**

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -12,7 +12,7 @@ import java.lang.reflect.Type
 import java.util.stream.Stream
 
 /**
- * 用于将 [稀有度][cc.mewcraft.wakame.rarity.RarityType] 映射成浮点数.
+ * 用于将 [稀有度][cc.mewcraft.wakame.rarity2.Rarity] 映射成浮点数.
  */
 fun interface RarityNumberMapping : Examinable {
     companion object {
@@ -40,7 +40,7 @@ fun interface RarityNumberMapping : Examinable {
 /**
  * [RarityNumberMapping] 的序列化器.
  */
-internal object RarityNumberMappingSerializer : TypeSerializer<RarityNumberMapping> {
+internal object RarityNumberMappingSerializer : TypeSerializer2<RarityNumberMapping> {
     override fun deserialize(
         type: Type,
         node: ConfigurationNode,

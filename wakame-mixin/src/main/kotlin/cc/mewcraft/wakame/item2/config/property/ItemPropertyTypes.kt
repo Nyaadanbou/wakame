@@ -1,13 +1,14 @@
 package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
-import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
-import cc.mewcraft.wakame.item2.config.property.impl.Lore
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
+import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
+import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
@@ -62,12 +63,32 @@ data object ItemPropertyTypes {
     val GLOWABLE: ItemPropertyType<Unit> = typeOf("glowable")
 
     @JvmField
-    val LORE: ItemPropertyType<Lore> = typeOf("lore")
+    val EXTRA_LORE: ItemPropertyType<ExtraLore> = typeOf("extra_lore")
 
     @JvmField
     val ABILITY: ItemPropertyType<AbilityOnItem> = typeOf("ability") {
         serializers {
             register(AbilityTriggerVariant.SERIALIZER)
+        }
+    }
+
+    @JvmField
+    val SLOT_DISPLAY_DICT: ItemPropertyType<SlotDisplayDictData> = typeOf("slot_display_dict")
+
+    @JvmField
+    val SLOT_DISPLAY_NAME: ItemPropertyType<SlotDisplayNameData> = typeOf("slot_display_name")
+
+    @JvmField
+    val SLOT_DISPLAY_LORE: ItemPropertyType<SlotDisplayLoreData> = typeOf("slot_display_lore") {
+        serializers {
+            register(SlotDisplayLoreData.SERIALIZER)
+        }
+    }
+
+    @JvmField
+    val ATTACK_SPEED: ItemPropertyType<RegistryEntry<AttackSpeed>> = typeOf("attack_speed") {
+        serializers {
+            register(BuiltInRegistries.ATTACK_SPEED.holderByNameTypeSerializer())
         }
     }
 
@@ -81,7 +102,7 @@ data object ItemPropertyTypes {
      */
     private inline fun <reified T> typeOf(id: String, block: ItemPropertyType.Builder<T>.() -> Unit = {}): ItemPropertyType<T> {
         val type = ItemPropertyType.builder(typeTokenOf<T>()).apply(block).build()
-        return type.also { KoishRegistries2.ITEM_PROPERTY_TYPE.add(id, it) }
+        return type.also { BuiltInRegistries.ITEM_PROPERTY_TYPE.add(id, it) }
     }
 
     // ------------
@@ -98,7 +119,7 @@ data object ItemPropertyTypes {
     internal fun directSerializers(): TypeSerializerCollection {
         val collection = TypeSerializerCollection.builder()
 
-        KoishRegistries2.ITEM_PROPERTY_TYPE.fold(collection) { acc, type ->
+        BuiltInRegistries.ITEM_PROPERTY_TYPE.fold(collection) { acc, type ->
             val serializers = type.serializers
             if (serializers != null) acc.registerAll(serializers) else acc
         }

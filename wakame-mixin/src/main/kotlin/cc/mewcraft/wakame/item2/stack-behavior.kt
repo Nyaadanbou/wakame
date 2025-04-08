@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.MojangStack
@@ -10,6 +11,7 @@ import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
+import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
@@ -26,13 +28,13 @@ import org.bukkit.inventory.ItemStack
 // ------------
 
 fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = toNMS().hasBehavior(behavior)
-fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
+
+inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
 
-// FIXME #350: 等完全迁移
-//fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
-//    handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
+fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
+    handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
 
 fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
     handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
@@ -74,10 +76,6 @@ fun ItemStack.handleRelease(player: Player, itemstack: ItemStack, event: PlayerS
 fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerItemConsumeEvent) =
     handleBehavior { it.handleConsume(player, itemstack, event) }
 
-// FIXME #350: 等完全迁移
-//fun ItemStack.handleAbilityPrepareCast(caster: Player, itemstack: ItemStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) =
-//    handleBehavior { it.handleAbilityPrepareCast(caster, itemstack, ability, event) }
-
 // ------------
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 ItemBehavior
 // ------------
@@ -85,6 +83,6 @@ fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerI
 fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean =
     koishItem?.behaviors?.has(behavior) == true
 
-fun MojangStack.handleBehavior(action: (ItemBehavior) -> Unit) {
+inline fun MojangStack.handleBehavior(action: (ItemBehavior) -> Unit) {
     koishItem?.behaviors?.forEach(action)
 }

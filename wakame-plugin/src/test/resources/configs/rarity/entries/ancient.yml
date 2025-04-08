@@ -1,5 +1,4 @@
 version: 1
-binary_index: 5
-display_name: "Ancient"
+name: "Ancient"
 styles: "<white>"
-glow_color: GOLD
+color: GOLD

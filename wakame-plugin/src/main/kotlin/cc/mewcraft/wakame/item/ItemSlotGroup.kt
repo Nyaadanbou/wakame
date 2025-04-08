@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import it.unimi.dsi.fastutil.objects.ReferenceSets
@@ -17,7 +17,7 @@ import java.lang.reflect.Type
 /**
  * [ItemSlotGroup] 的序列化器.
  */
-object ItemSlotGroupSerializer : TypeSerializer<ItemSlotGroup> {
+object ItemSlotGroupSerializer : TypeSerializer2<ItemSlotGroup> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): ItemSlotGroup? {
         return ItemSlotGroup.empty()
     }

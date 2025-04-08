@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util.eventbus
 
-import cc.mewcraft.wakame.KOISH_SCOPE
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.PLUGIN_SCOPE
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,7 +31,7 @@ object FlowEventBus {
         dispatcher: CoroutineDispatcher = Dispatchers.minecraft,
         delay: Long = 0,
     ) {
-        KOISH_SCOPE.launch(dispatcher) {
+        PLUGIN_SCOPE.launch(dispatcher) {
             delay(delay)
             getFlow(event.javaClass.simpleName).emit(event)
         }
@@ -42,7 +42,7 @@ object FlowEventBus {
         clazz: KClass<T>,
         dispatcher: CoroutineDispatcher = Dispatchers.minecraft,
         handler: suspend (T) -> Unit,
-    ): Job = KOISH_SCOPE.launch(dispatcher) {
+    ): Job = PLUGIN_SCOPE.launch(dispatcher) {
         getFlow(clazz.java.simpleName).collect {
             if (clazz.isInstance(it)) {
                 @Suppress("UNCHECKED_CAST")

@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.element.ElementStackManager
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import com.github.quillraven.fleks.Entity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -52,14 +52,14 @@ class ElementStackSystem : ListenableIteratingSystem(
             if (elementStackComponent.amount < requiredAmount)
                 continue
             for (ability in abilities) {
-                AbilityCastUtils.castPoint(ability.value, entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
+                AbilityCastUtils.castPoint(ability.unwrap(), entity[CastBy].entityOrPlayer(), entity[CastBy].entityOrPlayer())
             }
             elementStackComponent.triggeredLevels.add(requiredAmount)
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    private fun onNekoDamage(event: NekoEntityDamageEvent) {
+    fun on(event: NekoPostprocessDamageEvent) {
         val damagee = event.damagee
         val damagePackets = event.damageMetadata.damageBundle.packets()
         val causingEntity = event.damageSource.causingEntity

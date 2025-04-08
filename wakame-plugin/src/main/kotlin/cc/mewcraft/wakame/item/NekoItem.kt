@@ -4,10 +4,10 @@ import cc.mewcraft.wakame.crate.Crate
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.user.User
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
+import org.bukkit.entity.Player
 
 /**
  * Represents an **item template**, or an "archetype" in other words.
@@ -92,8 +92,8 @@ fun NekoItem.realize(context: ItemGenerationContext): NekoStack {
     return StandardNekoItemRealizer.realize(this, context)
 }
 
-fun NekoItem.realize(user: User<*>): NekoStack {
-    return StandardNekoItemRealizer.realize(this, user)
+fun NekoItem.realize(player: Player): NekoStack {
+    return StandardNekoItemRealizer.realize(this, player)
 }
 
 fun NekoItem.realize(crate: Crate): NekoStack {

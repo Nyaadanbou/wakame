@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
 import cc.mewcraft.wakame.item.template.ItemTemplateMap
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.util.MojangStack
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import net.kyori.adventure.key.Key
@@ -137,7 +137,7 @@ interface NekoStack : Examinable {
         behaviors.forEach { it.handleInteractAtEntity(player, itemStack, koishStack, clicked, event) }
     }
 
-    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
         behaviors.forEach { it.handleAttackEntity(player, itemStack, koishStack, damagee, event) }
     }
 
@@ -184,10 +184,6 @@ interface NekoStack : Examinable {
     fun handleConsume(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: PlayerItemConsumeEvent) {
         behaviors.forEach { it.handleConsume(player, itemStack, koishStack, event) }
     }
-
-//    fun handleAbilityPrepareCast(caster: Player, itemStack: ItemStack, koishStack: NekoStack, ability: Ability, event: PlayerAbilityPrepareCastEvent) {
-//        behaviors.forEach { it.handleAbilityPrepareCast(caster, itemStack, koishStack, ability, event) }
-//    }
     //</editor-fold>
 }
 

@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
-import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.datagen.impl.*
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
-import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -38,10 +42,39 @@ data object ItemMetaTypes {
         }
     }
 
+    @JvmField
+    val RARITY: ItemMetaType<MetaRarity, RegistryEntry<Rarity>> = typeOf("rarity") {
+        serializers {
+            register(MetaRarity.SERIALIZER)
+            register(BuiltInRegistries.RARITY.holderByNameTypeSerializer())
+            register(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
+        }
+    }
+
     // 开发日记: 数据类型 V 不一定需要封装类 (如 ItemLevel), 只需要可以被序列化.
     //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
     @JvmField
     val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
+
+    @JvmField
+    val CUSTOM_NAME: ItemMetaType<MetaCustomName, Component> = typeOf("custom_name")
+
+    @JvmField
+    val KIZAMI: ItemMetaType<MetaKizami, Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
+        serializers {
+            register(MetaKizami.SERIALIZER)
+            register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val CORE_CONTAINER: ItemMetaType<MetaCoreContainer, CoreContainer> = typeOf("cores") {
+        serializers {
+            register(MetaCoreContainer.SERIALIZER)
+            register(CoreContainer.SERIALIZER)
+            registerAll(Core.serializers())
+        }
+    }
 
     // ------------
     // 方便函数
@@ -52,8 +85,8 @@ data object ItemMetaTypes {
      * @param block 用于配置 [ItemMetaType]
      */
     private inline fun <reified U, V> typeOf(id: String, block: ItemMetaType.Builder<U, V>.() -> Unit = {}): ItemMetaType<U, V> {
-        val type = ItemMetaType.builder<U, V>(typeTokenOf<U>()).apply(block).build()
-        return type.also { KoishRegistries2.ITEM_META_TYPE.add(id, it) }
+        val type = ItemMetaType.builder<U, V>().apply(block).build()
+        return type.also { BuiltInRegistries.ITEM_META_TYPE.add(id, it) }
     }
 
     // ------------
@@ -70,7 +103,7 @@ data object ItemMetaTypes {
     internal fun directSerializers(): TypeSerializerCollection {
         val collection = TypeSerializerCollection.builder()
 
-        KoishRegistries2.ITEM_META_TYPE.fold(collection) { acc, type ->
+        BuiltInRegistries.ITEM_META_TYPE.fold(collection) { acc, type ->
             val serializers = type.serializers
             if (serializers != null) acc.registerAll(serializers) else acc
         }

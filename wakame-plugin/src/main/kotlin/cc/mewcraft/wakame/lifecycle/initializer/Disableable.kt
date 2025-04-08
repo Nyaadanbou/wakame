@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
-import cc.mewcraft.wakame.lifecycle.withLifecycleDependencyCreation
+import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyCreation
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
 

@@ -10,9 +10,9 @@ import org.jetbrains.annotations.ApiStatus
 interface Fleks {
 
     companion object {
+        @get:JvmStatic
         @get:JvmName("getInstance")
-        lateinit var INSTANCE: Fleks
-            private set
+        lateinit var INSTANCE: Fleks private set
 
         @ApiStatus.Internal
         fun register(instance: Fleks) {

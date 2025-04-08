@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.serialization.json
 
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.json.serializer.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -17,7 +17,7 @@ private val GSON_BUILDER = GsonBuilder()
     .registerTypeHierarchyAdapter(ItemStackSerialization)
     .registerTypeHierarchyAdapter(LocationSerialization)
     .registerTypeHierarchyAdapter(VersionSerialization)
-    .registerTypeAdapter(RegistryElementSerializer(KoishRegistries2.ITEM))
+    .registerTypeAdapter(RegistryElementSerializer(BuiltInRegistries.ITEM))
     .registerTypeAdapter(UUIDTypeAdapter.nullSafe())
 
 val GSON: Gson = GSON_BUILDER.create()

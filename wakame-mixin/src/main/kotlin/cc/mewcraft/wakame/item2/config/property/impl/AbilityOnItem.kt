@@ -20,6 +20,6 @@ data class AbilityOnItem(
     @Setting("id")
     val meta: AbilityMeta,
     val trigger: AbilityTrigger?,
-    val variant: AbilityTriggerVariant = AbilityTriggerVariant.Companion.any(),
+    val variant: AbilityTriggerVariant = AbilityTriggerVariant.any(),
     val manaCost: Expression?,
 )

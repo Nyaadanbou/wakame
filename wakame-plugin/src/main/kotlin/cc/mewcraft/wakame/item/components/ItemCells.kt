@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.attribute.Attribute
-import cc.mewcraft.wakame.attribute.AttributeModifier
+import cc.mewcraft.wakame.entity.attribute.Attribute
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableListMultimap
 import com.google.common.collect.Multimap
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
 import net.kyori.examination.Examinable
-import java.util.*
 import java.util.Collections.emptyMap
 
 

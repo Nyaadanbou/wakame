@@ -30,7 +30,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
 
 /**
- * 伤害系统的监听器, 也是代码入口.
+ * 伤害系统的监听器, 也是游戏内伤害计算逻辑的代码入口.
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object DamageListener : Listener {
@@ -81,7 +81,7 @@ internal object DamageListener : Listener {
                 text("点伤害")
             ).hoverEvent(
                 damageMetadata.damageBundle.packets()
-                    .map { packet -> LinearComponents.linear(packet.element.value.displayName, text(": "), text(packet.packetDamage)) }
+                    .map { packet -> LinearComponents.linear(packet.element.unwrap().displayName, text(": "), text(packet.packetDamage)) }
                     .join(JoinConfiguration.newlines())
                     .let { component ->
                         HoverEvent.showText(
@@ -129,7 +129,7 @@ internal object DamageListener : Listener {
 }
 
 /**
- * 监听萌芽伤害事件, 使其遵循保护系统的规则.
+ * 监听 Koish 伤害事件, 使其遵循保护系统的规则.
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object DamageIntegration : Listener {

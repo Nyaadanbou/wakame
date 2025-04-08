@@ -7,8 +7,8 @@ import cc.mewcraft.wakame.reforge.common.PriceInstanceSerializer
 import cc.mewcraft.wakame.reforge.common.PriceModifierSerializer
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -26,7 +26,7 @@ internal object RecyclingStationSerializer {
             .resolve(ITEMS_DIR)
             .toFile()
 
-        val yamlLoader = buildYamlConfigLoader {
+        val yamlLoader = yamlLoader {
             withDefaults()
             serializers {
                 register(PriceInstanceSerializer)
@@ -60,7 +60,7 @@ internal object RecyclingStationSerializer {
             .resolve(STATIONS_DIR)
             .toFile()
 
-        val yamlLoader = buildYamlConfigLoader {
+        val yamlLoader = yamlLoader {
             withDefaults()
         }
 

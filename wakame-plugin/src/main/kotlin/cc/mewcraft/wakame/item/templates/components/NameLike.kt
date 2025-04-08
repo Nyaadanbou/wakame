@@ -26,8 +26,8 @@ abstract class NameLike : ItemTemplate<Component> {
                 tag("rarity") { queue: ArgumentQueue, ctx: Context ->
                     val arg = queue.popOr("Tag <rarity:_> must have an argument. Available arguments: 'name', 'style'").lowerValue()
                     when (arg) {
-                        "name" -> Tag.selfClosingInserting(rarity.value.displayName)
-                        "style" -> Tag.styling(*rarity.value.displayStyles)
+                        "name" -> Tag.selfClosingInserting(rarity.unwrap().displayName)
+                        "style" -> Tag.styling(*rarity.unwrap().displayStyles)
                         else -> throw ctx.newException("Unknown argument. Available arguments: 'name', 'style'", queue)
                     }
                 }

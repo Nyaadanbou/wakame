@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -38,7 +38,7 @@ sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品对直接生物造成伤害时执行的逻辑.
      */
-    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) = Unit
+    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) = Unit
 
     /**
      * 玩家使用该攻击类型的物品进行交互事件时执行的逻辑.
@@ -46,8 +46,7 @@ sealed interface AttackType {
      */
     fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        val user = player.toUser()
-        if (!user.attackSpeed.isActive(nekoStack.id)) {
+        if (!player.attackCooldownContainer.isActive(nekoStack.id)) {
             // 没有左键到生物时, 也应该应用攻击冷却
             nekoStack.applyAttackCooldown(player)
         }
@@ -70,7 +69,7 @@ data object HandAttack : AttackType
 /**
  * [AttackType] 的序列化器.
  */
-internal object AttackTypeSerializer : TypeSerializer<AttackType> {
+internal object AttackTypeSerializer : TypeSerializer2<AttackType> {
     override fun emptyValue(specificType: Type, options: ConfigurationOptions): AttackType {
         return HandAttack // 默认的攻击类型
     }

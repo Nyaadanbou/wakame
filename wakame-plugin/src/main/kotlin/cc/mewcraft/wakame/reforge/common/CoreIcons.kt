@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -21,9 +21,9 @@ internal object CoreIcons {
     fun getNekoStack(core: Core): NekoStack {
         val coreId = core.id.value() // 核心 id, 但去掉 namespace
         val item = when (core) {
-            is AttributeCore -> KoishRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
-            is EmptyCore -> KoishRegistries.ITEM["$ICON_ID_PREFIX/empty"]
-            else -> KoishRegistries.ITEM[DEFAULT_ICON_ID]
+            is AttributeCore -> DynamicRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
+            is EmptyCore -> DynamicRegistries.ITEM["$ICON_ID_PREFIX/empty"]
+            else -> DynamicRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
         val stack = item.realize()
         return stack.apply(ItemRenderers.SIMPLE::render)
@@ -34,9 +34,9 @@ internal object CoreIcons {
     }
 
     private fun getDefaultIcon(): NekoItem {
-        return KoishRegistries.ITEM[DEFAULT_ICON_ID] ?: run {
+        return DynamicRegistries.ITEM[DEFAULT_ICON_ID] ?: run {
             LOGGER.error("Default core icon not found! Please fix your config by add a item with id '$DEFAULT_ICON_ID'")
-            KoishRegistries.ITEM.getDefaultEntry().value
+            DynamicRegistries.ITEM.getDefaultEntry().unwrap()
         }
     }
 }

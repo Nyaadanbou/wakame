@@ -1,18 +1,18 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.attribute.bundle.element
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
+import cc.mewcraft.wakame.entity.attribute.bundle.element
 import cc.mewcraft.wakame.item.components.ItemCells
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.extension.*
-import cc.mewcraft.wakame.item.template.AttributeContextData
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
-import cc.mewcraft.wakame.kizami.KizamiType
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
@@ -135,9 +135,9 @@ private constructor(
     private fun initializeContext(
         itemId: Key,
         itemLevel: Int,
-        itemRarity: RegistryEntry<RarityType>,
-        itemElements: Set<RegistryEntry<ElementType>>,
-        itemKizamiz: Set<RegistryEntry<KizamiType>>,
+        itemRarity: RegistryEntry<Rarity>,
+        itemElements: Set<RegistryEntry<Element>>,
+        itemKizamiz: Set<RegistryEntry<Kizami>>,
         itemCells: ItemCells,
     ): ItemGenerationContext {
         // 创建一个空的 context

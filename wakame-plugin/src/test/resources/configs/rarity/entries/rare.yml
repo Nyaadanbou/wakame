@@ -1,5 +1,4 @@
 version: 1
-binary_index: 2
-display_name: "Rare"
+name: "Rare"
 styles: "<white>"
-glow_color: AQUA
+color: AQUA

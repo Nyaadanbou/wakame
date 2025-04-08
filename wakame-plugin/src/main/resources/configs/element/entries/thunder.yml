@@ -1,6 +1,5 @@
 # 不要修改!
 version: 1
 
-binary_index: 5
-display_name: "<color:#cf70cd>雷"
+name: "<color:#cf70cd>雷"
 styles: "<color:#cf70cd>"

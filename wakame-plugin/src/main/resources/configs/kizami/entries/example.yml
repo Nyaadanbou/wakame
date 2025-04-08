@@ -1,9 +1,5 @@
-# FIXME 移除 binary_index, 持久化直接储存字符串 id
-# 该铭刻的持久化的数字 id
-binary_index: 127
-
 # 该铭刻的展示名字
-display_name: "<green>庇护"
+name: "<green>庇护"
 
 # 该铭刻的展示风格
 styles: "<green>"

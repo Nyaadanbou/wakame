@@ -6,8 +6,7 @@ import cc.mewcraft.wakame.item.realize
 import cc.mewcraft.wakame.item.template.ItemGenerationContexts
 import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
 import cc.mewcraft.wakame.item.wrap
-import cc.mewcraft.wakame.registry2.KoishRegistries
-import cc.mewcraft.wakame.user.toUser
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import net.kyori.adventure.key.Key
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -36,7 +35,7 @@ class ItemXNeko(
             )
             return archetype.realize(context).bukkitStack
         } else {
-            return archetype.realize(player.toUser()).bukkitStack
+            return archetype.realize(player).bukkitStack
         }
     }
 
@@ -53,7 +52,7 @@ class ItemXNeko(
     private fun getArchetype(): NekoItem? {
         val transformed = identifier.replaceFirst('/', ':')
         val nekoItemId = Key.key(transformed)
-        return KoishRegistries.ITEM[nekoItemId]
+        return DynamicRegistries.ITEM[nekoItemId]
     }
 }
 

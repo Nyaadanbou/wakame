@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.javaTypeOf
 import net.kyori.examination.ExaminableProperty
 import net.kyori.examination.string.StringExaminer
@@ -44,7 +44,7 @@ internal class ItemBaseImpl(
 /**
  * [ItemBase] 的序列化器.
  */
-internal object ItemBaseSerializer : TypeSerializer<ItemBase> {
+internal object ItemBaseSerializer : TypeSerializer2<ItemBase> {
     override fun deserialize(type: Type, node: ConfigurationNode): ItemBase {
         val arguments = node.string ?: throw SerializationException(javaTypeOf<String>(), "Expected a string, got ${node.raw()}")
         if (arguments.isEmpty()) {

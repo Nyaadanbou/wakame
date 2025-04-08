@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.item2.config.property.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.item.toNMS
-import org.bukkit.Bukkit
+import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.exceptions.CommandSyntaxException
+import net.minecraft.commands.arguments.item.ItemParser
+import net.minecraft.server.MinecraftServer
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
@@ -24,7 +28,7 @@ interface ItemBase {
         val EMPTY: ItemBase = EmptyItemBase
 
         @JvmField
-        val SERIALIZER: TypeSerializer<ItemBase> = SimpleItemBase.Serializer
+        val SERIALIZER: TypeSerializer2<ItemBase> = SimpleItemBase.Serializer
 
     }
 
@@ -82,15 +86,30 @@ private data class SimpleItemBase(
     }
 
     override fun createMojang(): MojangStack {
-        return createBukkit().toNMS()
+        // Source: org.bukkit.craftbukkit.inventory.CraftItemFactory.createItemStack
+        try {
+            val arguments = type.name.lowercase() + format
+            val arg = ItemParser(MinecraftServer.getDefaultRegistryAccess()).parse(StringReader(arguments))
+
+            val item = arg.item().value()
+            val mojangStack = MojangStack(item)
+
+            val nbt = arg.components()
+            if (nbt != null) {
+                mojangStack.applyComponents(nbt)
+            }
+
+            return mojangStack
+        } catch (ex: CommandSyntaxException) {
+            throw IllegalArgumentException("Could not parse ItemStack: $format", ex)
+        }
     }
 
     override fun createBukkit(): ItemStack {
-        val arguments = type.name.lowercase() + format
-        return Bukkit.getItemFactory().createItemStack(arguments)
+        return createMojang().toBukkit()
     }
 
-    object Serializer : TypeSerializer<ItemBase> {
+    object Serializer : TypeSerializer2<ItemBase> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemBase {
             val arguments = node.string ?: throw SerializationException(node, type, "Expected a string, got ${node.raw()}")
             if (arguments.isEmpty()) {

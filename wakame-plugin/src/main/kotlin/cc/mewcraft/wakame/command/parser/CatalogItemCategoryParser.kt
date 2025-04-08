@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.command.parser
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.typeTokenOf
 import org.incendo.cloud.caption.StandardCaptionKeys
@@ -27,16 +27,16 @@ internal class ItemCatalogCategoryParser<C : Any> : ArgumentParser<C, CatalogIte
 
     override fun parse(commandContext: CommandContext<C>, commandInput: CommandInput): ArgumentParseResult<CatalogItemCategory> {
         val peekStr = commandInput.peekString()
-        if (peekStr !in KoishRegistries.ITEM_CATEGORY.ids.map(Identifier::value)) {
+        if (peekStr !in DynamicRegistries.ITEM_CATEGORY.ids.map(Identifier::value)) {
             return ArgumentParseResult.failure(ItemCatalogCategoryParseException(commandContext))
         }
 
         val readStr = commandInput.readString()
-        return ArgumentParseResult.success(KoishRegistries.ITEM_CATEGORY[readStr]!!)
+        return ArgumentParseResult.success(DynamicRegistries.ITEM_CATEGORY[readStr]!!)
     }
 
     override fun stringSuggestions(commandContext: CommandContext<C>, input: CommandInput): Iterable<String> {
-        return KoishRegistries.ITEM_CATEGORY.ids.map(Identifier::value)
+        return DynamicRegistries.ITEM_CATEGORY.ids.map(Identifier::value)
     }
 }
 

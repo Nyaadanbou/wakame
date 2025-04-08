@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.TickResult
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ecs.bridge.FleksEntity
-import cc.mewcraft.wakame.registry2.KoishRegistries2
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import com.github.quillraven.fleks.EntityUpdateContext
 
 interface ActiveAbilitySystem {
@@ -64,7 +64,7 @@ interface ActiveAbilitySystem {
 
             return tickResult
         } catch (t: Throwable) {
-            val abilityName = KoishRegistries2.ABILITY_META_TYPE.getKey(entity[AbilityComponent].metaType) ?: "Unknown"
+            val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[AbilityComponent].metaType) ?: "Unknown"
             throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
         }
     }

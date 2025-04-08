@@ -2,15 +2,11 @@ package cc.mewcraft.wakame.ability2
 
 import cc.mewcraft.wakame.ability2.combo.PlayerComboResult
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Entity
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
+import org.bukkit.entity.*
 import org.bukkit.event.Cancellable
 import org.bukkit.event.player.PlayerInteractEvent
 
@@ -32,8 +28,7 @@ internal object AbilityEntryPointHandler {
     }
 
     private fun onLeftClick(player: Player, event: PlayerInteractEvent) {
-        val user = player.toUser()
-        val result = user.combo.addTrigger(AbilitySingleTrigger.LEFT_CLICK)
+        val result = player.combo.addTrigger(AbilitySingleTrigger.LEFT_CLICK)
         if (result == PlayerComboResult.CANCEL_EVENT) {
             event.isCancelled = true
         }
@@ -48,8 +43,7 @@ internal object AbilityEntryPointHandler {
     }
 
     private fun onRightClick(player: Player, event: PlayerInteractEvent) {
-        val user = player.toUser()
-        val result = user.combo.addTrigger(AbilitySingleTrigger.RIGHT_CLICK)
+        val result = player.combo.addTrigger(AbilitySingleTrigger.RIGHT_CLICK)
         tryApplyAbilityResult(result, event)
     }
 

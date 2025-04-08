@@ -2,11 +2,12 @@ package item
 
 import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.ability.AbilityRegistryLoader
+import cc.mewcraft.wakame.ability2.AbilityMetaRegistryLoader
+import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
-import cc.mewcraft.wakame.entity.attribute.AttributeBundleFacadeRegistryLoader
-import cc.mewcraft.wakame.entity.typeholder.EntityTypeHolderRegistryLoader
+import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
+import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
 import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
@@ -17,10 +18,10 @@ import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.filters.ItemFilterNodeFacade
-import cc.mewcraft.wakame.kizami.KizamiTypeRegistryLoader
-import cc.mewcraft.wakame.rarity.LevelRarityMappingRegistryLoader
-import cc.mewcraft.wakame.rarity.RarityTypeRegistryLoader
-import cc.mewcraft.wakame.util.buildYamlConfigLoader
+import cc.mewcraft.wakame.kizami.KizamiRegistryLoader
+import cc.mewcraft.wakame.rarity.LevelToRarityMappingRegistryLoader
+import cc.mewcraft.wakame.rarity.RarityRegistryLoader
+import cc.mewcraft.wakame.util.yamlLoader
 import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
@@ -51,13 +52,14 @@ object CommonNekoStackTest {
         KoishDataPaths.initialize()
 
         // 按依赖顺序, 初始化注册表
-        ElementTypeRegistryLoader.init()
-        AttributeBundleFacadeRegistryLoader.init()
-        AbilityRegistryLoader.init()
-        KizamiTypeRegistryLoader.init()
-        RarityTypeRegistryLoader.init()
-        LevelRarityMappingRegistryLoader.init()
-        EntityTypeHolderRegistryLoader.init()
+        ElementRegistryLoader.init()
+        AttributeFacadeRegistryLoader.init()
+        AbilityMetaRegistryLoader.init()
+        AbilityTriggerRegistryLoader.init()
+        KizamiRegistryLoader.init()
+        RarityRegistryLoader.init()
+        LevelToRarityMappingRegistryLoader.init()
+        EntityRefRegistryLoader.init()
 
         // 初始化所有 random3.Node 相关的实现
         ElementSampleNodeFacade.init()
@@ -82,7 +84,7 @@ fun KoinTest.readItemNode(namespace: String, path: String): Triple<Key, Path, Co
 
     val key = Key.key(namespace, path)
     val relPath = itemFile.toPath()
-    val loader = buildYamlConfigLoader {
+    val loader = yamlLoader {
         withDefaults()
         serializers { registerAll(ItemTypeRegistryLoader.SERIALIZERS) }
     }

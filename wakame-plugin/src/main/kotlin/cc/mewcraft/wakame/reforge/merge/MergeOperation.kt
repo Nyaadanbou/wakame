@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.*
 import cc.mewcraft.wakame.item.components.PortableCore
 import cc.mewcraft.wakame.item.components.ReforgeHistory
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
@@ -10,13 +10,12 @@ import cc.mewcraft.wakame.item.extension.level
 import cc.mewcraft.wakame.item.extension.portableCore
 import cc.mewcraft.wakame.item.extension.rarity
 import cc.mewcraft.wakame.item.extension.reforgeHistory
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
 import org.slf4j.Logger
-import java.util.*
 import kotlin.math.ceil
 
 /**
@@ -105,7 +104,7 @@ private constructor(
             // 选取权重较高的稀有度作为结果的稀有度
             val rarity1 = inputItem1.rarity
             val rarity2 = inputItem2.rarity
-            maxOf(rarity1, rarity2, Comparator.comparing(RegistryEntry<RarityType>::value))
+            maxOf(rarity1, rarity2, Comparator.comparing(RegistryEntry<Rarity>::unwrap))
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改

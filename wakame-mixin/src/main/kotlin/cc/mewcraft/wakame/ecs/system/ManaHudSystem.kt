@@ -1,18 +1,16 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.ecs.component.BukkitPlayerComponent
+import cc.mewcraft.wakame.ecs.component.BukkitObject
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.ecs.component.ManaBossBar
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.FamilyOnAdd
-import com.github.quillraven.fleks.Fixed
-import com.github.quillraven.fleks.IteratingSystem
+import cc.mewcraft.wakame.entity.player.component.InventoryListenable
+import com.github.quillraven.fleks.*
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 
 class ManaHudSystem : IteratingSystem(
-    family = Families.BUKKIT_PLAYER,
+    family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) },
     interval = Fixed(5f)
 ), FamilyOnAdd {
 
@@ -32,6 +30,6 @@ class ManaHudSystem : IteratingSystem(
 
     override fun onAddEntity(entity: Entity) {
         entity.configure { it += ManaBossBar(BossBar.bossBar(Component.empty(), 0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS)) }
-        entity[ManaBossBar].bossBar.addViewer(entity[BukkitPlayerComponent].bukkitPlayer)
+        entity[ManaBossBar].bossBar.addViewer(entity[BukkitPlayer].unwrap())
     }
 }

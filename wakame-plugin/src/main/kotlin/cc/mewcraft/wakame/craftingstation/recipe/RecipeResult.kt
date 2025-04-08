@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
@@ -8,6 +7,7 @@ import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStati
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemStacks
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.giveItemStack
 import cc.mewcraft.wakame.util.require
@@ -89,7 +89,7 @@ internal data class ItemResult(
 /**
  * [RecipeResult] 的序列化器.
  */
-internal object StationResultSerializer : TypeSerializer<RecipeResult> {
+internal object StationResultSerializer : TypeSerializer2<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
         val item = node.node("item").require<ItemX>()
         val amount = node.node("amount").getInt(1)

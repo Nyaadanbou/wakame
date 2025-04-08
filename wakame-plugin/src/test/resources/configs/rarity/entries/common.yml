@@ -1,5 +1,4 @@
 version: 1
-binary_index: 0
-display_name: "Common"
+name: "Common"
 styles: "<white>"
-glow_color: WHITE
+color: WHITE

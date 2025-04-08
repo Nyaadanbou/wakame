@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.lifecycle.reloader
 
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
-import cc.mewcraft.wakame.lifecycle.withLifecycleDependencyCreation
+import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyCreation
 import cc.mewcraft.wakame.util.internalName
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher

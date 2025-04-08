@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.api
 import cc.mewcraft.wakame.api.item.KoishItem
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
 import cc.mewcraft.wakame.item.nekoItem
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -28,7 +28,7 @@ object ApiItemRegistry : KoishItemRegistry {
 
     override fun getOrNull(id: Key?): KoishItem? {
         if (id == null) return null
-        return KoishRegistries.ITEM[id]?.let(::ApiItemWrapper)
+        return DynamicRegistries.ITEM[id]?.let(::ApiItemWrapper)
     }
 
     override fun getOrNull(itemStack: ItemStack?): KoishItem? {
@@ -36,6 +36,6 @@ object ApiItemRegistry : KoishItemRegistry {
     }
 
     override fun getNonNamespaced(name: String): List<KoishItem> {
-        return KoishRegistries.ITEM.getFuzzy(name).map(::ApiItemWrapper)
+        return DynamicRegistries.ITEM.getFuzzy(name).map(::ApiItemWrapper)
     }
 }

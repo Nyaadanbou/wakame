@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.toKotlinRange
@@ -43,7 +43,7 @@ data class MetaItemLevel(
 
         // 实现注意事项: 将内部的 TypeSerializer 暴露为一个 val
         @JvmField
-        val SERIALIZER: TypeSerializer<MetaItemLevel> = Serializer
+        val SERIALIZER: TypeSerializer2<MetaItemLevel> = Serializer
 
     }
 
@@ -88,7 +88,7 @@ data class MetaItemLevel(
      *   max: <int>
      * ```
      */
-    private object Serializer : TypeSerializer<MetaItemLevel> {
+    private object Serializer : TypeSerializer2<MetaItemLevel> {
         override fun deserialize(type: Type, node: ConfigurationNode): MetaItemLevel {
             val base = when (val scalar = node.node("base").rawScalar()) {
                 is Number -> scalar

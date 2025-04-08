@@ -3,10 +3,10 @@ package cc.mewcraft.wakame.display2.implementation.standard
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.display2.*
 import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.components.cells.AttributeCore
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.player.attackspeed.AttackSpeedLevel
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -19,7 +19,7 @@ internal data class CellularAttributeRendererFormat(
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
     override val textMetaFactory: TextMetaFactory = AttributeCoreTextMetaFactory(namespace, ordinal.operation, ordinal.element)
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> KoishRegistries.ATTRIBUTE_BUNDLE_FACADE.containsId(id) }
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace) { id: String -> BuiltInRegistries.ATTRIBUTE_FACADE.containsId(id) }
 
     fun render(data: AttributeCore): IndexedText {
         return SimpleIndexedText(computeIndex(data), data.description)
@@ -62,22 +62,14 @@ internal data class AttackSpeedRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun render(data: AttackSpeedLevel): IndexedText {
-        val resolver = Placeholder.component("value", tooltip.level.getOrDefault(data.ordinal, UNKNOWN_LEVEL))
+    fun render(data: AttackSpeed): IndexedText {
+        val resolver = Placeholder.component("value", data.displayName)
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip.line, resolver)))
     }
 
     @ConfigSerializable
     data class Tooltip(
         val line: String = "Attack Speed: <value>",
-        val level: Map<Int, Component> = mapOf(
-            0 to Component.text("Very Slow"),
-            1 to Component.text("Slow"),
-            2 to Component.text("Normal"),
-            3 to Component.text("Fast"),
-            4 to Component.text("Very Fast"),
-            // 等攻速可自定义的时候, 这部分也要跟着重构一下
-        ),
     )
 
     companion object Shared {

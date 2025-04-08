@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item2.config.property.impl
 import cc.mewcraft.wakame.GenericKeys
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.config.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.EnumLookup
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.require
@@ -31,7 +31,7 @@ import java.util.stream.Stream
  * 如果一个物品在这个栏位里, 那么这个物品就应该被认为是“生效的”,
  * 所有的属性、技能、铭刻等都应该对当前物品的拥有者 (即玩家) 生效.
  *
- * 如果一个物品没有生效的栏位, 使用 [ItemSlot.empty] 单例.
+ * 如果一个物品没有生效的栏位, 可以使用单例 [ItemSlot.empty] 以优雅的编写逻辑.
  */
 sealed interface ItemSlot : Examinable {
 
@@ -167,6 +167,7 @@ sealed interface ItemSlotGroup {
         /**
          * 获取一个空的 [ItemSlotGroup] 实例.
          */
+        @JvmStatic
         fun empty(): ItemSlotGroup = EmptyItemSlotGroup
 
     }

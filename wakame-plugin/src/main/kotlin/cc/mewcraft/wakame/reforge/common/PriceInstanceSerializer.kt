@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.lang.reflect.Type
 
-internal object PriceInstanceSerializer : TypeSerializer<PriceInstance> {
+internal object PriceInstanceSerializer : TypeSerializer2<PriceInstance> {
     override fun deserialize(type: Type, node: ConfigurationNode): PriceInstance {
         // 如果配置文件里只有 base, 那么 min_base = max_base = base
         // 如果配置文件里没有 base, 那么 min_base 和 max_base 按照自己的来

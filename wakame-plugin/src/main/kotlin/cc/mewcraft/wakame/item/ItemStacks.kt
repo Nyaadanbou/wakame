@@ -3,10 +3,9 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.item.extension.setNbt
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.registry2.DynamicRegistries
 import net.minecraft.nbt.CompoundTag
 import org.bukkit.inventory.ItemStack
-import java.util.*
 
 /**
  * 关于 [ItemStack] 的全局函数/变量.
@@ -35,8 +34,8 @@ object ItemStacks {
     fun createUnknown(trace: String? = null): ItemStack {
         return CACHE.getOrPut(trace ?: DEFAULT_ID) {
             // 从注册表获取“未知物品”的原型
-            val entry = KoishRegistries.ITEM.getDefaultEntry()
-            val item = entry.value
+            val entry = DynamicRegistries.ITEM.getDefaultEntry()
+            val item = entry.unwrap()
             val stack = item.realize()
 
             // 写入字符串标记, 方便开发人员识别

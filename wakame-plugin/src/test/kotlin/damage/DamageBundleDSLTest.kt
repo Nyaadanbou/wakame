@@ -2,13 +2,13 @@ package damage
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.adventure.adventureModule
-import cc.mewcraft.wakame.attribute.AttributeMap
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
-import cc.mewcraft.wakame.element.ElementType
-import cc.mewcraft.wakame.element.ElementTypeRegistryLoader
-import cc.mewcraft.wakame.registry2.KoishRegistries
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.element.ElementRegistryLoader
+import cc.mewcraft.wakame.entity.attribute.AttributeMap
+import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import io.mockk.every
 import io.mockk.mockk
@@ -52,7 +52,7 @@ class DamageBundleDSLTest : KoinTest {
             KoishDataPaths.initialize()
 
             // 按依赖顺序, 初始化注册表
-            ElementTypeRegistryLoader.init()
+            ElementRegistryLoader.init()
         }
 
         @AfterAll
@@ -65,16 +65,16 @@ class DamageBundleDSLTest : KoinTest {
     private val logger: Logger by inject()
 
     // 用于测试的 Element 实例
-    private lateinit var fireElem: RegistryEntry<ElementType>
-    private lateinit var windElem: RegistryEntry<ElementType>
+    private lateinit var fireElem: RegistryEntry<Element>
+    private lateinit var windElem: RegistryEntry<Element>
 
     // 用于测试的 AttributeMap 实例
     private lateinit var attriMap: AttributeMap
 
     @BeforeEach
     fun beforeEach() {
-        fireElem = KoishRegistries.ELEMENT.getEntryOrThrow("fire")
-        windElem = KoishRegistries.ELEMENT.getEntryOrThrow("wind")
+        fireElem = BuiltInRegistries.ELEMENT.getEntryOrThrow("fire")
+        windElem = BuiltInRegistries.ELEMENT.getEntryOrThrow("wind")
 
         // 初始化 AttributeMap 的摹刻, 用于测试
         attriMap = mockk()

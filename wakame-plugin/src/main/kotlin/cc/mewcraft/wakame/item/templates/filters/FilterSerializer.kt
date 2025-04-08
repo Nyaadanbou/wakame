@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.item.templates.filters
 
-import cc.mewcraft.wakame.attribute.AttributeModifier
-import cc.mewcraft.wakame.config.configurate.TypeSerializer
-import cc.mewcraft.wakame.element.ElementType
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
 import cc.mewcraft.wakame.random3.Filter
-import cc.mewcraft.wakame.rarity.RarityType
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import com.google.common.collect.Range
 import net.kyori.adventure.key.Key
@@ -15,7 +15,7 @@ import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>> {
+internal object FilterSerializer : TypeSerializer2<Filter<ItemGenerationContext>> {
     const val NAMESPACE_FILTER = "item"
 
     override fun deserialize(type: Type, node: ConfigurationNode): Filter<ItemGenerationContext> {
@@ -26,12 +26,12 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
             AttributeFilter.TYPE -> {
                 val id = node.node("attribute").require<String>()
                 val operation = node.node("operation").get<AttributeModifier.Operation>()
-                val element = node.node("element").get<RegistryEntry<ElementType>>() // optional
+                val element = node.node("element").get<RegistryEntry<Element>>() // optional
                 AttributeFilter(inverted, id, operation, element)
             }
 
             ElementFilter.TYPE -> {
-                val element = node.node("element").require<RegistryEntry<ElementType>>()
+                val element = node.node("element").require<RegistryEntry<Element>>()
                 ElementFilter(inverted, element)
             }
 
@@ -46,7 +46,7 @@ internal object FilterSerializer : TypeSerializer<Filter<ItemGenerationContext>>
             }
 
             RarityFilter.TYPE -> {
-                val rarity = node.node("rarity").require<RegistryEntry<RarityType>>()
+                val rarity = node.node("rarity").require<RegistryEntry<Rarity>>()
                 RarityFilter(inverted, rarity)
             }
 
