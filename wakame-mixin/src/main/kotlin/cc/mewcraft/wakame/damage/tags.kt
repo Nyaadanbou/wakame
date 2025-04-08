@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.damage
 
-import org.jetbrains.annotations.ApiStatus
-
 /**
  * 创建一个 [DamageTags].
  */
@@ -50,39 +48,6 @@ interface DamageTags {
      * 列出伤害标签集中的所有标签.
      */
     fun tags(): Set<DamageTag>
-}
-
-/**
- * 用于创建 [DamageTags] 的实例.
- */
-@Deprecated("In favor of DamageType")
-interface DamageTagsFactory {
-    /**
-     * 创建一个 [DamageTags].
-     */
-    fun create(vararg tags: DamageTag): DamageTags
-
-    /**
-     * 创建一个 [DamageTags].
-     */
-    fun create(tags: List<DamageTag>): DamageTags
-
-    /**
-     * 半生对象, 用于获取 [DamageTagsFactory] 的实例.
-     */
-    companion object {
-
-        @get:JvmName("getInstance")
-        lateinit var INSTANCE: DamageTagsFactory
-            private set
-
-        @ApiStatus.Internal
-        fun register(factory: DamageTagsFactory) {
-            INSTANCE = factory
-        }
-
-    }
-
 }
 
 /**
@@ -173,16 +138,6 @@ enum class DamageTag {
 // ------------
 // 内部实现
 // ------------
-
-internal object DefaultDamageTagsFactory : DamageTagsFactory {
-    override fun create(vararg tags: DamageTag): DamageTags {
-        return DamageTagsImpl(*tags)
-    }
-
-    override fun create(tags: List<DamageTag>): DamageTags {
-        return DamageTagsImpl(tags)
-    }
-}
 
 private class DamageTagsImpl(
     vararg tags: DamageTag,

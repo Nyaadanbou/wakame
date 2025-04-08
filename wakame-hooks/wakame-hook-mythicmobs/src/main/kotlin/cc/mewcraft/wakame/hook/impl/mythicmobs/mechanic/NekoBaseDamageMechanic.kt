@@ -69,9 +69,9 @@ class NekoBaseDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.INSTANCE.create()
+            return DamageTags()
         }
-        return DamageTagsFactory.INSTANCE.create(origin.map { DamageTag.valueOf(it) })
+        return DamageTags(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {

@@ -5,11 +5,11 @@ import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.registerSerializer
+import cc.mewcraft.wakame.entity.hologram.AnimationData
+import cc.mewcraft.wakame.entity.hologram.Hologram
+import cc.mewcraft.wakame.entity.hologram.TextHologramData
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.extensions.*
-import cc.mewcraft.wakame.hologram.AnimationData
-import cc.mewcraft.wakame.hologram.Hologram
-import cc.mewcraft.wakame.hologram.TextHologramData
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -48,7 +48,7 @@ private val MERGED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("merged")
 private val SEPARATED_DISPLAY_CONFIG = DISPLAY_CONFIG.node("separated")
 
 /**
- * 实现了以悬浮文字显示实体受到的伤害的功能.
+ * 该 object 实现了元素伤害显示的功能.
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object DamageDisplay : Listener {

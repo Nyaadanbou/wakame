@@ -55,9 +55,22 @@ class NekoPercentDamageMechanic(
                         // 配置文件内指定 element, min, max, rate
                         4 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data])
                         // 配置文件内指定 element, min, max, rate, defense_penetration
-                        5 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data])
+                        5 -> split[0] to DamagePacket(
+                            split[0],
+                            split[1].toHealthPercentDouble().invoke(data, target),
+                            split[2].toHealthPercentDouble().invoke(data, target),
+                            split[3].toPlaceholderDouble()[data],
+                            split[4].toPlaceholderDouble()[data]
+                        )
                         // 配置文件内指定 element, min, max, rate, defense_penetration, defense_penetration_rate
-                        6 -> split[0] to DamagePacket(split[0], split[1].toHealthPercentDouble().invoke(data, target), split[2].toHealthPercentDouble().invoke(data, target), split[3].toPlaceholderDouble()[data], split[4].toPlaceholderDouble()[data], split[5].toPlaceholderDouble()[data])
+                        6 -> split[0] to DamagePacket(
+                            split[0],
+                            split[1].toHealthPercentDouble().invoke(data, target),
+                            split[2].toHealthPercentDouble().invoke(data, target),
+                            split[3].toPlaceholderDouble()[data],
+                            split[4].toPlaceholderDouble()[data],
+                            split[5].toPlaceholderDouble()[data]
+                        )
 
                         else -> throw IllegalArgumentException("Invalid damage packet: '$rawPacketString'")
                     }
@@ -86,9 +99,9 @@ class NekoPercentDamageMechanic(
 
     private fun parseDamageTags(origin: List<String>): DamageTags {
         if (origin.isEmpty()) {
-            return DamageTagsFactory.INSTANCE.create()
+            return DamageTags()
         }
-        return DamageTagsFactory.INSTANCE.create(origin.map { DamageTag.valueOf(it) })
+        return DamageTags(origin.map { DamageTag.valueOf(it) })
     }
 
     private fun parseCriticalState(origin: String): CriticalStrikeState {

@@ -200,27 +200,6 @@ data class DamagePacket(
 // 内部实现
 // ------------
 
-internal object DefaultDamageBundleFactory : DamageBundleFactory {
-    override fun createUnsafe(data: Map<String, DamagePacket>): DamageBundle {
-        val packets = mutableMapOf<RegistryEntry<Element>, DamagePacket>()
-        for ((id, packet) in data) {
-            val element = getElementById(id)
-            if (element != null) {
-                packets[element] = packet
-            }
-        }
-        return DamageBundle(packets)
-    }
-
-    override fun create(data: Map<RegistryEntry<Element>, DamagePacket>): DamageBundle {
-        return DamageBundle(data)
-    }
-}
-
-private fun getElementById(id: String): RegistryEntry<Element>? {
-    return BuiltInRegistries.ELEMENT.getEntry(id)
-}
-
 private class DamageBundleImpl(
     packets: Map<RegistryEntry<Element>, DamagePacket>,
 ) : DamageBundle, Examinable {
@@ -247,7 +226,7 @@ private class DamageBundleImpl(
     }
 
     override fun remove(id: String): DamagePacket? {
-        val element = getElementById(id) ?: return null
+        val element = BuiltInRegistries.ELEMENT.getEntry(id) ?: return null
         return packets.remove(element)
     }
 
@@ -256,7 +235,7 @@ private class DamageBundleImpl(
     }
 
     override fun get(id: String): DamagePacket? {
-        val element = getElementById(id) ?: return null
+        val element = BuiltInRegistries.ELEMENT.getEntry(id) ?: return null
         return get(element)
     }
 

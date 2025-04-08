@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.hologram
+package cc.mewcraft.wakame.entity.hologram
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Color

@@ -1,11 +1,11 @@
-package cc.mewcraft.wakame.hologram
+package cc.mewcraft.wakame.entity.hologram
 
 import org.joml.Vector3f
 
 /**
  * 展示实体动画的具体变换参数.
  */
-internal data class AnimationData(
+data class AnimationData(
     val startInterpolation: Int,
     val interpolationDuration: Int,
     val translation: Vector3f,

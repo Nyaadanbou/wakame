@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity
 import java.util.*
 
 @ClassTarget(Entity::class)
-internal interface ShadowEntity : Shadow {
+interface ShadowEntity : Shadow {
     // protected static final EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID
     @get:Field
     @get:Static

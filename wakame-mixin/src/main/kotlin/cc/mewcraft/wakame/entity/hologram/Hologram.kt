@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.hologram
+package cc.mewcraft.wakame.entity.hologram
 
-import cc.mewcraft.wakame.shadow.network.ShadowSynchedEntityData
+import cc.mewcraft.wakame.shadow.network.syncher.ShadowSynchedEntityData
 import com.mojang.math.Transformation
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory

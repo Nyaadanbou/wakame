@@ -10,7 +10,7 @@ import net.minecraft.world.level.storage.loot.LootTable
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable
 
 @ClassTarget(NestedLootTable::class)
-internal interface ShadowNestedLootTable : Shadow {
+interface ShadowNestedLootTable : Shadow {
     @get:Field
     @get:Target("contents")
     val contents: Either<ResourceKey<LootTable>, LootTable>

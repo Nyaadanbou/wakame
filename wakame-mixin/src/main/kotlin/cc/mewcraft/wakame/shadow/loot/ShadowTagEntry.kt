@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.storage.loot.entries.TagEntry
 
 @ClassTarget(TagEntry::class)
-internal interface ShadowTagEntry : Shadow {
+interface ShadowTagEntry : Shadow {
     @get:Field
     @get:Target("tag")
     val tag: TagKey<Item>

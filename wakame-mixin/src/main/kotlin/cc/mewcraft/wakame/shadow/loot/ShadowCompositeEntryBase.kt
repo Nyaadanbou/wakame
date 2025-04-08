@@ -8,7 +8,7 @@ import net.minecraft.world.level.storage.loot.entries.CompositeEntryBase
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer
 
 @ClassTarget(CompositeEntryBase::class)
-internal interface ShadowCompositeEntryBase : Shadow {
+interface ShadowCompositeEntryBase : Shadow {
     @get:Field
     @get:Target("children")
     val children: List<LootPoolEntryContainer>

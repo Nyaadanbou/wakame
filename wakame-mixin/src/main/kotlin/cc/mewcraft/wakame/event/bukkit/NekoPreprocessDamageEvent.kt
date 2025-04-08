@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.damage.DamageContext
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
-import cc.mewcraft.wakame.entity.player.attributeContainer
 import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -28,8 +25,7 @@ import org.bukkit.event.HandlerList
  * @property damageSource 更多的伤害信息. 为 null 意为还未造成实际伤害.
  */
 // FIXME #366: 让 preprocess 支持 cancel 以尽早的停止伤害计算节省资源?
-class NekoPreprocessDamageEvent
-internal constructor(
+class NekoPreprocessDamageEvent(
     val phase: Phase,
     val causingEntity: Player,
     val causingAttributes: AttributeMapSnapshot, // 注意, 这里的属性与 causingEntity 直接返回的属性可能不一样
@@ -109,65 +105,12 @@ internal constructor(
     }
 
     companion object {
+        @JvmStatic
         private val handlerList = HandlerList()
 
         @JvmStatic
         fun getHandlerList(): HandlerList {
             return handlerList
-        }
-
-        internal fun launchProjectile(causingEntity: Player): NekoPreprocessDamageEvent {
-            return NekoPreprocessDamageEvent(
-                phase = Phase.SEARCHING_TARGET,
-                causingEntity = causingEntity,
-                causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-                _damageeEntity = null,
-                _damageSource = null
-            )
-        }
-
-        internal fun searchingTarget(causingEntity: Player): NekoPreprocessDamageEvent {
-            return NekoPreprocessDamageEvent(
-                phase = Phase.SEARCHING_TARGET,
-                causingEntity = causingEntity,
-                causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-                _damageeEntity = null,
-                _damageSource = null
-            )
-        }
-
-        internal fun actuallyDamage(causingEntity: Player, damageeEntity: LivingEntity): NekoPreprocessDamageEvent {
-            return NekoPreprocessDamageEvent(
-                phase = Phase.ACTUALLY_DAMAGE,
-                causingEntity = causingEntity,
-                causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-                _damageeEntity = damageeEntity,
-                _damageSource = DamageSource.builder(DamageType.GENERIC)
-                    .withCausingEntity(causingEntity)
-                    .withDirectEntity(causingEntity)
-                    .withDamageLocation(damageeEntity.location)
-                    .build(),
-            )
-        }
-
-        internal fun actuallyDamage(causingEntity: Player, damageContext: DamageContext): NekoPreprocessDamageEvent {
-            return NekoPreprocessDamageEvent(
-                phase = Phase.ACTUALLY_DAMAGE,
-                causingEntity = causingEntity,
-                causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-                _damageeEntity = damageContext.damagee,
-                _damageSource = damageContext.damageSource,
-            )
-        }
-
-        internal fun actuallyDamage(causingEntity: Player, causingAttributes: AttributeMapSnapshot, damageContext: DamageContext): NekoPreprocessDamageEvent {
-            return NekoPreprocessDamageEvent(
-                phase = Phase.ACTUALLY_DAMAGE,
-                causingEntity = causingEntity,
-                causingAttributes = causingAttributes,
-                _damageeEntity = damageContext.damagee,
-                _damageSource = damageContext.damageSource,
-            )
         }
     }
 }

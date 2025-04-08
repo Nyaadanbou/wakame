@@ -1,3 +1,4 @@
+@file:JvmName("LogicImpl")
 @file:Suppress("UnstableApiUsage")
 
 package cc.mewcraft.wakame.damage
@@ -22,6 +23,7 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent.Phase
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -36,60 +38,16 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
 import org.bukkit.damage.DamageSource
+import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
-import org.jetbrains.annotations.ApiStatus
 import xyz.xenondevs.commons.collections.enumSetOf
 import java.time.Duration
 import java.util.*
 import kotlin.math.round
-
-/**
- * @see DamageManagerApi.hurt
- */
-fun LivingEntity.hurt(damageMetadata: DamageMetadata, source: LivingEntity? = null, knockback: Boolean = false) {
-    DamageManager.hurt(this, damageMetadata, source, knockback)
-}
-
-interface DamageManagerApi {
-
-    /**
-     * 对 [victim] 造成由 [metadata] 指定的自定义伤害.
-     *
-     * 当 [damager] 为 `null` 时, 伤害属于无源, 不会产生击退效果.
-     *
-     * @param victim 受到伤害的实体
-     * @param metadata 伤害的元数据
-     * @param damager 造成伤害的实体
-     * @param knockback 是否产生击退效果
-     */
-    fun hurt(
-        victim: LivingEntity,
-        metadata: DamageMetadata,
-        damager: LivingEntity? = null,
-        knockback: Boolean = false,
-    )
-
-    /**
-     * 伴生对象, 提供 [DamageManagerApi] 的实例.
-     */
-    companion object {
-
-        @get:JvmName("getInstance")
-        lateinit var INSTANCE: DamageManagerApi
-            private set
-
-        @ApiStatus.Internal
-        fun register(instance: DamageManagerApi) {
-            this.INSTANCE = instance
-        }
-
-    }
-
-}
 
 // ------------
 // 内部实现
@@ -103,6 +61,9 @@ internal fun DamageContext(event: EntityDamageEvent): DamageContext {
     return DamageContext(damage, damagee, damageSource, damageCause)
 }
 
+/**
+ * 伤害信息的封装.
+ */
 internal class DamageContext(
     val damage: Double,
     val damagee: LivingEntity,
@@ -115,7 +76,67 @@ internal class DamageContext(
 }
 
 /**
- * 包含伤害系统的核心逻辑和状态.
+ * 用于方便构建 [NekoPreprocessDamageEvent].
+ */
+internal object PreprocessDamageEventFactory {
+
+    internal fun launchProjectile(causingEntity: Player): NekoPreprocessDamageEvent {
+        return NekoPreprocessDamageEvent(
+            phase = Phase.SEARCHING_TARGET,
+            causingEntity = causingEntity,
+            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
+            _damageeEntity = null,
+            _damageSource = null
+        )
+    }
+
+    internal fun searchingTarget(causingEntity: Player): NekoPreprocessDamageEvent {
+        return NekoPreprocessDamageEvent(
+            phase = Phase.SEARCHING_TARGET,
+            causingEntity = causingEntity,
+            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
+            _damageeEntity = null,
+            _damageSource = null
+        )
+    }
+
+    internal fun actuallyDamage(causingEntity: Player, damageeEntity: LivingEntity): NekoPreprocessDamageEvent {
+        return NekoPreprocessDamageEvent(
+            phase = Phase.ACTUALLY_DAMAGE,
+            causingEntity = causingEntity,
+            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
+            _damageeEntity = damageeEntity,
+            _damageSource = DamageSource.builder(DamageType.GENERIC)
+                .withCausingEntity(causingEntity)
+                .withDirectEntity(causingEntity)
+                .withDamageLocation(damageeEntity.location)
+                .build(),
+        )
+    }
+
+    internal fun actuallyDamage(causingEntity: Player, damageContext: DamageContext): NekoPreprocessDamageEvent {
+        return NekoPreprocessDamageEvent(
+            phase = Phase.ACTUALLY_DAMAGE,
+            causingEntity = causingEntity,
+            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
+            _damageeEntity = damageContext.damagee,
+            _damageSource = damageContext.damageSource,
+        )
+    }
+
+    internal fun actuallyDamage(causingEntity: Player, causingAttributes: AttributeMapSnapshot, damageContext: DamageContext): NekoPreprocessDamageEvent {
+        return NekoPreprocessDamageEvent(
+            phase = Phase.ACTUALLY_DAMAGE,
+            causingEntity = causingEntity,
+            causingAttributes = causingAttributes,
+            _damageeEntity = damageContext.damagee,
+            _damageSource = damageContext.damageSource,
+        )
+    }
+}
+
+/**
+ * 包含伤害系统的计算逻辑和状态.
  */
 internal object DamageManager : DamageManagerApi {
 
@@ -141,6 +162,7 @@ internal object DamageManager : DamageManagerApi {
         EntityType.TRIDENT,
         EntityType.WIND_CHARGE,
     )
+
     /**
      * 作为 direct_entity 时能够造成伤害的 entity 类型.
      */
@@ -569,7 +591,7 @@ internal object DamageManager : DamageManagerApi {
     private fun calculateAbstractArrowDamage(causingEntity: Player, abstractArrow: AbstractArrow, context: DamageContext): DamageMetadata? {
         val (force, attributes) = abstractArrow.getRegisteredDamage() ?: return null
 
-        val event = NekoPreprocessDamageEvent.actuallyDamage(causingEntity, attributes, context).apply { callEvent() }
+        val event = PreprocessDamageEventFactory.actuallyDamage(causingEntity, attributes, context).apply { callEvent() }
 
         val attributes2 = event.causingAttributes // 拦截/修改后的属性快照
         val damageBundle = run {

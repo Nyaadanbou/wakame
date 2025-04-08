@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.item.NekoStack
@@ -65,7 +65,7 @@ data class SpearAttack(
         return damageMeta
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoEntityDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
         if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
             return
         }

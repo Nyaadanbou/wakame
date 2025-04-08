@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.entity.player.koishLevel
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack
 
 interface LevelBarrier : ItemBehavior {
     private object Default : LevelBarrier {
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
             tryCancelEvent(itemStack, koishStack, player, event)
         }
 

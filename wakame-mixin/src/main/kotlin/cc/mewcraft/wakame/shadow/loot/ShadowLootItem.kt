@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.storage.loot.entries.LootItem
 
 @ClassTarget(LootItem::class)
-internal interface ShadowLootItem : Shadow {
+interface ShadowLootItem : Shadow {
     @get:Field
     @get:Target("item")
     val item: Holder<Item>

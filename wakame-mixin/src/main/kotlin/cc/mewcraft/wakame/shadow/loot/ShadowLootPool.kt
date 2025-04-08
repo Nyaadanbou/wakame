@@ -8,7 +8,7 @@ import net.minecraft.world.level.storage.loot.LootPool
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer
 
 @ClassTarget(LootPool::class)
-internal interface ShadowLootPool : Shadow {
+interface ShadowLootPool : Shadow {
     @get:Field
     @get:Target("entries")
     val entries: List<LootPoolEntryContainer>

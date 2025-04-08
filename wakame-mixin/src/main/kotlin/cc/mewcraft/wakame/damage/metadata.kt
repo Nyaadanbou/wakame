@@ -76,15 +76,11 @@ enum class CriticalStrikeState {
     NONE
 }
 
-// ------------
-// 内部实现
-// ------------
-
 //<editor-fold desc="CriticalStrikeMetadata">
 /**
  * 通过属性计算和随机过程创建一个 [CriticalStrikeMetadata].
  */
-internal fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
+fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negativePower: Double, nonePower: Double): CriticalStrikeMetadata {
     val power: Double
     val state: CriticalStrikeState
     if (chance < 0) {
@@ -107,7 +103,7 @@ internal fun CriticalStrikeMetadata(chance: Double, positivePower: Double, negat
     return CriticalStrikeMetadata(power, state)
 }
 
-internal fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
+fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
     return CriticalStrikeMetadata(
         attributeMap.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
         attributeMap.getValue(Attributes.CRITICAL_STRIKE_POWER),
@@ -124,7 +120,7 @@ internal fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeM
  * 如: 给溺水伤害加上水元素, 给着火伤害加上火元素.
  * 或用于无来源的弹射物的伤害.
  */
-internal object VanillaDamageMetadata {
+object VanillaDamageMetadata {
     operator fun invoke(damageBundle: DamageBundle): DamageMetadata {
         return DamageMetadata(
             damageTags = DamageTags(),
@@ -152,7 +148,7 @@ internal object VanillaDamageMetadata {
     }
 }
 
-internal object PlayerDamageMetadata {
+object PlayerDamageMetadata {
     /**
      * 返回一个`1`点默认元素伤害的 [DamageMetadata].
      *
@@ -189,7 +185,7 @@ internal object PlayerDamageMetadata {
     }
 }
 
-internal object EntityDamageMetadata {
+object EntityDamageMetadata {
     operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata, damageTags: DamageTags): DamageMetadata {
         return DamageMetadata(
             damageTags = damageTags,

@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.PreprocessDamageEventFactory
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.util.coroutine.minecraft
@@ -100,7 +100,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         val damage = context.get<Double>("damage")
         val target = context.getOrNull<MultipleEntitySelector>("target")?.values() ?: listOf(sender)
         target.filterIsInstance<LivingEntity>().forEach { entity ->
-            val preprocessEvent = NekoPreprocessDamageEvent.actuallyDamage(sender, entity).apply { callEvent() }
+            val preprocessEvent = PreprocessDamageEventFactory.actuallyDamage(sender, entity).apply { callEvent() }
             val attributes = preprocessEvent.causingAttributes
             val damageMeta = PlayerDamageMetadata(
                 attributes = attributes,

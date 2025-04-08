@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.GenericKeys
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorMap
 import cc.mewcraft.wakame.item.component.ItemComponentMap
@@ -137,7 +137,7 @@ interface NekoStack : Examinable {
         behaviors.forEach { it.handleInteractAtEntity(player, itemStack, koishStack, clicked, event) }
     }
 
-    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
         behaviors.forEach { it.handleAttackEntity(player, itemStack, koishStack, damagee, event) }
     }
 

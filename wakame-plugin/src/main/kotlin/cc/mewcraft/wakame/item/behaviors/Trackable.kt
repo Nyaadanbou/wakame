@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item.behaviors
 
 import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
@@ -17,7 +17,7 @@ interface Trackable : ItemBehavior {
     private object Default : Trackable {
         private val entityRefLookup: EntityRefLookup by Injector.inject<EntityRefLookup>()
 
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoEntityDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
             if (damagee !is LivingEntity) {
                 return
             }

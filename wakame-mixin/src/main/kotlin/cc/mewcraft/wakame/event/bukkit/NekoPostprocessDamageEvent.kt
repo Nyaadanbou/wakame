@@ -27,8 +27,7 @@ typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
  * @property finalDamageMap 伤害信息 (计算防御后)
  * @see NekoPreprocessDamageEvent 如果需要修改伤害, 使用这个事件
  */
-class NekoPostprocessDamageEvent
-internal constructor(
+class NekoPostprocessDamageEvent(
     val damageMetadata: DamageMetadata,
     private val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
     private val bukkitEvent: EntityDamageEvent,
