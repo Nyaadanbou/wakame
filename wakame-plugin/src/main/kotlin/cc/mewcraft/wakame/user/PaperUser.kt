@@ -33,11 +33,11 @@ class PaperUser(
     override val attributeMap: AttributeMap
         get() = player.attributeContainer // moved to ecs
 
-    // TODO #373: move to ecs
-    override val combo: PlayerCombo = PlayerCombo(player)
+    override val combo: PlayerCombo
+        get() = player.combo
 
-    // TODO #373: move to ecs
-    override val attackSpeed: AttackSpeed = AttackSpeed(player)
+    override val attackSpeed: AttackCooldownContainer
+        get() = player.attackCooldownContainer
 
     override var isInventoryListenable: Boolean
         get() = player.isInventoryListenable

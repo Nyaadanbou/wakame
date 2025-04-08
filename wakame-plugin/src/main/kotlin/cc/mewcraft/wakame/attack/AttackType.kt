@@ -3,12 +3,12 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
@@ -46,7 +46,7 @@ sealed interface AttackType {
      */
     fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (!player.attackSpeed.isActive(nekoStack.id)) {
+        if (!player.attackCooldownContainer.isActive(nekoStack.id)) {
             // 没有左键到生物时, 也应该应用攻击冷却
             nekoStack.applyAttackCooldown(player)
         }

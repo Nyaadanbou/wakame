@@ -31,12 +31,13 @@ internal object ConfigsExtractor {
     // 要抽取的文件夹, 全部位于 zip 的 /configs 之下
     private val DIRECTORIES_TO_EXTRACT: List<String> = listOf(
         "ability/",
+        "attack_speed/",
         "catalog/",
         "crafting_station/",
         "element/",
         "item/",
         "item2/", // TODO item2 迁移完后移除
-        "item2_proxied/",
+        "item_proxied/",
         "kizami/",
         "random/",
         "rarity/",

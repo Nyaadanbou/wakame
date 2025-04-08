@@ -20,6 +20,12 @@ val Player.koishLevel: Int
     get() = PlayerLevelManager.getOrDefault(uniqueId, 1)
 
 /**
+ * 玩家的攻速状态.
+ */
+val Player.attackCooldownContainer: AttackCooldownContainer
+    get() = koishify()[AttackCooldownContainer]
+
+/**
  * 玩家的属性容器.
  */
 val Player.attributeContainer: AttributeMap

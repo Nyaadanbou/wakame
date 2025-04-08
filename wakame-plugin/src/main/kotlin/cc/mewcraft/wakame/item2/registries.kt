@@ -128,7 +128,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         }
 
         // 获取存放所有物品配置的文件夹
-        val dataDir = getFileInConfigDirectory("item2_proxied/")
+        val dataDir = getFileInConfigDirectory("item_proxied/")
 
         for (f in dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }) {
             try {

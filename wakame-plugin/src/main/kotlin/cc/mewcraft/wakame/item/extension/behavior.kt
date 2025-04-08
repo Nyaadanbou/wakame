@@ -1,26 +1,23 @@
 package cc.mewcraft.wakame.item.extension
 
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item2.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 
 /**
  * 使物品的攻击进入冷却.
  */
-// TODO 让视觉冷却仅应用于萌芽物品类型, 而非 Minecraft 物品类型.
-//  升级 1.21.2 后使用 use_cooldown 组件即可解决这个问题.
 fun NekoStack.applyAttackCooldown(player: Player) {
     val itemAttackSpeed = this.components.get(ItemComponentTypes.ATTACK_SPEED) ?: return
     val attackSpeedLevel = itemAttackSpeed.level
     // 设置实际冷却
-    player.attackSpeed.activate(this.id, attackSpeedLevel)
+    player.attackCooldownContainer.activate(this.id, attackSpeedLevel)
     // 应用视觉冷却 (即末影珍珠使用后的白色覆盖层特效)
     player.setCooldown(this.itemType, attackSpeedLevel.cooldown)
 }
-
 
 /**
  * 使用该方法使物品失去最后一点耐久时, 不会有损坏动画效果.

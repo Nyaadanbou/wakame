@@ -1,9 +1,10 @@
 package cc.mewcraft.wakame.item.templates.components
 
-import cc.mewcraft.wakame.entity.player.AttackSpeedLevel
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -14,7 +15,7 @@ data class ItemAttackSpeed(
     /**
      * 攻速等级.
      */
-    val level: AttackSpeedLevel,
+    val level: AttackSpeed,
 ) : ItemTemplate<ItemAttackSpeedData> {
     override val componentType: ItemComponentType<ItemAttackSpeedData> = ItemComponentTypes.ATTACK_SPEED
 
@@ -40,8 +41,9 @@ data class ItemAttackSpeed(
          * ```
          */
         override fun decode(node: ConfigurationNode): ItemAttackSpeed {
-            val raw = node.require<AttackSpeedLevel>()
-            return ItemAttackSpeed(raw)
+            val raw = node.require<String>()
+            val attackSpeed = BuiltInRegistries.ATTACK_SPEED[raw] ?: error("Invalid attack speed: $raw")
+            return ItemAttackSpeed(attackSpeed)
         }
     }
 }

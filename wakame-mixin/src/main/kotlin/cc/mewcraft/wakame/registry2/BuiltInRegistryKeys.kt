@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -92,6 +93,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val CORE_TYPE = createRegistryKey<CoreType>("core_type")
+
+    @JvmField
+    val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")
 
     ///
 

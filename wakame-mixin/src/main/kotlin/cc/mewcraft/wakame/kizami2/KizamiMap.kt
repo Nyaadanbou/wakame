@@ -177,13 +177,13 @@ private class KizamiMapImpl(
     }
 
     override fun removeAllEffects(player: Player) {
-        for ((kizami, amount) in this) {
+        for ((kizami, amount) in iterator()) {
             kizami.unwrap().effects[amount]?.forEach { it.remove(player) }
         }
     }
 
     override fun applyAllEffects(player: Player) {
-        for ((kizami, amount) in this) {
+        for ((kizami, amount) in iterator()) {
             kizami.unwrap().effects[amount]?.forEach { it.apply(player) }
         }
     }

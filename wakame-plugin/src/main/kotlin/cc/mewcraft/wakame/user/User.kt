@@ -4,7 +4,7 @@ package cc.mewcraft.wakame.user
 
 import cc.mewcraft.wakame.ability2.combo.PlayerCombo
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
-import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.entity.player.AttackCooldownContainer
 import cc.mewcraft.wakame.kizami2.KizamiMap
 import java.util.*
 
@@ -55,7 +55,7 @@ interface User<P> {
     /**
      * The Attack Speed of the player.
      */
-    val attackSpeed: AttackSpeed
+    val attackSpeed: AttackCooldownContainer
 
     /**
      * 标记萌芽系统是否应该监听该玩家的背包变化.

@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.item2.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.Location
 import org.bukkit.Particle
@@ -53,7 +53,7 @@ class HammerAttack(
 
         // 只要这个物品的内部冷却处于激活状态就不处理
         // 内部冷却不一定是攻速组件造成的
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -118,7 +118,7 @@ class HammerAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 

@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.entity.attribute.ImaginaryAttributeMap
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
@@ -99,15 +100,13 @@ object BuiltInRegistries {
     val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(BuiltInRegistryKeys.ITEM_BEHAVIOR) { ItemBehaviorTypes }
 
     /**
-     * [ItemRefHandler] 的实例.
-     * 存放来自第三方插件的 [ItemRefHandler].
+     * [ItemRefHandler] 的实例. 包含来自第三方插件的 [ItemRefHandler].
      */
     @JvmField
     val ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(BuiltInRegistryKeys.ITEM_REF_HANDLER)
 
     /**
-     * [ItemRefHandler] 的内置实例.
-     * 只包含 Koish 和 Minecraft 两个 [ItemRefHandler].
+     * [ItemRefHandler] 的内置实例. 只包含 Koish 和 Minecraft 两个 [ItemRefHandler].
      */
     @ApiStatus.Internal
     @JvmField
@@ -180,6 +179,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val CORE_TYPE: WritableRegistry<CoreType> = registerSimple(BuiltInRegistryKeys.CORE_TYPE) { CoreTypes }
+
+    /**
+     * 攻击速度.
+     */
+    @JvmField
+    val ATTACK_SPEED: WritableRegistry<AttackSpeed> = registerSimple(BuiltInRegistryKeys.ATTACK_SPEED)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.system.ElementStackSystem
 import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
+import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
 import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffect
 import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffect
@@ -56,8 +57,10 @@ internal object KoishFleks : Listener, Fleks {
             // 属性
             // ------------
 
+            add(InitAttackSpeedContainer)
             add(InitAttributeContainer)
             add(InitKizamiContainer)
+            add(InitPlayerCombo)
 
             // ------------
             // 物品

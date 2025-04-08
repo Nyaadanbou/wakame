@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.ability2
 
 import cc.mewcraft.wakame.ability2.combo.PlayerComboResult
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
-import cc.mewcraft.wakame.user.combo
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import org.bukkit.entity.*
 import org.bukkit.event.Cancellable

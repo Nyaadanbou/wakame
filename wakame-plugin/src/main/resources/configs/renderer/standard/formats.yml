@@ -20,13 +20,6 @@ attack_speed:
     # 可用标签
     # <value> 攻击速度值
     line: "<!i><white>攻击速度<gray>: <value>"
-    # 数值对应的描述
-    level:
-      0: "<color:#ff8882>很慢"
-      1: "<color:#ff8882>较慢"
-      2: "<color:#fffd80>普通"
-      3: "<color:#91ffa9>较快"
-      4: "<color:#91ffa9>很快"
 
 # id: <有效的属性 id>
 cells/attributes:

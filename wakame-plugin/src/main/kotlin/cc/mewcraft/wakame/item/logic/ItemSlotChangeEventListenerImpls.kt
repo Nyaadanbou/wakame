@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.entity.attribute.AttributeInstance
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.entity.player.AttackSpeedLevel
 import cc.mewcraft.wakame.entity.player.kizamiContainer
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -15,31 +14,6 @@ import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-/**
- * 攻击速度.
- *
- * 物品发生变化时, 根据物品攻击速度, 更新所有必要的状态.
- */
-internal object AttackSpeedItemSlotChangeListener : ItemSlotChangeEventListener() {
-
-    override val predicates: List<(Player, ItemSlot, ItemStack, NekoStack?) -> Boolean> = listOf(
-        ::testSlot,
-        ::testLevel,
-        ::testDurability
-    )
-
-    override fun handlePreviousItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        nekoStack?.handleAttackSpeed { }
-    }
-
-    override fun handleCurrentItem(player: Player, slot: ItemSlot, itemStack: ItemStack, nekoStack: NekoStack?) {
-        nekoStack?.handleAttackSpeed { }
-    }
-
-    private fun NekoStack.handleAttackSpeed(block: (AttackSpeedLevel) -> Unit) {
-        components.get(ItemComponentTypes.ATTACK_SPEED)?.level?.apply(block)
-    }
-}
 
 /**
  * 属性.

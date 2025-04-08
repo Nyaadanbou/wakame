@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
 import cc.mewcraft.wakame.item2.ItemDamageEventMarker
-import cc.mewcraft.wakame.user.attackSpeed
 import com.destroystokyo.paper.ParticleBuilder
 import org.bukkit.*
 import org.bukkit.entity.LivingEntity
@@ -48,7 +48,7 @@ data class SpearAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -70,7 +70,7 @@ data class SpearAttack(
             return
         }
 
-        if (player.attackSpeed.isActive(nekoStack.id)) {
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -84,7 +84,7 @@ data class SpearAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackSpeed.isActive(nekoStack.id)) return
+        if (player.attackCooldownContainer.isActive(nekoStack.id)) return
 
         applySpearAttack(player)
 

@@ -1,18 +1,20 @@
 package cc.mewcraft.wakame.item.components
 
-import cc.mewcraft.wakame.entity.player.AttackSpeedLevel
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item.ItemConstants
 import cc.mewcraft.wakame.item.component.ItemComponentBridge
 import cc.mewcraft.wakame.item.component.ItemComponentConfig
 import cc.mewcraft.wakame.item.component.ItemComponentHolder
 import cc.mewcraft.wakame.item.component.ItemComponentType
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.util.adventure.asMinimalStringKoish
 import net.kyori.examination.Examinable
 
 data class ItemAttackSpeed(
     /**
      * 攻速等级.
      */
-    val level: AttackSpeedLevel,
+    val level: AttackSpeed,
 ) : Examinable {
 
     companion object : ItemComponentBridge<ItemAttackSpeed> {
@@ -31,13 +33,14 @@ data class ItemAttackSpeed(
     ) : ItemComponentType<ItemAttackSpeed> {
         override fun read(holder: ItemComponentHolder): ItemAttackSpeed? {
             val tag = holder.getNbt() ?: return null
-            val level = tag.getByte(TAG_KEY)
-            return ItemAttackSpeed(AttackSpeedLevel.entries[level.toInt()])
+            val id = tag.getString(TAG_KEY)
+            val attackSpeed = BuiltInRegistries.ATTACK_SPEED[id] ?: return null
+            return ItemAttackSpeed(attackSpeed)
         }
 
         override fun write(holder: ItemComponentHolder, value: ItemAttackSpeed) {
             holder.editNbt { tag ->
-                tag.putByte(TAG_KEY, value.level.ordinal.toByte())
+                tag.putString(TAG_KEY, value.level.key().asMinimalStringKoish())
             }
         }
 

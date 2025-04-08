@@ -69,7 +69,7 @@ data object ItemMetaTypes {
         serializers {
             register(MetaCoreContainer.SERIALIZER)
             register(CoreContainer.SERIALIZER)
-            registerAll(Core.makeDirectSerializers())
+            registerAll(Core.serializers())
         }
     }
 

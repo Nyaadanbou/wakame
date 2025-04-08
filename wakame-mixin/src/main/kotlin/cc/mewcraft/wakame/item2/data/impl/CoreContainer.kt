@@ -125,7 +125,7 @@ sealed interface Core {
 
     companion object {
 
-        fun makeDirectSerializers(): TypeSerializerCollection {
+        fun serializers(): TypeSerializerCollection {
             val serials = TypeSerializerCollection.builder()
             serials.register<CoreType>(BuiltInRegistries.CORE_TYPE.valueByNameTypeSerializer())
             serials.register<Core>(DispatchingSerializer.create(Core::type, CoreType::kotlinType))

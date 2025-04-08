@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.attack
 
+import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.user.attackSpeed
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.block.Action
@@ -24,7 +24,7 @@ class BowAttack : AttackType {
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (action.isRightClick) {
-            if (player.attackSpeed.isActive(nekoStack.id)) {
+            if (player.attackCooldownContainer.isActive(nekoStack.id)) {
                 wrappedEvent.event.setUseItemInHand(Event.Result.DENY)
             } else {
                 // 禁止副手使用弓

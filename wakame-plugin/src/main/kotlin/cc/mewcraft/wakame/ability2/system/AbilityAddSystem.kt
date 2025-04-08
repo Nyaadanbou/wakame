@@ -3,11 +3,11 @@ package cc.mewcraft.wakame.ability2.system
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
+import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
-import cc.mewcraft.wakame.user.combo
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World

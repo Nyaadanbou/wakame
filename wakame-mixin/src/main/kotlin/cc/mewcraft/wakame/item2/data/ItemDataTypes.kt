@@ -76,9 +76,12 @@ data object ItemDataTypes {
     val CORE_CONTAINER: ItemDataType<CoreContainer> = typeOf("cores") {
         serializers {
             register(CoreContainer.SERIALIZER)
-            registerAll(Core.makeDirectSerializers())
+            registerAll(Core.serializers())
         }
     }
+
+    @JvmField
+    val CORE: ItemDataType<Core> = typeOf("core")
 
     // ------------
     // 方便函数

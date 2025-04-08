@@ -8,10 +8,10 @@ import com.github.quillraven.fleks.UniqueId
 
 class KoishEntity(
     @PublishedApi
-    internal val entity: FleksEntity,
+    internal val entity: EEntity,
 ) {
 
-    fun unwrap(): FleksEntity =
+    fun unwrap(): EEntity =
         entity
 
     fun remove() =
