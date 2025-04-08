@@ -42,11 +42,6 @@ data object ItemMetaTypes {
         }
     }
 
-    // 开发日记: 数据类型 V 不一定需要封装类 (如 ItemLevel), 只需要可以被序列化.
-    //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
-    @JvmField
-    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
-
     @JvmField
     val RARITY: ItemMetaType<MetaRarity, RegistryEntry<Rarity>> = typeOf("rarity") {
         serializers {
@@ -55,6 +50,14 @@ data object ItemMetaTypes {
             register(BuiltInRegistries.LEVEL_TO_RARITY_MAPPING.holderByNameTypeSerializer())
         }
     }
+
+    // 开发日记: 数据类型 V 不一定需要封装类 (如 ItemLevel), 只需要可以被序列化.
+    //  这里直接使用了 Component 作为 V, 没有必要再去创建一个新的类型来封装它.
+    @JvmField
+    val ITEM_NAME: ItemMetaType<MetaItemName, Component> = typeOf("item_name")
+
+    @JvmField
+    val CUSTOM_NAME: ItemMetaType<MetaCustomName, Component> = typeOf("custom_name")
 
     @JvmField
     val KIZAMI: ItemMetaType<MetaKizami, Set<RegistryEntry<Kizami>>> = typeOf("kizami") {
