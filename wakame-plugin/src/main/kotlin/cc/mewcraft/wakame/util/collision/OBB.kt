@@ -34,11 +34,11 @@ data class OBB(
     /**
      * 该 OBB 在局部坐标系三轴上的半长.
      */
-    val halfExtents: FloatArray
+    val halfExtents: FloatArray,
 ) {
     init {
-        require(axes.size == 3) { "The size of obb axes must be 3." }
-        require(halfExtents.size == 3) { "The size of obb halfExtents must be 3." }
+        require(axes.size == 3) { "The amount of OBB axes must be 3." }
+        require(halfExtents.size == 3) { "The amount of OBB half extents must be 3." }
         require(halfExtents[0] > 0 && halfExtents[1] > 0 && halfExtents[2] > 0) { "The halfExtents of obb must more than 0." }
         require(isOrthonormalBasis(axes[0], axes[1], axes[2])) { "The axes must be orthonormal basis." }
     }
@@ -50,7 +50,7 @@ data class OBB(
         axis3: Vector3f,
         halfExtent1: Float,
         halfExtent2: Float,
-        halfExtent3: Float
+        halfExtent3: Float,
     ) : this(center, arrayOf(axis1, axis2, axis3), floatArrayOf(halfExtent1, halfExtent2, halfExtent3))
 
     constructor(boundingBox: BoundingBox) : this(
@@ -106,9 +106,9 @@ data class OBB(
         for ((i, j) in edges) {
             val start = vertices[i]
             val end = vertices[j]
-            Fleks.createEntity {
+            Fleks.INSTANCE.createEntity {
                 it += ParticleEffectComponent(
-                    bukkitWorld = viewer.world,
+                    world = viewer.world,
                     ParticleConfiguration(
                         builderProvider = { loc ->
                             ParticleBuilder(Particle.END_ROD)

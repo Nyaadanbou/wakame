@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.weapon
 
-import cc.mewcraft.wakame.attribute.Attributes
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.extensions.mul
 import cc.mewcraft.wakame.extensions.plus
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
 import org.bukkit.entity.LivingEntity
@@ -13,11 +13,12 @@ import org.bukkit.entity.Player
 
 private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "attack_hitbox")
 
-internal val Player.boundingBoxScale: Float get() = this.toUser().attributeMap.getValue(Attributes.SCALE).toFloat()
+internal val Player.boundingBoxScale: Float get() = attributeContainer.getValue(Attributes.SCALE).toFloat()
 
 /**
  * 获取基于 [player] 和 特定参数OBB 判定攻击到的生物.
- * 该OBB基于玩家视角且位于玩家视角正前方, 与玩家碰撞箱中心点相切.
+ *
+ * 该 OBB 基于玩家视角且位于玩家视角正前方, 与玩家碰撞箱中心点相切.
  * 基础半长宽高分别为 [halfDepthBase], [halfWidthBase], [halfHeightBase], 倾斜角度为 [angle].
  * 长宽高会根据玩家尺寸缩放.
  * [aabbRadius] 用来预筛选可能碰撞的生物, 减少计算量.
@@ -37,7 +38,7 @@ internal fun getHitEntities(player: Player, aabbRadius: Double, halfWidthBase: F
         floatArrayOf(halfWidth, halfHeight, halfDepth)
     )
     if (LOGGING) {
-        player.sendMessage("obb中心: ${attackOBB.center}")
+        player.sendMessage("OBB 中心: ${attackOBB.center}")
         attackOBB.drawWireframe(player)
     }
 

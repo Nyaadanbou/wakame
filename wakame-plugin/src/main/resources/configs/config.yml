@@ -97,4 +97,5 @@ debug:
     registry: false
     # 记录 ItemStackRenderer
     renderer: false
-  attack_hitbox : false
+  # 显示攻击碰撞箱
+  attack_hitbox: false

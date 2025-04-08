@@ -3,15 +3,14 @@ package cc.mewcraft.wakame.weapon
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.damage.*
-import cc.mewcraft.wakame.event.bukkit.NekoEntityDamageEvent
+import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.addCooldown
 import cc.mewcraft.wakame.item.extension.isOnCooldown
-import cc.mewcraft.wakame.player.interact.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.user.User
-import cc.mewcraft.wakame.user.toUser
 import cc.mewcraft.wakame.util.metadata.Metadata
 import cc.mewcraft.wakame.util.metadata.MetadataKey
 import cc.mewcraft.wakame.util.runTaskTimer
@@ -182,7 +181,7 @@ data class KatanaWeapon(
         }
     }
 
-    override fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: NekoEntityDamageEvent) {
+    override fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
         val katanaWeaponData = getData(player)
         if (!katanaWeaponData.isHold) return
 
@@ -215,7 +214,6 @@ data class KatanaWeapon(
 
     override fun handleSlotChangeCurrentItem(player: Player, nekoStack: NekoStack, slot: ItemSlot) {
         val katanaWeaponData = getData(player)
-        val user = player.toUser()
 
         katanaWeaponData.isHold = true
         // 重置玩家非手持太刀的 tick 数.
@@ -223,7 +221,7 @@ data class KatanaWeapon(
         katanaWeaponData.outSlotTicks = 0
         if (katanaWeaponData.task == null) {
             katanaWeaponData.task = runTaskTimer(delay = 0, period = 1) {
-                liveTick(user, katanaWeaponData)
+                liveTick(player, katanaWeaponData)
             }
         }
     }
@@ -232,11 +230,11 @@ data class KatanaWeapon(
      * 太刀横斩.
      */
     private fun horizontalSlash(player: Player, nekoStack: NekoStack, katanaWeaponData: KatanaWeaponData) {
-        val user = player.toUser()
+        val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
-            attributes = user.attributeMap,
+            attributes = attributeContainer,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
-            damageBundle = damageBundle(user.attributeMap) {
+            damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
                     rate {
@@ -283,7 +281,7 @@ data class KatanaWeapon(
     /**
      * 太刀居合斩判定.
      */
-    private fun laiSlashCheck(player: Player, katanaWeaponData: KatanaWeaponData, event: NekoEntityDamageEvent) {
+    private fun laiSlashCheck(player: Player, katanaWeaponData: KatanaWeaponData, event: NekoPostprocessDamageEvent) {
         // 不存在伤害来源实体, 不处理
         val damager = event.damageSource.causingEntity as? LivingEntity ?: return
 
@@ -304,12 +302,11 @@ data class KatanaWeapon(
         val direction = player.location.direction.setY(0).normalize().multiply(laiSlashVelocityMultiply)
         player.velocity = direction
         // 对伤害来源造成伤害
-        val user = player.toUser()
-        val attributeMap = user.attributeMap
+        val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
-            attributes = attributeMap,
+            attributes = attributeContainer,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
-            damageBundle = damageBundle(attributeMap) {
+            damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
                     rate {
@@ -329,11 +326,11 @@ data class KatanaWeapon(
      * 用于太刀气刃斩连段123.
      */
     private fun spiritBladeSlashBase(player: Player, katanaWeaponData: KatanaWeaponData, angel: Float) {
-        val user = player.toUser()
+        val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
-            attributes = user.attributeMap,
+            attributes = attributeContainer,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
-            damageBundle = damageBundle(user.attributeMap) {
+            damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
                     rate {
@@ -409,11 +406,11 @@ data class KatanaWeapon(
             it != player
         }
 
-        val user = player.toUser()
+        val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
-            attributes = user.attributeMap,
+            attributes = attributeContainer,
             damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
-            damageBundle = damageBundle(user.attributeMap) {
+            damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
                     rate {
@@ -487,7 +484,8 @@ data class KatanaWeapon(
                     // 非红刃, 尝试发动回旋斩
                     KatanaWeaponData.BladeLevel.NONE,
                     KatanaWeaponData.BladeLevel.WHITE,
-                    KatanaWeaponData.BladeLevel.YELLOW -> {
+                    KatanaWeaponData.BladeLevel.YELLOW,
+                        -> {
                         // 气刃值足够发动回旋斩
                         // 且处于连招允许时间内
                         if (katanaWeaponData.bladeSpirit >= roundSlashSpiritConsume && comboTicks > 0) {
@@ -532,8 +530,7 @@ data class KatanaWeapon(
     /**
      * 在太刀数据存在时总是 tick 的逻辑.
      */
-    private fun liveTick(user: User<Player>, katanaWeaponData: KatanaWeaponData) {
-        val player = user.player
+    private fun liveTick(player: Player, katanaWeaponData: KatanaWeaponData) {
         if (!katanaWeaponData.isHold) {
             // 手持非太刀时气刃值自动降低
             katanaWeaponData.outSlotTicks += 1
@@ -649,7 +646,7 @@ data class KatanaWeaponData(
      * 居合斩是否已经判定成功.
      * 发动居合斩时会被设置为 false .
      */
-    var isAlreadyLai: Boolean = true
+    var isAlreadyLai: Boolean = true,
 ) {
     companion object {
         /**
@@ -713,7 +710,7 @@ data class KatanaWeaponData(
         /**
          * 该气刃等级的持续时间.
          */
-        val duration: Int
+        val duration: Int,
     ) {
         NONE(1.0, -1),
         WHITE(1.05, 60 * 20),
