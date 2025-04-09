@@ -10,7 +10,7 @@ public final class MythicApiProvider {
     public static @NotNull MythicApi get() {
         MythicApi instance = MythicApiProvider.instance;
         if (instance == null) {
-            throw new IllegalStateException("MythicMobsBridgeProvider has not been initialized");
+            throw new IllegalStateException("MythicApiProvider has not been initialized");
         }
         return instance;
     }
