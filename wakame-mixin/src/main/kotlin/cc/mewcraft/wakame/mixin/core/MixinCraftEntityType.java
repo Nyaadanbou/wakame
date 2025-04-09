@@ -9,11 +9,15 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(CraftEntityType.class)
 public abstract class MixinCraftEntityType {
+
+    /**
+     * 如果是 {@link EntityTypeWrapper} 则返回其委托.
+     *
+     * @author g2213swo
+     */
     @ModifyVariable(
             method = "minecraftToBukkit",
-            at = @At(
-                    value = "STORE"
-            ),
+            at = @At(value = "HEAD"),
             ordinal = 0,
             argsOnly = true
     )

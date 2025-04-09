@@ -11,6 +11,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MobSpawnSettings.SpawnerData.class)
 public abstract class MixinSpawnerData {
+
+    /**
+     * 替换 {@link Codec} 以便让 {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData#type} 支持 MythicMobs 的怪物类型.
+     *
+     * @author g2213swo
+     */
     @Redirect(
             method = "lambda$static$3",
             at = @At(
@@ -18,7 +24,7 @@ public abstract class MixinSpawnerData {
                     target = "Lnet/minecraft/core/DefaultedRegistry;byNameCodec()Lcom/mojang/serialization/Codec;"
             )
     )
-    private static Codec<EntityType<?>> wakame$byNameCodec(
+    private static Codec<EntityType<?>> koish$byNameCodec(
             DefaultedRegistry<EntityType<?>> registry
     ) {
         return EntityTypeWrapper.CODEC;

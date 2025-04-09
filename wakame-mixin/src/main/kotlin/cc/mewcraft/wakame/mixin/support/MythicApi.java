@@ -6,7 +6,8 @@ import org.bukkit.entity.EntityType;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public interface MythicMobsBridge {
+public interface MythicApi {
+    
     EntityType getEntityType(Key id);
 
     void writeMobId(Entity entity, Key id);

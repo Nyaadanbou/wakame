@@ -3,11 +3,12 @@ package cc.mewcraft.wakame.mixin.support;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-public final class MythicMobsBridgeProvider {
-    private static MythicMobsBridge instance = null;
+public final class MythicApiProvider {
 
-    public static @NotNull MythicMobsBridge get() {
-        MythicMobsBridge instance = MythicMobsBridgeProvider.instance;
+    private static MythicApi instance = null;
+
+    public static @NotNull MythicApi get() {
+        MythicApi instance = MythicApiProvider.instance;
         if (instance == null) {
             throw new IllegalStateException("MythicMobsBridgeProvider has not been initialized");
         }
@@ -15,12 +16,12 @@ public final class MythicMobsBridgeProvider {
     }
 
     @ApiStatus.Internal
-    public static void register(MythicMobsBridge instance) {
-        MythicMobsBridgeProvider.instance = instance;
+    public static void register(MythicApi instance) {
+        MythicApiProvider.instance = instance;
     }
 
     @ApiStatus.Internal
     public static void unregister() {
-        MythicMobsBridgeProvider.instance = null;
+        MythicApiProvider.instance = null;
     }
 }

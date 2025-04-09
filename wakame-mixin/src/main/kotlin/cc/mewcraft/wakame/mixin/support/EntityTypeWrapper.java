@@ -13,11 +13,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
@@ -25,28 +21,30 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.AABB;
-import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.persistence.PersistentDataType;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * 这是一个封装了 MythicMobs 怪物类型的 {@link EntityType}.
+ *
+ * @param <T> Minecraft 内置实体的类型
+ */
 @NullMarked
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
-    private static final String MYTHICMOBS_NAMESPACE = "mythicmobs";
-    private static final NamespacedKey PDC_KEY = new NamespacedKey("koish", "mob_id");
 
+    private static final String MYTHICMOBS_NAMESPACE = "mythicmobs";
     public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(
-            resourceLocation -> {
-                if (resourceLocation.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-                    return DataResult.success(BuiltInRegistries.ENTITY_TYPE.getValue(resourceLocation));
+            id -> {
+                if (id.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+                    return DataResult.success(BuiltInRegistries.ENTITY_TYPE.getValue(id));
                 } else {
-                    return parse(resourceLocation);
+                    return parse(id);
                 }
             },
             entityType -> {
@@ -60,7 +58,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
     private final ResourceLocation id;
 
     @Nullable
-    private EntityType<T> delegate = null;
+    private EntityType<T> delegate = null; // make it lazy as MythicMobs is not loaded when this object is instantiated
 
     private static <T extends Entity> DataResult<EntityType<T>> parse(ResourceLocation id) {
         if (id.getNamespace().equals(MYTHICMOBS_NAMESPACE)) {
@@ -77,7 +75,7 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     public EntityType<T> getDelegate() {
         if (delegate == null) {
-            delegate = (EntityType<T>) CraftEntityType.bukkitToMinecraft(MythicMobsBridgeProvider.get().getEntityType(PaperAdventure.asAdventure(id)));
+            delegate = (EntityType<T>) CraftEntityType.bukkitToMinecraft(MythicApiProvider.get().getEntityType(PaperAdventure.asAdventure(id)));
         }
         return delegate;
     }
@@ -134,12 +132,12 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     @Override
     public boolean canSpawnFarFromPlayer() {
-        throw new UnsupportedOperationException();
+        return getDelegate().canSpawnFarFromPlayer();
     }
 
     @Override
     public MobCategory getCategory() {
-        return MobCategory.MONSTER;
+        return MobCategory.MONSTER; // FIXME #376: 该函数会在 EntityType 构建时调用, 必须返回一个常量, 具体影响未知
     }
 
     @Override
@@ -193,7 +191,11 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         if (entity == null)
             return null;
         CraftEntity bukkitEntity = entity.getBukkitEntity();
-        MythicMobsBridgeProvider.get().writeMobId(bukkitEntity, PaperAdventure.asAdventure(id));
+
+        // MythicMobs 5.8.2:
+        // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
+        MythicApiProvider.get().writeMobId(bukkitEntity, PaperAdventure.asAdventure(id));
+
         return entity;
     }
 
