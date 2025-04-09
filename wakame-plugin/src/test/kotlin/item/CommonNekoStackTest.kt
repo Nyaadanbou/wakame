@@ -22,7 +22,6 @@ import cc.mewcraft.wakame.kizami.KizamiRegistryLoader
 import cc.mewcraft.wakame.rarity.LevelToRarityMappingRegistryLoader
 import cc.mewcraft.wakame.rarity.RarityRegistryLoader
 import cc.mewcraft.wakame.util.yamlLoader
-import cc.mewcraft.wakame.world.worldModule
 import net.kyori.adventure.key.Key
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -45,7 +44,6 @@ object CommonNekoStackTest {
 
                 // dependencies
                 adventureModule(),
-                worldModule(),
             )
         }
 

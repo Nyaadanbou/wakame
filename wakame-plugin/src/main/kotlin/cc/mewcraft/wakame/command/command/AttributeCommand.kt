@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.attribute.*
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
 import cc.mewcraft.wakame.command.koishHandler

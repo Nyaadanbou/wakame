@@ -1,6 +1,6 @@
 package packet
 
-import cc.mewcraft.wakame.network.RadialPointCycle
+import cc.mewcraft.wakame.damage.RadialPointCycle
 import io.mockk.mockk
 import org.bukkit.entity.Entity
 import kotlin.test.Test

@@ -1,7 +1,6 @@
 package station
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.text.adventureTextModule
 import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
@@ -29,7 +28,6 @@ class StationSerializationTest : KoinTest {
             startKoin {
                 modules(
                     testEnv(),
-                    adventureTextModule(),
                 )
             }
 
