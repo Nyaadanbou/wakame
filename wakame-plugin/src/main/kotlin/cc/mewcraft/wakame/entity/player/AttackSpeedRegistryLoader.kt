@@ -39,7 +39,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
         entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val entryId = Identifiers.of(f.toRelativeString(entryDataDirectory).substringBeforeLast('.'))
+                val entryId = Identifiers.of(f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.'))
                 val entryVal = parseEntry(entryId, rootNode)
                 action(entryId, entryVal)
             } catch (e: Exception) {

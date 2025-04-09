@@ -76,7 +76,7 @@ internal object CustomItemRegistryLoader : RegistryLoader {
         dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val itemId = IdentifierTools.of(f.toRelativeString(dataDir).substringBeforeLast('.'))
+                val itemId = Identifiers.of(f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {
@@ -133,7 +133,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         for (f in dataDir.walk().drop(1).filter { it.isFile && it.extension == "yml" }) {
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val itemId = IdentifierTools.of(Identifier.MINECRAFT_NAMESPACE, f.toRelativeString(dataDir).substringBeforeLast('.'))
+                val itemId = Identifiers.of(Identifier.MINECRAFT_NAMESPACE, f.relativeTo(dataDir).invariantSeparatorsPath.substringBeforeLast('.'))
                 val itemValue = loadValue(itemId, rootNode)
                 consumer(itemId, itemValue)
             } catch (e: Exception) {

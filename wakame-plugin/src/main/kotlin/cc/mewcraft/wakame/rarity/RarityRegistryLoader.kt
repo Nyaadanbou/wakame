@@ -55,7 +55,7 @@ internal object RarityRegistryLoader : RegistryLoader {
         entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val rarityId = f.toRelativeString(entryDataDirectory).substringBeforeLast('.')
+                val rarityId = f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.')
                 val entry = parseEntry(rarityId, rootNode)
                 registryAction(entry.first, entry.second)
             } catch (e: Exception) {

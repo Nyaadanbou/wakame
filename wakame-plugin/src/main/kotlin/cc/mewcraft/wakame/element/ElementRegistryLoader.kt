@@ -57,7 +57,7 @@ internal object ElementRegistryLoader : RegistryLoader {
         entryDataDirectory.walk().drop(1).filter { it.isFile && it.extension == "yml" }.forEach { f ->
             try {
                 val rootNode = loader.buildAndLoadString(f.readText())
-                val entryId = f.toRelativeString(entryDataDirectory).substringBeforeLast('.')
+                val entryId = f.relativeTo(entryDataDirectory).invariantSeparatorsPath.substringBeforeLast('.')
                 val entryPair = parseEntry(entryId, rootNode)
                 registryAction(entryPair.first, entryPair.second)
             } catch (e: Exception) {
