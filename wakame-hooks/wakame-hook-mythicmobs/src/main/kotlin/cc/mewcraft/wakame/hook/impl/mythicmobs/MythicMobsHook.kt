@@ -36,8 +36,7 @@ private object MythicApiImpl : MythicApi {
     override fun getEntityType(id: Key): EntityType? {
         val mythicMob: MythicMob? = MYTHIC_API.apiHelper.getMythicMob(id.value())
         val mythicEntityType = mythicMob?.entityType ?: return null
-        val bukkitEntityType = runCatching { EntityType.valueOf(mythicEntityType.name) }.getOrNull()
-        return bukkitEntityType
+        return EntityType.fromName(mythicEntityType.name)
     }
 
     override fun writeIdMark(entity: Entity, id: Key) {
