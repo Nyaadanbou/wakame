@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.mixin.support.MythicApi
 import cc.mewcraft.wakame.mixin.support.MythicApiProvider
 import cc.mewcraft.wakame.util.registerEvents
+import io.lumine.mythic.api.mobs.MythicMob
 import io.lumine.mythic.bukkit.MythicBukkit
 import io.lumine.mythic.core.constants.MobKeys
 import net.kyori.adventure.key.Key
@@ -29,14 +30,17 @@ object MythicMobsHook {
 }
 
 private object MythicApiImpl : MythicApi {
+
     private val MYTHIC_API: MythicBukkit = MythicBukkit.inst()
 
-    override fun getEntityType(id: Key): EntityType {
-        val mythicEntityType = MYTHIC_API.apiHelper.getMythicMob(id.value()).entityType
-        return EntityType.valueOf(mythicEntityType.name)
+    override fun getEntityType(id: Key): EntityType? {
+        val mythicMob: MythicMob? = MYTHIC_API.apiHelper.getMythicMob(id.value())
+        val mythicEntityType = mythicMob?.entityType ?: return null
+        val bukkitEntityType = runCatching { EntityType.valueOf(mythicEntityType.name) }.getOrNull()
+        return bukkitEntityType
     }
 
-    override fun writeMobId(entity: Entity, id: Key) {
+    override fun writeIdMark(entity: Entity, id: Key) {
         entity.persistentDataContainer.set(MobKeys.TYPE, PersistentDataType.STRING, id.value())
     }
 }

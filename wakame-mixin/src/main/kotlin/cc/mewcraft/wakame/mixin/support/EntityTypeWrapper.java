@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.mixin.support;
 
 import com.google.common.collect.ImmutableSet;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import io.papermc.paper.adventure.PaperAdventure;
@@ -26,6 +27,7 @@ import org.bukkit.craftbukkit.entity.CraftEntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,6 +40,7 @@ import java.util.function.Consumer;
 @NullMarked
 public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
+    private static final Logger LOGGER = LogUtils.getLogger();
     private static final String MYTHICMOBS_NAMESPACE = "mythicmobs";
     public static final Codec<EntityType<?>> CODEC = ResourceLocation.CODEC.comapFlatMap(
             id -> {
@@ -75,7 +78,13 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
 
     public EntityType<T> getDelegate() {
         if (delegate == null) {
-            delegate = (EntityType<T>) CraftEntityType.bukkitToMinecraft(MythicApiProvider.get().getEntityType(PaperAdventure.asAdventure(id)));
+            org.bukkit.entity.EntityType entityType = MythicApiProvider.get().getEntityType(PaperAdventure.asAdventure(id));
+            if (entityType != null) {
+                delegate = (EntityType<T>) CraftEntityType.bukkitToMinecraft(entityType);
+            } else {
+                LOGGER.error("Could not find MythicMobs entity type {}. Fix you datapack(s) or MythicMobs configs as soon as possible. Fallback to BAT to avoid crash.", id);
+                delegate = (EntityType<T>) EntityType.BAT;
+            }
         }
         return delegate;
     }
@@ -190,11 +199,12 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
         T entity = getDelegate().create(world, reason);
         if (entity == null)
             return null;
+
         CraftEntity bukkitEntity = entity.getBukkitEntity();
 
         // MythicMobs 5.8.2:
         // 在实体被创建时, MythicMobs 会识别这里写入的数据, 将实体变成对应的 MythicMobs 实体
-        MythicApiProvider.get().writeMobId(bukkitEntity, PaperAdventure.asAdventure(id));
+        MythicApiProvider.get().writeIdMark(bukkitEntity, PaperAdventure.asAdventure(id));
 
         return entity;
     }
