@@ -26,8 +26,7 @@ data class OBB(
     val center: Vector3f,
 
     /**
-     * 该 OBB 所在局部坐标系三轴的单位向量.
-     * 需保证构成正交基.
+     * 该 OBB 所在局部坐标系三轴的单位向量. 需保证构成正交基.
      */
     val axes: Array<Vector3f>,
 
@@ -39,7 +38,7 @@ data class OBB(
     init {
         require(axes.size == 3) { "The amount of OBB axes must be 3." }
         require(halfExtents.size == 3) { "The amount of OBB half extents must be 3." }
-        require(halfExtents[0] > 0 && halfExtents[1] > 0 && halfExtents[2] > 0) { "The halfExtents of obb must more than 0." }
+        require(halfExtents[0] > 0 && halfExtents[1] > 0 && halfExtents[2] > 0) { "The half extents of obb must more than 0." }
         require(isOrthonormalBasis(axes[0], axes[1], axes[2])) { "The axes must be orthonormal basis." }
     }
 
@@ -190,7 +189,6 @@ private val UNIT_Y = Vector3f(0f, 1f, 0f)
 private val UNIT_Z = Vector3f(0f, 0f, 1f)
 private val ONE = Vector3f(1f, 1f, 1f)
 
-
 fun calculateOrthonormalBasis(entity: Entity, angle: Float = 0f): Array<Vector3f> {
     // 小于浮点误差认为为0, 不额外计算旋转.
     return if (abs(angle) < 1e-6f) {
@@ -244,10 +242,9 @@ fun calculateOrthonormalBasis(yaw: Float, pitch: Float, angle: Float): Array<Vec
 }
 
 /**
- * Minecraft世界坐标系下的标准正交基.
+ * Minecraft 世界坐标系下的标准正交基.
  */
 val MINECRAFT_ORTHONORMAL_BASIS: Array<Vector3f> = arrayOf(UNIT_X, UNIT_Y, UNIT_Z)
-
 
 /**
  * 计算 [obb] 在指定轴上的投影长度.

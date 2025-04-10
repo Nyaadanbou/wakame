@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
+import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
@@ -104,7 +105,7 @@ data object Katana : Weapon {
             }
         )
 
-        val hitEntities = getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
             hitEntities.forEach { entity ->
@@ -192,7 +193,7 @@ data object Katana : Weapon {
                 }
             }
         )
-        val hitEntities = getHitEntities(player, 5.0, 1.7f, 0.05f, 1.4f, angel)
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.7f, 0.05f, 1.4f, angel)
         // 造成伤害
         hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
     }
@@ -256,7 +257,7 @@ data object Katana : Weapon {
 
         // 造成伤害
         val centerLocation = player.location.add(.0, player.boundingBox.height / 2, .0)
-        val scale = player.boundingBoxScale
+        val scale = player.attributeContainer.getValue(Attributes.SCALE).toFloat()
         val hitEntities = centerLocation.getNearbyLivingEntities(katanaConfig.roundSlashRadius * scale, 1.1 * scale) { it != player }
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
