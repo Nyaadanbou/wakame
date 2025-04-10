@@ -7,12 +7,13 @@ import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
 import cc.mewcraft.wakame.element.system.TickElementStack
 import cc.mewcraft.wakame.enchantment2.system.*
+import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
-import cc.mewcraft.wakame.item2.behavior.impl.ApplyAttributeEffects
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.SwitchKatana
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.TickKatana
+import cc.mewcraft.wakame.kizami2.system.ApplyKizamiEffects
 import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -34,8 +35,8 @@ internal object KoishFleks : Listener, Fleks {
         }
 
         systems {
-            add(RemoveInvalidBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
-            add(RemoveInvalidBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
+            add(RemoveBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
+            add(RemoveBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
 
             add(InitAbilityContainer)
             add(InitItemCooldownContainer) // 初始化玩家的物品冷却容器
@@ -57,7 +58,6 @@ internal object KoishFleks : Listener, Fleks {
             add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
             add(ManageBossBar) // 显示/移除 boss bar
             add(CountTick) // 记录 entity 存在的 tick 数
-
             add(TickAbilityBlackhole)
             add(TickAbilityBlink)
             add(TickAbilityDash)

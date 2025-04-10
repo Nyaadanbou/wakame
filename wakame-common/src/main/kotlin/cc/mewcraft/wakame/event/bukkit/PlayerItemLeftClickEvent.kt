@@ -1,11 +1,9 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import net.minecraft.server.MinecraftServer.currentTick
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
-import kotlin.streams.asSequence
 
 /**
  * 当玩家使用物品点击左键时触发.
@@ -24,17 +22,17 @@ class PlayerItemLeftClickEvent(
 ) : PlayerEvent(player) {
 
     init {
-        require(!item.isEmpty) { "Item cannot be empty" } // throw early
+        require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        player.sendMessage(
-            "$currentTick ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
-                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-                    stream.asSequence().dropWhile { frame ->
-                        frame.className == PlayerItemLeftClickEvent::class.qualifiedName
-                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-                }
-            }"
-        )
+        //player.sendMessage(
+        //    "$currentTick ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
+        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+        //            stream.asSequence().dropWhile { frame ->
+        //                frame.className == PlayerItemLeftClickEvent::class.qualifiedName
+        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+        //        }
+        //    }"
+        //)
     }
 
     override fun getHandlers(): HandlerList {

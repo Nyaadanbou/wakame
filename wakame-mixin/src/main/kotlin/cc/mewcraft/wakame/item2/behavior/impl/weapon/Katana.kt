@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
@@ -22,7 +22,6 @@ import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.util.adventure.SoundSource
 import cc.mewcraft.wakame.util.adventure.playSound
-import cc.mewcraft.wakame.util.serverTick
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -37,8 +36,9 @@ import org.bukkit.event.Event
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import xyz.xenondevs.commons.provider.orElse
 
-private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
 /**
  * 太刀的物品行为.
@@ -53,7 +53,6 @@ object Katana : Weapon {
     }
 
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
-        player.sendMessage("$serverTick - 太刀左键")
         val katanaState = player.koishify().getOrNull(KatanaState) ?: return
         if (katanaState.isArmed.not()) return
         if (itemstack.isOnCooldown(player)) return
@@ -106,7 +105,6 @@ object Katana : Weapon {
                 }
             }
         }
-
 
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
         if (hitEntities.isNotEmpty()) {

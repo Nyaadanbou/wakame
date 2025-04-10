@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.weapon
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
@@ -27,9 +27,10 @@ import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.scheduler.BukkitTask
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import xyz.xenondevs.commons.provider.orElse
 import kotlin.jvm.optionals.getOrElse
 
-private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
 @ConfigSerializable
 data class KatanaWeapon(

@@ -13,6 +13,9 @@ import cc.mewcraft.wakame.util.item.toNMS
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
+// ------------
+// ItemStack
+// ------------
 
 fun ItemStack.isOnCooldown(player: Player): Boolean = toNMS().isOnCooldown(player)
 fun ItemStack.getCooldownRemainingRatio(player: Player): Float = toNMS().getCooldownRemainingRatio(player)
@@ -20,7 +23,9 @@ fun ItemStack.addCooldown(player: Player, ticks: Int) = toNMS().addCooldown(play
 fun ItemStack.addCooldown(player: Player, speed: AttackSpeed) = toNMS().addCooldown(player, speed)
 fun ItemStack.removeCooldown(player: Player) = toNMS().removeCooldown(player)
 
-//
+// ------------
+// MojangStack
+// ------------
 
 // Implemented according to: https://github.com/Nyaadanbou/wakame/issues/369
 private fun MojangStack.acquireCooldownGroup(): Identifier {

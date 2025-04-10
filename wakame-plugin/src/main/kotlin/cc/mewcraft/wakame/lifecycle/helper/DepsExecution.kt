@@ -4,13 +4,14 @@ package cc.mewcraft.wakame.lifecycle.helper
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.lifecycle.initializer.InitializerRunnable
 import cc.mewcraft.wakame.lifecycle.reloader.ReloaderRunnable
 import com.google.common.graph.Graph
 import kotlinx.coroutines.*
+import xyz.xenondevs.commons.provider.orElse
 
-private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "initializer")
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "initializer").orElse(false)
 
 internal fun <T> withLifecycleDependencyExecution(block: LifecycleDependencyExecutionHelper.() -> T): T {
     return block(LifecycleDependencyExecutionHelper)

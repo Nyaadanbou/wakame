@@ -10,7 +10,9 @@ import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
+import io.papermc.paper.datacomponent.item.UseCooldown
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -75,6 +77,12 @@ data object ItemMetaTypes {
             registerAll(Core.serializers())
         }
     }
+
+    @JvmField
+    val USE_COOLDOWN: ItemMetaType<MetaUseCooldown, UseCooldown> = typeOf("use_cooldown")
+
+    @JvmField
+    val COOLDOWN_GROUP: ItemMetaType<MetaCooldownGroup, Identifier> = typeOf("cooldown_group")
 
     // ------------
     // 方便函数

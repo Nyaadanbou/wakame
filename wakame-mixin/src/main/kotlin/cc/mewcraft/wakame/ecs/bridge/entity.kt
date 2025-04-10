@@ -12,16 +12,17 @@ import org.bukkit.entity.Player
 
 /**
  * 返回该 [BukkitEntity] 对应的 [KoishEntity].
- * 如果该 [BukkitEntity] 不存在对应的 [KoishEntity], 则会创建一个新的.
- * 如果该 [BukkitEntity] 已经存在对应的 [KoishEntity], 则会返回已经存在的.
  *
- * ### 生命周期
+ * 具体行为:
+ * - 如果该 [BukkitEntity] 不存在对应的 [KoishEntity], 则会创建一个新的.
+ * - 如果该 [BukkitEntity] 已经存在对应的 [KoishEntity], 则会返回已经存在的.
+ *
+ * 返回值 [KoishEntity] 的生命周期:
  * 当本函数返回后, 如果 [BukkitEntity] 变为`无效`, 那么与之对应的 [KoishEntity] 也将变为无效.
  */
 fun Entity.koishify(): KoishEntity {
-    val entity = this // make your life easier
-    if (!entity.isKoishfiable()) {
-        // 对于玩家, 使用 isConnected 来判断是否创建 EEntity 更合适
+    val entity = this // makes your life easier
+    if (!entity.canKoishify()) {
         error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid. Entity: $entity")
     }
     val metadataMap = Metadata.provide(entity)
@@ -41,7 +42,7 @@ fun Entity.koishify(): KoishEntity {
     return koishEntity
 }
 
-fun Entity.isKoishfiable(): Boolean {
+fun Entity.canKoishify(): Boolean {
     return isValid || (this is Player && isConnected)
 }
 

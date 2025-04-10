@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.weapon
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.extensions.mul
@@ -10,8 +10,9 @@ import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import xyz.xenondevs.commons.provider.orElse
 
-private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "attack_hitbox")
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "attack_hitbox").orElse(false)
 
 internal val Player.boundingBoxScale: Float get() = attributeContainer.getValue(Attributes.SCALE).toFloat()
 

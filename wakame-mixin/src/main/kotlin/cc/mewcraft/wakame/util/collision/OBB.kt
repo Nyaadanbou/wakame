@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.util.collision
 
 import cc.mewcraft.wakame.ecs.Fleks
-import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
+import cc.mewcraft.wakame.ecs.component.ParticleEffect
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import cc.mewcraft.wakame.extensions.*
@@ -106,7 +106,7 @@ data class OBB(
             val start = vertices[i]
             val end = vertices[j]
             Fleks.INSTANCE.createEntity {
-                it += ParticleEffectComponent(
+                it += ParticleEffect(
                     world = viewer.world,
                     ParticleConfiguration(
                         builderProvider = { loc ->
