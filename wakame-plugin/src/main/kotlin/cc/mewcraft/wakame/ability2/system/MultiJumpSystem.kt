@@ -2,7 +2,11 @@
 
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.AbilityContainer
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.MultiJump
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify

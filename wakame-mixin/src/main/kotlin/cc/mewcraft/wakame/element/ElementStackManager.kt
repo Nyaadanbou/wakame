@@ -38,12 +38,12 @@ object ElementStackManager {
         val stackEffect = element.unwrap().stackEffect
         if (stackEffect == null)
             return
-        if (containsElementStack(target, element)) {
+        if (target[ElementStackContainer].contains(element)) {
             addElementStack(target, element, amount)
             return
         }
 
-        val elementStackEntity = Fleks.INSTANCE.createEntity {
+        target[ElementStackContainer][element] = Fleks.INSTANCE.createEntity {
             it += CastBy(target.unwrap())
             it += TargetTo(target.unwrap())
             it += ElementComponent(element)
@@ -54,19 +54,12 @@ object ElementStackManager {
                 disappearTime = stackEffect.disappearTime,
             )
         }
-        target[ElementStackContainer][element] = elementStackEntity
-    }
-
-    fun containsElementStack(entity: KoishEntity, element: RegistryEntry<Element>): Boolean {
-        if (!entity.contains(ElementStackContainer))
-            return false
-        val elementEntity = entity[ElementStackContainer][element]
-        return elementEntity != null
     }
 
     private fun addElementStack(entity: KoishEntity, element: RegistryEntry<Element>, amount: Int) = with(Fleks.INSTANCE.world) {
         require(amount > 0) { "amount > 0" }
-        val stack = entity[ElementStackContainer][element] ?: return@with
+        val stack = entity[ElementStackContainer][element] ?:
+            error("ElementStackContainer does not contain element $element")
         stack[ElementStackComponent].amount += amount
         stack[TickCountComponent].tick = 0
     }

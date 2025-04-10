@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.bridge.isKoishfiable
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.util.toStableFloat
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.FamilyOnRemove
@@ -28,14 +28,12 @@ class EntityInfoBossBar : IteratingSystem(
 ), FamilyOnAdd, FamilyOnRemove {
 
     override fun onTickEntity(eentity: EEntity) {
-        val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return
+        val entity = eentity[BukkitEntity].unwrap()
         val bossBar = eentity[EntityInfoBossBarComponent].bossBar
 
         val progress = getEntityHealthProgress(eentity)
         val bossBarName = entity.name()
-            .appendSpace()
             .append(getEntityHealthComponent(eentity))
-            .appendSpace()
             .append(getElementStackComponent(eentity))
 
         when {
@@ -61,15 +59,16 @@ class EntityInfoBossBar : IteratingSystem(
 
     private fun getEntityHealthProgress(eentity: EEntity): Float {
         val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return 0f
-        val entityMaxHealth = getMaxHealth(eentity) ?: return 0f
-        val progress = entity.health / entityMaxHealth
-        return progress.toStableFloat()
+        val entityMaxHealth = getMaxHealth(eentity).takeUnless(Float::isNaN) ?: return 0f
+        val progress = entity.health.toFloat() / entityMaxHealth
+        return progress.coerceIn(0f, 1f)
     }
 
     private fun getEntityHealthComponent(eentity: EEntity): Component {
         val entity = eentity[BukkitEntity].unwrap() as? LivingEntity ?: return Component.empty()
-        val entityMaxHealth = getMaxHealth(eentity) ?: return Component.empty()
+        val entityMaxHealth = getMaxHealth(eentity).takeUnless(Float::isNaN) ?: return Component.empty()
         return Component.text()
+            .appendSpace()
             .append(
                 Component.text()
                     .content("${entity.health.toInt()}")
@@ -90,40 +89,45 @@ class EntityInfoBossBar : IteratingSystem(
 
     private fun getElementStackComponent(eentity: EEntity): Component {
         val container = eentity.getOrNull(ElementStackContainer)?.elementStacks() ?: return Component.empty()
+        val iterator = container.iterator()
         val elementStackMessage = Component.text()
 
-        for ((elementEntry, entity) in container) {
+        while (iterator.hasNext()) {
+            val (elementEntry, elementEntity) = iterator.next()
             val element = elementEntry.unwrap()
-            val stack = entity[ElementStackComponent]
+            val stack = elementEntity[ElementStackComponent]
 
-            elementStackMessage.append(
-                Component.text()
-                    .content("${stack.amount} ")
-                    .append(element.displayName)
-                    .style(Style.style(*element.displayStyles))
-            )
+            elementStackMessage.appendSpace()
+            val elementName = element.displayName
+                .appendSpace()
+                .append(
+                    Component.text()
+                        .content("${stack.amount} ")
+                        .style(Style.style(*element.displayStyles))
+                )
+            elementStackMessage.append(elementName)
         }
 
         return elementStackMessage.build()
     }
 
-    private fun getMaxHealth(eentity: EEntity): Double? {
+    private fun getMaxHealth(eentity: EEntity): Float {
         val attributeContainer = eentity[AttributeMap]
-        return attributeContainer.getInstance(Attributes.MAX_HEALTH)?.getValue()
+        return attributeContainer.getInstance(Attributes.MAX_HEALTH)?.getValue()?.toFloat() ?: Float.NaN
     }
 
     override fun onAddEntity(eentity: Entity) {
-        eentity[BukkitEntity].unwrap() as? LivingEntity ?: return
-        eentity.configure {
-            it += EntityInfoBossBarComponent()
-        }
+        eentity.configure { it += EntityInfoBossBarComponent() }
     }
 
     override fun onRemoveEntity(eentity: EEntity) {
-        // FIXME #375: Caused by: cc.mewcraft.wakame.shaded.fleks.FleksNoSuchEntityComponentException: Entity 'Entity(id=0, version=0)' has no component of type 'BossBarVisible'.
         val bossBar = eentity[EntityInfoBossBarComponent].bossBar
         for (viewer in bossBar.viewers()) {
-            (viewer as Player).koishify()[BossBarVisible].bossBar2DurationTick[bossBar] = 0
+            val player = viewer as Player
+            if (!player.isKoishfiable()) {
+                continue
+            }
+            player.koishify()[BossBarVisible].bossBar2DurationTick[bossBar] = 0
         }
     }
 }

@@ -1,6 +1,11 @@
 package cc.mewcraft.wakame.ability2
 
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.AbilityContainer
+import cc.mewcraft.wakame.ability2.component.AtSlot
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.ManaCost
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.Fleks
@@ -62,6 +67,7 @@ object AbilityEcsBridge {
             entity += listOf(abilityMeta.params)
             entity += CastBy(caster.unwrap())
             entity += TargetTo(target.unwrap())
+            entity += TickCountComponent(0)
         }
 
         if (caster.has(AbilityContainer)) {

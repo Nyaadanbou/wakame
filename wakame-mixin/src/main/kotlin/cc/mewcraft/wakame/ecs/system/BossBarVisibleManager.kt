@@ -1,15 +1,17 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
+import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
+import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
+import com.github.quillraven.fleks.World
 import org.bukkit.entity.Player
 
 class BossBarVisibleManager : IteratingSystem(
-    family = Families.BUKKIT_PLAYER
+    family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
 
     override fun onTickEntity(entity: Entity) {

@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.bridge.isKoishfiable
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
@@ -13,7 +14,7 @@ class BukkitEntityBridge : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val bukkitEntity = entity[BukkitEntity].unwrap()
-        if (!bukkitEntity.isValid) {
+        if (!bukkitEntity.isKoishfiable()) {
             entity.remove()
         }
     }

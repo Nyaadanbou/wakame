@@ -4,7 +4,11 @@ import cc.mewcraft.wakame.ability2.component.AbilityComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ecs.component.*
+import cc.mewcraft.wakame.ecs.component.BukkitBlock
+import cc.mewcraft.wakame.ecs.component.BukkitEntity
+import cc.mewcraft.wakame.ecs.component.BukkitObject
+import cc.mewcraft.wakame.ecs.component.BukkitPlayer
+import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import com.github.quillraven.fleks.Family
