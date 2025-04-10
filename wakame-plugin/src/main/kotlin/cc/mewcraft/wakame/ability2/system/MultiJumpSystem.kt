@@ -42,7 +42,7 @@ class MultiJumpSystem : ListenableIteratingSystem(
     @EventHandler
     private fun onPlayerInput(event: PlayerInputEvent) {
         val player = event.player
-        val playerEntity = player.koishify()
+        val playerEntity = player.koishify().unwrap()
         val multijumpEntities = playerEntity[AbilityContainer][AbilityMetaTypes.MULTI_JUMP]
         for (multijumpEntity in multijumpEntities) {
             val multijump = multijumpEntity[MultiJump]
@@ -78,7 +78,7 @@ class MultiJumpSystem : ListenableIteratingSystem(
         val player = event.player
         if (!player.isOnGround)
             return
-        val multijumpEntities = player.koishify()[AbilityContainer][AbilityMetaTypes.MULTI_JUMP]
+        val multijumpEntities = player.koishify().unwrap()[AbilityContainer][AbilityMetaTypes.MULTI_JUMP]
         for (multijumpEntity in multijumpEntities) {
             val multiJump = multijumpEntity[MultiJump]
             if (multiJump.jumpCount > 0)

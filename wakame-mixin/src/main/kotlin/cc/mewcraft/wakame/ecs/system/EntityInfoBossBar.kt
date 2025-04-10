@@ -127,7 +127,7 @@ class EntityInfoBossBar : IteratingSystem(
             if (!player.isKoishfiable()) {
                 continue
             }
-            player.koishify()[BossBarVisible].bossBar2DurationTick[bossBar] = 0
+            player.koishify().unwrap()[BossBarVisible].bossBar2DurationTick[bossBar] = 0
         }
     }
 }

@@ -5,17 +5,20 @@ import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.EntityInfoBossBarComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
-import cc.mewcraft.wakame.element.ElementStackManager
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.component.ElementComponent
 import cc.mewcraft.wakame.element.component.ElementStackComponent
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 
@@ -63,14 +66,14 @@ class ElementStackSystem : ListenableIteratingSystem(
         val damagee = event.damagee
         val damagePackets = event.damageMetadata.damageBundle.packets()
         val causingEntity = event.damageSource.causingEntity
-        val target = damagee.koishify()
+        val target = damagee.koishify().unwrap()
         for (damagePacket in damagePackets) {
             val element = damagePacket.element
-            ElementStackManager.applyElementStack(element, 1, target)
+            applyElementStack(element, 1, target)
         }
 
         if (causingEntity != null && causingEntity is Player) {
-            causingEntity.koishify()[BossBarVisible].bossBar2DurationTick.put(target[EntityInfoBossBarComponent].bossBar, 100)
+            causingEntity.koishify().unwrap()[BossBarVisible].bossBar2DurationTick.put(target[EntityInfoBossBarComponent].bossBar, 100)
         }
     }
 
@@ -79,5 +82,43 @@ class ElementStackSystem : ListenableIteratingSystem(
         target[ElementStackContainer].remove(element)
         entity.remove()
         LOGGER.info("在 $entity 上的 ${element.getIdAsString()} 元素效果已失效.")
+    }
+
+    /**
+     * 对一个目标实体应用元素层数.
+     *
+     * @param target 目标实体
+     * @param element 元素效果的元素
+     * @param amount 应用层数
+     */
+    fun applyElementStack(element: RegistryEntry<Element>, amount: Int, target: Entity) {
+        require(amount > 0) { "amount > 0" }
+        val stackEffect = element.unwrap().stackEffect
+        if (stackEffect == null)
+            return
+        if (target[ElementStackContainer].contains(element)) {
+            addElementStack(target, element, amount)
+            return
+        }
+
+        target[ElementStackContainer][element] = Fleks.INSTANCE.createEntity {
+            it += CastBy(target)
+            it += TargetTo(target)
+            it += ElementComponent(element)
+            it += TickCountComponent(0)
+            it += ElementStackComponent(
+                effects = stackEffect.stages.associate { it.amount to it.abilities }.toMap(Int2ObjectOpenHashMap()),
+                maxAmount = stackEffect.maxAmount,
+                disappearTime = stackEffect.disappearTime,
+            )
+        }
+    }
+
+    private fun addElementStack(entity: Entity, element: RegistryEntry<Element>, amount: Int) = with(Fleks.INSTANCE.world) {
+        require(amount > 0) { "amount > 0" }
+        val stack = entity[ElementStackContainer][element] ?:
+        error("ElementStackContainer does not contain element $element")
+        stack[ElementStackComponent].amount += amount
+        stack[TickCountComponent].tick = 0
     }
 }
