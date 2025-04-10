@@ -5,11 +5,15 @@ import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.ecs.component.ManaBossBar
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
-import com.github.quillraven.fleks.*
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.FamilyOnAdd
+import com.github.quillraven.fleks.Fixed
+import com.github.quillraven.fleks.IteratingSystem
+import com.github.quillraven.fleks.World
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 
-class ManaHudSystem : IteratingSystem(
+object ManaHudSystem : IteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) },
     interval = Fixed(5f)
 ), FamilyOnAdd {

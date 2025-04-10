@@ -16,7 +16,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
-class AbilityManaCostSystem : IteratingSystem(
+object AbilityManaCostSystem : IteratingSystem(
     family = family { all(AbilityComponent, CastBy, ManaCost, AbilityTickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {

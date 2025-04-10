@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * 每 tick 自动移除已经失效的 BukkitEntity Entity.
  */
-class BukkitEntityBridge : IteratingSystem(
+object BukkitEntityBridge : IteratingSystem(
     family = Families.BUKKIT_ENTITY
 ) {
     override fun onTickEntity(entity: Entity) {

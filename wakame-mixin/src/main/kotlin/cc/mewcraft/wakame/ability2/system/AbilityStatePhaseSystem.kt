@@ -8,7 +8,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
-class AbilityStatePhaseSystem : IteratingSystem(
+object AbilityStatePhaseSystem : IteratingSystem(
     family = family { all(AbilityComponent, AbilityTickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {

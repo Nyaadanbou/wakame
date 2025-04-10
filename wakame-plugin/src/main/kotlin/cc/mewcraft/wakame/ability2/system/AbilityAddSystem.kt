@@ -12,7 +12,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World
 
-class AbilityAddSystem : IteratingSystem(
+object AbilityAddSystem : IteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ) {
     override fun onTickEntity(entity: Entity) {

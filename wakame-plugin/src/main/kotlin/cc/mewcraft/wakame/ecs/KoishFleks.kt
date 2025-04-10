@@ -61,8 +61,8 @@ internal object KoishFleks : Listener, Fleks {
         }
 
         systems {
-            add(BukkitEntityBridge()) // 移除无效 bukkit entity 所映射的 ecs entity
-            add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
+            add(BukkitEntityBridge) // 移除无效 bukkit entity 所映射的 ecs entity
+            add(BukkitBlockBridge) // 移除无效 bukkit block 所映射的 ecs entity
 
             // ------------
             // 属性
@@ -79,7 +79,7 @@ internal object KoishFleks : Listener, Fleks {
             // 物品
             // ------------
 
-            add(ItemSlotChangeMonitor2()) // 监听背包物品变化
+            add(ItemSlotChangeMonitor2) // 监听背包物品变化
             add(ApplyAttributeEffect)
             add(ApplyKizamiEffect)
 
@@ -87,25 +87,25 @@ internal object KoishFleks : Listener, Fleks {
             // 带“移除”的系统 ???
             // -------------
 
-            add(AbilityAddSystem()) // “激活”玩家装备的技能
-            add(AbilityRemoveSystem()) // “移除”玩家装备的技能
-            add(AbilityTickResultSystem()) // 根据 TickResult 更新 entity
-            add(ElementStackSystem()) // 元素特效
-            add(AbilityInitSystem()) // ???
-            add(EntityInfoBossBar()) // 各种关于 boss bar 的逻辑
-            add(BossBarVisibleManager()) // 显示/移除 boss bar
-            add(TickCountSystem()) // 记录 entity 存在的 tick 数
+            add(AbilityAddSystem) // “激活”玩家装备的技能
+            add(AbilityRemoveSystem) // “移除”玩家装备的技能
+            add(AbilityTickResultSystem) // 根据 TickResult 更新 entity
+            add(ElementStackSystem) // 元素特效
+            add(AbilityInitSystem) // ???
+            add(EntityInfoBossBar) // 各种关于 boss bar 的逻辑
+            add(BossBarVisibleManager) // 显示/移除 boss bar
+            add(TickCountSystem) // 记录 entity 存在的 tick 数
 
             // ------------
             // 技能
             // ------------
 
-            add(BlackholeSystem())
-            add(BlinkSystem())
-            add(DashSystem())
-            add(MultiJumpSystem())
-            add(AbilityManaCostSystem()) // 消耗使用技能的魔法值
-            add(AbilityStatePhaseSystem()) // 管理技能的当前状态
+            add(BlackholeSystem)
+            add(BlinkSystem)
+            add(DashSystem)
+            add(MultiJumpSystem)
+            add(AbilityManaCostSystem) // 消耗使用技能的魔法值
+            add(AbilityStatePhaseSystem) // 管理技能的当前状态
 
             // ------------
             // 附魔
@@ -123,14 +123,14 @@ internal object KoishFleks : Listener, Fleks {
             // 资源
             // ------------
 
-            add(ManaSystem())
-            add(ManaHudSystem())
+            add(ManaSystem)
+            add(ManaHudSystem)
 
             // ------------
             // 粒子
             // -------------
 
-            add(ParticleSystem())
+            add(ParticleSystem)
         }
     }
 

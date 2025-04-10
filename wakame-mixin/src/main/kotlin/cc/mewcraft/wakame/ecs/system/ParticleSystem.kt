@@ -7,7 +7,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
-class ParticleSystem : IteratingSystem(
+object ParticleSystem : IteratingSystem(
     family = family { all(ParticleEffectComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {

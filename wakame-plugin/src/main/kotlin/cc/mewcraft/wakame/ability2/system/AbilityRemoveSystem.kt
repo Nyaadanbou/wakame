@@ -1,12 +1,16 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.AbilityContainer
+import cc.mewcraft.wakame.ability2.component.AtSlot
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
-class AbilityRemoveSystem : IteratingSystem(
+object AbilityRemoveSystem : IteratingSystem(
     family = Families.ABILITY
 ) {
     override fun onTickEntity(entity: Entity) {

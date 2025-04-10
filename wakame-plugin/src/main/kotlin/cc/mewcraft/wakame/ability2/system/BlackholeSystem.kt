@@ -1,7 +1,11 @@
 package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
+import cc.mewcraft.wakame.ability2.component.Blackhole
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -19,7 +23,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-class BlackholeSystem : IteratingSystem(
+object BlackholeSystem : IteratingSystem(
     family = family { all(AbilityComponent, CastBy, TargetTo, Blackhole) }
 ), ActiveAbilitySystem {
     override fun onTickEntity(entity: Entity) {

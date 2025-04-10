@@ -2,7 +2,11 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.Dash
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
@@ -14,15 +18,13 @@ import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Entity as BukkitEntity
 
-class DashSystem : IteratingSystem(
+object DashSystem : IteratingSystem(
     family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, Dash) }
 ), ActiveAbilitySystem {
-    companion object {
-        /**
-         * 在 Dash 开始前的准备时间
-         */
-        private const val STARTING_TICK: Long = 10L
-    }
+    /**
+     * 在 Dash 开始前的准备时间
+     */
+    private const val STARTING_TICK: Long = 10L
 
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick

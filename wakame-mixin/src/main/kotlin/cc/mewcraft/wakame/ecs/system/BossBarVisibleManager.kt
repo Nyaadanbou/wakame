@@ -10,7 +10,7 @@ import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World
 import org.bukkit.entity.Player
 
-class BossBarVisibleManager : IteratingSystem(
+object BossBarVisibleManager : IteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
 

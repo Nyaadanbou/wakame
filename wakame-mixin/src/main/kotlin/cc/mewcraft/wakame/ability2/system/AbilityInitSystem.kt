@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.ecs.Families
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
-class AbilityInitSystem : IteratingSystem(
+object AbilityInitSystem : IteratingSystem(
     family = Families.ABILITY
 ) {
     override fun onTickEntity(entity: Entity) {

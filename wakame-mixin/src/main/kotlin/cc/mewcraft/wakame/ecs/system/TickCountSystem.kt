@@ -5,7 +5,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 import com.github.quillraven.fleks.World.Companion.family
 
-class TickCountSystem : IteratingSystem(
+object TickCountSystem : IteratingSystem(
     family = family { all(TickCountComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {

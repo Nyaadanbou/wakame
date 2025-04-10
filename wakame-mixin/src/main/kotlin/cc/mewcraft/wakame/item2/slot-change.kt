@@ -13,7 +13,12 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
-import com.github.quillraven.fleks.*
+import com.github.quillraven.fleks.Component
+import com.github.quillraven.fleks.ComponentType
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.FamilyOnAdd
+import com.github.quillraven.fleks.IteratingSystem
+import com.github.quillraven.fleks.World
 import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -36,7 +41,7 @@ import org.jetbrains.annotations.ApiStatus
  * 如果第 `n` tick 扫描的结果和第 `n-1` tick 扫描的结果不同,
  * 则认为这个槽位发生了变化, 那么此时就会记录并触发一个事件.
  */
-class ItemSlotChangeMonitor2 : IteratingSystem(
+object ItemSlotChangeMonitor2 : IteratingSystem(
     family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {

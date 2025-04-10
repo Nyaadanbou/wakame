@@ -26,7 +26,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerMoveEvent
 
-class MultiJumpSystem : ListenableIteratingSystem(
+object MultiJumpSystem : ListenableIteratingSystem(
     family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, MultiJump) }
 ) {
     override fun onTickEntity(entity: Entity) {

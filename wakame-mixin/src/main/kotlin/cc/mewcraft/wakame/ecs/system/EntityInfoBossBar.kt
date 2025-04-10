@@ -23,7 +23,7 @@ import net.kyori.adventure.text.format.TextColor
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-class EntityInfoBossBar : IteratingSystem(
+object EntityInfoBossBar : IteratingSystem(
     family = Families.BUKKIT_ENTITY
 ), FamilyOnAdd, FamilyOnRemove {
 

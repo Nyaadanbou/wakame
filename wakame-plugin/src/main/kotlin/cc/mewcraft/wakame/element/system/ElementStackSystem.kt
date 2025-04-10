@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 
-class ElementStackSystem : ListenableIteratingSystem(
+object ElementStackSystem : ListenableIteratingSystem(
     family = Families.ELEMENT_STACK
 ) {
     override fun onTickEntity(entity: Entity) {
