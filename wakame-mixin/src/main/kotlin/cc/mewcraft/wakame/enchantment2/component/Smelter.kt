@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.enchantment2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.Identifier
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 import org.bukkit.inventory.FurnaceRecipe
 
 class Smelter(
@@ -11,7 +12,7 @@ class Smelter(
     val registeredFurnaceRecipes: HashSet<FurnaceRecipe>,
 ) : Component<Smelter> {
 
-    companion object : ComponentType<Smelter>()
+    companion object : EComponentType<Smelter>()
 
     override fun type() = Smelter
 

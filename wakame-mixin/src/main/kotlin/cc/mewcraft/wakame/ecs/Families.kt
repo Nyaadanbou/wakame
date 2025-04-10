@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.component.TargetTo
@@ -9,9 +9,9 @@ import cc.mewcraft.wakame.ecs.component.BukkitBlock
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
-import cc.mewcraft.wakame.element.component.ElementComponent
-import cc.mewcraft.wakame.element.component.ElementStackComponent
+import cc.mewcraft.wakame.ecs.component.TickCount
+import cc.mewcraft.wakame.element.component.Elemental
+import cc.mewcraft.wakame.element.component.ElementStack
 import com.github.quillraven.fleks.Family
 
 
@@ -42,13 +42,13 @@ object Families {
     // ------------------------------
 
     @JvmField
-    val ABILITY: Family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent) }
+    val ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount) }
 
     @JvmField
-    val MANA_COSTING_ABILITY: Family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, ManaCost) }
+    val MANA_COSTING_ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, ManaCost) }
 
     @JvmField
-    val ELEMENT_STACK: Family = EWorld.family { all(ElementComponent, ElementStackComponent, TargetTo) }
+    val ELEMENT_STACK: Family = EWorld.family { all(Elemental, ElementStack, TargetTo) }
 
     // 用于初始化本 object 里的 val
     fun bootstrap() = Unit

@@ -1,11 +1,11 @@
 package cc.mewcraft.wakame.kizami2
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.bukkit.entity.Player
-
 
 /**
  * Represents a map (kizami -> amount) owned by a subject.
@@ -97,7 +97,7 @@ interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component
 
     // Fleks
 
-    companion object : ComponentType<KizamiMap>() {
+    companion object : EComponentType<KizamiMap>() {
 
         /**
          * 创建一个新的 [KizamiMap].
@@ -108,7 +108,7 @@ interface KizamiMap : Iterable<Map.Entry<RegistryEntry<Kizami>, Int>>, Component
 
     }
 
-    override fun type(): ComponentType<KizamiMap> = KizamiMap
+    override fun type(): EComponentType<KizamiMap> = KizamiMap
 }
 
 

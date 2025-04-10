@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.cooldown.Cooldown
-import com.github.quillraven.fleks.ComponentType
+
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
@@ -47,7 +47,7 @@ class PlayerCombo(
         comboDisplay.cleanup()
     }
 
-    override fun type(): ComponentType<PlayerCombo> = PlayerCombo
+    override fun type(): EComponentType<PlayerCombo> = PlayerCombo
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

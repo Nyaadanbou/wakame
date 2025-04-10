@@ -1,14 +1,15 @@
 package cc.mewcraft.wakame.ecs.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 
 data class Mana(
     var maximum: Int,
 ) : Component<Mana> {
-    companion object : ComponentType<Mana>()
+    companion object : EComponentType<Mana>()
 
-    override fun type(): ComponentType<Mana> = Mana
+    override fun type(): EComponentType<Mana> = Mana
 
     var current: Int = maximum
         private set

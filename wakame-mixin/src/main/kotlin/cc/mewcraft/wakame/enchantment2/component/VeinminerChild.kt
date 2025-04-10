@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.enchantment2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 import org.bukkit.Material
 import org.bukkit.block.Block
 
@@ -31,7 +32,7 @@ class VeinminerChild(
         visited = HashSet<Block>(12).apply { this.add(startBlock) },
     )
 
-    companion object : ComponentType<VeinminerChild>()
+    companion object : EComponentType<VeinminerChild>()
 
     override fun type() = VeinminerChild
 

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -15,7 +16,7 @@ import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
@@ -25,7 +26,6 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.ApiStatus
-
 
 // ------------
 // 监测玩家背包中物品的变化
@@ -70,7 +70,7 @@ data class ItemSlotChanges(
     val entries: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
 ) : Component<ItemSlotChanges> {
 
-    companion object : ComponentType<ItemSlotChanges>() {
+    companion object : EComponentType<ItemSlotChanges>() {
 
         //
         // 下面提供一些方便函数用于判断一个特定槽位上的物品是否生效.
@@ -118,7 +118,7 @@ data class ItemSlotChanges(
         }
     }
 
-    override fun type(): ComponentType<ItemSlotChanges> = ItemSlotChanges
+    override fun type(): EComponentType<ItemSlotChanges> = ItemSlotChanges
 
     @Deprecated("使用 forEachChangingEntry 以避免 Array 的创建")
     val changingEntries: Collection<Entry>

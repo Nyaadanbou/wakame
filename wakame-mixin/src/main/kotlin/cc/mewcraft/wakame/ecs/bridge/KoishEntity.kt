@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ecs.bridge
 
 import cc.mewcraft.wakame.ecs.Fleks
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
+
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
 
@@ -17,10 +17,10 @@ class KoishEntity(
     fun remove() =
         with(Fleks.INSTANCE.world) { entity.remove() }
 
-    inline operator fun <reified T : Component<out Any>> get(type: ComponentType<T>): T =
+    inline operator fun <reified T : Component<out Any>> get(type: EComponentType<T>): T =
         with(Fleks.INSTANCE.world) { entity[type] }
 
-    inline fun <reified T : Component<out Any>> getOrNull(type: ComponentType<T>): T? =
+    inline fun <reified T : Component<out Any>> getOrNull(type: EComponentType<T>): T? =
         with(Fleks.INSTANCE.world) { entity.getOrNull(type) }
 
     operator fun contains(uniqueId: UniqueId<out Any>): Boolean =
@@ -33,7 +33,7 @@ class KoishEntity(
         Fleks.INSTANCE.editEntity(entity) { it += component }
     }
 
-    inline operator fun <reified T : Component<T>> minusAssign(type: ComponentType<T>) {
+    inline operator fun <reified T : Component<T>> minusAssign(type: EComponentType<T>) {
         Fleks.INSTANCE.editEntity(entity) { it -= type }
     }
 

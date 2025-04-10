@@ -1,41 +1,41 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.system.AbilityAddSystem
-import cc.mewcraft.wakame.ability2.system.AbilityInitSystem
-import cc.mewcraft.wakame.ability2.system.AbilityManaCostSystem
-import cc.mewcraft.wakame.ability2.system.AbilityRemoveSystem
-import cc.mewcraft.wakame.ability2.system.AbilityStatePhaseSystem
-import cc.mewcraft.wakame.ability2.system.AbilityTickResultSystem
-import cc.mewcraft.wakame.ability2.system.BlackholeSystem
-import cc.mewcraft.wakame.ability2.system.BlinkSystem
-import cc.mewcraft.wakame.ability2.system.DashSystem
-import cc.mewcraft.wakame.ability2.system.InitAbilityContainerSystem
+import cc.mewcraft.wakame.ability2.system.AbilityActivator
+import cc.mewcraft.wakame.ability2.system.AbilityRemover
+import cc.mewcraft.wakame.ability2.system.AbilityStateInitializer
+import cc.mewcraft.wakame.ability2.system.AbilityStateManager
+import cc.mewcraft.wakame.ability2.system.AbilityTickUpdater
+import cc.mewcraft.wakame.ability2.system.BlackholeAbility
+import cc.mewcraft.wakame.ability2.system.BlinkAbility
+import cc.mewcraft.wakame.ability2.system.DashAbility
+import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
 import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
-import cc.mewcraft.wakame.ability2.system.MultiJumpSystem
+import cc.mewcraft.wakame.ability2.system.ManaCostHandler
+import cc.mewcraft.wakame.ability2.system.MultiJumpAbility
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.system.BossBarVisibleManager
+import cc.mewcraft.wakame.ecs.system.BossBarVisibility
 import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
 import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
-import cc.mewcraft.wakame.ecs.system.EntityInfoBossBar
-import cc.mewcraft.wakame.ecs.system.ManaHudSystem
-import cc.mewcraft.wakame.ecs.system.ManaSystem
-import cc.mewcraft.wakame.ecs.system.ParticleSystem
-import cc.mewcraft.wakame.ecs.system.TickCountSystem
-import cc.mewcraft.wakame.element.system.ElementStackSystem
+import cc.mewcraft.wakame.ecs.system.EntityInfoBossBarManager
+import cc.mewcraft.wakame.ecs.system.ManaHandler
+import cc.mewcraft.wakame.ecs.system.ManaHud
+import cc.mewcraft.wakame.ecs.system.ParticleHandler
+import cc.mewcraft.wakame.ecs.system.TickCounter
+import cc.mewcraft.wakame.element.system.ElementStack
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentAntigravShotSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentAttributeSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentBlastMiningSystem
+import cc.mewcraft.wakame.enchantment2.system.AntigravShotEnchantmentHandler
+import cc.mewcraft.wakame.enchantment2.system.AttributeEnchantmentHandler
+import cc.mewcraft.wakame.enchantment2.system.BlastMiningEnchantmentHandler
 import cc.mewcraft.wakame.enchantment2.system.EnchantmentEffectApplier
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentFragileSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentSmelterSystem
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentVeinminerSystem
+import cc.mewcraft.wakame.enchantment2.system.FragileEnchantmentHandler
+import cc.mewcraft.wakame.enchantment2.system.SmelterEnchantmentHandler
+import cc.mewcraft.wakame.enchantment2.system.VeinminerEnchantmentHandler
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
-import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffect
-import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffect
+import cc.mewcraft.wakame.item2.behavior.system.AttributeEffectApply
+import cc.mewcraft.wakame.item2.behavior.system.KizamiEffectApply
 import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -68,7 +68,7 @@ internal object KoishFleks : Listener, Fleks {
             // 属性
             // ------------
 
-            add(InitAbilityContainerSystem)
+            add(InitAbilityContainer)
             add(InitAttackSpeedContainer)
             add(InitAttributeContainer)
             add(InitElementStackContainer)
@@ -80,69 +80,69 @@ internal object KoishFleks : Listener, Fleks {
             // ------------
 
             add(ItemSlotChangeMonitor2) // 监听背包物品变化
-            add(ApplyAttributeEffect)
-            add(ApplyKizamiEffect)
+            add(AttributeEffectApply)
+            add(KizamiEffectApply)
 
             // -------------
             // 带“移除”的系统 ???
             // -------------
 
-            add(AbilityAddSystem) // “激活”玩家装备的技能
-            add(AbilityRemoveSystem) // “移除”玩家装备的技能
-            add(AbilityTickResultSystem) // 根据 TickResult 更新 entity
-            add(ElementStackSystem) // 元素特效
-            add(AbilityInitSystem) // ???
-            add(EntityInfoBossBar) // 各种关于 boss bar 的逻辑
-            add(BossBarVisibleManager) // 显示/移除 boss bar
-            add(TickCountSystem) // 记录 entity 存在的 tick 数
+            add(AbilityActivator) // “激活”玩家装备的技能
+            add(AbilityRemover) // “移除”玩家装备的技能
+            add(AbilityTickUpdater) // 根据 TickResult 更新 entity
+            add(ElementStack) // 元素特效层数
+            add(AbilityStateInitializer) //  tick 初始化技能的状态
+            add(EntityInfoBossBarManager) // 各种关于 boss bar 的逻辑
+            add(BossBarVisibility) // 显示/移除 boss bar
+            add(TickCounter) // 记录 entity 存在的 tick 数
 
             // ------------
             // 技能
             // ------------
 
-            add(BlackholeSystem)
-            add(BlinkSystem)
-            add(DashSystem)
-            add(MultiJumpSystem)
-            add(AbilityManaCostSystem) // 消耗使用技能的魔法值
-            add(AbilityStatePhaseSystem) // 管理技能的当前状态
+            add(BlackholeAbility)
+            add(BlinkAbility)
+            add(DashAbility)
+            add(MultiJumpAbility)
+            add(ManaCostHandler) // 消耗使用技能的魔法值
+            add(AbilityStateManager) // 管理技能的当前状态
 
             // ------------
             // 附魔
             // ------------
 
             add(EnchantmentEffectApplier) // framework
-            add(EnchantmentAntigravShotSystem)
-            add(EnchantmentAttributeSystem)
-            add(EnchantmentBlastMiningSystem)
-            add(EnchantmentFragileSystem)
-            add(EnchantmentSmelterSystem)
-            add(EnchantmentVeinminerSystem)
+            add(AntigravShotEnchantmentHandler)
+            add(AttributeEnchantmentHandler)
+            add(BlastMiningEnchantmentHandler)
+            add(FragileEnchantmentHandler)
+            add(SmelterEnchantmentHandler)
+            add(VeinminerEnchantmentHandler)
 
             // ------------
             // 资源
             // ------------
 
-            add(ManaSystem)
-            add(ManaHudSystem)
+            add(ManaHandler)
+            add(ManaHud)
 
             // ------------
             // 粒子
             // -------------
 
-            add(ParticleSystem)
+            add(ParticleHandler)
         }
     }
 
     /**
-     * 创建一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
+     * 创建一个 [EEntity].
      */
     override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): EEntity = world.entity {
         configuration.invoke(this, it)
     }
 
     /**
-     * 修改一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
+     * 修改一个 [EEntity].
      */
     override fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) = with(world) {
         if (!contains(entity)) error("Trying to edit entity ($entity) that does not exist in the world")

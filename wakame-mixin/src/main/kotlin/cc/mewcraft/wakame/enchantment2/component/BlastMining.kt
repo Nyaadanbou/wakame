@@ -1,16 +1,16 @@
 package cc.mewcraft.wakame.enchantment2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
-import org.bukkit.block.Block
 
+import org.bukkit.block.Block
 
 class BlastMining(
     val explosionPower: Float,
     val minBlockHardness: Float,
 ) : Component<BlastMining> {
 
-    companion object : ComponentType<BlastMining>()
+    companion object : EComponentType<BlastMining>()
 
     override fun type() = BlastMining
 

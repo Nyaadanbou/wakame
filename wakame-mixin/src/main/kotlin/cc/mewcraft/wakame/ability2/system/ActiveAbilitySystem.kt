@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -15,7 +15,7 @@ interface ActiveAbilitySystem {
     context(EntityUpdateContext)
     fun tickIdle(tickCount: Int, entity: EEntity): TickResult {
         // 默认将技能标记为准备移除.
-        entity[AbilityComponent].isReadyToRemove = true
+        entity[Ability].isReadyToRemove = true
         return TickResult.CONTINUE_TICK
     }
 
@@ -50,7 +50,7 @@ interface ActiveAbilitySystem {
     context(EntityUpdateContext)
     fun tick(tickCount: Int, entity: EEntity): TickResult {
         try {
-            val state = entity[AbilityComponent]
+            val state = entity[Ability]
             var tickResult = TickResult.CONTINUE_TICK
             entity.configure {
                 tickResult = when (state.phase) {
@@ -64,7 +64,7 @@ interface ActiveAbilitySystem {
 
             return tickResult
         } catch (t: Throwable) {
-            val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[AbilityComponent].metaType) ?: "Unknown"
+            val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[Ability].metaType) ?: "Unknown"
             throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
         }
     }
