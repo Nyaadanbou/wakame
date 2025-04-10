@@ -42,6 +42,9 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
 
 /**
  * 太刀的物品行为.
+ *
+ * 该 `object` 里的所有逻辑都是与事件相关的, 不包含 tick 逻辑.
+ * tick 逻辑全部由 [SwitchKatana] 和 [TickKatana] 实现.
  */
 object Katana : Weapon {
 
@@ -81,9 +84,11 @@ object Katana : Weapon {
 
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         val event = wrappedEvent.event
+        if (event.useItemInHand() == Event.Result.DENY) return
         if (event.hand != EquipmentSlot.HAND) {
             event.setUseItemInHand(Event.Result.DENY)
         }
+
         wrappedEvent.actionPerformed = true
     }
 
@@ -367,6 +372,8 @@ object Katana : Weapon {
 
 /**
  * 切换手持太刀时的逻辑.
+ *
+ * 这同时也是一个标准的“监听”物品变化来执行逻辑的写法.
  */
 object SwitchKatana : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
@@ -375,6 +382,10 @@ object SwitchKatana : IteratingSystem(
         val player = entity[BukkitPlayer].unwrap()
         val slotChanges = entity[ItemSlotChanges]
         val katanaState = entity.getOrNull(KatanaState)
+
+        // 99% 的情况应该只需要关注当前 tick 发生了变化的物品. 无变化的物品一般不需要关注.
+        // 所以可以直接使用这个函数来快速遍历所有在当前 tick 发生了变化的物品.
+        // 其中 slot 是物品槽位, curr 是新的物品, prev 是旧的物品.
         slotChanges.forEachChangingEntry { slot, curr, prev ->
             if (prev != null &&
                 ItemSlotChanges.testSlot(slot, prev)
@@ -409,6 +420,8 @@ object SwitchKatana : IteratingSystem(
 // TODO #349: 也许可以把这部分逻辑放到 ItemBehavior 里, 但会存在比较大的局限性.
 //  相当于只有当物品[有效]时 tick 逻辑才能执行. 与[有效]相反的[无效]情况就包括了玩家把物品丢地上或者放箱子里,
 //  此时 ItemBehavior 是无法执行这个所谓的 tick 函数的, 因为我们无法轻易从这个已经离开玩家的物品上获取到除了物品本身以外的信息 (如玩家).
+//  这时候如果 tick 逻辑需要玩家则只能在构建一个 tick 任务时将玩家信息传递进去, 而这个任务一般都是一个追踪起来比较丑陋的 BukkitTask.
+//  而 Fleks 可以实现同样的效果, 并且也可以更清晰的管理跟 tick 相关的所有状态, 所以写个 Fleks system 从各方面来说都更好.
 /**
  * tick 太刀状态的逻辑.
  */

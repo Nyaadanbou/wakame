@@ -10,8 +10,9 @@ import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
-import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffects
-import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffects
+import cc.mewcraft.wakame.item2.behavior.impl.ApplyAttributeEffects
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.SwitchKatana
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.TickKatana
 import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -36,30 +37,17 @@ internal object KoishFleks : Listener, Fleks {
             add(RemoveInvalidBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
             add(RemoveInvalidBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
 
-            // ------------
-            // 属性
-            // ------------
-
             add(InitAbilityContainer)
-            add(InitItemCooldownContainer)
-            add(InitAttributeContainer)
+            add(InitItemCooldownContainer) // 初始化玩家的物品冷却容器
+            add(InitAttributeContainer) // 初始化玩家的属性容器
             add(InitElementStackContainer)
-            add(InitKizamiContainer)
-            add(InitPlayerCombo)
-
-            // ------------
-            // 物品
-            // ------------
-
-            add(ItemSlotChangeMonitor2) // 监听背包物品变化
-            add(ApplyAttributeEffects)
-            add(ApplyKizamiEffects)
-            add(SwitchKatana)
-            add(TickKatana)
-
-            // -------------
-            // 带“移除”的系统 ???
-            // -------------
+            add(InitKizamiContainer) // 初始化玩家的铭刻容器
+            add(InitPlayerCombo) // 初始化玩家的连招状态
+            add(ItemSlotChangeMonitor2)// 监听玩家背包里的物品变化
+            add(ApplyAttributeEffects) // 将物品上的属性效果应用到玩家
+            add(ApplyKizamiEffects) // 将物品上的铭刻效果应用到玩家
+            add(SwitchKatana) // 当玩家切换太刀时更新太刀状态
+            add(TickKatana) // 更新每 tick 的太刀状态
 
             add(AbilityActivator) // “激活”玩家装备的技能
             add(AbilityRemover) // “移除”玩家装备的技能
@@ -70,10 +58,6 @@ internal object KoishFleks : Listener, Fleks {
             add(ManageBossBar) // 显示/移除 boss bar
             add(CountTick) // 记录 entity 存在的 tick 数
 
-            // ------------
-            // 技能
-            // ------------
-
             add(TickAbilityBlackhole)
             add(TickAbilityBlink)
             add(TickAbilityDash)
@@ -81,29 +65,15 @@ internal object KoishFleks : Listener, Fleks {
             add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
             add(TickAbilityPhase) // 管理技能的当前状态
 
-            // ------------
-            // 附魔
-            // ------------
-
-            add(ApplyEnchantmentEffect) // framework
+            add(ApplyEnchantmentEffect) //
             add(TickAntigravShotEnchantment)
             add(TickAttributeEnchantment)
             add(TickBlastMiningEnchantment)
             add(TickFragileEnchantment)
             add(TickSmelterEnchantment)
             add(TickVeinminerEnchantment)
-
-            // ------------
-            // 资源
-            // ------------
-
             add(RestoreMana)
             add(DisplayMana)
-
-            // ------------
-            // 粒子
-            // -------------
-
             add(RenderParticle)
         }
     }

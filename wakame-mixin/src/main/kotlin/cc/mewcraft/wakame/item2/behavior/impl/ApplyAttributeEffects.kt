@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item2.behavior.impl
+package cc.mewcraft.wakame.entity.attribute.system
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.EWorld

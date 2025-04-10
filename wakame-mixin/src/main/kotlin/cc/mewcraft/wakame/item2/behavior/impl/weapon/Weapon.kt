@@ -13,9 +13,8 @@ import org.bukkit.inventory.ItemStack
 interface Weapon : ItemBehavior {
 
     /**
-     * 玩家使用该武器类型对生物攻击造成伤害所使用的 [DamageMetadata].
-     * 默认返回造成 1 点默认元素的伤害元数据.
-     * 返回 `null` 后续会使本次伤害事件取消.
+     * 玩家使用该武器类型可造成的 [DamageMetadata].
+     * 返回 `null` 会让 Koish 系统取消本次伤害事件.
      *
      * 注意: 被取消的伤害事件仍然会触发 [PlayerItemLeftClickEvent].
      *

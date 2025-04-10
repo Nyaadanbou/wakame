@@ -36,7 +36,7 @@ object Sword : Weapon {
                 standard()
             }
         }
-        val hitEntities = WeaponUtils.getHitEntities(player, 4.0, 1.2f, 0.1f, 1f)
+        val hitEntities = WeaponUtils.getHitEntities(player, 4.0, 1.2f, 0.1f, 1f) // 参考了太刀的实现
         hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
 
         itemstack.addCooldown(player, attackSpeed)
@@ -46,6 +46,7 @@ object Sword : Weapon {
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         val event = wrappedEvent.event
         if (event.hand != EquipmentSlot.HAND) {
+            // 只允许主手使用剑进行交互
             event.setUseItemInHand(Event.Result.DENY)
         }
         wrappedEvent.actionPerformed = true
