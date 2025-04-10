@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
@@ -57,15 +57,15 @@ interface ItemBehavior {
 
     fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
-    fun handleReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) = Unit
+    fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
 
-    fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoPostprocessDamageEvent) = Unit
+    fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) = Unit
 
     fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
 
     fun handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
 
-    fun handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
+    fun handlePlayerBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
 
     fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) = Unit
 

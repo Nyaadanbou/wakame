@@ -11,8 +11,8 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
@@ -64,7 +64,7 @@ object Katana : Weapon {
         }
     }
 
-    override fun handleReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
+    override fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) {
         val katanaState = player.koishify().getOrNull(KatanaState) ?: return
         if (katanaState.isArmed.not()) return
 
@@ -93,24 +93,20 @@ object Katana : Weapon {
     private fun horizontalSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
         val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(
-            attributes = attributeContainer,
-            damageBundle = damageBundle(attributeContainer) {
-                every {
-                    standard()
-                    rate { // override
-                        katanaState.getBladeLevelDamageRate() * standard()
-                    }
+        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+            every {
+                standard()
+                rate { // override
+                    katanaState.getBladeLevelDamageRate() * standard()
                 }
             }
-        )
+        }
+
 
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
-            hitEntities.forEach { entity ->
-                entity.hurt(damageMetadata, player, true)
-            }
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
             // 增加气刃值
             katanaState.addBladeSpirit(katanaConfig.horizontalSlashSpiritReward)
         }
@@ -139,7 +135,7 @@ object Katana : Weapon {
     /**
      * 太刀居合斩判定.
      */
-    private fun laiSlashCheck(player: Player, katanaState: KatanaState, event: NekoPostprocessDamageEvent) {
+    private fun laiSlashCheck(player: Player, katanaState: KatanaState, event: PostprocessDamageEvent) {
         val katanaConfig = katanaState.config
         // 不存在伤害来源实体 - 不处理
         val damager = event.damageSource.causingEntity as? LivingEntity ?: return
@@ -157,19 +153,16 @@ object Katana : Weapon {
         player.velocity = force
         // 对伤害来源造成伤害
         val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(
-            attributes = attributeContainer,
-            damageBundle = damageBundle(attributeContainer) {
-                every {
-                    standard()
-                    rate {
-                        katanaState.getBladeLevelDamageRate() * standard()
-                    }
+        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+            every {
+                standard()
+                rate {
+                    katanaState.getBladeLevelDamageRate() * standard()
                 }
             }
-        )
+        }
         damager.hurt(damageMetadata, player, true)
-        // TODO 音效和特效: 叮~
+        // 播放音效 // TODO 音效和特效: 叮~
         player.playSound(player) {
             type(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP)
             source(SoundSource.PLAYER)
@@ -182,17 +175,15 @@ object Katana : Weapon {
      */
     private fun spiritBladeSlashBase(player: Player, katanaState: KatanaState, angel: Float) {
         val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(
-            attributes = attributeContainer,
-            damageBundle = damageBundle(attributeContainer) {
-                every {
-                    standard()
-                    rate { // override
-                        katanaState.getBladeLevelDamageRate() * standard()
-                    }
+        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+            every {
+                standard()
+                rate { // override
+                    katanaState.getBladeLevelDamageRate() * standard()
                 }
             }
-        )
+        }
+
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.7f, 0.05f, 1.4f, angel)
         // 造成伤害
         hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
@@ -204,6 +195,7 @@ object Katana : Weapon {
      */
     private fun spiritBladeSlash1(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
+
         // 消耗气
         katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume1)
         spiritBladeSlashBase(player, katanaState, 35f)
@@ -220,6 +212,7 @@ object Katana : Weapon {
      */
     private fun spiritBladeSlash2(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
+
         // 消耗气
         katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume2)
         spiritBladeSlashBase(player, katanaState, -35f)
@@ -236,6 +229,7 @@ object Katana : Weapon {
      */
     private fun spiritBladeSlash3(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
+
         // 消耗气
         katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume3)
         spiritBladeSlashBase(player, katanaState, 35f)
@@ -252,6 +246,7 @@ object Katana : Weapon {
      */
     private fun roundSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
+
         // 消耗气
         katanaState.addBladeSpirit(-katanaConfig.roundSlashSpiritConsume)
 
@@ -260,21 +255,17 @@ object Katana : Weapon {
         val scale = player.attributeContainer.getValue(Attributes.SCALE).toFloat()
         val hitEntities = centerLocation.getNearbyLivingEntities(katanaConfig.roundSlashRadius * scale, 1.1 * scale) { it != player }
         val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(
-            attributes = attributeContainer,
-            damageBundle = damageBundle(attributeContainer) {
-                every {
-                    standard()
-                    rate {
-                        katanaState.getBladeLevelDamageRate() * standard()
-                    }
+        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+            every {
+                standard()
+                rate {
+                    katanaState.getBladeLevelDamageRate() * standard()
                 }
             }
-        )
+        }
         if (hitEntities.isNotEmpty()) {
-            hitEntities.forEach { entity ->
-                entity.hurt(damageMetadata, player, true)
-            }
+            // 造成伤害
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
             // 提升气刃等级
             katanaState.upgradeBladeLevel()
             if (LOGGING) player.sendMessage("回旋斩命中! 气刃等级提升!")
@@ -361,6 +352,7 @@ object Katana : Weapon {
      */
     private fun dragonAscendSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
+
         // 消耗气和一层气刃等级
         katanaState.addBladeSpirit(-katanaConfig.dragonAscendSlashSpiritConsume)
         katanaState.downgradeBladeLevel()

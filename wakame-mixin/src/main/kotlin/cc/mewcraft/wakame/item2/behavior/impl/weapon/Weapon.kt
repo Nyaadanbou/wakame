@@ -13,8 +13,9 @@ import org.bukkit.inventory.ItemStack
 interface Weapon : ItemBehavior {
 
     /**
-     * 玩家使用该武器类型物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].
-     * 默认返回造成 1 点默认元素伤害的伤害元数据. 返回 `null` 后续会使本次伤害事件取消.
+     * 玩家使用该武器类型对生物攻击造成伤害所使用的 [DamageMetadata].
+     * 默认返回造成 1 点默认元素的伤害元数据.
+     * 返回 `null` 后续会使本次伤害事件取消.
      *
      * 注意: 被取消的伤害事件仍然会触发 [PlayerItemLeftClickEvent].
      *
@@ -23,6 +24,5 @@ interface Weapon : ItemBehavior {
     fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         return PlayerDamageMetadata.INTRINSIC_ATTACK
     }
-
 
 }
