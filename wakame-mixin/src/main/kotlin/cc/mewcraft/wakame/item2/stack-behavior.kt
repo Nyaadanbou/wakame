@@ -31,7 +31,14 @@ import org.bukkit.inventory.ItemStack
 // 用于访问 `org.bukkit.inventory.ItemStack` 上的 ItemBehavior
 // ------------
 
-fun ItemStack.hasBehavior(behavior: ItemBehavior): Boolean = toNMS().hasBehavior(behavior)
+/**
+ * 当判断一个物品是否拥有特定的 [ItemBehavior] 时 (类型绝对匹配, 不包含子类型), 尽量使用这个函数, 性能比较好.
+ */
+fun ItemStack.hasBehaviorExact(behavior: ItemBehavior): Boolean = toNMS().hasBehaviorExact(behavior)
+
+inline fun <reified T : ItemBehavior> ItemStack.hasBehavior(): Boolean = toNMS().hasBehavior<T>()
+
+inline fun <reified T : ItemBehavior> ItemStack.getBehavior(): T? = toNMS().getBehavior<T>()
 
 inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().handleBehavior(action)
 
@@ -92,8 +99,14 @@ fun ItemStack.handleConsume(player: Player, itemstack: ItemStack, event: PlayerI
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 ItemBehavior
 // ------------
 
-fun MojangStack.hasBehavior(behavior: ItemBehavior): Boolean =
-    koishItem?.behaviors?.has(behavior) == true
+fun MojangStack.hasBehaviorExact(behavior: ItemBehavior): Boolean =
+    koishItem?.behaviors?.hasExact(behavior) == true
+
+inline fun <reified T : ItemBehavior> MojangStack.hasBehavior(): Boolean =
+    koishItem?.behaviors?.has(T::class) == true
+
+inline fun <reified T : ItemBehavior> MojangStack.getBehavior(): T? =
+    koishItem?.behaviors?.get(T::class)
 
 inline fun MojangStack.handleBehavior(action: (ItemBehavior) -> Unit) {
     koishItem?.behaviors?.forEach(action)
