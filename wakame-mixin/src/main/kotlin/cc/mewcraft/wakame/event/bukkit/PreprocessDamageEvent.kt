@@ -25,7 +25,7 @@ import org.bukkit.event.HandlerList
  * @property damageSource 更多的伤害信息. 为 null 意为还未造成实际伤害.
  */
 // FIXME #366: 让 preprocess 支持 cancel 以尽早的停止伤害计算节省资源?
-class NekoPreprocessDamageEvent(
+class PreprocessDamageEvent(
     val phase: Phase,
     val causingEntity: Player,
     val causingAttributes: AttributeMapSnapshot, // 注意, 这里的属性与 causingEntity 直接返回的属性可能不一样

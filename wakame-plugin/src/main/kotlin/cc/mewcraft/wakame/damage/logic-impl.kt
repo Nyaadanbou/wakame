@@ -22,8 +22,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.NekoPreprocessDamageEvent.Phase
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
@@ -37,10 +35,7 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
-import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
@@ -52,88 +47,6 @@ import kotlin.math.round
 // ------------
 // 内部实现
 // ------------
-
-internal fun DamageContext(event: EntityDamageEvent): DamageContext {
-    val damage = event.damage
-    val damagee = event.entity as? LivingEntity ?: error("The damagee must be a living entity")
-    val damageSource = event.damageSource
-    val damageCause = event.cause
-    return DamageContext(damage, damagee, damageSource, damageCause)
-}
-
-/**
- * 伤害信息的封装.
- */
-internal class DamageContext(
-    val damage: Double,
-    val damagee: LivingEntity,
-    val damageSource: DamageSource,
-    val damageCause: DamageCause,
-) {
-    override fun toString(): String {
-        return "DamageContext(damage=$damage, damagee=$damagee, damageCause=$damageCause, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
-    }
-}
-
-/**
- * 用于方便构建 [NekoPreprocessDamageEvent].
- */
-internal object PreprocessDamageEventFactory {
-
-    internal fun launchProjectile(causingEntity: Player): NekoPreprocessDamageEvent {
-        return NekoPreprocessDamageEvent(
-            phase = Phase.SEARCHING_TARGET,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = null,
-            _damageSource = null
-        )
-    }
-
-    internal fun searchingTarget(causingEntity: Player): NekoPreprocessDamageEvent {
-        return NekoPreprocessDamageEvent(
-            phase = Phase.SEARCHING_TARGET,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = null,
-            _damageSource = null
-        )
-    }
-
-    internal fun actuallyDamage(causingEntity: Player, damageeEntity: LivingEntity): NekoPreprocessDamageEvent {
-        return NekoPreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = damageeEntity,
-            _damageSource = DamageSource.builder(DamageType.GENERIC)
-                .withCausingEntity(causingEntity)
-                .withDirectEntity(causingEntity)
-                .withDamageLocation(damageeEntity.location)
-                .build(),
-        )
-    }
-
-    internal fun actuallyDamage(causingEntity: Player, damageContext: DamageContext): NekoPreprocessDamageEvent {
-        return NekoPreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = damageContext.damagee,
-            _damageSource = damageContext.damageSource,
-        )
-    }
-
-    internal fun actuallyDamage(causingEntity: Player, causingAttributes: AttributeMapSnapshot, damageContext: DamageContext): NekoPreprocessDamageEvent {
-        return NekoPreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingAttributes,
-            _damageeEntity = damageContext.damagee,
-            _damageSource = damageContext.damageSource,
-        )
-    }
-}
 
 /**
  * 包含伤害系统的计算逻辑和状态.

@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.weapon
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -66,12 +66,12 @@ sealed interface WeaponType {
     /**
      * 玩家使用该武器类型物品对直接生物造成伤害时执行的逻辑.
      */
-    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) = Unit
+    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: PostprocessDamageEvent) = Unit
 
     /**
      * 玩家使用该武器类型物品受到伤害时执行的逻辑.
      */
-    fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) = Unit
+    fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
 
     /**
      * 玩家使用该武器类型物品进行交互事件时执行的逻辑.

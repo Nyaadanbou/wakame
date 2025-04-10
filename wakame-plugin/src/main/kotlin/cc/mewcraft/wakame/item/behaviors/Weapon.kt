@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.behaviors
 
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.behavior.ItemBehavior
@@ -32,7 +32,7 @@ interface Weapon : ItemBehavior {
             weapon.weaponType.handleRightClick(player, koishStack, clickHand, event)
         }
 
-        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
+        override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: PostprocessDamageEvent) {
             if (event.isCancelled) return
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
             if (damagee !is LivingEntity) return

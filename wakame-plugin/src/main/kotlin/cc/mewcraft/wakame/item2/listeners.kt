@@ -3,9 +3,9 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
@@ -98,24 +98,24 @@ internal object ItemBehaviorListener : Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onReceive(event: NekoPostprocessDamageEvent) {
+    fun onReceive(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? Player ?: return
         if (!damagee.isInventoryListenable) return
 
         val damageSource = event.damageSource
         for (slot in ItemSlotRegistry.all()) {
             val itemstack = slot.getItem(damagee) ?: continue
-            itemstack.handleReceiveDamage(damagee, itemstack, damageSource, event)
+            itemstack.handlePlayerReceiveDamage(damagee, itemstack, damageSource, event)
         }
     }
 
     @EventHandler()
-    fun onAttack(event: NekoPostprocessDamageEvent) {
+    fun onAttack(event: PostprocessDamageEvent) {
         val player = event.damageSource.causingEntity as? Player ?: return
         if (!player.isInventoryListenable) return
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
 
-        itemstack.handleAttackEntity(player, itemstack, event.damagee, event)
+        itemstack.handlePlayerAttackEntity(player, itemstack, event.damagee, event)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

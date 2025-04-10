@@ -2,9 +2,9 @@
 
 package cc.mewcraft.wakame.item2
 
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
@@ -49,11 +49,11 @@ fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Actio
 fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
     handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
 
-fun ItemStack.handleReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) =
-    handleBehavior { it.handleReceiveDamage(player, itemstack, damageSource, event) }
+fun ItemStack.handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) =
+    handleBehavior { it.handlePlayerReceiveDamage(player, itemstack, damageSource, event) }
 
-fun ItemStack.handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoPostprocessDamageEvent) =
-    handleBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
+fun ItemStack.handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) =
+    handleBehavior { it.handlePlayerAttackEntity(player, itemstack, damagee, event) }
 
 fun ItemStack.handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) =
     handleBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
@@ -62,7 +62,7 @@ fun ItemStack.handleItemProjectileHit(player: Player, itemstack: ItemStack, proj
     handleBehavior { it.handleItemProjectileHit(player, itemstack, projectile, event) }
 
 fun ItemStack.handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) =
-    handleBehavior { it.handleBreakBlock(player, itemstack, event) }
+    handleBehavior { it.handlePlayerBreakBlock(player, itemstack, event) }
 
 fun ItemStack.handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) =
     handleBehavior { it.handleDamage(player, itemstack, event) }

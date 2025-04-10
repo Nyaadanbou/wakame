@@ -183,6 +183,14 @@ object PlayerDamageMetadata {
             )
         )
     }
+
+    operator fun invoke(attributes: AttributeMapLike, builder: DamageBundleDsl.() -> Unit): DamageMetadata {
+        return invoke(
+            attributes = attributes,
+            damageBundle = damageBundle(attributes, builder),
+            damageTags = DamageTags()
+        )
+    }
 }
 
 object EntityDamageMetadata {

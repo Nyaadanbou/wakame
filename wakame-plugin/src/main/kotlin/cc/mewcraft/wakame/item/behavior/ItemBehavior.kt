@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item.behavior
 
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
@@ -60,7 +60,7 @@ interface ItemBehavior : ItemBehaviorHolder {
     fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
     fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
     fun handleInteractAtEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
-    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: NekoPostprocessDamageEvent) = Unit
+    fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: PostprocessDamageEvent) = Unit
     fun handleItemProjectileLaunch(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
     fun handleItemProjectileHit(player: Player, itemStack: ItemStack, koishStack: NekoStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
     fun handleBreakBlock(player: Player, itemStack: ItemStack, koishStack: NekoStack, event: BlockBreakEvent) = Unit

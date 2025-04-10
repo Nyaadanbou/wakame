@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 
 @Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessDamageEvent"))
-typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
+typealias NekoEntityDamageEvent = PostprocessDamageEvent
 
 /**
  * 该事件发生在最终伤害已经计算完毕, 但还未实际将最终伤害应用到实体上.
@@ -25,9 +25,9 @@ typealias NekoEntityDamageEvent = NekoPostprocessDamageEvent
  *
  * @property damageMetadata 伤害信息 (计算防御前)
  * @property finalDamageMap 伤害信息 (计算防御后)
- * @see NekoPreprocessDamageEvent 如果需要修改伤害, 使用这个事件
+ * @see PreprocessDamageEvent 如果需要修改伤害, 使用这个事件
  */
-class NekoPostprocessDamageEvent(
+class PostprocessDamageEvent(
     val damageMetadata: DamageMetadata,
     private val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
     private val bukkitEvent: EntityDamageEvent,

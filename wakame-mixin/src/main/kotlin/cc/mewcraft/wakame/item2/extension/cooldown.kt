@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item2.extension
 
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack
 fun ItemStack.isOnCooldown(player: Player): Boolean = toNMS().isOnCooldown(player)
 fun ItemStack.getCooldownRemainingRatio(player: Player): Float = toNMS().getCooldownRemainingRatio(player)
 fun ItemStack.addCooldown(player: Player, ticks: Int) = toNMS().addCooldown(player, ticks)
+fun ItemStack.addCooldown(player: Player, speed: AttackSpeed) = toNMS().addCooldown(player, speed)
 fun ItemStack.removeCooldown(player: Player) = toNMS().removeCooldown(player)
 
 //
@@ -44,6 +46,13 @@ fun MojangStack.getCooldownRemainingRatio(player: Player): Float {
  */
 fun MojangStack.addCooldown(player: Player, ticks: Int) {
     player.itemCooldownContainer.activate(acquireCooldownGroup(), ticks)
+}
+
+/**
+ * @see cc.mewcraft.wakame.entity.player.ItemCooldownContainer.activate
+ */
+fun MojangStack.addCooldown(player: Player, speed: AttackSpeed) {
+    player.itemCooldownContainer.activate(acquireCooldownGroup(), speed)
 }
 
 /**

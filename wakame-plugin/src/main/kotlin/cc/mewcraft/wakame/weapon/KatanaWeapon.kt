@@ -4,8 +4,8 @@ import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.NekoStack
@@ -181,7 +181,7 @@ data class KatanaWeapon(
         }
     }
 
-    override fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
+    override fun handlePlayerDamage(player: Player, nekoStack: NekoStack, damageSource: DamageSource, event: PostprocessDamageEvent) {
         val katanaWeaponData = getData(player)
         if (!katanaWeaponData.isHold) return
 
@@ -281,7 +281,7 @@ data class KatanaWeapon(
     /**
      * 太刀居合斩判定.
      */
-    private fun laiSlashCheck(player: Player, katanaWeaponData: KatanaWeaponData, event: NekoPostprocessDamageEvent) {
+    private fun laiSlashCheck(player: Player, katanaWeaponData: KatanaWeaponData, event: PostprocessDamageEvent) {
         // 不存在伤害来源实体, 不处理
         val damager = event.damageSource.causingEntity as? LivingEntity ?: return
 

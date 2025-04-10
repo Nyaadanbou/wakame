@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.entry
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -56,7 +56,7 @@ internal object DamageListener : Listener {
         // 计算防御后的伤害 (最终伤害)
         val finalDamageMap = DamageManager.calculateFinalDamageMap(damageMetadata, damagee)
 
-        val postprocessEvent = NekoPostprocessDamageEvent(damageMetadata, finalDamageMap, event)
+        val postprocessEvent = PostprocessDamageEvent(damageMetadata, finalDamageMap, event)
         if (!postprocessEvent.callEvent()) {
             // 萌芽伤害事件被取消, 则直接返回
             // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
@@ -140,7 +140,7 @@ internal object DamageIntegration : Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: NekoPostprocessDamageEvent) {
+    fun on(event: PostprocessDamageEvent) {
         val damager = event.damageSource.causingEntity as? Player ?: return
         val damagee = event.damagee as? LivingEntity ?: return
         event.isCancelled = !ProtectionManager.canHurtEntity(damager, damagee, null)
