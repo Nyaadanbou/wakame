@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior
 
-import cc.mewcraft.wakame.item2.behavior.impl.*
+import cc.mewcraft.wakame.item2.behavior.impl.Arrow
+import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
@@ -26,24 +27,6 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
-
-    /**
-     * 应用技能效果的逻辑.
-     */
-    @JvmField
-    val APPLY_ABILITY_EFFECT = typeOf("apply_ability_effect", ApplyAbilityEffect)
-
-    /**
-     * 应用属性效果的逻辑.
-     */
-    @JvmField
-    val APPLY_ATTRIBUTE_EFFECT = typeOf("apply_attribute_effect", ApplyAttributeEffect)
-
-    /**
-     * 应用铭刻效果的逻辑.
-     */
-    @JvmField
-    val APPLY_KIZAMI_EFFECT = typeOf("apply_kizami_effect", ApplyKizamiEffect)
 
     /**
      * 作为斧的逻辑.

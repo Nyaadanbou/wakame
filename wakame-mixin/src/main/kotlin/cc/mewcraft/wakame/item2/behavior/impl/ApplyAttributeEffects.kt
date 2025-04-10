@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.item2.ItemSlotChanges
-import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import com.github.quillraven.fleks.Entity
