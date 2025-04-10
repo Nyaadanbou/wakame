@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.ability2.component
 
 import cc.mewcraft.wakame.ability2.AbilityInfo
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
@@ -15,17 +15,17 @@ data class AbilityContainer(
      */
     private val abilities: Multimap<AbilityMetaType<*>, Entity> = HashMultimap.create(),
 ) : Component<AbilityContainer> {
-    companion object : ComponentType<AbilityContainer>()
+    companion object : EComponentType<AbilityContainer>()
 
-    override fun type(): ComponentType<AbilityContainer> = AbilityContainer
+    override fun type(): EComponentType<AbilityContainer> = AbilityContainer
 
     fun convertToSingleAbilityList(): List<AbilityInfo> {
         val abilityEntities = abilities.values().map(::KoishEntity)
         val playerAbilities = abilityEntities.map { koishEntity ->
-            val abilityComponent = koishEntity[AbilityComponent]
+            val ability = koishEntity[Ability]
             AbilityInfo(
-                metaType = abilityComponent.metaType,
-                trigger = abilityComponent.trigger
+                metaType = ability.metaType,
+                trigger = ability.trigger
             )
         }
         return playerAbilities

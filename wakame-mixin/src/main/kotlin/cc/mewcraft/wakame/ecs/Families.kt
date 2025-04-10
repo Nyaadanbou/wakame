@@ -1,14 +1,14 @@
 package cc.mewcraft.wakame.ecs
 
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.*
-import cc.mewcraft.wakame.element.component.ElementComponent
-import cc.mewcraft.wakame.element.component.ElementStackComponent
+import cc.mewcraft.wakame.element.component.ElementStack
+import cc.mewcraft.wakame.element.component.Elemental
 import com.github.quillraven.fleks.Family
-import com.github.quillraven.fleks.World.Companion.family
 
 /**
  * 所有会长期使用到的 [Family] 都应该在此声明.
@@ -22,13 +22,13 @@ object Families {
     // ------------------------------
 
     @JvmField
-    val BUKKIT_BLOCK: Family = family { all(BukkitObject, BukkitBlock) }
+    val BUKKIT_BLOCK: Family = EWorld.family { all(BukkitObject, BukkitBlock) }
 
     @JvmField
-    val BUKKIT_ENTITY: Family = family { all(BukkitObject, BukkitEntity) }
+    val BUKKIT_ENTITY: Family = EWorld.family { all(BukkitObject, BukkitEntity) }
 
     @JvmField
-    val BUKKIT_PLAYER: Family = family { all(BukkitObject, BukkitEntity, BukkitPlayer) }
+    val BUKKIT_PLAYER: Family = EWorld.family { all(BukkitObject, BukkitEntity, BukkitPlayer) }
 
     // ------------------------------
     // 其余 family 为任意系统的具体实现, 其具体定义应该参考具体的文档
@@ -37,13 +37,13 @@ object Families {
     // ------------------------------
 
     @JvmField
-    val ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent) }
+    val ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount) }
 
     @JvmField
-    val MANA_COSTING_ABILITY: Family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, ManaCost) }
+    val MANA_COSTING_ABILITY: Family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, ManaCost) }
 
     @JvmField
-    val ELEMENT_STACK: Family = family { all(ElementComponent, ElementStackComponent, TargetTo) }
+    val ELEMENT_STACK: Family = EWorld.family { all(Elemental, ElementStack, TargetTo) }
 
     // 用于初始化本 object 里的 val
     fun bootstrap() = Unit

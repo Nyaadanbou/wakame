@@ -18,7 +18,7 @@ import com.github.quillraven.fleks.IteratingSystem
  * 如果第 `n` tick 扫描的结果和第 `n-1` tick 扫描的结果不同,
  * 则认为这个槽位发生了变化, 那么此时就会记录并触发一个事件.
  */
-class ItemSlotChangeMonitor : IteratingSystem(
+object ItemSlotChangeMonitor : IteratingSystem(
     family = Families.BUKKIT_PLAYER
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {

@@ -1,13 +1,13 @@
 package cc.mewcraft.wakame.enchantment2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 
 class Fragile(
     val multiplier: Float,
 ) : Component<Fragile> {
 
-    companion object : ComponentType<Fragile>()
+    companion object : EComponentType<Fragile>()
 
     override fun type() = Fragile
 

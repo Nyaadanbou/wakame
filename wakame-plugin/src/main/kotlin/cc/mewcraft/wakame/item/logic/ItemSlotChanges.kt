@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item.logic
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.entity.player.koishLevel
 import cc.mewcraft.wakame.item.ItemSlot
 import cc.mewcraft.wakame.item.ItemSlotRegistry
@@ -9,7 +10,6 @@ import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -18,7 +18,7 @@ data class ItemSlotChanges(
     private val items: Reference2ObjectOpenHashMap<ItemSlot, Entry> = Reference2ObjectOpenHashMap(ItemSlotRegistry.size + 1, 0.99f),
 ) : Component<ItemSlotChanges> {
 
-    companion object : ComponentType<ItemSlotChanges>() {
+    companion object : EComponentType<ItemSlotChanges>() {
         /**
          * 检查物品在“正确”的物品槽.
          */
@@ -60,7 +60,7 @@ data class ItemSlotChanges(
         }
     }
 
-    override fun type(): ComponentType<ItemSlotChanges> = ItemSlotChanges
+    override fun type(): EComponentType<ItemSlotChanges> = ItemSlotChanges
 
     val changingItems: Collection<Entry>
         get() = items.values.filter(Entry::changing)

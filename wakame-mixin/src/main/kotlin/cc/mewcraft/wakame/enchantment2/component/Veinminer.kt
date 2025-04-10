@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.enchantment2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.Identifier
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 import org.bukkit.Material
 
 class Veinminer(
@@ -11,7 +11,7 @@ class Veinminer(
     val blockBreakSound: Identifier,
 ) : Component<Veinminer> {
 
-    companion object : ComponentType<Veinminer>()
+    companion object : EComponentType<Veinminer>()
 
     override fun type() = Veinminer
 

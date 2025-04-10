@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability2.AbilityEcsBridge
 import cc.mewcraft.wakame.ability2.ManaCostPenalty
 import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.combo.display.PlayerComboInfoDisplay
-import cc.mewcraft.wakame.ability2.component.AbilityComponent
+import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
@@ -166,11 +166,11 @@ class PlayerComboInfo(
         Families.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setNextState)
                 return@forEach
-            if (entity[AbilityComponent].phase != StatePhase.IDLE)
+            if (entity[Ability].phase != StatePhase.IDLE)
                 return@forEach // 只有在 IDLE 状态下才能进行下一个状态的标记.
-            if (entity[AbilityComponent].metaType != abilityMetaType)
+            if (entity[Ability].metaType != abilityMetaType)
                 return@forEach
-            entity[AbilityComponent].isMarkNextState = true
+            entity[Ability].isMarkNextState = true
         }
     }
 
@@ -178,7 +178,7 @@ class PlayerComboInfo(
         Families.MANA_COSTING_ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@setCostPenalty)
                 return@forEach
-            if (entity[AbilityComponent].metaType != abilityMetaType)
+            if (entity[Ability].metaType != abilityMetaType)
                 return@forEach
             entity[ManaCost].penalty = penalty
         }

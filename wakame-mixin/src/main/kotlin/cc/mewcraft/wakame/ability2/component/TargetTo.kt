@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ability2.component
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.EntityComponentContext
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
@@ -12,9 +12,9 @@ import org.bukkit.entity.Player
 data class TargetTo(
     var target: EEntity,
 ) : Component<TargetTo> {
-    companion object : ComponentType<TargetTo>()
+    companion object : EComponentType<TargetTo>()
 
-    override fun type(): ComponentType<TargetTo> = TargetTo
+    override fun type(): EComponentType<TargetTo> = TargetTo
 
 
     context(EntityComponentContext)

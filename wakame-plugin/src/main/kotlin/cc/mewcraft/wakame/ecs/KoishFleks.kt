@@ -1,18 +1,17 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.component.AbilityContainer
 import cc.mewcraft.wakame.ability2.system.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.system.*
-import cc.mewcraft.wakame.element.component.ElementStackContainer
-import cc.mewcraft.wakame.element.system.ElementStackSystem
+import cc.mewcraft.wakame.element.system.InitElementStackContainer
+import cc.mewcraft.wakame.element.system.TickElementStack
 import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
-import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffect
-import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffect
+import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffects
+import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffects
 import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -30,35 +29,21 @@ internal object KoishFleks : Listener, Fleks {
     override val world: World = configureWorld {
 
         families {
-
             Families.bootstrap()
-
-            // TODO #373: 把这两个 onAdd 移到各自的 system#onAddEntity 里面去
-            onAdd(Families.BUKKIT_PLAYER) { entity ->
-                entity.configure {
-                    it += AbilityContainer()
-                    it += ElementStackContainer()
-                }
-            }
-            onAdd(Families.BUKKIT_ENTITY) { entity ->
-                entity.configure {
-                    it += AbilityContainer()
-                    it += ElementStackContainer()
-                }
-            }
-
         }
 
         systems {
-            add(BukkitEntityBridge()) // 移除无效 bukkit entity 所映射的 ecs entity
-            add(BukkitBlockBridge()) // 移除无效 bukkit block 所映射的 ecs entity
+            add(RemoveInvalidBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
+            add(RemoveInvalidBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
 
             // ------------
             // 属性
             // ------------
 
+            add(InitAbilityContainer)
             add(InitAttackSpeedContainer)
             add(InitAttributeContainer)
+            add(InitElementStackContainer)
             add(InitKizamiContainer)
             add(InitPlayerCombo)
 
@@ -66,70 +51,70 @@ internal object KoishFleks : Listener, Fleks {
             // 物品
             // ------------
 
-            add(ItemSlotChangeMonitor2()) // 监听背包物品变化
-            add(ApplyAttributeEffect)
-            add(ApplyKizamiEffect)
+            add(ItemSlotChangeMonitor2) // 监听背包物品变化
+            add(ApplyAttributeEffects)
+            add(ApplyKizamiEffects)
 
             // -------------
             // 带“移除”的系统 ???
             // -------------
 
-            add(AbilityAddSystem()) // “激活”玩家装备的技能
-            add(AbilityRemoveSystem()) // “移除”玩家装备的技能
-            add(AbilityTickResultSystem()) // 根据 TickResult 更新 entity
-            add(ElementStackSystem()) // 元素特效
-            add(AbilityInitSystem()) // ???
-            add(EntityInfoBossBar()) // 各种关于 boss bar 的逻辑
-            add(BossBarVisibleManager()) // 显示/移除 boss bar
-            add(TickCountSystem()) // 记录 entity 存在的 tick 数
+            add(AbilityActivator) // “激活”玩家装备的技能
+            add(AbilityRemover) // “移除”玩家装备的技能
+            add(RemoveAbility) // 根据 TickResult 更新 entity
+            add(TickElementStack) // 元素特效层数
+            add(InitAbilityState) //  tick 初始化技能的状态
+            add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
+            add(ManageBossBar) // 显示/移除 boss bar
+            add(CountTick) // 记录 entity 存在的 tick 数
 
             // ------------
             // 技能
             // ------------
 
-            add(BlackholeSystem())
-            add(BlinkSystem())
-            add(DashSystem())
-            add(MultiJumpSystem())
-            add(AbilityManaCostSystem()) // 消耗使用技能的魔法值
-            add(AbilityStatePhaseSystem()) // 管理技能的当前状态
+            add(TickAbilityBlackhole)
+            add(TickAbilityBlink)
+            add(TickAbilityDash)
+            add(TickAbilityMultiJump)
+            add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
+            add(TickAbilityPhase) // 管理技能的当前状态
 
             // ------------
             // 附魔
             // ------------
 
-            add(EnchantmentEffectApplier) // framework
-            add(EnchantmentAntigravShotSystem)
-            add(EnchantmentAttributeSystem)
-            add(EnchantmentBlastMiningSystem)
-            add(EnchantmentFragileSystem)
-            add(EnchantmentSmelterSystem)
-            add(EnchantmentVeinminerSystem)
+            add(ApplyEnchantmentEffect) // framework
+            add(TickAntigravShotEnchantment)
+            add(TickAttributeEnchantment)
+            add(TickBlastMiningEnchantment)
+            add(TickFragileEnchantment)
+            add(TickSmelterEnchantment)
+            add(TickVeinminerEnchantment)
 
             // ------------
             // 资源
             // ------------
 
-            add(ManaSystem())
-            add(ManaHudSystem())
+            add(RestoreMana)
+            add(DisplayMana)
 
             // ------------
             // 粒子
             // -------------
 
-            add(ParticleSystem())
+            add(RenderParticle)
         }
     }
 
     /**
-     * 创建一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
+     * 创建一个 [EEntity].
      */
     override fun createEntity(configuration: EntityCreateContext.(Entity) -> Unit): EEntity = world.entity {
         configuration.invoke(this, it)
     }
 
     /**
-     * 修改一个 [cc.mewcraft.wakame.ecs.bridge.EEntity].
+     * 修改一个 [EEntity].
      */
     override fun editEntity(entity: Entity, configuration: EntityUpdateContext.(Entity) -> Unit) = with(world) {
         if (!contains(entity)) error("Trying to edit entity ($entity) that does not exist in the world")

@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.entity.attribute
 
+import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-import com.github.quillraven.fleks.ComponentType
 import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
 
@@ -103,9 +103,9 @@ interface AttributeMap : Component<AttributeMap>, AttributeMapLike, AttributeMap
 
     // Fleks
 
-    override fun type(): ComponentType<AttributeMap> = AttributeMap
+    override fun type(): EComponentType<AttributeMap> = AttributeMap
 
-    companion object : ComponentType<AttributeMap>()
+    companion object : EComponentType<AttributeMap>()
 }
 
 /**

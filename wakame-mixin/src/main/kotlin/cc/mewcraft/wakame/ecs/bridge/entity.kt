@@ -20,9 +20,9 @@ import org.bukkit.entity.Player
  */
 fun Entity.koishify(): KoishEntity {
     val entity = this // make your life easier
-    if (!entity.isValid && (entity !is Player || !entity.isConnected)) {
+    if (!entity.isKoishfiable()) {
         // 对于玩家, 使用 isConnected 来判断是否创建 EEntity 更合适
-        error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid.")
+        error("Failed to get the corresponding KoishEntity since the BukkitEntity is no longer valid. Entity: $entity")
     }
     val metadataMap = Metadata.provide(entity)
     val koishEntity = metadataMap.getOrPut(MetadataKeys.ECS_BUKKIT_ENTITY_ENTITY_ID) {
@@ -39,6 +39,10 @@ fun Entity.koishify(): KoishEntity {
         }
     }
     return koishEntity
+}
+
+fun Entity.isKoishfiable(): Boolean {
+    return isValid || (this is Player && isConnected)
 }
 
 // BukkitEntity 所对应的 ECS entity 将通过一个 ECS system 自动移除

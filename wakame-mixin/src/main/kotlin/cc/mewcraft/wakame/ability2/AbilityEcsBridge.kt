@@ -1,12 +1,17 @@
 package cc.mewcraft.wakame.ability2
 
-import cc.mewcraft.wakame.ability2.component.*
+import cc.mewcraft.wakame.ability2.component.Ability
+import cc.mewcraft.wakame.ability2.component.AbilityContainer
+import cc.mewcraft.wakame.ability2.component.AtSlot
+import cc.mewcraft.wakame.ability2.component.CastBy
+import cc.mewcraft.wakame.ability2.component.ManaCost
+import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import cc.mewcraft.wakame.ecs.bridge.koishify
-import cc.mewcraft.wakame.ecs.component.TickCountComponent
+import cc.mewcraft.wakame.ecs.component.TickCount
 import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import org.bukkit.entity.Player
@@ -23,7 +28,7 @@ object AbilityEcsBridge {
     ) {
         val metaType = ability.meta.type
         val entity = Fleks.INSTANCE.createEntity { entity ->
-            entity += AbilityComponent(
+            entity += Ability(
                 metaType = metaType,
                 phase = phase,
                 trigger = ability.trigger,
@@ -35,7 +40,7 @@ object AbilityEcsBridge {
             entity += TargetTo(target.unwrap())
             ability.manaCost?.let { entity += ManaCost(it) }
             slot?.let { entity += AtSlot(it) }
-            entity += TickCountComponent(0)
+            entity += TickCount(0)
         }
 
         if (caster.has(AbilityContainer)) {
@@ -52,7 +57,7 @@ object AbilityEcsBridge {
     ) {
         val metaType = abilityMeta.type
         val entity = Fleks.INSTANCE.createEntity { entity ->
-            entity += AbilityComponent(
+            entity += Ability(
                 metaType = metaType,
                 phase = phase,
                 trigger = null,
@@ -62,6 +67,7 @@ object AbilityEcsBridge {
             entity += listOf(abilityMeta.params)
             entity += CastBy(caster.unwrap())
             entity += TargetTo(target.unwrap())
+            entity += TickCount(0)
         }
 
         if (caster.has(AbilityContainer)) {
