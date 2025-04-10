@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.enchantment2.component
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.Identifier
 import com.github.quillraven.fleks.Component
-
 import org.bukkit.inventory.FurnaceRecipe
 
 class Smelter(

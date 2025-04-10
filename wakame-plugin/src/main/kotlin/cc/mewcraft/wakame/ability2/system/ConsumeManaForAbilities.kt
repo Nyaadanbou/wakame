@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.util.bindInstance
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
-object ManaCostHandler : IteratingSystem(
+object ConsumeManaForAbilities : IteratingSystem(
     family = EWorld.family { all(Ability, CastBy, ManaCost, AbilityTickResult) }
 ) {
     override fun onTickEntity(entity: Entity) {

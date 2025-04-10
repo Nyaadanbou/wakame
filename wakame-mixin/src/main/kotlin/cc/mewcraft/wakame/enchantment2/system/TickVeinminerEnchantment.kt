@@ -20,7 +20,7 @@ import org.bukkit.event.block.BlockBreakEvent
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentVeinminerEffect
  */
-object VeinminerEnchantmentHandler : ListenableIteratingSystem(
+object TickVeinminerEnchantment : ListenableIteratingSystem(
     family = EWorld.family { all(EntityPlayer, BukkitPlayer, Veinminer, VeinminerChild) }
 ) {
 

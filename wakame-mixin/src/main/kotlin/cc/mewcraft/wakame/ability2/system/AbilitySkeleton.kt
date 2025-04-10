@@ -7,7 +7,7 @@ import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import com.github.quillraven.fleks.EntityUpdateContext
 
-interface ActiveAbilitySystem {
+interface AbilitySkeleton {
 
     /**
      * 一般不会在技能中直接进行 [StatePhase.IDLE] 的转换.

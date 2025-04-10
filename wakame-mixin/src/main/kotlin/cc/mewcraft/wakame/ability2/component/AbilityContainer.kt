@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
 import com.github.quillraven.fleks.Component
-
 import com.github.quillraven.fleks.Entity
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.cooldown.Cooldown
-
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player

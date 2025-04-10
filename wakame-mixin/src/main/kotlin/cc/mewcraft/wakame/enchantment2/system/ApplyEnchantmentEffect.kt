@@ -13,7 +13,7 @@ import com.github.quillraven.fleks.IteratingSystem
  * 读取 [net.minecraft.world.item.enchantment.Enchantment.effects],
  * 然后从中创建对应的 ecs component, 并添加到 ecs entity (player) 上.
  */
-object EnchantmentEffectApplier : IteratingSystem(
+object ApplyEnchantmentEffect : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 

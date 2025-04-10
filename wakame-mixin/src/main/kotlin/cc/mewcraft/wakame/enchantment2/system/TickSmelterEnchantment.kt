@@ -20,7 +20,7 @@ import org.bukkit.inventory.FurnaceRecipe
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentSmelterEffect
  */
-object SmelterEnchantmentHandler : ListenableIteratingSystem(
+object TickSmelterEnchantment : ListenableIteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, Smelter) }
 ) {
 

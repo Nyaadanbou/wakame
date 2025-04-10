@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.ecs.component.TickCount
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
-object AbilityTickUpdater : IteratingSystem(
+object RemoveAbility : IteratingSystem(
     family = EWorld.family { all(Ability, AbilityTickResult) }
 ) {
     override fun onTickEntity(entity: Entity) {
@@ -17,14 +17,15 @@ object AbilityTickUpdater : IteratingSystem(
         when (tickResult) {
             TickResult.INTERRUPT -> {
                 entity.remove()
-                return
             }
 
-            TickResult.CONTINUE_TICK -> return
+            TickResult.CONTINUE_TICK -> {}
 
-            TickResult.ADVANCE_TO_NEXT_STATE, TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME, TickResult.RESET_STATE -> {
+            TickResult.ADVANCE_TO_NEXT_STATE,
+            TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME,
+            TickResult.RESET_STATE,
+                -> {
                 entity[TickCount].tick = 0
-                return
             }
         }
     }

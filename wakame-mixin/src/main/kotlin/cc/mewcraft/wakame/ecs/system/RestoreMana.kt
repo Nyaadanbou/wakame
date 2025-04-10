@@ -11,7 +11,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
 
-object ManaHandler : IteratingSystem(
+object RestoreMana : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {

@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.ecs.component
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
 
-
 data class Mana(
     var maximum: Int,
 ) : Component<Mana> {

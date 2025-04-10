@@ -2,11 +2,7 @@ package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.Ability
-import cc.mewcraft.wakame.ability2.component.AbilityTickResult
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.Dash
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.TickCount
@@ -18,9 +14,9 @@ import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Entity as BukkitEntity
 
-object DashAbility : IteratingSystem(
+object TickAbilityDash : IteratingSystem(
     family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, Dash) }
-), ActiveAbilitySystem {
+), AbilitySkeleton {
     /**
      * 在 Dash 开始前的准备时间
      */

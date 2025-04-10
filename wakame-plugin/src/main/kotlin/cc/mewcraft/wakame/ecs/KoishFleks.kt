@@ -1,41 +1,17 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.system.AbilityActivator
-import cc.mewcraft.wakame.ability2.system.AbilityRemover
-import cc.mewcraft.wakame.ability2.system.AbilityStateInitializer
-import cc.mewcraft.wakame.ability2.system.AbilityStateManager
-import cc.mewcraft.wakame.ability2.system.AbilityTickUpdater
-import cc.mewcraft.wakame.ability2.system.BlackholeAbility
-import cc.mewcraft.wakame.ability2.system.BlinkAbility
-import cc.mewcraft.wakame.ability2.system.DashAbility
-import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
-import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
-import cc.mewcraft.wakame.ability2.system.ManaCostHandler
-import cc.mewcraft.wakame.ability2.system.MultiJumpAbility
+import cc.mewcraft.wakame.ability2.system.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.system.BossBarVisibility
-import cc.mewcraft.wakame.ecs.system.BukkitBlockBridge
-import cc.mewcraft.wakame.ecs.system.BukkitEntityBridge
-import cc.mewcraft.wakame.ecs.system.EntityInfoBossBarManager
-import cc.mewcraft.wakame.ecs.system.ManaHandler
-import cc.mewcraft.wakame.ecs.system.ManaHud
-import cc.mewcraft.wakame.ecs.system.ParticleHandler
-import cc.mewcraft.wakame.ecs.system.TickCounter
-import cc.mewcraft.wakame.element.system.ElementStack
+import cc.mewcraft.wakame.ecs.system.*
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
-import cc.mewcraft.wakame.enchantment2.system.AntigravShotEnchantmentHandler
-import cc.mewcraft.wakame.enchantment2.system.AttributeEnchantmentHandler
-import cc.mewcraft.wakame.enchantment2.system.BlastMiningEnchantmentHandler
-import cc.mewcraft.wakame.enchantment2.system.EnchantmentEffectApplier
-import cc.mewcraft.wakame.enchantment2.system.FragileEnchantmentHandler
-import cc.mewcraft.wakame.enchantment2.system.SmelterEnchantmentHandler
-import cc.mewcraft.wakame.enchantment2.system.VeinminerEnchantmentHandler
+import cc.mewcraft.wakame.element.system.TickElementStack
+import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitAttackSpeedContainer
 import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
-import cc.mewcraft.wakame.item2.behavior.system.AttributeEffectApply
-import cc.mewcraft.wakame.item2.behavior.system.KizamiEffectApply
+import cc.mewcraft.wakame.item2.behavior.system.ApplyAttributeEffects
+import cc.mewcraft.wakame.item2.behavior.system.ApplyKizamiEffects
 import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -43,11 +19,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.EntityCreateContext
-import com.github.quillraven.fleks.EntityUpdateContext
-import com.github.quillraven.fleks.World
-import com.github.quillraven.fleks.configureWorld
+import com.github.quillraven.fleks.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -61,8 +33,8 @@ internal object KoishFleks : Listener, Fleks {
         }
 
         systems {
-            add(BukkitEntityBridge) // 移除无效 bukkit entity 所映射的 ecs entity
-            add(BukkitBlockBridge) // 移除无效 bukkit block 所映射的 ecs entity
+            add(RemoveInvalidBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
+            add(RemoveInvalidBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
 
             // ------------
             // 属性
@@ -80,8 +52,8 @@ internal object KoishFleks : Listener, Fleks {
             // ------------
 
             add(ItemSlotChangeMonitor2) // 监听背包物品变化
-            add(AttributeEffectApply)
-            add(KizamiEffectApply)
+            add(ApplyAttributeEffects)
+            add(ApplyKizamiEffects)
 
             // -------------
             // 带“移除”的系统 ???
@@ -89,48 +61,48 @@ internal object KoishFleks : Listener, Fleks {
 
             add(AbilityActivator) // “激活”玩家装备的技能
             add(AbilityRemover) // “移除”玩家装备的技能
-            add(AbilityTickUpdater) // 根据 TickResult 更新 entity
-            add(ElementStack) // 元素特效层数
-            add(AbilityStateInitializer) //  tick 初始化技能的状态
-            add(EntityInfoBossBarManager) // 各种关于 boss bar 的逻辑
-            add(BossBarVisibility) // 显示/移除 boss bar
-            add(TickCounter) // 记录 entity 存在的 tick 数
+            add(RemoveAbility) // 根据 TickResult 更新 entity
+            add(TickElementStack) // 元素特效层数
+            add(InitAbilityState) //  tick 初始化技能的状态
+            add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
+            add(ManageBossBar) // 显示/移除 boss bar
+            add(CountTick) // 记录 entity 存在的 tick 数
 
             // ------------
             // 技能
             // ------------
 
-            add(BlackholeAbility)
-            add(BlinkAbility)
-            add(DashAbility)
-            add(MultiJumpAbility)
-            add(ManaCostHandler) // 消耗使用技能的魔法值
-            add(AbilityStateManager) // 管理技能的当前状态
+            add(TickAbilityBlackhole)
+            add(TickAbilityBlink)
+            add(TickAbilityDash)
+            add(TickAbilityMultiJump)
+            add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
+            add(TickAbilityPhase) // 管理技能的当前状态
 
             // ------------
             // 附魔
             // ------------
 
-            add(EnchantmentEffectApplier) // framework
-            add(AntigravShotEnchantmentHandler)
-            add(AttributeEnchantmentHandler)
-            add(BlastMiningEnchantmentHandler)
-            add(FragileEnchantmentHandler)
-            add(SmelterEnchantmentHandler)
-            add(VeinminerEnchantmentHandler)
+            add(ApplyEnchantmentEffect) // framework
+            add(TickAntigravShotEnchantment)
+            add(TickAttributeEnchantment)
+            add(TickBlastMiningEnchantment)
+            add(TickFragileEnchantment)
+            add(TickSmelterEnchantment)
+            add(TickVeinminerEnchantment)
 
             // ------------
             // 资源
             // ------------
 
-            add(ManaHandler)
-            add(ManaHud)
+            add(RestoreMana)
+            add(DisplayMana)
 
             // ------------
             // 粒子
             // -------------
 
-            add(ParticleHandler)
+            add(RenderParticle)
         }
     }
 

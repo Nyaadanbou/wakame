@@ -3,11 +3,7 @@
 package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.TickResult
-import cc.mewcraft.wakame.ability2.component.Ability
-import cc.mewcraft.wakame.ability2.component.AbilityTickResult
-import cc.mewcraft.wakame.ability2.component.Blink
-import cc.mewcraft.wakame.ability2.component.CastBy
-import cc.mewcraft.wakame.ability2.component.TargetTo
+import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.ParticleEffect
@@ -25,9 +21,9 @@ import org.bukkit.Particle
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-object BlinkAbility : IteratingSystem(
+object TickAbilityBlink : IteratingSystem(
     family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, Blink) }
-), ActiveAbilitySystem {
+), AbilitySkeleton {
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCount].tick
         entity.configure {

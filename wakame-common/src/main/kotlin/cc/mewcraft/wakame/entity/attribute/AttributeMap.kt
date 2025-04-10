@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-
 import com.google.common.collect.Multimap
 import net.kyori.adventure.key.Key
 

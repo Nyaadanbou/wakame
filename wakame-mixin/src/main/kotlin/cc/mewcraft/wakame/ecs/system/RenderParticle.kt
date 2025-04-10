@@ -8,7 +8,7 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
 
-object ParticleHandler : IteratingSystem(
+object RenderParticle : IteratingSystem(
     family = EWorld.family { all(ParticleEffect) }
 ) {
     override fun onTickEntity(entity: Entity) {

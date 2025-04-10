@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import com.github.quillraven.fleks.Component
-
 import com.github.quillraven.fleks.EntityComponentContext
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player

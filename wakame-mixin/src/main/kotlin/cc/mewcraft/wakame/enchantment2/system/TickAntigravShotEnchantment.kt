@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.EntityShootBowEvent
 
-object AntigravShotEnchantmentHandler : ListenableIteratingSystem(
+object TickAntigravShotEnchantment : ListenableIteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, AntigravShot) }
 ) {
 

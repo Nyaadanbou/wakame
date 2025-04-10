@@ -13,7 +13,7 @@ import com.github.quillraven.fleks.IteratingSystem
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 
-object ManaHud : IteratingSystem(
+object DisplayMana : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) },
     interval = Fixed(5f)
 ), FamilyOnAdd {

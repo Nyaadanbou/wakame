@@ -14,7 +14,7 @@ import kotlin.math.ceil
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentFragileEffect
  */
-object FragileEnchantmentHandler : ListenableIteratingSystem(
+object TickFragileEnchantment : ListenableIteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, Fragile) }
 ) {
 

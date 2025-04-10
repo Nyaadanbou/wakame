@@ -12,9 +12,9 @@ import cc.mewcraft.wakame.ecs.component.EntityInfoBossBar
 import cc.mewcraft.wakame.ecs.component.TickCount
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.element.component.Elemental
 import cc.mewcraft.wakame.element.component.ElementStack
 import cc.mewcraft.wakame.element.component.ElementStackContainer
+import cc.mewcraft.wakame.element.component.Elemental
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 
-object ElementStack : ListenableIteratingSystem(
+object TickElementStack : ListenableIteratingSystem(
     family = Families.ELEMENT_STACK
 ) {
     override fun onTickEntity(entity: Entity) {
@@ -36,13 +36,13 @@ object ElementStack : ListenableIteratingSystem(
         val tickCount = entity[TickCount]
         val elementStack = entity[ElementStack]
 
-        // 如果 stackCount 小于等于 0，移除实体
+        // 如果 stackCount 小于等于 0, 移除实体
         if (elementStack.amount <= 0) {
             removeEntity(entity, target)
             return
         }
 
-        // 如果 tickCount 达到设置好的时间, 移除异常效果.
+        // 如果 tickCount 达到设置好的时间, 移除异常效果
         if (tickCount.tick >= elementStack.disappearTime) {
             removeEntity(entity, target)
         }

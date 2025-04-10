@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.ability2.TickResult
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
 
-
 data class AbilityTickResult(
     var result: TickResult,
 ) : Component<AbilityTickResult> {

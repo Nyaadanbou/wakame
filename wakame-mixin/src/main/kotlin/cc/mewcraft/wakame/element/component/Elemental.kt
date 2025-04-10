@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Component
 
-
 data class Elemental(
     val element: RegistryEntry<Element>,
 ) : Component<Elemental> {

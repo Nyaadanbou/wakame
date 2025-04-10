@@ -10,7 +10,6 @@ import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
 import com.github.quillraven.fleks.Component
-
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

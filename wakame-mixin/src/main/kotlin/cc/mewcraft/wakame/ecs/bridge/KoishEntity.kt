@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.ecs.bridge
 
 import cc.mewcraft.wakame.ecs.Fleks
 import com.github.quillraven.fleks.Component
-
 import com.github.quillraven.fleks.EntityTags
 import com.github.quillraven.fleks.UniqueId
 

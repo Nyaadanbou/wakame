@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-
 import team.unnamed.mocha.MochaEngine
 
 data class Ability(

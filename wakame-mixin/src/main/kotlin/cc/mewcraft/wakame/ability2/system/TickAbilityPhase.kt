@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.ecs.bridge.EWorld
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
-object AbilityStateManager : IteratingSystem(
+object TickAbilityPhase : IteratingSystem(
     family = EWorld.family { all(Ability, AbilityTickResult) }
 ) {
     override fun onTickEntity(entity: Entity) {

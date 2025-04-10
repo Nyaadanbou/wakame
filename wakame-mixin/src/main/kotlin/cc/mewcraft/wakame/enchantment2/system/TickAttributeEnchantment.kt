@@ -13,7 +13,7 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentAttributeEffect
  */
-object AttributeEnchantmentHandler : IteratingSystem(
+object TickAttributeEnchantment : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 

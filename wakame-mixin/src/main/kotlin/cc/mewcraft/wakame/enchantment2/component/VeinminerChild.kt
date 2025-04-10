@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.enchantment2.component
 
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import com.github.quillraven.fleks.Component
-
 import org.bukkit.Material
 import org.bukkit.block.Block
 

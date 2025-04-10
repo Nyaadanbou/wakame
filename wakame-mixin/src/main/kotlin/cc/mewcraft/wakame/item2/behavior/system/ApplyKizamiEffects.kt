@@ -14,7 +14,7 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * 使物品上的铭刻对玩家生效.
  */
-object KizamiEffectApply : IteratingSystem(
+object ApplyKizamiEffects : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges, KizamiMap) }
 ) {
     override fun onTickEntity(entity: Entity) {

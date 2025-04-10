@@ -14,7 +14,7 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * 使物品上的属性对玩家生效.
  */
-object AttributeEffectApply : IteratingSystem(
+object ApplyAttributeEffects : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges, AttributeMap) }
 ) {
     override fun onTickEntity(entity: Entity) {

@@ -3,7 +3,6 @@ package cc.mewcraft.wakame.ability2.component
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.molang.Expression
 import com.github.quillraven.fleks.Component
-
 import org.bukkit.Location
 import org.bukkit.block.BlockFace
 

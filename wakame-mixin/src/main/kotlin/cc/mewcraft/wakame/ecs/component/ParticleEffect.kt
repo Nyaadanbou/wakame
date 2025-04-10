@@ -10,7 +10,7 @@ import org.bukkit.World
 /**
  * 在指定的 [World] 上显示粒子效果.
  *
- * @see cc.mewcraft.wakame.ecs.system.ParticleHandler
+ * @see cc.mewcraft.wakame.ecs.system.RenderParticle
  */
 data class ParticleEffect(
     var world: World,
