@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.ability2.component.Blackhole
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.CirclePath
@@ -16,7 +17,6 @@ import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.Color
 import org.bukkit.Particle
 import org.bukkit.block.BlockFace
@@ -24,7 +24,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 object BlackholeSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, Blackhole) }
+    family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, Blackhole) }
 ), ActiveAbilitySystem {
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick

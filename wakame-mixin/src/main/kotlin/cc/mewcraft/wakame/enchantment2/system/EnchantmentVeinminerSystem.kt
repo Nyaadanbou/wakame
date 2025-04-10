@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.enchantment2.system
 
 import cc.mewcraft.wakame.ecs.Fleks
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.EntityPlayer
@@ -10,7 +11,6 @@ import cc.mewcraft.wakame.enchantment2.component.VeinminerChild
 import cc.mewcraft.wakame.util.adventure.playSound
 import cc.mewcraft.wakame.util.serverTick
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.World
 import net.kyori.adventure.sound.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -21,7 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentVeinminerEffect
  */
 object EnchantmentVeinminerSystem : ListenableIteratingSystem(
-    family = World.family { all(EntityPlayer, BukkitPlayer, Veinminer, VeinminerChild) }
+    family = EWorld.family { all(EntityPlayer, BukkitPlayer, Veinminer, VeinminerChild) }
 ) {
 
     private val validAdjacentFaces: Array<BlockFace> = arrayOf(

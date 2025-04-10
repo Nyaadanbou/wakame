@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.combo
@@ -10,10 +11,9 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 
 object AbilityAddSystem : IteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()

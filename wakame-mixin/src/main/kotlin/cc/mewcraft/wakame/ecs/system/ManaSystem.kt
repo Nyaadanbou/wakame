@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
@@ -9,10 +10,9 @@ import cc.mewcraft.wakame.entity.player.component.InventoryListenable
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 
 object ManaSystem : IteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {
         entity[Mana] += 1

@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.player.component.InventoryListenable
@@ -18,7 +19,6 @@ import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 import it.unimi.dsi.fastutil.objects.ObjectIterator
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -42,7 +42,7 @@ import org.jetbrains.annotations.ApiStatus
  * 则认为这个槽位发生了变化, 那么此时就会记录并触发一个事件.
  */
 object ItemSlotChangeMonitor2 : IteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()

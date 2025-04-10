@@ -2,13 +2,14 @@
 
 package cc.mewcraft.wakame.ecs.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
+
 
 object ParticleSystem : IteratingSystem(
-    family = family { all(ParticleEffectComponent) }
+    family = EWorld.family { all(ParticleEffectComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val particleEffectComponent = entity[ParticleEffectComponent]

@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.enchantment2.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import cc.mewcraft.wakame.enchantment2.component.BlastMining
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityExplodeEvent
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentBlastMiningEffect
  */
 object EnchantmentBlastMiningSystem : ListenableIteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, BlastMining) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, BlastMining) }
 ) {
 
     override fun onTickEntity(entity: Entity) {

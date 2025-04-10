@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.enchantment2.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import cc.mewcraft.wakame.enchantment2.component.Fragile
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.World
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerItemDamageEvent
 import kotlin.math.ceil
@@ -15,7 +15,7 @@ import kotlin.math.ceil
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentFragileEffect
  */
 object EnchantmentFragileSystem : ListenableIteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, Fragile) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, Fragile) }
 ) {
 
     override fun onTickEntity(entity: Entity) {

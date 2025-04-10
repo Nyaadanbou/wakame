@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.enchantment2.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -8,7 +9,6 @@ import cc.mewcraft.wakame.enchantment2.component.Smelter
 import cc.mewcraft.wakame.util.adventure.sound
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.World
 import net.kyori.adventure.sound.Sound
 import org.bukkit.Particle
 import org.bukkit.block.Container
@@ -21,7 +21,7 @@ import org.bukkit.inventory.FurnaceRecipe
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentSmelterEffect
  */
 object EnchantmentSmelterSystem : ListenableIteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, Smelter) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, Smelter) }
 ) {
 
     override fun onTickEntity(entity: Entity) {

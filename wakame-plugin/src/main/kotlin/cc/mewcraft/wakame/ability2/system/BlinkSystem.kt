@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.ability2.component.Blink
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import cc.mewcraft.wakame.ecs.data.LinePath
@@ -18,7 +19,6 @@ import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 import io.papermc.paper.entity.TeleportFlag
 import io.papermc.paper.math.Position
 import org.bukkit.Particle
@@ -26,7 +26,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 object BlinkSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, Blink) }
+    family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, Blink) }
 ), ActiveAbilitySystem {
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCountComponent].tick

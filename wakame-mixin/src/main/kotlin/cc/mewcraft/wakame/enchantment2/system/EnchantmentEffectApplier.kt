@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.enchantment2.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.enchantment2.getListenerBasedEffects
@@ -7,14 +8,13 @@ import cc.mewcraft.wakame.enchantment2.koishEnchantments
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 
 /**
  * 读取 [net.minecraft.world.item.enchantment.Enchantment.effects],
  * 然后从中创建对应的 ecs component, 并添加到 ecs entity (player) 上.
  */
 object EnchantmentEffectApplier : IteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 
     override fun onTickEntity(entity: Entity) {

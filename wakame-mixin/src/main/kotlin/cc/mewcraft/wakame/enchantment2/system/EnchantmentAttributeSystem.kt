@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.enchantment2.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.enchantment2.getEffectList
@@ -8,13 +9,12 @@ import cc.mewcraft.wakame.item2.ItemSlotChanges
 import cc.mewcraft.wakame.mixin.support.ExtraEnchantmentEffectComponents
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 
 /**
  * @see cc.mewcraft.wakame.enchantment2.effect.EnchantmentAttributeEffect
  */
 object EnchantmentAttributeSystem : IteratingSystem(
-    family = World.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
+    family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
 
     override fun onTickEntity(entity: Entity) {

@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.ability2.component.MultiJump
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.ParticleEffectComponent
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
@@ -17,7 +18,6 @@ import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
-import com.github.quillraven.fleks.World.Companion.family
 import io.papermc.paper.math.Position
 import org.bukkit.Particle
 import org.bukkit.block.BlockFace
@@ -27,7 +27,7 @@ import org.bukkit.event.player.PlayerInputEvent
 import org.bukkit.event.player.PlayerMoveEvent
 
 object MultiJumpSystem : ListenableIteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, MultiJump) }
+    family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, MultiJump) }
 ) {
     override fun onTickEntity(entity: Entity) {
         entity[AbilityComponent].isReadyToRemove = true

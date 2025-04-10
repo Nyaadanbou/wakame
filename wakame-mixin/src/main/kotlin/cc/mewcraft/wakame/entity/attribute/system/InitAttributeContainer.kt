@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.entity.attribute.system
 
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
 import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
@@ -7,13 +8,12 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapFactory
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World
 
 /**
  * 负责给玩家/生物初始化属性的容器.
  */
 object InitAttributeContainer : IteratingSystem(
-    family = World.family { all(BukkitObject).any(BukkitPlayer, BukkitEntity) }
+    family = EWorld.family { all(BukkitObject).any(BukkitPlayer, BukkitEntity) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) = Unit
 

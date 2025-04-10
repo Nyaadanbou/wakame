@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.ability2.component.AbilityTickResultComponent
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
 import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
 import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
@@ -14,10 +15,9 @@ import cc.mewcraft.wakame.molang.ManaPenalty
 import cc.mewcraft.wakame.util.bindInstance
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 
 object AbilityManaCostSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, ManaCost, AbilityTickResultComponent) }
+    family = EWorld.family { all(AbilityComponent, CastBy, ManaCost, AbilityTickResultComponent) }
 ) {
     override fun onTickEntity(entity: Entity) {
         val tickResult = entity[AbilityTickResultComponent].result

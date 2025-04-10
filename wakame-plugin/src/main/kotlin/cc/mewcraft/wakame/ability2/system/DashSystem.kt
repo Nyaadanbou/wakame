@@ -8,18 +8,18 @@ import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.Dash
 import cc.mewcraft.wakame.ability2.component.TargetTo
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.TickCountComponent
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
 import com.github.quillraven.fleks.IteratingSystem
-import com.github.quillraven.fleks.World.Companion.family
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Entity as BukkitEntity
 
 object DashSystem : IteratingSystem(
-    family = family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, Dash) }
+    family = EWorld.family { all(AbilityComponent, CastBy, TargetTo, TickCountComponent, Dash) }
 ), ActiveAbilitySystem {
     /**
      * 在 Dash 开始前的准备时间
