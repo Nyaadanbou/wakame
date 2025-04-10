@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.item2.behavior.system
+package cc.mewcraft.wakame.item2.behavior.impl
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.EWorld
@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.ecs.component.BukkitObject
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.item2.ItemSlotChanges
+import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import com.github.quillraven.fleks.Entity
@@ -14,7 +15,11 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * 使物品上的属性对玩家生效.
  */
+<<<<<<<< HEAD:wakame-mixin/src/main/kotlin/cc/mewcraft/wakame/item2/behavior/impl/ApplyAttributeEffects.kt
 object ApplyAttributeEffects : IteratingSystem(
+========
+data object ApplyAttributeEffect : ItemBehavior, IteratingSystem(
+>>>>>>>> 2a005b2b6 (初步迁移太刀, 还需进一步考虑太刀状态存放的位置):wakame-mixin/src/main/kotlin/cc/mewcraft/wakame/item2/behavior/impl/ApplyAttributeEffect.kt
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges, AttributeMap) }
 ) {
     override fun onTickEntity(entity: Entity) {

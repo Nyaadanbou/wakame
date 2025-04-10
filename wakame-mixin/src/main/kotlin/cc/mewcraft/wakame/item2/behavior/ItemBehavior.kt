@@ -1,8 +1,12 @@
 package cc.mewcraft.wakame.item2.behavior
 
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -45,11 +49,17 @@ interface ItemBehavior {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 
+    fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) = Unit
+
+    fun handleRightClick(player: Player, itemstack: ItemStack, hand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
+
     fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 
     fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
-    //fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
+    fun handleReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) = Unit
+
+    fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoPostprocessDamageEvent) = Unit
 
     fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
 

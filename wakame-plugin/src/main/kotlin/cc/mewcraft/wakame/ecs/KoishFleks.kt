@@ -54,6 +54,8 @@ internal object KoishFleks : Listener, Fleks {
             add(ItemSlotChangeMonitor2) // 监听背包物品变化
             add(ApplyAttributeEffects)
             add(ApplyKizamiEffects)
+            add(SwitchKatana)
+            add(TickKatana)
 
             // -------------
             // 带“移除”的系统 ???

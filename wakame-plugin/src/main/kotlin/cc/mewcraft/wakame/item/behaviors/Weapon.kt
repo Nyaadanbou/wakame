@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.item.behavior.ItemBehavior
 import cc.mewcraft.wakame.item.behavior.ItemBehaviorType
 import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
-import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -40,11 +39,11 @@ interface Weapon : ItemBehavior {
             weapon.weaponType.handleAttackEntity(player, koishStack, damagee, event)
         }
 
-        override fun handlePlayerDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
-            if (event.isCancelled) return
-            val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
-            weapon.weaponType.handlePlayerDamage(player, koishStack, damageSource, event)
-        }
+        //override fun handlePlayerDamage(player: Player, itemStack: ItemStack, koishStack: NekoStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) {
+        //    if (event.isCancelled) return
+        //    val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
+        //    weapon.weaponType.handlePlayerDamage(player, koishStack, damageSource, event)
+        //}
 
         override fun handleInteract(player: Player, itemStack: ItemStack, koishStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
             if (wrappedEvent.event.useItemInHand() == Event.Result.DENY) return

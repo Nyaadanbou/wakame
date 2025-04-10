@@ -4,8 +4,11 @@ import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -41,7 +44,6 @@ internal object ItemBehaviorListener : Listener {
     // Item Behavior
     // ------------
 
-    // TODO #373: 需要确保传入的是 KoishItem 吗?
     // FIXME #373: ArmorChangeEvent 很早就会被触发
     //  https://pastes.dev/riyJVh6WMH
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -53,6 +55,24 @@ internal object ItemBehaviorListener : Listener {
 
         previous?.handleEquip(player, previous, false, event)
         current?.handleEquip(player, current, true, event)
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun on(event: PlayerItemLeftClickEvent) {
+        val player = event.player
+        if (!player.isInventoryListenable) return
+        val itemstack = event.item
+
+        itemstack.handleLeftClick(player, itemstack, event)
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun on(event: PlayerItemRightClickEvent) {
+        val player = event.player
+        if (!player.isInventoryListenable) return
+        val itemstack = event.item
+
+        itemstack.handleRightClick(player, itemstack, event.hand, event)
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -77,13 +97,25 @@ internal object ItemBehaviorListener : Listener {
         itemstack.handleInteractAtEntity(event.player, itemstack, event.rightClicked, event)
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    fun onReceive(event: NekoPostprocessDamageEvent) {
+        val damagee = event.damagee as? Player ?: return
+        if (!damagee.isInventoryListenable) return
+
+        val damageSource = event.damageSource
+        for (slot in ItemSlotRegistry.all()) {
+            val itemstack = slot.getItem(damagee) ?: continue
+            itemstack.handleReceiveDamage(damagee, itemstack, damageSource, event)
+        }
+    }
+
     @EventHandler()
-    fun on(event: NekoPostprocessDamageEvent) {
+    fun onAttack(event: NekoPostprocessDamageEvent) {
         val player = event.damageSource.causingEntity as? Player ?: return
         if (!player.isInventoryListenable) return
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
 
-        //itemstack.handleAttackEntity(player, itemstack, event.damagee, event)
+        itemstack.handleAttackEntity(player, itemstack, event.damagee, event)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -2,12 +2,16 @@
 
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -33,15 +37,23 @@ inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().ha
 
 // 注: 这些 handle... 函数都是为了方便遍历 ItemBehavior
 
+fun ItemStack.handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) =
+    handleBehavior { it.handleLeftClick(player, itemstack, event) }
+
+fun ItemStack.handleRightClick(player: Player, itemstack: ItemStack, hand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) =
+    handleBehavior { it.handleRightClick(player, itemstack, hand, event) }
+
 fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =
     handleBehavior { it.handleInteract(player, itemstack, action, wrappedEvent) }
 
 fun ItemStack.handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) =
     handleBehavior { it.handleInteractAtEntity(player, itemstack, clicked, event) }
 
-// FIXME #350: 等完全迁移
-//fun ItemStack.handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) =
-//    handleBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
+fun ItemStack.handleReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: NekoPostprocessDamageEvent) =
+    handleBehavior { it.handleReceiveDamage(player, itemstack, damageSource, event) }
+
+fun ItemStack.handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoPostprocessDamageEvent) =
+    handleBehavior { it.handleAttackEntity(player, itemstack, damagee, event) }
 
 fun ItemStack.handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) =
     handleBehavior { it.handleItemProjectileLaunch(player, itemstack, projectile, event) }
