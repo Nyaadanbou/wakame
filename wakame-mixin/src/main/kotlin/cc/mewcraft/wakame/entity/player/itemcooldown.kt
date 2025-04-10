@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.serverPlayer
 import io.papermc.paper.adventure.PaperAdventure
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import net.kyori.adventure.key.Key
 import net.minecraft.world.item.ItemCooldowns
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -145,18 +144,18 @@ private class StandaloneItemCooldownContainer : ItemCooldownContainer {
      * - K: 冷却的索引
      * - V: 冷却变为"未激活"的游戏刻
      */
-    private val inactiveTimestamps = Object2IntOpenHashMap<Key>()
+    private val inactiveTimestamps = Object2IntOpenHashMap<Identifier>()
 
     override fun activate(id: Identifier, ticks: Int) {
         inactiveTimestamps[id] = Bukkit.getServer().currentTick + ticks
     }
 
-    override fun activate(key: Key, level: AttackSpeed) {
-        activate(key, level.cooldown)
+    override fun activate(id: Identifier, level: AttackSpeed) {
+        activate(id, level.cooldown)
     }
 
-    override fun isActive(key: Key): Boolean {
-        return inactiveTimestamps.getInt(key) > Bukkit.getServer().currentTick
+    override fun isActive(id: Identifier): Boolean {
+        return inactiveTimestamps.getInt(id) > Bukkit.getServer().currentTick
     }
 
     override fun getRemainingRatio(id: Identifier): Float {
@@ -165,12 +164,12 @@ private class StandaloneItemCooldownContainer : ItemCooldownContainer {
         return if (totalCooldown <= 0) 0f else remainingTicks.toFloat() / totalCooldown
     }
 
-    override fun getRemainingTicks(key: Key): Int {
-        val diff = inactiveTimestamps.getInt(key) - Bukkit.getServer().currentTick
+    override fun getRemainingTicks(id: Identifier): Int {
+        val diff = inactiveTimestamps.getInt(id) - Bukkit.getServer().currentTick
         return if (diff < 0) 0 else diff
     }
 
-    override fun reset(key: Key) {
-        inactiveTimestamps.put(key, 0)
+    override fun reset(id: Identifier) {
+        inactiveTimestamps.put(id, 0)
     }
 }

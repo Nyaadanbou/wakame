@@ -61,7 +61,7 @@ object ItemBehaviorTypes {
      * 作为弩的逻辑.
      */
     @JvmField
-    val CROSSBOW = typeOf("crossbow", Bow)
+    val CROSSBOW = typeOf("crossbow", Crossbow)
 
     /**
      * 作为棍的逻辑.
