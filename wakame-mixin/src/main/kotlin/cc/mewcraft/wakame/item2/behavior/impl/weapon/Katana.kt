@@ -43,7 +43,7 @@ private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "damage")
 /**
  * 太刀的物品行为.
  */
-data object Katana : Weapon {
+object Katana : Weapon {
 
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         return null // 太刀没有直接点击实体造成伤害触发的逻辑, 直接返回 null 取消伤害事件
@@ -376,7 +376,7 @@ data object Katana : Weapon {
 /**
  * 切换手持太刀时的逻辑.
  */
-data object SwitchKatana : IteratingSystem(
+object SwitchKatana : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges) }
 ) {
     override fun onTickEntity(entity: Entity) {
@@ -420,7 +420,7 @@ data object SwitchKatana : IteratingSystem(
 /**
  * tick 太刀状态的逻辑.
  */
-data object TickKatana : IteratingSystem(
+object TickKatana : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, KatanaState) }
 ) {
     override fun onTickEntity(entity: Entity) {

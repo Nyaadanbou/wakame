@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.registry2.BuiltInRegistries
  *
  * [ItemBehavior] 描述的是一个物品与世界交互的逻辑, 不包含任何数据.
  */
-data object ItemBehaviorTypes {
+object ItemBehaviorTypes {
 
     // ------------
     // 注册表

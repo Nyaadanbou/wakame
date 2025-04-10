@@ -11,7 +11,6 @@ import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
-
 object WeaponUtils {
 
     private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "attack_hitbox")

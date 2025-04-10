@@ -15,11 +15,7 @@ import com.github.quillraven.fleks.IteratingSystem
 /**
  * 使物品上的铭刻对玩家生效.
  */
-<<<<<<<< HEAD:wakame-mixin/src/main/kotlin/cc/mewcraft/wakame/item2/behavior/impl/ApplyKizamiEffects.kt
-object ApplyKizamiEffects : IteratingSystem(
-========
-data object ApplyKizamiEffect : ItemBehavior, IteratingSystem(
->>>>>>>> 2a005b2b6 (初步迁移太刀, 还需进一步考虑太刀状态存放的位置):wakame-mixin/src/main/kotlin/cc/mewcraft/wakame/item2/behavior/impl/ApplyKizamiEffect.kt
+object ApplyKizamiEffects : ItemBehavior, IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, ItemSlotChanges, KizamiMap) }
 ) {
     override fun onTickEntity(entity: Entity) {

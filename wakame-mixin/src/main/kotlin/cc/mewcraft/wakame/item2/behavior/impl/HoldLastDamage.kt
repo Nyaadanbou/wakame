@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.item2.behavior.impl
 
+import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
@@ -19,11 +20,11 @@ import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
-data object HoldLastDamage : ItemBehavior {
+object HoldLastDamage : ItemBehavior {
 
-    //override fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) {
-    //    tryCancelEvent(itemstack,player, event)
-    //}
+    override fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoPostprocessDamageEvent) {
+        tryCancelEvent(itemstack, player, event)
+    }
 
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         tryCancelEvent(itemstack, player, wrappedEvent.event)
