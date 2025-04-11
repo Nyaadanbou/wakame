@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.ItemDamageEventMarker
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.extension.addCooldown
+import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getProperty
 import org.bukkit.entity.Player
@@ -26,10 +27,8 @@ object Sword : Weapon {
 
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         if (itemstack.isOnCooldown(player)) return
-        val swordConfig = itemstack.getProperty(ItemPropertyTypes.SWORD) ?: return
-        val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)?.unwrap() ?: return
-
         // TODO #349: 触发 pre damage event
+        // 造成伤害
         val attrContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attrContainer) {
             every {
@@ -38,16 +37,17 @@ object Sword : Weapon {
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 4.0, 1.2f, 0.1f, 1f) // 参考了太刀的实现
         hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
-
+        // 设置冷却
+        val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)
         itemstack.addCooldown(player, attackSpeed)
-        // TODO #349: 使物品掉耐久
+        // 设置耐久
+        player.damageItem(event.hand, 1)
     }
 
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         val event = wrappedEvent.event
         if (event.hand != EquipmentSlot.HAND) {
-            // 只允许主手使用剑进行交互
-            event.setUseItemInHand(Event.Result.DENY)
+            event.setUseItemInHand(Event.Result.DENY) // 只允许主手使用剑进行交互
         }
         wrappedEvent.actionPerformed = true
     }

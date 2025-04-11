@@ -42,4 +42,11 @@ constructor(
     override fun toString(): String {
         return toSimpleString()
     }
+
+    companion object {
+
+        @JvmField
+        val INTRINSIC: AttackSpeed = AttackSpeed(Component.text("intrinsic"), emptyArray(), 10)
+
+    }
 }

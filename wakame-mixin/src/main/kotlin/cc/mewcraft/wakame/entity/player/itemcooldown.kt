@@ -2,6 +2,8 @@ package cc.mewcraft.wakame.entity.player
 
 import cc.mewcraft.wakame.ecs.bridge.EComponent
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.serverPlayer
 import io.papermc.paper.adventure.PaperAdventure
@@ -51,8 +53,9 @@ sealed interface ItemCooldownContainer : EComponent<ItemCooldownContainer> {
 
     /**
      * “激活”指定冷却. 如果已存在将覆盖原有的冷却状态.
+     * 如果 [entry] 为 `null` 将使用默认的冷却时间.
      */
-    fun activate(id: Identifier, entry: AttackSpeed)
+    fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?)
 
     /**
      * 查询指定冷却是否为“激活”状态.
@@ -97,8 +100,9 @@ private class MinecraftItemCooldownContainer(
         delegate.addCooldown(resLoc, ticks, true)
     }
 
-    override fun activate(id: Identifier, level: AttackSpeed) {
-        activate(id, level.cooldown)
+    override fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?) {
+        val entry2 = entry ?: BuiltInRegistries.ATTACK_SPEED.getDefaultEntry()
+        activate(id, entry2.unwrap().cooldown)
     }
 
     override fun isActive(id: Identifier): Boolean {
@@ -150,8 +154,9 @@ private class StandaloneItemCooldownContainer : ItemCooldownContainer {
         inactiveTimestamps[id] = Bukkit.getServer().currentTick + ticks
     }
 
-    override fun activate(id: Identifier, level: AttackSpeed) {
-        activate(id, level.cooldown)
+    override fun activate(id: Identifier, entry: RegistryEntry<AttackSpeed>?) {
+        val entry2 = entry ?: BuiltInRegistries.ATTACK_SPEED.getDefaultEntry()
+        activate(id, entry2.unwrap().cooldown)
     }
 
     override fun isActive(id: Identifier): Boolean {

@@ -27,6 +27,7 @@ internal object AttackSpeedRegistryLoader : RegistryLoader {
     @InitFun
     fun init() {
         BuiltInRegistries.ATTACK_SPEED.resetRegistry()
+        BuiltInRegistries.ATTACK_SPEED.add("intrinsic", AttackSpeed.INTRINSIC) // add default entry
         consumeData(BuiltInRegistries.ATTACK_SPEED::add)
         BuiltInRegistries.ATTACK_SPEED.freeze()
     }

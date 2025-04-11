@@ -18,6 +18,7 @@ import cc.mewcraft.wakame.item2.ItemSlotChanges
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.extension.addCooldown
+import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.util.adventure.SoundSource
@@ -113,6 +114,12 @@ object Katana : Weapon {
             // 增加气刃值
             katanaState.addBladeSpirit(katanaConfig.horizontalSlashSpiritReward)
         }
+
+        // 设置冷却
+        val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)
+        itemstack.addCooldown(player, attackSpeed) // 太刀横斩使用武器本身的攻击速度
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**
@@ -131,8 +138,10 @@ object Katana : Weapon {
             katanaConfig.laiSlashTicks
         }
         katanaState.laiTicks = laiTicks
-        // 攻击冷却
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.laiSlashCooldown)
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**
@@ -205,8 +214,10 @@ object Katana : Weapon {
         // 连招状态
         katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_1
         katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 冷却
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown1)
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**
@@ -222,8 +233,10 @@ object Katana : Weapon {
         // 连招状态
         katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_2
         katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 冷却
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown2)
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**
@@ -240,8 +253,10 @@ object Katana : Weapon {
         // 连招状态
         katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_3
         katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 冷却
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown3)
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**
@@ -279,9 +294,9 @@ object Katana : Weapon {
         // 更新连招状态
         katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.NONE
         katanaState.spiritBladeSlashComboTicks = 0
-
-        // 更新冷却
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.roundSlashCooldown)
+        // 设置耐久
     }
 
     /**
@@ -356,15 +371,18 @@ object Katana : Weapon {
     private fun dragonAscendSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
 
+        if (LOGGING) player.sendMessage("登龙斩!")
+
         // 消耗气和一层气刃等级
         katanaState.addBladeSpirit(-katanaConfig.dragonAscendSlashSpiritConsume)
         katanaState.downgradeBladeLevel()
 
         // TODO 登龙效果
 
+        // 设置冷却
         itemstack.addCooldown(player, katanaConfig.dragonAscendSlashCooldown)
-
-        if (LOGGING) player.sendMessage("登龙斩!")
+        // 设置耐久
+        player.damageItem(EquipmentSlot.HAND, 1)
     }
 }
 
