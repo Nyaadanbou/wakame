@@ -86,9 +86,8 @@ object Katana : Weapon {
         val event = wrappedEvent.event
         if (event.useItemInHand() == Event.Result.DENY) return
         if (event.hand != EquipmentSlot.HAND) {
-            event.setUseItemInHand(Event.Result.DENY)
+            event.setUseItemInHand(Event.Result.DENY) // 只允许主手使用太刀进行交互
         }
-
         wrappedEvent.actionPerformed = true
     }
 
