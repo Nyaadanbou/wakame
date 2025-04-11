@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.system.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.system.*
-import cc.mewcraft.wakame.ecs.system.ManaHudSystem
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
 import cc.mewcraft.wakame.element.system.TickElementStack
 import cc.mewcraft.wakame.enchantment2.system.*
