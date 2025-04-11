@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.key.Key
@@ -66,9 +66,9 @@ internal object CraftingStationRecipeRegistry {
                 val recipeNode = yamlLoader {
                     withDefaults()
                     serializers {
-                        register(StationRecipeSerializer)
-                        register(StationChoiceSerializer)
-                        register(StationResultSerializer)
+                        registerExact(StationRecipeSerializer)
+                        registerExact(StationChoiceSerializer)
+                        registerExact(StationResultSerializer)
                         register(ItemXSerializer)
                     }
                 }.buildAndLoadString(fileText)

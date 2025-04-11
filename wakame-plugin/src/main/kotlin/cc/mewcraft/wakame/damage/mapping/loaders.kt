@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -65,7 +66,7 @@ internal object DamageTypeDamageMappings {
         val rootNode = yamlLoader {
             withDefaults()
             serializers {
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             file.readText()
@@ -110,7 +111,7 @@ internal object AttackCharacteristicDamageMappings {
             serializers {
                 register<DamagePredicate>(DamagePredicate.SERIALIZER)
                 register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             file.readText()
@@ -160,7 +161,7 @@ internal object NullCausingDamageMappings {
             serializers {
                 register<DamagePredicate>(DamagePredicate.SERIALIZER)
                 register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             file.readText()
@@ -210,7 +211,7 @@ internal object PlayerAdhocDamageMappings {
             serializers {
                 register<DamagePredicate>(DamagePredicate.SERIALIZER)
                 register<DamagePredicateMapper>(DamagePredicateMapper.SERIALIZER)
-                register<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
+                registerExact<DamageMetadataBuilder<*>>(DamageMetadataBuilder.SERIALIZER)
             }
         }.buildAndLoadString(
             file.readText()

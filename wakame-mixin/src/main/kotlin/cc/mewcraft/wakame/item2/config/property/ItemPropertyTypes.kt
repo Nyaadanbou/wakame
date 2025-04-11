@@ -14,6 +14,7 @@ import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -38,7 +39,7 @@ data object ItemPropertyTypes {
     @JvmField
     val BASE: ItemPropertyType<ItemBase> = typeOf("base") {
         serializers {
-            register<ItemBase>(ItemBase.SERIALIZER)
+            registerExact<ItemBase>(ItemBase.SERIALIZER)
         }
     }
 
@@ -48,8 +49,8 @@ data object ItemPropertyTypes {
     @JvmField
     val SLOT: ItemPropertyType<ItemSlotGroup> = typeOf("slot") {
         serializers {
-            register(ItemSlot.SERIALIZER)
-            register(ItemSlotGroup.SERIALIZER)
+            registerExact(ItemSlot.SERIALIZER)
+            registerExact(ItemSlotGroup.SERIALIZER)
         }
     }
 

@@ -6,6 +6,7 @@ import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -46,7 +47,7 @@ class DispatchingSerializerTest {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.registerAnnotatedObjects(objectMapperFactory())
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
+            builder.registerExact<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
         })
 
         assertNode(node)
@@ -56,7 +57,7 @@ class DispatchingSerializerTest {
     fun `using type serializer`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
             builder.register(AnimalType.REGISTRY.valueByNameTypeSerializer())
-            builder.register<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
+            builder.registerExact<Animal>(DispatchingSerializer.create(Animal::type, AnimalType::kotlinType))
             builder.register<Cat>(CatSerializer)
             builder.register<Dog>(DogSerializer)
         })
@@ -67,7 +68,7 @@ class DispatchingSerializerTest {
     @Test
     fun `deserialize only`() {
         val node = BasicConfigurationNode.root(ConfigurationOptions.defaults().serializers { builder ->
-            builder.register<Animal>(
+            builder.registerExact<Animal>(
                 DispatchingSerializer.createPartial<String, Animal>( // 对于仅需要反序列化的数据类型, 其写法可以极大的简化, 无需定义 XxxType 类型
                     mapOf(
                         "cat" to Cat::class,

@@ -5,7 +5,9 @@ import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.wakame.serialization.configurate.serializer.CompressedEnumValueSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -49,6 +51,8 @@ sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
             serials.registerAll(makeDirectSerializers())
             // 添加间接依赖的 TypeSerializer (注册新的物品数据类型时, 如果有间接依赖的类型, 在这里添加即可)
             serials.register(IdentifierSerializer)
+            // 优先使用带压缩的枚举类序列化实现
+            serials.register(CompressedEnumValueSerializer)
             // 添加 Configurate 内置的 TypeSerializer.
             // 注意: 按照 Configurate 的实现, 查询 TypeSerializer 的顺序 是按照 注册 TypeSerializer 的顺序 进行的.
             // 因此内置的 TypeSerializeCollection 必须在我们自定义的 ObjectMapper 之后注册, 否则在反序列化时,
