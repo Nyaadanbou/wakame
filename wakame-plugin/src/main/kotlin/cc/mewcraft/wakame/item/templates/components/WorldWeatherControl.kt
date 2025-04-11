@@ -3,7 +3,7 @@ package cc.mewcraft.wakame.item.templates.components
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import cc.mewcraft.wakame.world.WeatherControl
@@ -40,7 +40,7 @@ data class WorldWeatherControl(
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder().apply {
-                register<WeatherControl.Action>(WeatherControlActionSerializer)
+                registerExact<WeatherControl.Action>(WeatherControlActionSerializer)
             }.build()
         }
     }

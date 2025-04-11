@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import net.minecraft.server.MinecraftServer.currentTick
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import kotlin.streams.asSequence
 
 /**
  * 当玩家使用物品点击左键时触发.
@@ -17,24 +16,26 @@ import kotlin.streams.asSequence
  *
  * @param player 触发事件的玩家
  * @param item 使用的物品, 永远不为空气
+ * @param hand 使用的手, 必为主手或副手
  */
 class PlayerItemLeftClickEvent(
     player: Player,
     val item: ItemStack,
+    val hand: EquipmentSlot, // As of 1.21.5, Minecraft can only fire this event for main hand
 ) : PlayerEvent(player) {
 
     init {
-        require(!item.isEmpty) { "Item cannot be empty" } // throw early
+        require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        player.sendMessage(
-            "$currentTick ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
-                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-                    stream.asSequence().dropWhile { frame ->
-                        frame.className == PlayerItemLeftClickEvent::class.qualifiedName
-                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-                }
-            }"
-        )
+        //player.sendMessage(
+        //    "$currentTick ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
+        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+        //            stream.asSequence().dropWhile { frame ->
+        //                frame.className == PlayerItemLeftClickEvent::class.qualifiedName
+        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+        //        }
+        //    }"
+        //)
     }
 
     override fun getHandlers(): HandlerList {

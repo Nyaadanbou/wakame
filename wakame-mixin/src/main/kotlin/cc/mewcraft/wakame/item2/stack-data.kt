@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack
 
 // ------------------
 // 用于访问 `org.bukkit.inventory.ItemStack` 上的 Koish 数据
-// (关于注释和文档, 请参考下面的 MojangStack 的扩展函数)
+// (关于注释和文档, 请参考本文件后半部分的 MojangStack 的扩展函数)
 // ------------------
 
 //// Type

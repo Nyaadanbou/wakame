@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -46,7 +46,7 @@ class CudgelAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 
@@ -63,12 +63,12 @@ class CudgelAttack(
         return damageMeta
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: PostprocessDamageEvent) {
         if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
             return
         }
 
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -82,7 +82,7 @@ class CudgelAttack(
 
     override fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) return
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) return
 
         applyCudgelAttack(player)
 

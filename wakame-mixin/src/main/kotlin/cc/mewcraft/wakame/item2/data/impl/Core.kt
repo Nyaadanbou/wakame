@@ -7,6 +7,7 @@ import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.valueByNameTypeSerializer
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -29,7 +30,7 @@ sealed interface Core {
         fun serializers(): TypeSerializerCollection {
             val serials = TypeSerializerCollection.builder()
             serials.register<CoreType>(BuiltInRegistries.CORE_TYPE.valueByNameTypeSerializer())
-            serials.register<Core>(DispatchingSerializer.create(Core::type, CoreType::kotlinType))
+            serials.registerExact<Core>(DispatchingSerializer.create(Core::type, CoreType::kotlinType))
             //
             serials.register<VirtualCore>(VirtualCore.SERIALIZER)
             serials.register<EmptyCore>(EmptyCore.SERIALIZER)

@@ -11,6 +11,7 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
 import java.util.stream.Stream
+import kotlin.reflect.KClass
 
 /**
  * 代表一个容器, 存放关于 *物品类型* 的行为逻辑.
@@ -49,13 +50,21 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
 
     /**
      * 检查该容器是否有指定的 [ItemBehavior].
+     * 子类不会被视作相同类型.
      */
-    infix fun has(type: ItemBehavior): Boolean
+    fun hasExact(type: ItemBehavior): Boolean
 
     /**
      * 检查该容器是否有指定的 [ItemBehavior].
+     * 子类将会被视作相同类型.
      */
-    operator fun contains(type: ItemBehavior): Boolean = has(type)
+    fun has(type: KClass<out ItemBehavior>): Boolean
+
+    /**
+     * 返回该容器里第一个类型匹配的 [ItemBehavior].
+     * 子类将会被视作相同类型.
+     */
+    operator fun <T : ItemBehavior> get(type: KClass<T>): T?
 
     /**
      * [ItemBehaviorContainer] 的生成器, 用于构建一个 [ItemBehaviorContainer].
@@ -87,7 +96,9 @@ sealed interface ItemBehaviorContainer : Iterable<ItemBehavior>, Examinable {
 
 private data object EmptyItemBehaviorContainer : ItemBehaviorContainer {
     private val empty: List<ItemBehavior> = emptyList<ItemBehavior>()
-    override fun has(type: ItemBehavior): Boolean = false
+    override fun hasExact(type: ItemBehavior): Boolean = false
+    override fun has(type: KClass<out ItemBehavior>): Boolean = false
+    override fun <T : ItemBehavior> get(type: KClass<T>): T? = null
     override fun iterator(): Iterator<ItemBehavior> = empty.iterator()
     override fun toString(): String = toSimpleString()
 }
@@ -96,8 +107,16 @@ private data object EmptyItemBehaviorContainer : ItemBehaviorContainer {
 private class SimpleItemBehaviorContainer(
     private val behaviorMap: ReferenceArraySet<ItemBehavior> = ReferenceArraySet(),
 ) : ItemBehaviorContainer, Builder {
-    override fun has(type: ItemBehavior): Boolean {
+    override fun hasExact(type: ItemBehavior): Boolean {
         return behaviorMap.contains(type)
+    }
+
+    override fun has(type: KClass<out ItemBehavior>): Boolean {
+        return behaviorMap.any { type.isInstance(it) }
+    }
+
+    override fun <T : ItemBehavior> get(type: KClass<T>): T? {
+        return behaviorMap.first { type.isInstance(it) } as T?
     }
 
     override fun add(behavior: ItemBehavior) {

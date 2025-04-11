@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.ecs.system
 
 import cc.mewcraft.wakame.ecs.Families
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.bridge.isKoishfiable
+import cc.mewcraft.wakame.ecs.bridge.canKoishify
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.BossBarVisible
 import cc.mewcraft.wakame.ecs.component.BukkitEntity
@@ -124,7 +124,7 @@ object UpdateEntityInfoBossBar : IteratingSystem(
         val bossBar = eentity[EntityInfoBossBar].bossBar
         for (viewer in bossBar.viewers()) {
             val player = viewer as Player
-            if (!player.isKoishfiable()) {
+            if (!player.canKoishify()) {
                 continue
             }
             player.koishify().unwrap()[BossBarVisible].bossBar2DurationTick[bossBar] = 0

@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.component.ElementStack
 import cc.mewcraft.wakame.element.component.ElementStackContainer
 import cc.mewcraft.wakame.element.component.Elemental
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import com.github.quillraven.fleks.Entity
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
@@ -62,7 +62,7 @@ object TickElementStack : ListenableIteratingSystem(
     }
 
     @EventHandler(ignoreCancelled = true)
-    fun on(event: NekoPostprocessDamageEvent) {
+    fun on(event: PostprocessDamageEvent) {
         val damagee = event.damagee
         val damagePackets = event.damageMetadata.damageBundle.packets()
         val causingEntity = event.damageSource.causingEntity
@@ -116,8 +116,7 @@ object TickElementStack : ListenableIteratingSystem(
 
     private fun addElementStack(entity: Entity, element: RegistryEntry<Element>, amount: Int) = with(Fleks.INSTANCE.world) {
         require(amount > 0) { "amount > 0" }
-        val stack = entity[ElementStackContainer][element] ?:
-        error("ElementStackContainer does not contain element $element")
+        val stack = entity[ElementStackContainer][element] ?: error("ElementStackContainer does not contain element $element")
         stack[ElementStack].amount += amount
         stack[TickCount].tick = 0
     }

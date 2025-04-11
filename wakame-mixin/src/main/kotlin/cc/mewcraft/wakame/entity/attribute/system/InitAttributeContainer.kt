@@ -10,7 +10,7 @@ import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
 
 /**
- * 负责给玩家/生物初始化属性的容器.
+ * 初始化玩家/生物的属性容器.
  */
 object InitAttributeContainer : IteratingSystem(
     family = EWorld.family { all(BukkitObject).any(BukkitPlayer, BukkitEntity) }

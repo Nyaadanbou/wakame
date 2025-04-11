@@ -9,7 +9,7 @@ import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.data.getByteOrNull
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
@@ -130,7 +130,7 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     companion object {
         @JvmField
         val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.builder()
-            .register(
+            .registerExact(
                 DispatchingSerializer.create<String, ConstantAttributeBundle>(
                     { obj -> obj.id },
                     { key -> BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(key).valueType }

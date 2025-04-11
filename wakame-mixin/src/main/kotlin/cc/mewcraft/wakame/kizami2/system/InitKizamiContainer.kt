@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
 
 /**
- * 负责给玩家初始化铭刻的容器.
+ * 初始化玩家的铭刻容器.
  */
 object InitKizamiContainer : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer) }

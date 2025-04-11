@@ -4,6 +4,7 @@ package cc.mewcraft.wakame.serialization.configurate
 
 import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
 import cc.mewcraft.wakame.serialization.configurate.serializer.*
+import cc.mewcraft.wakame.util.register
 import org.spongepowered.configurate.serialize.Scalars
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -40,5 +41,5 @@ val STANDARD_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bu
     .registerExact(ArraySerializer.Doubles.TYPE, ArraySerializer.Doubles())
     .register(SetSerializer::accepts, SetSerializer())
     .register(ConfigurationNodeSerializer.TYPE, ConfigurationNodeSerializer())
-    .register(Unit::class.java, UnitSerializer)
+    .register(Unit::class, UnitSerializer)
     .build()

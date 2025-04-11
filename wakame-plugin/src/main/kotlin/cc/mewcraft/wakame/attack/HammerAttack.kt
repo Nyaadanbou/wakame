@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.attack
 
 import cc.mewcraft.wakame.damage.*
 import cc.mewcraft.wakame.entity.attribute.Attributes
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
 import cc.mewcraft.wakame.item.extension.damageItemStack2
@@ -46,14 +46,14 @@ class HammerAttack(
         }
     }
 
-    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) {
+    override fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: PostprocessDamageEvent) {
         if (!event.damageMetadata.damageTags.contains(DamageTag.DIRECT)) {
             return
         }
 
         // 只要这个物品的内部冷却处于激活状态就不处理
         // 内部冷却不一定是攻速组件造成的
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return
         }
 
@@ -118,7 +118,7 @@ class HammerAttack(
     }
 
     override fun generateDamageMetadata(player: Player, nekoStack: NekoStack): DamageMetadata? {
-        if (player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (player.itemCooldownContainer.isActive(nekoStack.id)) {
             return null
         }
 

@@ -184,7 +184,7 @@ object BuiltInRegistries {
      * 攻击速度.
      */
     @JvmField
-    val ATTACK_SPEED: WritableRegistry<AttackSpeed> = registerSimple(BuiltInRegistryKeys.ATTACK_SPEED)
+    val ATTACK_SPEED: WritableDefaultedRegistry<AttackSpeed> = registerDefaulted(BuiltInRegistryKeys.ATTACK_SPEED, "intrinsic")
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

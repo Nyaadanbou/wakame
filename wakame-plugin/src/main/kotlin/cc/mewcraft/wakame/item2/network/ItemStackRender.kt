@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.item2.network
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.MAIN_CONFIG
-import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
@@ -41,9 +41,10 @@ import net.minecraft.world.item.trading.MerchantOffers
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import xyz.xenondevs.commons.provider.orElse
 import java.util.*
 
-private val LOGGING by MAIN_CONFIG.entry<Boolean>("debug", "logging", "renderer")
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "renderer").orElse(false)
 
 /**
  * 修改 [ItemStack].

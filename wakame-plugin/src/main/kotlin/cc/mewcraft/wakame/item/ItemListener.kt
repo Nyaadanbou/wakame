@@ -5,9 +5,7 @@ package cc.mewcraft.wakame.item
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerItemSlotChangeEvent
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
+import cc.mewcraft.wakame.event.bukkit.*
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.item.logic.ItemSlotChangeEventListenerRegistry
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
@@ -81,6 +79,24 @@ object ItemListener {
             current?.wrap()?.let { it.handleEquip(player, current, it, true, event) }
         }
 
+        event<PlayerItemLeftClickEvent>(EventPriority.HIGHEST) { event ->
+            val player = event.player
+            if (!player.isHandleableByKoish) return@event
+            val itemStack = event.item
+            val koishStack = itemStack.wrap() ?: return@event
+
+            koishStack.handleLeftClick(player, itemStack, koishStack, event)
+        }
+
+        event<PlayerItemRightClickEvent>(EventPriority.HIGHEST) { event ->
+            val player = event.player
+            if (!player.isHandleableByKoish) return@event
+            val itemStack = event.item
+            val koishStack = itemStack.wrap() ?: return@event
+
+            koishStack.handleRightClick(player, itemStack, koishStack, event.hand, event)
+        }
+
         event<WrappedPlayerInteractEvent>(EventPriority.NORMAL) { wrappedEvent ->
             val event = wrappedEvent.event
             val player = event.player
@@ -103,7 +119,7 @@ object ItemListener {
             koishStack.handleInteractAtEntity(event.player, itemStack, koishStack, event.rightClicked, event)
         }
 
-        event<NekoPostprocessDamageEvent> { event ->
+        event<PostprocessDamageEvent> { event ->
             val player = event.damageSource.causingEntity as? Player ?: return@event
             if (!player.isHandleableByKoish) return@event
             val itemStack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event

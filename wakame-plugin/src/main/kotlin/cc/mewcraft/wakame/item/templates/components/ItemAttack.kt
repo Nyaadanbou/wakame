@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.attack.AttackTypeSerializer
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
 import cc.mewcraft.wakame.item.template.*
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.typeTokenOf
 import io.leangen.geantyref.TypeToken
@@ -14,7 +14,7 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 data class ItemAttack(
     val attackType: AttackType,
-) : ItemTemplate<Nothing>{
+) : ItemTemplate<Nothing> {
     override val componentType: ItemComponentType<Nothing> = ItemComponentTypes.EMPTY
 
     override fun generate(context: ItemGenerationContext): ItemGenerationResult<Nothing> {
@@ -39,7 +39,7 @@ data class ItemAttack(
 
         override fun childrenCodecs(): TypeSerializerCollection {
             return TypeSerializerCollection.builder()
-                .register<AttackType>(AttackTypeSerializer)
+                .registerExact<AttackType>(AttackTypeSerializer)
                 .build()
         }
     }

@@ -3,6 +3,9 @@ package cc.mewcraft.wakame.item2.config.property
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Spear
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Weapon
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
 import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
@@ -11,6 +14,7 @@ import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.holderByNameTypeSerializer
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.typeTokenOf
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -35,7 +39,7 @@ data object ItemPropertyTypes {
     @JvmField
     val BASE: ItemPropertyType<ItemBase> = typeOf("base") {
         serializers {
-            register<ItemBase>(ItemBase.SERIALIZER)
+            registerExact<ItemBase>(ItemBase.SERIALIZER)
         }
     }
 
@@ -45,8 +49,8 @@ data object ItemPropertyTypes {
     @JvmField
     val SLOT: ItemPropertyType<ItemSlotGroup> = typeOf("slot") {
         serializers {
-            register(ItemSlot.SERIALIZER)
-            register(ItemSlotGroup.SERIALIZER)
+            registerExact(ItemSlot.SERIALIZER)
+            registerExact(ItemSlotGroup.SERIALIZER)
         }
     }
 
@@ -86,11 +90,35 @@ data object ItemPropertyTypes {
     }
 
     @JvmField
+    val COOLDOWN_GROUP: ItemPropertyType<Identifier> = typeOf("cooldown_group")
+
+    @JvmField
     val ATTACK_SPEED: ItemPropertyType<RegistryEntry<AttackSpeed>> = typeOf("attack_speed") {
         serializers {
             register(BuiltInRegistries.ATTACK_SPEED.holderByNameTypeSerializer())
         }
     }
+
+    @JvmField
+    val KATANA: ItemPropertyType<Katana> = typeOf("katana")
+
+    @JvmField
+    val AXE: ItemPropertyType<Weapon> = typeOf("axe")
+
+    @JvmField
+    val CUDGEL: ItemPropertyType<Weapon> = typeOf("cudgel")
+
+    @JvmField
+    val HAMMER: ItemPropertyType<Weapon> = typeOf("hammer")
+
+    @JvmField
+    val SPEAR: ItemPropertyType<Spear> = typeOf("spear")
+
+    @JvmField
+    val SWORD: ItemPropertyType<Weapon> = typeOf("sword")
+
+    @JvmField
+    val TRIDENT: ItemPropertyType<Weapon> = typeOf("trident")
 
     // ------------
     // 方便函数

@@ -6,9 +6,9 @@ import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
 /**
- * 每 tick 自动移除已经失效的 BukkitBlock Entity.
+ * 每 tick 自动移除已经失效的 [BukkitBlock].
  */
-object RemoveInvalidBukkitBlocks : IteratingSystem(
+object RemoveBukkitBlocks : IteratingSystem(
     family = Families.BUKKIT_BLOCK
 ) {
     override fun onTickEntity(entity: Entity) {

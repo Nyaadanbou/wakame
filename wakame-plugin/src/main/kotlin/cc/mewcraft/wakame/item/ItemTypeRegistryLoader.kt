@@ -14,7 +14,7 @@ import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
-import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.yamlLoader
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -52,9 +52,9 @@ internal object ItemTypeRegistryLoader : RegistryLoader {
      */
     @JvmField
     internal val SERIALIZERS = TypeSerializerCollection.builder()
-        .register(ItemBaseSerializer)
-        .register(ItemSlotSerializer)
-        .register(ItemSlotGroupSerializer)
+        .registerExact(ItemBaseSerializer)
+        .registerExact(ItemSlotSerializer)
+        .registerExact(ItemSlotGroupSerializer)
         .registerAll(ItemTemplateTypes.serializers()) // 每个模板的序列化器
         .build()
 

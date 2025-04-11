@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item.extension
 
 import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
@@ -14,6 +15,7 @@ import io.papermc.paper.datacomponent.DataComponentBuilder
 import io.papermc.paper.datacomponent.DataComponentType
 import net.kyori.adventure.text.Component
 import net.minecraft.nbt.CompoundTag
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.Collections.emptySet
 import kotlin.reflect.KProperty
@@ -47,6 +49,37 @@ var NekoStack.damage: Int
 val NekoStack.maxDamage: Int get() = this.bukkitStack.maxDamage
 val NekoStack.shouldBreak: Boolean get() = this.bukkitStack.shouldBreak
 val NekoStack.willBreakNextUse: Boolean get() = this.bukkitStack.willBreakNextUse
+
+
+// 用于方便操作物品冷却
+
+/**
+ * 获取物品是否正在冷却.
+ */
+fun NekoStack.isOnCooldown(player: Player): Boolean {
+    return player.itemCooldownContainer.isActive(id)
+}
+
+/**
+ * 获取物品 **未完成冷却时长** 占 **总冷却时长** 的比例.
+ */
+fun NekoStack.getCooldownPercent(player: Player): Float {
+    return player.itemCooldownContainer.getRemainingRatio(id)
+}
+
+/**
+ * 使物品进入冷却.
+ */
+fun NekoStack.addCooldown(player: Player, cooldownTicks: Int) {
+    player.itemCooldownContainer.activate(id, cooldownTicks)
+}
+
+/**
+ * 使物品退出冷却.
+ */
+fun NekoStack.removeCooldown(player: Player) {
+    player.itemCooldownContainer.reset(id)
+}
 
 
 // 会被高频使用的操作

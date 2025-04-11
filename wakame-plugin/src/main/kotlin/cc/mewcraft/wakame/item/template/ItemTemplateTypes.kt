@@ -27,6 +27,7 @@ import cc.mewcraft.wakame.item.templates.components.ItemMaxDamage
 import cc.mewcraft.wakame.item.templates.components.ItemName
 import cc.mewcraft.wakame.item.templates.components.ItemRarity
 import cc.mewcraft.wakame.item.templates.components.ItemTownFlight
+import cc.mewcraft.wakame.item.templates.components.ItemWeapon
 import cc.mewcraft.wakame.item.templates.components.PortableCore
 import cc.mewcraft.wakame.item.templates.components.Tool
 import cc.mewcraft.wakame.item.templates.components.Unbreakable
@@ -241,6 +242,12 @@ object ItemTemplateTypes {
      */
     @JvmField
     val UNBREAKABLE: ItemTemplateType<Unbreakable> = Unbreakable.codec(ItemConstants.UNBREAKABLE).register()
+
+    /**
+     * 组件: n/a
+     */
+    @JvmField
+    val WEAPON: ItemTemplateType<ItemWeapon> = ItemWeapon.codec(ItemConstants.WEAPON).register()
 
     /**
      * 组件: n/a

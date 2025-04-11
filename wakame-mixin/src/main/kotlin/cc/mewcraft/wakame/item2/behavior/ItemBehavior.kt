@@ -1,8 +1,12 @@
 package cc.mewcraft.wakame.item2.behavior
 
+import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
+import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
@@ -15,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -45,17 +50,23 @@ interface ItemBehavior {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 
+    fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) = Unit
+
+    fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) = Unit
+
     fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 
     fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
-    //fun handleAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: NekoEntityDamageEvent) = Unit
+    fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
+
+    fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) = Unit
 
     fun handleItemProjectileLaunch(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileLaunchEvent) = Unit
 
     fun handleItemProjectileHit(player: Player, itemstack: ItemStack, projectile: Projectile, event: ProjectileHitEvent) = Unit
 
-    fun handleBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
+    fun handlePlayerBreakBlock(player: Player, itemstack: ItemStack, event: BlockBreakEvent) = Unit
 
     fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) = Unit
 

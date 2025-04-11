@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.config.registerSerializer
 import cc.mewcraft.wakame.entity.hologram.AnimationData
 import cc.mewcraft.wakame.entity.hologram.Hologram
 import cc.mewcraft.wakame.entity.hologram.TextHologramData
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.extensions.*
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -76,7 +76,7 @@ internal object DamageDisplay : Listener {
     }
 
     @EventHandler
-    fun on(event: NekoPostprocessDamageEvent) {
+    fun on(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? LivingEntity ?: return
         val damageeLoc = damagee.location
         val css = event.getCriticalState()
@@ -276,7 +276,7 @@ internal class RadialPointCycle {
 
 internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
 
-    fun finalText(context: NekoPostprocessDamageEvent): Component {
+    fun finalText(context: PostprocessDamageEvent): Component {
         val criticalStrikeMetadata = context.damageMetadata.criticalStrikeMetadata
         val criticalStrikeStyle = criticalStrikeStyle(criticalStrikeMetadata)
         val criticalStrikeText = criticalStrikeText(criticalStrikeMetadata)
@@ -291,7 +291,7 @@ internal interface DamageDisplaySettings : DamageDisplaySettingsFields {
         return finalText
     }
 
-    fun damageValueText(context: NekoPostprocessDamageEvent): Component
+    fun damageValueText(context: PostprocessDamageEvent): Component
 
     fun criticalStrikeStyle(context: CriticalStrikeMetadata): Array<StyleBuilderApplicable> = when (context.state) {
         CriticalStrikeState.NONE -> criticalStrikeStyleNone
@@ -339,7 +339,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
 
     val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
 
-    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
+    override fun damageValueText(context: PostprocessDamageEvent): Component {
         val damageMap = context.getFinalDamageMap()
         val elementType = damageMap.maxWithOrNull(
             compareBy { it.value }
@@ -360,7 +360,7 @@ internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDi
     val damageValueText: String by SEPARATED_DISPLAY_CONFIG.entry("damage_value_text")
     val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
 
-    override fun damageValueText(context: NekoPostprocessDamageEvent): Component {
+    override fun damageValueText(context: PostprocessDamageEvent): Component {
         val damageMap = context.getFinalDamageMap()
         val damageValueText = damageMap.map { (elementType, damageValue) ->
             MM.deserialize(

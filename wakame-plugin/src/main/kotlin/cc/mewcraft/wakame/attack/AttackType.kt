@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.attack
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
-import cc.mewcraft.wakame.entity.player.attackCooldownContainer
-import cc.mewcraft.wakame.event.bukkit.NekoPostprocessDamageEvent
+import cc.mewcraft.wakame.entity.player.itemCooldownContainer
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item.NekoStack
 import cc.mewcraft.wakame.item.extension.applyAttackCooldown
@@ -17,12 +17,12 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
 
-
 /**
  * 攻击类型.
  */
 // 其实现类先不要写成单例.
 // 未来确认是无参数的实现再写成单例.
+@Deprecated("Use WeaponType instead")
 sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].
@@ -38,7 +38,7 @@ sealed interface AttackType {
     /**
      * 玩家使用该攻击类型的物品对直接生物造成伤害时执行的逻辑.
      */
-    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: NekoPostprocessDamageEvent) = Unit
+    fun handleAttackEntity(player: Player, nekoStack: NekoStack, damagee: LivingEntity, event: PostprocessDamageEvent) = Unit
 
     /**
      * 玩家使用该攻击类型的物品进行交互事件时执行的逻辑.
@@ -46,7 +46,7 @@ sealed interface AttackType {
      */
     fun handleInteract(player: Player, nekoStack: NekoStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         if (!action.isLeftClick) return
-        if (!player.attackCooldownContainer.isActive(nekoStack.id)) {
+        if (!player.itemCooldownContainer.isActive(nekoStack.id)) {
             // 没有左键到生物时, 也应该应用攻击冷却
             nekoStack.applyAttackCooldown(player)
         }
