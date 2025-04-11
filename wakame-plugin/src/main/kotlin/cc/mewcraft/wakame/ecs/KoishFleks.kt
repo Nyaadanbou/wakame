@@ -1,9 +1,27 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.system.*
+import cc.mewcraft.wakame.ability2.system.AbilityActivator
+import cc.mewcraft.wakame.ability2.system.AbilityRemover
+import cc.mewcraft.wakame.ability2.system.ConsumeManaForAbilities
+import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
+import cc.mewcraft.wakame.ability2.system.InitAbilityState
+import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
+import cc.mewcraft.wakame.ability2.system.RemoveAbility
+import cc.mewcraft.wakame.ability2.system.TickAbilityBlackhole
+import cc.mewcraft.wakame.ability2.system.TickAbilityBlink
+import cc.mewcraft.wakame.ability2.system.TickAbilityDash
+import cc.mewcraft.wakame.ability2.system.TickAbilityMultiJump
+import cc.mewcraft.wakame.ability2.system.TickAbilityPhase
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.system.*
+import cc.mewcraft.wakame.ecs.system.CountTick
+import cc.mewcraft.wakame.ecs.system.DisplayMana
+import cc.mewcraft.wakame.ecs.system.InitMana
+import cc.mewcraft.wakame.ecs.system.ManageBossBar
+import cc.mewcraft.wakame.ecs.system.RenderParticle
+import cc.mewcraft.wakame.ecs.system.RestoreMana
+import cc.mewcraft.wakame.ecs.system.UpdateEntityInfoBossBar
+import cc.mewcraft.wakame.ecs.system.UpdateMaxMana
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
 import cc.mewcraft.wakame.element.system.TickElementStack
 import cc.mewcraft.wakame.enchantment2.system.*
@@ -48,6 +66,7 @@ internal object KoishFleks : Listener, Fleks {
             add(InitAttributeContainer) // 初始化玩家的属性容器
             add(InitElementStackContainer)
             add(InitKizamiContainer) // 初始化玩家的铭刻容器
+            add(InitMana)
             add(InitPlayerCombo) // 初始化玩家的连招状态
             add(ScanItemSlotChanges)// 监听玩家背包里的物品变化
             add(PlayAttackSpeedAnimation) // 渲染武器攻击速度的动画效果
@@ -78,6 +97,7 @@ internal object KoishFleks : Listener, Fleks {
             add(TickFragileEnchantment)
             add(TickSmelterEnchantment)
             add(TickVeinminerEnchantment)
+            add(UpdateMaxMana)
             add(RestoreMana)
             add(DisplayMana)
             add(RenderParticle)
