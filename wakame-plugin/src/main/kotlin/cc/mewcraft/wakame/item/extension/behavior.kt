@@ -20,13 +20,6 @@ fun NekoStack.applyAttackCooldown(player: Player) {
 }
 
 /**
- * 使用该方法使物品失去最后一点耐久时, 不会有损坏动画效果.
- */
-fun NekoStack.hurtAndBreak(player: Player, amount: Int) {
-    this.bukkitStack.damage(amount, player)
-}
-
-/**
  * Damages the itemstack in this slot by the specified amount.
  *
  * This runs all logic associated with damaging an itemstack like
