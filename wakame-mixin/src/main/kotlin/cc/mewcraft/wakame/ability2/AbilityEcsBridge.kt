@@ -26,7 +26,8 @@ object AbilityEcsBridge {
         phase: StatePhase,
         slot: ItemSlot?,
     ) {
-        val metaType = ability.meta.type
+        val meta = ability.meta.unwrap()
+        val metaType = meta.type
         val entity = Fleks.INSTANCE.createEntity { entity ->
             entity += Ability(
                 metaType = metaType,
@@ -35,7 +36,7 @@ object AbilityEcsBridge {
                 variant = ability.variant,
                 mochaEngine = MochaEngine.createStandard()
             )
-            entity += listOf(ability.meta.params)
+            entity += listOf(meta.params)
             entity += CastBy(caster.unwrap())
             entity += TargetTo(target.unwrap())
             ability.manaCost?.let { entity += ManaCost(it) }

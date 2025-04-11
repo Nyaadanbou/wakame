@@ -6,7 +6,11 @@ import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
 import org.bukkit.event.Cancellable
 import org.bukkit.event.player.PlayerInteractEvent
 
@@ -54,7 +58,7 @@ internal object AbilityEntryPointHandler {
                 val abilityOnItem = itemStack.getProperty(ItemPropertyTypes.ABILITY) ?: return
                 val caster = projectile.shooter as? LivingEntity ?: return
                 val target = hitEntity ?: return
-                AbilityCastUtils.castPoint(abilityOnItem.meta, caster, target)
+                AbilityCastUtils.castPoint(abilityOnItem.meta.unwrap(), caster, target)
             }
         }
     }
