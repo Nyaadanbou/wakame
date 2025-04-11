@@ -150,78 +150,92 @@ sealed interface ItemRef {
  */
 interface ItemRefHandler<T> {
 
-    // 实现所代表的物品系统的名字, 比如 "Minecraft", "Koish"
+    /**
+     * 实现所代表的物品系统的名字, 比如 "Minecraft", "Koish"
+     */
     val systemName: String
 
-    // 判断该系统是否可以处理传入的 id
-    // 必须检查传入的 id 是否指向该系统内一个有效的物品类型
-    //
-    // 对于 Koish 和 Minecraft:
-    // 这里必须完整的实现, 即从完整的注册表查询 id 的有效性
-    //
-    // 对于其他系统 (比如 Brewery):
-    // 这里可以只检查 namespace 是否属于该系统,
-    // 因为无法直接知道: 当此函数调用时, 第三方系统的物品注册表是否加载完毕.
-    // 也就是说如果 id 是无效的, 那么问题会出现在下面这些函数被调用时,
-    // 而非出现在 ItemRef 框架内专门的 id 验证阶段.
-    // 而 Koish 能做的就是尽可能的晚的调用下面这些函数,
-    // 目前已经做了的事情包括: 让合成配方的注册发生在游戏的第一个 tick, 而非 JavaPlugin#onEnable 中.
+    /**
+     * 判断该系统是否可以处理传入的 id.
+     * 必须检查传入的 id 是否指向该系统内一个有效的物品类型.
+     *
+     * 对于 Koish 和 Minecraft:
+     * 这里必须完整的实现, 即从完整的注册表查询 id 的有效性.
+     *
+     * 对于其他系统 (比如 Brewery):
+     * 这里可以只检查 namespace 是否属于该系统, 因为当此函数调用时第三方系统, 无法直接知道物品的注册表是否加载完毕.
+     * 也就是说如果 id 是无效的, 那么问题会出现在下面这些函数被调用时, 而非出现在 ItemRef 框架内专门的 id 验证阶段.
+     * 而 Koish 能做的就是尽可能的晚的调用下面这些函数.
+     * 目前已经做了的事情包括: 让合成配方的注册发生在游戏的第一个 tick, 而非 JavaPlugin#onEnable 中.
+     */
     fun accepts(id: Identifier): Boolean
 
-    // 获取传入的 ItemStack 在该系统之下的物品类型 id
-    // 如果该系统无法识别传入的 ItemStack 则应该返回 `null`
+    /**
+     * 获取传入的 [ItemStack] 在该系统之下的物品类型 id.
+     * 如果该系统无法识别传入的 [ItemStack] 则应该返回 null.
+     */
     fun getId(stack: ItemStack): Identifier?
 
-    // 获取物品 id 对应的物品类型名字, 用于直接展示给玩家.
-    //
-    // 实现应该假设 id 永远是有效 id
-    // 对于无效的 id 可以直接抛出异常 (bug)
-    fun getName(id: Identifier): Component
+    /**
+     * 获取物品 id 对应的物品类型名字, 用于直接展示给玩家.
+     *
+     * 实现应该假设 id 永远是有效 id.
+     * 对于无效的 id 应该返回 null (bug).
+     */
+    fun getName(id: Identifier): Component?
 
-    // 在该系统下获取 id 对应的物品类型 T
-    // 对于无效的物品类型该函数应该直接抛异常 (bug)
-    fun getInternalType(id: Identifier): T
+    /**
+     * 在该系统下获取 id 对应的物品类型 T.
+     * 对于无效的 id 应该返回 null (bug).
+     */
+    fun getInternalType(id: Identifier): T?
 
-    // 实现应该假设 id 永远是有效 id
-    // 对于无效的 id 可以直接抛出异常 (bug)
     /**
      * 从 [id] 和基于可能存在的 [player] 创建一个新的 [ItemStack].
      *
-     * @throws ItemStackGenerationException 如果物品堆叠创建失败
+     * 实现应该假设 id 永远是有效 id.
+     * 对于无效的 id 应该返回 null (bug).
      */
-    fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack
+    fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack?
 
-    // 判断两个物品 id 是否一致
-    //
-    // 实现应该假设 xId 永远是有效 id, 但对于 yId 可以假设其为无效 id
-    // 对于无效的 xId 可以直接抛出异常 (bug)
+    /**
+     * 判断两个物品 id 是否一致.
+     *
+     * 实现应该假设 [xId] 永远是有效 id, 但对于 [yId] 可以假设其为无效 id.
+     * 对于无效的 [xId] 可以直接抛出异常 (bug).
+     */
     fun matches(xId: Identifier, yId: Identifier): Boolean {
         return xId == yId
     }
 
-    // 判断两个物品 id 是否一致
-    //
-    // ItemRef 只是个形如 x:y 的 id
-    // 所以同上, 只不过是对于 ItemRef
+    /**
+     * 判断两个物品 id 是否一致.
+     *
+     * ItemRef 只是个形如 `"x:y"` 的 id.
+     * 所以同上, 只不过是对于 [ItemRef].
+     */
     fun matches(xId: Identifier, yRef: ItemRef): Boolean {
         val yId = yRef.id
         return matches(xId, yId)
     }
 
-    // 判断两个物品 id 是否一致
-    //
-    // 同上, 只不过是对于 ItemStack
+    /**
+     * 判断两个物品 id 是否一致.
+     *
+     * 同上, 只不过是对于 [ItemStack].
+     */
     fun matches(xId: Identifier, yStack: ItemStack): Boolean {
         val yId = getId(yStack) ?: return false
         return matches(xId, yId)
     }
 
-    // 方便函数, 用于当物品类型不存在时, 统一抛出异常的逻辑
+    /**
+     * 方便函数, 用于当物品类型不存在时, 统一抛出异常的逻辑.
+     */
     fun throwItemTypeNotFound(id: Identifier): Nothing {
         val cause = IllegalArgumentException("Cannot find a item type in '$systemName' item system by: $id. This is a bug!")
         throw ItemStackGenerationException(id, cause)
     }
-
 }
 
 // ------------
@@ -249,7 +263,7 @@ private data class ItemRefImpl(
         }
 
     override val name: Component
-        get() = handlerOrThrow.getName(id)
+        get() = handlerOrThrow.getName(id) ?: handlerOrThrow.throwItemTypeNotFound(id)
 
     override fun matches(id: Identifier): Boolean {
         // 虽然可以在这里 `this.id == id`, 但使用 handlerOrThrow 是为了满足 API 的定义, 也就是: 调用未检查的 ItemRef 实例函数应该抛出异常
@@ -266,7 +280,7 @@ private data class ItemRefImpl(
     }
 
     override fun createItemStack(amount: Int, player: Player?): ItemStack {
-        return handlerOrThrow.createItemStack(this.id, amount, player)
+        return handlerOrThrow.createItemStack(this.id, amount, player) ?: handlerOrThrow.throwItemTypeNotFound(id)
     }
 }
 

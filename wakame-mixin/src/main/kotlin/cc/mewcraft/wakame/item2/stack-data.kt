@@ -26,6 +26,7 @@ import org.bukkit.inventory.ItemStack
 
 val ItemStack.typeId: Identifier get() = toNMS().typeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
+val ItemStack.isKoishExact: Boolean get() = toNMS().isKoishExact
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
 val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
@@ -68,6 +69,9 @@ val MojangStack.typeId: Identifier
 
 val MojangStack.isKoish: Boolean
     get() = koishItem != null
+
+val MojangStack.isKoishExact: Boolean
+    get() = koishData(false)?.has(ItemDataTypes.ID) == true
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
