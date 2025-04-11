@@ -39,6 +39,8 @@ papi = "2.11.6"
 towny = "0.100.4.0"
 worldguard = "7.0.7"
 townyflight = "1.13.0"
+nightcore = "2.7.5.2"
+economybridge = "1.2.1"
 
 [libraries]
 
@@ -98,6 +100,8 @@ luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
+nightcore = { group = "su.nightexpress.nightcore", name = "nightcore", version.ref = "nightcore" }
+economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
 
 [plugins]
 
