@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.molang.Expression
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
@@ -18,7 +19,7 @@ import org.spongepowered.configurate.objectmapping.meta.Setting
 @ConfigSerializable
 data class AbilityOnItem(
     @Setting("id")
-    val meta: AbilityMeta,
+    val meta: RegistryEntry<AbilityMeta>,
     val trigger: AbilityTrigger?,
     val variant: AbilityTriggerVariant = AbilityTriggerVariant.any(),
     val manaCost: Expression?,
