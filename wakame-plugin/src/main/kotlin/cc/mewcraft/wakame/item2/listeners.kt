@@ -1,13 +1,16 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
+import cc.mewcraft.wakame.ability2.AbilityCastUtils
+import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
+import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -17,19 +20,22 @@ import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.ThrowableProjectile
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 @Init(stage = InitStage.POST_WORLD)
@@ -221,26 +227,30 @@ internal object AbilityEntryPointListener : Listener {
     // Ability Entry Point
     // ------------
 
-    // TODO #373: 使用 Player(RL)ClickEvent
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on2(event: PlayerInteractEvent) {
-        val hand = event.hand ?: return
+    @EventHandler
+    private fun onLeftClickItem(event: PlayerItemLeftClickEvent) {
         val player = event.player
-        if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
+        player.combo.handleTrigger(AbilitySingleTrigger.LEFT_CLICK)
+    }
 
-        when (event.action) {
-            Action.LEFT_CLICK_BLOCK -> AbilityEntryPointHandler.onLeftClickBlock(player, event)
-            Action.LEFT_CLICK_AIR -> AbilityEntryPointHandler.onLeftClickAir(player, event)
-            Action.RIGHT_CLICK_BLOCK -> AbilityEntryPointHandler.onRightClickBlock(player, event)
-            Action.RIGHT_CLICK_AIR -> AbilityEntryPointHandler.onRightClickAir(player, event)
-            else -> return
+    @EventHandler
+    private fun onRightClick(event: PlayerItemRightClickEvent) {
+        val player = event.player
+        player.combo.handleTrigger(AbilitySingleTrigger.RIGHT_CLICK)
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private fun onProjectileHit(event: ProjectileHitEvent) {
+        val projectile = event.entity
+        val hitEntity = event.hitEntity
+        when (projectile) {
+            is AbstractArrow -> {
+                val itemStack = projectile.itemStack.takeUnlessEmpty() ?: return
+                val abilityOnItem = itemStack.getProperty(ItemPropertyTypes.ABILITY) ?: return
+                val caster = projectile.shooter as? LivingEntity ?: return
+                val target = hitEntity ?: return
+                AbilityCastUtils.castPoint(abilityOnItem.meta.unwrap(), caster, target)
+            }
         }
     }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on2(event: ProjectileHitEvent) {
-        AbilityEntryPointHandler.onProjectileHit(event.entity, event.hitEntity)
-    }
-
 }
