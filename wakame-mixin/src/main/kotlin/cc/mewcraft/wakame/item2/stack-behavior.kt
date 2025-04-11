@@ -24,6 +24,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 
@@ -47,7 +48,7 @@ inline fun ItemStack.handleBehavior(action: (ItemBehavior) -> Unit) = toNMS().ha
 fun ItemStack.handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) =
     handleBehavior { it.handleLeftClick(player, itemstack, event) }
 
-fun ItemStack.handleRightClick(player: Player, itemstack: ItemStack, hand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) =
+fun ItemStack.handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) =
     handleBehavior { it.handleRightClick(player, itemstack, hand, event) }
 
 fun ItemStack.handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) =

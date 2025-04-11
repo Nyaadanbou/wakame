@@ -17,6 +17,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import java.lang.reflect.Type
@@ -61,7 +62,7 @@ sealed interface WeaponType {
      *
      * !!! 注意该事件与 [handleInteract] 之间的区别与联系 !!!
      */
-    fun handleRightClick(player: Player, nekoStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
+    fun handleRightClick(player: Player, nekoStack: NekoStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) = Unit
 
     /**
      * 玩家使用该武器类型物品对直接生物造成伤害时执行的逻辑.

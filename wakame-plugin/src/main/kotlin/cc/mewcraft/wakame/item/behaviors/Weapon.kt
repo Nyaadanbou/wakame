@@ -15,6 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -27,9 +28,9 @@ interface Weapon : ItemBehavior {
             weapon.weaponType.handleLeftClick(player, koishStack, event)
         }
 
-        override fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, clickHand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) {
+        override fun handleRightClick(player: Player, itemStack: ItemStack, koishStack: NekoStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) {
             val weapon = koishStack.templates.get(ItemTemplateTypes.WEAPON) ?: return
-            weapon.weaponType.handleRightClick(player, koishStack, clickHand, event)
+            weapon.weaponType.handleRightClick(player, koishStack, hand, event)
         }
 
         override fun handleAttackEntity(player: Player, itemStack: ItemStack, koishStack: NekoStack, damagee: Entity, event: PostprocessDamageEvent) {

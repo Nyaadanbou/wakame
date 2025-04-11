@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.event.bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -15,10 +16,12 @@ import org.bukkit.inventory.ItemStack
  *
  * @param player 触发事件的玩家
  * @param item 使用的物品, 永远不为空气
+ * @param hand 使用的手, 必为主手或副手
  */
 class PlayerItemLeftClickEvent(
     player: Player,
     val item: ItemStack,
+    val hand: EquipmentSlot, // As of 1.21.5, Minecraft can only fire this event for main hand
 ) : PlayerEvent(player) {
 
     init {

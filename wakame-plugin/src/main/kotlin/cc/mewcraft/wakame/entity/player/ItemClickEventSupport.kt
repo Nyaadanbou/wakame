@@ -22,6 +22,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.vehicle.VehicleDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.provider.map
 
 /**
@@ -62,18 +63,20 @@ internal object ItemClickEventSupport : Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerInteractEvent) {
         val item = event.item ?: return
-        val player = event.player
         val action = event.action
+        if (action == Action.PHYSICAL) return
+        val hand = event.hand!!
+        val player = event.player
         when (action) {
             Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
                 if (haveLeftClicked.add(player)) {
-                    PlayerItemLeftClickEvent(player, item).callEvent()
+                    PlayerItemLeftClickEvent(player, item, hand).callEvent()
                 }
             }
 
             Action.RIGHT_CLICK_AIR -> {
                 if (haveRightClicked.add(player)) {
-                    PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
+                    PlayerItemRightClickEvent(player, item, hand).callEvent()
                 }
             }
 
@@ -85,7 +88,7 @@ internal object ItemClickEventSupport : Listener {
                     ) {
                         // 如果玩家是潜行右键点击 (c1) 或者方块右键交互已被其他代码显式禁用 (c2)
                         // 则认为物品可以无条件 right_click, 不再考虑可右键交互的方块类型 (c3)
-                        PlayerItemRightClickEvent(player, item, event.hand!!).callEvent()
+                        PlayerItemRightClickEvent(player, item, hand).callEvent()
                     }
                 }
             }
@@ -109,7 +112,7 @@ internal object ItemClickEventSupport : Listener {
         val player = event.damageSource.directEntity as? Player ?: return
         val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         if (haveLeftClicked.add(player)) {
-            PlayerItemLeftClickEvent(player, itemInMainHand).callEvent()
+            PlayerItemLeftClickEvent(player, itemInMainHand, EquipmentSlot.HAND).callEvent()
         }
     }
 
@@ -120,7 +123,7 @@ internal object ItemClickEventSupport : Listener {
         val player = event.attacker as? Player ?: return
         val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         if (haveLeftClicked.add(player)) {
-            PlayerItemLeftClickEvent(player, itemInMainHand).callEvent()
+            PlayerItemLeftClickEvent(player, itemInMainHand, EquipmentSlot.HAND).callEvent()
         }
     }
 

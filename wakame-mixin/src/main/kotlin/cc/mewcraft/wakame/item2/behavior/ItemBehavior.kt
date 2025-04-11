@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -51,7 +52,7 @@ interface ItemBehavior {
 
     fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) = Unit
 
-    fun handleRightClick(player: Player, itemstack: ItemStack, hand: PlayerItemRightClickEvent.Hand, event: PlayerItemRightClickEvent) = Unit
+    fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) = Unit
 
     fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 

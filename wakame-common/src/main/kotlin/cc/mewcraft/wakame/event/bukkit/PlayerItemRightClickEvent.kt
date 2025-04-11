@@ -18,12 +18,12 @@ import org.bukkit.inventory.ItemStack
  *
  * @param player 触发事件的玩家
  * @param item 使用的物品, 永远不为空气
- * @param hand 使用的物品的 [Hand]
+ * @param hand 使用的手, 必为主手或副手
  */
 class PlayerItemRightClickEvent(
     player: Player,
     val item: ItemStack,
-    hand: EquipmentSlot,
+    val hand: EquipmentSlot,
 ) : PlayerEvent(player) {
 
     init {
@@ -38,17 +38,6 @@ class PlayerItemRightClickEvent(
         //        }
         //    }"
         //)
-    }
-
-    val hand = when (hand) {
-        EquipmentSlot.HAND -> Hand.MAIN_HAND
-        EquipmentSlot.OFF_HAND -> Hand.OFF_HAND
-        else -> throw IllegalArgumentException("Invalid hand: $hand")
-    }
-
-    enum class Hand {
-        MAIN_HAND,
-        OFF_HAND;
     }
 
     override fun getHandlers(): HandlerList {
