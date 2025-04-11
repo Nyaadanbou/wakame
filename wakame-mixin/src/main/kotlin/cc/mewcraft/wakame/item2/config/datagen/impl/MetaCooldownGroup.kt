@@ -5,12 +5,11 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.MojangStack
-import io.papermc.paper.adventure.PaperAdventure
-import net.minecraft.core.component.DataComponents
-import net.minecraft.world.item.component.UseCooldown
+import cc.mewcraft.wakame.util.item.toBukkit
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.UseCooldown
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
-import java.util.*
 
 @ConfigSerializable
 data class MetaCooldownGroup(
@@ -23,6 +22,6 @@ data class MetaCooldownGroup(
     }
 
     override fun write(value: Identifier, itemstack: MojangStack) {
-        itemstack.set(DataComponents.USE_COOLDOWN, UseCooldown(.1f, Optional.of(PaperAdventure.asVanilla(id))))
+        itemstack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, UseCooldown.useCooldown(.1f).cooldownGroup(id))
     }
 }
