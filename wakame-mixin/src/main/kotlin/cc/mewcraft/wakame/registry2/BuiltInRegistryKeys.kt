@@ -24,6 +24,7 @@ import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.world.KoishBlock
 
 object BuiltInRegistryKeys {
     @JvmField
@@ -96,6 +97,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")
+
+    @JvmField
+    val BLOCK = createRegistryKey<KoishBlock>("block")
 
     ///
 

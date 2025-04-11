@@ -1,0 +1,3 @@
+base: stone[item_model=grass_block]
+item_name: "<gray>假·草方块"
+block: "broken_stone"
