@@ -26,7 +26,7 @@ import java.lang.reflect.Type
  * 如果要基于当前容器修改数据, 使用 [toBuilder] 创建一个 [Builder] 实例便可开始修改数据.
  * 修改完后再使用 [build] 创建一个新的 [ItemDataContainer] 实例, 便可获得修改后的版本.
  */
-sealed interface ItemDataContainer : Iterable<Map.Entry<ItemDataType<*>, Any>> {
+sealed interface ItemDataContainer {
 
     companion object {
 
@@ -203,10 +203,9 @@ private data object EmptyItemDataContainer : ItemDataContainer {
     override fun isEmpty(): Boolean = true
     override fun <T> get(type: ItemDataType<out T>): T? = null
     override fun has(type: ItemDataType<*>): Boolean = false
-    override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = iterator()
+    override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = emptyMap<ItemDataType<*>, Any>().iterator()
     override fun copy(): ItemDataContainer = this
     override fun toBuilder(): ItemDataContainer.Builder = SimpleItemDataContainer(copyOnWrite = false)
-    override fun iterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> = emptyMap<ItemDataType<*>, Any>().iterator()
 }
 
 // 该 class 同时实现了 ItemDataContainer, ItemDataContainer.Builder.
@@ -246,10 +245,6 @@ private open class SimpleItemDataContainer(
     override fun <T> remove(type: ItemDataType<out T>): T? {
         ensureContainerOwnership()
         return dataMap.remove(type) as T?
-    }
-
-    override fun iterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
-        return dataMap.entries.iterator()
     }
 
     override fun fastIterator(): Iterator<Map.Entry<ItemDataType<*>, Any>> {
@@ -298,7 +293,7 @@ private open class SimpleItemDataContainer(
 
     override fun toString(): String {
         return "{${
-            joinToString(
+            dataMap.reference2ObjectEntrySet().joinToString(
                 separator = ", ",
                 prefix = "(",
                 postfix = ")",
