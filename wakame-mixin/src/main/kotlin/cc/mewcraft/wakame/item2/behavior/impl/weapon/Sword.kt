@@ -34,12 +34,15 @@ object Sword : Weapon {
             }
         }
         val hitEntities = WeaponUtils.getHitEntities(player, 4.0, 1.2f, 0.1f, 1f) // 参考了太刀的实现
-        hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+        if (hitEntities.isNotEmpty()) {
+            // 造成伤害
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+            // 设置耐久
+            player.damageItem(event.hand, 1)
+        }
         // 设置冷却
         val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)
         itemstack.addCooldown(player, attackSpeed)
-        // 设置耐久
-        player.damageItem(event.hand, 1)
     }
 
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
