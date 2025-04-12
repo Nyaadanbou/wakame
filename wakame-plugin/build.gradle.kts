@@ -25,6 +25,7 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-chestsort"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-economy"))
+    runtimeOnly(project(":wakame-hooks:wakame-hook-economybridge"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-luckperms"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-mythicmobs"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-papi"))

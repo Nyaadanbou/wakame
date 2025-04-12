@@ -18,6 +18,9 @@ dependencies:
     Economy:
       required: false
       load: OMIT
+    EconomyBridge:
+      required: false
+      load: OMIT
     LuckPerms:
       required: false
       load: OMIT
