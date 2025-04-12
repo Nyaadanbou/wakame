@@ -29,7 +29,7 @@ internal object PluginCommand : KoishCommandFactory<Source> {
         sender.sendMessage("Start reloading process, it may take a while ...")
         val reloadTime = measureTimeMillis {
             Configs.reload()
-            Reloader.reload()
+            Reloader.performReload()
         }
         sender.sendMessage("Koish has been reloaded successfully! ${reloadTime}ms elapsed.")
     }

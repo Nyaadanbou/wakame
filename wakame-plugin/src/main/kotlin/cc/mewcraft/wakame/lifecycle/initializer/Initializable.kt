@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
-import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyCreation
+import cc.mewcraft.wakame.lifecycle.LifecycleUtils
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -16,42 +16,47 @@ internal abstract class Initializable(
 
     abstract val initClass: InitializableClass
 
-    override fun loadDependencies(all: Set<Initializable>, graph: MutableGraph<Initializable>) = withLifecycleDependencyCreation {
+    override fun loadDependencies(all: Set<Initializable>, graph: MutableGraph<Initializable>) {
         // this runBefore that
         for (runBeforeName in runBeforeNames) {
             val runBefore = findInitializableClass(all, runBeforeName)
-                ?: throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '${this@Initializable}'")
-            if (!stage.isPreWorld && runBefore.stage.isPreWorld)
-                throw IllegalArgumentException("Incompatible stages: '${this@Initializable}' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
+            if (runBefore == null) throw IllegalArgumentException("Could not find initializable class '$runBeforeName', which is a runBefore of '${this}'")
+            if (!stage.isPreWorld && runBefore.stage.isPreWorld) {
+                throw IllegalArgumentException("Incompatible stages: '${this}' (post-world) is configured to be initialized before '$runBeforeName' (pre-world)")
+            }
 
-            if (runBefore.completion.isCompleted)
-                throw IllegalArgumentException("'${this@Initializable}' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
+            if (runBefore.completion.isCompleted) {
+                throw IllegalArgumentException("'${this}' is configured to be initialized before '$runBeforeName', but '$runBeforeName' is already initialized")
+            }
 
             // stages are compatible, and execution order is already specified through those
-            if (stage != runBefore.stage)
+            if (stage != runBefore.stage) {
                 continue
+            }
 
-            graph.tryPutEdge(this@Initializable, runBefore)
+            LifecycleUtils.tryPutEdge(graph, this, runBefore)
         }
 
         // this runAfter that
         for (runAfterName in runAfterNames) {
             val runAfters = HashSet<Initializable>()
             val runAfterClass = findInitializableClass(all, runAfterName)
-                ?: throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '${this@Initializable}'")
+            if (runAfterClass == null) throw IllegalArgumentException("Could not find initializable class '$runAfterName', which is a runAfter of '${this}'")
             runAfters += runAfterClass
             if (runAfterClass != initClass)
                 runAfters += runAfterClass.initFunctions
 
             for (runAfter in runAfters) {
-                if (stage.isPreWorld && !runAfter.stage.isPreWorld)
-                    throw IllegalArgumentException("Incompatible stages: '${this@Initializable}' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
+                if (stage.isPreWorld && !runAfter.stage.isPreWorld) {
+                    throw IllegalArgumentException("Incompatible stages: '${this}' (pre-world) is configured to be initialized after '$runAfterName' (post-world)")
+                }
 
                 // stages are compatible, and execution order is already specified through those
-                if (stage != runAfter.stage)
+                if (stage != runAfter.stage) {
                     continue
+                }
 
-                graph.tryPutEdge(runAfter, this@Initializable)
+                LifecycleUtils.tryPutEdge(graph, runAfter, this)
             }
         }
     }
@@ -92,10 +97,10 @@ internal class InitializableClass(
 
     companion object {
 
-        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass = withLifecycleDependencyCreation {
-            val stage = getEnum<InitStage>("stage", annotation)
-                ?: throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
-            val (dispatcher, runBefore, runAfter) = getAnnotationCommons(annotation)
+        fun fromAddonAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
+            val stage = LifecycleUtils.getEnum<InitStage>("stage", annotation)
+            if (stage == null) throw IllegalStateException("Init annotation on $clazz does not contain a stage!")
+            val (dispatcher, runBefore, runAfter) = LifecycleUtils.getAnnotationCommons(annotation)
             runBefore += stage.runBefore
             runAfter += stage.runAfter
 
@@ -106,11 +111,11 @@ internal class InitializableClass(
             )
         }
 
-        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass = withLifecycleDependencyCreation {
-            val stage = getEnum<InternalInitStage>("stage", annotation)
-                ?: throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
-            val dispatcher = getDispatcher(annotation)
-            val dependsOn = getStrings("dependsOn", annotation)
+        fun fromInternalAnnotation(classLoader: ClassLoader, clazz: String, annotation: Map<String, Any?>): InitializableClass {
+            val stage = LifecycleUtils.getEnum<InternalInitStage>("stage", annotation)
+            if (stage == null) throw IllegalStateException("InternalInit annotation on $clazz does not contain a stage!")
+            val dispatcher = LifecycleUtils.getDispatcher(annotation)
+            val dependsOn = LifecycleUtils.getStrings("dependsOn", annotation)
 
             return InitializableClass(
                 classLoader, clazz,
@@ -118,9 +123,7 @@ internal class InitializableClass(
                 emptySet(), dependsOn
             )
         }
-
     }
-
 }
 
 internal class InitializableFunction(
@@ -136,19 +139,19 @@ internal class InitializableFunction(
     runAfterNames + initClass.className
 ) {
 
-    override suspend fun run() = withLifecycleDependencyCreation {
+    override suspend fun run() {
         val clazz = initClass.clazz.kotlin
-        clazz.executeSuspendFunction(methodName, completion)
+        LifecycleUtils.executeSuspendFunction(clazz, methodName, completion)
     }
 
     override fun toString(): String {
-        return initClass.className + "::" + methodName
+        return "${initClass.className}::$methodName"
     }
 
     companion object {
 
-        fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction = withLifecycleDependencyCreation {
-            val (dispatcher, runBefore, runAfter) = getAnnotationCommons(annotation)
+        fun fromInitAnnotation(clazz: InitializableClass, methodName: String, annotation: Map<String, Any?>): InitializableFunction {
+            val (dispatcher, runBefore, runAfter) = LifecycleUtils.getAnnotationCommons(annotation)
             val func = InitializableFunction(
                 clazz, methodName,
                 dispatcher?.dispatcher ?: clazz.dispatcher,
@@ -157,7 +160,5 @@ internal class InitializableFunction(
             clazz.initFunctions += func
             return func
         }
-
     }
-
 }

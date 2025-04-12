@@ -6,9 +6,8 @@ import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.config.PermanentStorage
-import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
-import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyExecution
-import cc.mewcraft.wakame.lifecycle.initializer.Initializer.start
+import cc.mewcraft.wakame.lifecycle.LifecycleUtils
+import cc.mewcraft.wakame.lifecycle.initializer.Initializer.initialize
 import cc.mewcraft.wakame.util.data.JarUtils
 import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
@@ -17,19 +16,18 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.server.ServerLoadEvent
 import java.io.File
+import java.nio.file.Path
 
 internal object Initializer : Listener {
 
     private val initializables: HashSet<Initializable> = HashSet()
     private val disableables: HashSet<Disableable> = HashSet()
 
-    private val initPreWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
-    private val initPostWorld: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
-    private val disable: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val initPreWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val initPostWorldDependencyGraph: MutableGraph<Initializable> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val disableDependencyGraph: MutableGraph<Disableable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     private lateinit var preWorldScope: CoroutineScope
     private var preWorldInitialized = false
@@ -38,23 +36,54 @@ internal object Initializer : Listener {
         private set
 
     /**
-     * Stats the initialization process.
+     * Finds all initializable tasks and registers them all.
      */
-    fun start() = tryExecute {
-        collectAndRegisterTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader)
-        initPreWorld()
+    fun initialize(): Unit = LifecycleUtils.runLifecycle {
+        findAndRegisterTasks(BootstrapContexts.PLUGIN_JAR, javaClass.classLoader)
     }
 
-    private fun collectAndRegisterTasks(file: File, classLoader: ClassLoader) {
-        val (initializables, disableables) = collectTasks(file, classLoader)
-        addTasks(initializables, disableables)
+    /**
+     * Performs pre-world initialization.
+     */
+    fun performPreWorld(): Unit {
+        LifecycleUtils.runLifecycle(::initPreWorld)
+    }
+
+    /**
+     * Performs post-world initialization.
+     */
+    fun performPostWorld(): Unit = LifecycleUtils.runLifecycle {
+        if (preWorldInitialized) {
+            initPostWorld()
+        } else {
+            LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
+        }
+    }
+
+    /**
+     * Runs all disable functions of [Initializable] in the reverse order that they were initialized in.
+     */
+    fun performDisable(): Unit = runBlocking {
+        if (isDone) {
+            coroutineScope {
+                LifecycleUtils.launchAll(this, disableDependencyGraph)
+            }
+        } else {
+            LOGGER.warn("Skipping disable phase due to incomplete initialization")
+        }
+    }
+
+    private fun findAndRegisterTasks(path: Path, classLoader: ClassLoader) {
+        val file = path.toFile()
+        val (initializables, disableables) = findTasks(file, classLoader)
+        registerTasks(initializables, disableables)
     }
 
     /**
      * Searches [file] and collects classes annotated by [InternalInit] and [Init] and functions annotated by
      * [InitFun] and [DisableFun] as [Initializables][Initializable] and [DisableableFunctions][Disableable].
      */
-    private fun collectTasks(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<Disableable>> {
+    private fun findTasks(file: File, classLoader: ClassLoader): Pair<List<Initializable>, List<Disableable>> {
         val initializables = ArrayList<Initializable>()
         val disableables = ArrayList<Disableable>()
         val initializableClasses = HashMap<String, InitializableClass>()
@@ -83,8 +112,7 @@ internal object Initializer : Listener {
 
         for ((className, annotatedFuncs) in initFunctions) {
             val clazz = initializableClasses[className]
-                ?: throw IllegalStateException("Class $className is missing an init annotation!")
-
+            if (clazz == null) throw IllegalStateException("Class $className is missing an ${Init::class} annotation!")
             for ((methodName, annotations) in annotatedFuncs) {
                 initializables += InitializableFunction.fromInitAnnotation(clazz, methodName, annotations.first())
             }
@@ -100,129 +128,114 @@ internal object Initializer : Listener {
     }
 
     /**
-     * Adds the given [Initializables][Initializable] and [DisableFunctions][Disableable] to the initialization process.
+     * Adds the given [InitializeFunctions][Initializable] and [DisableFunctions][Disableable] to the initialization process.
      *
-     * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
+     * This method can only be invoked during the pre-world initialization phase or before the [initialize] method is called.
      */
-    private fun addTasks(initializables: List<Initializable>, disableables: List<Disableable>) = withLifecycleDependencyExecution {
+    private fun registerTasks(initializables: List<Initializable>, disableables: List<Disableable>) {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
         for (initializable in initializables) {
             Initializer.initializables += initializable
             when (initializable.stage) {
-                InternalInitStage.PRE_WORLD -> initPreWorld.addNode(initializable)
-                else -> initPostWorld.addNode(initializable)
+                InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph.addNode(initializable)
+                InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph.addNode(initializable)
             }
         }
         for (disableable in disableables) {
             Initializer.disableables += disableable
-            disable.addNode(disableable)
+            disableDependencyGraph.addNode(disableable)
         }
 
         // add edges
         for (initializable in initializables) {
             initializable.loadDependencies(
                 Initializer.initializables,
-                if (initializable.stage == InternalInitStage.PRE_WORLD) initPreWorld else initPostWorld
+                when (initializable.stage) {
+                    InternalInitStage.PRE_WORLD -> initPreWorldDependencyGraph
+                    InternalInitStage.POST_WORLD -> initPostWorldDependencyGraph
+                }
             )
         }
         for (disableable in disableables) {
-            disableable.loadDependencies(Initializer.disableables, disable)
+            disableable.loadDependencies(Initializer.disableables, disableDependencyGraph)
         }
 
         // launch initialization it if already started
         if (Initializer::preWorldScope.isInitialized) {
             for (initializable in initializables) {
-                if (initializable.stage != InternalInitStage.PRE_WORLD)
+                if (initializable.stage != InternalInitStage.PRE_WORLD) {
                     continue
-
-                launch(preWorldScope, initializable, initPreWorld)
+                }
+                LifecycleUtils.launch(preWorldScope, initializable, initPreWorldDependencyGraph)
             }
         }
 
-        // if (IS_DEV_SERVER) {
-        //     dumpGraphs()
-        // }
+        if (BootstrapContexts.IS_DEV_SERVER) {
+            dumpGraphs()
+        }
     }
 
-    // @Suppress("UNCHECKED_CAST")
-    // private fun dumpGraphs() {
-    //     val dir = File("debug/nova/")
-    //     val preWorldFile = File(dir, "pre_world.dot")
-    //     val postWorldFile = File(dir, "post_world.dot")
-    //     val disableFile = File(dir, "disable.dot")
-    //     dir.mkdirs()
-    //
-    //     val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
-    //     exporter.setVertexAttributeProvider { vertex ->
-    //         mapOf(
-    //             "label" to DefaultAttribute.createAttribute(vertex.toString()),
-    //             "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
-    //         )
-    //     }
-    //     exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
-    //     exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
-    //     exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
-    // }
+    @Suppress("UNCHECKED_CAST")
+    private fun dumpGraphs() {
+        // TODO 将图库从 guava 迁移至 jgrapht 以实现 dumpGraphs
+        //val dir = File("debug/koish/")
+        //val preWorldFile = File(dir, "pre_world.dot")
+        //val postWorldFile = File(dir, "post_world.dot")
+        //val disableFile = File(dir, "disable.dot")
+        //dir.mkdirs()
+        //
+        //val exporter = DOTExporter<InitializerRunnable<*>, DefaultEdge>()
+        //exporter.setVertexAttributeProvider { vertex ->
+        //    mapOf(
+        //        "label" to DefaultAttribute.createAttribute(vertex.toString()),
+        //        "color" to DefaultAttribute.createAttribute(if (vertex.dispatcher != null) "aqua" else "black")
+        //    )
+        //}
+        //exporter.exportGraph(initPreWorld as Graph<InitializerRunnable<*>, DefaultEdge>, preWorldFile)
+        //exporter.exportGraph(initPostWorld as Graph<InitializerRunnable<*>, DefaultEdge>, postWorldFile)
+        //exporter.exportGraph(disable as Graph<InitializerRunnable<*>, DefaultEdge>, disableFile)
+    }
 
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld() = withLifecycleDependencyExecution {
-        runBlocking {
-            tryExecute {
-                coroutineScope {
-                    preWorldScope = this
-                    launchAll(this, initPreWorld)
-                }
+    private fun initPreWorld(): Unit = runBlocking {
+        LifecycleUtils.runLifecycle {
+            coroutineScope {
+                preWorldScope = this
+                LifecycleUtils.launchAll(this, initPreWorldDependencyGraph)
             }
-
-            preWorldInitialized = true
         }
+
+        preWorldInitialized = true
     }
 
     /**
      * Starts the post-world initialization process.
      */
-    private fun initPostWorld() = withLifecycleDependencyExecution {
-        runBlocking {
-            tryExecute {
-                coroutineScope {
-                    launchAll(this, initPostWorld)
-                }
-            }
-
-            isDone = true
-            KoishLoadDataEvent().callEvent()
-
-            PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
-            // setGlobalIngredients()
-            // setupMetrics()
-            BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)
-            LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
-        }
-    }
-
-    /**
-     * Disables all [Initializables][Initializable] in the reverse order that they were initialized in.
-     */
-    fun disable() = withLifecycleDependencyExecution {
-        runBlocking {
-            if (isDone) {
-                coroutineScope { launchAll(this, disable) }
-            } else {
-                LOGGER.warn("Skipping disable phase due to incomplete initialization")
+    private fun initPostWorld(): Unit = runBlocking {
+        LifecycleUtils.runLifecycle {
+            coroutineScope {
+                LifecycleUtils.launchAll(this, initPostWorldDependencyGraph)
             }
         }
+
+        isDone = true
+        KoishLoadDataEvent().callEvent()
+        PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
+        BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)
+        LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
 
-    @EventHandler
-    private fun handleServerStarted(event: ServerLoadEvent) {
-        if (preWorldInitialized) {
-            initPostWorld()
-        } else {
-            LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
-        }
-    }
+    // POST_WORLD 的调用时机移动到了 KoishPlugin#onEnable
+    //@EventHandler
+    //private fun on(event: ServerLoadEvent) {
+    //    if (preWorldInitialized) {
+    //        initPostWorld()
+    //    } else {
+    //        LOGGER.error("Skipping post-world initialization because pre-world initialization failed")
+    //    }
+    //}
 }

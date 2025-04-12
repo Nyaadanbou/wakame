@@ -47,25 +47,27 @@ private data object MinecraftItemRefHandler : ItemRefHandler<Material> {
         return stack.type.key
     }
 
-    override fun getName(id: Identifier): Component {
-        val type = getInternalType(id)
+    override fun getName(id: Identifier): Component? {
+        val type = getInternalType(id) ?: return null
         return Component.translatable(type)
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {
-        val type = getInternalType(id)
+    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+        val type = getInternalType(id) ?: return null
         return ItemStack(type).apply { this.amount = amount }
     }
 
-    override fun getInternalType(id: Identifier): Material {
-        return Material.matchMaterial(id.asString()) ?: throwItemTypeNotFound(id)
+    override fun getInternalType(id: Identifier): Material? {
+        return Material.matchMaterial(id.asString())
     }
 
 }
 
 // *原版套皮物品* 不属于此 handler 处理的范畴. 原版套皮物品依然是原版物品.
 // 这样实现以符合 ItemRef API 的定义, 以及在所有场景下让实际表现符合预期.
-private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
+//
+// make it public so that other item systems can make use of it
+/*private*/ data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
 
     override val systemName: String = "Koish"
 
@@ -79,19 +81,19 @@ private data object KoishItemRefHandler : ItemRefHandler<KoishItem> {
         return stack.koishData(false)?.get(ItemDataTypes.ID)?.id
     }
 
-    override fun getName(id: Identifier): Component {
-        val type = getInternalType(id)
+    override fun getName(id: Identifier): Component? {
+        val type = getInternalType(id) ?: return null
         return type.name
     }
 
-    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack {
-        val type = getInternalType(id)
+    override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
+        val type = getInternalType(id) ?: return null
         val item = KoishStackGenerator.generate(type, Context(type))
         return item
     }
 
-    override fun getInternalType(id: Identifier): KoishItem {
-        return BuiltInRegistries.ITEM[id] ?: throwItemTypeNotFound(id)
+    override fun getInternalType(id: Identifier): KoishItem? {
+        return BuiltInRegistries.ITEM[id]
     }
 
 }

@@ -97,7 +97,8 @@ internal class KoishBootstrap : PluginBootstrap {
             AssetExtractor.extractDefaults()
 
             // 初始化所有 InitFun (PRE_WORLD)
-            Initializer.start()
+            Initializer.initialize()
+            Initializer.performPreWorld()
 
             // 让指令注册发生在所有 PRE_WORLD 的 InitFun 之后,
             // 这样如果之前发生了异常那么指令将不会注册,

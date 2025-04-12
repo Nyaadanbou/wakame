@@ -31,14 +31,11 @@ import kotlin.reflect.KClass
 internal object HooksLoader {
 
     /** 用户指定的玩家等级系统. */
-    private val selectedPlayerLevelIntegration by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
+    private val selectedPlayerLevelProvider by MAIN_CONFIG.entry<PlayerLevelType>("player_level_provider")
 
     /** 用户指定的经济账户系统. */
-    private val selectedEconomyIntegration by MAIN_CONFIG.entry<EconomyType>("economy_provider")
+    private val selectedEconomyProvider by MAIN_CONFIG.entry<EconomyType>("economy_provider")
 
-    // 部分 integration 会在 pre world 阶段加载默认(自带)的钩子,
-    // 因此对于外部系统, 应该在 post world 阶段加载它们的钩子,
-    // 这样的话外部的钩子实例就可以覆盖默认的钩子实例.
     @InitFun
     fun init() {
         loadHooks()
@@ -46,9 +43,10 @@ internal object HooksLoader {
 
     @Suppress("UNCHECKED_CAST")
     private fun loadHooks() {
+        val pluginJar = BootstrapContexts.PLUGIN_JAR.toFile()
         JarUtils.findAnnotatedClasses(
-            BootstrapContexts.PLUGIN_JAR.toFile(),
-            listOf(Hook::class), emptyList(),
+            pluginJar,
+            listOf(Hook::class), listOf(),
             "cc/mewcraft/wakame/hook/impl/"
         ).classes[Hook::class]?.forEach { (className, annotations) ->
             val annotation = annotations.first()
@@ -64,7 +62,6 @@ internal object HooksLoader {
 
                 if (shouldLoadHook(plugins, unless, requireAll)) {
                     loadHook(className.replace('/', '.'), loadListener)
-
                     LOGGER.info(Component.text("Hook ${className.substringAfterLast('/')} loaded").color(NamedTextColor.AQUA))
                 }
             } catch (t: Throwable) {
@@ -74,11 +71,11 @@ internal object HooksLoader {
     }
 
     private fun shouldLoadHook(plugins: List<String>, unless: List<String>, requireAll: Boolean): Boolean {
-        if (plugins.isEmpty())
+        if (plugins.isEmpty()) {
             throw IllegalStateException("No plugins specified")
+        }
 
         val pluginManager = Bukkit.getPluginManager()
-
         return if (requireAll) {
             plugins.all { pluginManager.getPlugin(it) != null } && unless.none { pluginManager.getPlugin(it) != null }
         } else {
@@ -90,7 +87,7 @@ internal object HooksLoader {
         if (loadListener != null) {
             @Suppress("UNCHECKED_CAST")
             val obj = (Class.forName(loadListener.className).kotlin as KClass<out LoadListener>).objectInstance
-                ?: throw IllegalStateException("The LoadListener $loadListener is not an object class")
+            if (obj == null) throw IllegalStateException("$loadListener is not an object class")
 
             if (!obj.loaded.get()) { // blocking call
                 return
@@ -99,32 +96,27 @@ internal object HooksLoader {
 
         val hookClass = Class.forName(className).kotlin
         val hookInstance = hookClass.objectInstance
-            ?: throw IllegalStateException("Hook $hookClass is not an object class")
+        if (hookInstance == null) throw IllegalStateException("$hookClass is not an object class")
 
         useHook(hookInstance)
     }
 
     private fun useHook(hook: Any) {
-        if (hook is EconomyIntegration && selectedEconomyIntegration == hook.type) {
+        if (hook is EconomyIntegration && selectedEconomyProvider == hook.type) {
             EconomyManager.integration = hook // overwrite
         }
-
         if (hook is PermissionIntegration) {
             PermissionManager.integrations += hook
         }
-
         if (hook is ResourceLoadingFixHandler) {
             ResourceLoadingFixHandler.CURRENT_HANDLER = hook
         }
-
-        if (hook is PlayerLevelIntegration && selectedPlayerLevelIntegration == hook.type) {
+        if (hook is PlayerLevelIntegration && selectedPlayerLevelProvider == hook.type) {
             PlayerLevelManager.integration = hook // overwrite
         }
-
         if (hook is ProtectionIntegration) {
             ProtectionManager.integrations += hook
         }
-
         if (hook is TownFlightIntegration) {
             TownFlightManager.integration = hook
         }
