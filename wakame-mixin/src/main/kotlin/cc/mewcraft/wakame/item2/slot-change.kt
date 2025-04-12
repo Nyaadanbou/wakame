@@ -40,12 +40,12 @@ import org.jetbrains.annotations.ApiStatus
  * 如果第 `n` tick 扫描的结果和第 `n-1` tick 扫描的结果不同,
  * 则认为这个槽位发生了变化, 那么此时就会记录并触发一个事件.
  */
-object ItemSlotChangeMonitor2 : IteratingSystem(
+object ScanItemSlotChanges : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer, InventoryListenable) }
 ), FamilyOnAdd {
     override fun onTickEntity(entity: Entity) {
         val player = entity[BukkitPlayer].unwrap()
-        for (slot in ItemSlotRegistry.all()) {
+        for (slot in ItemSlotRegistry.itemSlots()) {
             val curr = slot.getItem(player)
             val slotChanges = entity[ItemSlotChanges]
             val entry = slotChanges[slot]

@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.FamilyOnAdd
 import com.github.quillraven.fleks.IteratingSystem
 
 /**
- * 负责给玩家初始化 [ItemCooldownContainer].
+ * 负责初始化玩家的 [ItemCooldownContainer].
  */
 object InitItemCooldownContainer : IteratingSystem(
     family = EWorld.family { all(BukkitObject, BukkitPlayer) }
