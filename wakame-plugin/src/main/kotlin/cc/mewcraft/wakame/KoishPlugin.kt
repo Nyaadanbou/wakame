@@ -7,7 +7,6 @@ import cc.mewcraft.wakame.api.block.KoishBlockRegistry
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.tileentity.TileEntityManager
-import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.util.ServerUtils
@@ -17,8 +16,6 @@ import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.stopKoin
-import xyz.xenondevs.invui.InvUI
-import xyz.xenondevs.invui.window.WindowManager
 import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
@@ -30,19 +27,22 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     }
 
     override fun onEnable() {
-        InvUI.getInstance().setPlugin(this) // https://docs.xen.cx/invui/#paper-plugin
-        WindowManager.getInstance() // 初始化 static blocks
-        Initializer.registerEvents()
-        ItemXBootstrap.init()
-        KoishProvider.register(this)
         BootstrapContexts.registerLifecycleManager(lifecycleManager) // LifecycleManager 此时已发生变化, 重新注册
+
+        // 在 onEnable() 调用 Initializer.performPostWorld() 可以让我们利用 paper-plugin.yml
+        // 中的插件依赖的配置项来控制 KoishPlugin#onEnable 的调用时机是先于其他插件还是晚于其他插件.
+        // 这主要是可以让本项目的 hooks 的加载时机可以遵循 paper-plugin.yml 中定义的依赖.
+        Initializer.performPostWorld()
+        Initializer.registerEvents()
+
+        KoishProvider.register(this)
         BootstrapContexts.setPluginReady(true)
     }
 
     override fun onDisable() {
         BootstrapContexts.setPluginReady(false)
         KoishProvider.unregister()
-        Initializer.disable()
+        Initializer.performDisable()
         PLUGIN_SCOPE.cancel("Koish Plugin has been disabled")
         stopKoin()
 

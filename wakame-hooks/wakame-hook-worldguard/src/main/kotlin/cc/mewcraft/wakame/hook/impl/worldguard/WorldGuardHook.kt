@@ -19,8 +19,11 @@ import org.bukkit.inventory.ItemStack
 @Hook(plugins = ["WorldGuard"])
 object WorldGuardHook : ProtectionIntegration {
 
-    private val PLUGIN = WorldGuardPlugin.inst()
-    private val PLATFORM = WorldGuard.getInstance().platform
+    private val PLUGIN get() = WorldGuardPlugin.inst()
+
+    // 在 JavaPlugin#onEnable 阶段, 即使 Koish 是在 WorldGuard 之后, WorldGuard.getInstance().platform 依然可能会返回 null
+    // 所以将这个 property 改为 getter 而非 initializer 以解决这个问题
+    private val PLATFORM get() = WorldGuard.getInstance().platform
 
     override fun getExecutionMode(): ExecutionMode {
         return ExecutionMode.NONE

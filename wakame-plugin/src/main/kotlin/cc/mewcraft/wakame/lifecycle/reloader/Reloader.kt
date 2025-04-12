@@ -14,27 +14,49 @@ import com.google.common.graph.GraphBuilder
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
-import java.io.File
+import java.nio.file.Path
 
-@InternalInit(
-    stage = InternalInitStage.PRE_WORLD,
-)
+@InternalInit(stage = InternalInitStage.PRE_WORLD)
 internal object Reloader {
 
     private val reloadables: HashSet<Reloadable> = HashSet()
-    private val dependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
+    private val reloadableDependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     @InitFun
-    private fun init() = LifecycleUtils.tryExecute {
-        registerTasks(collectTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader))
+    fun init() = LifecycleUtils.runLifecycle {
+        // find all tasks and register them all
+        registerTasks(findTasks(BootstrapContexts.PLUGIN_JAR, this.javaClass.classLoader))
     }
 
-    private fun collectTasks(file: File, classLoader: ClassLoader): List<Reloadable> {
+    /**
+     * Reloads all [ReloadableFunctions][ReloadableFunction].
+     */
+    internal fun performReload() {
+        if (Initializer.isDone) {
+            runBlocking {
+                LOGGER.info("Calling Reload Functions")
+                LifecycleUtils.runLifecycle {
+                    coroutineScope {
+                        LifecycleUtils.launchAll(this, reloadableDependencyGraph)
+                    }
+                }
+
+                LOGGER.info("Calling Reload Events")
+                MapEventBus.post(ConfigurationReloadEvent)
+
+                LOGGER.info("Done reloading")
+            }
+        } else {
+            LOGGER.error("Skipping reload because initialization is not done")
+        }
+    }
+
+    private fun findTasks(path: Path, classLoader: ClassLoader): List<Reloadable> {
         val reloadables = ArrayList<Reloadable>()
         val reloadableClasses = HashMap<String, ReloadableClass>()
 
         val result = JarUtils.findAnnotatedClasses(
-            file,
+            path.toFile(),
             listOf(InternalReload::class, Reload::class),
             listOf(ReloadFun::class)
         )
@@ -78,38 +100,15 @@ internal object Reloader {
         // add vertices
         for (reloadable in reloadables) {
             Reloader.reloadables += reloadable
-            dependencyGraph.addNode(reloadable)
+            reloadableDependencyGraph.addNode(reloadable)
         }
 
         // add edges
         for (reloadable in reloadables) {
             reloadable.loadDependencies(
                 Reloader.reloadables,
-                dependencyGraph
+                reloadableDependencyGraph
             )
-        }
-    }
-
-    /**
-     * Reloads all [ReloadableFunctions][ReloadableFunction].
-     */
-    internal fun performReload() {
-        if (Initializer.isDone) {
-            runBlocking {
-                LOGGER.info("Calling Reload Functions")
-                LifecycleUtils.tryExecute {
-                    coroutineScope {
-                        LifecycleUtils.launchAll(this, dependencyGraph)
-                    }
-                }
-
-                LOGGER.info("Calling Reload Events")
-                MapEventBus.post(ConfigurationReloadEvent)
-
-                LOGGER.info("Done reloading")
-            }
-        } else {
-            LOGGER.error("Skipping reload because initialization is not done")
         }
     }
 

@@ -106,7 +106,7 @@ internal object LifecycleUtils {
      * Wraps [run] in a try-catch block with error logging specific to lifecycle.
      * Returns whether the lifecycle has run successful, and also shuts down the server if it wasn't.
      */
-    inline fun tryExecute(run: () -> Unit) {
+    inline fun runLifecycle(run: () -> Unit) {
         try {
             run()
         } catch (t: Throwable) {

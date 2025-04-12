@@ -11,7 +11,7 @@ dependencies:
   server:
     AdventureLevel:
       required: false
-      load: BEFORE
+      load: BEFORE # Koish 需要访问其事件
     ChestSort:
       required: false
       load: OMIT
@@ -20,7 +20,15 @@ dependencies:
       load: OMIT
     EconomyBridge:
       required: false
-      load: OMIT
+      load: BEFORE # Koish 需要访问其 ItemManager
+    ExcellentShop:
+      required: false
+      join-classpath: false
+      load: AFTER # ExcellentShop 需要访问 Koish 注册的 ItemHandler
+    ExcellentCrates:
+      required: false
+      join-classpath: false
+      load: AFTER # ExcellentCrates 需要访问 Koish 注册的 ItemHandler
     LuckPerms:
       required: false
       load: OMIT
