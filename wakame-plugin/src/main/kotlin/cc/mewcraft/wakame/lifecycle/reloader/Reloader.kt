@@ -3,8 +3,7 @@ package cc.mewcraft.wakame.lifecycle.reloader
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.event.map.ConfigurationReloadEvent
-import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
-import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyExecution
+import cc.mewcraft.wakame.lifecycle.LifecycleUtils
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
@@ -26,7 +25,7 @@ internal object Reloader {
     private val dependencyGraph: MutableGraph<Reloadable> = GraphBuilder.directed().allowsSelfLoops(false).build()
 
     @InitFun
-    fun collectAndRegisterTasks() = tryExecute {
+    private fun init() = LifecycleUtils.tryExecute {
         registerTasks(collectTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader))
     }
 
@@ -94,13 +93,13 @@ internal object Reloader {
     /**
      * Reloads all [ReloadableFunctions][ReloadableFunction].
      */
-    internal fun reload() = withLifecycleDependencyExecution {
+    internal fun performReload() {
         if (Initializer.isDone) {
             runBlocking {
                 LOGGER.info("Calling Reload Functions")
-                tryExecute {
+                LifecycleUtils.tryExecute {
                     coroutineScope {
-                        launchAll(this, dependencyGraph)
+                        LifecycleUtils.launchAll(this, dependencyGraph)
                     }
                 }
 

@@ -3,7 +3,7 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.lifecycle.LifecycleDispatcher
-import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyCreation
+import cc.mewcraft.wakame.lifecycle.LifecycleUtils
 import com.google.common.graph.MutableGraph
 import kotlinx.coroutines.CoroutineDispatcher
 
@@ -13,7 +13,7 @@ internal class Disableable(
     private val methodName: String,
     override val dispatcher: CoroutineDispatcher?,
     private val runBeforeNames: Set<String>,
-    private val runAfterNames: Set<String>
+    private val runAfterNames: Set<String>,
 ) : InitializerRunnable<Disableable>() {
 
     override fun loadDependencies(all: Set<Disableable>, graph: MutableGraph<Disableable>) {
@@ -28,10 +28,10 @@ internal class Disableable(
             .forEach { graph.putEdge(it, this) }
     }
 
-    override suspend fun run() = withLifecycleDependencyCreation {
+    override suspend fun run() {
         val javaClazz = Class.forName(className.replace('/', '.'), true, classLoader)
         val kotlinClazz = javaClazz.kotlin
-        kotlinClazz.executeSuspendFunction(methodName, completion)
+        LifecycleUtils.executeSuspendFunction(kotlinClazz, methodName, completion)
     }
 
     override fun toString(): String {
@@ -43,17 +43,15 @@ internal class Disableable(
         fun fromInitAnnotation(
             classLoader: ClassLoader,
             className: String, methodName: String,
-            annotation: Map<String, Any?>
-        ) = withLifecycleDependencyCreation {
-            Disableable(
+            annotation: Map<String, Any?>,
+        ): Disableable {
+            return Disableable(
                 classLoader,
                 className, methodName,
-                (getDispatcher(annotation) ?: LifecycleDispatcher.SYNC).dispatcher,
-                getStrings("runBefore", annotation),
-                getStrings("runAfter", annotation)
+                (LifecycleUtils.getDispatcher(annotation) ?: LifecycleDispatcher.SYNC).dispatcher,
+                LifecycleUtils.getStrings("runBefore", annotation),
+                LifecycleUtils.getStrings("runAfter", annotation)
             )
         }
-
     }
-
 }

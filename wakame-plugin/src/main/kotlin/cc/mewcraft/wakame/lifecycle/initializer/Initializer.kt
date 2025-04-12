@@ -6,8 +6,7 @@ import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.adventure.BuiltInMessages
 import cc.mewcraft.wakame.api.event.KoishLoadDataEvent
 import cc.mewcraft.wakame.config.PermanentStorage
-import cc.mewcraft.wakame.lifecycle.helper.TryExecution.tryExecute
-import cc.mewcraft.wakame.lifecycle.helper.withLifecycleDependencyExecution
+import cc.mewcraft.wakame.lifecycle.LifecycleUtils
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer.start
 import cc.mewcraft.wakame.util.data.JarUtils
 import com.google.common.graph.GraphBuilder
@@ -40,9 +39,22 @@ internal object Initializer : Listener {
     /**
      * Stats the initialization process.
      */
-    fun start() = tryExecute {
+    fun start() = LifecycleUtils.tryExecute {
         collectAndRegisterTasks(BootstrapContexts.PLUGIN_JAR.toFile(), this.javaClass.classLoader)
         initPreWorld()
+    }
+
+    /**
+     * Disables all [Initializable] in the reverse order that they were initialized in.
+     */
+    fun disable() {
+        runBlocking {
+            if (isDone) {
+                coroutineScope { LifecycleUtils.launchAll(this, disable) }
+            } else {
+                LOGGER.warn("Skipping disable phase due to incomplete initialization")
+            }
+        }
     }
 
     private fun collectAndRegisterTasks(file: File, classLoader: ClassLoader) {
@@ -82,8 +94,7 @@ internal object Initializer : Listener {
         }
 
         for ((className, annotatedFuncs) in initFunctions) {
-            val clazz = initializableClasses[className]
-                ?: throw IllegalStateException("Class $className is missing an init annotation!")
+            val clazz = initializableClasses[className] ?: throw IllegalStateException("Class $className is missing an init annotation!")
 
             for ((methodName, annotations) in annotatedFuncs) {
                 initializables += InitializableFunction.fromInitAnnotation(clazz, methodName, annotations.first())
@@ -104,7 +115,7 @@ internal object Initializer : Listener {
      *
      * This method can only be invoked during the pre-world initialization phase or before the [start] method is called.
      */
-    private fun addTasks(initializables: List<Initializable>, disableables: List<Disableable>) = withLifecycleDependencyExecution {
+    private fun addTasks(initializables: List<Initializable>, disableables: List<Disableable>) {
         check(!preWorldInitialized) { "Cannot add additional callables after pre-world initialization!" }
 
         // add vertices
@@ -137,7 +148,7 @@ internal object Initializer : Listener {
                 if (initializable.stage != InternalInitStage.PRE_WORLD)
                     continue
 
-                launch(preWorldScope, initializable, initPreWorld)
+                LifecycleUtils.launch(preWorldScope, initializable, initPreWorld)
             }
         }
 
@@ -169,56 +180,36 @@ internal object Initializer : Listener {
     /**
      * Stats the pre-world initialization process.
      */
-    private fun initPreWorld() = withLifecycleDependencyExecution {
-        runBlocking {
-            tryExecute {
-                coroutineScope {
-                    preWorldScope = this
-                    launchAll(this, initPreWorld)
-                }
+    private fun initPreWorld(): Unit = runBlocking {
+        LifecycleUtils.tryExecute {
+            coroutineScope {
+                preWorldScope = this
+                LifecycleUtils.launchAll(this, initPreWorld)
             }
-
-            preWorldInitialized = true
         }
+
+        preWorldInitialized = true
     }
 
     /**
      * Starts the post-world initialization process.
      */
-    private fun initPostWorld() = withLifecycleDependencyExecution {
-        runBlocking {
-            tryExecute {
-                coroutineScope {
-                    launchAll(this, initPostWorld)
-                }
-            }
-
-            isDone = true
-            KoishLoadDataEvent().callEvent()
-
-            PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
-            // setGlobalIngredients()
-            // setupMetrics()
-            BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)
-            LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
-        }
-    }
-
-    /**
-     * Disables all [Initializables][Initializable] in the reverse order that they were initialized in.
-     */
-    fun disable() = withLifecycleDependencyExecution {
-        runBlocking {
-            if (isDone) {
-                coroutineScope { launchAll(this, disable) }
-            } else {
-                LOGGER.warn("Skipping disable phase due to incomplete initialization")
+    private fun initPostWorld(): Unit = runBlocking {
+        LifecycleUtils.tryExecute {
+            coroutineScope {
+                LifecycleUtils.launchAll(this, initPostWorld)
             }
         }
+
+        isDone = true
+        KoishLoadDataEvent().callEvent()
+        PermanentStorage.store("last_version", BootstrapContexts.PLUGIN_VERSION.toString())
+        BuiltInMessages.STARTUP_BANNER.send(SERVER.consoleSender)
+        LOGGER.info(Component.text("Done loading").color(NamedTextColor.AQUA))
     }
 
     @EventHandler
-    private fun handleServerStarted(event: ServerLoadEvent) {
+    private fun on(event: ServerLoadEvent) {
         if (preWorldInitialized) {
             initPostWorld()
         } else {
