@@ -147,8 +147,7 @@ private class KizamiMapImpl(
     }
 
     override fun addOneEach(kizami: Iterable<RegistryEntry<Kizami>>) {
-        ensureContainerOwnership()
-        kizami.forEach(this::addOne)
+        kizami.forEach(::addOne)
     }
 
     override fun addOne(kizami: RegistryEntry<Kizami>) {
@@ -162,7 +161,6 @@ private class KizamiMapImpl(
     }
 
     override fun subtractOneEach(kizami: Iterable<RegistryEntry<Kizami>>) {
-        ensureContainerOwnership()
         kizami.forEach(::subtractOne)
     }
 
