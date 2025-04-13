@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.adventure
 
 import cc.mewcraft.wakame.MM
+import cc.mewcraft.wakame.item2.network.sendItemName
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.audience.Audience
@@ -13,6 +14,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.adventure.title.Title
 import net.kyori.adventure.title.Title.Times
 import net.kyori.adventure.util.Ticks
+import org.bukkit.entity.Player
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
@@ -92,6 +94,19 @@ internal class TitleAudienceMessage(
     }
 }
 
+internal class ItemNameAudienceMessage(
+    private val text: String,
+    private val index: Int,
+    private val duration: Long,
+) : AudienceMessage {
+    override fun send(audience: Audience, tagResolver: TagResolver) {
+        val component = MM.deserialize(text, tagResolver)
+        if (audience !is Player)
+            return
+        audience.sendItemName(index, component, duration)
+    }
+}
+
 internal class SoundAudienceMessage(
     private val sound: Sound,
     private val emitter: EmitterValue,
@@ -154,6 +169,7 @@ object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessage> {
             "chat" -> ChatAudienceMessageSerializer.deserialize(type, node)
             "actionbar" -> ActionbarAudienceMessageSerializer.deserialize(type, node)
             "title" -> TitleAudienceMessageSerializer.deserialize(type, node)
+            "item_name" -> ItemNameAudienceMessageSerializer.deserialize(type, node)
             "sound" -> SoundAudienceMessageSerializer.deserialize(type, node)
             "sound_stop" -> SoundStopAudienceMessageSerializer.deserialize(type, node)
             "sound_stop_all" -> SoundStopAudienceMessage(SoundStop.all())
@@ -236,6 +252,24 @@ internal object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMe
         val stay = node.node("stay").require<Long>()
         val fadeOut = node.node("fade_out").require<Long>()
         return TitleAudienceMessage(title, subtitle, Times.times(Ticks.duration(fadeIn), Ticks.duration(stay), Ticks.duration(fadeOut)))
+    }
+}
+
+/**
+ * ## Node structure
+ *
+ * ```yaml
+ * text: "foo"
+ * index: 0 # 可选, 默认: 0
+ * duration: 20 # 可选, 默认: 20
+ * ```
+ */
+internal object ItemNameAudienceMessageSerializer : TypeSerializer2<ItemNameAudienceMessage> {
+    override fun deserialize(type: Type, node: ConfigurationNode): ItemNameAudienceMessage {
+        val text = node.node("text").require<String>()
+        val index = node.node("index").get<Int>(0)
+        val duration = node.node("duration").get<Long>(20)
+        return ItemNameAudienceMessage(text, index, duration)
     }
 }
 
