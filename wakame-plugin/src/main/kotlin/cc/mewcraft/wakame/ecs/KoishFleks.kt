@@ -8,6 +8,7 @@ import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
 import cc.mewcraft.wakame.ability2.system.InitAbilityState
 import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
 import cc.mewcraft.wakame.ability2.system.RemoveAbility
+import cc.mewcraft.wakame.ability2.system.RenderOnceOffItemName
 import cc.mewcraft.wakame.ability2.system.TickAbilityBlackhole
 import cc.mewcraft.wakame.ability2.system.TickAbilityBlink
 import cc.mewcraft.wakame.ability2.system.TickAbilityDash
@@ -18,13 +19,21 @@ import cc.mewcraft.wakame.ecs.system.CountTick
 import cc.mewcraft.wakame.ecs.system.DisplayMana
 import cc.mewcraft.wakame.ecs.system.InitMana
 import cc.mewcraft.wakame.ecs.system.ManageBossBar
+import cc.mewcraft.wakame.ecs.system.RemoveBukkitBlocks
+import cc.mewcraft.wakame.ecs.system.RemoveBukkitEntities
 import cc.mewcraft.wakame.ecs.system.RenderParticle
 import cc.mewcraft.wakame.ecs.system.RestoreMana
 import cc.mewcraft.wakame.ecs.system.UpdateEntityInfoBossBar
 import cc.mewcraft.wakame.ecs.system.UpdateMaxMana
 import cc.mewcraft.wakame.element.system.InitElementStackContainer
 import cc.mewcraft.wakame.element.system.TickElementStack
-import cc.mewcraft.wakame.enchantment2.system.*
+import cc.mewcraft.wakame.enchantment2.system.ApplyEnchantmentEffect
+import cc.mewcraft.wakame.enchantment2.system.TickAntigravShotEnchantment
+import cc.mewcraft.wakame.enchantment2.system.TickAttributeEnchantment
+import cc.mewcraft.wakame.enchantment2.system.TickBlastMiningEnchantment
+import cc.mewcraft.wakame.enchantment2.system.TickFragileEnchantment
+import cc.mewcraft.wakame.enchantment2.system.TickSmelterEnchantment
+import cc.mewcraft.wakame.enchantment2.system.TickVeinminerEnchantment
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
@@ -89,6 +98,7 @@ internal object KoishFleks : Listener, Fleks {
             add(TickAbilityMultiJump)
             add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
             add(TickAbilityPhase) // 管理技能的当前状态
+            add(RenderOnceOffItemName)
 
             add(ApplyEnchantmentEffect) //
             add(TickAntigravShotEnchantment)
