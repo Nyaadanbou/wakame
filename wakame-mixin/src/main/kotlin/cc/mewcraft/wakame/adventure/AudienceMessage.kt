@@ -96,14 +96,13 @@ internal class TitleAudienceMessage(
 
 internal class ItemNameAudienceMessage(
     private val text: String,
-    private val index: Int,
     private val duration: Long,
 ) : AudienceMessage {
     override fun send(audience: Audience, tagResolver: TagResolver) {
         val component = MM.deserialize(text, tagResolver)
         if (audience !is Player)
             return
-        audience.sendItemName(index, component, duration)
+        audience.sendItemName(component, duration)
     }
 }
 
@@ -260,16 +259,14 @@ internal object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMe
  *
  * ```yaml
  * text: "foo"
- * index: 0 # 可选, 默认: 0
  * duration: 20 # 可选, 默认: 20
  * ```
  */
 internal object ItemNameAudienceMessageSerializer : TypeSerializer2<ItemNameAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ItemNameAudienceMessage {
         val text = node.node("text").require<String>()
-        val index = node.node("index").get<Int>(0)
         val duration = node.node("duration").get<Long>(20)
-        return ItemNameAudienceMessage(text, index, duration)
+        return ItemNameAudienceMessage(text, duration)
     }
 }
 

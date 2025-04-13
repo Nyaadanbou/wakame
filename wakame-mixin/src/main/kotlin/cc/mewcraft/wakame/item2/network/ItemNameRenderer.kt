@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item2.network
 import cc.mewcraft.wakame.ability2.component.OnceOffItemName
 import cc.mewcraft.wakame.ecs.bridge.canKoishify
 import cc.mewcraft.wakame.ecs.bridge.koishify
+import cc.mewcraft.wakame.util.adventure.removeItalic
 import cc.mewcraft.wakame.util.item.toNMS
 import cc.mewcraft.wakame.util.serverPlayer
 import io.papermc.paper.adventure.PaperAdventure
@@ -47,8 +48,8 @@ object ItemNameRenderer {
     }
 }
 
-fun Player.sendItemName(index: Int, component: Component, duration: Long) {
+fun Player.sendItemName(component: Component, duration: Long) {
     if (!canKoishify())
         return
-    koishify() += OnceOffItemName(index, component, duration)
+    koishify() += OnceOffItemName(inventory.heldItemSlot, component.removeItalic, duration)
 }
