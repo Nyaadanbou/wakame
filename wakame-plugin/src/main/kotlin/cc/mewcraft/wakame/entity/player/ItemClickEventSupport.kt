@@ -62,7 +62,7 @@ internal object ItemClickEventSupport : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun on(event: PlayerInteractEvent) {
-        val item = event.item ?: return
+        val item = event.item?.takeUnlessEmpty() ?: return
         val action = event.action
         if (action == Action.PHYSICAL) return
         val hand = event.hand!!
