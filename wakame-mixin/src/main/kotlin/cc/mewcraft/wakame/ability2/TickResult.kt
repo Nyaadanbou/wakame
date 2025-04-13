@@ -11,12 +11,13 @@ enum class TickResult {
 
     /**
      * 此 Tick 完成, 并且可以进行到下一个 [StatePhase].
+     * 会触发一些系统的消耗 (如 [cc.mewcraft.wakame.ability2.system.ConsumeManaForAbilities]), 当不满足消耗时, 会相当于使用 [TickResult.RESET_STATE].
      */
     ADVANCE_TO_NEXT_STATE,
 
     /**
      * 此 Tick 完成, 并且可以进行到下一个 [StatePhase],
-     * 但不会触发消耗. 适合条件不满足时的 [TickResult].
+     * 但触发不会一些系统的消耗 (如 [cc.mewcraft.wakame.ability2.system.ConsumeManaForAbilities]). 适合条件不满足时的 [TickResult].
      */
     ADVANCE_TO_NEXT_STATE_NO_CONSUME,
 
