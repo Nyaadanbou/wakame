@@ -35,7 +35,7 @@ internal object ItemRefBootstrap {
 
 // 实现注意事项: 其他物品系统(如盲盒与酿酒)的代码实现应该放在 hooks 模块里
 
-private data object MinecraftItemRefHandler : ItemRefHandler<Material> {
+/*private*/ data object MinecraftItemRefHandler : ItemRefHandler<Material> {
 
     override val systemName: String = "Minecraft"
 
