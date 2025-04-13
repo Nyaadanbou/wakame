@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.registry2.RegistryLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.format.Style
@@ -18,18 +17,18 @@ import org.bukkit.entity.Player
 /**
  * 玩家打出的 Combo 的显示器.
  */
-internal object PlayerComboInfoDisplay : RegistryLoader {
-    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.INSTANCE["ability.yml"]
+internal object PlayerComboInfoDisplay {
+    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.INSTANCE["ability"]
+    private val PLAYER_COMBO_CONFIG = GLOBAL_ABILITY_CONFIG.node("display", "player_combo")
 
     private val triggerDisplays: Map<AbilityTrigger, TriggerDisplay> by GLOBAL_ABILITY_CONFIG.entry("display", "triggers")
 
-    private val playerComboConfig = GLOBAL_ABILITY_CONFIG.node("display", "player_combo")
-    private val connector: Component by playerComboConfig.entry("connector")
-    private val successMessages: AudienceMessageGroup by playerComboConfig.entry("success_message")
-    private val failureMessages: AudienceMessageGroup by playerComboConfig.entry("failure_message")
-    private val progressMessages: AudienceMessageGroup by playerComboConfig.entry("progress_message")
-    private val manaCostMessages: AudienceMessageGroup by playerComboConfig.entry("mana_cost_message")
-    private val noEnoughManaMessages: AudienceMessageGroup by playerComboConfig.entry("no_enough_mana_message")
+    private val connector: Component by PLAYER_COMBO_CONFIG.entry("connector")
+    private val successMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("success_message")
+    private val failureMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("failure_message")
+    private val progressMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("progress_message")
+    private val manaCostMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("mana_cost_message")
+    private val noEnoughManaMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("no_enough_mana_message")
 
     fun displaySuccess(triggers: List<AbilitySingleTrigger>, audience: Player) {
         val triggerTagResolver = getTriggersTagResolver(triggers) { it.successStyle }

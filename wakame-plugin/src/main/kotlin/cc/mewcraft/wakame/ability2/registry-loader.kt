@@ -3,8 +3,6 @@ package cc.mewcraft.wakame.ability2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
-import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
-import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -13,7 +11,12 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.yamlLoader
 
 /**
  * 加载技能类型.
@@ -46,8 +49,6 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
             withDefaults()
             serializers {
                 register(AbilityMeta.SERIALIZER)
-                register(AudienceMessageGroupSerializer)
-                register(CombinedAudienceMessageSerializer)
             }
         }
 
