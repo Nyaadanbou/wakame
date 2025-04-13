@@ -39,9 +39,9 @@ display:
         emitter: self
 
     mana_cost_message:
-      - type: chat
+      - type: item_name
         text: "<aqua><gray>-</gray> <aqua><count></aqua> <blue>[</blue>●<blue>]</blue></aqua>"
 
     no_enough_mana_message:
-      - type: chat
+      - type: item_name
         text: "<red>你的魔力不足. </red>"
