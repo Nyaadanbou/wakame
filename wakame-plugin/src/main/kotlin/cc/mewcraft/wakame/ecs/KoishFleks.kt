@@ -10,7 +10,8 @@ import cc.mewcraft.wakame.enchantment2.system.*
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
-import cc.mewcraft.wakame.item2.ItemSlotChangeMonitor2
+import cc.mewcraft.wakame.entity.player.system.PlayAttackSpeedAnimation
+import cc.mewcraft.wakame.item2.ScanItemSlotChanges
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.SwitchKatana
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.TickKatana
 import cc.mewcraft.wakame.kizami2.system.ApplyKizamiEffects
@@ -44,7 +45,8 @@ internal object KoishFleks : Listener, Fleks {
             add(InitElementStackContainer)
             add(InitKizamiContainer) // 初始化玩家的铭刻容器
             add(InitPlayerCombo) // 初始化玩家的连招状态
-            add(ItemSlotChangeMonitor2)// 监听玩家背包里的物品变化
+            add(ScanItemSlotChanges)// 监听玩家背包里的物品变化
+            add(PlayAttackSpeedAnimation) // 渲染武器攻击速度的动画效果
             add(ApplyAttributeEffects) // 将物品上的属性效果应用到玩家
             add(ApplyKizamiEffects) // 将物品上的铭刻效果应用到玩家
             add(SwitchKatana) // 当玩家切换太刀时更新太刀状态

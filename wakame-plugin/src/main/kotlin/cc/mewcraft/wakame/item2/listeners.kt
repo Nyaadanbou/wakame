@@ -103,7 +103,7 @@ internal object ItemBehaviorListener : Listener {
         if (!damagee.isInventoryListenable) return
 
         val damageSource = event.damageSource
-        for (slot in ItemSlotRegistry.all()) {
+        for (slot in ItemSlotRegistry.itemSlots()) {
             val itemstack = slot.getItem(damagee) ?: continue
             itemstack.handlePlayerReceiveDamage(damagee, itemstack, damageSource, event)
         }

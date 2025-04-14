@@ -105,20 +105,18 @@ object Katana : Weapon {
                 }
             }
         }
-
         val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
             hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
             // 增加气刃值
             katanaState.addBladeSpirit(katanaConfig.horizontalSlashSpiritReward)
+            // 设置耐久
+            player.damageItem(EquipmentSlot.HAND, 1)
         }
-
         // 设置冷却
         val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)
         itemstack.addCooldown(player, attackSpeed) // 太刀横斩使用武器本身的攻击速度
-        // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
     }
 
     /**

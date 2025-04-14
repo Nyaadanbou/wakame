@@ -223,17 +223,25 @@ object ItemSlotRegistry {
         get() = allItemSlots.size
 
     /**
-     * 获取当前所有已经注册的 [ItemSlot].
+     * 获取当前所有已经注册的 [ItemSlot] 实例.
      */
-    fun all(): Set<ItemSlot> {
+    fun itemSlots(): Collection<ItemSlot> {
         return allItemSlots
+    }
+
+    /**
+     * 获取 Minecraft 的 [ItemSlot] 实例.
+     * 这些实例代表原版的装备栏位, 例如双手/盔甲.
+     */
+    fun minecraftItemSlots(): Collection<ItemSlot> {
+        return equipmentSlotToItemSlot.values
     }
 
     /**
      * 获取自定义的 [ItemSlot] 实例.
      * 这些实例代表是非原版的装备栏位, 例如非双手/非盔甲.
      */
-    fun custom(): Set<ItemSlot> {
+    fun extraItemSlots(): Collection<ItemSlot> {
         return extraItemSlots
     }
 
