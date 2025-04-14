@@ -39,14 +39,14 @@ object TickAbilityBlink : IteratingSystem(
         // 如果玩家面前方块过近, 无法传送
         if (bukkitEntity?.getTargetBlockExact(3) != null) {
             bukkitEntity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
-            return StatePhase.RESET
+            return StatePhase.Reset()
         }
-        return StatePhase.CASTING
+        return StatePhase.Casting(true)
     }
 
     context(EntityUpdateContext)
     override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
-        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.RESET
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.Reset()
         val blink = entity[Blink]
         val location = bukkitEntity.location.clone()
 
@@ -58,7 +58,7 @@ object TickAbilityBlink : IteratingSystem(
 
         // 如果没有找到可传送的方块，那么就不传送
         if (blocks.isEmpty()) {
-            return StatePhase.RESET
+            return StatePhase.Reset()
         }
 
         // 遍历所有方块，试图找到第一个可传送的方块
@@ -100,7 +100,7 @@ object TickAbilityBlink : IteratingSystem(
             )
         )
 
-        return StatePhase.BACKSWING
+        return StatePhase.Backswing()
     }
 
     context(EntityUpdateContext)
@@ -108,9 +108,9 @@ object TickAbilityBlink : IteratingSystem(
         val blink = entity[Blink]
         if (!blink.isTeleported) {
             // TODO: 发送取消传送消息
-            return StatePhase.IDLE
+            return StatePhase.Idle()
         }
         blink.isTeleported = false
-        return StatePhase.IDLE
+        return StatePhase.Idle()
     }
 }

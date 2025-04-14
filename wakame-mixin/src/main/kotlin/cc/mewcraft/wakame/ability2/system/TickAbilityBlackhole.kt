@@ -31,16 +31,16 @@ object TickAbilityBlackhole : IteratingSystem(
 
     context(EntityUpdateContext)
     override fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase {
-        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.RESET
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.Reset()
         val blackhole = entity[Blackhole]
 
         // 设置技能选定的位置
-        val rayTraceResult = bukkitEntity.rayTraceBlocks(16.0) ?: return StatePhase.RESET
+        val rayTraceResult = bukkitEntity.rayTraceBlocks(16.0) ?: return StatePhase.Reset()
         val targetLocation = rayTraceResult.hitPosition.toLocation(bukkitEntity.world)
         rayTraceResult.hitBlockFace?.let { blackhole.holeDirection = it }
         blackhole.holeCenter = targetLocation
 
-        return StatePhase.CASTING
+        return StatePhase.Casting()
     }
 
     context(EntityUpdateContext)
@@ -48,7 +48,7 @@ object TickAbilityBlackhole : IteratingSystem(
         val caster = entity[CastBy].entityOrPlayer()
         val blackhole = entity[Blackhole]
         val mochaEngine = entity[Ability].mochaEngine
-        val targetLocation = blackhole.holeCenter ?: return StatePhase.RESET
+        val targetLocation = blackhole.holeCenter ?: return StatePhase.Reset()
         val radius = blackhole.radius.evaluate(mochaEngine)
         val damage = blackhole.damage.evaluate(mochaEngine)
 
@@ -68,7 +68,7 @@ object TickAbilityBlackhole : IteratingSystem(
         }
 
         if (tickCount >= blackhole.duration.evaluate(mochaEngine)) {
-            return StatePhase.BACKSWING
+            return StatePhase.Backswing()
         }
 
         if (tickCount % 10 == 0) {
@@ -109,7 +109,7 @@ object TickAbilityBlackhole : IteratingSystem(
             )
         }
 
-        return StatePhase.CASTING
+        return StatePhase.Casting(true)
     }
 
     context(EntityUpdateContext)
@@ -118,6 +118,6 @@ object TickAbilityBlackhole : IteratingSystem(
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null
         entity -= ParticleEffect
-        return StatePhase.IDLE
+        return StatePhase.Idle()
     }
 }

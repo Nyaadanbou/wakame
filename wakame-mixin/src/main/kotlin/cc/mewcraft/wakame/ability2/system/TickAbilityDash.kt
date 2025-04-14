@@ -34,7 +34,7 @@ object TickAbilityDash : IteratingSystem(
         val dash = entity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return StatePhase.BACKSWING
+            return StatePhase.Backswing()
         }
         val bukkitEntity = entity[CastBy].entityOrPlayer()
         val direction = bukkitEntity.location.direction.setY(0).normalize()
@@ -52,7 +52,7 @@ object TickAbilityDash : IteratingSystem(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return StatePhase.BACKSWING
+                return StatePhase.Backswing()
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -69,11 +69,11 @@ object TickAbilityDash : IteratingSystem(
 
         if (this.affectEntityNearby(bukkitEntity, entity)) {
             if (!dash.canContinueAfterHit) {
-                return StatePhase.BACKSWING
+                return StatePhase.Backswing()
             }
         }
 
-        return StatePhase.CASTING
+        return StatePhase.Casting(true)
     }
 
     private fun affectEntityNearby(casterEntity: BukkitEntity, entity: EEntity): Boolean {
