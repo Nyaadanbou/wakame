@@ -5,15 +5,12 @@ import cc.mewcraft.wakame.ability2.system.AbilityActivator
 import cc.mewcraft.wakame.ability2.system.AbilityRemover
 import cc.mewcraft.wakame.ability2.system.ConsumeManaForAbilities
 import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
-import cc.mewcraft.wakame.ability2.system.InitAbilityState
 import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
-import cc.mewcraft.wakame.ability2.system.RemoveAbility
 import cc.mewcraft.wakame.ability2.system.RenderOnceOffItemName
 import cc.mewcraft.wakame.ability2.system.TickAbilityBlackhole
 import cc.mewcraft.wakame.ability2.system.TickAbilityBlink
 import cc.mewcraft.wakame.ability2.system.TickAbilityDash
 import cc.mewcraft.wakame.ability2.system.TickAbilityMultiJump
-import cc.mewcraft.wakame.ability2.system.TickAbilityPhase
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.system.CountTick
 import cc.mewcraft.wakame.ecs.system.DisplayMana
@@ -86,9 +83,7 @@ internal object KoishFleks : Listener, Fleks {
 
             add(AbilityActivator) // “激活”玩家装备的技能
             add(AbilityRemover) // “移除”玩家装备的技能
-            add(RemoveAbility) // 根据 TickResult 更新 entity
             add(TickElementStack) // 元素特效层数
-            add(InitAbilityState) //  tick 初始化技能的状态
             add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
             add(ManageBossBar) // 显示/移除 boss bar
             add(CountTick) // 记录 entity 存在的 tick 数
@@ -97,7 +92,6 @@ internal object KoishFleks : Listener, Fleks {
             add(TickAbilityDash)
             add(TickAbilityMultiJump)
             add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
-            add(TickAbilityPhase) // 管理技能的当前状态
             add(RenderOnceOffItemName)
 
             add(ApplyEnchantmentEffect) //
