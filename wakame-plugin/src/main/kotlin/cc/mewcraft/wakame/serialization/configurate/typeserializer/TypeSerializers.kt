@@ -2,8 +2,6 @@
 
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
-import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
-import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.DynamicRegistries
@@ -37,8 +35,6 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(RandomizedValueSerializer)
     .register(ExpressionSerializer)
     // Text
-    .register(AudienceMessageGroupSerializer)
-    .register(CombinedAudienceMessageSerializer)
     .register(ComponentSerializer)
     .register(StyleSerializer)
     .register(StyleBuilderApplicableSerializer)

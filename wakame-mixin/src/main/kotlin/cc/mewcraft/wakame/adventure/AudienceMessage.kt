@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.adventure
 import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.item2.network.sendItemName
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.key.Key
@@ -20,6 +21,7 @@ import org.spongepowered.configurate.ConfigurationOptions
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
+import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
 /**
@@ -40,6 +42,12 @@ interface AudienceMessageGroup {
     fun send(audience: Audience, tagResolver: TagResolver = TagResolver.empty())
 
     companion object {
+        @JvmField
+        val SERIALIZER: TypeSerializerCollection = TypeSerializerCollection.builder()
+            .register(AudienceMessageGroupSerializer)
+            .register(CombinedAudienceMessageSerializer)
+            .build()
+
         fun empty(): AudienceMessageGroup = EmptyAudienceMessageGroup
     }
 }
@@ -155,7 +163,7 @@ internal class SoundStopAudienceMessage(
  * (相关设置 ...)
  * ```
  */
-object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessage> {
+private object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessageSerializer.deserialize(type, node)
@@ -181,7 +189,7 @@ object CombinedAudienceMessageSerializer : TypeSerializer2<AudienceMessage> {
     }
 }
 
-object AudienceMessageGroupSerializer : TypeSerializer2<AudienceMessageGroup> {
+private object AudienceMessageGroupSerializer : TypeSerializer2<AudienceMessageGroup> {
     override fun deserialize(type: Type, node: ConfigurationNode): AudienceMessageGroup {
         if (node.rawScalar() != null) {
             return AudienceMessageGroupImpl(listOf(node.require<AudienceMessage>()))
@@ -208,7 +216,7 @@ object AudienceMessageGroupSerializer : TypeSerializer2<AudienceMessageGroup> {
  * "foo"
  * ```
  */
-internal object ChatAudienceMessageSerializer : TypeSerializer2<ChatAudienceMessage> {
+private object ChatAudienceMessageSerializer : TypeSerializer2<ChatAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ChatAudienceMessage {
         if (node.rawScalar() != null) {
             return ChatAudienceMessage(node.require<String>())
@@ -225,7 +233,7 @@ internal object ChatAudienceMessageSerializer : TypeSerializer2<ChatAudienceMess
  * text: "foo"
  * ```
  */
-internal object ActionbarAudienceMessageSerializer : TypeSerializer2<ActionbarAudienceMessage> {
+private object ActionbarAudienceMessageSerializer : TypeSerializer2<ActionbarAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ActionbarAudienceMessage {
         val text = node.node("text").require<String>()
         return ActionbarAudienceMessage(text)
@@ -243,7 +251,7 @@ internal object ActionbarAudienceMessageSerializer : TypeSerializer2<ActionbarAu
  * fade_out: # 单位: 刻
  * ```
  */
-internal object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMessage> {
+private object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): TitleAudienceMessage {
         val title = node.node("title").require<String>()
         val subtitle = node.node("subtitle").require<String>()
@@ -262,7 +270,7 @@ internal object TitleAudienceMessageSerializer : TypeSerializer2<TitleAudienceMe
  * duration: 20 # 可选, 默认: 20
  * ```
  */
-internal object ItemNameAudienceMessageSerializer : TypeSerializer2<ItemNameAudienceMessage> {
+private object ItemNameAudienceMessageSerializer : TypeSerializer2<ItemNameAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): ItemNameAudienceMessage {
         val text = node.node("text").require<String>()
         val duration = node.node("duration").get<Long>(20)
@@ -282,7 +290,7 @@ internal object ItemNameAudienceMessageSerializer : TypeSerializer2<ItemNameAudi
  * emitter: self # 可选, 默认: 'recipient_location', 可用值: 'self', 'recipient_location'
  * ```
  */
-internal object SoundAudienceMessageSerializer : TypeSerializer2<SoundAudienceMessage> {
+private object SoundAudienceMessageSerializer : TypeSerializer2<SoundAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundAudienceMessage {
         // read name
         val name = node.node("name").require<Key>()
@@ -324,7 +332,7 @@ internal object SoundAudienceMessageSerializer : TypeSerializer2<SoundAudienceMe
  * source: "master" # 可选, 默认: MASTER, 可用: https://minecraft.wiki/w/Sound#Categories
  * ```
  */
-internal object SoundStopAudienceMessageSerializer : TypeSerializer2<SoundStopAudienceMessage> {
+private object SoundStopAudienceMessageSerializer : TypeSerializer2<SoundStopAudienceMessage> {
     override fun deserialize(type: Type, node: ConfigurationNode): SoundStopAudienceMessage {
         // read name
         val name = node.node("name").require<Key>()
