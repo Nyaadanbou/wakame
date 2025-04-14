@@ -9,6 +9,7 @@ import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.item.KoishStackImplementations
 import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.item.toNMS
@@ -59,6 +60,13 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             required("damage", DoubleParser.doubleParser(.0, MINECRAFT_KILL_DAMAGE))
             optional("target", MultipleEntitySelectorParser.multipleEntitySelectorParser(false))
             koishHandler(context = Dispatchers.minecraft, handler = ::handleCustomDamage)
+        }
+
+        // <root> debug read_item_ref
+        // 读取手持物品的 ItemRef
+        buildAndAdd(commonBuilder) {
+            literal("read_item_ref")
+            koishHandler(context = Dispatchers.minecraft, handler = ::handleReadItemRef)
         }
     }
 
@@ -116,6 +124,18 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             )
             entity.hurt(damageMetadata = damageMeta, source = sender)
         }
+    }
+
+    private fun handleReadItemRef(context: CommandContext<Source>) {
+        val sender = (context.sender() as PlayerSource).source()
+        val itemInMainHand = sender.inventory.itemInMainHand.takeUnlessEmpty()
+        if (itemInMainHand == null) {
+            sender.sendPlainMessage("No item in your main hand")
+            return
+        }
+
+        val itemRef = ItemRef.checkedItemRef(itemInMainHand)
+        sender.sendPlainMessage("ItemRef: $itemRef")
     }
 
 }

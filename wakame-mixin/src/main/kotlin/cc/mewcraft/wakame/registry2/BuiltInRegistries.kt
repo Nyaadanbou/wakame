@@ -100,13 +100,13 @@ object BuiltInRegistries {
     val ITEM_BEHAVIOR: WritableRegistry<ItemBehavior> = registerSimple(BuiltInRegistryKeys.ITEM_BEHAVIOR) { ItemBehaviorTypes }
 
     /**
-     * [ItemRefHandler] 的实例. 包含来自第三方插件的 [ItemRefHandler].
+     * [ItemRefHandler] 的外部实例. 包含来自第三方物品系统 (如 Brewery) 的 [ItemRefHandler].
      */
     @JvmField
-    val ITEM_REF_HANDLER: WritableRegistry<ItemRefHandler<*>> = registerSimple(BuiltInRegistryKeys.ITEM_REF_HANDLER)
+    val ITEM_REF_HANDLER_EXTERNAL: WritableRegistry<ItemRefHandler<*>> = registerSimple(BuiltInRegistryKeys.ITEM_REF_HANDLER)
 
     /**
-     * [ItemRefHandler] 的内置实例. 只包含 Koish 和 Minecraft 两个 [ItemRefHandler].
+     * [ItemRefHandler] 的内置实例. 只包含 Koish 和 Minecraft 两个系统的 [ItemRefHandler].
      */
     @ApiStatus.Internal
     @JvmField
