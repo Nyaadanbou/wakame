@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame
 
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
@@ -42,7 +41,6 @@ internal class KoishBootstrap : PluginBootstrap {
         startKoin {
             modules(
                 // (按字母顺序)
-                adventureModule(),
                 entityModule(),
                 guiModule(),
                 packModule(),

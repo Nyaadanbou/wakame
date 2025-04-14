@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.lang
 
-import cc.mewcraft.wakame.Injector
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -16,7 +16,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
 import java.text.MessageFormat
 import java.util.*
@@ -45,7 +44,7 @@ object GlobalTranslations : RegistryLoader {
 
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
 
-    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, Injector.get<MiniMessage>())
+    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, MM)
 
     @InitFun
     fun init() {

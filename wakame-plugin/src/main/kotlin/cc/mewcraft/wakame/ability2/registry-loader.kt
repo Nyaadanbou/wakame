@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ability2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
+import cc.mewcraft.wakame.adventure.AudienceMessageGroup
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -49,6 +50,7 @@ internal object AbilityMetaRegistryLoader : RegistryLoader {
             withDefaults()
             serializers {
                 register(AbilityMeta.SERIALIZER)
+                registerAll(AudienceMessageGroup.SERIALIZER)
             }
         }
 
