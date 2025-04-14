@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.TickResult
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.EWorld
@@ -28,25 +28,25 @@ object TickAbilityBlink : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCount].tick
         entity.configure {
-            it += AbilityTickResult(tick(tickCount, entity))
+            entity[Ability].phase = tick(tickCount, entity)
         }
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
+    override fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity
 
         // 如果玩家面前方块过近, 无法传送
         if (bukkitEntity?.getTargetBlockExact(3) != null) {
             bukkitEntity.sendMessage("<dark_red>无法传送至目标位置, 你面前的方块过近".mini)
-            return TickResult.RESET_STATE
+            return StatePhase.RESET
         }
-        return TickResult.ADVANCE_TO_NEXT_STATE
+        return StatePhase.CASTING
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
-        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
+    override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.RESET
         val blink = entity[Blink]
         val location = bukkitEntity.location.clone()
 
@@ -58,7 +58,7 @@ object TickAbilityBlink : IteratingSystem(
 
         // 如果没有找到可传送的方块，那么就不传送
         if (blocks.isEmpty()) {
-            return TickResult.RESET_STATE
+            return StatePhase.RESET
         }
 
         // 遍历所有方块，试图找到第一个可传送的方块
@@ -100,17 +100,17 @@ object TickAbilityBlink : IteratingSystem(
             )
         )
 
-        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+        return StatePhase.BACKSWING
     }
 
     context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, entity: EEntity): TickResult {
+    override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
         val blink = entity[Blink]
         if (!blink.isTeleported) {
             // TODO: 发送取消传送消息
-            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+            return StatePhase.IDLE
         }
         blink.isTeleported = false
-        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+        return StatePhase.IDLE
     }
 }

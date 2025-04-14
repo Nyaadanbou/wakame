@@ -20,5 +20,4 @@ data class Ability(
     override fun type(): EComponentType<Ability> = Ability
 
     var isReadyToRemove: Boolean = false
-    var isMarkNextState: Boolean = false
 }

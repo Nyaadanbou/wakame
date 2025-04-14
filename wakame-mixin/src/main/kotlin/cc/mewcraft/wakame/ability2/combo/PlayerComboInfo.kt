@@ -129,7 +129,7 @@ class PlayerComboInfo(
             if (entity[Ability].metaType != abilityMetaType)
                 return@forEach
             if (entity[Ability].phase == StatePhase.IDLE) {
-                entity[Ability].isMarkNextState = true
+                entity[Ability].phase = StatePhase.CAST_POINT
             }
             entity[ManaCost].penalty = penalty
         }
