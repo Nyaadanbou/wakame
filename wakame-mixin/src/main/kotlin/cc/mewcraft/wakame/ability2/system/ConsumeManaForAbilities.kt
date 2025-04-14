@@ -22,6 +22,8 @@ object ConsumeManaForAbilities : IteratingSystem(
         val caster = entity[CastBy].caster
         if (caster !in Families.BUKKIT_PLAYER)
             return
+        if (!entity[Ability].phase.isCostMana)
+            return
         val player = caster[BukkitPlayer].unwrap()
         val mana = caster[Mana]
         val penalty = entity[ManaCost].penalty
@@ -31,7 +33,7 @@ object ConsumeManaForAbilities : IteratingSystem(
         val manaCost = entity[ManaCost].manaCost.evaluate(engine).toInt()
         if (!mana.costMana(manaCost)) {
             PlayerNotEnoughManaEvent(player, manaCost).callEvent()
-            entity[Ability].phase = StatePhase.RESET
+            entity[Ability].phase = StatePhase.Reset()
         } else {
             penalty.resetCooldown.reset()
             PlayerManaConsumeEvent(player, manaCost).callEvent()

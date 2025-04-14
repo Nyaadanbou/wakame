@@ -3,43 +3,16 @@ package cc.mewcraft.wakame.ability2
 /**
  * 表示技能的执行状态.
  */
-enum class StatePhase {
-    /**
-     * 闲置.
-     */
-    IDLE,
+sealed interface StatePhase {
+    val isCostMana: Boolean
 
-    /**
-     * 施法前摇.
-     */
-    CAST_POINT,
+    class Idle(override val isCostMana: Boolean = false) : StatePhase
 
-    /**
-     * 施法中.
-     */
-    CASTING,
+    class CastPoint(override val isCostMana: Boolean = false) : StatePhase
 
-    /**
-     * 施法后摇.
-     */
-    BACKSWING,
+    class Casting(override val isCostMana: Boolean = false) : StatePhase
 
-    /**
-     * 技能状态重置.
-     */
-    RESET,
-    ;
+    class Backswing(override val isCostMana: Boolean = false) : StatePhase
 
-    /**
-     * 获取当前状态的下一个状态.
-     */
-    fun next(): StatePhase {
-        return when (this) {
-            IDLE -> CAST_POINT
-            CAST_POINT -> CASTING
-            CASTING -> BACKSWING
-            BACKSWING -> RESET
-            RESET -> IDLE
-        }
-    }
+    class Reset(override val isCostMana: Boolean = false) : StatePhase
 }

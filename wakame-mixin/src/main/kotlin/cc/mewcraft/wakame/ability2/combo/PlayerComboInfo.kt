@@ -128,8 +128,8 @@ class PlayerComboInfo(
                 return@forEach
             if (entity[Ability].metaType != abilityMetaType)
                 return@forEach
-            if (entity[Ability].phase == StatePhase.IDLE) {
-                entity[Ability].phase = StatePhase.CAST_POINT
+            if (entity[Ability].phase is StatePhase.Idle) {
+                entity[Ability].phase = StatePhase.CastPoint()
             }
             entity[ManaCost].penalty = penalty
         }

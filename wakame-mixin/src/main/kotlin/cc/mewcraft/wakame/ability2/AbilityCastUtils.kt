@@ -13,9 +13,9 @@ import org.bukkit.entity.Player
 object AbilityCastUtils {
 
     /**
-     * 立马释放技能. 技能的初始状态为 [StatePhase.CAST_POINT].
+     * 立马释放技能. 技能的初始状态为 [StatePhase.CastPoint].
      *
-     * 例如, 立刻发射一个火球, 而不是先使技能进入 [StatePhase.IDLE] 状态再等待玩家输入才进行发射.
+     * 例如, 立刻发射一个火球, 而不是先使技能进入 [StatePhase.Idle] 状态再等待玩家输入才进行发射.
      */
     fun castPoint(
         ability: AbilityMeta,
@@ -24,13 +24,13 @@ object AbilityCastUtils {
     ) {
         val caster = caster.koishify()
         val target = target.koishify()
-        AbilityEcsBridge.createEcsEntities(ability, caster, target, StatePhase.CAST_POINT)
+        AbilityEcsBridge.createEcsEntities(ability, caster, target, StatePhase.CastPoint())
     }
 
     /**
-     * 为玩家"激活"技能. 技能的初始状态为 [StatePhase.IDLE].
+     * 为玩家"激活"技能. 技能的初始状态为 [StatePhase.Idle].
      *
-     * 例如, 玩家手持传送法杖 (进入 [StatePhase.IDLE] 状态), 然后点击右键, 技能就会进入 [StatePhase.CAST_POINT] 状态.
+     * 例如, 玩家手持传送法杖 (进入 [StatePhase.Idle] 状态), 然后点击右键, 技能就会进入 [StatePhase.CastPoint] 状态.
      */
     fun idle(
         ability: AbilityOnItem,
@@ -39,7 +39,7 @@ object AbilityCastUtils {
         slot: ItemSlot,
     ) {
         val target = target.koishify()
-        AbilityEcsBridge.createEcsEntities(ability, caster.koishify(), target, StatePhase.IDLE, slot)
+        AbilityEcsBridge.createEcsEntities(ability, caster.koishify(), target, StatePhase.Idle(), slot)
     }
 
 }

@@ -9,7 +9,7 @@ import com.github.quillraven.fleks.EntityUpdateContext
 interface AbilitySkeleton {
 
     /**
-     * 一般不会在技能中直接进行 [StatePhase.IDLE] 的转换.
+     * 一般不会在技能中直接进行 [StatePhase.Idle] 的转换.
      *
      * @return 下一 tick 的状态.
      */
@@ -17,7 +17,7 @@ interface AbilitySkeleton {
     fun tickIdle(tickCount: Int, entity: EEntity): StatePhase {
         // 默认将技能标记为准备移除.
         entity[Ability].isReadyToRemove = true
-        return StatePhase.IDLE
+        return StatePhase.Idle()
     }
 
     /**
@@ -27,7 +27,7 @@ interface AbilitySkeleton {
      */
     context(EntityUpdateContext)
     fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase =
-        StatePhase.CASTING
+        StatePhase.Casting()
 
     /**
      * 执行此技能的施法时逻辑.
@@ -36,34 +36,34 @@ interface AbilitySkeleton {
      */
     context(EntityUpdateContext)
     fun tickCast(tickCount: Int, entity: EEntity): StatePhase =
-        StatePhase.BACKSWING
+        StatePhase.Backswing()
 
     /**
      * 执行此技能施法后摇逻辑
      */
     context(EntityUpdateContext)
     fun tickBackswing(tickCount: Int, entity: EEntity): StatePhase =
-        StatePhase.RESET
+        StatePhase.Reset()
 
     /**
      * 执行此技能的重置逻辑.
      */
     context(EntityUpdateContext)
     fun tickReset(tickCount: Int, entity: EEntity): StatePhase =
-        StatePhase.IDLE
+        StatePhase.Idle()
 
     context(EntityUpdateContext)
     fun tick(tickCount: Int, entity: EEntity): StatePhase {
         try {
             val ability = entity[Ability]
-            var nextPhase = StatePhase.IDLE
+            var nextPhase: StatePhase = StatePhase.Idle()
             entity.configure {
                 nextPhase = when (ability.phase) {
-                    StatePhase.IDLE -> tickIdle(tickCount, entity)
-                    StatePhase.CAST_POINT -> tickCastPoint(tickCount, entity)
-                    StatePhase.CASTING -> tickCast(tickCount, entity)
-                    StatePhase.BACKSWING -> tickBackswing(tickCount, entity)
-                    StatePhase.RESET -> tickReset(tickCount, entity)
+                    is StatePhase.Idle -> tickIdle(tickCount, entity)
+                    is StatePhase.CastPoint -> tickCastPoint(tickCount, entity)
+                    is StatePhase.Casting -> tickCast(tickCount, entity)
+                    is StatePhase.Backswing -> tickBackswing(tickCount, entity)
+                    is StatePhase.Reset -> tickReset(tickCount, entity)
                 }
             }
 
