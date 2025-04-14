@@ -314,7 +314,7 @@ private object ItemRefManager {
     // 返回符合 predicate 条件的 ItemRefHandler
     private inline fun getHandler(predicate: (ItemRefHandler<*>) -> Boolean): ItemRefHandler<*>? {
         // 先从由外部注册的实例中寻找支持的 handler
-        for (handler in BuiltInRegistries.ITEM_REF_HANDLER) {
+        for (handler in BuiltInRegistries.ITEM_REF_HANDLER_EXTERNAL) {
             if (predicate(handler)) {
                 return handler
             }
