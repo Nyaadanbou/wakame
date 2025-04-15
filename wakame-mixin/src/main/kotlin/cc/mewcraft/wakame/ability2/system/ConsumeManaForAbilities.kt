@@ -37,6 +37,7 @@ object ConsumeManaForAbilities : IteratingSystem(
         } else {
             penalty.resetCooldown.reset()
             PlayerManaConsumeEvent(player, manaCost).callEvent()
+            entity[Ability].phase = entity[Ability].phase.setCostMana(false)
         }
     }
 }
