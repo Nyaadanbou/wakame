@@ -53,10 +53,9 @@ interface AbilitySkeleton {
         StatePhase.Idle()
 
     context(EntityUpdateContext)
-    fun tick(tickCount: Int, entity: EEntity): StatePhase {
+    fun tick(tickCount: Int, phase: StatePhase, entity: EEntity): StatePhase {
         try {
-            val ability = entity[Ability]
-            val nextPhase = when (ability.phase) {
+            val nextPhase = when (phase) {
                 is StatePhase.Idle -> tickIdle(tickCount, entity)
                 is StatePhase.CastPoint -> tickCastPoint(tickCount, entity)
                 is StatePhase.Casting -> tickCast(tickCount, entity)
@@ -67,7 +66,7 @@ interface AbilitySkeleton {
             return nextPhase
         } catch (t: Throwable) {
             val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[Ability].metaType) ?: "Unknown"
-            throw IllegalStateException("在执行 $abilityName 技能时发生了异常", t)
+            throw IllegalStateException("在执行 $abilityName 技能的阶段 $phase 时发生了异常", t)
         }
     }
 }

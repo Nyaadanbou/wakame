@@ -25,7 +25,7 @@ object TickAbilityDash : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCount].tick
         entity.configure {
-            entity[Ability].phase = tick(tickCount, entity)
+            entity[Ability].phase = tick(tickCount, entity[Ability].phase, entity)
         }
     }
 
