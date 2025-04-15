@@ -6,6 +6,14 @@ package cc.mewcraft.wakame.ability2
 sealed interface StatePhase {
     val isCostMana: Boolean
 
+    fun setCostMana(isCostMana: Boolean): StatePhase = when (this) {
+        is Idle -> Idle(isCostMana)
+        is CastPoint -> CastPoint(isCostMana)
+        is Casting -> Casting(isCostMana)
+        is Backswing -> Backswing(isCostMana)
+        is Reset -> Reset(isCostMana)
+    }
+
     class Idle(override val isCostMana: Boolean = false) : StatePhase
 
     class CastPoint(override val isCostMana: Boolean = false) : StatePhase

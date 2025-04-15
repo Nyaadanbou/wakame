@@ -56,15 +56,12 @@ interface AbilitySkeleton {
     fun tick(tickCount: Int, entity: EEntity): StatePhase {
         try {
             val ability = entity[Ability]
-            var nextPhase: StatePhase = StatePhase.Idle()
-            entity.configure {
-                nextPhase = when (ability.phase) {
-                    is StatePhase.Idle -> tickIdle(tickCount, entity)
-                    is StatePhase.CastPoint -> tickCastPoint(tickCount, entity)
-                    is StatePhase.Casting -> tickCast(tickCount, entity)
-                    is StatePhase.Backswing -> tickBackswing(tickCount, entity)
-                    is StatePhase.Reset -> tickReset(tickCount, entity)
-                }
+            val nextPhase = when (ability.phase) {
+                is StatePhase.Idle -> tickIdle(tickCount, entity)
+                is StatePhase.CastPoint -> tickCastPoint(tickCount, entity)
+                is StatePhase.Casting -> tickCast(tickCount, entity)
+                is StatePhase.Backswing -> tickBackswing(tickCount, entity)
+                is StatePhase.Reset -> tickReset(tickCount, entity)
             }
 
             return nextPhase
