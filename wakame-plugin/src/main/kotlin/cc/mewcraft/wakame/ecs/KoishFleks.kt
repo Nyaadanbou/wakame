@@ -87,11 +87,11 @@ internal object KoishFleks : Listener, Fleks {
             add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
             add(ManageBossBar) // 显示/移除 boss bar
             add(CountTick) // 记录 entity 存在的 tick 数
+            add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
             add(TickAbilityBlackhole)
             add(TickAbilityBlink)
             add(TickAbilityDash)
             add(TickAbilityMultiJump)
-            add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
             add(RenderOnceOffItemName)
 
             add(ApplyEnchantmentEffect) //

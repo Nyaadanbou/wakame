@@ -16,7 +16,6 @@ data class MultiJump(
 
     override fun type(): EComponentType<MultiJump> = MultiJump
 
-    val originCount: Int = count
     var cooldown: Long = USE_COOLDOWN
     var isHoldingJump: Boolean = false
     var jumpCount: Int = count
