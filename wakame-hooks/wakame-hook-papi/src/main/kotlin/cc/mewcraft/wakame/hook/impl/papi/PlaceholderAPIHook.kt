@@ -3,8 +3,8 @@ package cc.mewcraft.wakame.hook.impl.papi
 import cc.mewcraft.wakame.BootstrapContexts
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.Mana
-import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.Attributes
+import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
@@ -44,10 +44,11 @@ object PlaceholderAPIHook : PlaceholderExpansion() {
                     .0.toString()
                 }
             }
+
             "attribute" -> {
                 if (paramsList.size < 2)
                     return null
-                val attributeMap = player.koishify()[AttributeMap]
+                val attributeMap = player.attributeContainer
                 val attribute = Attributes.get(paramsList[1]) ?: return null
                 return attributeMap.getValue(attribute).toString()
             }
