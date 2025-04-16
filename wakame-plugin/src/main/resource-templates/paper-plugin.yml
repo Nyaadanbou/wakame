@@ -15,6 +15,9 @@ dependencies:
     BetterHud:
       required: false
       load: OMIT
+    BreweryX:
+      required: false
+      load: BEFORE # Koish 需要访问其 PluginItem 并注册实例
     ChestSort:
       required: false
       load: OMIT

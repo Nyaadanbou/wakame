@@ -83,6 +83,9 @@ data object ItemDataTypes {
         }
     }
 
+    @JvmField
+    val BREW_RECIPE: ItemDataType<String> = typeOf("brew_recipe")
+
     // ------------
     // 方便函数
     // ------------
