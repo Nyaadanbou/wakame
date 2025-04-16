@@ -85,6 +85,13 @@ data object ItemMetaTypes {
     @JvmField
     val COOLDOWN_GROUP: ItemMetaType<MetaCooldownGroup, Identifier> = typeOf("cooldown_group")
 
+    @JvmField
+    val BREW_RECIPE: ItemMetaType<MetaBrewRecipe, String> = typeOf("brew_recipe") {
+        serializers {
+            registerAll(MetaBrewRecipe.SERIALIZERS)
+        }
+    }
+
     // ------------
     // 方便函数
     // ------------
