@@ -2,8 +2,18 @@
 
 package cc.mewcraft.wakame.command
 
-import cc.mewcraft.wakame.command.command.*
+import cc.mewcraft.wakame.command.command.AbilityCommand
+import cc.mewcraft.wakame.command.command.AttributeCommand
+import cc.mewcraft.wakame.command.command.CatalogCommand
+import cc.mewcraft.wakame.command.command.CraftCommand
+import cc.mewcraft.wakame.command.command.DebugCommand
+import cc.mewcraft.wakame.command.command.Item2Command
+import cc.mewcraft.wakame.command.command.ItemCommand
+import cc.mewcraft.wakame.command.command.PluginCommand
+import cc.mewcraft.wakame.command.command.ReforgeCommand
+import cc.mewcraft.wakame.command.command.ResourcepackCommand
 import cc.mewcraft.wakame.command.parser.AbilityMetaParser
+import cc.mewcraft.wakame.command.parser.AttributeParser
 import cc.mewcraft.wakame.command.parser.Item2Parser
 import cc.mewcraft.wakame.command.parser.ItemPathParser
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -34,6 +44,7 @@ internal object KoishCommandManager {
 
             // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
             registerMapping(typeTokenOf<AbilityMetaParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+            registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
             registerMapping(typeTokenOf<ItemPathParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
             registerMapping(typeTokenOf<Item2Parser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
         }

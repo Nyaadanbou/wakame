@@ -22,7 +22,11 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
-import com.github.quillraven.fleks.*
+import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityCreateContext
+import com.github.quillraven.fleks.EntityUpdateContext
+import com.github.quillraven.fleks.World
+import com.github.quillraven.fleks.configureWorld
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
