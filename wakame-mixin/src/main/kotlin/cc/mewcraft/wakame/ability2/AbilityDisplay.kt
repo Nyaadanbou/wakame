@@ -1,5 +1,6 @@
-package cc.mewcraft.wakame.ability2.combo.display
+package cc.mewcraft.wakame.ability2
 
+import cc.mewcraft.wakame.ability2.combo.display.TriggerDisplay
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
@@ -17,8 +18,8 @@ import org.bukkit.entity.Player
 /**
  * 玩家打出的 Combo 的显示器.
  */
-internal object PlayerComboInfoDisplay {
-    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.INSTANCE["ability"]
+object AbilityDisplay {
+    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.Companion.INSTANCE["ability"]
     private val PLAYER_COMBO_CONFIG = GLOBAL_ABILITY_CONFIG.node("display", "player_combo")
 
     private val triggerDisplays: Map<AbilityTrigger, TriggerDisplay> by GLOBAL_ABILITY_CONFIG.entry("display", "triggers")

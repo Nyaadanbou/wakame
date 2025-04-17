@@ -1,10 +1,10 @@
 package cc.mewcraft.wakame.ability2.combo
 
 import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.ability2.AbilityDisplay
 import cc.mewcraft.wakame.ability2.AbilityEcsBridge
 import cc.mewcraft.wakame.ability2.ManaCostPenalty
 import cc.mewcraft.wakame.ability2.StatePhase
-import cc.mewcraft.wakame.ability2.combo.display.PlayerComboInfoDisplay
 import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
@@ -13,12 +13,8 @@ import cc.mewcraft.wakame.ability2.trigger.AbilitySequenceTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.ecs.Families
-import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
-import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
-import cc.mewcraft.wakame.util.event.Events
-import cc.mewcraft.wakame.util.event.Subscription
 import cc.mewcraft.wakame.util.runTaskLater
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
@@ -33,40 +29,17 @@ import java.util.stream.Stream
 class PlayerComboInfo(
     private val uniqueId: UUID,
 ) : Examinable {
-    private val player: Player
-        get() = requireNotNull(SERVER.getPlayer(uniqueId))
-
-    private val manaNoEnoughSubscription: Subscription = Events.subscribe(PlayerNotEnoughManaEvent::class.java)
-        .filter { it.player == player }
-        .handler { PlayerComboInfoDisplay.displayNotEnoughMana(player) }
-
-    private val manaCostSubscription: Subscription = Events.subscribe(PlayerManaConsumeEvent::class.java)
-        .filter { it.player == player }
-        .handler { PlayerComboInfoDisplay.displayManaCost(it.amount, player) }
-
     companion object {
         private const val SEQUENCE_SIZE = 3
         private val SEQUENCE_GENERATION_TRIGGERS = listOf(AbilitySingleTrigger.LEFT_CLICK, AbilitySingleTrigger.RIGHT_CLICK)
     }
 
+    private val player: Player
+        get() = requireNotNull(SERVER.getPlayer(uniqueId))
+
     private val comboSequence: RingBuffer<AbilitySingleTrigger> = RingBuffer(SEQUENCE_SIZE)
     private val manaCostPenalties: MutableMap<AbilityMetaType<*>, ManaCostPenalty> = HashMap()
     private var resetTask: BukkitTask? = null
-
-    fun handleTrigger(trigger: AbilitySingleTrigger) {
-        val singleAbility = player.getAbilityMetasBy(trigger)
-        if (singleAbility.isNotEmpty()) {
-            markNextState(singleAbility)
-            return
-        }
-
-        if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
-            val sequenceAbility = trySequenceAbility(trigger)
-            if (sequenceAbility.isNotEmpty()) {
-                markNextState(sequenceAbility)
-            }
-        }
-    }
 
     private fun markNextState(abilities: List<AbilityMetaType<*>>) {
         abilities.forEach { abilityMeta ->
@@ -88,15 +61,15 @@ class PlayerComboInfo(
         if (hasSequenceTrigger && isValidSequenceStart) {
             comboSequence.write(trigger)
             scheduleResetTask()
-            PlayerComboInfoDisplay.displayProgress(comboSequence.readAll(), player)
+            AbilityDisplay.displayProgress(comboSequence.readAll(), player)
 
             if (comboSequence.isFull()) {
                 val sequence = AbilitySequenceTrigger.of(comboSequence.readAll())
                 val abilities = player.getAbilityMetasBy(sequence)
                 if (abilities.isEmpty()) {
-                    PlayerComboInfoDisplay.displayFailure(comboSequence.readAll(), player)
+                    AbilityDisplay.displayFailure(comboSequence.readAll(), player)
                 } else {
-                    PlayerComboInfoDisplay.displaySuccess(comboSequence.readAll(), player)
+                    AbilityDisplay.displaySuccess(comboSequence.readAll(), player)
                 }
                 clearSequence()
                 return abilities
@@ -135,13 +108,26 @@ class PlayerComboInfo(
         }
     }
 
+    fun handleTrigger(trigger: AbilitySingleTrigger) {
+        val singleAbility = player.getAbilityMetasBy(trigger)
+        if (singleAbility.isNotEmpty()) {
+            markNextState(singleAbility)
+            return
+        }
+
+        if (trigger in SEQUENCE_GENERATION_TRIGGERS) {
+            val sequenceAbility = trySequenceAbility(trigger)
+            if (sequenceAbility.isNotEmpty()) {
+                markNextState(sequenceAbility)
+            }
+        }
+    }
+
     fun clearSequence() {
         comboSequence.clear()
     }
 
     fun cleanup() {
-        manaNoEnoughSubscription.close()
-        manaCostSubscription.close()
         resetTask?.cancel()
     }
 
