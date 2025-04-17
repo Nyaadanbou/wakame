@@ -15,7 +15,7 @@ import java.lang.reflect.Type
 data class AbilityMeta(
     val type: AbilityMetaType<*>,
     val params: Component<*>,
-    val display: AbilityDisplay,
+    val display: AbilityMetaDisplay,
 ) {
     companion object {
         val SERIALIZER: TypeSerializer2<AbilityMeta> = Serializer
@@ -24,11 +24,8 @@ data class AbilityMeta(
     private object Serializer : TypeSerializer2<AbilityMeta> {
         override fun deserialize(type: Type, node: ConfigurationNode): AbilityMeta {
             val metaType = node.node("type").require<AbilityMetaType<*>>()
-            val component = node.get(metaType.typeToken)
-            if (component == null) {
-                throw SerializationException(node, type, "Failed to deserialize $type")
-            }
-            val display = AbilityDisplay.EMPTY // TODO: Deserialize display
+            val component = node.get(metaType.typeToken) ?: throw SerializationException(node, type, "Failed to deserialize $type")
+            val display = node.node("display").require<AbilityMetaDisplay>()
             return AbilityMeta(metaType, component, display)
         }
     }
