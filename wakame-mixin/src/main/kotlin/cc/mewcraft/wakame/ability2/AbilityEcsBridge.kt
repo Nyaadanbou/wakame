@@ -27,10 +27,9 @@ object AbilityEcsBridge {
         slot: ItemSlot?,
     ) {
         val meta = ability.meta.unwrap()
-        val metaType = meta.type
         val entity = Fleks.INSTANCE.createEntity { entity ->
             entity += Ability(
-                metaType = metaType,
+                meta = meta,
                 phase = phase,
                 trigger = ability.trigger,
                 variant = ability.variant,
@@ -45,6 +44,7 @@ object AbilityEcsBridge {
         }
 
         if (caster.has(AbilityContainer)) {
+            val metaType = meta.type
             val container = caster[AbilityContainer]
             container[metaType] = entity
         }
@@ -56,10 +56,9 @@ object AbilityEcsBridge {
         target: KoishEntity,
         phase: StatePhase,
     ) {
-        val metaType = abilityMeta.type
         val entity = Fleks.INSTANCE.createEntity { entity ->
             entity += Ability(
-                metaType = metaType,
+                meta = abilityMeta,
                 phase = phase,
                 trigger = null,
                 variant = AbilityTriggerVariant.any(),
@@ -72,6 +71,7 @@ object AbilityEcsBridge {
         }
 
         if (caster.has(AbilityContainer)) {
+            val metaType = abilityMeta.type
             val container = caster[AbilityContainer]
             container[metaType] = entity
         }

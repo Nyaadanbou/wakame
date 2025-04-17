@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.ability2
 
 import cc.mewcraft.wakame.ability2.combo.display.TriggerDisplay
+import cc.mewcraft.wakame.ability2.meta.AbilityMetaDisplay
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
 import cc.mewcraft.wakame.adventure.AudienceMessageGroup
@@ -16,7 +17,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import org.bukkit.entity.Player
 
 /**
- * 玩家打出的 Combo 的显示器.
+ * 技能相关的显示器.
  */
 object AbilityDisplay {
     private val GLOBAL_ABILITY_CONFIG = ConfigAccess.Companion.INSTANCE["ability"]
@@ -46,12 +47,12 @@ object AbilityDisplay {
         failureMessages.send(audience, triggerTagResolver)
     }
 
-    fun displayManaCost(count: Int, audience: Player) {
-        manaCostMessages.send(audience, Formatter.number("count", count))
+    fun displayManaCost(count: Int, audience: Player, abilityMetaDisplay: AbilityMetaDisplay,) {
+        manaCostMessages.send(audience, TagResolver.resolver(Placeholder.component("ability", abilityMetaDisplay.displayName), Formatter.number("count", count)))
     }
 
-    fun displayNotEnoughMana(audience: Player) {
-        noEnoughManaMessages.send(audience)
+    fun displayNotEnoughMana(audience: Player, abilityMetaDisplay: AbilityMetaDisplay) {
+        noEnoughManaMessages.send(audience, Placeholder.component("ability", abilityMetaDisplay.displayName))
     }
 
     private fun getTriggersTagResolver(triggers: List<AbilitySingleTrigger>, style: (TriggerDisplay) -> Style): TagResolver {

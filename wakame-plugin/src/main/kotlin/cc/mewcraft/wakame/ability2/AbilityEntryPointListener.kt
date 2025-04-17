@@ -47,13 +47,13 @@ internal object AbilityEntryPointListener : Listener {
     @EventHandler
     private fun onManaCost(event: PlayerManaConsumeEvent) {
         val player = event.player
-        AbilityDisplay.displayManaCost(event.amount, player)
+        AbilityDisplay.displayManaCost(event.amount, player, event.ability.display)
     }
 
     @EventHandler
     private fun onNoEnoughMana(event: PlayerNotEnoughManaEvent) {
         val player = event.player
-        AbilityDisplay.displayNotEnoughMana(player)
+        AbilityDisplay.displayNotEnoughMana(player, event.ability.display)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

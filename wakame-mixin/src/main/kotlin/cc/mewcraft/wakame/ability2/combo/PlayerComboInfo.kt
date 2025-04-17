@@ -99,7 +99,7 @@ class PlayerComboInfo(
         Families.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@updateAbilityState)
                 return@forEach
-            if (entity[Ability].metaType != abilityMetaType)
+            if (entity[Ability].meta.type != abilityMetaType)
                 return@forEach
             if (entity[Ability].phase is StatePhase.Idle) {
                 entity[Ability].phase = StatePhase.CastPoint()
