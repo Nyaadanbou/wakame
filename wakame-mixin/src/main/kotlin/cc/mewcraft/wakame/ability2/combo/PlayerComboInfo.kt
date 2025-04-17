@@ -86,7 +86,7 @@ class PlayerComboInfo(
     private fun Player.getAbilityMetasBy(trigger: AbilityTrigger): List<AbilityMetaType<*>> {
         return AbilityEcsBridge.getPlayerAllSingleAbilities(this)
             .filter { it.trigger == trigger }
-            .map { it.metaType }
+            .map { it.meta.type }
     }
 
     private fun Player.getAllActiveTriggers(): Set<AbilityTrigger> {

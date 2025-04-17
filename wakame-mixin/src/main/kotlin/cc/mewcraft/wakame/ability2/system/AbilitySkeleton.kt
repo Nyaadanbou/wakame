@@ -63,7 +63,7 @@ interface AbilitySkeleton {
                 is StatePhase.Reset -> tickReset(tickCount, entity)
             }
         } catch (t: Throwable) {
-            val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[Ability].metaType) ?: "Unknown"
+            val abilityName = BuiltInRegistries.ABILITY_META_TYPE.getKey(entity[Ability].meta.type) ?: "Unknown"
             throw IllegalStateException("在执行 $abilityName 技能的阶段 $phase 时发生了异常", t)
         }
     }

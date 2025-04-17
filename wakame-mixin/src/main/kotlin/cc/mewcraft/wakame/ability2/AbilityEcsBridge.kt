@@ -77,7 +77,7 @@ object AbilityEcsBridge {
         }
     }
 
-    fun getPlayerAllSingleAbilities(player: Player): List<AbilityInfo> {
+    fun getPlayerAllSingleAbilities(player: Player): List<Ability> {
         return player.koishify()[AbilityContainer].convertToSingleAbilityList()
     }
 }
