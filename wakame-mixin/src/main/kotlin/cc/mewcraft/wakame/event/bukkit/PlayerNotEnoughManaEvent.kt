@@ -6,7 +6,6 @@ import org.bukkit.event.player.PlayerEvent
 
 class PlayerNotEnoughManaEvent(
     player: Player,
-    val requiredAmount: Int,
 ) : PlayerEvent(player) {
     override fun getHandlers(): HandlerList {
         return HANDLER_LIST

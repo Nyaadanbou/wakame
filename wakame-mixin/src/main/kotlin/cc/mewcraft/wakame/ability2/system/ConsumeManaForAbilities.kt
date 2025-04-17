@@ -32,7 +32,7 @@ object ConsumeManaForAbilities : IteratingSystem(
         }
         val manaCost = entity[ManaCost].manaCost.evaluate(engine).toInt()
         if (!mana.costMana(manaCost)) {
-            PlayerNotEnoughManaEvent(player, manaCost).callEvent()
+            PlayerNotEnoughManaEvent(player).callEvent()
             entity[Ability].phase = StatePhase.Reset()
         } else {
             penalty.resetCooldown.reset()

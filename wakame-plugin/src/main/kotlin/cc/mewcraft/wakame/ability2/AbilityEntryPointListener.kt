@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.entity.player.combo
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerManaConsumeEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerNotEnoughManaEvent
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -40,6 +42,18 @@ internal object AbilityEntryPointListener : Listener {
     private fun onRightClick(event: PlayerItemRightClickEvent) {
         val player = event.player
         player.combo.handleTrigger(AbilitySingleTrigger.RIGHT_CLICK)
+    }
+
+    @EventHandler
+    private fun onManaCost(event: PlayerManaConsumeEvent) {
+        val player = event.player
+        AbilityDisplay.displayManaCost(event.amount, player)
+    }
+
+    @EventHandler
+    private fun onNoEnoughMana(event: PlayerNotEnoughManaEvent) {
+        val player = event.player
+        AbilityDisplay.displayNotEnoughMana(player)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
