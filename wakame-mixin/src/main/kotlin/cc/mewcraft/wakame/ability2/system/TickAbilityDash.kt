@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ability2.AbilityCastUtils
-import cc.mewcraft.wakame.ability2.TickResult
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.EWorld
@@ -25,21 +25,16 @@ object TickAbilityDash : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCount].tick
         entity.configure {
-            it += AbilityTickResult(tick(tickCount, entity))
+            entity[Ability].phase = tick(tickCount, entity[Ability].phase, entity)
         }
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
-        return TickResult.ADVANCE_TO_NEXT_STATE
-    }
-
-    context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
+    override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val dash = entity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {
             // 超过了执行时间, 直接完成技能
-            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+            return StatePhase.Backswing()
         }
         val bukkitEntity = entity[CastBy].entityOrPlayer()
         val direction = bukkitEntity.location.direction.setY(0).normalize()
@@ -57,7 +52,7 @@ object TickAbilityDash : IteratingSystem(
             if (blockAboveFront.isAccessible() && blockInFront.location.add(0.0, 1.0, 0.0).block.isAccessible()) {
                 stepVector = stepVector.setY(1.0)
             } else {
-                return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+                return StatePhase.Backswing()
             }
         } else {
             stepVector = if (blockBelow.isAccessible()) {
@@ -74,11 +69,11 @@ object TickAbilityDash : IteratingSystem(
 
         if (this.affectEntityNearby(bukkitEntity, entity)) {
             if (!dash.canContinueAfterHit) {
-                return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+                return StatePhase.Backswing()
             }
         }
 
-        return TickResult.CONTINUE_TICK
+        return StatePhase.Casting(true)
     }
 
     private fun affectEntityNearby(casterEntity: BukkitEntity, entity: EEntity): Boolean {

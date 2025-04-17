@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
@@ -23,13 +22,15 @@ import org.bukkit.entity.ThrowableProjectile
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 @Init(stage = InitStage.POST_WORLD)
@@ -209,38 +210,3 @@ internal object ItemBehaviorListener : Listener {
 
 }
 
-@Init(stage = InitStage.POST_WORLD)
-internal object AbilityEntryPointListener : Listener {
-
-    @InitFun
-    fun init() {
-        registerEvents()
-    }
-
-    // ------------
-    // Ability Entry Point
-    // ------------
-
-    // TODO #373: 使用 Player(RL)ClickEvent
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on2(event: PlayerInteractEvent) {
-        val hand = event.hand ?: return
-        val player = event.player
-        if (!player.isInventoryListenable) return
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-
-        when (event.action) {
-            Action.LEFT_CLICK_BLOCK -> AbilityEntryPointHandler.onLeftClickBlock(player, event)
-            Action.LEFT_CLICK_AIR -> AbilityEntryPointHandler.onLeftClickAir(player, event)
-            Action.RIGHT_CLICK_BLOCK -> AbilityEntryPointHandler.onRightClickBlock(player, event)
-            Action.RIGHT_CLICK_AIR -> AbilityEntryPointHandler.onRightClickAir(player, event)
-            else -> return
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on2(event: ProjectileHitEvent) {
-        AbilityEntryPointHandler.onProjectileHit(event.entity, event.hitEntity)
-    }
-
-}

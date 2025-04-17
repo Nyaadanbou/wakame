@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.ability2.component
 
-import cc.mewcraft.wakame.ability2.AbilityInfo
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ecs.bridge.EComponentType
 import cc.mewcraft.wakame.ecs.bridge.KoishEntity
@@ -19,16 +18,9 @@ data class AbilityContainer(
 
     override fun type(): EComponentType<AbilityContainer> = AbilityContainer
 
-    fun convertToSingleAbilityList(): List<AbilityInfo> {
+    fun convertToSingleAbilityList(): List<Ability> {
         val abilityEntities = abilities.values().map(::KoishEntity)
-        val playerAbilities = abilityEntities.map { koishEntity ->
-            val ability = koishEntity[Ability]
-            AbilityInfo(
-                metaType = ability.metaType,
-                trigger = ability.trigger
-            )
-        }
-        return playerAbilities
+        return abilityEntities.map { it[Ability] }
     }
 
     operator fun get(metaType: AbilityMetaType<*>): Collection<Entity> {
