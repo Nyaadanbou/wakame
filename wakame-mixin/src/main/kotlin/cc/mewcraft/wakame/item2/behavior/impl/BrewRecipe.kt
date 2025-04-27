@@ -1,10 +1,16 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.setData
+import cc.mewcraft.wakame.util.adventure.SoundSource
+import cc.mewcraft.wakame.util.adventure.playSound
+import cc.mewcraft.wakame.util.text.arguments
+import io.papermc.paper.registry.keys.SoundEventKeys
+import net.kyori.adventure.sound.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
@@ -21,9 +27,19 @@ object BrewRecipe : ItemBehavior {
     override fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) {
         val itemBrewRecipe = itemstack.getData(ItemDataTypes.BREW_RECIPE)
         if (itemBrewRecipe == null) return
-        if (itemBrewRecipe.learned) return
+        if (itemBrewRecipe.learned) {
+            player.sendMessage(TranslatableMessages.MSG_ALREADY_REVEALED_BREW_RECIPE)
+            return
+        }
         if (hand != EquipmentSlot.HAND) return
+
         itemstack.setData(ItemDataTypes.BREW_RECIPE, itemBrewRecipe.copy(learned = true))
-        player.sendMessage("你学习了酒酿配方: ${itemBrewRecipe.recipeId}")
+
+        player.sendMessage(TranslatableMessages.MSG_REVEALED_BREW_RECIPE.arguments(itemBrewRecipe.recipeId))
+        player.playSound(Sound.Emitter.self()) {
+            type(SoundEventKeys.ITEM_BOOK_PAGE_TURN)
+            source(SoundSource.PLAYER)
+            volume(2f)
+        }
     }
 }
