@@ -25,7 +25,7 @@ interface BrewRecipeRenderer {
     /**
      * 无操作的 [BrewRecipeRenderer] 实现.
      */
-    object NoOp : BrewRecipeRenderer {
+    private object NoOp : BrewRecipeRenderer {
         override fun render(recipe: BrewRecipe): List<Component> = emptyList()
     }
 }

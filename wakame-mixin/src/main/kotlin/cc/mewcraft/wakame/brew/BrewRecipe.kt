@@ -41,17 +41,17 @@ data class BrewRecipe(
 }
 
 /**
- * 酒酿配方的适配器.
+ * 酒酿配方的适配器, 用于将外部的 [T] 转换为 Koish 定义的 [BrewRecipe].
  *
- * 定义该接口只是为了规范实现.
- * 实例应该仅在钩子内部使用, Koish 内部不需要使用该接口.
+ * 该接口的作用仅仅只是为了规范实现, 一般来说只有一个实现.
+ * 其实例应该仅在钩子内部使用, Koish 内部不需要使用该实例.
  */
 interface BrewRecipeAdapter<T> {
     fun adapt(recipe: T): BrewRecipe
 }
 
 /**
- * 酒桶木头类型.
+ * 酒桶木头的类型.
  *
  * 实例创建:
  * 该类型的实例由插件 Brewery 创建.

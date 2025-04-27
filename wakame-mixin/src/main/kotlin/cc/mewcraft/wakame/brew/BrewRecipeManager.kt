@@ -32,7 +32,7 @@ interface BrewRecipeManager : Iterable<BrewRecipe> {
     /**
      * 无操作的 [BrewRecipeManager] 实现.
      */
-    object NoOp : BrewRecipeManager {
+    private object NoOp : BrewRecipeManager {
         override fun get(id: String): BrewRecipe? = null
         override fun random(): BrewRecipe? = null
         override fun iterator(): Iterator<BrewRecipe> = emptyList<BrewRecipe>().iterator()
