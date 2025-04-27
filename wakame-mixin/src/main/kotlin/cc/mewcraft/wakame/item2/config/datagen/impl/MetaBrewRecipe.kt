@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.ItemBrewRecipe
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
@@ -13,6 +14,7 @@ import cc.mewcraft.wakame.util.registerExact
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
+
 
 interface MetaBrewRecipe : ItemMetaEntry<String> {
 
@@ -34,7 +36,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
     }
 
     override fun write(value: String, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.BREW_RECIPE, value)
+        itemstack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
     }
 
     /**

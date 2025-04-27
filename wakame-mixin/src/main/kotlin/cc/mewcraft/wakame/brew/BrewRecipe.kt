@@ -7,8 +7,16 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import org.bukkit.Color
 
-// 我们希望玩家手中的配方物品的 lore 始终能反应最新的配置文件, 因此这里只写一个配方 id.
-// 如果要获取配方的具体内容, 如材料, 其他代码需要使用这里的 id 来获取完整的配方对象.
+/**
+ * 酒酿的配方.
+ *
+ * 实例创建:
+ * 该类型应该由 Brewery 的钩子逻辑创建.
+ *
+ * 实现细节:
+ * - Koish 内部这边仅直接跟该类型交互, 以应对不确定的 Brewery 实现.
+ * - 之所以不直接使用 Brewery 的配方类型是因为有太多不需要的属性和函数.
+ */
 data class BrewRecipe(
     val id: String,
     val name: String,
@@ -21,13 +29,31 @@ data class BrewRecipe(
     val lore: List<String>,
     val ingredients: Map<String, Int>,
     val potionColor: Color?,
-    val customModelData: Int,
-    val rarityWeight: Int,
-)
+) {
+
+    override fun equals(other: Any?): Boolean {
+        return other is BrewRecipe && other.id == this.id
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
+
+/**
+ * 酒酿配方的适配器.
+ *
+ * 定义该接口只是为了规范实现.
+ * 实例应该仅在钩子内部使用, Koish 内部不需要使用该接口.
+ */
+interface BrewRecipeAdapter<T> {
+    fun adapt(recipe: T): BrewRecipe
+}
 
 /**
  * 酒桶木头类型.
  *
+ * 实例创建:
  * 该类型的实例由插件 Brewery 创建.
  *
  * @property formattedName 来自外部的类型名字
@@ -46,7 +72,12 @@ class BarrelWoodType(
         return "BarrelWoodType(formattedName='$formattedName', translatedName='$translatedName')"
     }
 
+    // equals/hashCode 不实现, 使用 object identity 判断相等
+
     companion object {
+
+        @JvmField
+        val NONE: BarrelWoodType = BarrelWoodType("None")
 
         @JvmField
         val REGISTRY: WritableRegistry<BarrelWoodType> = Registry.of("barrel_wood_type")

@@ -14,15 +14,18 @@ interface BrewRecipeRenderer {
 
     companion object {
 
-        private val NO_OP: BrewRecipeRenderer = object : BrewRecipeRenderer {
-            override fun render(recipe: BrewRecipe): List<Component> = emptyList()
-        }
-
-        var INSTANCE: BrewRecipeRenderer = NO_OP
+        var INSTANCE: BrewRecipeRenderer = NoOp
             private set
 
         fun register(instance: BrewRecipeRenderer) {
             INSTANCE = instance
         }
+    }
+
+    /**
+     * 无操作的 [BrewRecipeRenderer] 实现.
+     */
+    object NoOp : BrewRecipeRenderer {
+        override fun render(recipe: BrewRecipe): List<Component> = emptyList()
     }
 }

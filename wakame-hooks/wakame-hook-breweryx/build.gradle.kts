@@ -21,5 +21,6 @@ dependencies {
 
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
+    compileOnly(platform(libs.bom.caffeine))
     compileOnly(local.breweryx)
 }

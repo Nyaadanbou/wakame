@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.CoreContainer
-import cc.mewcraft.wakame.item2.data.impl.ItemId
-import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -84,7 +81,7 @@ data object ItemDataTypes {
     }
 
     @JvmField
-    val BREW_RECIPE: ItemDataType<String> = typeOf("brew_recipe")
+    val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
 
     // ------------
     // 方便函数
