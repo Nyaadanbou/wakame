@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.AbilityEntryPointHandler
 import cc.mewcraft.wakame.entity.player.isInventoryListenable
 import cc.mewcraft.wakame.event.bukkit.*
 import cc.mewcraft.wakame.integration.protection.ProtectionManager
@@ -19,13 +18,15 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Projectile
 import org.bukkit.entity.ThrowableProjectile
 import org.bukkit.event.EventPriority
-import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerInteractAtEntityEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
 import org.bukkit.inventory.ItemStack
 
 //@Init(stage = InitStage.POST_WORLD)
@@ -35,7 +36,6 @@ object ItemListener {
     fun init() {
         registerItemChangeListeners()
         registerItemBehaviorListeners()
-        registerAbilityEntryPointListeners()
     }
 
     /**
@@ -205,27 +205,6 @@ object ItemListener {
             val koishStack = itemStack.wrap() ?: return@event
 
             koishStack.handleConsume(player, itemStack, koishStack, event)
-        }
-    }
-
-    private fun registerAbilityEntryPointListeners() {
-        event<PlayerInteractEvent> { event ->
-            event.hand ?: return@event
-            val player = event.player
-            if (!player.isHandleableByKoish) return@event
-            player.inventory.itemInMainHand.takeUnlessEmpty() ?: return@event
-
-            when (event.action) {
-                Action.LEFT_CLICK_BLOCK -> AbilityEntryPointHandler.onLeftClickBlock(player, event)
-                Action.LEFT_CLICK_AIR -> AbilityEntryPointHandler.onLeftClickAir(player, event)
-                Action.RIGHT_CLICK_BLOCK -> AbilityEntryPointHandler.onRightClickBlock(player, event)
-                Action.RIGHT_CLICK_AIR -> AbilityEntryPointHandler.onRightClickAir(player, event)
-                else -> return@event
-            }
-        }
-
-        event<ProjectileHitEvent> { event ->
-            AbilityEntryPointHandler.onProjectileHit(event.entity, event.hitEntity)
         }
     }
 

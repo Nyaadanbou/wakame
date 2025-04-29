@@ -9,12 +9,23 @@ import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.network.event.*
-import cc.mewcraft.wakame.network.event.clientbound.*
+import cc.mewcraft.wakame.network.event.PacketHandler
+import cc.mewcraft.wakame.network.event.PacketListener
+import cc.mewcraft.wakame.network.event.PlayerPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetContentPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundContainerSetSlotPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundMerchantOffersPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
+import cc.mewcraft.wakame.network.event.clientbound.ClientboundSystemChatPacketEvent
+import cc.mewcraft.wakame.network.event.registerPacketListener
+import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.getOrThrow
 import cc.mewcraft.wakame.util.item.editNbt
-import cc.mewcraft.wakame.util.item.fastUpdate
 import cc.mewcraft.wakame.util.item.isNetworkRewrite
 import cc.mewcraft.wakame.util.registerEvents
 import cc.mewcraft.wakame.util.unregisterEvents
@@ -25,16 +36,19 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
 import net.minecraft.core.component.DataComponentPredicate
-import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
-import net.minecraft.nbt.ByteTag
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData.DataValue
-import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.crafting.Ingredient
-import net.minecraft.world.item.crafting.display.*
+import net.minecraft.world.item.crafting.display.FurnaceRecipeDisplay
+import net.minecraft.world.item.crafting.display.RecipeDisplay
+import net.minecraft.world.item.crafting.display.RecipeDisplayEntry
+import net.minecraft.world.item.crafting.display.ShapedCraftingRecipeDisplay
+import net.minecraft.world.item.crafting.display.ShapelessCraftingRecipeDisplay
+import net.minecraft.world.item.crafting.display.SlotDisplay
+import net.minecraft.world.item.crafting.display.SmithingRecipeDisplay
+import net.minecraft.world.item.crafting.display.StonecutterRecipeDisplay
 import net.minecraft.world.item.trading.ItemCost
 import net.minecraft.world.item.trading.MerchantOffer
 import net.minecraft.world.item.trading.MerchantOffers
@@ -309,9 +323,6 @@ internal object ItemStackRender : PacketListener, Listener {
 
         // 移除任意物品的 PDC
         copy.editNbt { nbt ->
-            if (nbt.contains(PDC_FIELD)) {
-                processed = true
-            }
             nbt.remove(PDC_FIELD)
         }
 
@@ -328,24 +339,4 @@ internal object ItemStackRender : PacketListener, Listener {
 
         return copy
     }
-
-    private const val PROCESSED_FIELD = "processed"
-
-    private var MojangStack.processed: Boolean
-        get() = get(DataComponents.CUSTOM_DATA)?.contains(PROCESSED_FIELD) == true
-        set(value) {
-            fastUpdate(
-                type = DataComponents.CUSTOM_DATA,
-                default = { CustomData.of(CompoundTag()) },
-                applier = { customData ->
-                    customData.update { nbt ->
-                        if (value) {
-                            nbt.put(PROCESSED_FIELD, ByteTag.ZERO)
-                        } else {
-                            nbt.remove(PROCESSED_FIELD)
-                        }
-                    }
-                }
-            )
-        }
 }

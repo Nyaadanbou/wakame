@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.lang
 
-import cc.mewcraft.wakame.Injector
-import cc.mewcraft.wakame.adventure.AudienceMessageGroupSerializer
-import cc.mewcraft.wakame.adventure.CombinedAudienceMessageSerializer
+import cc.mewcraft.wakame.MM
 import cc.mewcraft.wakame.adventure.translator.MiniMessageTranslationRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -10,7 +8,6 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
 import net.kyori.adventure.audience.Audience
@@ -19,7 +16,6 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TranslatableComponent
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.translation.GlobalTranslator
 import java.text.MessageFormat
 import java.util.*
@@ -44,11 +40,8 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 @Init(stage = InitStage.PRE_WORLD)
 @Reload
 object GlobalTranslations : RegistryLoader {
-    private const val DIR_PATH = "lang/"
-
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
-
-    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, Injector.get<MiniMessage>())
+    private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, MM)
 
     @InitFun
     fun init() {
@@ -72,13 +65,9 @@ object GlobalTranslations : RegistryLoader {
 
     private fun loadDataIntoRegistry() {
         // Load translation
-        val dataDirectory = getFileInDataDirectory(DIR_PATH)
+        val dataDirectory = getFileInDataDirectory("lang/")
         val loaderBuilder = yamlLoader {
             withDefaults()
-            serializers {
-                register(AudienceMessageGroupSerializer)
-                register(CombinedAudienceMessageSerializer)
-            }
         }
         val allLocales = Locale.getAvailableLocales()
         for (locale in allLocales) {

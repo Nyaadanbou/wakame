@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ability2.system
 
-import cc.mewcraft.wakame.ability2.TickResult
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.EWorld
@@ -25,30 +25,30 @@ object TickAbilityBlackhole : IteratingSystem(
     override fun onTickEntity(entity: Entity) {
         val tickCount = entity[TickCount].tick
         entity.configure {
-            it += AbilityTickResult(tick(tickCount, entity))
+            entity[Ability].phase = tick(tickCount, entity[Ability].phase, entity)
         }
     }
 
     context(EntityUpdateContext)
-    override fun tickCastPoint(tickCount: Int, entity: EEntity): TickResult {
-        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return TickResult.RESET_STATE
+    override fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase {
+        val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.Reset()
         val blackhole = entity[Blackhole]
 
         // 设置技能选定的位置
-        val rayTraceResult = bukkitEntity.rayTraceBlocks(16.0) ?: return TickResult.RESET_STATE
+        val rayTraceResult = bukkitEntity.rayTraceBlocks(16.0) ?: return StatePhase.Reset()
         val targetLocation = rayTraceResult.hitPosition.toLocation(bukkitEntity.world)
         rayTraceResult.hitBlockFace?.let { blackhole.holeDirection = it }
         blackhole.holeCenter = targetLocation
 
-        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+        return StatePhase.Casting()
     }
 
     context(EntityUpdateContext)
-    override fun tickCast(tickCount: Int, entity: EEntity): TickResult {
+    override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val caster = entity[CastBy].entityOrPlayer()
         val blackhole = entity[Blackhole]
         val mochaEngine = entity[Ability].mochaEngine
-        val targetLocation = blackhole.holeCenter ?: return TickResult.RESET_STATE
+        val targetLocation = blackhole.holeCenter ?: return StatePhase.Reset()
         val radius = blackhole.radius.evaluate(mochaEngine)
         val damage = blackhole.damage.evaluate(mochaEngine)
 
@@ -68,7 +68,7 @@ object TickAbilityBlackhole : IteratingSystem(
         }
 
         if (tickCount >= blackhole.duration.evaluate(mochaEngine)) {
-            return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+            return StatePhase.Backswing()
         }
 
         if (tickCount % 10 == 0) {
@@ -109,20 +109,15 @@ object TickAbilityBlackhole : IteratingSystem(
             )
         }
 
-        return TickResult.CONTINUE_TICK
+        return StatePhase.Casting(true)
     }
 
     context(EntityUpdateContext)
-    override fun tickBackswing(tickCount: Int, entity: EEntity): TickResult {
-        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
-    }
-
-    context(EntityUpdateContext)
-    override fun tickReset(tickCount: Int, entity: EEntity): TickResult {
+    override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
         val blackhole = entity[Blackhole]
         blackhole.holeDirection = BlockFace.UP
         blackhole.holeCenter = null
         entity -= ParticleEffect
-        return TickResult.ADVANCE_TO_NEXT_STATE_NO_CONSUME
+        return StatePhase.Idle()
     }
 }

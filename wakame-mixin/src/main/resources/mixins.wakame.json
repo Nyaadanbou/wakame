@@ -10,7 +10,6 @@
     "InvokerEnchantmentEffectComponents",
     "InvokerLootPoolEntries",
     "InvokerRegistryData",
-    "MixinAbstractContainerMenu",
     "MixinCraftEntityType",
     "MixinDataComponents",
     "MixinEnchantmentEffectComponents",

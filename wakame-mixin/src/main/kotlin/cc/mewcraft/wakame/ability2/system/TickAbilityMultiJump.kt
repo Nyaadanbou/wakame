@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.ability2.system
 
+import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.*
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaTypes
 import cc.mewcraft.wakame.ecs.bridge.EEntity
@@ -14,6 +15,7 @@ import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
 import cc.mewcraft.wakame.ecs.system.ListenableIteratingSystem
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
+import com.github.quillraven.fleks.EntityUpdateContext
 import io.papermc.paper.math.Position
 import org.bukkit.Particle
 import org.bukkit.block.BlockFace
@@ -24,15 +26,54 @@ import org.bukkit.event.player.PlayerMoveEvent
 
 object TickAbilityMultiJump : ListenableIteratingSystem(
     family = EWorld.family { all(Ability, CastBy, TargetTo, TickCount, MultiJump) }
-) {
+), AbilitySkeleton {
     override fun onTickEntity(entity: Entity) {
+        val tickCount = entity[TickCount].tick
+        entity.configure {
+            entity[Ability].phase = tick(tickCount, entity[Ability].phase, entity)
+        }
+    }
+
+    context(EntityUpdateContext)
+    override fun tickIdle(tickCount: Int, entity: EEntity): StatePhase {
         entity[Ability].isReadyToRemove = true
-        val multijump = entity[MultiJump]
-        if (multijump.cooldown > 0) {
-            multijump.cooldown--
+        val multiJump = entity[MultiJump]
+        if (multiJump.cooldown > 0) {
+            multiJump.cooldown--
+            return StatePhase.Idle()
         }
         val player = entity[CastBy].player()
-        multijump.isHoldingJump = player.currentInput.isJump
+        multiJump.isHoldingJump = player.currentInput.isJump
+        return StatePhase.Idle()
+    }
+
+    context(EntityUpdateContext)
+    override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
+        val multijump = entity[MultiJump]
+        val player = entity[CastBy].player()
+        multijump.cooldown = MultiJump.USE_COOLDOWN
+
+        // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
+        val direction = player.location.direction.normalize()
+        player.velocity = player.velocity.add(direction.multiply(0.3)).setY(0.6)
+
+        // 减少跳跃次数.
+        multijump.jumpCount--
+
+        // 播放粒子特效.
+        playParticle(player, entity)
+        // 发送跳跃消息.
+        multijump.jumpedMessages.send(player)
+
+        return StatePhase.Idle()
+    }
+
+    context(EntityUpdateContext)
+    override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
+        val multiJump = entity[MultiJump]
+        multiJump.jumpCount = multiJump.count
+        multiJump.isHoldingJump = false
+        return StatePhase.Idle()
     }
 
     @EventHandler
@@ -41,6 +82,9 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
         val playerEntity = player.koishify().unwrap()
         val multijumpEntities = playerEntity[AbilityContainer][AbilityMetaTypes.MULTI_JUMP]
         for (multijumpEntity in multijumpEntities) {
+            val ability = multijumpEntity[Ability]
+            if (ability.phase !is StatePhase.Idle)
+                continue
             val multijump = multijumpEntity[MultiJump]
             if (multijump.jumpCount <= 0)
                 continue
@@ -53,19 +97,7 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
             if (!event.input.isJump)
                 continue
 
-            multijump.cooldown = MultiJump.USE_COOLDOWN
-
-            // 进行额外的跳跃效果, 也就是让玩家在跳跃的时候额外的向上移动一段距禽.
-            val direction = player.location.direction.normalize()
-            player.velocity = player.velocity.add(direction.multiply(0.3)).setY(0.6)
-
-            // 减少跳跃次数.
-            multijump.jumpCount--
-
-            // 播放粒子特效.
-            playParticle(player, multijumpEntity)
-            // 发送跳跃消息.
-            multijump.jumpedMessages.send(player)
+            multijumpEntity[Ability].phase = StatePhase.Casting(true)
         }
     }
 
@@ -79,7 +111,7 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
             val multiJump = multijumpEntity[MultiJump]
             if (multiJump.jumpCount > 0)
                 continue
-            multiJump.jumpCount = multiJump.originCount
+            multijumpEntity[Ability].phase = StatePhase.Reset()
         }
     }
 

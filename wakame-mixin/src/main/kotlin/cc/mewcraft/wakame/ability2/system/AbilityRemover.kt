@@ -44,7 +44,7 @@ object AbilityRemover : IteratingSystem(
     }
 
     private fun removeAbilityEntity(entity: Entity) {
-        entity[CastBy].caster[AbilityContainer].remove(entity[Ability].metaType, entity)
+        entity[CastBy].caster[AbilityContainer].remove(entity[Ability].meta.type, entity)
         entity.remove()
     }
 }

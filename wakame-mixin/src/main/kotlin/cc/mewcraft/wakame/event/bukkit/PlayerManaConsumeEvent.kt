@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame.event.bukkit
 
+import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 
 class PlayerManaConsumeEvent(
     player: Player,
+    val ability: AbilityMeta,
     val amount: Int,
 ) : PlayerEvent(player) {
     override fun getHandlers(): HandlerList {

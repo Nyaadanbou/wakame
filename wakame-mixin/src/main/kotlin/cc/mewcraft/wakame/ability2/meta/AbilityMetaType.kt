@@ -6,12 +6,11 @@ import org.spongepowered.configurate.serialize.TypeSerializer
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
 /**
- * 代表一个技能的类型.
+ * 代表一个技能的类型 (技能类型).
  *
- * 技能类型可看成数据模板, 仅包含 *待定* 的参数, 本身无法直接运行.
- * 在实际使用当中, 用户通过创建配置文件的方式来"实例化"一个技能的类型,
- * 即 "填充了参数的技能类型" ([AbilityMeta]).
- * 这些填充了参数的技能类型, 之后便可在游戏当中直接运行.
+ * 技能类型可看成数据模板, 仅包含 **待定** 的参数, 本身无法直接运行.
+ * 实际使用时, 用户通过创建配置文件的方式来"实例化"一个技能类型, 即 "填充了参数的技能" ([AbilityMeta]).
+ * 之后便可在游戏当中, 直接运行这些填充了参数的技能类型.
  */
 sealed interface AbilityMetaType<T : Component<T>> {
 
