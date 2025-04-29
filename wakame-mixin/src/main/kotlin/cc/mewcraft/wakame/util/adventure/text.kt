@@ -1,16 +1,22 @@
 package cc.mewcraft.wakame.util.adventure
 
+import cc.mewcraft.wakame.MM
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.ComponentBuilder
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextColor
 import net.kyori.adventure.text.format.TextDecoration
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
 import net.minecraft.nbt.StringTag
+import org.bukkit.ChatColor
 import java.awt.Color
+
 
 fun Component.toJson(): String {
     return GsonComponentSerializer.gson().serialize(this)
@@ -40,6 +46,33 @@ val Component.removeItalic: Component
 val List<Component>.removeItalic: List<Component>
     get() = map(Component::removeItalic)
 
+private val legacyComponentSerializer: LegacyComponentSerializer = LegacyComponentSerializer.builder()
+    .hexColors()
+    .useUnusualXRepeatedCharacterHexFormat()
+    .extractUrls()
+    .build()
+private val newlineRegex: Regex = "(?<!\\\\)\\\\n".toRegex()
+private val escapedAngleBracketRegex: Regex = "\\\\<".toRegex()
+private val legacyMiniMessage: MiniMessage = MiniMessage.builder()
+    .preProcessor { input ->
+        val input2: String = ChatColor.translateAlternateColorCodes('&', input).replace(newlineRegex, "\n")
+        val input3: TextComponent = legacyComponentSerializer.deserialize(input2)
+        val input4: String = MM.serialize(input3)
+        input4.replace(escapedAngleBracketRegex, "<")
+    }
+    .build()
+
+val String.legacyMini: Component
+    get() = legacyMiniMessage.deserialize(this)
+
+val String.legacy: Component
+    get() = legacyComponentSerializer.deserialize(this)
+
+val List<String>.legacyMini: List<Component>
+    get() = map(legacyMiniMessage::deserialize)
+
+val List<String>.legacy: List<Component>
+    get() = map(legacyComponentSerializer::deserialize)
 
 fun <C : BuildableComponent<C, B>, B : ComponentBuilder<C, B>> ComponentBuilder<C, B>.font(font: String): B {
     return font(Key.key(font))

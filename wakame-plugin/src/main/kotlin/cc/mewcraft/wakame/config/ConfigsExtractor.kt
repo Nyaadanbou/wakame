@@ -16,6 +16,7 @@ internal object ConfigsExtractor {
     private val FILES_TO_EXTRACT: List<String> = listOf(
         "ability.yml",
         "attributes.yml",
+        "brewery/config.yml",
         "config.yml",
         "damage/config.yml",
         "damage/attack_characteristics_mappings.yml",

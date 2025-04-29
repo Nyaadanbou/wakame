@@ -1,0 +1,13 @@
+lore_format:
+  - "配方名字: <name>"
+  - "配方难度: <difficulty>"
+  - "烹饪时间: <cooking_time>"
+  - "蒸馏次数: <distill_runs>"
+  - "蒸馏时间: <distill_time>"
+  - "陈酿天数: <age>"
+  - "木桶类型: <barrel_type>"
+  - ""
+  - "{lore}"
+  - ""
+  - "材料列表:"
+  - "{ingredient}"

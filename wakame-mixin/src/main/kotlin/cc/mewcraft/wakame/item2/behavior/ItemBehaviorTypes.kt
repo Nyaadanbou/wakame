@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
+import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -27,6 +28,12 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val HOLD_LAST_DAMAGE = typeOf("hold_last_damage", HoldLastDamage)
+
+    /**
+     * 当物品是未学习的酒酿配方时, 物品所具有的逻辑.
+     */
+    @JvmField
+    val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
     /**
      * 作为斧的逻辑.
