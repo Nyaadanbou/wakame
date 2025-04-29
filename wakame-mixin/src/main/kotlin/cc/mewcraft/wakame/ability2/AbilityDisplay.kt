@@ -20,11 +20,12 @@ import org.bukkit.entity.Player
  * 技能相关的显示器.
  */
 object AbilityDisplay {
-    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.Companion.INSTANCE["ability"]
+    // Nodes
+    private val GLOBAL_ABILITY_CONFIG = ConfigAccess.INSTANCE["ability"]
     private val PLAYER_COMBO_CONFIG = GLOBAL_ABILITY_CONFIG.node("display", "player_combo")
 
+    // Entries
     private val triggerDisplays: Map<AbilityTrigger, TriggerDisplay> by GLOBAL_ABILITY_CONFIG.entry("display", "triggers")
-
     private val connector: Component by PLAYER_COMBO_CONFIG.entry("connector")
     private val successMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("success_message")
     private val failureMessages: AudienceMessageGroup by PLAYER_COMBO_CONFIG.entry("failure_message")

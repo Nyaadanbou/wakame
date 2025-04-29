@@ -40,10 +40,7 @@ fun List<ComponentLike>.translate(viewer: Audience): List<Component> = map { it.
 @Init(stage = InitStage.PRE_WORLD)
 @Reload
 object GlobalTranslations : RegistryLoader {
-    private const val DIR_PATH = "lang/"
-
     private val TRANSLATION_KEY = Key.key("wakame", "global.translation")
-
     private val translations: MiniMessageTranslationRegistry = MiniMessageTranslationRegistry.create(TRANSLATION_KEY, MM)
 
     @InitFun
@@ -68,7 +65,7 @@ object GlobalTranslations : RegistryLoader {
 
     private fun loadDataIntoRegistry() {
         // Load translation
-        val dataDirectory = getFileInDataDirectory(DIR_PATH)
+        val dataDirectory = getFileInDataDirectory("lang/")
         val loaderBuilder = yamlLoader {
             withDefaults()
         }

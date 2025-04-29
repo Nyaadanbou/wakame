@@ -33,31 +33,31 @@ internal object AbilityEntryPointListener : Listener {
     // ------------
 
     @EventHandler
-    private fun onLeftClickItem(event: PlayerItemLeftClickEvent) {
+    fun onLeftClickItem(event: PlayerItemLeftClickEvent) {
         val player = event.player
         player.combo.handleTrigger(AbilitySingleTrigger.LEFT_CLICK)
     }
 
     @EventHandler
-    private fun onRightClick(event: PlayerItemRightClickEvent) {
+    fun onRightClickItem(event: PlayerItemRightClickEvent) {
         val player = event.player
         player.combo.handleTrigger(AbilitySingleTrigger.RIGHT_CLICK)
     }
 
     @EventHandler
-    private fun onManaCost(event: PlayerManaConsumeEvent) {
+    fun onManaCost(event: PlayerManaConsumeEvent) {
         val player = event.player
         AbilityDisplay.displayManaCost(event.amount, player, event.ability.display)
     }
 
     @EventHandler
-    private fun onNoEnoughMana(event: PlayerNotEnoughManaEvent) {
+    fun onNotEnoughMana(event: PlayerNotEnoughManaEvent) {
         val player = event.player
         AbilityDisplay.displayNotEnoughMana(player, event.ability.display)
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    private fun onProjectileHit(event: ProjectileHitEvent) {
+    fun onProjectileHit(event: ProjectileHitEvent) {
         val projectile = event.entity
         val hitEntity = event.hitEntity
         when (projectile) {

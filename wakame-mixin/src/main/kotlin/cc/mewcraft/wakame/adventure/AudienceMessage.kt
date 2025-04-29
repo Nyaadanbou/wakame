@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.adventure
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.item2.network.sendItemName
+import cc.mewcraft.wakame.item2.network.sendItemNameChangeInMainHand
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.require
@@ -110,7 +110,7 @@ internal class ItemNameAudienceMessage(
         val component = MM.deserialize(text, tagResolver)
         if (audience !is Player)
             return
-        audience.sendItemName(component, duration)
+        audience.sendItemNameChangeInMainHand(component, duration)
     }
 }
 
