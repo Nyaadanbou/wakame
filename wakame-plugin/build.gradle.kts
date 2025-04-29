@@ -21,7 +21,6 @@ dependencies {
     compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
     compileOnlyApi(project(":wakame-common")) // 同上
     compileOnlyApi(project(":wakame-mixin")) // 同上
-    compileOnly(project(":wakame-mixin"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))

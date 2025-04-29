@@ -25,7 +25,7 @@ data class BrewRecipe(
     val distillRuns: Int,
     val distillTime: Int,
     val age: Int,
-    val woodType: BarrelWoodType,
+    val barrelType: BarrelWoodType,
     val lore: List<String>,
     val ingredients: Map<String, Int>,
     val potionColor: Color?,

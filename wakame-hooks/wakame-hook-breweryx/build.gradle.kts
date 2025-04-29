@@ -7,6 +7,7 @@ plugins {
 version = "0.0.1"
 
 repositories {
+    nyaadanbouReleases()
     nyaadanbouPrivate()
     maven {
         name = "jsinco"
@@ -15,6 +16,9 @@ repositories {
 }
 
 dependencies {
+    // master
+    compileOnly(local.breweryx)
+
     // internal
     compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
@@ -22,5 +26,6 @@ dependencies {
     // libraries
     paperweight.paperDevBundle(local.versions.paper)
     compileOnly(platform(libs.bom.caffeine))
-    compileOnly(local.breweryx)
+    compileOnly(platform(libs.bom.configurate.yaml))
+    compileOnly(local.commons.provider)
 }

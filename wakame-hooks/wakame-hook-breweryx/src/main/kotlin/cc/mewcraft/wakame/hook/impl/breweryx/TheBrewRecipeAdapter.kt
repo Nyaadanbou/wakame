@@ -20,9 +20,13 @@ object TheBrewRecipeAdapter : BrewRecipeAdapter<BRecipe> {
             distillTime = recipe.distillTime,
             distillRuns = recipe.distillruns.toInt(),
             age = recipe.age,
-            woodType = BarrelWoodType.REGISTRY.get(recipe.wood.index) ?: BarrelWoodType.NONE,
-            lore = recipe.lore?.map { it.second() } ?: emptyList(),
-            ingredients = recipe.ingredients.associate { it.configId to it.amount },
+            barrelType = BarrelWoodType.REGISTRY.get(recipe.wood.index) ?: BarrelWoodType.NONE,
+            lore = recipe.lore?.map { tuple -> tuple.second() } ?: emptyList(),
+            ingredients = recipe.ingredients.associate { recipeItem ->
+                val configString = recipeItem.toConfigString() // something like "dirt/1", "stone/2"
+                val (item, amount) = configString.split("/")
+                Pair(item, amount.toInt())
+            },
             potionColor = recipe.color.color,
         )
     }

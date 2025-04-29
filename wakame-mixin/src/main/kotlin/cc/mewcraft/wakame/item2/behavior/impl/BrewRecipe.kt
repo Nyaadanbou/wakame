@@ -1,6 +1,8 @@
 package cc.mewcraft.wakame.item2.behavior.impl
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.brewery.BrewRecipeManager
+import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -34,6 +36,13 @@ object BrewRecipe : ItemBehavior {
         if (hand != EquipmentSlot.HAND) return
 
         itemstack.setData(ItemDataTypes.BREW_RECIPE, itemBrewRecipe.copy(learned = true))
+
+        val recipeId = itemBrewRecipe.recipeId
+        val recipe = BrewRecipeManager.INSTANCE.get(recipeId)
+        if (recipe != null) {
+            val lore = BrewRecipeRenderer.INSTANCE.render(recipe)
+            lore.forEach { line -> player.sendMessage(line) }
+        }
 
         player.sendMessage(TranslatableMessages.MSG_REVEALED_BREW_RECIPE.arguments(itemBrewRecipe.recipeId))
         player.playSound(Sound.Emitter.self()) {
