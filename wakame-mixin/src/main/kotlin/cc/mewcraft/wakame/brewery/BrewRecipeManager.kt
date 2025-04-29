@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.brew
+package cc.mewcraft.wakame.brewery
 
 /**
  * 管理 [BrewRecipe].

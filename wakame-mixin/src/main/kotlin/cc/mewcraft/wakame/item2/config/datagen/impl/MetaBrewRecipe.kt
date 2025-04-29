@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.brew.BrewRecipeManager
+import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult

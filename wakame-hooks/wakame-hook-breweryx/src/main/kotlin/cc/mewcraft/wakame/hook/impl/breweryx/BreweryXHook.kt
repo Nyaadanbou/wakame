@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.brew.BrewRecipeManager
-import cc.mewcraft.wakame.brew.BrewRecipeRenderer
+import cc.mewcraft.wakame.brewery.BrewRecipeManager
+import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
 import cc.mewcraft.wakame.integration.Hook
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItemRefHandler
@@ -15,7 +15,7 @@ import com.dre.brewery.recipe.PluginItem
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import cc.mewcraft.wakame.brew.BarrelWoodType as KBarrelWoodType
+import cc.mewcraft.wakame.brewery.BarrelWoodType as KBarrelWoodType
 
 @Hook(plugins = ["BreweryX"])
 object BreweryXHook {

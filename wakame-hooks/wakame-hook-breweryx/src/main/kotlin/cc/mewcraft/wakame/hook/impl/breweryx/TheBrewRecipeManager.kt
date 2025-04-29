@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.brew.BrewRecipe
-import cc.mewcraft.wakame.brew.BrewRecipeManager
+import cc.mewcraft.wakame.brewery.BrewRecipe
+import cc.mewcraft.wakame.brewery.BrewRecipeManager
 import com.dre.brewery.recipe.BRecipe
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache

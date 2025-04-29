@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.brew.BarrelWoodType
-import cc.mewcraft.wakame.brew.BrewRecipe
-import cc.mewcraft.wakame.brew.BrewRecipeAdapter
+import cc.mewcraft.wakame.brewery.BarrelWoodType
+import cc.mewcraft.wakame.brewery.BrewRecipe
+import cc.mewcraft.wakame.brewery.BrewRecipeAdapter
 import com.dre.brewery.recipe.BRecipe
 
 

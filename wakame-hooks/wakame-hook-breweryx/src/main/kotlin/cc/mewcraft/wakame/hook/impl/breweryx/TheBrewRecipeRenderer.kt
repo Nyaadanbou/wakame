@@ -1,7 +1,11 @@
 package cc.mewcraft.wakame.hook.impl.breweryx
 
-import cc.mewcraft.wakame.brew.BrewRecipe
-import cc.mewcraft.wakame.brew.BrewRecipeRenderer
+import cc.mewcraft.wakame.brewery.BrewRecipe
+import cc.mewcraft.wakame.brewery.BrewRecipeRenderer
+import cc.mewcraft.wakame.config.ConfigAccess
+import cc.mewcraft.wakame.config.entry
+import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
+import cc.mewcraft.wakame.util.text.mini
 import net.kyori.adventure.text.Component
 
 

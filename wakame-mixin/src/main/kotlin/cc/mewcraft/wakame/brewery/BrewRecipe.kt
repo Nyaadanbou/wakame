@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.brew
+package cc.mewcraft.wakame.brewery
 
 import cc.mewcraft.wakame.registry2.Registry
 import cc.mewcraft.wakame.registry2.WritableRegistry
