@@ -59,8 +59,8 @@ internal object DamageListener : Listener {
 
         val postprocessEvent = PostprocessDamageEvent(damageMetadata, finalDamageMap, event)
         if (!postprocessEvent.callEvent()) {
-            // 萌芽伤害事件被取消, 则直接返回
-            // 萌芽伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
+            // Koish 伤害事件被取消, 则直接返回
+            // Koish 伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
             return
         }
 

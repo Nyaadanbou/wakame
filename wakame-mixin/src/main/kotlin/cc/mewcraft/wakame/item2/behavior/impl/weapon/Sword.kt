@@ -17,6 +17,9 @@ import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 
+/**
+ * 剑的物品行为.
+ */
 object Sword : Weapon {
 
     override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
@@ -25,7 +28,6 @@ object Sword : Weapon {
 
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         if (itemstack.isOnCooldown(player)) return
-        // TODO #349: 触发 pre damage event
         // 造成伤害
         val attrContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attrContainer) {
@@ -52,14 +54,4 @@ object Sword : Weapon {
         }
         wrappedEvent.actionPerformed = true
     }
-
-    // 如果武器都是“凭空”产生的攻击, 那么也就不需要处理原版攻击所损耗的耐久了
-    //override fun handleDamage(player: Player, itemstack: ItemStack, event: PlayerItemDamageEvent) {
-    //    if (event.isCancelled) return
-    //    val swordConfig = itemstack.getProperty(ItemPropertyTypes.SWORD) ?: return
-    //    if (swordConfig.cancelVanillaDamage && ItemDamageEventMarker.isAlreadyDamaged(player)) {
-    //        event.isCancelled = true
-    //    }
-    //}
-
 }
