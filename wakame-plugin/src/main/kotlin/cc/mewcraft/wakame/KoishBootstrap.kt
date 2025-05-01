@@ -21,7 +21,7 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
 import org.koin.core.context.GlobalContext.startKoin
 
-private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.3")..Version("1.21.3")
+private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.4")..Version("1.21.4")
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
 
 internal class KoishBootstrap : PluginBootstrap {
