@@ -6,7 +6,7 @@ kotlinx-coroutines = "1.10.1"
 libraries-repository = "0.0.2-snapshot"
 copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
-paperweight = "1.7.7"
+paperweight = "2.0.0-beta.16"
 blossom = "2.1.0"
 
 # Gradle plugin deps
@@ -20,7 +20,7 @@ fleks = "2.11"
 snakeyaml-engine = "2.8"
 
 # Server deps
-paper = "1.21.3-R0.1-SNAPSHOT"
+paper = "1.21.4-R0.1-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
