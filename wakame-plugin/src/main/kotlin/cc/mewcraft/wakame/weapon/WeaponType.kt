@@ -27,6 +27,7 @@ import kotlin.reflect.KClass
 /**
  * 武器类型.
  */
+@Deprecated("过时")
 sealed interface WeaponType {
     /**
      * 玩家使用该武器类型物品直接左键攻击一个生物造成的伤害所使用的 [DamageMetadata].
@@ -101,6 +102,7 @@ data object EmptyHand : WeaponType
 /**
  * [WeaponType] 的序列化器.
  */
+@Deprecated("过时")
 internal object WeaponTypeSerializer : TypeSerializer2<WeaponType> {
     private val weaponTypeMap: Map<String, KClass<out WeaponType>> = mapOf(
         "katana" to KatanaWeapon::class

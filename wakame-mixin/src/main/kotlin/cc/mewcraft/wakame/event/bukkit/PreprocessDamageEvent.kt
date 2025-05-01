@@ -25,6 +25,7 @@ import org.bukkit.event.HandlerList
  * @property damageSource 更多的伤害信息. 为 null 意为还未造成实际伤害.
  */
 // FIXME #366: 让 preprocess 支持 cancel 以尽早的停止伤害计算节省资源?
+@Deprecated("不采用基于事件的设计模式来支持各种逻辑的伤害修改")
 class PreprocessDamageEvent(
     val phase: Phase,
     val causingEntity: Player,

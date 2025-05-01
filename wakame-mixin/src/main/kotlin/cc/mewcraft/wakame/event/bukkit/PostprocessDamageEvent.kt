@@ -10,11 +10,7 @@ import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-
-@Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessDamageEvent"))
-typealias NekoEntityDamageEvent = PostprocessDamageEvent
 
 /**
  * 该事件发生在最终伤害已经计算完毕, 但还未实际将最终伤害应用到实体上.
@@ -22,10 +18,10 @@ typealias NekoEntityDamageEvent = PostprocessDamageEvent
  * - 监听该事件可以读取到完整的伤害信息 (计算防御前/后).
  * - 取消该事件会使本次伤害失效.
  * - 无法使用该事件修改伤害.
+ * - 伤害的所有计算逻辑均应由伤害系统负责, 不提供外部修改的接口.
  *
  * @property damageMetadata 伤害信息 (计算防御前)
  * @property finalDamageMap 伤害信息 (计算防御后)
- * @see PreprocessDamageEvent 如果需要修改伤害, 使用这个事件
  */
 class PostprocessDamageEvent(
     val damageMetadata: DamageMetadata,
@@ -45,13 +41,6 @@ class PostprocessDamageEvent(
      */
     val damageSource: DamageSource
         get() = bukkitEvent.damageSource
-
-    /**
-     * 获取本次伤害是否是玩家跳劈.
-     */
-    fun isJumpCriticalHit(): Boolean {
-        return bukkitEvent is EntityDamageByEntityEvent && bukkitEvent.isCritical
-    }
 
     /**
      * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 `null`.

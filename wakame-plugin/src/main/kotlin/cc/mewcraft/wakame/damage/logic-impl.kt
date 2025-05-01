@@ -40,7 +40,6 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
 import org.bukkit.entity.*
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import xyz.xenondevs.commons.collections.enumSetOf
@@ -200,19 +199,7 @@ internal object DamageManager : DamageManagerApi {
                     return context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 }
 
-                when (context.damageCause) {
-                    DamageCause.ENTITY_ATTACK -> { // 左键直接点到了实体
-                        return createPlayerDirectAttackDamageMetadata(context)
-                    }
-
-                    DamageCause.ENTITY_SWEEP_ATTACK -> { // 横扫之刃“溅射”到了实体
-                        return createPlayerSweepAttackDamageMetadata(context)
-                    }
-
-                    else -> { // 不太可能
-                        return calculateDefaultDamageMetadata(context)
-                    }
-                }
+                return createPlayerAttackDamageMetadata(context)
             }
 
             is LivingEntity -> { // causing_entity 是 non-player living_entity
@@ -412,7 +399,7 @@ internal object DamageManager : DamageManagerApi {
     }
 
     // 可以返回 null, 意为取消本次伤害
-    private fun createPlayerDirectAttackDamageMetadata(context: DamageContext): DamageMetadata? {
+    private fun createPlayerAttackDamageMetadata(context: DamageContext): DamageMetadata? {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
@@ -420,10 +407,9 @@ internal object DamageManager : DamageManagerApi {
     }
 
     // 可以返回 null, 意为取消本次伤害
+    @Deprecated("现有武器系统不存在原版横扫, 仅作为过期代码留作参考")
     private fun createPlayerSweepAttackDamageMetadata(context: DamageContext): DamageMetadata? {
-        // TODO 横扫的临时实现, 等待麻将的组件化
-        // TODO #349: 暂时保留一部分过期的代码供参考
-        // 需要玩家手中的物品是 Attack 且攻击特效是 “sword” 才能打出横扫伤害
+        // 需要玩家手中的物品是 Weapon 且攻击特效是 “sword” 才能打出横扫伤害
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
@@ -511,9 +497,6 @@ internal object DamageManager : DamageManagerApi {
     private fun calculateAbstractArrowDamage(causingEntity: Player, abstractArrow: AbstractArrow, context: DamageContext): DamageMetadata? {
         val (force, attributes) = abstractArrow.getRegisteredDamage() ?: return null
 
-        val event = PreprocessDamageEventFactory.actuallyDamage(causingEntity, attributes, context).apply { callEvent() }
-
-        val attributes2 = event.causingAttributes // 拦截/修改后的属性快照
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
             val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
@@ -523,26 +506,18 @@ internal object DamageManager : DamageManagerApi {
                 // 该分支将考虑这些属性.
 
                 val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-                attributes2.addTransientModifiers(modifiersOnArrow)
-                damageBundle(attributes2) {
-                    every {
-                        standard()
-                        min { force * standard() }
-                        max { force * standard() }
-                    }
-                }
-            } else {
-                damageBundle(attributes2) {
-                    every {
-                        standard()
-                        min { force * standard() }
-                        max { force * standard() }
-                    }
+                attributes.addTransientModifiers(modifiersOnArrow)
+            }
+            damageBundle(attributes) {
+                every {
+                    standard()
+                    min { force * standard() }
+                    max { force * standard() }
                 }
             }
         }
         return PlayerDamageMetadata(
-            attributes = attributes2,
+            attributes = attributes,
             damageBundle = damageBundle
         )
     }

@@ -115,8 +115,7 @@ object Katana : Weapon {
             player.damageItem(EquipmentSlot.HAND, 1)
         }
         // 设置冷却
-        val attackSpeed = itemstack.getProperty(ItemPropertyTypes.ATTACK_SPEED)
-        itemstack.addCooldown(player, attackSpeed) // 太刀横斩使用武器本身的攻击速度
+        itemstack.addCooldown(player, katanaConfig.horizontalSlashCooldown)
     }
 
     /**

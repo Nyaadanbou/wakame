@@ -33,6 +33,7 @@ import kotlin.jvm.optionals.getOrElse
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
 @ConfigSerializable
+@Deprecated("过时")
 data class KatanaWeapon(
     /**
      * 玩家非手持太刀时, 每秒气刃值减少量.
