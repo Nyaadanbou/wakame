@@ -72,7 +72,9 @@ fun DamageContext(event: EntityDamageEvent): DamageContext {
 }
 
 /**
- * 伤害信息的封装.
+ * 对 Bukkit 伤害事件所含伤害信息的封装.
+ * 用于兼容原版的各种伤害场景.
+ * 其中不含 Koish 自定义伤害的信息.
  */
 @ApiStatus.Internal
 class DamageContext(
@@ -90,6 +92,7 @@ class DamageContext(
  * 用于方便构建 [PreprocessDamageEvent].
  */
 @ApiStatus.Internal
+@Deprecated("不采用基于事件的设计模式来支持各种逻辑的伤害修改")
 object PreprocessDamageEventFactory {
 
     fun launchProjectile(causingEntity: Player): PreprocessDamageEvent {

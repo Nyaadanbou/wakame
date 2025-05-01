@@ -60,6 +60,8 @@ object Attributes : AttributeProvider {
     @JvmField
     val CRITICAL_STRIKE_POWER = RangedAttribute("critical_strike_power", 1.0, .0, 16384.0).register()
     @JvmField
+    val DAMAGE_RATE_BY_UNTARGETED = RangedAttribute("damage_rate_by_untargeted", 1.0, .0, 16384.0).register()
+    @JvmField
     val HAMMER_DAMAGE_RANGE = RangedAttribute("hammer_damage_range", .0, .0, 64.0).register()
     @JvmField
     val HAMMER_DAMAGE_RATIO = RangedAttribute("hammer_damage_ratio", .0, .0, 1.0).register()
@@ -107,9 +109,9 @@ object Attributes : AttributeProvider {
     @JvmField
     val MIN_ATTACK_DAMAGE = registerLazy { element -> ElementAttribute("min_attack_damage", "attack_damage", .0, .0, 16384.0, element) }
     @JvmField
-    val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, .0, 16384.0, element) }
     @JvmField
-    val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, -1.0, 16384.0, element) }
+    val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, .0, 16384.0, element) }
     //</editor-fold>
 
     /**

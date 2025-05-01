@@ -43,7 +43,7 @@ object WeaponUtils {
             attackOBB.drawWireframe(player)
         }
 
-        return location.getNearbyLivingEntities(aabbRadius) { entity ->
+        return location.getNearbyLivingEntities(aabbRadius * scale) { entity ->
             entity != player
         }.filter { entity ->
             attackOBB.isCollide(entity)
