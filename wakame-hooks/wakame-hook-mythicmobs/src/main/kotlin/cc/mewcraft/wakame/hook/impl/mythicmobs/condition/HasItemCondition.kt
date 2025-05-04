@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.api.Koish
+import cc.mewcraft.wakame.item2.ItemRef
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.adapters.AbstractLocation
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -68,8 +68,8 @@ class HasItemCondition(
             if (itemStack == null || itemStack.isEmpty) {
                 continue
             }
-            val nekoItem = Koish.get().itemRegistry.getOrNull(itemStack)
-            if (nekoItem?.id == itemKey) {
+            val itemRef = ItemRef.checkedItemRef(itemStack)
+            if (itemRef.id == itemKey) {
                 count += itemStack.amount
             }
         }
