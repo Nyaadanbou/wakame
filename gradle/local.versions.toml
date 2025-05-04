@@ -3,7 +3,7 @@
 # Gradle plugins
 kotlin = "2.1.10"
 kotlinx-coroutines = "1.10.1"
-libraries-repository = "0.0.2-snapshot"
+libraries-repository = "0.0.3-snapshot"
 copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.16"
