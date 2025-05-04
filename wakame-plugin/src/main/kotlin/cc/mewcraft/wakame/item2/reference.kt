@@ -3,7 +3,6 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.item2.config.datagen.Context
-import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -78,7 +77,7 @@ internal object ItemRefBootstrap {
     override fun getId(stack: ItemStack): Identifier? {
         // 对于 Koish 物品, 返回非空
         // 对于 原版套皮/纯原版/其他 物品, 返回空
-        return stack.koishData(false)?.get(ItemDataTypes.ID)?.id
+        return stack.koishTypeId
     }
 
     override fun getName(id: Identifier): Component? {
