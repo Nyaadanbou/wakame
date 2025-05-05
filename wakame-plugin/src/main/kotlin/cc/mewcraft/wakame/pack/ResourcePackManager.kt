@@ -6,9 +6,11 @@ import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.pack.generate.*
-import cc.mewcraft.wakame.registry2.DynamicRegistries
-import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.pack.generate.ResourcePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackGenerationContext
+import cc.mewcraft.wakame.pack.generate.ResourcePackIconGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
+import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
 import cc.mewcraft.wakame.util.formatSize
 import cc.mewcraft.wakame.util.writeToDirectory
 import cc.mewcraft.wakame.util.writeToZipFile
@@ -53,16 +55,12 @@ internal class ResourcePackManager(
                 max = generationSettings.max,
                 mergePacks = generationSettings.mergePacks,
                 resourcePack = resourcePack,
-                itemModelInfos = DynamicRegistries.ITEM
-                    .filter { it.id.namespace() != Identifier.MINECRAFT_NAMESPACE }
-                    .map { ItemModelInfo(it.id, it.base.type.key()) }
             )
 
             // Generate the resource pack
             val generations: List<ResourcePackGeneration> = listOf(
                 ResourcePackMetaGeneration(context),
                 ResourcePackIconGeneration(context),
-                ResourcePackCustomModelGeneration(context),
                 ResourcePackMergePackGeneration(context, packReader),
             )
 
@@ -79,7 +77,11 @@ internal class ResourcePackManager(
 
             LOGGER.info("Resource pack has been generated.")
             // Build the resource pack to ensure it's valid
-            MinecraftResourcePackWriter.minecraft().build(resourcePack)
+            MinecraftResourcePackWriter.builder()
+                .prettyPrinting(true)
+                .targetPackFormat(generationSettings.format)
+                .build()
+                .build(resourcePack)
 
             LOGGER.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
         } finally {
