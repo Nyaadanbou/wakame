@@ -77,11 +77,7 @@ internal class ResourcePackManager(
 
             LOGGER.info("Resource pack has been generated.")
             // Build the resource pack to ensure it's valid
-            MinecraftResourcePackWriter.builder()
-                .prettyPrinting(true)
-                .targetPackFormat(generationSettings.format)
-                .build()
-                .build(resourcePack)
+            MinecraftResourcePackWriter.minecraft().build(resourcePack)
 
             LOGGER.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
         } finally {
