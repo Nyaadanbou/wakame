@@ -6,7 +6,7 @@ plugins {
 
 group = "cc.mewcraft.wakame"
 version = "0.0.1-snapshot"
-description = "The API of wakame system"
+description = "The API of the core gameplay implementation"
 
 dependencies {
     compileOnly(local.paper)

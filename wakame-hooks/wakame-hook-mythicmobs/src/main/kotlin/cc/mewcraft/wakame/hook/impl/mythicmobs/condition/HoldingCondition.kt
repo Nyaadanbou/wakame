@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.condition
 
-import cc.mewcraft.wakame.api.Koish
-import cc.mewcraft.wakame.api.KoishProvider
+import cc.mewcraft.wakame.item2.ItemRef
 import io.lumine.mythic.api.adapters.AbstractEntity
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.skills.ThreadSafetyLevel
@@ -44,9 +43,9 @@ class HoldingCondition(
             val entityEquipment = bukkitEntity.equipment
             if (entityEquipment != null) {
                 val holding = entityEquipment.itemInMainHand
-                val itemRegistry = Koish.get().itemRegistry
                 for (itemKey in this.comparisons) {
-                    if (itemKey == itemRegistry.getOrNull(holding)?.id) {
+                    val itemRef = ItemRef.checkedItemRef(holding)
+                    if (itemKey == itemRef.id) {
                         return true
                     }
                 }

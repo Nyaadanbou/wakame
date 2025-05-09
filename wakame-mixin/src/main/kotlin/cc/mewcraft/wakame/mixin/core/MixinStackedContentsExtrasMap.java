@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.ItemStackStrategy;
+import cc.mewcraft.wakame.mixin.support.CustomItemStackLinkedSet;
 import io.papermc.paper.inventory.recipe.StackedContentsExtrasMap;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MixinStackedContentsExtrasMap {
 
     /**
-     * @author Nailm, Flandre, g2213swo
-     * @reason 让原版无序合成完全支持萌芽物品
+     * @author Nailm, Flandre
+     * @reason 让 Koish 物品在 Shapeless 配方中只考虑 Koish 的唯一物品标识而忽略其他物品数据
      */
     @Redirect(
             method = "<init>",
@@ -25,7 +25,7 @@ public abstract class MixinStackedContentsExtrasMap {
                     opcode = Opcodes.NEW
             )
     )
-    public ObjectOpenCustomHashSet<ItemStack> redirect(final Hash.Strategy<ItemStack> strategy) {
-        return new ObjectOpenCustomHashSet<>(ItemStackStrategy.CUSTOM_STRATEGY);
+    public ObjectOpenCustomHashSet<ItemStack> koish$ObjectOpenCustomHashSet(final Hash.Strategy<ItemStack> strategy) {
+        return new ObjectOpenCustomHashSet<>(CustomItemStackLinkedSet.KOISH_STRATEGY);
     }
 }

@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.item2.network
 
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.hasProperty
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -56,9 +57,7 @@ internal object ItemEntityRender : PacketListener {
     @PacketHandler
     private fun handleSetEntityData(event: ClientboundSetEntityDataPacketEvent) {
         val oldData = event.packedItems
-        val item = NMSUtils.getEntity(event.id) as? Item
-          if (item == null || item.itemStack.wrap() == null)
-            return
+        val item = NMSUtils.getEntity(event.id) as? Item ?: return
         val newData = oldData.toMutableList()
         tryAddCustomNameEntityData(item, newData)
         tryAddGlowEffectEntityData(item, newData)
@@ -76,9 +75,7 @@ internal object ItemEntityRender : PacketListener {
     }
 
     private fun tryAddGlowEffectEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
-        val koishStack = item.itemStack.wrap()!!
-        val templates = koishStack.templates
-        if (!templates.has(ItemTemplateTypes.GLOWABLE))
+        if (!item.itemStack.hasProperty(ItemPropertyTypes.GLOWABLE))
             return
 
         // Glow effect flag
@@ -95,11 +92,10 @@ internal object ItemEntityRender : PacketListener {
         entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME_VISIBLE, true))
     }
 
-    private fun sendGlowColorPacket(player: Player, entity: Item) {
-        val koishStack = entity.itemStack.wrap() ?: return
-        val rarityColor = koishStack.rarity.unwrap().color ?: return
-        val teamPacket = buildCreateTeamPacket(entity, rarityColor)
-        entityId2EntityUniqueId[entity.entityId] = entity.uniqueId
+    private fun sendGlowColorPacket(player: Player, item: Item) {
+        val rarityColor = item.itemStack.getData(ItemDataTypes.RARITY)?.unwrap()?.color ?: return
+        val teamPacket = buildCreateTeamPacket(item, rarityColor)
+        entityId2EntityUniqueId[item.entityId] = item.uniqueId
         player.connection.send(teamPacket)
     }
 
@@ -110,7 +106,7 @@ internal object ItemEntityRender : PacketListener {
                 this.color = PaperAdventure.asVanilla(color) ?: ChatFormatting.RESET
                 this.players += entityUniqueId.toString()
             },
-            /* updatePlayers = */ true
+            /* useAdd = */ true
         )
     }
 

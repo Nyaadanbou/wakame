@@ -22,22 +22,23 @@ import org.bukkit.inventory.ItemStack
 // (关于注释和文档, 请参考本文件后半部分的 MojangStack 的扩展函数)
 // ------------------
 
-//// Type
+/* Type */
 
 val ItemStack.typeId: Identifier get() = toNMS().typeId
+val ItemStack.koishTypeId: Identifier? get() = toNMS().koishTypeId
 val ItemStack.isKoish: Boolean get() = toNMS().isKoish
-val ItemStack.isKoishExact: Boolean get() = toNMS().isKoishExact
+val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
-fun ItemStack.koishData(includeProxy: Boolean): ItemDataContainer? = toNMS().koishData(includeProxy)
+fun ItemStack.dataContainer(includeProxy: Boolean): ItemDataContainer? = toNMS().dataContainer(includeProxy)
 val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 
-//// Property
+/* Property */
 
 fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
 fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
 fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropertyOrDefault(type, fallback)
 
-//// ItemData
+/* ItemData */
 
 fun ItemStack.hasData(type: ItemDataType<*>): Boolean = toNMS().hasData(type)
 fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
@@ -55,23 +56,36 @@ var ItemStack.isNetworkRewrite: Boolean
 // 用于访问 `net.minecraft.world.item.ItemStack` 上的 Koish 数据
 // ------------------
 
-//// Type
+/* Type */
 
 /**
  * 获取该物品堆叠的物品类型的 [Identifier].
  *
  * - 如果该物品堆叠是一个 *Koish 物品* , 则命名空间为 [cc.mewcraft.wakame.util.KOISH_NAMESPACE]
  * - 如果该物品堆叠是一个 *原版(或 Koish 套皮)物品*, 则命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
- * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE]
+ * - 如果该物品堆叠来自其他物品系统, 将被当作是一个 *原版物品*, 命名空间为 [cc.mewcraft.wakame.util.MINECRAFT_NAMESPACE] // TODO 支持 ItemRef
  */
 val MojangStack.typeId: Identifier
-    get() = koishData(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
+    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.id ?: CraftItemType.minecraftToBukkit(item).key()
 
+/**
+ * 获取该物品堆叠的物品类型的 [Identifier].
+ *
+ * - 只有当该物品堆叠属于 Koish 物品库时才返回非空值.
+ * - 不包含套皮物品/原版物品 - 这种情况会直接返回空值.
+ */
+val MojangStack.koishTypeId: Identifier?
+    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.id
+
+/**
+ * 方便函数, 其行为等同于判断 [koishItem] 是否为空.
+ * @see koishItem
+ */
 val MojangStack.isKoish: Boolean
-    get() = koishItem != null
+    get() = dataContainer(true)?.has(ItemDataTypes.ID) == true
 
-val MojangStack.isKoishExact: Boolean
-    get() = koishData(false)?.has(ItemDataTypes.ID) == true
+val MojangStack.isExactKoish: Boolean
+    get() = dataContainer(false)?.has(ItemDataTypes.ID) == true
 
 /**
  * 获取该物品堆叠的 *Koish 物品类型*.
@@ -86,7 +100,23 @@ val MojangStack.isKoishExact: Boolean
  * *绝大多数情况下无需使用该函数.*
  */
 val MojangStack.koishItem: KoishItem?
-    get() = koishData(true)?.get(ItemDataTypes.ID)?.itemType
+    get() = dataContainer(true)?.get(ItemDataTypes.ID)?.itemType
+
+/**
+ * 获取该物品堆叠的 *Koish 物品类型*.
+ *
+ * 返回非空的情况:
+ * - 该物品堆叠是*Koish 物品*
+ *
+ * 返回空的情况:
+ * - 该物品堆叠是*Koish 套皮物品*
+ * - 该物品堆叠是*原版物品*
+ * - 其余所有情况
+ *
+ * *绝大多数情况下无需使用该函数.*
+ */
+val MojangStack.exactKoishItem: KoishItem?
+    get() = dataContainer(false)?.get(ItemDataTypes.ID)?.itemType
 
 /**
  * 获取该物品堆叠的持久化数据容器 [ItemDataContainer].
@@ -94,13 +124,16 @@ val MojangStack.koishItem: KoishItem?
  *
  * *绝大多数情况下无需使用该函数.*
  *
+ * @param includeProxy 是否包含套皮物品的容器
+ * @return 如果该物品堆叠是 Koish 物品, 则返回其数据容器
+ *
  * @see hasData
  * @see getData
  * @see getDataOrDefault
  * @see setData
  * @see removeData
  */
-fun MojangStack.koishData(includeProxy: Boolean): ItemDataContainer? =
+fun MojangStack.dataContainer(includeProxy: Boolean): ItemDataContainer? =
     get(ExtraDataComponents.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
 
 /**
@@ -111,7 +144,7 @@ fun MojangStack.koishData(includeProxy: Boolean): ItemDataContainer? =
 val Item.koishProxy: KoishItemProxy?
     get() = CraftItemType.minecraftToBukkit(this).koishProxy
 
-//// Property
+/* Property */
 
 fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
     koishItem?.properties?.get(type)
@@ -122,16 +155,16 @@ fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
 fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
     koishItem?.properties?.getOrDefault(type, fallback)
 
-//// ItemData
+/* ItemData */
 
 fun MojangStack.hasData(type: ItemDataType<*>): Boolean =
-    koishData(true)?.has(type) == true
+    dataContainer(true)?.has(type) == true
 
 fun <T> MojangStack.getData(type: ItemDataType<out T>): T? =
-    koishData(true)?.get(type)
+    dataContainer(true)?.get(type)
 
 fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T =
-    koishData(true)?.getOrDefault(type, fallback) ?: fallback
+    dataContainer(true)?.getOrDefault(type, fallback) ?: fallback
 
 /**
  * 向物品堆叠写入 Koish 数据 [T].
@@ -142,7 +175,7 @@ fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T 
  * @see setData
  */
 fun <T> MojangStack.setData(type: ItemDataType<in T>, value: T): T? {
-    val builder = koishData(false)?.toBuilder() ?: return null
+    val builder = dataContainer(false)?.toBuilder() ?: return null
     val oldVal = builder.set(type, value)
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
@@ -164,7 +197,7 @@ fun MojangStack.setData(type: ItemDataType<Unit>): Boolean {
  * 如果该物品堆叠是套皮物品, 该函数没有实际效果.
  */
 fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
-    val builder = koishData(false)?.toBuilder() ?: return null
+    val builder = dataContainer(false)?.toBuilder() ?: return null
     val oldVal = builder.remove(type)
     set(ExtraDataComponents.DATA_CONTAINER, builder.build())
     return oldVal
@@ -174,10 +207,15 @@ fun <T> MojangStack.removeData(type: ItemDataType<out T>): T? {
  * 设置该物品堆叠是否应该在网络发包时重写.
  */
 var MojangStack.isNetworkRewrite: Boolean
-    get() = !hasData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    get() {
+        return !hasData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+    }
     set(value) {
-        if (value) removeData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
-        else setData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+        if (value) {
+            removeData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+        } else {
+            setData(ItemDataTypes.BYPASS_NETWORK_REWRITE)
+        }
     }
 
 // -----------------

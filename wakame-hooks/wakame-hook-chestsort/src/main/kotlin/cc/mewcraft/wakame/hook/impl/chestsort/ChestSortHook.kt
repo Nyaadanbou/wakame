@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.chestsort
 
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.item.ItemSlotRegistry
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.util.registerEvents
 import de.jeff_media.chestsort.api.ChestSortEvent
 import org.bukkit.entity.Player
@@ -22,10 +22,10 @@ object ChestSortHook : Listener {
         if (inventory.type == InventoryType.PLAYER) {
             inventory.holder as? Player ?: return
 
-            val slots = ItemSlotRegistry.custom()
+            val slots = ItemSlotRegistry.extraItemSlots()
             for (slot in slots) {
                 // 不整理饰品栏位
-                event.setUnmovable(slot.slotIndex)
+                event.setUnmovable(slot.index)
             }
         }
     }

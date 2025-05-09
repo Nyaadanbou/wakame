@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.pack.generate
 
-import cc.mewcraft.wakame.pack.ItemModelInfo
 import team.unnamed.creative.ResourcePack
 
 data class ResourcePackGenerationContext(
@@ -27,13 +26,6 @@ data class ResourcePackGenerationContext(
      * 需要合并的资源包路径.
      */
     val mergePacks: List<String>,
-
-    //
-
-    /**
-     * 资源包里包含的所有“物品材质”.
-     */
-    val itemModelInfos: Collection<ItemModelInfo>,
 
     //
 

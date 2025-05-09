@@ -5,7 +5,7 @@ import cc.mewcraft.wakame.core.ItemXNeko
 import cc.mewcraft.wakame.core.ItemXNoOp
 import cc.mewcraft.wakame.core.ItemXVanilla
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.mixin.support.LootKoishItem
+import cc.mewcraft.wakame.mixin.support.KoishLootItem
 import cc.mewcraft.wakame.shadow.loot.*
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.shadow
@@ -98,7 +98,7 @@ data class CatalogItemLootTableRecipe(
                 }
             }
 
-            is LootKoishItem -> {
+            is KoishLootItem -> {
                 return listOf(ItemXNeko(lootPoolEntryContainer.id.toString()))
             }
 

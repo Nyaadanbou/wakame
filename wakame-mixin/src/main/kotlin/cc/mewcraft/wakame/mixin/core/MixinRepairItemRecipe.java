@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
+import cc.mewcraft.wakame.item2.KoishStackData;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -15,20 +16,19 @@ public abstract class MixinRepairItemRecipe extends CustomRecipe {
     }
 
     /**
-     * @author Nailm, Flandre, g2213swo
-     * @reason 禁止自定义物品参与工作台修复配方
+     * @author Nailm, Flandre
+     * @reason 禁止 Koish 物品参与 RepairItem 配方
      */
     @Overwrite
-    public static boolean canCombine(ItemStack first, ItemStack second) {
-        // 如果 first 或者 second 有自定义数据, 则返回 false
-        return second.is(first.getItem())
-                && !first.has(DataComponents.CUSTOM_DATA)
-                && !second.has(DataComponents.CUSTOM_DATA)
-                && first.getCount() == 1
-                && second.getCount() == 1
-                && first.has(DataComponents.MAX_DAMAGE)
-                && second.has(DataComponents.MAX_DAMAGE)
-                && first.has(DataComponents.DAMAGE)
-                && second.has(DataComponents.DAMAGE);
+    public static boolean canCombine(ItemStack stack1, ItemStack stack2) {
+        return stack2.is(stack1.getItem())
+                && stack1.getCount() == 1
+                && stack2.getCount() == 1
+                && stack1.has(DataComponents.MAX_DAMAGE)
+                && stack2.has(DataComponents.MAX_DAMAGE)
+                && stack1.has(DataComponents.DAMAGE)
+                && stack2.has(DataComponents.DAMAGE)
+                && !KoishStackData.isExactKoish(stack1)
+                && !KoishStackData.isExactKoish(stack2);
     }
 }

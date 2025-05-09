@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.hook.impl.mythicmobs.drop
 
-import cc.mewcraft.wakame.api.Koish
+import cc.mewcraft.wakame.item2.ItemRef
 import io.lumine.mythic.api.adapters.AbstractItemStack
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.DropMetadata
@@ -22,8 +22,8 @@ class NekoItemDrop(
         val key = Key.key(itemKey)
         val player = data.cause.getOrNull()?.bukkitEntity as? Player
 
-        val nekoItem = Koish.get().itemRegistry.get(key) // may throw exceptions, can MM handle it?
-        val itemStack = nekoItem.createItemStack(player)
+        val itemRef = ItemRef.checkedItemRef(key) ?: error("Invalid ItemRef: $key") // may throw exceptions, can MM handle it?
+        val itemStack = itemRef.createItemStack(1, player)
 
         return ItemComponentBukkitItemStack(itemStack).amount(amount.toInt())
     }

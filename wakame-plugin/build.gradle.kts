@@ -3,13 +3,12 @@ plugins {
     id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-build")
     id("cc.mewcraft.copy-jar-docker")
-    id("io.papermc.paperweight.userdev")
     alias(local.plugins.blossom)
 }
 
 group = "cc.mewcraft.wakame"
 version = "0.0.1-snapshot"
-description = "The core plugin of Nyaadanbou"
+description = "The core gameplay implementation of Xiaomi's server (paper plugin)"
 
 repositories {
     nyaadanbouReleases()
@@ -18,9 +17,9 @@ repositories {
 
 dependencies {
     // internal
-    compileOnlyApi(project(":wakame-api")) // 运行时由 wakame-mixin 提供
-    compileOnlyApi(project(":wakame-common")) // 同上
-    compileOnlyApi(project(":wakame-mixin")) // 同上
+    compileOnly(project(":wakame-api")) // 运行时由 koish-mod 提供
+    compileOnly(project(":wakame-common")) // 运行时由 koish-mod 提供
+    compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))
@@ -37,7 +36,6 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-worldguard"))
 
     // libraries
-    paperweight.paperDevBundle(local.versions.paper)
     compileOnly(platform(local.koin.bom)) // 运行时由 koish-mod 提供
     compileOnly(local.koin.core)
     compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供

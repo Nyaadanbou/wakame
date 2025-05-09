@@ -4,12 +4,12 @@
 plugins {
     id("wakame-conventions.kotlin")
     id("cc.mewcraft.libraries-repository")
-    id("io.papermc.paperweight.userdev")
     `maven-publish`
 }
 
 group = "cc.mewcraft.wakame"
 version = "0.0.1-SNAPSHOT"
+description = "The common code of the core gameplay implementation"
 
 repositories {
     nyaadanbouReleases()
@@ -17,11 +17,8 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle(local.versions.paper)
-    compileOnlyApi(local.fleks) {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
-    }
+    // 我们希望 koish-common 的代码趋于通用/稳定/低依赖, 因此不包含 NMS
+    compileOnly(local.paper)
 }
 
 publishing {

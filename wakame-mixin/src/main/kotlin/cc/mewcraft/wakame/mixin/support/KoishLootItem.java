@@ -28,15 +28,15 @@ import java.util.function.Consumer;
  * 本实现相当于新增了一个 {@code Singleton Entry}. 具体请参考 <a href="https://minecraft.wiki/w/Loot_table#Singleton_entry">Loot table</a>.
  */
 @NullMarked
-public class LootKoishItem extends LootPoolSingletonContainer {
-    public static final MapCodec<LootKoishItem> CODEC = RecordCodecBuilder.mapCodec(
+public class KoishLootItem extends LootPoolSingletonContainer {
+    public static final MapCodec<KoishLootItem> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(ResourceLocation.CODEC.fieldOf("id").forGetter(entry -> entry.id))
                     .and(singletonFields(instance))
-                    .apply(instance, LootKoishItem::new)
+                    .apply(instance, KoishLootItem::new)
     );
     private final ResourceLocation id;
 
-    private LootKoishItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
+    private KoishLootItem(ResourceLocation id, int weight, int quality, List<LootItemCondition> conditions, List<LootItemFunction> functions) {
         super(weight, quality, conditions, functions);
         this.id = id;
     }

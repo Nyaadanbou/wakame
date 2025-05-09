@@ -151,7 +151,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
 
         // 生成一个完整的 ItemStack, 但只取其 ItemDataContainer
         val tempItemstack = KoishStackGenerator.generate(koishItem, Context(koishItem))
-        val dataContainer = tempItemstack.koishData(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
+        val dataContainer = tempItemstack.dataContainer(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
 
         return KoishItemProxy(id, dataConfig, properties, behaviors, dataContainer)
     }

@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryType;
 public class ExtraLootPoolEntries {
 
     public static final LootPoolEntryType KOISH_ITEM = register(
-            "koish:item", LootKoishItem.CODEC
+            "koish:item", KoishLootItem.CODEC
     );
 
     public static void bootstrap() {

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import net.minecraft.core.component.DataComponents;
+import cc.mewcraft.wakame.item2.KoishStackData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -19,26 +19,25 @@ public abstract class MixinTippedArrowRecipe extends CustomRecipe {
     }
 
     /**
-     * @author Nailm, Flandre, g2213swo
-     * @reason 禁止萌芽箭参与药水箭配方
+     * @author Nailm, Flandre
+     * @reason 禁止 Koish 物品参与 TippedArrow 配方
      */
     @Override
     @Overwrite
     public boolean matches(CraftingInput input, @NonNull Level world) {
-        if (input.width() == 3 && input.height() == 3) {
+        if (input.width() == 3 && input.height() == 3 && input.ingredientCount() == 9) {
             for (int i = 0; i < input.height(); i++) {
-                for (int j = 0; j < input.width(); j++) {
-                    ItemStack itemStack = input.getItem(j, i);
-                    if (itemStack.isEmpty()) {
+                for (int i1 = 0; i1 < input.width(); i1++) {
+                    ItemStack item = input.getItem(i1, i);
+                    if (item.isEmpty()) {
                         return false;
                     }
 
-                    if (j == 1 && i == 1) {
-                        if (!itemStack.is(Items.LINGERING_POTION)) {
+                    if (i1 == 1 && i == 1) {
+                        if (!item.is(Items.LINGERING_POTION)) {
                             return false;
                         }
-                    } else if (!itemStack.is(Items.ARROW) || itemStack.has(DataComponents.CUSTOM_DATA)) {
-                        // 如果 itemStack 有自定义数据, 则让配方的匹配返回 false
+                    } else if (!item.is(Items.ARROW) || KoishStackData.isExactKoish(item)) { // Koish
                         return false;
                     }
                 }
