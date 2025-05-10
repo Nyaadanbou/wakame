@@ -29,6 +29,7 @@ import cc.mewcraft.wakame.item2.data.impl.CoreTypes
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.world.KoishBlock
 import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.TestOnly
 
@@ -185,6 +186,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val ATTACK_SPEED: WritableDefaultedRegistry<AttackSpeed> = registerDefaulted(BuiltInRegistryKeys.ATTACK_SPEED, "intrinsic")
+
+    /**
+     * 方块的类型.
+     */
+    @JvmField
+    val BLOCK: WritableRegistry<KoishBlock> = registerSimple(BuiltInRegistryKeys.BLOCK)
 
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER

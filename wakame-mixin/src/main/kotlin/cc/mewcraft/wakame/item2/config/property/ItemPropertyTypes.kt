@@ -16,6 +16,7 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.typeTokenOf
+import cc.mewcraft.wakame.world.KoishBlock
 import net.kyori.adventure.text.Component
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 
@@ -119,6 +120,13 @@ data object ItemPropertyTypes {
 
     @JvmField
     val TRIDENT: ItemPropertyType<Weapon> = typeOf("trident")
+
+    @JvmField
+    val BLOCK: ItemPropertyType<RegistryEntry<KoishBlock>> = typeOf("block") {
+        serializers {
+            register(BuiltInRegistries.BLOCK.holderByNameTypeSerializer())
+        }
+    }
 
     // ------------
     // 方便函数
