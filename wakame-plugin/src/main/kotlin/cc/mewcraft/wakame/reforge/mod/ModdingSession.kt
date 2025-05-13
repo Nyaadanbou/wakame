@@ -1,8 +1,7 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -67,7 +66,7 @@ interface ModdingSession : Examinable {
      * - 访问该物品始终会返回一个克隆.
      */
     @VariableByPlayer
-    val usableInput: NekoStack?
+    val usableInput: ItemStack?
 
     /**
      * 当前 [usableInput] 的重铸规则.
@@ -194,7 +193,7 @@ interface ModdingSession : Examinable {
          * - 源物品不存在, i.e., [ModdingSession.usableInput] = `null`
          */
         @get:Contract(" -> new")
-        val output: NekoStack?
+        val output: ItemStack?
     }
 
     /**
@@ -227,7 +226,12 @@ interface ModdingSession : Examinable {
         /**
          * 被定制的核孔.
          */
-        val cell: Cell
+        val core: Core
+
+        /**
+         * 被定制的核孔 ID
+         */
+        val coreId: String
 
         /**
          * 被定制的核孔所对应的规则.
@@ -276,14 +280,14 @@ interface ModdingSession : Examinable {
          * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
          */
         @VariableByPlayer
-        val usableInput: NekoStack?
+        val usableInput: ItemStack?
 
         /**
          * 方便函数.
-         * 获取 [usableInput] 中包含的 [PortableCore].
+         * 获取 [usableInput] 中包含的 [Core].
          */
         @VariableByPlayer
-        val augment: PortableCore?
+        val augment: Core?
 
         /**
          * 储存了当前的重铸结果.

@@ -149,11 +149,11 @@ internal class ReplaceMenu(
 
             // 使用 SlotDisplay 再处理一遍
             val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_usable").resolveEverything {
-                folded("item_lore", usableInput.bukkitStack.fastLoreOrEmpty)
+                folded("item_lore", usableInput.fastLoreOrEmpty)
                 folded("result_description", replaceResult.description)
             }
 
-            return resolved.applyTo(usableInput.bukkitStack)
+            return resolved.applyTo(usableInput)
         }
     }
 
@@ -165,8 +165,9 @@ internal class ReplaceMenu(
         val replace: ModdingSession.Replace,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
-            val core = replace.cell.core
-            val icon = CoreIcons.getItemStack(core)
+            val core = replace.core
+            val coreId = replace.coreId
+            val icon = CoreIcons.getItemStack(coreId, core)
             val resolved = parent.table.replaceMenuSettings.getSlotDisplay("core_view").resolveEverything {
                 standard { component("core_name", core.displayName) }
                 folded("core_description", core.description)

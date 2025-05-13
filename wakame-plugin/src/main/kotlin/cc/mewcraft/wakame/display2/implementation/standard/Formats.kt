@@ -1,12 +1,23 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
+import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -62,8 +73,8 @@ internal data class AttackSpeedRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun render(data: AttackSpeed): IndexedText {
-        val resolver = Placeholder.component("value", data.displayName)
+    fun render(data: RegistryEntry<AttackSpeed>): IndexedText {
+        val resolver = Placeholder.component("value", data.unwrap().displayName)
         return SimpleIndexedText(index, listOf(MM.deserialize(tooltip.line, resolver)))
     }
 

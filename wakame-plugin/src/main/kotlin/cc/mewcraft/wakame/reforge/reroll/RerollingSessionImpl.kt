@@ -3,16 +3,17 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.extension.cells
 import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getMeta
+import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.random3.Group
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.ItemStackDelegates
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
@@ -27,7 +28,6 @@ import team.unnamed.mocha.runtime.MochaFunction
 import java.util.*
 import java.util.Collections.*
 import java.util.stream.Stream
-import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -42,7 +42,7 @@ internal class SimpleRerollingSession(
 
     override var originalInput: ItemStack? by OriginalInputDelegate(null)
 
-    override var usableInput: NekoStack? by UsableInputDelegate(null)
+    override var usableInput: ItemStack? by UsableInputDelegate(null)
 
     override var itemRule: RerollingTable.ItemRule? = null
 
@@ -92,7 +92,7 @@ internal class SimpleRerollingSession(
     override fun getFinalOutputs(): Array<ItemStack> {
         val reforgeResult = latestResult
         if (reforgeResult.isSuccess) {
-            return arrayOf(reforgeResult.output.bukkitStack.clone())
+            return arrayOf(reforgeResult.output.clone())
         } else {
             return emptyArray()
         }
@@ -112,19 +112,19 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            usableInput = value?.wrap()
-            itemRule = usableInput?.id?.let(table.itemRuleMap::get)
+            usableInput = value
+            itemRule = usableInput?.koishTypeId?.let(table.itemRuleMap::get)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }
     }
 
-    private inner class UsableInputDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
-        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
+    private inner class UsableInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
             return backing?.clone()
         }
 
-        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: NekoStack?) {
+        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
         }
     }
@@ -149,7 +149,7 @@ internal object ReforgeResult {
      * 失败结果; 用于表示因已知的某些条件不满足而无法进行重造.
      */
     fun failure(viewer: Player, description: List<ComponentLike>): RerollingSession.ReforgeResult {
-        return Simple(false, description.translate(viewer), NekoStack.empty(), ReforgeCost.empty(viewer))
+        return Simple(false, description.translate(viewer), ItemStack.empty(), ReforgeCost.empty(viewer))
     }
 
     /**
@@ -162,7 +162,7 @@ internal object ReforgeResult {
     /**
      * 成功结果; 用于表示重造已准备就绪.
      */
-    fun success(viewer: Player, item: NekoStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
+    fun success(viewer: Player, item: ItemStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
         return Simple(true, TranslatableMessages.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
     }
 
@@ -182,34 +182,34 @@ internal object ReforgeResult {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error(viewer)
-        override val output: NekoStack = NekoStack.empty()
+        override val output: ItemStack = ItemStack.empty()
     }
 
     private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty(viewer)
-        override val output: NekoStack = NekoStack.empty()
+        override val output: ItemStack = ItemStack.empty()
     }
 
     private class Simple(
         successful: Boolean,
         description: List<Component>,
-        item: NekoStack,
+        item: ItemStack,
         cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
             description: Component,
-            item: NekoStack,
+            item: ItemStack,
             cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
         override val isSuccess: Boolean = successful
         override val description: List<Component> = description
         override val reforgeCost: RerollingSession.ReforgeCost = cost
-        override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
+        override val output: ItemStack by ItemStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("isSuccess", isSuccess),
@@ -369,28 +369,29 @@ internal object SelectionMap {
 
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
-        val templates = usableInput.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
+        val templates = usableInput.getMeta(ItemMetaTypes.CORE_CONTAINER) ?: run {
             // logger.info("Usable input has no `cells` template.")
             return empty(session)
         }
 
         // 获取源物品的核孔
         // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
-        val cells = usableInput.cells ?: return empty(session)
+        val coreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: return empty(session)
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[usableInput.id] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[usableInput.koishTypeId!!] ?: return empty(session)
 
         val cellRuleMap = itemRule.cellRuleMap
         val selectionData = sortedMapOf<String, RerollingSession.Selection>(cellRuleMap.comparator)
-        for ((id, _) in cells) {
+        for ((id, _) in coreContainer) {
 
             // 获取核孔的重造规则
             val cellRule = cellRuleMap[id]
 
             // 获取核孔的重造模板
-            val template = templates[id]?.core
+            // val template = templates[id]?.core
+            val template = TODO("Not yet implemented")
 
             // 如果:
             //   这个核孔没有对应的重造规则, 或者

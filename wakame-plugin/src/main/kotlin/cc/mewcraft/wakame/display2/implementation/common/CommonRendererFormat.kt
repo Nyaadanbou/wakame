@@ -1,9 +1,14 @@
 package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.removeItalic
@@ -127,8 +132,8 @@ internal data class PortableCoreRendererFormat(
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
     private val unknownIndex: Key = Key.key(namespace, "unknown")
 
-    fun render(data: PortableCore): IndexedText {
-        val core = (data.wrapped as? AttributeCore)
+    fun render(data: Core): IndexedText {
+        val core = (data as? AttributeCore)
             ?: return SimpleIndexedText(unknownIndex, emptyList())
         return SimpleIndexedText(index, core.description)
     }

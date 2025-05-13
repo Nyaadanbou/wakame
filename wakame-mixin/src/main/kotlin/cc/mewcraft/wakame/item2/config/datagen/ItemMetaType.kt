@@ -11,10 +11,10 @@ import kotlin.reflect.typeOf
  * @param U 元数据的类型, 即 [ItemMetaEntry] 的实现类
  * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
  */
-sealed interface ItemMetaType<U, V> {
+sealed interface ItemMetaType<U : ItemMetaEntry<V>, V> {
 
     companion object {
-        inline fun <reified U, V> builder(): Builder<U, V> {
+        inline fun <reified U : ItemMetaEntry<V>, V> builder(): Builder<U, V> {
             return Builder(typeOf<U>())
         }
     }
@@ -31,7 +31,7 @@ sealed interface ItemMetaType<U, V> {
      * @param U 元数据的类型, 即 [ItemMetaEntry] 的实现类
      * @param V 持久化数据的类型, 即 [元数据类型][U] 对应的*数据类型*
      */
-    class Builder<U, V>(
+    class Builder<U : ItemMetaEntry<V>, V>(
         private val kotlinType: KType, // KType<U>
     ) {
         private var serializers: TypeSerializerCollection? = null
@@ -50,7 +50,7 @@ sealed interface ItemMetaType<U, V> {
             return Simple(kotlinType, serializers)
         }
 
-        private class Simple<U, V>(
+        private class Simple<U : ItemMetaEntry<V>, V>(
             override val kotlinType: KType, // KType<U>
             override val serializers: TypeSerializerCollection?,
         ) : ItemMetaType<U, V> {

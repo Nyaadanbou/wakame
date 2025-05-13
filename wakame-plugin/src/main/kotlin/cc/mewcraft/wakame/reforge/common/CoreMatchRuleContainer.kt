@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item.components.cells.Core
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable

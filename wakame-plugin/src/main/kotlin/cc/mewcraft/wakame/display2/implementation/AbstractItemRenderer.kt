@@ -4,19 +4,33 @@
 package cc.mewcraft.wakame.display2.implementation
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.item.component.ItemComponentMap
-import cc.mewcraft.wakame.item.component.ItemComponentType
-import cc.mewcraft.wakame.item.template.ItemTemplateMap
-import cc.mewcraft.wakame.item.template.ItemTemplateType
+import cc.mewcraft.wakame.display2.IndexedDataRenderer
+import cc.mewcraft.wakame.display2.IndexedDataRenderer2
+import cc.mewcraft.wakame.display2.IndexedDataRenderer3
+import cc.mewcraft.wakame.display2.IndexedDataRenderer4
+import cc.mewcraft.wakame.display2.IndexedDataRenderer5
+import cc.mewcraft.wakame.display2.IndexedDataRenderer6
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.ItemRenderer
+import cc.mewcraft.wakame.display2.ItemRendererConstants
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
+import cc.mewcraft.wakame.item2.data.ItemDataType
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getMeta
+import cc.mewcraft.wakame.item2.getProperty
+import io.papermc.paper.datacomponent.DataComponentType
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
+import org.bukkit.inventory.ItemStack
 import org.jetbrains.annotations.VisibleForTesting
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.requireNotNull
 
 /* 这里定义了可以在不同渲染器之间通用的 ItemRenderer 实现 */
 
-internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
+internal abstract class AbstractItemRenderer<in C> : ItemRenderer<ItemStack, C> {
     /**
      * 渲染器的名字, 用来定位配置文件和生成日志.
      */
@@ -34,30 +48,58 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
 
     // 方便函数
 
-    protected inline fun <T> ItemTemplateMap.process(type: ItemTemplateType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
+    protected inline fun <T : Any> ItemStack.process(type: DataComponentType.Valued<T>, block: (T) -> Unit) {
+        getData(type)?.apply(block)
     }
 
-    protected inline fun <T1, T2> ItemTemplateMap.process(type1: ItemTemplateType<T1>, type2: ItemTemplateType<T2>, block: (T1?, T2?) -> Unit) {
-        block(get(type1), get(type2))
+    protected inline fun <T1 : Any, T2 : Any> ItemStack.process(type1: DataComponentType.Valued<T1>, type2: DataComponentType.Valued<T2>, block: (T1?, T2?) -> Unit) {
+        block(getData(type1), getData(type2))
     }
 
-    protected inline fun <T1, T2, T3> ItemTemplateMap.process(type1: ItemTemplateType<T1>, type2: ItemTemplateType<T2>, type3: ItemTemplateType<T3>, block: (T1?, T2?, T3?) -> Unit) {
-        block(get(type1), get(type2), get(type3))
+    protected inline fun <T1 : Any, T2 : Any, T3 : Any> ItemStack.process(type1: DataComponentType.Valued<T1>, type2: DataComponentType.Valued<T2>, type3: DataComponentType.Valued<T3>, block: (T1?, T2?, T3?) -> Unit) {
+        block(getData(type1), getData(type2), getData(type3))
     }
 
     // 方便函数
 
-    protected inline fun <T> ItemComponentMap.process(type: ItemComponentType<T>, block: (T) -> Unit) {
-        get(type)?.apply(block)
+    protected inline fun <T> ItemStack.process(type: ItemPropertyType<T>, block: (T) -> Unit) {
+        getProperty(type)?.apply(block)
     }
 
-    protected inline fun <T1, T2> ItemComponentMap.process(type1: ItemComponentType<T1>, type2: ItemComponentType<T2>, block: (T1?, T2?) -> Unit) {
-        block(get(type1), get(type2))
+    protected inline fun <T1, T2> ItemStack.process(type1: ItemPropertyType<T1>, type2: ItemPropertyType<T2>, block: (T1?, T2?) -> Unit) {
+        block(getProperty(type1), getProperty(type2))
     }
 
-    protected inline fun <T1, T2, T3> ItemComponentMap.process(type1: ItemComponentType<T1>, type2: ItemComponentType<T2>, type3: ItemComponentType<T3>, block: (T1?, T2?, T3?) -> Unit) {
-        block(get(type1), get(type2), get(type3))
+    protected inline fun <T1, T2, T3> ItemStack.process(type1: ItemPropertyType<T1>, type2: ItemPropertyType<T2>, type3: ItemPropertyType<T3>, block: (T1?, T2?, T3?) -> Unit) {
+        block(getProperty(type1), getProperty(type2), getProperty(type3))
+    }
+
+    // 方便函数
+
+    protected inline fun <T> ItemStack.process(type: ItemDataType<T>, block: (T) -> Unit) {
+        getData(type)?.apply(block)
+    }
+
+    protected inline fun <T1, T2> ItemStack.process(type1: ItemDataType<T1>, type2: ItemDataType<T2>, block: (T1?, T2?) -> Unit) {
+        block(getData(type1), getData(type2))
+    }
+
+    protected inline fun <T1, T2, T3> ItemStack.process(type1: ItemDataType<T1>, type2: ItemDataType<T2>, type3: ItemDataType<T3>, block: (T1?, T2?, T3?) -> Unit) {
+        block(getData(type1), getData(type2), getData(type3))
+    }
+
+    // 方便函数
+
+    protected inline fun <U : ItemMetaEntry<V>, V> ItemStack.process(type: ItemMetaType<U, V>, block: (U) -> Unit) {
+       getMeta(type)?.apply(block)
+    }
+
+    protected inline fun <U1 : ItemMetaEntry<V1>, U2 : ItemMetaEntry<V2>, V1, V2> ItemStack.process(type1: ItemMetaType<U1, V1>, type2: ItemMetaType<U2, V2>, block: (U1?, U2?) -> Unit) {
+        block(getMeta(type1), getMeta(type2))
+    }
+
+    protected inline fun <U1 : ItemMetaEntry<V1>, U2 : ItemMetaEntry<V2>, U3 : ItemMetaEntry<V3>, V1, V2, V3> ItemStack.process(type1: ItemMetaType<U1, V1>, type2: ItemMetaType<U2, V2>, type3: ItemMetaType<U3, V3>, block: (U1?, U2?, U3?) -> Unit) {
+        block(getMeta(type1), getMeta(type2), getMeta(type3))
     }
 
     @VisibleForTesting
@@ -79,7 +121,7 @@ internal abstract class AbstractItemRenderer<in T, in C> : ItemRenderer<T, C> {
  * 具体的推荐用法, 请参考已经存在的实现.
  */
 internal abstract class RenderingHandlerRegistry(
-    private val renderer: AbstractItemRenderer<*, *>,
+    private val renderer: AbstractItemRenderer<*>,
 ) {
     /**
      * To explicitly initialize static block.

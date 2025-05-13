@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
@@ -13,7 +12,6 @@ import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
-import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -145,7 +143,7 @@ internal class SimpleRerollingTable(
         override val cellRuleMap: RerollingTable.CellRuleMap,
     ) : RerollingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("cellRuleMap", cellRuleMap),
+            ExaminableProperty.of("coreRuleMap", cellRuleMap),
         )
 
         override fun toString(): String = toSimpleString()
@@ -199,13 +197,13 @@ internal class TableCostBinding(
     @Binding("source_rarity")
     fun getSourceRarity(): Double {
         val mapping = session.table.rarityNumberMapping
-        val rarity = session.usableInput?.rarity?.getKeyOrThrow()?.value ?: return .0
+        val rarity = session.usableInput?.getData(ItemDataTypes.RARITY)?.getKeyOrThrow()?.value ?: return .0
         return mapping.get(rarity)
     }
 
     @Binding("source_level")
     fun getSourceLevel(): Int {
-        return session.usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+        return session.usableInput?.getData(ItemDataTypes.LEVEL)?.level ?: 0
     }
 
     @Binding("cell_count")
@@ -243,6 +241,6 @@ internal class CellCostBinding(
 
     @Binding("mod_count")
     fun getModCount(): Int {
-        return session.usableInput?.reforgeHistory?.modCount ?: 0
+        return session.usableInput?.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: 0
     }
 }

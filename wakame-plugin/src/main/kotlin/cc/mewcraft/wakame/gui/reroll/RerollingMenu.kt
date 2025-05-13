@@ -4,8 +4,9 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.extension.reforgeHistory
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import cc.mewcraft.wakame.reforge.reroll.RerollingTable
 import cc.mewcraft.wakame.reforge.reroll.SimpleRerollingSession
@@ -230,23 +231,24 @@ internal class RerollingMenu(
             // 我们不选择渲染*重造之后*的物品, 因为那样必须绕很多弯路, 非常不好实现.
 
             // 输入的[原始物品]
-            val previewItem = session.originalInput?.wrap() ?: error("result is successful but the input item is null - this is a bug!")
+            val previewItem = session.originalInput ?: error("result is successful but the input item is null - this is a bug!")
 
             // 单独把 ReforgeHistory 赋值给[预览物品],
             // 这样玩家就可以知道物品重铸后的次数是多少.
-            previewItem.reforgeHistory = reforgeResult.output.reforgeHistory
+            val reforgeHistory = reforgeResult.output.getData(ItemDataTypes.REFORGE_HISTORY)
+            reforgeHistory?.let { previewItem.setData(ItemDataTypes.REFORGE_HISTORY, it) }
 
             // 使用重造台的物品渲染器渲染[预览物品]
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
             val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
-                standard { component("item_name", previewItem.bukkitStack.itemNameOrType) }
-                folded("item_lore", previewItem.bukkitStack.fastLoreOrEmpty)
+                standard { component("item_name", previewItem.itemNameOrType) }
+                folded("item_lore", previewItem.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
             }
 
-            slotDisplayResolved.applyTo(previewItem.bukkitStack)
+            slotDisplayResolved.applyTo(previewItem)
         } else {
             // 如果不可重造:
 
@@ -282,7 +284,7 @@ internal class RerollingMenu(
 
         val renderingCtx = RerollingTableContext(session, RerollingTableContext.Slot.INPUT)
         ItemRenderers.REROLLING_TABLE.render(sourceItem, renderingCtx)
-        val newItemStack = sourceItem.bukkitStack.clone()
+        val newItemStack = sourceItem.clone()
 
         return newItemStack
     }

@@ -5,8 +5,7 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.isKoish
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.merge.MergingSession
 import cc.mewcraft.wakame.reforge.merge.MergingTable
@@ -109,7 +108,7 @@ internal class MergingMenu(
             }
 
             e.isAdd -> {
-                val added = newItem?.wrap() ?: run {
+                val added = newItem?.takeIf { it.isKoish } ?: run {
                     e.isCancelled = true
                     viewer.sendMessage(TranslatableMessages.MSG_ERR_NOT_AUGMENT_CORE)
                     return
@@ -214,10 +213,10 @@ internal class MergingMenu(
     /**
      * 基于当前 [session] 的状态, 渲染物品 [source].
      */
-    private fun renderInputSlot(source: NekoStack): ItemStack {
+    private fun renderInputSlot(source: ItemStack): ItemStack {
         val context = MergingTableContext.MergeInputSlot(session)
         ItemRenderers.MERGING_TABLE.render(source, context)
-        return source.bukkitStack.clone()
+        return source.clone()
     }
 
     /**
@@ -245,13 +244,13 @@ internal class MergingMenu(
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
             val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
-                folded("item_lore", output.bukkitStack.fastLoreOrEmpty)
+                folded("item_lore", output.fastLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
                 folded("result_description", result.description)
             }
 
-            return slotDisplayResolved.applyTo(output.bukkitStack)
+            return slotDisplayResolved.applyTo(output)
         } else {
             return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.

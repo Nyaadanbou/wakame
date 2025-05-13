@@ -3,15 +3,28 @@
 
 package cc.mewcraft.wakame.display2.implementation.common
 
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.item.components.ItemElements
-import cc.mewcraft.wakame.item.components.ItemLevel
-import cc.mewcraft.wakame.item.components.ItemRarity
-import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.display2.IndexedDataRenderer
+import cc.mewcraft.wakame.display2.IndexedDataRenderer2
+import cc.mewcraft.wakame.display2.IndexedDataRenderer3
+import cc.mewcraft.wakame.display2.IndexedDataRenderer4
+import cc.mewcraft.wakame.display2.IndexedDataRenderer5
+import cc.mewcraft.wakame.display2.IndexedDataRenderer6
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler4
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler5
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler6
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 
@@ -20,18 +33,18 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
  */
 internal object CommonRenderingHandlers {
     @JvmField
-    val CUSTOM_NAME: RenderingHandlerRegistry.() -> RenderingHandler<CustomName, SingleValueRendererFormat> = xconfigure("custom_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
+    val CUSTOM_NAME: RenderingHandlerRegistry.() -> RenderingHandler<MetaCustomName, SingleValueRendererFormat> = xconfigure("custom_name") { data, format ->
+        format.render(Placeholder.component("value", data.customName))
     }
 
     @JvmField
-    val ELEMENTS: RenderingHandlerRegistry.() -> RenderingHandler<ItemElements, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
-        format.render(data.elements) { it.unwrap().displayName }
+    val ELEMENTS: RenderingHandlerRegistry.() -> RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
+        format.render(data) { it.unwrap().displayName }
     }
 
     @JvmField
-    val ITEM_NAME: RenderingHandlerRegistry.() -> RenderingHandler<ItemName, SingleValueRendererFormat> = xconfigure("item_name") { data, format ->
-        format.render(Placeholder.parsed("value", data.plainName))
+    val ITEM_NAME: RenderingHandlerRegistry.() -> RenderingHandler<MetaItemName, SingleValueRendererFormat> = xconfigure("item_name") { data, format ->
+        format.render(Placeholder.parsed("value", data.itemName))
     }
 
     @JvmField
@@ -41,15 +54,15 @@ internal object CommonRenderingHandlers {
 
     @JvmField
     val LORE: RenderingHandlerRegistry.() -> RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = xconfigure("lore") { data, format ->
-        format.render(data.processedLore)
+        format.render(data.lore)
     }
 
     @JvmField
-    val RARITY: RenderingHandlerRegistry.() -> RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = xconfigure2("rarity") { data1, data2, format ->
+    val RARITY: RenderingHandlerRegistry.() -> RenderingHandler2<RegistryEntry<Rarity>, ReforgeHistory, RarityRendererFormat> = xconfigure2("rarity") { data1, data2, format ->
         if (data2 == ReforgeHistory.ZERO) {
-            format.renderSimple(data1.rarity)
+            format.renderSimple(data1)
         } else {
-            format.renderComplex(data1.rarity, data2.modCount)
+            format.renderComplex(data1, data2.modCount)
         }
     }
 

@@ -3,29 +3,44 @@ package cc.mewcraft.wakame.display2.implementation.modding_table
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.SimpleIndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.*
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.extension.fastLore
-import cc.mewcraft.wakame.item.extension.hideAll
-import cc.mewcraft.wakame.item.isNetworkRewrite
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler3
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
+import cc.mewcraft.wakame.display2.implementation.common.HardcodedRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.data.impl.VirtualCore
+import cc.mewcraft.wakame.item2.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.reforge.mod.ModdingSession
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.adventure.removeItalic
+import cc.mewcraft.wakame.util.item.fastLore
+import cc.mewcraft.wakame.util.item.hideAll
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
+import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
-
 
 internal class ModdingTableRendererFormatRegistry(renderer: ModdingTableItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
@@ -54,7 +69,7 @@ internal sealed interface ModdingTableContext {
     stage = InitStage.POST_WORLD
 )
 @Reload
-internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, ModdingTableContext>() {
+internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableContext>() {
     override val name: String = "modding_table"
     override val formats = ModdingTableRendererFormatRegistry(this)
     override val layout = ModdingTableRendererLayout(this)
@@ -76,40 +91,40 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: NekoStack, context: ModdingTableContext?) {
+    override fun render(item: ItemStack, context: ModdingTableContext?) {
         requireNotNull(context) { "context" }
 
         item.isNetworkRewrite = false
 
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        val templates = item.templates
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        item.process(ItemMetaTypes.ITEM_NAME) { data -> ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
 
-        val components = item.components
-        components.process(ItemComponentTypes.ELEMENTS) { data -> ModdingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.LEVEL) { data -> ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
+        item.process(ItemDataTypes.ELEMENT) { data -> ModdingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        item.process(ItemDataTypes.LEVEL) { data -> ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
+        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
             val data2 = data2 ?: ReforgeHistory.ZERO
             ModdingTableRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
 
         if (context is ModdingTableContext.Input) {
-            components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, cell.id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, cell.id, context)
+            item.process(ItemDataTypes.CORE_CONTAINER) { data ->
+                for ((id, core) in data) when (core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, context)
+                    is VirtualCore -> IndexedText.NOP
                 }
             }
         }
 
         if (context is ModdingTableContext.Output) {
-            components.process(ItemComponentTypes.CELLS) { data ->
-                for ((_, cell) in data) when (val core = cell.core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, cell.id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, cell.id, context)
+            item.process(ItemDataTypes.CORE_CONTAINER) { data ->
+                for ((id, core) in data) when (core) {
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, context)
+                    is VirtualCore -> IndexedText.NOP
                 }
             }
 
@@ -128,8 +143,6 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<NekoStack, Moddi
         item.fastLore(lore)
 
         item.hideAll()
-
-        item.erase()
     }
 }
 
@@ -160,7 +173,7 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     }
 
     @JvmField
-    val REPLACE_IN: RenderingHandler2<PortableCore, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
+    val REPLACE_IN: RenderingHandler2<Core, ModdingTableContext, HardcodedRendererFormat> = configure2("replace_input") { core, context, format ->
         SimpleIndexedText(format.index, core.description)
     }
 
@@ -170,17 +183,17 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENTS: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
 
     @JvmField
-    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
     val LEVEL: RenderingHandler<ItemLevel, SingleValueRendererFormat> = CommonRenderingHandlers.LEVEL(this)
 
     @JvmField
-    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
+    val RARITY: RenderingHandler2<RegistryEntry<Rarity>, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 }

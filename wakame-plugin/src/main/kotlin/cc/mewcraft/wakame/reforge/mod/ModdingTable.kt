@@ -77,7 +77,7 @@ interface ModdingTable : Examinable {
         /**
          * 该物品每个核孔的定制规则.
          */
-        val cellRuleMap: CellRuleMap
+        val coreRuleMap: CoreRuleMap
     }
 
     /**
@@ -135,10 +135,10 @@ interface ModdingTable : Examinable {
     /**
      * 储存了每个核孔的定制规则.
      */
-    interface CellRuleMap : Examinable {
+    interface CoreRuleMap : Examinable {
 
         companion object {
-            fun empty(): CellRuleMap = EmptyCellRuleMap
+            fun empty(): CoreRuleMap = EmptyCoreRuleMap
         }
 
         /**
@@ -198,8 +198,8 @@ private object EmptyItemRule : ModdingTable.ItemRule {
         get() = GenericKeys.EMPTY
     override val modLimit: Int
         get() = 0
-    override val cellRuleMap: ModdingTable.CellRuleMap
-        get() = EmptyCellRuleMap
+    override val coreRuleMap: ModdingTable.CoreRuleMap
+        get() = EmptyCoreRuleMap
 }
 
 private object EmptyCellRule : ModdingTable.CellRule {
@@ -213,7 +213,7 @@ private object EmptyCellRule : ModdingTable.CellRule {
     }
 }
 
-private object EmptyCellRuleMap : ModdingTable.CellRuleMap {
+private object EmptyCoreRuleMap : ModdingTable.CoreRuleMap {
     override val comparator: Comparator<String?> = nullsLast(naturalOrder())
     override fun get(key: String): ModdingTable.CellRule? = null
 }

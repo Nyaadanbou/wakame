@@ -11,7 +11,7 @@ import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
-interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
+sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
 
     companion object {
         @JvmField

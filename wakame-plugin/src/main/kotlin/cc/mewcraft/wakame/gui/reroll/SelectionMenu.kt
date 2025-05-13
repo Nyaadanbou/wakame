@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.gui.reroll
 
-import cc.mewcraft.wakame.item.extension.cells
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -36,8 +37,7 @@ private constructor(
     private inner class IndicatorItem : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             val sourceItem = parent.session.usableInput ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
-            val sourceCell = sourceItem.cells?.get(selection.id) ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
-            val sourceCore = sourceCell.core
+            val sourceCore = sourceItem.getData(ItemDataTypes.CORE_CONTAINER)?.get(selection.id) ?: return parent.table.selectionMenuSettings.getSlotDisplay("error").resolveToItemWrapper()
             return parent.table.selectionMenuSettings.getSlotDisplay("core_view").resolveToItemWrapper {
                 standard { component("core_name", sourceCore.displayName) }
                 folded("core_description", sourceCore.description)

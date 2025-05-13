@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.util.MojangStack
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
 
-interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
+sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
 
     companion object {
 
