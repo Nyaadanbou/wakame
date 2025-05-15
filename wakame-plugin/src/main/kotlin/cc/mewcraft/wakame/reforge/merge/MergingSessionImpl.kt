@@ -5,15 +5,12 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.extension.level
-import cc.mewcraft.wakame.item.extension.portableCore
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.ItemStackDelegates
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
@@ -26,20 +23,19 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
-import java.util.*
 import java.util.stream.Stream
 import kotlin.properties.Delegates
 
 internal class SimpleMergingSession(
     override val viewer: Player,
     override val table: MergingTable,
-    inputItem1: NekoStack? = null,
-    inputItem2: NekoStack? = null,
+    inputItem1: ItemStack? = null,
+    inputItem2: ItemStack? = null,
 ) : MergingSession {
     private val logger: Logger = LOGGER.decorate(prefix = ReforgingStationConstants.MERING_LOG_PREFIX)
 
-    override var inputItem1: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem1)
-    override var inputItem2: NekoStack? by NekoStackDelegates.nullableCopyOnWrite(inputItem2)
+    override var inputItem1: ItemStack? by ItemStackDelegates.nullableCopyOnWrite(inputItem1)
+    override var inputItem2: ItemStack? by ItemStackDelegates.nullableCopyOnWrite(inputItem2)
 
     private enum class InputSlot {
         INPUT1, INPUT2
@@ -57,7 +53,7 @@ internal class SimpleMergingSession(
         val item = when (slot) {
             InputSlot.INPUT1 -> inputItem1
             InputSlot.INPUT2 -> inputItem2
-        }?.bukkitStack?.clone()
+        }?.clone()
 
         if (item != null) {
             try {
@@ -77,7 +73,7 @@ internal class SimpleMergingSession(
     override fun returnInputItem2(viewer: Player) = returnInputItem(viewer, InputSlot.INPUT2)
     override fun getFinalOutputs(): Array<ItemStack> {
         if (latestResult.isSuccess) {
-            return arrayOf(latestResult.output.bukkitStack.clone())
+            return arrayOf(latestResult.output.clone())
         } else {
             return emptyArray()
         }
@@ -132,24 +128,24 @@ internal class SimpleMergingSession(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun getValue(inputItem: NekoStack?): Double {
-        val core = inputItem?.portableCore?.wrapped as? AttributeCore ?: return .0
-        val scalar = core.data as? AttributeBundleTrait.Scalar<Double>
+    private fun getValue(inputItem: ItemStack?): Double {
+        val core = inputItem?.getData(ItemDataTypes.CORE) as? AttributeCore ?: return .0
+        val scalar = core.wrapped as? AttributeBundleTrait.Scalar<Double>
         return scalar?.value ?: .0
     }
 
     // 物品不存在, 返回 .0
     // 物品存在, 返回物品等级
-    private fun getLevel(inputItem: NekoStack?): Double {
-        return inputItem?.level?.toDouble() ?: .0
+    private fun getLevel(inputItem: ItemStack?): Double {
+        return inputItem?.getData(ItemDataTypes.LEVEL)?.level?.toDouble() ?: .0
     }
 
-    private fun getRarityNumber(inputItem: NekoStack?): Double {
-        return inputItem?.rarity?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
+    private fun getRarityNumber(inputItem: ItemStack?): Double {
+        return inputItem?.getData(ItemDataTypes.RARITY)?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
     }
 
-    private fun getPenalty(inputItem: NekoStack?): Double {
-        return inputItem?.reforgeHistory?.modCount?.toDouble() ?: .0
+    private fun getPenalty(inputItem: ItemStack?): Double {
+        return inputItem?.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount?.toDouble() ?: .0
     }
 
     override fun getValue1(): Double = getValue(inputItem1)
@@ -178,20 +174,20 @@ internal object ReforgeResult {
      * 构建一个用于表示*没有合并*的 [MergingSession.ReforgeResult].
      */
     fun empty(player: Player): MergingSession.ReforgeResult {
-        return Simple(false, TranslatableMessages.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), NekoStack.empty())
+        return Simple(false, TranslatableMessages.MSG_MERGING_RESULT_EMPTY.translate(player), ReforgeType.empty(player), ReforgeCost.zero(player), ItemStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并失败*的 [MergingSession.ReforgeResult].
      */
     fun failure(player: Player, description: ComponentLike): MergingSession.ReforgeResult {
-        return Simple(false, description.translate(player), ReforgeType.failure(player), ReforgeCost.failure(player), NekoStack.empty())
+        return Simple(false, description.translate(player), ReforgeType.failure(player), ReforgeCost.failure(player), ItemStack.empty())
     }
 
     /**
      * 构建一个用于表示*合并成功*的 [MergingSession.ReforgeResult].
      */
-    fun success(player: Player, item: NekoStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
+    fun success(player: Player, item: ItemStack, type: MergingSession.ReforgeType, cost: MergingSession.ReforgeCost): MergingSession.ReforgeResult {
         return Simple(true, TranslatableMessages.MSG_MERGING_RESULT_SUCCESS.translate(player), type, cost, item)
     }
 
@@ -200,9 +196,9 @@ internal object ReforgeResult {
         override val description: Component,
         override val reforgeType: MergingSession.ReforgeType,
         override val reforgeCost: MergingSession.ReforgeCost,
-        output: NekoStack,
+        output: ItemStack,
     ) : MergingSession.ReforgeResult, Examinable {
-        override val output: NekoStack by NekoStackDelegates.copyOnRead(output)
+        override val output: ItemStack by ItemStackDelegates.copyOnRead(output)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("isSuccess", isSuccess),

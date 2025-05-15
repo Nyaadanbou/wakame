@@ -1,6 +1,10 @@
 package cc.mewcraft.wakame.display2.implementation.standard
 
-import cc.mewcraft.wakame.display2.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.SimpleTextMeta
+import cc.mewcraft.wakame.display2.SourceIndex
+import cc.mewcraft.wakame.display2.SourceOrdinal
+import cc.mewcraft.wakame.display2.TextMetaFactory
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -18,7 +22,7 @@ internal data class AttributeCoreTextMeta(
     override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
 
     /**
-     * 实现要求: 返回的列表必须是 [CellularAttributeRendererFormat.computeIndex] 的超集.
+     * 实现要求: 返回的列表必须是 [CoreAttributeRendererFormat.computeIndex] 的超集.
      */
     override fun deriveIndexes(): List<DerivedIndex> {
         val sourceNamespace = sourceIndex.namespace()
@@ -50,25 +54,5 @@ internal data class AttributeCoreTextMetaFactory(
     override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
         val derivationRule = AttributeCoreTextMeta.DerivationRule(operationIndex, elementIndex)
         return AttributeCoreTextMeta(sourceIndex, sourceOrdinal, defaultText, derivationRule)
-    }
-}
-
-internal data class AbilityCoreTextMeta(
-    override val sourceIndex: SourceIndex,
-    override val sourceOrdinal: SourceOrdinal,
-    override val defaultText: List<Component>?,
-) : SimpleTextMeta {
-    override val derivedIndexes: List<DerivedIndex> = deriveIndexes()
-
-    override fun deriveIndexes(): List<DerivedIndex> {
-        return listOf(sourceIndex)
-    }
-}
-
-internal data class AbilityCoreTextMetaFactory(
-    private val namespace: String,
-) : TextMetaFactory {
-    override fun create(sourceIndex: SourceIndex, sourceOrdinal: SourceOrdinal, defaultText: List<Component>?): SimpleTextMeta {
-        return AbilityCoreTextMeta(sourceIndex, sourceOrdinal, defaultText)
     }
 }

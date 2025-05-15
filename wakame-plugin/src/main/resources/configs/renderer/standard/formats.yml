@@ -22,7 +22,7 @@ attack_speed:
     line: "<!i><white>攻击速度<gray>: <value>"
 
 # id: <有效的属性 id>
-cells/attributes:
+core/attributes:
   namespace: attribute
   ordinal:
     # 元素排序
@@ -39,12 +39,8 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
-# id: <有效的技能 id, 如果带命名空间, 则把冒号换成 '/'>
-cells/skills:
-  namespace: skill
-
-# id: `cells/empty`
-cells/empty:
+# id: `core/empty`
+core/empty:
   namespace: stash
   tooltip:
     - "<dark_gray>[ 空核孔 ]"
@@ -64,8 +60,8 @@ custom_name:
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<value>"
 
-# id: `elements`
-elements:
+# id: `element`
+element:
   namespace: general
   # 可用标签
   # <merged> 多个元素合并后的文本
@@ -94,7 +90,6 @@ food:
   tooltip:
     - "<!i><blue>饥饿值 +<nutrition>"
     - "<!i><blue>饱和度 +<saturation>"
-    - "<!i><blue>食用时间: <eat_seconds>"
 
 # id: `item_name`
 item_name:
@@ -103,8 +98,8 @@ item_name:
   # <value> 物品的 `minecraft:item_name`
   tooltip: "<value>"
 
-# id: `kizamiz`
-kizamiz:
+# id: `kizami`
+kizami:
   namespace: general
   # 可用标签
   # <merged> 多个铭刻合并后的文本
@@ -131,8 +126,8 @@ lore:
     header: []
     bottom: []
 
-# id: `portable_core`
-portable_core:
+# id: `core`
+core:
   namespace: special
 
 # id: `rarity`

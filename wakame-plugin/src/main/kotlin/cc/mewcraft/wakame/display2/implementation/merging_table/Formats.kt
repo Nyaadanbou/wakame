@@ -1,7 +1,12 @@
 package cc.mewcraft.wakame.display2.implementation.merging_table
 
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.item.components.PortableCore
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
@@ -22,7 +27,7 @@ internal data class MergeOutputRendererFormat(
     override val textMetaFactory: TextMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)
 
-    fun render(data: PortableCore): IndexedText {
+    fun render(data: Core): IndexedText {
         return SimpleIndexedText(
             index, data.description
                 .map(Component::plain) // 先转成纯文本, 使得 regex 可以正常匹配

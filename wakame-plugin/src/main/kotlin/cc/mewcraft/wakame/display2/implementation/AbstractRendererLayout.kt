@@ -18,7 +18,7 @@ import kotlin.io.path.readText
 /* 这里定义了可以在不同渲染器之间通用的 RendererLayout 实现 */
 
 internal abstract class AbstractRendererLayout(
-    protected val renderer: AbstractItemRenderer<*, *>,
+    protected val renderer: AbstractItemRenderer<*>,
 ) : RendererLayout {
 
     companion object Shared {

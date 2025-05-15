@@ -58,7 +58,7 @@ interface RerollingSession : Examinable {
      * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
      */
     @VariableByPlayer
-    val usableInput: NekoStack?
+    val usableInput: ItemStack?
 
     /**
      * 当前 [usableInput] 的重铸规则.
@@ -134,7 +134,7 @@ interface RerollingSession : Examinable {
          * 重造后的物品.
          */
         @get:Contract(" -> new")
-        val output: NekoStack
+        val output: ItemStack
     }
 
     /**

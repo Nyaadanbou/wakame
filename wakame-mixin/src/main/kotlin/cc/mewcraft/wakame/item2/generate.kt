@@ -5,6 +5,7 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
@@ -87,7 +88,7 @@ object KoishStackGenerator {
         return itemstack.toBukkit()
     }
 
-    private fun <U, V> makePersistentDataThenWrite(
+    private fun <U : ItemMetaEntry<V>, V> makePersistentDataThenWrite(
         metaType: ItemMetaType<U, V>,
         metaContainer: ItemMetaContainer,
         itemstack: MojangStack,

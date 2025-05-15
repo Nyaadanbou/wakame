@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStati
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.ItemStacks
-import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.giveItemStack
@@ -102,8 +101,7 @@ internal object StationResultSerializer : TypeSerializer2<RecipeResult> {
  * 方便函数.
  */
 private fun ItemStack.render(): ItemStack {
-    val nekoStack = wrap() ?: return this
-    val context = CraftingStationContext(Pos.RESULT, erase = true)
-    ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
+    val context = CraftingStationContext(Pos.RESULT)
+    ItemRenderers.CRAFTING_STATION.render(this, context)
     return this
 }
