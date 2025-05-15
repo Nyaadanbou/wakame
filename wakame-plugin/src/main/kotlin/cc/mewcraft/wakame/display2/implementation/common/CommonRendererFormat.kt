@@ -82,6 +82,8 @@ internal data class EnchantmentRendererFormat(
      * @param data 魔咒和等级的映射
      */
     fun render(data: Map<Enchantment, Int>): IndexedText {
+        if (data.isEmpty())
+            return IndexedText.NOP
         return SimpleIndexedText(index, data.map { (enchantment, level) -> enchantment.displayName(level).removeItalic })
     }
 }

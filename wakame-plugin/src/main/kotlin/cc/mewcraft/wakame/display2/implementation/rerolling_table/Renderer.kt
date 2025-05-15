@@ -107,16 +107,16 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
         when (slot) {
             RerollingTableContext.Slot.INPUT -> {
                 when (core) {
-                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_IN.process(collector, id, core, context)
-                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, core, context)
+                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_IN.process(collector, id, core, context)
+                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, core, context)
                     is VirtualCore -> IndexedText.NOP
                 }
             }
 
             RerollingTableContext.Slot.OUTPUT -> {
                 when (core) {
-                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_OUT.process(collector, id, core, context)
-                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, core, context)
+                    is AttributeCore -> RerollingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_OUT.process(collector, id, core, context)
+                    is EmptyCore -> RerollingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, core, context)
                     is VirtualCore -> IndexedText.NOP
                 }
             }
@@ -128,26 +128,26 @@ internal object RerollingTableItemRenderer : AbstractItemRenderer<RerollingTable
 
 internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistry(RerollingTableItemRenderer) {
     @JvmField
-    val CELLULAR_ATTRIBUTE_IN: RenderingHandler3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
-        configure3("cells/attributes/in") { id, core, context, format ->
+    val CORE_ATTRIBUTE_IN: RenderingHandler3<String, AttributeCore, RerollingTableContext, CoreAttributeRendererFormat> =
+        configure3("core/attributes/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_OUT: RenderingHandler3<String, AttributeCore, RerollingTableContext, CellularAttributeRendererFormat> =
-        configure3("cells/attributes/out") { id, core, context, format ->
+    val CORE_ATTRIBUTE_OUT: RenderingHandler3<String, AttributeCore, RerollingTableContext, CoreAttributeRendererFormat> =
+        configure3("core/attributes/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_EMPTY_IN: RenderingHandler3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
-        configure3("cells/empty/in") { id, core, context, format ->
+    val CORE_EMPTY_IN: RenderingHandler3<String, EmptyCore, RerollingTableContext, CoreEmptyRendererFormat> =
+        configure3("core/empty/in") { id, core, context, format ->
             format.render(id, core, context)
         }
 
     @JvmField
-    val CELLULAR_EMPTY_OUT: RenderingHandler3<String, EmptyCore, RerollingTableContext, CellularEmptyRendererFormat> =
-        configure3("cells/empty/out") { id, core, context, format ->
+    val CORE_EMPTY_OUT: RenderingHandler3<String, EmptyCore, RerollingTableContext, CoreEmptyRendererFormat> =
+        configure3("core/empty/out") { id, core, context, format ->
             format.render(id, core, context)
         }
 
@@ -155,7 +155,7 @@ internal object RerollingTableRenderingHandlerRegistry : RenderingHandlerRegistr
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENT: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENT(this)
 
     @JvmField
     val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)

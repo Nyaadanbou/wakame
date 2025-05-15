@@ -23,9 +23,8 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
-
 @ConfigSerializable
-internal data class CellularAttributeRendererFormat(
+internal data class CoreAttributeRendererFormat(
     override val namespace: String,
     private val ordinal: AttributeCoreOrdinalFormat,
 ) : RendererFormat.Dynamic<AttributeCore> {
@@ -45,7 +44,7 @@ internal data class CellularAttributeRendererFormat(
 }
 
 @ConfigSerializable
-internal data class CellularEmptyRendererFormat(
+internal data class CoreEmptyRendererFormat(
     override val namespace: String,
     private val tooltip: List<Component>,
 ) : RendererFormat.Simple {

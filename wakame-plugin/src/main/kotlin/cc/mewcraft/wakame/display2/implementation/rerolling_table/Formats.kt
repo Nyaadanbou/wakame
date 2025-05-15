@@ -65,7 +65,7 @@ internal data class RerollingDifferenceFormats(
 }
 
 @ConfigSerializable
-internal data class CellularAttributeRendererFormat(
+internal data class CoreAttributeRendererFormat(
     override val namespace: String,
     private val ordinal: AttributeCoreOrdinalFormat,
     private val diffFormats: RerollingDifferenceFormats,
@@ -93,7 +93,7 @@ internal data class CellularAttributeRendererFormat(
 }
 
 @ConfigSerializable
-internal data class CellularEmptyRendererFormat(
+internal data class CoreEmptyRendererFormat(
     override val namespace: String,
     private val tooltip: List<Component>,
     private val diffFormats: RerollingDifferenceFormats,

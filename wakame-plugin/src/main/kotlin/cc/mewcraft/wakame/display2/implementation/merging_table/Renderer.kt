@@ -82,7 +82,7 @@ internal object MergingTableItemRenderer : AbstractItemRenderer<MergingTableCont
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> MergingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
         item.process(ItemMetaTypes.ITEM_NAME) { data -> MergingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
 
-        item.process(ItemDataTypes.ELEMENT) { data -> MergingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        item.process(ItemDataTypes.ELEMENT) { data -> MergingTableRenderingHandlerRegistry.ELEMENT.process(collector, data) }
         item.process(ItemDataTypes.LEVEL) { data -> MergingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
@@ -114,7 +114,7 @@ internal object MergingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENT: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENT(this)
 
     @JvmField
     val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)

@@ -38,7 +38,7 @@ internal object CommonRenderingHandlers {
     }
 
     @JvmField
-    val ELEMENTS: RenderingHandlerRegistry.() -> RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = xconfigure("elements") { data, format ->
+    val ELEMENT: RenderingHandlerRegistry.() -> RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = xconfigure("element") { data, format ->
         format.render(data) { it.unwrap().displayName }
     }
 

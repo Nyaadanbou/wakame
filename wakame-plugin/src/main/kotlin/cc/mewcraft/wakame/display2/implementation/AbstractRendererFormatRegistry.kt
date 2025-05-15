@@ -51,7 +51,8 @@ internal abstract class AbstractRendererFormatRegistry(
         for ((id, type) in typeIdToRendererFormatType) {
             val node = rootNode.node(id)
             if (node.virtual()) {
-                LOGGER.warn("Renderer format '$id' is not found in '$relativeTo'")
+                LOGGER.error("Renderer format '$id' is not found in '$relativeTo'")
+                continue
             }
             val format = node.require<RendererFormat>(type)
 

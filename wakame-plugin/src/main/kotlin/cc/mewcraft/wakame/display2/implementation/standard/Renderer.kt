@@ -98,7 +98,7 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
 
         item.process(ItemDataTypes.CORE_CONTAINER) { data -> for ((_, core) in data) renderCore(collector, core) }
         item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-        item.process(ItemDataTypes.ELEMENT) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        item.process(ItemDataTypes.ELEMENT) { data -> StandardRenderingHandlerRegistry.ELEMENT.process(collector, data) }
         item.process(ItemDataTypes.KIZAMI) { data -> StandardRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
         item.process(ItemDataTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
         item.process(ItemDataTypes.CORE) { data -> StandardRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
@@ -137,8 +137,8 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
-            is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
-            is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
+            is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
+            is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
             is VirtualCore -> IndexedText.NOP
         }
     }
@@ -162,12 +162,12 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE: RenderingHandler<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
+    val CORE_ATTRIBUTE: RenderingHandler<AttributeCore, CoreAttributeRendererFormat> = configure("core/attributes") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_EMPTY: RenderingHandler<EmptyCore, CellularEmptyRendererFormat> = configure("cells/empty") { data, format ->
+    val CORE_EMPTY: RenderingHandler<EmptyCore, CoreEmptyRendererFormat> = configure("core/empty") { data, format ->
         format.render(data)
     }
 
@@ -182,7 +182,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENT: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENT(this)
 
     @JvmField
     val ENCHANTMENTS: RenderingHandler<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
@@ -198,7 +198,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     val FOOD: RenderingHandler<FoodProperties, ListValueRendererFormat> = configure("food") { data, format ->
         format.render(
             Placeholder.component("nutrition", Component.text(data.nutrition())),
-            Placeholder.component("saturation", Component.text(data.saturation())),
+            Placeholder.component("saturation", Component.text(data.saturation()))
         )
     }
 

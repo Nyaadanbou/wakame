@@ -7,5 +7,5 @@ primary:
   - reforge:merge_input
   - reforge:merge_output
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:elements
+  - general:element
   - general:rarity

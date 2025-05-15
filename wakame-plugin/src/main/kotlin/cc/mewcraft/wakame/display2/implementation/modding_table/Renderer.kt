@@ -101,7 +101,7 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
         item.process(ItemMetaTypes.ITEM_NAME) { data -> ModdingTableRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> ModdingTableRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
 
-        item.process(ItemDataTypes.ELEMENT) { data -> ModdingTableRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
+        item.process(ItemDataTypes.ELEMENT) { data -> ModdingTableRenderingHandlerRegistry.ELEMENT.process(collector, data) }
         item.process(ItemDataTypes.LEVEL) { data -> ModdingTableRenderingHandlerRegistry.LEVEL.process(collector, data) }
         item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
@@ -112,8 +112,8 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
         if (context is ModdingTableContext.Input) {
             item.process(ItemDataTypes.CORE_CONTAINER) { data ->
                 for ((id, core) in data) when (core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_IN.process(collector, id, context)
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_IN.process(collector, id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_IN.process(collector, id, context)
                     is VirtualCore -> IndexedText.NOP
                 }
             }
@@ -122,8 +122,8 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
         if (context is ModdingTableContext.Output) {
             item.process(ItemDataTypes.CORE_CONTAINER) { data ->
                 for ((id, core) in data) when (core) {
-                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
-                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CELLULAR_EMPTY_OUT.process(collector, id, context)
+                    is AttributeCore -> ModdingTableRenderingHandlerRegistry.CORE_ATTRIBUTE_MAIN_OUT.process(collector, id, core, context)
+                    is EmptyCore -> ModdingTableRenderingHandlerRegistry.CORE_EMPTY_OUT.process(collector, id, context)
                     is VirtualCore -> IndexedText.NOP
                 }
             }
@@ -153,22 +153,22 @@ internal object ModdingTableItemRenderer : AbstractItemRenderer<ModdingTableCont
 internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(ModdingTableItemRenderer) {
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_IN: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/in") { id, attribute, context, format ->
+    val CORE_ATTRIBUTE_MAIN_IN: RenderingHandler3<String, AttributeCore, ModdingTableContext, CoreAttributeRendererFormat> = configure3("core/attributes/in") { id, attribute, context, format ->
         format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_ATTRIBUTE_MAIN_OUT: RenderingHandler3<String, AttributeCore, ModdingTableContext, CellularAttributeRendererFormat> = configure3("cells/attributes/out") { id, attribute, context, format ->
+    val CORE_ATTRIBUTE_MAIN_OUT: RenderingHandler3<String, AttributeCore, ModdingTableContext, CoreAttributeRendererFormat> = configure3("core/attributes/out") { id, attribute, context, format ->
         format.render(id, attribute, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_IN: RenderingHandler2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/in") { id, context, format ->
+    val CORE_EMPTY_IN: RenderingHandler2<String, ModdingTableContext, CoreEmptyRendererFormat> = configure2("core/empty/in") { id, context, format ->
         format.render(id, context)
     }
 
     @JvmField
-    val CELLULAR_EMPTY_OUT: RenderingHandler2<String, ModdingTableContext, CellularEmptyRendererFormat> = configure2("cells/empty/out") { id, context, format ->
+    val CORE_EMPTY_OUT: RenderingHandler2<String, ModdingTableContext, CoreEmptyRendererFormat> = configure2("core/empty/out") { id, context, format ->
         format.render(id, context)
     }
 
@@ -186,7 +186,7 @@ internal object ModdingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENT: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENT(this)
 
     @JvmField
     val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
