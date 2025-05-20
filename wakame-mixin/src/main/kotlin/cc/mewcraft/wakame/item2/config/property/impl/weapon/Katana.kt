@@ -50,5 +50,4 @@ data class Katana(
     val roundSlashCooldown: Int = 20,
     val dragonAscendSlashSpiritConsume: Int = 25,
     val dragonAscendSlashCooldown: Int = 40,
-    override val cancelVanillaDamage: Boolean = false,
-) : WeaponBase()
+)

@@ -36,12 +36,6 @@ object ItemBehaviorTypes {
     val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
     /**
-     * 作为斧的逻辑.
-     */
-    @JvmField
-    val AXE = typeOf("axe", Axe)
-
-    /**
      * 作为弓的逻辑.
      */
     @JvmField
@@ -54,28 +48,23 @@ object ItemBehaviorTypes {
     val CROSSBOW = typeOf("crossbow", Crossbow)
 
     /**
-     * 作为棍的逻辑.
-     */
-    @JvmField
-    val CUDGEL = typeOf("stick", Cudgel)
-
-    /**
-     * 作为锤的逻辑.
-     */
-    @JvmField
-    val HAMMER = typeOf("hammer", Hammer)
-
-    /**
      * 作为太刀的逻辑.
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
 
     /**
-     * 作为矛的逻辑.
+     * 作为锤的逻辑.
      */
     @JvmField
-    val SPEAR = typeOf("spear", Spear)
+    val MACE = typeOf("mace", Mace)
+
+    /**
+     * 作为一般近战武器的逻辑.
+     * 如斧等.
+     */
+    @JvmField
+    val MELEE = typeOf("melee", Melee)
 
     /**
      * 作为剑的逻辑.

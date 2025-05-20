@@ -85,8 +85,10 @@ object Katana : Weapon {
     override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
         val event = wrappedEvent.event
         if (event.useItemInHand() == Event.Result.DENY) return
+        if (event.action == Action.PHYSICAL) return
         if (event.hand != EquipmentSlot.HAND) {
-            event.setUseItemInHand(Event.Result.DENY) // 只允许主手使用太刀进行交互
+            // 太刀只允许主手交互
+            event.setUseItemInHand(Event.Result.DENY)
         }
         wrappedEvent.actionPerformed = true
     }
