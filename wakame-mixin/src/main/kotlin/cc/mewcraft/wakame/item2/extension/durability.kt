@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item2.extension
 
-import cc.mewcraft.wakame.item2.ItemDamageEventMarker
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EquipmentSlot
 
@@ -16,6 +15,4 @@ import org.bukkit.inventory.EquipmentSlot
 fun LivingEntity.damageItem(slot: EquipmentSlot, amount: Int) {
     // 执行 Paper 的逻辑
     damageItemStack(slot, amount)
-    // 正确处理此次的损耗
-    ItemDamageEventMarker.markAlreadyDamaged(this)
 }

@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 代表一种武器的物品行为.
  */
-interface Weapon : ItemBehavior {
+sealed interface Weapon : ItemBehavior {
 
     /**
      * 玩家使用该武器类型可造成的 [DamageMetadata].
