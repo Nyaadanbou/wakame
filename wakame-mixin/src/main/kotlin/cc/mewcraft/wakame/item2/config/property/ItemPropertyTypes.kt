@@ -4,8 +4,7 @@ import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
-import cc.mewcraft.wakame.item2.config.property.impl.weapon.Spear
-import cc.mewcraft.wakame.item2.config.property.impl.weapon.Weapon
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Sword
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
 import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
@@ -103,22 +102,13 @@ data object ItemPropertyTypes {
     val KATANA: ItemPropertyType<Katana> = typeOf("katana")
 
     @JvmField
-    val AXE: ItemPropertyType<Weapon> = typeOf("axe")
+    val MELEE: ItemPropertyType<Unit> = typeOf("melee")
 
     @JvmField
-    val CUDGEL: ItemPropertyType<Weapon> = typeOf("cudgel")
+    val SWORD: ItemPropertyType<Sword> = typeOf("sword")
 
     @JvmField
-    val HAMMER: ItemPropertyType<Weapon> = typeOf("hammer")
-
-    @JvmField
-    val SPEAR: ItemPropertyType<Spear> = typeOf("spear")
-
-    @JvmField
-    val SWORD: ItemPropertyType<Weapon> = typeOf("sword")
-
-    @JvmField
-    val TRIDENT: ItemPropertyType<Weapon> = typeOf("trident")
+    val TRIDENT: ItemPropertyType<Unit> = typeOf("trident")
 
     // ------------
     // 方便函数

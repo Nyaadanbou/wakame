@@ -16,5 +16,4 @@ data class Sword(
     val attackHalfHeight: Float = 0.05f,
     val attackHalfDepth: Float = 1.5f,
     val attackCooldown: Int = 12,
-    override val cancelVanillaDamage: Boolean = false,
-) : WeaponBase()
+)
