@@ -87,7 +87,7 @@ internal class RecipeMatcherResult(
                             // 类似上面的 "choice_exp", 只不过这里是 "choice_item"
                             resolve("choice_item") {
                                 preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
-                                parsed("item", choice.item.displayName())
+                                component("item", choice.item.name)
                                 component("amount", Component.text(choice.amount))
                             }
                         }

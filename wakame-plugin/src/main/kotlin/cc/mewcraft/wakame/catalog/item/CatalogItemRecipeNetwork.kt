@@ -1,9 +1,19 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.catalog.item.recipe.*
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogBlastingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogCampfireRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogFurnaceRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapedRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapelessRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTransformRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTrimRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmokingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogStandardRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogStonecuttingRecipe
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -13,18 +23,26 @@ import com.google.common.graph.ImmutableNetwork
 import com.google.common.graph.MutableNetwork
 import com.google.common.graph.NetworkBuilder
 import org.bukkit.Bukkit
-import org.bukkit.inventory.*
+import org.bukkit.inventory.BlastingRecipe
+import org.bukkit.inventory.CampfireRecipe
+import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingTransformRecipe
+import org.bukkit.inventory.SmithingTrimRecipe
+import org.bukkit.inventory.SmokingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 @Init(stage = InitStage.POST_WORLD)
 object CatalogItemRecipeNetwork {
 
-    private lateinit var network: ImmutableNetwork<ItemX, CatalogRecipeEdge>
+    private lateinit var network: ImmutableNetwork<ItemRef, CatalogRecipeEdge>
 
     /**
      * 获取特定物品的所有获取方式 (来源).
      */
-    fun getSource(node: ItemX): Set<CatalogRecipe> {
+    fun getSource(node: ItemRef): Set<CatalogRecipe> {
         if (!network.nodes().contains(node)) return emptySet()
         return network.inEdges(node).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -32,7 +50,7 @@ object CatalogItemRecipeNetwork {
     /**
      * 获取特定物品的所有可参与制作 (用途).
      */
-    fun getUsage(node: ItemX): Set<CatalogRecipe> {
+    fun getUsage(node: ItemRef): Set<CatalogRecipe> {
         if (!network.nodes().contains(node)) return emptySet()
         return network.outEdges(node).map(CatalogRecipeEdge::recipe).toSet()
     }
@@ -58,12 +76,12 @@ object CatalogItemRecipeNetwork {
         network = buildNetWork()
     }
 
-    private fun buildNetWork(): ImmutableNetwork<ItemX, CatalogRecipeEdge> {
+    private fun buildNetWork(): ImmutableNetwork<ItemRef, CatalogRecipeEdge> {
         LOGGER.info("Building catalog recipe network")
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
         // 平行边: 淡灰色染料无序合成配方(白色染料+灰色染料->淡灰色染料*2 白色染料*2+黑色染料->灰色染料*3)
-        val network: MutableNetwork<ItemX, CatalogRecipeEdge> = NetworkBuilder
+        val network: MutableNetwork<ItemRef, CatalogRecipeEdge> = NetworkBuilder
             .directed()
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
@@ -110,7 +128,7 @@ object CatalogItemRecipeNetwork {
      * 方便函数.
      * 输入输出存在空时会抛异常.
      */
-    private fun MutableNetwork<ItemX, CatalogRecipeEdge>.addRecipe(
+    private fun MutableNetwork<ItemRef, CatalogRecipeEdge>.addRecipe(
         catalogRecipe: CatalogRecipe,
         errorMessage: String,
     ) {
@@ -135,7 +153,7 @@ object CatalogItemRecipeNetwork {
      * 方便函数.
      * 输入输出存在空时仅跳过.
      */
-    private fun MutableNetwork<ItemX, CatalogRecipeEdge>.addRecipe(
+    private fun MutableNetwork<ItemRef, CatalogRecipeEdge>.addRecipe(
         catalogRecipe: CatalogRecipe,
     ) {
         val lookupInputs = catalogRecipe.getLookupInputs()

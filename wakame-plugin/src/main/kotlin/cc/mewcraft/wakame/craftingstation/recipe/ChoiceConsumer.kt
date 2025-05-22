@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.util.removeItem
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
@@ -95,13 +95,13 @@ internal class ItemChoiceConsumerContext(
     override val player: Player,
 ) : ChoiceConsumerContext {
     // 要被消耗掉的物品堆叠
-    private val items: Object2IntOpenHashMap<ItemX> = Object2IntOpenHashMap()
+    private val items: Object2IntOpenHashMap<ItemRef> = Object2IntOpenHashMap()
 
-    fun add(itemX: ItemX, amount: Int) {
-        items.mergeInt(itemX, amount) { oldValue, newValue -> oldValue + newValue }
+    fun add(itemRef: ItemRef, amount: Int) {
+        items.mergeInt(itemRef, amount) { oldValue, newValue -> oldValue + newValue }
     }
 
-    fun get(): Map<ItemX, Int> {
+    fun get(): Map<ItemRef, Int> {
         return items
     }
 }

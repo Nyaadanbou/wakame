@@ -4,17 +4,34 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.catalog.item.CatalogItemRecipeNetwork
-import cc.mewcraft.wakame.catalog.item.recipe.*
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogBlastingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogCampfireRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogCookingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogFurnaceRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapedRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogShapelessRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTransformRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmithingTrimRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmokingRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogStandardRecipe
+import cc.mewcraft.wakame.catalog.item.recipe.CatalogStonecuttingRecipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.*
+import org.bukkit.inventory.CookingRecipe
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.scheduler.BukkitTask
 import xyz.xenondevs.invui.InvUI
 import xyz.xenondevs.invui.gui.Gui
@@ -44,7 +61,7 @@ internal object CatalogRecipeGuiManager {
 
     private val CACHED_GUIS: HashMap<LookupKey, List<CatalogRecipeGui>> by ReloadableProperty { HashMap(1024) }
 
-    private data class LookupKey(val item: ItemX, val state: LookupState)
+    private data class LookupKey(val item: ItemRef, val state: LookupState)
 
     init {
         registerGuiCreator<CatalogBlastingRecipe>(::createCookingRecipeGui)
@@ -81,9 +98,9 @@ internal object CatalogRecipeGuiManager {
     }
 
     /**
-     * 根据 [ItemX] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
+     * 根据 [ItemRef] 和 [LookupState] 获取图鉴中配方展示的 [CatalogRecipeGui] 列表.
      */
-    fun getGui(item: ItemX, state: LookupState): List<CatalogRecipeGui> {
+    fun getGui(item: ItemRef, state: LookupState): List<CatalogRecipeGui> {
         return CACHED_GUIS.getOrPut(LookupKey(item, state)) {
             val catalogRecipes = when (state) {
                 LookupState.SOURCE -> CatalogItemRecipeNetwork.getSource(item)
@@ -150,8 +167,8 @@ internal object CatalogRecipeGuiManager {
             // 转化为图标物品并放入gui
             builder.setContent(chars.map {
                 if (it == ' ') return@map SimpleItem(ItemStack.empty())
-                val itemXs = catalogRecipe.inputItems[it] as List<ItemX>
-                return@map DisplayItem(itemXs)
+                val itemRefs = catalogRecipe.inputItems[it] as List<ItemRef>
+                return@map DisplayItem(itemRefs)
             })
         }
         return CatalogRecipeGui(settings.title, gui)
@@ -184,7 +201,7 @@ internal object CatalogRecipeGuiManager {
             builder.addIngredient('b', DisplayItem(catalogRecipe.baseItems))
             builder.addIngredient('t', DisplayItem(catalogRecipe.templateItems))
             builder.addIngredient('a', DisplayItem(catalogRecipe.additionItems))
-            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItemX, catalogRecipe.recipe<SmithingRecipe>().result.amount))
+            builder.addIngredient('o', DisplayItem(catalogRecipe.outputItemRef, catalogRecipe.recipe<SmithingRecipe>().result.amount))
         }
         return CatalogRecipeGui(settings.title, gui)
     }
@@ -338,7 +355,7 @@ private class NextItem(
  * 直接点击 = 查找该物品的获取方式.
  * Shift 点击 = 查找该物品的用途.
  */
-private fun DisplayItem(items: List<ItemX>, amount: Int = 1): AbstractItem {
+private fun DisplayItem(items: List<ItemRef>, amount: Int = 1): AbstractItem {
     if (items.isEmpty()) return SimpleItem(ItemStack.empty())
     return if (items.size == 1) {
         DisplayItem(items.first(), amount)
@@ -348,14 +365,19 @@ private fun DisplayItem(items: List<ItemX>, amount: Int = 1): AbstractItem {
 }
 
 @Suppress("FunctionName")
-private fun DisplayItem(items: ItemX, amount: Int = 1): AbstractItem {
+private fun DisplayItem(items: ItemRef, amount: Int = 1): AbstractItem {
     return SingleDisplayItem(items, amount)
 }
 
 private class SingleDisplayItem(
-    val item: ItemX,
+    val item: ItemRef,
     val amount: Int,
 ) : AbstractItem() {
+
+    init {
+        ItemRef.checkAll()
+    }
+
     override fun getItemProvider(): ItemProvider {
         // TODO 渲染
         return ItemWrapper(item.createItemStack(amount))
@@ -367,7 +389,7 @@ private class SingleDisplayItem(
 }
 
 private class MultiDisplayItem(
-    val items: List<ItemX>,
+    val items: List<ItemRef>,
     /**
      * 对于循环物品, 所有物品数量相同.
      */
@@ -375,6 +397,10 @@ private class MultiDisplayItem(
 ) : AbstractItem() {
     private var task: BukkitTask? = null
     private var state = 0
+
+    init {
+        ItemRef.checkAll()
+    }
 
     fun start() {
         task?.cancel()
@@ -422,7 +448,7 @@ private class MultiDisplayItem(
 /**
  * 方便函数.
  */
-private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item: ItemX) {
+private fun AbstractItem.handleClick0(clickType: ClickType, player: Player, item: ItemRef) {
     val lookupState = when (clickType) {
         ClickType.LEFT, ClickType.RIGHT -> LookupState.SOURCE
         ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT -> LookupState.USAGE

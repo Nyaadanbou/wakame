@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.examination.Examinable
@@ -34,11 +34,11 @@ data object EmptyRecipeChoice : RecipeChoice {
  * 单物品输入.
  */
 data class SingleRecipeChoice(
-    val item: ItemX,
+    val item: ItemRef,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
-        val itemstack = item.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${item.key}'")
-        return BukkitRecipeChoice.ExactChoice(itemstack)
+        val itemStack = item.createItemStack()
+        return BukkitRecipeChoice.ExactChoice(itemStack)
     }
 
 
@@ -53,13 +53,13 @@ data class SingleRecipeChoice(
  * 多物品输入.
  */
 data class MultiRecipeChoice(
-    val items: List<ItemX>,
+    val items: List<ItemRef>,
 ) : RecipeChoice {
     override fun toBukkitRecipeChoice(): BukkitRecipeChoice {
         val itemStacks: MutableList<ItemStack> = mutableListOf()
         items.forEach {
-            val itemstack = it.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${it.key}'")
-            itemStacks.add(itemstack)
+            val itemStack = it.createItemStack()
+            itemStacks.add(itemStack)
         }
         return BukkitRecipeChoice.ExactChoice(itemStacks)
     }
@@ -76,7 +76,7 @@ data class MultiRecipeChoice(
  */
 internal object RecipeChoiceSerializer : TypeSerializer2<RecipeChoice> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val itemXList = node.getList<ItemX>(emptyList())
+        val itemXList = node.getList<ItemRef>(emptyList())
         return when (itemXList.size) {
             0 -> throw SerializationException(node, type, "Recipe choice must have at least 1 element")
             1 -> SingleRecipeChoice(itemXList[0])

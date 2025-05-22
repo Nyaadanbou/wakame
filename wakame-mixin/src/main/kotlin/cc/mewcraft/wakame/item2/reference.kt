@@ -5,11 +5,16 @@ package cc.mewcraft.wakame.item2
 import cc.mewcraft.wakame.item2.ItemRef.Companion.checkAll
 import cc.mewcraft.wakame.item2.ItemRef.Companion.uncheckedItemRef
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.item.toJsonString
+import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.Type
 
 // ------------
 // 物品引用 ItemRef API
@@ -98,6 +103,15 @@ sealed interface ItemRef {
             return checkedItemRef(id) ?: error("Cannot get reference from ItemStack: ${stack.toJsonString()}. This is a bug!")
         }
 
+        /**
+         * 返回一个占位的 [ItemRef].
+         *
+         * 该引用永远不会匹配任何物品类型, 也不会创建任何物品堆叠.
+         */
+        fun noop(): ItemRef {
+            return ItemRefNoop
+        }
+
     }
 
     /**
@@ -138,6 +152,12 @@ sealed interface ItemRef {
      */
     fun createItemStack(amount: Int = 1, player: Player? = null): ItemStack
 
+    object Serializer : TypeSerializer2<ItemRef> {
+        override fun deserialize(type: Type, node: ConfigurationNode): ItemRef {
+            val id = node.require<Identifier>()
+            return uncheckedItemRef(id)
+        }
+    }
 }
 
 // ------------
@@ -281,6 +301,31 @@ private data class ItemRefImpl(
 
     override fun createItemStack(amount: Int, player: Player?): ItemStack {
         return handlerOrThrow.createItemStack(this.id, amount, player) ?: handlerOrThrow.throwItemTypeNotFound(id)
+    }
+}
+
+private object ItemRefNoop : ItemRef {
+
+    override val id: Identifier
+        get() = Identifiers.of("internal", "noop")
+
+    override val name: Component
+        get() = Component.text("")
+
+    override fun matches(id: Identifier): Boolean {
+        return false
+    }
+
+    override fun matches(ref: ItemRef): Boolean {
+        return false
+    }
+
+    override fun matches(stack: ItemStack): Boolean {
+        return false
+    }
+
+    override fun createItemStack(amount: Int, player: Player?): ItemStack {
+        throw ItemStackGenerationException(id, UnsupportedOperationException("Noop ItemRef cannot create ItemStack."))
     }
 }
 

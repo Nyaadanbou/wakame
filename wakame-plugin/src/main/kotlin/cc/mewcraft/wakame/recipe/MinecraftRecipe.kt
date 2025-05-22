@@ -32,16 +32,31 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 /**
  * 合成配方 (对 Bukkit 的合成配方的包装).
  */
-// TODO 重命名为 MinecraftRecipe?
-//  原因: Vanilla 一词的意思是未经修改的内容. 而 Minecraft 早在 1.16 开始就引入了数据包, 支持数据驱动添加新的游戏内容,
-//  因此用 Vanilla 来描述这里所指的配方并不准确. 使用 Minecraft 来描述更加合适 - 强调其来自于这个游戏本身所创造的东西.
-sealed interface VanillaRecipe : Keyed, Examinable {
+sealed interface MinecraftRecipe : Keyed, Examinable {
     val result: RecipeResult
 
     fun registerBukkitRecipe(): Boolean
 
     fun unregisterBukkitRecipe() {
         Bukkit.removeRecipe(key.toNamespacedKey, false)
+    }
+
+    /**
+     * [MinecraftRecipe] 的序列化器.
+     */
+    object Serializer : TypeSerializer2<MinecraftRecipe> {
+        /**
+         * ## Node structure
+         * ```yaml
+         * type: <recipe type>
+         * (剩下的取决于 Recipe 具体实现)
+         * ```
+         */
+        override fun deserialize(type: Type, node: ConfigurationNode): MinecraftRecipe? {
+            val recipeType = node.node("type").require<RecipeType>()
+            val recipe = recipeType.deserialize(node)
+            return recipe
+        }
     }
 }
 
@@ -54,7 +69,7 @@ class BlastingRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val blastingRecipe = BukkitBlastingRecipe(
             key.toNamespacedKey,
@@ -86,7 +101,7 @@ class CampfireRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val campfireRecipe = BukkitCampfireRecipe(
             key.toNamespacedKey,
@@ -118,7 +133,7 @@ class FurnaceRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val furnaceRecipe = BukkitFurnaceRecipe(
             key.toNamespacedKey,
@@ -150,7 +165,7 @@ class ShapedRecipe(
     override val result: RecipeResult,
     val pattern: Array<String>,
     val ingredients: Map<Char, RecipeChoice>,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     companion object {
         const val EMPTY_INGREDIENT_CHAR = 'X'
     }
@@ -182,7 +197,7 @@ class ShapelessRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val ingredients: List<RecipeChoice>,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
         ingredients.forEach {
@@ -209,7 +224,7 @@ class SmithingTransformRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smithingTransformRecipe = BukkitSmithingTransformRecipe(
             key.toNamespacedKey,
@@ -241,7 +256,7 @@ class SmithingTrimRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     // 锻造台纹饰配方的结果是原版生成的
     override val result: RecipeResult = EmptyRecipeResult
     override fun registerBukkitRecipe(): Boolean {
@@ -274,7 +289,7 @@ class SmokingRecipe(
     val input: RecipeChoice,
     val cookingTime: Int,
     val exp: Float,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smokingRecipe = BukkitSmokingRecipe(
             key.toNamespacedKey,
@@ -304,7 +319,7 @@ class StonecuttingRecipe(
     override val key: Key,
     override val result: RecipeResult,
     val input: RecipeChoice,
-) : VanillaRecipe {
+) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val stonecuttingRecipe = BukkitStonecuttingRecipe(
             key.toNamespacedKey,
@@ -509,7 +524,7 @@ enum class RecipeType(
         )
     });
 
-    fun deserialize(node: ConfigurationNode): VanillaRecipe? {
+    fun deserialize(node: ConfigurationNode): MinecraftRecipe? {
         val typeToken = bridge.typeToken
         val serializer = bridge.serializer
         return serializer.deserialize(typeToken.type, node)
@@ -525,7 +540,7 @@ private fun ConfigurationNode.getRecipeKey(): Key {
 /**
  * 一个容器, 封装了 [typeToken] 和 [serializer].
  */
-internal class RecipeTypeBridge<T : VanillaRecipe>(
+internal class RecipeTypeBridge<T : MinecraftRecipe>(
     val typeToken: TypeToken<T>,
     val serializer: TypeSerializer2<T>,
 ) {
@@ -536,22 +551,4 @@ internal class RecipeTypeBridge<T : VanillaRecipe>(
         typeToken,
         TypeSerializer2<T> { type, node -> serializer(type, node) }
     )
-}
-
-/**
- * [VanillaRecipe] 的序列化器.
- */
-internal object VanillaRecipeSerializer : TypeSerializer2<VanillaRecipe> {
-    /**
-     * ## Node structure
-     * ```yaml
-     * type: <recipe type>
-     * (剩下的取决于 Recipe 具体实现)
-     * ```
-     */
-    override fun deserialize(type: Type, node: ConfigurationNode): VanillaRecipe? {
-        val recipeType = node.node("type").require<RecipeType>()
-        val recipe = recipeType.deserialize(node)
-        return recipe
-    }
 }

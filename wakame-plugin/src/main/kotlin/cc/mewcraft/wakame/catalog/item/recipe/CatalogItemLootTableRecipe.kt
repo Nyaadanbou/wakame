@@ -1,13 +1,16 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXNeko
-import cc.mewcraft.wakame.core.ItemXNoOp
-import cc.mewcraft.wakame.core.ItemXVanilla
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.mixin.support.KoishLootItem
-import cc.mewcraft.wakame.shadow.loot.*
+import cc.mewcraft.wakame.shadow.loot.ShadowCompositeEntryBase
+import cc.mewcraft.wakame.shadow.loot.ShadowLootItem
+import cc.mewcraft.wakame.shadow.loot.ShadowLootPool
+import cc.mewcraft.wakame.shadow.loot.ShadowLootTable
+import cc.mewcraft.wakame.shadow.loot.ShadowNestedLootTable
+import cc.mewcraft.wakame.shadow.loot.ShadowTagEntry
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
+import cc.mewcraft.wakame.util.namespacedKey
 import cc.mewcraft.wakame.util.shadow
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
@@ -50,17 +53,17 @@ data class CatalogItemLootTableRecipe(
     override val sortId
         get() = lootTableId
 
-    val lootItems: List<ItemX> = flattenLootTable(lootTable).distinct().sortedBy(ItemX::identifier)
+    val lootItems: List<ItemRef> = flattenLootTable(lootTable).distinct().sortedBy(ItemRef::id)
 
-    override fun getLookupInputs(): Set<ItemX> {
-        return setOf(ItemXNoOp)
+    override fun getLookupInputs(): Set<ItemRef> {
+        return setOf(ItemRef.noop())
     }
 
-    override fun getLookupOutputs(): Set<ItemX> {
+    override fun getLookupOutputs(): Set<ItemRef> {
         return lootItems.toSet()
     }
 
-    private fun flattenLootTable(lootTable: MojangLootTable): List<ItemX> {
+    private fun flattenLootTable(lootTable: MojangLootTable): List<ItemRef> {
         val pools = BukkitShadowFactory.global().shadow<ShadowLootTable>(lootTable).pools
         return pools.flatMap { pool ->
             val entries = pool.shadow<ShadowLootPool>().entries
@@ -68,7 +71,7 @@ data class CatalogItemLootTableRecipe(
         }
     }
 
-    private fun flattenLootPoolEntryContainer(lootPoolEntryContainer: MojangLootPoolEntryContainer): List<ItemX> {
+    private fun flattenLootPoolEntryContainer(lootPoolEntryContainer: MojangLootPoolEntryContainer): List<ItemRef> {
         when (lootPoolEntryContainer) {
             is MojangCompositeEntryBase -> {
                 val children = lootPoolEntryContainer.shadow<ShadowCompositeEntryBase>().children
@@ -78,7 +81,7 @@ data class CatalogItemLootTableRecipe(
             is MojangLootItem -> {
                 val holder = lootPoolEntryContainer.shadow<ShadowLootItem>().item
                 val resourceKey = holder.unwrapKey().getOrNull() ?: return emptyList()
-                return listOf(ItemXVanilla(resourceKey.location().path))
+                return listOf(ItemRef.uncheckedItemRef(resourceKey.location().namespacedKey))
             }
 
             // TODO 战利品表本身可能会存在循环引用导致堆栈溢出
@@ -94,12 +97,12 @@ data class CatalogItemLootTableRecipe(
                 val tagKey = lootPoolEntryContainer.shadow<ShadowTagEntry>().tag
                 return MojangBuiltInRegistries.ITEM.getTagOrEmpty(tagKey).mapNotNull { holder ->
                     val resourceKey = holder.unwrapKey().getOrNull() ?: return@mapNotNull null
-                    ItemXVanilla(resourceKey.location().path)
+                    ItemRef.uncheckedItemRef(resourceKey.location().namespacedKey)
                 }
             }
 
             is KoishLootItem -> {
-                return listOf(ItemXNeko(lootPoolEntryContainer.id.toString()))
+                return listOf(ItemRef.uncheckedItemRef(lootPoolEntryContainer.id.namespacedKey))
             }
 
             else -> {

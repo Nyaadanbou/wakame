@@ -14,7 +14,7 @@ import org.spongepowered.configurate.RepresentationHint
 import org.spongepowered.configurate.kotlin.extensions.getList
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
-import java.util.Collections.emptyList
+import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -33,12 +33,6 @@ internal sealed interface Recipe : Keyed, Examinable {
     val output: RecipeResult
 
     /**
-     * 检查该 [Recipe] 是否有效.
-     * 用于延迟检查配方是否能够注册到服务端.
-     */
-    fun valid(): Boolean
-
-    /**
      * 针对 [player] 发起一次检查. 返回的结果包含了玩家已满足/不满足的条件.
      */
     fun match(player: Player): RecipeMatcherResult
@@ -47,6 +41,22 @@ internal sealed interface Recipe : Keyed, Examinable {
      * 针对 [player] 发起一次消耗. 该函数将消耗掉玩家背包中的物品堆叠.
      */
     fun consume(player: Player)
+
+    /**
+     * [Recipe] 的序列化器.
+     */
+    object Serializer : TypeSerializer2<Recipe> {
+        val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
+
+        override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
+            val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
+            val input = node.node("input").getList<RecipeChoice>(Collections.emptyList())
+            require(input.isNotEmpty()) { "station recipe input is not present" }
+            val output = node.node("output").require<RecipeResult>()
+
+            return SimpleRecipe(key, input, output)
+        }
+    }
 }
 
 /**
@@ -57,15 +67,6 @@ internal class SimpleRecipe(
     override val input: List<RecipeChoice>,
     override val output: RecipeResult,
 ) : Recipe {
-
-    override fun valid(): Boolean {
-        input.forEach { choice: RecipeChoice ->
-            if (!choice.valid()) {
-                return false
-            }
-        }
-        return output.valid()
-    }
 
     override fun match(player: Player): RecipeMatcherResult {
         return RecipeMatcher.match(this, player)
@@ -83,22 +84,5 @@ internal class SimpleRecipe(
 
     override fun toString(): String {
         return toSimpleString()
-    }
-}
-
-
-/**
- * [Recipe] 的序列化器.
- */
-internal object StationRecipeSerializer : TypeSerializer2<Recipe> {
-    val HINT_NODE: RepresentationHint<Key> = RepresentationHint.of("key", typeTokenOf<Key>())
-
-    override fun deserialize(type: Type, node: ConfigurationNode): Recipe {
-        val key = node.hint(HINT_NODE) ?: throw SerializationException("the hint node for station recipe key is not present")
-        val input = node.node("input").getList<RecipeChoice>(emptyList())
-        require(input.isNotEmpty()) { "station recipe input is not present" }
-        val output = node.node("output").require<RecipeResult>()
-
-        return SimpleRecipe(key, input, output)
     }
 }
