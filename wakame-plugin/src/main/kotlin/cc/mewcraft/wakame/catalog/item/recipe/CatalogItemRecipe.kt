@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
 import xyz.xenondevs.invui.gui.Gui
 
 /**
@@ -22,14 +22,14 @@ interface CatalogRecipe {
      * 用于检索时作为节点.
      * 只会在网络构建时被调用一次.
      */
-    fun getLookupInputs(): Set<ItemX>
+    fun getLookupInputs(): Set<ItemRef>
 
     /**
      * 获取配方输出物品展平去重后的物品集合.
      * 用于检索时作为节点.
      * 只会在网络构建时被调用一次.
      */
-    fun getLookupOutputs(): Set<ItemX>
+    fun getLookupOutputs(): Set<ItemRef>
 
 }
 

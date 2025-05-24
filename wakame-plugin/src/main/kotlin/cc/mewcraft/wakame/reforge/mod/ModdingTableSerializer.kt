@@ -109,7 +109,7 @@ internal object ModdingTableSerializer {
                     val modLimit = itemNode.node("mod_limit").getInt(0)
                     // configurate 返回的是 LinkedHashMap, 保留了顺序
                     val cellRuleMapData = itemNode.node("cells").require<Map<String, ModdingTable.CellRule>>()
-                    val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
+                    val cellRuleMap = SimpleModdingTable.CoreRuleMap(LinkedHashMap(cellRuleMapData))
                     val itemRule = SimpleModdingTable.ItemRule(itemId, modLimit, cellRuleMap)
 
                     itemId to itemRule

@@ -5,7 +5,7 @@ package cc.mewcraft.wakame.display2.implementation.common
 
 import cc.mewcraft.wakame.display2.DerivedIndex
 import cc.mewcraft.wakame.entity.attribute.bundle.element
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
 import net.kyori.adventure.key.Key
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
@@ -14,11 +14,11 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 internal fun AttributeCore.computeIndex(namespace: String): DerivedIndex {
     val indexId = buildString {
-        val data2 = data
-        append(data2.id)
+        val wrapped2 = wrapped
+        append(wrapped2.id)
         append('.')
-        append(data2.operation.key)
-        data2.element?.let {
+        append(wrapped2.operation.key)
+        wrapped2.element?.let {
             append('.')
             append(it.getIdAsString())
         }

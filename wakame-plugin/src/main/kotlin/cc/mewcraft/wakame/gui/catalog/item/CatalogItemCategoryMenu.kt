@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -121,7 +121,7 @@ internal class CatalogItemCategoryMenu(
      * **展示物品** 的图标.
      */
     inner class DisplayItem(
-        val item: ItemX,
+        val item: ItemRef,
     ) : AbstractItem() {
         override fun getItemProvider(): ItemProvider {
             // TODO 渲染

@@ -4,9 +4,9 @@ import cc.mewcraft.wakame.Namespaces
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import cc.mewcraft.wakame.entity.attribute.bundle.element
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.isEmpty
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -118,7 +118,7 @@ private data object CoreMatchRuleEmpty : CoreMatchRule {
     override val path: Pattern = "empty".toPattern()
     override val priority: Int = Int.MIN_VALUE + 1
     override fun test(core: Core): Boolean {
-        return core.isEmpty
+        return core is EmptyCore
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -170,12 +170,12 @@ private class CoreMatchRuleAttribute(
             return false
         }
 
-        val matcher = path.matcher(core.id.value())
+        val matcher = path.matcher(core.wrapped.id)
         if (!matcher.matches()) {
             return false
         }
 
-        val attribute = core.data
+        val attribute = core.wrapped
         if (operation != null && attribute.operation != operation) {
             return false
         }

@@ -30,7 +30,7 @@ internal data class RepairingTableItemRendererContext(val damage: Int, val maxDa
     stage = InitStage.POST_WORLD
 )
 @Reload
-internal object RepairingTableItemRenderer : AbstractItemRenderer<ItemStack, RepairingTableItemRendererContext>() {
+internal object RepairingTableItemRenderer : AbstractItemRenderer<RepairingTableItemRendererContext>() {
     override val name: String = "repairing_table"
     override val formats: AbstractRendererFormatRegistry = RepairingTableRendererFormatRegistry()
     override val layout: AbstractRendererLayout = RepairingTableItemRendererLayout()

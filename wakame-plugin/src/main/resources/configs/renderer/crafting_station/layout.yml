@@ -5,13 +5,13 @@ primary:
   - topmost:attack_speed
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:cells
-  - general:elements
-  - general:kizamiz
+  - general:core_container
+  - general:element
+  - general:kizami
 
   - (fixed:special)<st><dark_gray>             </dark_gray></st>
   - special:crate
-  - special:portable_core
+  - special:core
 
   - (fixed:enchantments)<st><dark_gray>             </dark_gray></st>
   - enchantments:enchantments

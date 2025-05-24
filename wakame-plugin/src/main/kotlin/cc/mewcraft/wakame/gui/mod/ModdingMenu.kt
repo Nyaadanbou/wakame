@@ -274,10 +274,9 @@ internal class ModdingMenu(
             // 定制成功了:
 
             // 用定制台的渲染器重新渲染物品
-            val outputNekoStack = reforgeResult.output ?: error("output item is null, but the result is successful. This is a bug!")
+            val outputItemStack = reforgeResult.output ?: error("output item is null, but the result is successful. This is a bug!")
             val renderingContext = ModdingTableContext.Output(session)
-            ItemRenderers.MODDING_TABLE.render(outputNekoStack, renderingContext)
-            val outputItemStack = outputNekoStack.bukkitStack
+            ItemRenderers.MODDING_TABLE.render(outputItemStack, renderingContext)
 
             // 再用 SlotDisplay 处理一下
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
@@ -339,7 +338,7 @@ internal class ModdingMenu(
         // 用定制台的渲染器重新渲染物品
         val renderingCtx = ModdingTableContext.Input(session)
         ItemRenderers.MODDING_TABLE.render(sourceItem, renderingCtx)
-        val newItemStack = sourceItem.bukkitStack.clone()
+        val newItemStack = sourceItem.clone()
 
         // 再用 SlotDisplay 处理一下
         val resolved = table.primaryMenuSettings.getSlotDisplay("input_ok").resolveEverything {

@@ -44,13 +44,13 @@ primary:
   - attribute:mana_regeneration
 
   - (fixed:stash)<st><dark_gray>             </dark_gray></st>
-  - stash:cells/empty
+  - stash:core/empty
 
   - (fixed:reforge)<st><dark_gray>             </dark_gray></st>
   - reforge:replace_input
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:elements
+  - general:element
   - general:rarity
 
   - (fixed:reforge)<st><dark_gray>             </dark_gray></st>

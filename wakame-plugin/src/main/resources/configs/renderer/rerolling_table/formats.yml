@@ -2,7 +2,7 @@
 version: 1
 
 # id: <有效的属性 id>
-cells/attributes/in:
+core/attributes/in:
   namespace: attribute
   # 用于区分核孔是否 要将重造,可被重造,... 的一些渲染格式
   diff_formats:
@@ -31,7 +31,7 @@ cells/attributes/in:
       - multiply_total
 
 # id: <有效的属性 id>
-cells/attributes/out:
+core/attributes/out:
   namespace: attribute
   diff_formats:
     changeable: {}
@@ -56,8 +56,8 @@ cells/attributes/out:
       - multiply_base
       - multiply_total
 
-# id: `cells/empty`
-cells/empty/in:
+# id: `core/empty`
+core/empty/in:
   namespace: stash
   tooltip: "<!i><gray>[ 空核孔 ]"
   diff_formats:
@@ -67,7 +67,7 @@ cells/empty/in:
     selected: {}
     unselected: {}
 
-cells/empty/out:
+core/empty/out:
   namespace: stash
   tooltip: "<!i><gray>[ 空核孔 ]"
   diff_formats:
@@ -88,8 +88,8 @@ custom_name:
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<!i><value>"
 
-# id: `elements`
-elements:
+# id: `element`
+element:
   namespace: general
   # 可用标签
   # <merged> 多个元素合并后的文本

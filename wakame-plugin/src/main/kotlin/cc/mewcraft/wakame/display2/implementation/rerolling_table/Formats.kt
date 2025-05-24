@@ -1,11 +1,22 @@
 package cc.mewcraft.wakame.display2.implementation.rerolling_table
 
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.display2.implementation.common.*
+import cc.mewcraft.wakame.display2.DerivedIndex
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.display2.implementation.common.AttributeCoreOrdinalFormat
+import cc.mewcraft.wakame.display2.implementation.common.CyclicIndexRule
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMeta
+import cc.mewcraft.wakame.display2.implementation.common.CyclicTextMetaFactory
+import cc.mewcraft.wakame.display2.implementation.common.IndexedTextCycle
+import cc.mewcraft.wakame.display2.implementation.common.ReforgeDifferenceFormat
+import cc.mewcraft.wakame.display2.implementation.common.computeIndex
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMeta
 import cc.mewcraft.wakame.display2.implementation.standard.AttributeCoreTextMetaFactory
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -54,7 +65,7 @@ internal data class RerollingDifferenceFormats(
 }
 
 @ConfigSerializable
-internal data class CellularAttributeRendererFormat(
+internal data class CoreAttributeRendererFormat(
     override val namespace: String,
     private val ordinal: AttributeCoreOrdinalFormat,
     private val diffFormats: RerollingDifferenceFormats,
@@ -82,7 +93,7 @@ internal data class CellularAttributeRendererFormat(
 }
 
 @ConfigSerializable
-internal data class CellularEmptyRendererFormat(
+internal data class CoreEmptyRendererFormat(
     override val namespace: String,
     private val tooltip: List<Component>,
     private val diffFormats: RerollingDifferenceFormats,

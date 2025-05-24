@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.adventure.toSimpleString
@@ -12,7 +13,6 @@ import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
-import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -71,7 +71,7 @@ internal object WtfModdingTable : ModdingTable {
         override val itemId: Key,
     ) : ModdingTable.ItemRule {
         override val modLimit: Int = Int.MAX_VALUE
-        override val cellRuleMap: ModdingTable.CellRuleMap = AnyCellRuleMap
+        override val coreRuleMap: ModdingTable.CoreRuleMap = AnyCoreRuleMap
     }
 
     private object AnyCellRule : ModdingTable.CellRule {
@@ -81,7 +81,7 @@ internal object WtfModdingTable : ModdingTable {
         override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.any()
     }
 
-    private object AnyCellRuleMap : ModdingTable.CellRuleMap {
+    private object AnyCoreRuleMap : ModdingTable.CoreRuleMap {
         override val comparator: Comparator<String?> = nullsLast(naturalOrder())
         override fun get(key: String): ModdingTable.CellRule = AnyCellRule
     }
@@ -128,12 +128,12 @@ internal class SimpleModdingTable(
     class ItemRule(
         override val itemId: Key,
         override val modLimit: Int,
-        override val cellRuleMap: ModdingTable.CellRuleMap,
+        override val coreRuleMap: ModdingTable.CoreRuleMap,
     ) : ModdingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("itemId", itemId),
             ExaminableProperty.of("modLimit", modLimit),
-            ExaminableProperty.of("cellRuleMap", cellRuleMap),
+            ExaminableProperty.of("coreRuleMap", coreRuleMap),
         )
 
         override fun toString(): String = toSimpleString()
@@ -173,9 +173,9 @@ internal class SimpleModdingTable(
         override fun toString(): String = toSimpleString()
     }
 
-    class CellRuleMap(
+    class CoreRuleMap(
         private val data: LinkedHashMap<String, ModdingTable.CellRule>,
-    ) : ModdingTable.CellRuleMap {
+    ) : ModdingTable.CoreRuleMap {
 
         // 让 string 的顺序采用 key 在 data 里的顺序
         private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
@@ -298,7 +298,7 @@ internal class CellTotalBinding(
 
     @Binding("source_item_mod_count")
     fun getSourceItemModCount(): Int {
-        return session.usableInput?.reforgeHistory?.modCount ?: 0
+        return session.usableInput?.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: 0
     }
 
     @Binding("joined_item_level")

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
@@ -36,14 +36,14 @@ data object EmptyRecipeResult : RecipeResult {
  * 单物品输出.
  */
 data class SingleRecipeResult(
-    val item: ItemX,
+    val item: ItemRef,
     val amount: Int,
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
-        val itemstack = item.createItemStack() ?: throw IllegalArgumentException("Unknown item: '${item.key}'")
-        itemstack.setData(DataComponentTypes.ITEM_MODEL, item.key)
-        itemstack.amount = amount
-        return itemstack
+        val itemStack = item.createItemStack()
+        itemStack.setData(DataComponentTypes.ITEM_MODEL, item.id)
+        itemStack.amount = amount
+        return itemStack
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -59,7 +59,7 @@ data class SingleRecipeResult(
  */
 internal object RecipeResultSerializer : TypeSerializer2<RecipeResult> {
     override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
-        val item = node.node("item").require<ItemX>()
+        val item = node.node("item").require<ItemRef>()
         val amount = node.node("amount").getInt(1).apply {
             require(this >= 1) { "Item amount should not less than 1" }
         }

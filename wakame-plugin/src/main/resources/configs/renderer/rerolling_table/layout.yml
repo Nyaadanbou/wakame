@@ -45,5 +45,5 @@ primary:
   - stash:cells/empty
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:elements
+  - general:element
   - general:rarity

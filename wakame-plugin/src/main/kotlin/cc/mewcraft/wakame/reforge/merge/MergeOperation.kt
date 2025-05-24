@@ -2,16 +2,21 @@ package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.entity.attribute.bundle.*
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.ReforgeHistory
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.extension.level
-import cc.mewcraft.wakame.item.extension.portableCore
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleR
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleRE
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleSE
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getDataOrDefault
+import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.decorate
 import org.bukkit.entity.Player
@@ -52,9 +57,9 @@ private constructor(
         }
 
         // 输入的物品必须是*便携式*属性*核心*
-        val core1 = (inputItem1.portableCore?.wrapped as? AttributeCore)
+        val core1 = (inputItem1.getData(ItemDataTypes.CORE) as? AttributeCore)
             ?: return ReforgeResult.failure(player, TranslatableMessages.MSG_MERGING_RESULT_BAD_INPUT_1)
-        val core2 = (inputItem2.portableCore?.wrapped as? AttributeCore)
+        val core2 = (inputItem2.getData(ItemDataTypes.CORE) as? AttributeCore)
             ?: return ReforgeResult.failure(player, TranslatableMessages.MSG_MERGING_RESULT_BAD_INPUT_2)
 
         // 两个核心除了数值以外, 其余数据必须一致
@@ -83,12 +88,12 @@ private constructor(
             return ReforgeResult.failure(player, TranslatableMessages.MSG_MERGING_RESULT_PENALTY_TOO_HIGH)
         }
 
-        val attribute1 = core1.data
+        val attribute1 = core1.wrapped
         val resultedOperation = attribute1.operation
         val (resultedValue, resultedScore) = session.valueMergeFunction(resultedOperation).evaluate()
         val resultedCore = when (attribute1 /* 或者用 core2, 结果上没有区别 */) {
-            is ConstantAttributeBundleS -> AttributeCore(id = core1.id, data = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
-            is ConstantAttributeBundleSE -> AttributeCore(id = core1.id, data = attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleS -> AttributeCore(attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
+            is ConstantAttributeBundleSE -> AttributeCore(attribute1.copy(value = resultedValue, quality = ConstantAttributeBundle.Quality.fromZScore(resultedScore)))
             is ConstantAttributeBundleR, is ConstantAttributeBundleRE -> {
                 // 我们不支持拥有两个数值的核心, 原因:
                 // - 实际的游戏设计中, 不太可能设计出合并这种核心
@@ -102,17 +107,17 @@ private constructor(
         val resultedLevel = session.outputLevelFunction.evaluate().let(::ceil).toInt()
         val resultedRarity = run {
             // 选取权重较高的稀有度作为结果的稀有度
-            val rarity1 = inputItem1.rarity
-            val rarity2 = inputItem2.rarity
+            val rarity1 = inputItem1.getDataOrDefault(ItemDataTypes.RARITY, BuiltInRegistries.RARITY.getDefaultEntry())
+            val rarity2 = inputItem2.getDataOrDefault(ItemDataTypes.RARITY, BuiltInRegistries.RARITY.getDefaultEntry())
             maxOf(rarity1, rarity2, Comparator.comparing(RegistryEntry<Rarity>::unwrap))
         }
 
         // 输出的物品直接以 inputItem1 为基础进行修改
         val resultedItem = inputItem1.apply {
-            level = resultedLevel
-            rarity = resultedRarity
-            portableCore = PortableCore(resultedCore)
-            reforgeHistory = ReforgeHistory(resultedPenalty)
+            setData(ItemDataTypes.LEVEL, ItemLevel(resultedLevel))
+            setData(ItemDataTypes.RARITY, resultedRarity)
+            setData(ItemDataTypes.CORE, resultedCore)
+            setData(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory(resultedPenalty))
         }
         val totalCost = session.currencyCostFunction.evaluate()
 

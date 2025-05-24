@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.reforge.merge
 
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.item.NekoStack
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
 import org.bukkit.entity.Player
@@ -27,13 +26,13 @@ interface MergingSession : Examinable {
      * 输入的第一个物品.
      */
     @get:Contract(" -> new")
-    var inputItem1: NekoStack?
+    var inputItem1: ItemStack?
 
     /**
      * 输入的第二个物品.
      */
     @get:Contract(" -> new")
-    var inputItem2: NekoStack?
+    var inputItem2: ItemStack?
 
     /**
      * 将 [inputItem1] (的克隆) 归还给玩家.
@@ -192,10 +191,10 @@ interface MergingSession : Examinable {
          * 合并后的物品.
          *
          * 如果要将该物品给予玩家, 应该先确保 [isSuccess] 为 `true` 后再进行操作.
-         * 当 [isSuccess] 为 `false` 时, 该对象实际上是 [NekoStack.empty].
+         * 当 [isSuccess] 为 `false` 时, 该对象实际上是 [ItemStack.empty].
          */
         @get:Contract(" -> new")
-        val output: NekoStack
+        val output: ItemStack
     }
 
     /**
