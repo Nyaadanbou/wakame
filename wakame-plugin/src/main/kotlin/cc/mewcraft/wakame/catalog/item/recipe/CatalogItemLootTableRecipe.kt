@@ -15,7 +15,7 @@ import cc.mewcraft.wakame.util.shadow
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.shadow
 import net.kyori.adventure.key.Key
-import kotlin.jvm.optionals.getOrNull
+import org.bukkit.craftbukkit.inventory.CraftItemType
 
 
 typealias MojangLootTable = net.minecraft.world.level.storage.loot.LootTable
@@ -56,7 +56,7 @@ data class CatalogItemLootTableRecipe(
     val lootItems: List<ItemRef> = flattenLootTable(lootTable).distinct().sortedBy(ItemRef::id)
 
     override fun getLookupInputs(): Set<ItemRef> {
-        return setOf(ItemRef.noop())
+        return emptySet()
     }
 
     override fun getLookupOutputs(): Set<ItemRef> {
@@ -80,8 +80,8 @@ data class CatalogItemLootTableRecipe(
 
             is MojangLootItem -> {
                 val holder = lootPoolEntryContainer.shadow<ShadowLootItem>().item
-                val resourceKey = holder.unwrapKey().getOrNull() ?: return emptyList()
-                return listOf(ItemRef.uncheckedItemRef(resourceKey.location().namespacedKey))
+                val material = CraftItemType.minecraftToBukkit(holder.value())
+                return listOf(ItemRef.checkedItemRef(material))
             }
 
             // TODO 战利品表本身可能会存在循环引用导致堆栈溢出
@@ -96,13 +96,14 @@ data class CatalogItemLootTableRecipe(
             is MojangTagEntry -> {
                 val tagKey = lootPoolEntryContainer.shadow<ShadowTagEntry>().tag
                 return MojangBuiltInRegistries.ITEM.getTagOrEmpty(tagKey).mapNotNull { holder ->
-                    val resourceKey = holder.unwrapKey().getOrNull() ?: return@mapNotNull null
-                    ItemRef.uncheckedItemRef(resourceKey.location().namespacedKey)
+                    val material = CraftItemType.minecraftToBukkit(holder.value())
+                    ItemRef.checkedItemRef(material)
                 }
             }
 
             is KoishLootItem -> {
-                return listOf(ItemRef.uncheckedItemRef(lootPoolEntryContainer.id.namespacedKey))
+                val itemRef = ItemRef.checkedItemRef(lootPoolEntryContainer.id.namespacedKey) ?: error("Invalid KoishLootItem: ${lootPoolEntryContainer.id}. This is a bug!")
+                return listOf(itemRef)
             }
 
             else -> {

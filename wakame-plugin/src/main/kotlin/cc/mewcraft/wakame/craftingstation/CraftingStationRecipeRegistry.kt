@@ -69,7 +69,7 @@ internal object CraftingStationRecipeRegistry {
                         registerExact(Recipe.Serializer)
                         registerExact(RecipeChoice.Serializer)
                         registerExact(RecipeResult.Serializer)
-                        register(ItemRef.Serializer)
+                        register(ItemRef.SERIALIZER)
                     }
                 }.buildAndLoadString(fileText)
 

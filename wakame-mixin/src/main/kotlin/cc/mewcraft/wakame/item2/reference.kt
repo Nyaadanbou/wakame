@@ -7,14 +7,13 @@ import cc.mewcraft.wakame.item2.ItemRef.Companion.uncheckedItemRef
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
-import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.item.toJsonString
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.text.Component
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.spongepowered.configurate.ConfigurationNode
-import java.lang.reflect.Type
+import org.spongepowered.configurate.serialize.SerializationException
 
 // ------------
 // 物品引用 ItemRef API
@@ -41,6 +40,22 @@ import java.lang.reflect.Type
 sealed interface ItemRef {
 
     companion object {
+
+        /**
+         * [ItemRef] 的序列化器.
+         *
+         * 该序列化器始终会将字符串反序列化为一个有效的 [ItemRef].
+         * 如果字符串并不对应一个有效的 [ItemRef], 则会抛出异常.
+         */
+        @JvmField
+        val SERIALIZER: TypeSerializer2<ItemRef> = TypeSerializer2 { type, node ->
+            val id = node.require<Identifier>()
+            checkedItemRef(id) ?: throw SerializationException(
+                node,
+                type,
+                "$id does not correspond to a valid ItemRef."
+            )
+        }
 
         /**
          * 验证到目前为止创建出来的所有 [ItemRef].
@@ -104,12 +119,10 @@ sealed interface ItemRef {
         }
 
         /**
-         * 返回一个占位的 [ItemRef].
-         *
-         * 该引用永远不会匹配任何物品类型, 也不会创建任何物品堆叠.
+         * 从 [material] 创建一个 [ItemRef].
          */
-        fun noop(): ItemRef {
-            return ItemRefNoop
+        fun checkedItemRef(material: Material): ItemRef {
+            return checkedItemRef(material.key) ?: error("Cannot get reference from Material: $material. This is a bug!")
         }
 
     }
@@ -151,13 +164,6 @@ sealed interface ItemRef {
      * @throws ItemStackGenerationException 如果物品堆叠创建失败
      */
     fun createItemStack(amount: Int = 1, player: Player? = null): ItemStack
-
-    object Serializer : TypeSerializer2<ItemRef> {
-        override fun deserialize(type: Type, node: ConfigurationNode): ItemRef {
-            val id = node.require<Identifier>()
-            return uncheckedItemRef(id)
-        }
-    }
 }
 
 // ------------
@@ -304,31 +310,6 @@ private data class ItemRefImpl(
     }
 }
 
-private object ItemRefNoop : ItemRef {
-
-    override val id: Identifier
-        get() = Identifiers.of("internal", "noop")
-
-    override val name: Component
-        get() = Component.text("")
-
-    override fun matches(id: Identifier): Boolean {
-        return false
-    }
-
-    override fun matches(ref: ItemRef): Boolean {
-        return false
-    }
-
-    override fun matches(stack: ItemStack): Boolean {
-        return false
-    }
-
-    override fun createItemStack(amount: Int, player: Player?): ItemStack {
-        throw ItemStackGenerationException(id, UnsupportedOperationException("Noop ItemRef cannot create ItemStack."))
-    }
-}
-
 /**
  * 管理 [ItemRef] 的对象池.
  */
@@ -336,6 +317,7 @@ private object ItemRefManager {
 
     // 已验证的 ItemRef
     private val checkedItemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
+
     // 未验证的 ItemRef
     private val uncheckedItemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
 

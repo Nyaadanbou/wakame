@@ -32,27 +32,28 @@ import org.bukkit.inventory.SmithingTransformRecipe
 import org.bukkit.inventory.SmithingTrimRecipe
 import org.bukkit.inventory.SmokingRecipe
 import org.bukkit.inventory.StonecuttingRecipe
+import java.util.*
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 @Init(stage = InitStage.POST_WORLD)
 object CatalogItemRecipeNetwork {
 
-    private lateinit var network: ImmutableNetwork<ItemRef, CatalogRecipeEdge>
+    private lateinit var network: ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>
 
     /**
      * 获取特定物品的所有获取方式 (来源).
      */
     fun getSource(node: ItemRef): Set<CatalogRecipe> {
-        if (!network.nodes().contains(node)) return emptySet()
-        return network.inEdges(node).map(CatalogRecipeEdge::recipe).toSet()
+        if (!network.nodes().contains(Optional.of(node))) return emptySet()
+        return network.inEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
 
     /**
      * 获取特定物品的所有可参与制作 (用途).
      */
     fun getUsage(node: ItemRef): Set<CatalogRecipe> {
-        if (!network.nodes().contains(node)) return emptySet()
-        return network.outEdges(node).map(CatalogRecipeEdge::recipe).toSet()
+        if (!network.nodes().contains(Optional.of(node))) return emptySet()
+        return network.outEdges(Optional.of(node)).map(CatalogRecipeEdge::recipe).toSet()
     }
 
     /**
@@ -76,22 +77,25 @@ object CatalogItemRecipeNetwork {
         network = buildNetWork()
     }
 
-    private fun buildNetWork(): ImmutableNetwork<ItemRef, CatalogRecipeEdge> {
+    private fun buildNetWork(): ImmutableNetwork<Optional<ItemRef>, CatalogRecipeEdge> {
         LOGGER.info("Building catalog recipe network")
         // 自循环和平行边都是需要的, 举例说明:
         // 自循环: 锻造模板复制有序合成配方(模板+钻石等->模板*2)
         // 平行边: 淡灰色染料无序合成配方(白色染料+灰色染料->淡灰色染料*2 白色染料*2+黑色染料->灰色染料*3)
-        val network: MutableNetwork<ItemRef, CatalogRecipeEdge> = NetworkBuilder
+        val network: MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge> = NetworkBuilder
             .directed()
             .allowsSelfLoops(true)
             .allowsParallelEdges(true)
             .build()
 
+        // 添加起占位作用的空节点
+        network.addNode(Optional.empty())
+
         // 原版配方
         for (bukkitRecipe in Bukkit.recipeIterator()) {
             // 为空意味着是图鉴无法显示的原版特殊配方, 直接跳过
             val catalogBukkitRecipe = bukkitRecipe.toCatalogRecipe() ?: continue
-            network.addRecipe(catalogBukkitRecipe, "BukkitRecipe '${bukkitRecipe::class}' has no input or output")
+            network.addRecipe(catalogBukkitRecipe)
         }
 
         // 战利品表配方
@@ -126,47 +130,33 @@ object CatalogItemRecipeNetwork {
 
     /**
      * 方便函数.
-     * 输入输出存在空时会抛异常.
+     * 当配方的输入输出为空时会使用空节点占位.
      */
-    private fun MutableNetwork<ItemRef, CatalogRecipeEdge>.addRecipe(
-        catalogRecipe: CatalogRecipe,
-        errorMessage: String,
-    ) {
-        // 当配方输入和输出均非空时才会添加节点和边, 正常情况下不应该出现
+    private fun MutableNetwork<Optional<ItemRef>, CatalogRecipeEdge>.addRecipe(catalogRecipe: CatalogRecipe) {
         val lookupInputs = catalogRecipe.getLookupInputs()
         val lookupOutputs = catalogRecipe.getLookupOutputs()
-        if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
-            LOGGER.error(errorMessage)
-            return
-        }
 
-        for (inputNode in lookupInputs) {
+        if (lookupInputs.isEmpty()) {
             for (outputNode in lookupOutputs) {
-                addNode(inputNode)
-                addNode(outputNode)
-                addEdge(inputNode, outputNode, CatalogRecipeEdge(catalogRecipe))
+                addNode(Optional.of(outputNode))
+                addEdge(Optional.empty(), Optional.of(outputNode), CatalogRecipeEdge(catalogRecipe))
             }
+            return
         }
-    }
 
-    /**
-     * 方便函数.
-     * 输入输出存在空时仅跳过.
-     */
-    private fun MutableNetwork<ItemRef, CatalogRecipeEdge>.addRecipe(
-        catalogRecipe: CatalogRecipe,
-    ) {
-        val lookupInputs = catalogRecipe.getLookupInputs()
-        val lookupOutputs = catalogRecipe.getLookupOutputs()
-        if (lookupInputs.isEmpty() || lookupOutputs.isEmpty()) {
+        if (lookupOutputs.isEmpty()) {
+            for (inputNode in lookupInputs) {
+                addNode(Optional.of(inputNode))
+                addEdge(Optional.of(inputNode), Optional.empty(), CatalogRecipeEdge(catalogRecipe))
+            }
             return
         }
 
         for (inputNode in lookupInputs) {
             for (outputNode in lookupOutputs) {
-                addNode(inputNode)
-                addNode(outputNode)
-                addEdge(inputNode, outputNode, CatalogRecipeEdge(catalogRecipe))
+                addNode(Optional.of(inputNode))
+                addNode(Optional.of(outputNode))
+                addEdge(Optional.of(inputNode), Optional.of(outputNode), CatalogRecipeEdge(catalogRecipe))
             }
         }
     }

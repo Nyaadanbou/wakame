@@ -70,7 +70,7 @@ internal object MinecraftRecipeRegistryLoader {
                         register<MinecraftRecipe>(MinecraftRecipe.Serializer)
                         register<RecipeChoice>(RecipeChoiceSerializer)
                         register<RecipeResult>(RecipeResultSerializer)
-                        register(ItemRef.Serializer)
+                        register(ItemRef.SERIALIZER)
                     }
                 }.buildAndLoadString(fileText)
 

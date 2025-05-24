@@ -115,7 +115,7 @@ class CatalogSmithingTrimRecipe(
     override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 
     // 锻造台纹饰配方没有输出, 返回一个占位物品作为节点
-    override fun getLookupOutputs(): Set<ItemRef> = setOf(ItemRef.noop())
+    override fun getLookupOutputs(): Set<ItemRef> = emptySet()
 }
 
 class CatalogSmokingRecipe(
@@ -142,7 +142,7 @@ class CatalogStonecuttingRecipe(
 private fun RecipeChoice?.toItems(): List<ItemRef> {
     return when (this) {
         is RecipeChoice.ExactChoice -> choices.mapNotNull { ItemRef.checkedItemRef(it) }
-        is RecipeChoice.MaterialChoice -> choices.map { ItemRef.uncheckedItemRef(it.key) }
+        is RecipeChoice.MaterialChoice -> choices.map { ItemRef.checkedItemRef(it) }
         else -> emptyList()
     }
 }
