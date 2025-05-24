@@ -3,12 +3,13 @@ package cc.mewcraft.wakame.item2.behavior.impl.weapon
 import cc.mewcraft.wakame.damage.DamageManagerApi
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.extension.addCooldown
 import cc.mewcraft.wakame.item2.extension.damageItem
 import cc.mewcraft.wakame.item2.extension.isOnCooldown
+import cc.mewcraft.wakame.item2.getProperty
 import org.bukkit.FluidCollisionMode
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
@@ -24,17 +25,18 @@ import org.bukkit.inventory.ItemStack
 object Melee : Weapon {
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         if (itemstack.isOnCooldown(player)) return
+        val melee = itemstack.getProperty(ItemPropertyTypes.MELEE) ?: return
 
         val world = player.world
         val attrContainer = player.attributeContainer
-        val maxDistance = attrContainer.getValue(Attributes.ENTITY_INTERACTION_RANGE)
+        val maxDistance = melee.attackRange
 
         val rayTraceResult = world.rayTrace(
             player.eyeLocation,
             player.eyeLocation.direction,
             maxDistance,
             FluidCollisionMode.NEVER,
-            true,
+            true, // 是否忽略草、告示牌、流体等有碰撞判定但是可穿过的方块
             0.05
         ) {
             it is LivingEntity && it != player
@@ -53,10 +55,10 @@ object Melee : Weapon {
             // 造成伤害
             hitEntity.hurt(damageMetadata, player, true)
             // 设置耐久
-            player.damageItem(event.hand, 1)
+            player.damageItem(event.hand, melee.itemDamagePerAttack)
         }
 
-        // 设置冷却 TODO
-        itemstack.addCooldown(player, 1)
+        // 设置冷却
+        itemstack.addCooldown(player, melee.attackCooldown)
     }
 }
