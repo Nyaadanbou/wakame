@@ -1,13 +1,17 @@
 package cc.mewcraft.wakame.item2.config.property.impl.weapon
 
+import org.joml.Vector3f
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
  * 太刀的配置.
  *
+ * @property itemDamagePerAttack 每次攻击命中消耗的耐久度.
  * @property unarmedSpiritConsume 玩家非手持太刀时, 每秒气刃值减少量.
+ * @property horizontalSlashHalfExtentsBase 横斩OBB攻击判定范围.
  * @property horizontalSlashCooldown 横斩后物品冷却.
  * @property horizontalSlashSpiritReward 横斩命中奖励的气刃值.
+ * @property spiritBladeSlashHalfExtentsBase 气刃斩OBB攻击判定范围.
  * @property spiritBladeSlashSpiritConsume1 发动气刃斩1所需的气刃值.
  * @property spiritBladeSlashSpiritConsume2 发动气刃斩2所需的气刃值.
  * @property spiritBladeSlashSpiritConsume3 发动气刃斩3所需的气刃值.
@@ -29,9 +33,12 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  */
 @ConfigSerializable
 data class Katana(
+    val itemDamagePerAttack: Int = 1,
     val unarmedSpiritConsume: Int = 5,
+    val horizontalSlashHalfExtentsBase: Vector3f = Vector3f(1.2f, 0.05f, 1.1f),
     val horizontalSlashCooldown: Int = 14,
     val horizontalSlashSpiritReward: Int = 4,
+    val spiritBladeSlashHalfExtentsBase: Vector3f = Vector3f(1.7f, 0.05f, 1.4f),
     val spiritBladeSlashSpiritConsume1: Int = 15,
     val spiritBladeSlashSpiritConsume2: Int = 15,
     val spiritBladeSlashSpiritConsume3: Int = 20,

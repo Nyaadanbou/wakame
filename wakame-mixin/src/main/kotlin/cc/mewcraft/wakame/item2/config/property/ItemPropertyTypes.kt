@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Sword
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
@@ -102,7 +103,7 @@ data object ItemPropertyTypes {
     val KATANA: ItemPropertyType<Katana> = typeOf("katana")
 
     @JvmField
-    val MELEE: ItemPropertyType<Unit> = typeOf("melee")
+    val MELEE: ItemPropertyType<Melee> = typeOf("melee")
 
     @JvmField
     val SWORD: ItemPropertyType<Sword> = typeOf("sword")

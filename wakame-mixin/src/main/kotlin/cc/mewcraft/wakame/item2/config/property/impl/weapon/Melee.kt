@@ -1,18 +1,17 @@
 package cc.mewcraft.wakame.item2.config.property.impl.weapon
 
-import org.joml.Vector3f
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 /**
- * 剑的配置.
+ * 一般近战武器的配置.
  *
  * @property itemDamagePerAttack 每次攻击命中消耗的耐久度.
- * @property attackHalfExtentsBase OBB攻击判定范围.
+ * @property attackRange 攻击距离.
  * @property attackCooldown 攻击后物品冷却.
  */
 @ConfigSerializable
-data class Sword(
+data class Melee(
     val itemDamagePerAttack: Int = 1,
-    val attackHalfExtentsBase: Vector3f = Vector3f(1.3f, 0.05f, 1.4f),
-    val attackCooldown: Int = 12,
+    val attackRange: Double = 3.0,
+    val attackCooldown: Int = 20,
 )

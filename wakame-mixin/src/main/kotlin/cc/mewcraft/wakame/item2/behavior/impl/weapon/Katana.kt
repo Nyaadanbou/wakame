@@ -107,14 +107,14 @@ object Katana : Weapon {
                 }
             }
         }
-        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.2f, 0.05f, 1.1f)
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, katanaConfig.horizontalSlashHalfExtentsBase)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
             hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
             // 增加气刃值
             katanaState.addBladeSpirit(katanaConfig.horizontalSlashSpiritReward)
             // 设置耐久
-            player.damageItem(EquipmentSlot.HAND, 1)
+            player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
         }
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.horizontalSlashCooldown)
@@ -139,7 +139,7 @@ object Katana : Weapon {
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.laiSlashCooldown)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
+        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
 
     /**
@@ -184,6 +184,7 @@ object Katana : Weapon {
      * 用于太刀气刃斩连段123.
      */
     private fun spiritBladeSlashBase(player: Player, katanaState: KatanaState, angel: Float) {
+        val katanaConfig = katanaState.config
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attributeContainer) {
             every {
@@ -194,7 +195,7 @@ object Katana : Weapon {
             }
         }
 
-        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, 1.7f, 0.05f, 1.4f, angel)
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, katanaConfig.spiritBladeSlashHalfExtentsBase, angel)
         // 造成伤害
         hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
     }
@@ -215,7 +216,7 @@ object Katana : Weapon {
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown1)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
+        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
 
     /**
@@ -234,7 +235,7 @@ object Katana : Weapon {
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown2)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
+        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
 
     /**
@@ -254,7 +255,7 @@ object Katana : Weapon {
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown3)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
+        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
 
     /**
@@ -380,7 +381,7 @@ object Katana : Weapon {
         // 设置冷却
         itemstack.addCooldown(player, katanaConfig.dragonAscendSlashCooldown)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, 1)
+        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
 }
 
@@ -589,9 +590,9 @@ data class KatanaState(
         val duration: Int,
     ) {
         NONE(1.0, -1),
-        WHITE(1.05, 60 * 20),
-        YELLOW(1.1, 40 * 20),
-        RED(1.2, 20 * 20)
+        WHITE(1.1, 60 * 20),
+        YELLOW(1.2, 45 * 20),
+        RED(1.4, 30 * 20)
     }
 
     /**
