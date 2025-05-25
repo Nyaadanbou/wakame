@@ -42,6 +42,7 @@ internal object DamageListener : Listener {
     }
 
     // 由于 MythicMobs 的各种问题, priority 必须设置为 MONITOR.
+    // 整个项目中, Bukkit伤害事件应只在此处被监听
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun on(event: EntityDamageEvent) {
         val damagee = event.entity as? LivingEntity ?: return

@@ -8,6 +8,8 @@ import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.MinecraftItemSlot
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.extension.addCooldown
 import cc.mewcraft.wakame.item2.extension.damageItem
@@ -49,6 +51,13 @@ object Sword : Weapon {
     }
 
     override fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) {
+        // 右键事件不是主手触发的 - 不处理
+        // 这样做的目的是确保副手剑的攻击是通过主手剑触发的
+        // 防止主手不是剑也能右键使用副手的剑攻击
+        if (hand != EquipmentSlot.HAND) {
+            return
+        }
+
         val itemInOffHand = player.inventory.itemInOffHand
         // 副手物品处于冷却 - 不处理
         if (itemInOffHand.isOnCooldown(player)) return
@@ -56,16 +65,21 @@ object Sword : Weapon {
         val offSword = itemInOffHand.getProperty(ItemPropertyTypes.SWORD) ?: return
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
-        // 移除主手剑上的属性
+        // 如果主手剑位于主手时提供属性修饰符, 才需要移除
         val coresOnMainSword = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
-        val modifiersOnMainSword = coresOnMainSword?.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-        if (modifiersOnMainSword != null) {
-            attributeContainerSnapshot.removeModifiers(modifiersOnMainSword)
+        val slotGroup = itemstack.getProperty(ItemPropertyTypes.SLOT) ?: ItemSlotGroup.empty()
+        if (slotGroup.contains(MinecraftItemSlot.MAINHAND)){
+            // 移除主手剑上的属性修饰符
+            val modifiersOnMainSword = coresOnMainSword?.collectAttributeModifiers(itemstack, MinecraftItemSlot.MAINHAND)
+            if (modifiersOnMainSword != null) {
+                attributeContainerSnapshot.removeModifiers(modifiersOnMainSword)
+            }
         }
+
         // 副手剑上没有核心容器 - 不处理
         val coresOnOffSword = itemInOffHand.getData(ItemDataTypes.CORE_CONTAINER) ?: return
         val modifiersOnOffSword = coresOnOffSword.collectAttributeModifiers(itemInOffHand, ItemSlot.imaginary())
-        // 加上副手剑上的属性
+        // 加上副手剑上的属性修饰符
         attributeContainerSnapshot.addTransientModifiers(modifiersOnOffSword)
 
         // 造成伤害
