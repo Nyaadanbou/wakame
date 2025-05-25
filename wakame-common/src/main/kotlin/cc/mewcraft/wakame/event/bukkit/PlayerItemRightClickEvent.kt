@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.HandlerList
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import kotlin.streams.asSequence
 
 /**
  * 当玩家使用物品点击右键时触发.
@@ -31,15 +29,15 @@ class PlayerItemRightClickEvent(
     init {
         require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        player.sendMessage(
-            "${Bukkit.getCurrentTick()} ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
-                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-                    stream.asSequence().dropWhile { frame ->
-                        frame.className == PlayerItemRightClickEvent::class.qualifiedName
-                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-                }
-            }"
-        )
+//        player.sendMessage(
+//            "${Bukkit.getCurrentTick()} ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
+//                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+//                    stream.asSequence().dropWhile { frame ->
+//                        frame.className == PlayerItemRightClickEvent::class.qualifiedName
+//                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+//                }
+//            }"
+//        )
     }
 
     override fun getHandlers(): HandlerList {
