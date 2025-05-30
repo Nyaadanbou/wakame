@@ -22,7 +22,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Sword
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Weapon
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -91,18 +90,19 @@ internal object DamageManager : DamageManagerApi {
     )
 
     /**
-     * 作为 direct_entity 时能够造成伤害的 entity 类型.
+     * 作为 direct_entity 时能够对受击者造成伤害的 entity 类型.
      */
-    private val MISC_DAMAGER_TYPES: Set<EntityType> = PROJECTILE_DAMAGER_TYPES + enumSetOf(
+    private val DIRECT_ATTACKABLE_TYPES: Set<EntityType> = PROJECTILE_DAMAGER_TYPES + enumSetOf(
         EntityType.TNT,
         EntityType.END_CRYSTAL,
         EntityType.AREA_EFFECT_CLOUD,
     )
 
     /**
-     * 作为 direct_entity 时能够造成伤害的并且比较“特殊”的 entity 类型.
+     * 作为 direct_entity 时能够对受击者造成伤害的 entity 类型.
+     * 这些实体作为直接实体时, 可能有来源实体, 但视为无源的
      */
-    private val SPECIAL_DAMAGER_TYPES: Set<EntityType> = enumSetOf(
+    private val AS_NULL_CAUSING_DIRECT_ATTACKABLE_TYPES: Set<EntityType> = enumSetOf(
         EntityType.TNT,
         EntityType.END_CRYSTAL,
     )
@@ -123,12 +123,10 @@ internal object DamageManager : DamageManagerApi {
     )
 
     /**
-     * 可以作为(用弓/弩射出的)“箭矢”的实体类型.
+     * 无来源实体时, 伤害需要考虑物品属性的直接实体类型.
+     * 例如: 发射器射出带属性的自定义箭矢.
      */
-    // 如果 BukkitAPI 存在一个这样的接口表示这类实体,
-    // 那我们也就不需要这么一个 set 了, 可以直接用 is.
-    // 问题就是没有, 所以只能这样了.
-    private val EXACT_ARROW_TYPES: Set<EntityType> = enumSetOf(
+    private val ATTRIBUTED_ARROW_TYPES: Set<EntityType> = enumSetOf(
         EntityType.ARROW,
         EntityType.SPECTRAL_ARROW
     )
@@ -186,11 +184,14 @@ internal object DamageManager : DamageManagerApi {
         when (causingEntity) { // 根据 causing_entity 的类型, 生成 damage_metadata
 
             null -> { // 不存在 causing_entity
-                if (directEntity.type in EXACT_ARROW_TYPES) {
-                    // 特殊处理属于 exact_arrow_types 的 direct_entity, 考虑箭矢本身给予的额外伤害.
-                    return createAttributedArrowDamage(directEntity as AbstractArrow)
-                } else if (directEntity.type in MISC_DAMAGER_TYPES) {
+                if (directEntity.type in ATTRIBUTED_ARROW_TYPES) {
+                    // 特殊处理属于 attributed_arrow_types 的 direct_entity, 考虑箭矢本身给予的额外伤害.
+                    // 例如: 无源箭矢(发射器)
+                    return calculateNoCausingAttributedArrowDamage(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
+                } else if (directEntity.type in DIRECT_ATTACKABLE_TYPES) {
                     // 使用映射来计算 direct_entity 造成的伤害.
+                    // attributed_arrow_types 中的直接实体类型不会进入此分支
+                    // 例如: 无源弹射物(发射器), 无源TNT(发射器), 无源区域效果云(发射器), 无源末影水晶爆炸.
                     return context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 } else {
                     // 不太可能发生
@@ -202,11 +203,15 @@ internal object DamageManager : DamageManagerApi {
                 if (directEntity.type in REGISTERED_PROJECTILE_TYPES) {
                     // 这里的情况: direct_entity 的 *类型* 在已注册弹射物类型当中.
                     // 这意味着 direct_entity 在之前的某个时间点*也许*已经注册了一个伤害信息.
-                    // 因此这里先尝试获取已经注册的伤害信息; 若没有注册, 则使用 player_adhoc_mappings.
-                    return calculateAbstractArrowDamage(causingEntity, directEntity as AbstractArrow, context) ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
-                } else if (directEntity.type in MISC_DAMAGER_TYPES) {
+                    // 先尝试获取已经注册的伤害信息
+                    // 若没有注册则考虑弹射物物品上的属性.
+                    // 再没有则使用 player_adhoc_mappings.
+                    // 例如: 玩家箭矢, 玩家光灵箭, 玩家三叉戟
+                    return calculateRegisteredAbstractArrowDamage(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
+                } else if (directEntity.type in DIRECT_ATTACKABLE_TYPES) {
                     // 这里的情况: direct_entity 属于游戏里比较特殊的能够造成伤害的实体.
                     // 直接使用 player_adhoc_mappings.
+                    // 例如: 玩家其他弹射物, 玩家TNT, 玩家末影水晶
                     return context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 }
 
@@ -214,10 +219,10 @@ internal object DamageManager : DamageManagerApi {
             }
 
             is LivingEntity -> { // causing_entity 是 non-player living_entity
-
-                if (directEntity.type in SPECIAL_DAMAGER_TYPES) {
-                    // 特殊处理: causing_entity 是 living_entity 但 direct_entity
-                    // 是 tnt_primed 或 ender_crystal 时, 视为没有 causing_entity
+                if (directEntity.type in AS_NULL_CAUSING_DIRECT_ATTACKABLE_TYPES) {
+                    // causing_entity 是 living_entity 但 direct_entity
+                    // 是 tnt_primed 等特殊情况时, 视为没有 causing_entity
+                    // 例如: 非玩家生物点燃的TNT, 非玩家生物引爆的末影水晶
                     return context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 }
 
@@ -391,53 +396,12 @@ internal object DamageManager : DamageManagerApi {
         }
     }
 
-    private fun createAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
-        val itemstack = arrow.itemStack
-        if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
-        val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
-        val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-        val arrowAttributes = BuiltInRegistries.IMG_ATTRIBUTE_MAP["minecraft:arrow"]?.getSnapshot() ?: run {
-            LOGGER.warn("Could not find imaginary attribute map \"minecraft:arrow\" for context: $this. Returning null damage metadata.")
-            return null
-        }
-        arrowAttributes.addTransientModifiers(modifiersOnArrow)
-        val damageBundle = damageBundle(arrowAttributes) {
-            every {
-                standard()
-            }
-        }
-        return VanillaDamageMetadata(damageBundle)
-    }
-
     // 可以返回 null, 意为取消本次伤害
     private fun createPlayerAttackDamageMetadata(context: DamageContext): DamageMetadata? {
         val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         return weapon.generateDamageMetadata(player, itemstack)
-    }
-
-    // 可以返回 null, 意为取消本次伤害
-    @Deprecated("现有武器系统不存在原版横扫, 仅作为过期代码留作参考")
-    private fun createPlayerSweepAttackDamageMetadata(context: DamageContext): DamageMetadata? {
-        // 需要玩家手中的物品是 Weapon 且攻击特效是 “sword” 才能打出横扫伤害
-        val player = context.damageSource.causingEntity as? Player ?: error("The causing entity must be a player.")
-        val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
-        if (weapon !is Sword) return null // 返回 null 是为了供外部识别以不触发萌芽伤害事件
-        val attributeContainer = player.attributeContainer
-        val damageBundle = damageBundle(attributeContainer) {
-            every {
-                standard()
-                rate {
-                    standard() * attributeContainer.getValue(Attributes.SWEEPING_DAMAGE_RATIO)
-                }
-            }
-        }
-        return PlayerDamageMetadata(
-            attributes = attributeContainer,
-            damageBundle = damageBundle
-        )
     }
 
     private fun calculateDefaultDamageMetadata(context: DamageContext): DamageMetadata {
@@ -503,22 +467,43 @@ internal object DamageManager : DamageManagerApi {
 
     /**
      * 该函数应该在弹射物击中实体时调用.
+     * 考虑弹射物物品上的属性.
      * 返回 `null` 表示不由该函数负责.
      */
-    private fun calculateAbstractArrowDamage(causingEntity: Player, abstractArrow: AbstractArrow, context: DamageContext): DamageMetadata? {
-        val (force, attributes) = abstractArrow.getRegisteredDamage() ?: return null
+    private fun calculateNoCausingAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
+        val itemstack = arrow.itemStack
+        if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
+        val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+        val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
+        val arrowAttributes = getImaginaryArrowAttributes() ?: return null
+        arrowAttributes.addTransientModifiers(modifiersOnArrow)
+
+        val damageBundle = damageBundle(arrowAttributes) {
+            every {
+                standard()
+            }
+        }
+        return VanillaDamageMetadata(damageBundle)
+    }
+
+    /**
+     * 该函数应该在弹射物击中实体时调用.
+     * 先尝试获取已经注册的伤害信息
+     * 若没有注册则考虑弹射物物品上的属性.
+     * 返回 `null` 表示不由该函数负责.
+     */
+    private fun calculateRegisteredAbstractArrowDamage(abstractArrow: AbstractArrow): DamageMetadata? {
+        val registeredProjectileDamage = abstractArrow.getRegisteredDamage()
+        val attributes = registeredProjectileDamage?.attributes ?: getImaginaryArrowAttributes() ?: return null
+        val force = registeredProjectileDamage?.force ?: 1.0
         val damageBundle = run {
             val itemstack = abstractArrow.itemStack
-            val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER)
-            if (itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW) && itemcores != null) {
-                // As of 1.21.3, AbstractArrow = 箭矢/光灵箭矢/三叉戟,
-                // 这些物品上在我们的游戏设计上可能有修改伤害的属性.
-                // 该分支将考虑这些属性.
+            if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
+            val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
+            val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
 
-                val modifiersOnArrow = itemcores.collectAttributeModifiers(itemstack, ItemSlot.imaginary())
-                attributes.addTransientModifiers(modifiersOnArrow)
-            }
+            attributes.addTransientModifiers(modifiersOnArrow)
             damageBundle(attributes) {
                 every {
                     standard()
@@ -531,6 +516,13 @@ internal object DamageManager : DamageManagerApi {
             attributes = attributes,
             damageBundle = damageBundle
         )
+    }
+
+    private fun getImaginaryArrowAttributes(): AttributeMapSnapshot? {
+        return BuiltInRegistries.IMG_ATTRIBUTE_MAP["minecraft:arrow"]?.getSnapshot() ?: run {
+            LOGGER.warn("Could not find imaginary attribute map \"minecraft:arrow\" for context: $this. Returning default 1.0 damage metadata.")
+            null
+        }
     }
 
     /**
@@ -562,7 +554,7 @@ internal object DamageManager : DamageManagerApi {
      * 而不是*创建*弹射物时拦截属性和修改 - 代码无法从这个时机得知受伤实体的状态.
      */
     private val registeredProjectileDamages: Cache<UUID, RegisteredProjectileDamage> = Caffeine.newBuilder()
-        .expireAfterAccess(Duration.ofSeconds(10))
+        .expireAfterAccess(Duration.ofSeconds(30))
         .build()
 
     private fun Projectile.getRegisteredDamage(): RegisteredProjectileDamage? {

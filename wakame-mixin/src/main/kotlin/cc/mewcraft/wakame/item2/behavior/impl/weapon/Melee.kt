@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
-import cc.mewcraft.wakame.damage.DamageManagerApi
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
@@ -18,9 +17,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 一般近战武器的物品行为.
  * 特指左键点击生物以进行攻击的"近战武器", 如斧等.
- * 代码实际运行时会先取消左键点击生物直接导致的伤害事件.
- * 再通过射线检测获取目标, 调用 [DamageManagerApi.hurt] 方法造成伤害.
- * 目的是让武器行为无需直接处理伤害事件, 同时有一定的反作弊作用.
+ * 此类物品只有攻击到生物才会进入冷却.
  */
 object Melee : Weapon {
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
@@ -37,7 +34,7 @@ object Melee : Weapon {
             maxDistance,
             FluidCollisionMode.NEVER,
             true, // 是否忽略草、告示牌、流体等有碰撞判定但是可穿过的方块
-            0.05
+            0.0
         ) {
             it is LivingEntity && it != player
         }
@@ -54,11 +51,12 @@ object Melee : Weapon {
             }
             // 造成伤害
             hitEntity.hurt(damageMetadata, player, true)
+
             // 设置耐久
             player.damageItem(event.hand, melee.itemDamagePerAttack)
+            // 设置冷却
+            // 命中实体才进入冷却
+            itemstack.addCooldown(player, melee.attackCooldown)
         }
-
-        // 设置冷却
-        itemstack.addCooldown(player, melee.attackCooldown)
     }
 }
