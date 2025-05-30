@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
-import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
@@ -24,10 +23,6 @@ import org.bukkit.inventory.ItemStack
  * 剑的物品行为.
  */
 object Sword : Weapon {
-
-    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
-        return null
-    }
 
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         if (itemstack.isOnCooldown(player)) return

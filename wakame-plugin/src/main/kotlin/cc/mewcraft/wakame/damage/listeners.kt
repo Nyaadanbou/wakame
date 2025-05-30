@@ -50,12 +50,14 @@ internal object DamageListener : Listener {
         val damageContext = DamageContext(event)
 
         // 计算防御前的伤害
+        // 考虑伤害发起者对伤害值的各种影响
         val damageMetadata = DamageManager.calculateDamageBeforeDefense(damageContext) ?: run {
             event.isCancelled = true
             return
         }
 
         // 计算防御后的伤害 (最终伤害)
+        // 考虑伤害承受者对伤害值的各种影响
         val finalDamageMap = DamageManager.calculateFinalDamageMap(damageMetadata, damagee)
 
         val postprocessEvent = PostprocessDamageEvent(damageMetadata, finalDamageMap, event)

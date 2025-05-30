@@ -49,10 +49,6 @@ private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "d
  */
 object Katana : Weapon {
 
-    override fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
-        return null // 太刀没有直接点击实体造成伤害触发的逻辑, 直接返回 null 取消伤害事件
-    }
-
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         val katanaState = player.koishify().getOrNull(KatanaState) ?: return
         if (katanaState.isArmed.not()) return

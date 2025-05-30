@@ -9,8 +9,7 @@ version: 1
 # 玩家造成了基于原版特殊机制的伤害, 而非使用武器左键造成的直接伤害.
 # 也就是说 damage_source 需要同时满足以下条件:
 # - direct_entity 和 causing_entity 都存在
-# - direct_entity 不是 player; 但 causing_entity 是 player
-# - direct_entity 不能是 arrow 和 trident FIXME #366: 存疑
+# - causing_entity 是 player
 
 tnt:
   一般:
