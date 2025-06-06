@@ -15,6 +15,7 @@ sealed interface Weapon : ItemBehavior {
      * 返回 `null` 会让 Koish 系统取消本次伤害事件.
      *
      * 警告: 不要在该方法中的实现中写攻击的附带效果!
+     * 会导致伤害事件取消时附带效果没有被取消!
      */
     fun generateDamageMetadata(player: Player, itemstack: ItemStack): DamageMetadata? {
         return null

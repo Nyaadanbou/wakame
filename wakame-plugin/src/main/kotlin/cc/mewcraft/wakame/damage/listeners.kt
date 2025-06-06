@@ -23,6 +23,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileHitEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
@@ -67,8 +68,10 @@ internal object DamageListener : Listener {
             return
         }
 
-        // 修改最终伤害
-        event.damage = postprocessEvent.getFinalDamage()
+        // 修改原版各伤害修饰器
+        event.modifyDamageModifiers()
+        // 修改 Base 伤害
+        event.modifyDamageModifier(BASE, postprocessEvent.getFinalDamage())
 
         // 记录日志
         if (LOGGING) {
@@ -103,6 +106,48 @@ internal object DamageListener : Listener {
 
             SERVER.filterAudience { it is Player }.sendMessage(message)
         }
+    }
+
+    /**
+     * 方便函数.
+     * 修改原版各伤害修饰器.
+     */
+    private fun EntityDamageEvent.modifyDamageModifiers(){
+        // 以下修饰器移至 [DamageManager#calculateFinalDamage]
+        // INVULNERABILITY_REDUCTION - 无懈可击时间伤害减免
+        modifyDamageModifier(INVULNERABILITY_REDUCTION, .0)
+        // BLOCKING - 格挡
+        modifyDamageModifier(BLOCKING, .0)
+        // RESISTANCE - 抗性提升药水效果伤害减免
+        modifyDamageModifier(RESISTANCE, .0)
+        // ABSORPTION - 伤害吸收
+        modifyDamageModifier(ABSORPTION, .0)
+
+        // 以下修饰器移除
+        // FREEZING - 烈焰人等受细雪伤害*5
+        // 该特性通过给相关生物配置对应元素易伤实现
+        modifyDamageModifier(FREEZING, .0)
+        // HARD_HAT - 头盔减少25%下落的方块伤害
+        // 移除无关紧要的原版特性
+        modifyDamageModifier(HARD_HAT, .0)
+        // ARMOR - 原版盔甲值/盔甲韧性/魔咒效果组件armor_effectiveness的伤害减免
+        // Koish 有专门的防御力机制
+        modifyDamageModifier(ARMOR, .0)
+        // MAGIC - 魔咒保护系数伤害减免/女巫85%魔法伤害减免
+        // Koish 有专门的防御力机制
+        modifyDamageModifier(MAGIC, .0)
+    }
+
+    /**
+     * 方便函数.
+     * 修改特定原版伤害修饰器.
+     */
+    private fun EntityDamageEvent.modifyDamageModifier(modifierType: EntityDamageEvent.DamageModifier, value: Double): Boolean {
+        if (this.isApplicable(modifierType)) {
+            this.setDamage(modifierType, value)
+            return true
+        }
+        return false
     }
 
     @EventHandler
