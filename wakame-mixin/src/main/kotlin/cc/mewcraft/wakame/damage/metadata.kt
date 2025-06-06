@@ -154,7 +154,7 @@ object PlayerDamageMetadata {
      *
      * 使用场景:
      * - 使用 *空手* 造成的伤害.
-     * - 使用 *没有攻击行为的物品* 造成的伤害.
+     * - 使用 *没有武器行为的物品* 造成的伤害.
      */
     @JvmField
     val INTRINSIC_ATTACK: DamageMetadata = DamageMetadata(
