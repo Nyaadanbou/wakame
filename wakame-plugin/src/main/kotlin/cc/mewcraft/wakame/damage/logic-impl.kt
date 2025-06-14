@@ -4,9 +4,6 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.damage.DamageManager.calculateDamageBeforeDefense
-import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamage
-import cc.mewcraft.wakame.damage.DamageManager.calculateFinalDamageMap
 import cc.mewcraft.wakame.damage.DamageManager.registerExactArrow
 import cc.mewcraft.wakame.damage.DamageManager.registerTrident
 import cc.mewcraft.wakame.damage.DamageManager.registeredCustomDamageMetadata
@@ -16,10 +13,8 @@ import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
 import cc.mewcraft.wakame.damage.mapping.NullCausingDamageMappings
 import cc.mewcraft.wakame.damage.mapping.PlayerAdhocDamageMappings
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
-import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Weapon
@@ -35,7 +30,6 @@ import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
-import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
 import org.bukkit.entity.AbstractArrow
@@ -49,8 +43,10 @@ import org.bukkit.entity.SpectralArrow
 import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.entity.*
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
+import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.enumSetOf
 import java.time.Duration
 import java.util.*
@@ -156,13 +152,12 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
-     * 计算“攻击阶段”之后-“防御阶段”之前-的伤害.
+     * 计算“攻击阶段”的伤害信息.
+     * 即考虑所有因为伤害发起者导致的影响.
      *
-     * @return 攻击阶段的伤害信息
-     * @see calculateFinalDamage 计算“防御阶段”之后的单个元素的伤害
-     * @see calculateFinalDamageMap 计算“防御阶段”之后的所有元素的伤害之和
+     * @return 攻击阶段的伤害信息, null意为取消伤害事件
      */
-    fun calculateDamageBeforeDefense(context: DamageContext): DamageMetadata? {
+    fun calculateAttackPhaseMetadata(context: DamageContext): DamageMetadata? {
         val damagee = context.damagee
         val customDamageMetadata = damagee.getCustomDamageMetadata()
         if (customDamageMetadata != null) {
@@ -237,108 +232,189 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
-     * @see calculateFinalDamageMap
+     * 计算“防御阶段”的伤害信息.
+     * 即考虑所有因为伤害承受者导致的影响.
+     *
+     * @return 防御阶段的伤害信息, null意为取消伤害事件
      */
-    fun calculateFinalDamageMap(
-        damageMetadata: DamageMetadata,
-        damagee: LivingEntity,
-    ): Reference2DoubleMap<RegistryEntry<Element>> {
+    fun calculateDefensePhaseMetadata(context: DamageContext): DefenseMetadata? {
+        val damagee = context.damagee
         val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
-            error("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
+            LOGGER.warn("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
+            return null
         }
-        return calculateFinalDamageMap(damageMetadata, damageeAttributes)
+
+        // 受伤者抗性提升等级
+        val resistanceLevel = damagee.getPotionEffect(PotionEffectType.RESISTANCE)?.amplifier?.plus(1) ?: 0
+
+        return DefenseMetadata(damageeAttributes, false, resistanceLevel)
     }
 
     /**
-     * 计算所有元素-“防御阶段”之后-的伤害之和, 即最终伤害.
-     *
-     * @param damageMetadata “攻击阶段”的信息, 该信息通过 [calculateDamageBeforeDefense] 计算得出
-     * @param damageeAttributes 受伤实体的属性
+     * 计算 [BASE] 修饰器的伤害.
+     * 主要与 Koish 的属性和元素系统有关.
+     * 在功能上包含了原版的 [ARMOR] 和 [MAGIC] 修饰器对伤害的影响.
      */
-    private fun calculateFinalDamageMap(
+    fun calculateBaseModifierDamage(
         damageMetadata: DamageMetadata,
-        damageeAttributes: AttributeMap,
-    ): Reference2DoubleMap<RegistryEntry<Element>> {
-        val damagePackets = damageMetadata.damageBundle.packets()
-        if (damagePackets.isEmpty()) {
-            // 记录空伤害包以方便定位问题
-            LOGGER.warn("Empty damage bundle!", IllegalStateException())
-            return Reference2DoubleMaps.emptyMap()
+        defenseMetadata: DefenseMetadata
+    ): Double {
+        val map = calculateElementDamageMap(damageMetadata, defenseMetadata)
+        if (map.isEmpty()) {
+            LOGGER.warn("Empty element damage map! There may be some problems with the calculation of damage!", IllegalStateException())
+            return .0
         } else {
-            val res = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
-            damagePackets.forEach { damagePacket ->
-                val elementType = damagePacket.element
-                val criticalStrikeMetadata = damageMetadata.criticalStrikeMetadata
-                val damage = calculateFinalDamage(damagePacket, criticalStrikeMetadata, damageeAttributes)
-                if (damage > 0) {
-                    res[elementType] = damage
-                }
-            }
-            return res
+            return map.values.sum()
         }
     }
 
     /**
-     * 计算单个元素-“防御阶段”之后-的伤害.
-     *
-     * @param damagePacket “攻击阶段”的伤害信息
-     * @param criticalStrikeMetadata 暴击信息
-     * @param damageeAttributes 受伤实体的属性
+     * 计算 [INVULNERABILITY_REDUCTION] 修饰器的伤害.
+     * @return 修饰器的伤害, 正值增加伤害, 负值减少伤害, 空表示不修改
      */
-    private fun calculateFinalDamage(
+    fun calculateInvulnerabilityModifierDamage(
+        /**
+         * 在此修饰器处理前, 其他伤害修饰流程处理后的伤害.
+         */
+        modifiedDamage: Double,
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
+    ): Double? {
+        // 若此次攻击忽略无懈可击时间则置零
+        // 否则不改动
+        return if (damageMetadata.ignoreInvulnerability) {
+            .0
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 计算 [BLOCKING] 修饰器的伤害.
+     * @return 修饰器的伤害, 正值增加伤害, 负值减少伤害, 空表示不修改
+     */
+    fun calculateBlockingModifierDamage(
+        modifiedDamage: Double,
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
+    ): Double? {
+        // TODO 根据格挡机制计算
+        return .0
+    }
+
+    /**
+     * 计算 [RESISTANCE] 修饰器的伤害.
+     * @return 修饰器的伤害, 正值增加伤害, 负值减少伤害, 空表示不修改
+     */
+    fun calculateResistanceModifierDamage(
+        modifiedDamage: Double,
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
+    ): Double? {
+        // 若此次攻击忽略抗性提升药水效果则置零
+        // 否则根据配置文件指定的抗性提升药水效果伤害减免格式计算
+        return if (damageMetadata.ignoreResistance) {
+            .0
+        } else {
+            if (defenseMetadata.resistanceLevel > 0) {
+                DamageRules.calculateDamageAfterResistance(modifiedDamage, defenseMetadata.resistanceLevel) - modifiedDamage
+            } else {
+                .0
+            }
+        }
+    }
+
+    /**
+     * 计算 [ABSORPTION] 修饰器的伤害.
+     * 实际上红心+黄心的总损失量不变, 只是考虑是否使用黄心抵消伤害
+     * @return 修饰器的伤害, 正值增加伤害, 负值减少伤害, 空表示不修改
+     */
+    fun calculateAbsorptionModifierDamage(
+        modifiedDamage: Double,
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
+    ): Double? {
+        // 若此次攻击忽略伤害吸收则置零
+        // 否则不改动
+        return if (damageMetadata.ignoreAbsorption) {
+            .0
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 计算各元素的伤害.
+     */
+    fun calculateElementDamageMap(
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
+    ): Reference2DoubleMap<RegistryEntry<Element>> {
+        val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
+        val damagePackets = damageMetadata.damageBundle.packets()
+        damagePackets.forEach { damagePacket ->
+            val elementType = damagePacket.element
+            val elementDamage = calculateElementDamage(damagePacket, damageMetadata, defenseMetadata)
+            // 忽略修饰后为0的元素伤害
+            if (elementDamage > 0) {
+                map[elementType] = elementDamage
+            }
+        }
+        return map
+    }
+
+    /**
+     * 计算特定元素的伤害.
+     */
+    private fun calculateElementDamage(
         damagePacket: DamagePacket,
-        criticalStrikeMetadata: CriticalStrikeMetadata,
-        damageeAttributes: AttributeMap,
+        damageMetadata: DamageMetadata,
+        defenseMetadata: DefenseMetadata
     ): Double {
         // 伤害包的元素类型
         val elementType = damagePacket.element
-        // 该元素伤害倍率(或称攻击威力)
-        val attackDamageRate = damagePacket.rate
-        // 暴击倍率
-        val criticalStrikePower = criticalStrikeMetadata.power
-        // 受伤者防御, 不会小于0
-        val defense = (damageeAttributes.getValue(Attributes.DEFENSE.of(elementType)) + damageeAttributes.getValue(Attributes.UNIVERSAL_DEFENSE)).coerceAtLeast(0.0)
-        // 受伤者承伤倍率
-        val incomingDamageRate = damageeAttributes.getValue(Attributes.INCOMING_DAMAGE_RATE.of(elementType))
+        // 原始伤害
+        var damage = damagePacket.packetDamage
 
-        // 计算原始伤害
-        var originalDamage = damagePacket.packetDamage
-        if (DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
-            originalDamage *= attackDamageRate
-        }
-        if (DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
-            originalDamage *= criticalStrikePower
-        }
+        // 基于攻击者的伤害修饰计算:
+        // 攻击者元素伤害倍率(或称攻击威力)修饰
+        // 直接倍乘
+        damage *= damagePacket.rate
+        // 攻击者暴击倍率修饰
+        // 直接倍乘
+        damage *= damageMetadata.criticalStrikeMetadata.power
 
-        // 计算有效防御
+        // 基于受伤者的伤害修饰计算:
+        // 受伤者防御力修饰
+        // 受伤者对应元素防御值, 不会小于0
+        val defense = defenseMetadata.getElementDefense(elementType)
+        // 有效防御值根据配置文件的公式计算
         val validDefense = DamageRules.calculateValidDefense(
             defense = defense,
             defensePenetration = damagePacket.defensePenetration,
             defensePenetrationRate = damagePacket.defensePenetrationRate
         )
-
-        // 计算防御后伤害
-        val damageAfterDefense = DamageRules.calculateDamageAfterDefense(
-            originalDamage = originalDamage,
+        // 防御后伤害值根据配置文件公式计算
+        damage = DamageRules.calculateDamageAfterDefense(
+            originalDamage = damage,
             validDefense = validDefense
         )
+        // 受伤者承伤倍率修饰
+        // 受伤者对应元素承伤倍率值
+        // 直接倍乘
+        val incomingDamageRate = defenseMetadata.getElementIncomingDamageRate(elementType)
+        damage *= incomingDamageRate
 
-        // 计算最终伤害
-        var finalDamage = damageAfterDefense * incomingDamageRate
-        if (!DamageRules.ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE) {
-            finalDamage *= attackDamageRate
-        }
-        if (!DamageRules.CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE) {
-            finalDamage *= criticalStrikePower
-        }
+        // 伤害系统底层机制修饰计算:
+        // 最小伤害限制修饰
         val leastDamage = if (damagePacket.packetDamage > 0) DamageRules.LEAST_DAMAGE else 0.0
-        finalDamage = finalDamage.coerceAtLeast(leastDamage)
-
+        damage = damage.coerceAtLeast(leastDamage)
+        // 伤害取整修饰
         if (DamageRules.ROUNDING_DAMAGE) {
-            finalDamage = round(finalDamage)
+            damage = round(damage)
         }
 
-        return finalDamage
+        return damage
     }
 
     private enum class Mapping {
@@ -586,6 +662,4 @@ internal object DamageManager : DamageManagerApi {
     fun unregisterCancelKnockback(entity: Entity): Boolean {
         return entitiesCancellingKnockback.remove(entity.uniqueId)
     }
-
-    // TODO 更通用的临时标记工具类
 }
