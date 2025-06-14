@@ -8,28 +8,54 @@ import cc.mewcraft.wakame.entity.attribute.AttributeMapLike
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
+import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 /**
  * 伤害元数据, 包含了一次伤害中"攻击阶段"的有关信息.
- * 一旦实例化后, 攻击伤害的数值以及各种信息就已经确定.
+ * 这些信息均由伤害发起者计算而来.
+ * 一旦实例化后, 各种信息就已经确定并不允许修改.
  */
 data class DamageMetadata(
     /**
      * 伤害标签.
      */
+    @Deprecated("待移除")
     val damageTags: DamageTags,
 
     /**
-     * 伤害捆绑包.
+     * 攻击者伤害捆绑包.
      */
     val damageBundle: DamageBundle,
 
     /**
-     * 暴击元数据.
+     * 攻击者暴击元数据.
      */
     val criticalStrikeMetadata: CriticalStrikeMetadata,
+
+    /**
+     * 此攻击是否忽略无懈可击期间的伤害减免.
+     */
+    val ignoreInvulnerability: Boolean = false,
+
+    /**
+     * 此攻击是否忽略格挡的伤害减免.
+     */
+    val ignoreBlocking: Boolean = false,
+
+    /**
+     * 此攻击是否忽略抗性提升药水效果的伤害减免.
+     */
+    val ignoreResistance: Boolean = false,
+
+    /**
+     * 此攻击是否忽略伤害吸收.
+     * 若忽略则跳过黄心直接扣除红心.
+     * 实际上红心+黄心的总损失量不变.
+     */
+    val ignoreAbsorption: Boolean = false,
 )
 
 /**
@@ -207,3 +233,73 @@ object EntityDamageMetadata {
     }
 }
 //</editor-fold>
+
+/**
+ * 防御元数据, 包含了一次伤害中"防御阶段"的有关信息.
+ * 这些信息均由伤害承受者计算而来.
+ * 一旦实例化后, 各种信息就已经确定并不允许修改.
+ */
+data class DefenseMetadata(
+    /**
+     * 受伤者各元素防御值.
+     */
+    val defenseMap: Reference2DoubleMap<RegistryEntry<Element>>,
+
+    /**
+     * 受伤者各元素承伤倍率值.
+     */
+    val incomingDamageRateMap: Reference2DoubleMap<RegistryEntry<Element>>,
+
+    /**
+     * 受伤者格挡减伤.
+     */
+    val isBlocking: Boolean,
+
+    /**
+     * 受伤者抗性提升状态效果等级.
+     */
+    val resistanceLevel: Int,
+) {
+    constructor(
+        damageeAttributes: AttributeMap,
+        isBlocking: Boolean,
+        resistanceLevel: Int
+    ) : this(
+        defenseMap = damageeAttributes.getDefenseMap(),
+        incomingDamageRateMap = damageeAttributes.getIncomingDamageRateMap(),
+        isBlocking = isBlocking,
+        resistanceLevel = resistanceLevel
+    )
+
+    fun getElementDefense(elementType:RegistryEntry<Element>): Double{
+        // 默认值是0.0
+        return defenseMap.getDouble(elementType)
+    }
+
+    fun getElementIncomingDamageRate(elementType:RegistryEntry<Element>): Double{
+        // 默认值是1.0
+        return incomingDamageRateMap.getDouble(elementType)
+    }
+}
+
+private fun AttributeMap.getDefenseMap(): Reference2DoubleMap<RegistryEntry<Element>> {
+    val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
+    for (elementType in BuiltInRegistries.ELEMENT.entrySequence) {
+        // 防御为对应元素防御 + 通用防御
+        // 强制不小于0
+        val defenseValue = getValue(Attributes.DEFENSE.of(elementType)) + getValue(Attributes.UNIVERSAL_DEFENSE)
+        map[elementType] = defenseValue.coerceAtLeast(0.0)
+    }
+    return map
+}
+
+private fun AttributeMap.getIncomingDamageRateMap(): Reference2DoubleMap<RegistryEntry<Element>> {
+    val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
+    // 承伤倍率默认值为1.0
+    map.defaultReturnValue(1.0)
+    for (elementType in BuiltInRegistries.ELEMENT.entrySequence) {
+        val incomingDamageRate = getValue(Attributes.INCOMING_DAMAGE_RATE.of(elementType))
+        map[elementType] = incomingDamageRate
+    }
+    return map
+}
