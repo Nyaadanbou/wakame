@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item.components.cells.Core
 import cc.mewcraft.wakame.item.components.cells.EmptyCore
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import org.bukkit.inventory.ItemStack
 
@@ -24,7 +24,7 @@ internal object CoreIcons2 {
             is EmptyCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/empty"]
             else -> BuiltInRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
-        val stack = KoishStackGenerator.generate(item, Context(item))
+        val stack = KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 0))
         return stack
     }
 

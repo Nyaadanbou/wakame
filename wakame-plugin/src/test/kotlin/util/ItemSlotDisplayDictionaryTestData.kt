@@ -1,6 +1,5 @@
 package util
 
-import cc.mewcraft.wakame.adventure.adventureModule
 import commonEnv
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -15,7 +14,6 @@ class ItemSlotDisplayDictionaryTestData : KoinTest {
         startKoin {
             modules(
                 commonEnv(),
-                adventureModule(),
             )
         }
     }

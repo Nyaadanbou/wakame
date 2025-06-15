@@ -1,10 +1,12 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.CoreContainer
+import cc.mewcraft.wakame.random4.LootTable
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack
@@ -32,7 +34,7 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
         @Setting("value")
         val entry: CoreContainer,
     ) : MetaCoreContainer {
-        override fun make(context: Context): ItemMetaResult<CoreContainer> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
             return ItemMetaResult.of(entry)
         }
     }
@@ -40,11 +42,11 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
     @ConfigSerializable
     data class Dynamic(
         @Setting("value")
-        val entry: Nothing,
+        val entry: LootTable<Pair<String, Core>>,
     ) : MetaCoreContainer {
-        override fun make(context: Context): ItemMetaResult<CoreContainer> {
-            // TODO #373: 实现动态生成
-            return ItemMetaResult.empty()
+        override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
+            val cores = entry.select(context).toMap()
+            return ItemMetaResult.of(CoreContainer.of(cores))
         }
     }
 

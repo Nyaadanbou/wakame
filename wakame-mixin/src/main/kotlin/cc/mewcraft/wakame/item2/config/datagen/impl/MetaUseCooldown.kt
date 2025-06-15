@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.util.Identifier
@@ -16,7 +16,7 @@ data class MetaUseCooldown(
     val cooldownGroup: Identifier?,
 ) : ItemMetaEntry<UseCooldown> {
 
-    override fun make(context: Context): ItemMetaResult<UseCooldown> {
+    override fun make(context: ItemGenerationContext): ItemMetaResult<UseCooldown> {
         val useCooldown = UseCooldown.useCooldown(seconds).cooldownGroup(cooldownGroup).build()
         return ItemMetaResult.of(useCooldown)
     }

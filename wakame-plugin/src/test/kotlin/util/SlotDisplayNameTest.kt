@@ -1,6 +1,5 @@
 package util
 
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.util.SlotDisplayNameData
 import commonEnv
 import net.kyori.adventure.text.Component.text
@@ -18,7 +17,6 @@ class SlotDisplayNameTest : KoinTest {
         startKoin {
             modules(
                 commonEnv(),
-                adventureModule(),
             )
         }
     }

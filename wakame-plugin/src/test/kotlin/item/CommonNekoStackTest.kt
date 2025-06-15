@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.InjectionQualifier
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.ability2.AbilityMetaRegistryLoader
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.typeref.EntityRefRegistryLoader
@@ -13,7 +12,11 @@ import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.item.NekoItemFactory
 import cc.mewcraft.wakame.item.component.ItemComponentType
 import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.template.*
+import cc.mewcraft.wakame.item.template.ItemGenerationContext
+import cc.mewcraft.wakame.item.template.ItemGenerationResult
+import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
+import cc.mewcraft.wakame.item.template.ItemTemplate
+import cc.mewcraft.wakame.item.template.ItemTemplateType
 import cc.mewcraft.wakame.item.templates.components.ElementSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.KizamiSampleNodeFacade
 import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetypeSampleNodeFacade
@@ -41,9 +44,6 @@ object CommonNekoStackTest {
             modules(
                 // environment
                 testEnv(),
-
-                // dependencies
-                adventureModule(),
             )
         }
 

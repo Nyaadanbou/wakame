@@ -1,9 +1,22 @@
 package recipe
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.core.ItemXBootstrap
-import cc.mewcraft.wakame.recipe.*
-import core.ItemXMock
+import cc.mewcraft.wakame.recipe.BlastingRecipe
+import cc.mewcraft.wakame.recipe.CampfireRecipe
+import cc.mewcraft.wakame.recipe.EmptyRecipeChoice
+import cc.mewcraft.wakame.recipe.EmptyRecipeResult
+import cc.mewcraft.wakame.recipe.FurnaceRecipe
+import cc.mewcraft.wakame.recipe.MinecraftRecipeRegistryLoader
+import cc.mewcraft.wakame.recipe.MultiRecipeChoice
+import cc.mewcraft.wakame.recipe.ShapedRecipe
+import cc.mewcraft.wakame.recipe.ShapelessRecipe
+import cc.mewcraft.wakame.recipe.SingleRecipeChoice
+import cc.mewcraft.wakame.recipe.SingleRecipeResult
+import cc.mewcraft.wakame.recipe.SmithingTransformRecipe
+import cc.mewcraft.wakame.recipe.SmithingTrimRecipe
+import cc.mewcraft.wakame.recipe.SmokingRecipe
+import cc.mewcraft.wakame.recipe.StonecuttingRecipe
+import core.ItemRefMock
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -13,7 +26,14 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.slf4j.Logger
 import testEnv
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class VanillaRecipeSerializationTest : KoinTest {
     companion object {
@@ -28,7 +48,6 @@ class VanillaRecipeSerializationTest : KoinTest {
 
             KoishDataPaths.initialize()
 
-            ItemXBootstrap.init()
             MinecraftRecipeRegistryLoader.load()
         }
 
@@ -64,23 +83,23 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<MultiRecipeChoice>(input)
         assertContentEquals(
             expected = listOf(
-                ItemXMock("minecraft:glass"),
-                ItemXMock("minecraft:white_stained_glass"),
-                ItemXMock("minecraft:orange_stained_glass"),
-                ItemXMock("minecraft:magenta_stained_glass"),
-                ItemXMock("minecraft:light_blue_stained_glass"),
-                ItemXMock("minecraft:yellow_stained_glass"),
-                ItemXMock("minecraft:lime_stained_glass"),
-                ItemXMock("minecraft:pink_stained_glass"),
-                ItemXMock("minecraft:gray_stained_glass"),
-                ItemXMock("minecraft:light_gray_stained_glass"),
-                ItemXMock("minecraft:cyan_stained_glass"),
-                ItemXMock("minecraft:purple_stained_glass"),
-                ItemXMock("minecraft:blue_stained_glass"),
-                ItemXMock("minecraft:brown_stained_glass"),
-                ItemXMock("minecraft:green_stained_glass"),
-                ItemXMock("minecraft:red_stained_glass"),
-                ItemXMock("minecraft:black_stained_glass")
+                ItemRefMock("minecraft:glass"),
+                ItemRefMock("minecraft:white_stained_glass"),
+                ItemRefMock("minecraft:orange_stained_glass"),
+                ItemRefMock("minecraft:magenta_stained_glass"),
+                ItemRefMock("minecraft:light_blue_stained_glass"),
+                ItemRefMock("minecraft:yellow_stained_glass"),
+                ItemRefMock("minecraft:lime_stained_glass"),
+                ItemRefMock("minecraft:pink_stained_glass"),
+                ItemRefMock("minecraft:gray_stained_glass"),
+                ItemRefMock("minecraft:light_gray_stained_glass"),
+                ItemRefMock("minecraft:cyan_stained_glass"),
+                ItemRefMock("minecraft:purple_stained_glass"),
+                ItemRefMock("minecraft:blue_stained_glass"),
+                ItemRefMock("minecraft:brown_stained_glass"),
+                ItemRefMock("minecraft:green_stained_glass"),
+                ItemRefMock("minecraft:red_stained_glass"),
+                ItemRefMock("minecraft:black_stained_glass")
             ),
             actual = input.items
         )
@@ -93,7 +112,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:quartz"), result.item)
+        assertEquals(ItemRefMock("minecraft:quartz"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -107,7 +126,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:poisonous_potato"), input.item)
+        assertEquals(ItemRefMock("minecraft:poisonous_potato"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(1, cookingTime)
@@ -117,7 +136,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:diamond"), result.item)
+        assertEquals(ItemRefMock("minecraft:diamond"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -131,7 +150,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:gravel"), input.item)
+        assertEquals(ItemRefMock("minecraft:gravel"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(200, cookingTime)
@@ -141,7 +160,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:sand"), result.item)
+        assertEquals(ItemRefMock("minecraft:sand"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -170,15 +189,15 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<SingleRecipeChoice>(recipeChoiceB)
         assertContentEquals(
             listOf(
-                ItemXMock("minecraft:gold_block"),
-                ItemXMock("minecraft:diamond_block")
+                ItemRefMock("minecraft:gold_block"),
+                ItemRefMock("minecraft:diamond_block")
             ), recipeChoiceA.items
         )
-        assertEquals(ItemXMock("minecraft:apple"), recipeChoiceB.item)
+        assertEquals(ItemRefMock("minecraft:apple"), recipeChoiceB.item)
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:enchanted_golden_apple"), result.item)
+        assertEquals(ItemRefMock("minecraft:enchanted_golden_apple"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -190,32 +209,32 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertNotNull(recipe)
         assertIs<ShapelessRecipe>(recipe)
         val ingredients = recipe.ingredients
-        assertContains(ingredients, SingleRecipeChoice(ItemXMock("minecraft", "poppy")))
+        assertContains(ingredients, SingleRecipeChoice(ItemRefMock("minecraft", "poppy")))
         assertContains(
             ingredients,
             MultiRecipeChoice(
                 listOf(
-                    ItemXMock("minecraft:red_dye"),
-                    ItemXMock("minecraft:pink_dye"),
+                    ItemRefMock("minecraft:red_dye"),
+                    ItemRefMock("minecraft:pink_dye"),
                 )
             )
         )
         assertEquals(4, ingredients
             .filterIsInstance<SingleRecipeChoice>()
-            .count { it.item == ItemXMock("minecraft:poppy") }
+            .count { it.item == ItemRefMock("minecraft:poppy") }
         )
         assertEquals(1, ingredients
             .filterIsInstance<MultiRecipeChoice>()
             .count {
                 it.items == listOf(
-                    ItemXMock("minecraft:red_dye"),
-                    ItemXMock("minecraft:pink_dye")
+                    ItemRefMock("minecraft:red_dye"),
+                    ItemRefMock("minecraft:pink_dye")
                 )
             }
         )
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:rose_bush"), result.item)
+        assertEquals(ItemRefMock("minecraft:rose_bush"), result.item)
         assertEquals(2, result.amount)
     }
 
@@ -231,14 +250,14 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<MultiRecipeChoice>(base)
         assertContentEquals(
             listOf(
-                ItemXMock("minecraft:cobblestone"),
-                ItemXMock("minecraft:stone"),
+                ItemRefMock("minecraft:cobblestone"),
+                ItemRefMock("minecraft:stone"),
             ), base.items
         )
 
         val addition = recipe.addition
         assertIs<SingleRecipeChoice>(addition)
-        assertEquals(ItemXMock("minecraft:ender_pearl"), addition.item)
+        assertEquals(ItemRefMock("minecraft:ender_pearl"), addition.item)
 
         val template = recipe.template
         assertIs<EmptyRecipeChoice>(template)
@@ -247,7 +266,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:end_stone"), result.item)
+        assertEquals(ItemRefMock("minecraft:end_stone"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -261,22 +280,22 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val base = recipe.base
         assertIs<SingleRecipeChoice>(base)
-        assertEquals(ItemXMock("wakame:armor/bronze_helmet"), base.item)
+        assertEquals(ItemRefMock("wakame:armor/bronze_helmet"), base.item)
 
         val addition = recipe.addition
         assertIs<MultiRecipeChoice>(addition)
         assertContentEquals(
             listOf(
-                ItemXMock("minecraft:amethyst_shard"),
-                ItemXMock("minecraft:copper_ingot"),
-                ItemXMock("minecraft:diamond"),
-                ItemXMock("minecraft:emerald"),
-                ItemXMock("minecraft:gold_ingot"),
-                ItemXMock("minecraft:iron_ingot"),
-                ItemXMock("minecraft:lapis_lazuli"),
-                ItemXMock("minecraft:netherite_ingot"),
-                ItemXMock("minecraft:quartz"),
-                ItemXMock("minecraft:redstone")
+                ItemRefMock("minecraft:amethyst_shard"),
+                ItemRefMock("minecraft:copper_ingot"),
+                ItemRefMock("minecraft:diamond"),
+                ItemRefMock("minecraft:emerald"),
+                ItemRefMock("minecraft:gold_ingot"),
+                ItemRefMock("minecraft:iron_ingot"),
+                ItemRefMock("minecraft:lapis_lazuli"),
+                ItemRefMock("minecraft:netherite_ingot"),
+                ItemRefMock("minecraft:quartz"),
+                ItemRefMock("minecraft:redstone")
             ), addition.items
         )
 
@@ -284,24 +303,24 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<MultiRecipeChoice>(template)
         assertContentEquals(
             listOf(
-                ItemXMock("minecraft:coast_armor_trim_smithing_template"),
-                ItemXMock("minecraft:dune_armor_trim_smithing_template"),
-                ItemXMock("minecraft:eye_armor_trim_smithing_template"),
-                ItemXMock("minecraft:host_armor_trim_smithing_template"),
-                ItemXMock("minecraft:raiser_armor_trim_smithing_template"),
-                ItemXMock("minecraft:rib_armor_trim_smithing_template"),
-                ItemXMock("minecraft:sentry_armor_trim_smithing_template"),
-                ItemXMock("minecraft:shaper_armor_trim_smithing_template"),
-                ItemXMock("minecraft:silence_armor_trim_smithing_template"),
-                ItemXMock("minecraft:snout_armor_trim_smithing_template"),
-                ItemXMock("minecraft:spire_armor_trim_smithing_template"),
-                ItemXMock("minecraft:tide_armor_trim_smithing_template"),
-                ItemXMock("minecraft:vex_armor_trim_smithing_template"),
-                ItemXMock("minecraft:ward_armor_trim_smithing_template"),
-                ItemXMock("minecraft:wayfinder_armor_trim_smithing_template"),
-                ItemXMock("minecraft:wild_armor_trim_smithing_template"),
-                ItemXMock("minecraft:bolt_armor_trim_smithing_template"),
-                ItemXMock("minecraft:flow_armor_trim_smithing_template")
+                ItemRefMock("minecraft:coast_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:dune_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:eye_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:host_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:raiser_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:rib_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:sentry_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:shaper_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:silence_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:snout_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:spire_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:tide_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:vex_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:ward_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:wayfinder_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:wild_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:bolt_armor_trim_smithing_template"),
+                ItemRefMock("minecraft:flow_armor_trim_smithing_template")
             ), template.items
         )
 
@@ -320,7 +339,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val input = recipe.input
         assertIs<SingleRecipeChoice>(input)
-        assertEquals(ItemXMock("minecraft:cobblestone"), input.item)
+        assertEquals(ItemRefMock("minecraft:cobblestone"), input.item)
 
         val cookingTime = recipe.cookingTime
         assertEquals(100, cookingTime)
@@ -330,7 +349,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:netherrack"), result.item)
+        assertEquals(ItemRefMock("minecraft:netherrack"), result.item)
         assertEquals(1, result.amount)
     }
 
@@ -346,23 +365,23 @@ class VanillaRecipeSerializationTest : KoinTest {
         assertIs<MultiRecipeChoice>(input)
         assertContentEquals(
             listOf(
-                ItemXMock("minecraft:oak_planks"),
-                ItemXMock("minecraft:spruce_planks"),
-                ItemXMock("minecraft:birch_planks"),
-                ItemXMock("minecraft:jungle_planks"),
-                ItemXMock("minecraft:acacia_planks"),
-                ItemXMock("minecraft:dark_oak_planks"),
-                ItemXMock("minecraft:mangrove_planks"),
-                ItemXMock("minecraft:cherry_planks"),
-                ItemXMock("minecraft:bamboo_planks"),
-                ItemXMock("minecraft:crimson_planks"),
-                ItemXMock("minecraft:warped_planks")
+                ItemRefMock("minecraft:oak_planks"),
+                ItemRefMock("minecraft:spruce_planks"),
+                ItemRefMock("minecraft:birch_planks"),
+                ItemRefMock("minecraft:jungle_planks"),
+                ItemRefMock("minecraft:acacia_planks"),
+                ItemRefMock("minecraft:dark_oak_planks"),
+                ItemRefMock("minecraft:mangrove_planks"),
+                ItemRefMock("minecraft:cherry_planks"),
+                ItemRefMock("minecraft:bamboo_planks"),
+                ItemRefMock("minecraft:crimson_planks"),
+                ItemRefMock("minecraft:warped_planks")
             ), input.items
         )
 
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
-        assertEquals(ItemXMock("minecraft:stick"), result.item)
+        assertEquals(ItemRefMock("minecraft:stick"), result.item)
         assertEquals(2, result.amount)
     }
 }

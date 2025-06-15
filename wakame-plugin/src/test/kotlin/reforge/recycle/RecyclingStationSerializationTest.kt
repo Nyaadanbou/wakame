@@ -1,7 +1,6 @@
 package reforge.recycle
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationSerializer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -19,7 +18,6 @@ class RecyclingStationSerializationTest : KoinTest {
             startKoin {
                 modules(
                     testEnv(),
-                    adventureModule(),
                 )
             }
 

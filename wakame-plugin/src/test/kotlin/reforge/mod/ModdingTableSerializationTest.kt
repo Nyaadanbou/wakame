@@ -1,7 +1,6 @@
 package reforge.mod
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.reforge.mod.ModdingTableSerializer
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -21,7 +20,6 @@ class ModdingTableSerializationTest : KoinTest {
             startKoin {
                 modules(
                     testEnv(),
-                    adventureModule(),
                 )
             }
 

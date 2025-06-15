@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.item2
 
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -87,7 +87,7 @@ internal object ItemRefBootstrap {
 
     override fun createItemStack(id: Identifier, amount: Int, player: Player?): ItemStack? {
         val type = getInternalType(id) ?: return null
-        val item = KoishStackGenerator.generate(type, Context(type))
+        val item = KoishStackGenerator.generate(type, ItemGenerationContext(type, 0f, 0))
         return item
     }
 

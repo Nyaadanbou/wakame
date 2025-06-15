@@ -37,7 +37,7 @@ import org.spongepowered.configurate.serialize.SerializationException
  * 要使该假设成立很简单, 只需要不在服务端运行时去增加或移除物品类型即可.
  * 而幸运的是如此简单的假设却可以大大的降低本系统的复杂度.
  */
-sealed interface ItemRef {
+interface ItemRef {
 
     companion object {
 

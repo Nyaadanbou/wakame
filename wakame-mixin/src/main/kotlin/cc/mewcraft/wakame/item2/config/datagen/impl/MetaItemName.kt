@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.util.MojangStack
@@ -17,7 +17,7 @@ data class MetaItemName(
     val itemName: String,
 ) : ItemMetaEntry<Component> {
 
-    override fun make(context: Context): ItemMetaResult<Component> {
+    override fun make(context: ItemGenerationContext): ItemMetaResult<Component> {
         val itemName = MM.deserialize(itemName)
         return ItemMetaResult.of(itemName)
     }

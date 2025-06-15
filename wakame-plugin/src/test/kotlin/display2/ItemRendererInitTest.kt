@@ -1,7 +1,6 @@
 package display2
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.display2.ItemRenderers
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -24,11 +23,6 @@ class ItemRendererInitTest : KoinTest {
                 // this module
                 modules(
 
-                )
-
-                // dependencies
-                modules(
-                    adventureModule()
                 )
             }
 

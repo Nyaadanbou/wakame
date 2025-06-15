@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
@@ -15,7 +16,7 @@ interface ItemMetaEntry<V> {
     /**
      * 根据上下文生成数据 [V].
      */
-    fun make(context: Context): ItemMetaResult<V>
+    fun make(context: ItemGenerationContext): ItemMetaResult<V>
 
     /**
      * 向物品堆叠写入数据 [V].

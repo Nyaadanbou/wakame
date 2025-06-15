@@ -1,10 +1,11 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.random4.LootTable
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
@@ -40,22 +41,20 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
         val entries: Set<RegistryEntry<Kizami>>,
     ) : MetaKizami {
 
-        override fun make(context: Context): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
             return ItemMetaResult.of(entries)
         }
 
     }
 
-    // TODO #373: 实现动态生成
-
     @ConfigSerializable
     data class Dynamic(
         @Setting("value")
-        val selector: Nothing,
+        val selector: LootTable<RegistryEntry<Kizami>>,
     ) : MetaKizami {
 
-        override fun make(context: Context): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
-            TODO("Not yet implemented")
+        override fun make(context: ItemGenerationContext): ItemMetaResult<Set<RegistryEntry<Kizami>>> {
+            return ItemMetaResult.of(selector.select(context).toSet())
         }
 
     }

@@ -1,8 +1,12 @@
 package util
 
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.SlotDisplayDictData
+import cc.mewcraft.wakame.util.SlotDisplayLoreData
+import cc.mewcraft.wakame.util.SlotDisplayLoreDataSerializer
+import cc.mewcraft.wakame.util.SlotDisplayNameData
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
 import commonEnv
 import net.kyori.adventure.text.Component.text
 import org.junit.jupiter.api.AfterEach
@@ -30,7 +34,6 @@ class SlotDisplayDataMixTest : KoinTest {
         startKoin {
             modules(
                 commonEnv(),
-                adventureModule(),
             )
         }
     }

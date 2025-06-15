@@ -21,6 +21,7 @@ import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.random4.entry.LootPoolEntryType
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
@@ -96,6 +97,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")
+
+    @JvmField
+    val LOOT_POOL_ENTRY_TYPE = createRegistryKey<LootPoolEntryType<*>>("loot_pool_entry_type")
 
     ///
 

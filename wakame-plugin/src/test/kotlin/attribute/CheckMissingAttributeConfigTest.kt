@@ -1,7 +1,6 @@
 package attribute
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
@@ -26,7 +25,7 @@ class CheckMissingAttributeConfigTest : KoinTest {
     fun beforeEach() {
         startKoin {
             modules(
-                adventureModule(),
+
             )
         }
     }

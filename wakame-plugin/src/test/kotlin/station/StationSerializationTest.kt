@@ -1,14 +1,13 @@
 package station
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.core.ItemXBootstrap
 import cc.mewcraft.wakame.craftingstation.CraftingStationRecipeRegistry
 import cc.mewcraft.wakame.craftingstation.CraftingStationRegistry
 import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
-import core.ItemXMock
+import core.ItemRefMock
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
@@ -17,7 +16,11 @@ import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import testEnv
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertContentEquals
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class StationSerializationTest : KoinTest {
 
@@ -32,8 +35,6 @@ class StationSerializationTest : KoinTest {
             }
 
             KoishDataPaths.initialize()
-
-            ItemXBootstrap.init()
         }
 
         @JvmStatic
@@ -56,14 +57,14 @@ class StationSerializationTest : KoinTest {
         val input1 = recipe1.input
         assertContentEquals(
             listOf(
-                ItemChoice(ItemXMock("minecraft:raw_copper"), 3),
-                ItemChoice(ItemXMock("wakame:material/raw_tin"), 1),
+                ItemChoice(ItemRefMock("minecraft:raw_copper"), 3),
+                ItemChoice(ItemRefMock("wakame:material/raw_tin"), 1),
                 ExpChoice(495)
             ), input1
         )
 
         val output1 = recipe1.output
-        assertEquals(ItemResult(ItemXMock("wakame:material/raw_bronze"), 4), output1)
+        assertEquals(ItemResult(ItemRefMock("wakame:material/raw_bronze"), 4), output1)
 
 
         val key2 = Key.key("test:amethyst_dust")
@@ -74,12 +75,12 @@ class StationSerializationTest : KoinTest {
         val input2 = recipe2.input
         assertContentEquals(
             listOf(
-                ItemChoice(ItemXMock("minecraft:amethyst_shard"), 1),
+                ItemChoice(ItemRefMock("minecraft:amethyst_shard"), 1),
             ), input2
         )
 
         val output2 = recipe2.output
-        assertEquals(ItemResult(ItemXMock("wakame:material/amethyst_dust"), 2), output2)
+        assertEquals(ItemResult(ItemRefMock("wakame:material/amethyst_dust"), 2), output2)
 
 
         val id = "simple_station"

@@ -1,9 +1,9 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
@@ -38,7 +38,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         val entry: RegistryEntry<Rarity>,
     ) : MetaRarity {
 
-        override fun make(context: Context): ItemMetaResult<RegistryEntry<Rarity>> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             return ItemMetaResult.of(entry)
         }
 
@@ -50,7 +50,7 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
         val entry: RegistryEntry<LevelToRarityMapping>,
     ) : MetaRarity {
 
-        override fun make(context: Context): ItemMetaResult<RegistryEntry<Rarity>> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<RegistryEntry<Rarity>> {
             val mapper = entry.unwrap()
             val level = context.level
             if (mapper.contains(level)) {

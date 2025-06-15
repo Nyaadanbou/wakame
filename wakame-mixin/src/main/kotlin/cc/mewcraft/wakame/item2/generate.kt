@@ -3,12 +3,12 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemId
@@ -45,19 +45,19 @@ import kotlin.time.measureTimedValue
 object KoishStackGenerator {
 
     /**
-     * 基于上下文 [Context] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.
+     * 基于上下文 [ItemGenerationContext] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.
      *
      * @param type 物品类型
      * @param context 生成物品的上下文
      * @return 新生成的 [ItemStack]
      */
-    fun generate(type: KoishItem, context: Context): ItemStack {
+    fun generate(type: KoishItem, context: ItemGenerationContext): ItemStack {
         val result = measureTimedValue { generate0(type, context) }
         LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
         return result.value
     }
 
-    private fun generate0(type: KoishItem, context: Context): ItemStack {
+    private fun generate0(type: KoishItem, context: ItemGenerationContext): ItemStack {
         val dataContainer = ItemDataContainer.builder()
 
         // 写入基础信息, 每个自定义物品都有
@@ -92,7 +92,7 @@ object KoishStackGenerator {
         metaType: ItemMetaType<U, V>,
         metaContainer: ItemMetaContainer,
         itemstack: MojangStack,
-        context: Context,
+        context: ItemGenerationContext,
     ) {
         val entry = metaContainer[metaType]
         if (entry != null) {

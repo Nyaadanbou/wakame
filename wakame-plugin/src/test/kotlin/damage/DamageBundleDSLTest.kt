@@ -1,7 +1,6 @@
 package damage
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.adventure.adventureModule
 import cc.mewcraft.wakame.damage.DamageBundle
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.element.Element
@@ -41,11 +40,6 @@ class DamageBundleDSLTest : KoinTest {
                 // this module
                 modules(
                     // damageModule()
-                )
-
-                // dependencies
-                modules(
-                    adventureModule(),
                 )
             }
 

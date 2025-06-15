@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorContainer
-import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -17,7 +17,12 @@ import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
-import cc.mewcraft.wakame.util.*
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
+import cc.mewcraft.wakame.util.register
+import cc.mewcraft.wakame.util.require
+import cc.mewcraft.wakame.util.runTask
+import cc.mewcraft.wakame.util.yamlLoader
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
 import org.spongepowered.configurate.ConfigurationNode
@@ -150,7 +155,7 @@ internal object ItemProxyRegistryLoader : RegistryLoader {
         val koishItem = KoishItem(id, dataConfig, properties, behaviors)
 
         // 生成一个完整的 ItemStack, 但只取其 ItemDataContainer
-        val tempItemstack = KoishStackGenerator.generate(koishItem, Context(koishItem))
+        val tempItemstack = KoishStackGenerator.generate(koishItem, ItemGenerationContext(koishItem, 0f, 0))
         val dataContainer = tempItemstack.dataContainer(false) ?: error("The generated ItemStack has no ItemDataContainer. This is a bug!")
 
         return KoishItemProxy(id, dataConfig, properties, behaviors, dataContainer)

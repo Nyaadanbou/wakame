@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.impl.AttributeCore
 import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.EmptyCore
@@ -24,7 +24,7 @@ internal object CoreIcons {
             is EmptyCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/empty"]
             else -> BuiltInRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
-        val stack = KoishStackGenerator.generate(item, Context(item))
+        val stack = KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 0))
         return stack.apply(ItemRenderers.SIMPLE::render)
     }
 

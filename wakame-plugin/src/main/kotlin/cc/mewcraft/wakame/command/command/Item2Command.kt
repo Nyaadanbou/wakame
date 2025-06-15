@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.command.koishHandler
 import cc.mewcraft.wakame.command.parser.Item2Parser
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishStackGenerator
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,7 +50,7 @@ internal object Item2Command : KoishCommandFactory<Source> {
         val itemstackMap: Map<Player, Array<ItemStack>> = recipients.associateWith { player ->
             buildList(amount) {
                 repeat(amount) {
-                    add(KoishStackGenerator.generate(item, Context(item)))
+                    add(KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 0)))
                 }
             }
         }.mapValues { (_, items) ->

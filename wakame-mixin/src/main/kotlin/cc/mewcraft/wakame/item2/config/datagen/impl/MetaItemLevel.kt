@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemLevel
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
@@ -47,7 +47,7 @@ data class MetaItemLevel(
 
     }
 
-    override fun make(context: Context): ItemMetaResult<ItemLevel> {
+    override fun make(context: ItemGenerationContext): ItemMetaResult<ItemLevel> {
         val raw: Int = when (base) {
             is Number -> {
                 base.toInt() + (if (context.random.nextDouble() < floatChance) context.random.nextInt(floatAmount) else 0)

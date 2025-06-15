@@ -86,6 +86,7 @@ private data class SimpleItemGenerationContext(
     override val target: Key,
     override val seed: Long,
 ) : ItemGenerationContext {
+    override val luck: Float = 0f
     override val random: Random = Random(seed)
     override val marks: MutableCollection<Mark> by ObservableDelegates.set(HashSet())
     override var level: Int by ObservableDelegates.reference(1)
