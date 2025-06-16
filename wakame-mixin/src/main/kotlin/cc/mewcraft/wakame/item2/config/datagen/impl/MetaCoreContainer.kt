@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.CoreContainer
@@ -42,10 +42,10 @@ sealed interface MetaCoreContainer : ItemMetaEntry<CoreContainer> {
     @ConfigSerializable
     data class Dynamic(
         @Setting("value")
-        val entry: LootTable<Pair<String, Core>>,
+        val entry: Map<String, LootTable<Core>>,
     ) : MetaCoreContainer {
         override fun make(context: ItemGenerationContext): ItemMetaResult<CoreContainer> {
-            val cores = entry.select(context).toMap()
+            val cores = entry.mapValues { (_, table) -> table.select(context).first() }
             return ItemMetaResult.of(CoreContainer.of(cores))
         }
     }

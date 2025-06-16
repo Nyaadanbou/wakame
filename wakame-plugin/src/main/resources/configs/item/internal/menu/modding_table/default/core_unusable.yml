@@ -1,8 +1,0 @@
-slot_display_name: "<white>结果: <red>无效"
-
-# 额外占位符
-# {result_description}
-slot_display_lore:
-  - "{result_description}"
-  - ""
-  - "<!i><aqua>点击取出物品"

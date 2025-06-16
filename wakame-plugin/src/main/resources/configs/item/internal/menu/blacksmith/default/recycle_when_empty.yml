@@ -1,5 +1,0 @@
-base: writable_book
-slot_display_name: "没有要出售的物品"
-slot_display_lore:
-  - "<gray>点击自己背包中的物品"
-  - "<gray>即可选择出售给铁匠."

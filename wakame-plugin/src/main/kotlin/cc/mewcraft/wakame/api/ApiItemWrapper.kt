@@ -1,8 +1,12 @@
 package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.block.KoishBlock
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.realize
+import cc.mewcraft.wakame.entity.player.koishLevel
+import cc.mewcraft.wakame.item2.KoishItem
+import cc.mewcraft.wakame.item2.KoishStackGenerator
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
+import cc.mewcraft.wakame.item2.name
+import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
@@ -10,7 +14,7 @@ import org.bukkit.inventory.ItemStack
 import cc.mewcraft.wakame.api.item.KoishItem as INekoItem
 
 internal class ApiItemWrapper(
-    private val item: NekoItem,
+    private val item: KoishItem,
 ) : INekoItem {
     override fun getId(): Key {
         return item.id
@@ -25,22 +29,20 @@ internal class ApiItemWrapper(
     }
 
     override fun getPlainName(): String {
-        return item.plainName
+        return item.name.plain
     }
 
     override fun createItemStack(amount: Int): ItemStack {
-        val nekoStack = item.realize()
-        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
+        val itemStack = KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 1)).apply { this.amount = amount }
         return itemStack
     }
 
     override fun createItemStack(amount: Int, player: Player?): ItemStack {
-        val nekoStack = if (player == null) {
-            item.realize()
+        val itemStack = if (player == null) {
+            KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 1))
         } else {
-            item.realize(player)
+            KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, player.koishLevel))
         }
-        val itemStack = nekoStack.bukkitStack.apply { this.amount = amount }
-        return itemStack
+        return itemStack.apply { this.amount = amount }
     }
 }

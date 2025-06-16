@@ -7,12 +7,13 @@ import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.PreprocessDamageEventFactory
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
-import cc.mewcraft.wakame.item.KoishStackImplementations
-import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.isKoish
+import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.util.coroutine.minecraft
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
-import cc.mewcraft.wakame.util.item.toNMS
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
@@ -36,13 +37,6 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             senderType<PlayerSource>()
             permission(CommandPermissions.DEBUG)
             literal("debug")
-        }
-
-        // <root> debug inspect_nbt
-        // Inspects the Koish NBT tags on the item held in main hand
-        buildAndAdd(commonBuilder) {
-            literal("inspect_nbt")
-            koishHandler(context = Dispatchers.minecraft, handler = ::handleInspectNbt)
         }
 
         // <root> debug change_variant <variant>
@@ -77,12 +71,6 @@ internal object DebugCommand : KoishCommandFactory<Source> {
         return prettyJson
     }
 
-    private fun handleInspectNbt(context: CommandContext<Source>) {
-        val sender = (context.sender() as PlayerSource).source()
-        val nbtOrNull = KoishStackImplementations.getNbt(sender.inventory.itemInMainHand.toNMS())
-        sender.sendPlainMessage("NBT: " + nbtOrNull?.asString?.prettifyJson())
-    }
-
     private fun handleChangeVariant(context: CommandContext<Source>) {
         val sender = (context.sender() as PlayerSource).source()
         val variant = context.get<Int>("variant")
@@ -92,14 +80,13 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             return
         }
 
-        val nekoStack = itemInMainHand.wrap()
-        if (nekoStack == null) {
-            sender.sendPlainMessage("Item is not a legal wakame item")
+        if (!itemInMainHand.isKoish) {
+            sender.sendPlainMessage("Item in your main hand is not a Koish item")
             return
         }
 
-        val oldVariant = nekoStack.variant
-        nekoStack.variant = variant
+        val oldVariant = itemInMainHand.getData(ItemDataTypes.VARIANT)
+        itemInMainHand.setData(ItemDataTypes.VARIANT, variant)
         sender.sendPlainMessage("Variant has been changed from $oldVariant to $variant")
     }
 

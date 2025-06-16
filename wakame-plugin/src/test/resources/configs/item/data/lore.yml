@@ -1,6 +1,0 @@
-base: bedrock
-
-# 物品额外的描述
-lore:
-  - "<gold>Test Lore 1"
-  - "<gold>Test Lore 2"

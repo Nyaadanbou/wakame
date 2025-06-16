@@ -1,2 +1,0 @@
-# 当配置文件没有为一个核心指定图标时, 将退回使用这个图标
-base: sentry_armor_trim_smithing_template[hide_additional_tooltip={}]

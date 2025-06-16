@@ -3,15 +3,15 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.getMeta
 import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.ItemStackDelegates
 import cc.mewcraft.wakame.util.adventure.plain
@@ -25,8 +25,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
-import java.util.*
-import java.util.Collections.*
+import java.util.Collections.emptyList
+import java.util.Collections.emptyMap
+import java.util.Collections.emptySet
 import java.util.stream.Stream
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
@@ -296,8 +297,8 @@ internal object Selection {
     /**
      * 创建一个可被修改的 [Selection].
      */
-    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CellRule, template: Group<CoreArchetype, ItemGenerationContext>): RerollingSession.Selection {
-        return Simple(session, id, rule, template)
+    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CellRule, lootTable: LootTable<Core>): RerollingSession.Selection {
+        return Simple(session, id, rule, lootTable)
     }
 
     // FIXME data class
@@ -309,8 +310,8 @@ internal object Selection {
             get() = RerollingTable.CellRule.empty()
         override val changeable: Boolean
             get() = false
-        override val template: Group<CoreArchetype, ItemGenerationContext>
-            get() = Group.empty()
+        override val lootTable: LootTable<Core>
+            get() = LootTable.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
         override var selected: Boolean
@@ -325,7 +326,7 @@ internal object Selection {
         override val session: RerollingSession,
         override val id: String,
         override val rule: RerollingTable.CellRule,
-        override val template: Group<CoreArchetype, ItemGenerationContext>,
+        override val lootTable: LootTable<Core>,
     ) : RerollingSession.Selection {
         // private val logger: Logger = LOGGER.decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
@@ -369,8 +370,13 @@ internal object SelectionMap {
 
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
-        val templates = usableInput.getMeta(ItemMetaTypes.CORE_CONTAINER) ?: run {
+        val metaCoreContainer = usableInput.getMeta(ItemMetaTypes.CORE_CONTAINER) ?: run {
             // logger.info("Usable input has no `cells` template.")
+            return empty(session)
+        }
+
+        // 如果源物品的核孔模板不是动态的, 则判定整个物品不支持重造
+        if (metaCoreContainer !is MetaCoreContainer.Dynamic) {
             return empty(session)
         }
 
@@ -390,8 +396,7 @@ internal object SelectionMap {
             val cellRule = cellRuleMap[id]
 
             // 获取核孔的重造模板
-            // val template = templates[id]?.core
-            val template = TODO("Not yet implemented")
+            val lootTable = metaCoreContainer.entry[id]
 
             // 如果:
             //   这个核孔没有对应的重造规则, 或者
@@ -399,8 +404,8 @@ internal object SelectionMap {
             // 则判定该核孔不支持重造.
             // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
             // 这样可以让其他系统比较优雅的处理一些特殊情况 (例如无定义情况).
-            if (cellRule != null && template != null) {
-                selectionData[id] = Selection.changeable(session, id, cellRule, template)
+            if (cellRule != null && lootTable != null) {
+                selectionData[id] = Selection.changeable(session, id, cellRule, lootTable)
             } else {
                 // logger.info("Item cell '$id' does not support rerolling.")
                 selectionData[id] = Selection.unchangeable(session, id)

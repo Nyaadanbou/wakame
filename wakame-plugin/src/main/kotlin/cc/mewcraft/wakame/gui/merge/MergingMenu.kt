@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.merging_table.MergingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import cc.mewcraft.wakame.item2.isKoish
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.reforge.merge.MergingSession
@@ -243,14 +244,14 @@ internal class MergingMenu(
             ItemRenderers.MERGING_TABLE.render(output, MergingTableContext.MergeOutputSlot(session))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolve {
                 folded("item_lore", output.fastLoreOrEmpty)
                 folded("type_description", result.reforgeType.description)
                 folded("cost_description", result.reforgeCost.description)
                 folded("result_description", result.description)
             }
 
-            return slotDisplayResolved.applyTo(output)
+            return slotDisplayResolved.applyInPlace(output)
         } else {
             return table.primaryMenuSettings.getSlotDisplay("output_failure").resolveToItemStack {
                 // 这里仅仅解析 result_description 告诉玩家为什么合并失败.

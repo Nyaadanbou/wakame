@@ -2,8 +2,8 @@ package cc.mewcraft.wakame.api
 
 import cc.mewcraft.wakame.api.item.KoishItem
 import cc.mewcraft.wakame.api.item.KoishItemRegistry
-import cc.mewcraft.wakame.item.nekoItem
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.item2.koishItem
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifiers
 import net.kyori.adventure.key.Key
 import org.bukkit.inventory.ItemStack
@@ -28,14 +28,14 @@ object ApiItemRegistry : KoishItemRegistry {
 
     override fun getOrNull(id: Key?): KoishItem? {
         if (id == null) return null
-        return DynamicRegistries.ITEM[id]?.let(::ApiItemWrapper)
+        return BuiltInRegistries.ITEM[id]?.let(::ApiItemWrapper)
     }
 
     override fun getOrNull(itemStack: ItemStack?): KoishItem? {
-        return itemStack.nekoItem?.let(::ApiItemWrapper)
+        return itemStack?.koishItem?.let(::ApiItemWrapper)
     }
 
     override fun getNonNamespaced(name: String): List<KoishItem> {
-        return DynamicRegistries.ITEM.getFuzzy(name).map(::ApiItemWrapper)
+        return BuiltInRegistries.ITEM.getFuzzy(name).map(::ApiItemWrapper)
     }
 }

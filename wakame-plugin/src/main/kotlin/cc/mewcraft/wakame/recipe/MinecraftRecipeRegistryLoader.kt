@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.event.map.MinecraftRecipeRegistrationDoneEvent
-import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -22,11 +21,7 @@ import org.bukkit.Bukkit
 import org.jetbrains.annotations.VisibleForTesting
 
 @Init(stage = InitStage.POST_WORLD)
-@Reload(
-    runAfter = [
-        ItemTypeRegistryLoader::class, // deps: 需要直接的数据
-    ]
-)
+@Reload
 internal object MinecraftRecipeRegistryLoader {
 
     @VisibleForTesting

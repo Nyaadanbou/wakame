@@ -18,8 +18,9 @@ import cc.mewcraft.wakame.catalog.item.recipe.CatalogSmokingRecipe
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogStandardRecipe
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogStonecuttingRecipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.SlotDisplay
 import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item2.display.SlotDisplay
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import cc.mewcraft.wakame.util.ReloadableProperty
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit

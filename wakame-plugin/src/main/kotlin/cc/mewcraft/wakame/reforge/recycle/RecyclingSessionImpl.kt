@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.recycle
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.decorate
@@ -12,7 +12,6 @@ import net.kyori.examination.ExaminableProperty
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
-import java.util.*
 import java.util.stream.Stream
 import kotlin.random.Random
 
@@ -33,7 +32,7 @@ internal class SimpleRecyclingSession(
     private val claims: ArrayList<Claim> = ArrayList(maxClaims)
 
     private fun getItemKey(item: ItemStack): Key {
-        return item.wrap()?.id ?: item.type.key
+        return item.koishTypeId ?: item.type.key
     }
 
     private fun getItemPrice(item: ItemStack?): PriceInstance? {

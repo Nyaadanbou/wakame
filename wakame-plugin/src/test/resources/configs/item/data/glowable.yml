@@ -1,4 +1,0 @@
-base: bedrock
-
-# 标记该物品可以发光
-glowable: { }

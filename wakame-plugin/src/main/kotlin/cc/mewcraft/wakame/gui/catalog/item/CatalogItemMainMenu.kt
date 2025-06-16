@@ -3,7 +3,8 @@ package cc.mewcraft.wakame.gui.catalog.item
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
 import cc.mewcraft.wakame.integration.permission.PermissionManager
-import cc.mewcraft.wakame.item.SlotDisplay
+import cc.mewcraft.wakame.item2.display.SlotDisplay
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.ReloadableProperty

@@ -6,7 +6,6 @@ import cc.mewcraft.wakame.Util
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeChoice
 import cc.mewcraft.wakame.craftingstation.recipe.RecipeResult
-import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
 import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
@@ -24,9 +23,7 @@ import org.jetbrains.annotations.VisibleForTesting
 @Init(
     stage = InitStage.POST_WORLD,
 )
-@Reload(
-    runAfter = [ItemTypeRegistryLoader::class],
-)
+@Reload
 internal object CraftingStationRecipeRegistry {
 
     @VisibleForTesting

@@ -7,7 +7,9 @@ import org.incendo.cloud.component.CommandComponent
 import org.incendo.cloud.context.CommandContext
 import org.incendo.cloud.context.CommandInput
 import org.incendo.cloud.exception.parsing.ParserException
-import org.incendo.cloud.parser.*
+import org.incendo.cloud.parser.ArgumentParseResult
+import org.incendo.cloud.parser.ArgumentParser
+import org.incendo.cloud.parser.ParserDescriptor
 import org.incendo.cloud.suggestion.BlockingSuggestionProvider
 
 class AttributeModifierOperationParser<C : Any> : ArgumentParser<C, AttributeModifier.Operation>, BlockingSuggestionProvider.Strings<C> {
@@ -37,7 +39,7 @@ class AttributeModifierOperationParser<C : Any> : ArgumentParser<C, AttributeMod
 class AttributeModifierOperationParseException(
     context: CommandContext<*>,
 ) : ParserException(
-    ItemNamespaceParser::class.java,
+    AttributeModifierOperationParser::class.java,
     context,
     StandardCaptionKeys.EXCEPTION_INVALID_ARGUMENT
 )

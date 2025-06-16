@@ -1,6 +1,0 @@
-# 位于 minecraft 命名空间下的原型是不需要指定 item_type 的.
-# 因为文件名就是对应的 item_type.
-# 文件名必须是 MC 原版的物品数据值.
-
-lore:
-  - <!i><gray>温德尔的苹果.

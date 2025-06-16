@@ -1,4 +1,0 @@
-package item
-
-class MockNekoItemRealizer {
-}

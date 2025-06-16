@@ -1,12 +1,25 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
+import cc.mewcraft.wakame.entity.attribute.bundle.element
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
 import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.data.impl.VirtualCore
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.getDataOrDefault
 import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.item2.setData
+import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifier
 import org.bukkit.entity.Player
 import org.slf4j.Logger
 
@@ -75,35 +88,33 @@ private constructor(
         val itemKizamiz = usableInput.getData(ItemDataTypes.KIZAMI)!!
 
         // 准备生成核心用的上下文
-        // val context = try {
-        //    initializeContext(
-        //        itemId,
-        //        itemLevel,
-        //        itemRarity,
-        //        itemElements,
-        //        itemKizamiz,
-        //        itemCoreContainer
-        //    )
-        // } catch (e: Exception) { // 有必要 try-catch?
-        //    logger.error("Unexpected error while preparing generation context", e)
-        //    return ReforgeResult.error(viewer)
-        // }
+        val context = try {
+            initializeContext(
+                itemId,
+                itemLevel,
+                itemRarity,
+                itemElements,
+                itemKizamiz,
+                itemCoreContainer
+            )
+        } catch (e: Exception) { // 有必要 try-catch?
+            logger.error("Unexpected error while preparing generation context", e)
+            return ReforgeResult.error(viewer)
+        }
 
-        // val updatedCoreContainer = itemCoreContainer.toBuilder().apply {
-        //    // 遍历每一个选择:
-        //    for ((id, sel) in selectionMap) {
-        //
-        //        // 如果玩家选择了该核孔:
-        //        if (sel.selected) {
-        //            // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-        //
-        //            val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreArchetype
-        //            val generated = selected.generate(context)
-        //            put(id, generated)
-        //        }
-        //    }
-        // }.build()
-        val updatedCoreContainer = itemCoreContainer // TODO: 生成新的核孔
+        val updatedCoreContainer = itemCoreContainer.toBuilder().apply {
+            // 遍历每一个选择:
+            for ((id, sel) in selectionMap) {
+
+                // 如果玩家选择了该核孔:
+                if (sel.selected) {
+                    // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
+
+                    val selected = sel.lootTable.select(context).firstOrNull() ?: EmptyCore
+                    put(id, selected)
+                }
+            }
+        }.build()
 
         // 为物品的重铸历史次数 +1
         usableInput.setData(ItemDataTypes.REFORGE_HISTORY, usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).incCount(1))
@@ -120,53 +131,55 @@ private constructor(
         return ReforgeResult.success(viewer, output, total)
     }
 
-//    /**
-//     * 初始化物品生成的上下文.
-//     */
-//    private fun initializeContext(
-//        itemId: Key,
-//        itemLevel: Int,
-//        itemRarity: RegistryEntry<Rarity>,
-//        itemElements: Set<RegistryEntry<Element>>,
-//        itemKizamiz: Set<RegistryEntry<Kizami>>,
-//        itemCoreContainer: CoreContainer,
-//    ): Context {
-//        // 创建一个空的 context
-//        val context = Context(BuiltInRegistries.ITEM.getDefaultEntry())
-//
-//        // 先把*不可由玩家改变的信息*全部写入上下文
-//        context.level = itemLevel
-//        context.rarity = itemRarity
-//        context.elements += itemElements
-//        context.kizamiz += itemKizamiz
-//
-//        val selectionMap = session.selectionMap
-//
-//        // 然后再把*可由玩家改变的信息*全部写入上下文
-//        itemCoreContainer
-//            // 注意, 我们必须跳过玩家选择要重造的核孔.
-//            // 如果不跳过, 那么新的核孔将无法被正确生成.
-//            // 这是因为截止至 2024/8/20, 我们的设计不允许
-//            // 相似的核心出现在同一个物品上.
-//            .filter { id, core -> !selectionMap[id].selected }
-//            .forEach { (id, core) ->
-//                when (core) {
-//                    is AttributeCore -> {
-//                        context.attributes += AttributeContextData(
-//                            id = id,
-//                            operation = core.wrapped.operation,
-//                            element = core.wrapped.element
-//                        )
-//                    }
-//                    EmptyCore -> {
-//                        // NOP
-//                    }
-//                    VirtualCore -> {
-//                        // NOP
-//                    }
-//                }
-//            }
-//
-//        return context
-//    }
+    /**
+     * 初始化物品生成的上下文.
+     */
+    private fun initializeContext(
+        itemId: Identifier,
+        itemLevel: Int,
+        itemRarity: RegistryEntry<Rarity>,
+        itemElements: Set<RegistryEntry<Element>>,
+        itemKizamiz: Set<RegistryEntry<Kizami>>,
+        itemCoreContainer: CoreContainer,
+    ): ItemGenerationContext {
+        // 创建一个空的 context
+        val context = ItemGenerationContext(BuiltInRegistries.ITEM.getOrThrow(itemId), 0f)
+
+        // 先把*不可由玩家改变的信息*全部写入上下文
+        context.level = itemLevel
+        context.rarity = itemRarity
+        context.elements += itemElements
+        context.kizamiz += itemKizamiz
+
+        val selectionMap = session.selectionMap
+
+        // 然后再把*可由玩家改变的信息*全部写入上下文
+        itemCoreContainer
+            // 注意, 我们必须跳过玩家选择要重造的核孔.
+            // 如果不跳过, 那么新的核孔将无法被正确生成.
+            // 这是因为截止至 2024/8/20, 我们的设计不允许
+            // 相似的核心出现在同一个物品上.
+            .filter { id, core -> !selectionMap[id].selected }
+            .forEach { (id, core) ->
+                when (core) {
+                    is AttributeCore -> {
+                        context.attributes += AttributeContextData(
+                            id = id,
+                            operation = core.wrapped.operation,
+                            element = core.wrapped.element
+                        )
+                    }
+
+                    EmptyCore -> {
+                        // NOP
+                    }
+
+                    VirtualCore -> {
+                        // NOP
+                    }
+                }
+            }
+
+        return context
+    }
 }

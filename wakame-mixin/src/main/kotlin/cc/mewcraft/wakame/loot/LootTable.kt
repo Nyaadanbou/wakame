@@ -23,6 +23,10 @@ inline fun <reified S> LootTable(
 interface LootTable<S> {
     companion object {
         val SERIALIZER: TypeSerializer2<LootTable<*>> = Serializer
+
+        fun <T> empty(): LootTable<T> {
+            return SimpleLootTable(emptyList())
+        }
     }
 
     /**

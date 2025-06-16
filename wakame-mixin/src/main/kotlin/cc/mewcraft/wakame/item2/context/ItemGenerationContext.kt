@@ -1,7 +1,13 @@
 package cc.mewcraft.wakame.item2.context
 
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
 import cc.mewcraft.wakame.item2.KoishItem
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import kotlin.random.Random
 
 /**
@@ -14,7 +20,12 @@ import kotlin.random.Random
 data class ItemGenerationContext(
     val koishItem: KoishItem,
     override val luck: Float,
-    override var level: Int,
+    override var level: Int = 0
 ): LootContext {
     override val random: Random = Random.Default
+
+    var rarity: RegistryEntry<Rarity> = BuiltInRegistries.RARITY.getDefaultEntry()
+    val attributes: MutableList<AttributeContextData> = mutableListOf()
+    val elements: MutableSet<RegistryEntry<Element>> = mutableSetOf()
+    val kizamiz: MutableSet<RegistryEntry<Kizami>> = mutableSetOf()
 }

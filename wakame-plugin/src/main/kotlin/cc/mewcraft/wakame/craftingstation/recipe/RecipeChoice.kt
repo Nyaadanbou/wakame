@@ -129,13 +129,13 @@ internal data class ItemChoice(
         itemStack.render()
 
         // 解析展示用的物品堆叠信息
-        val slotDisplayResolved = settings.getSlotDisplay("choice").resolveEverything {
+        val slotDisplayResolved = settings.getSlotDisplay("choice").resolve {
             standard { component("item_name", itemStack.itemNameOrType) }
             folded("item_lore", itemStack.fastLoreOrEmpty)
         }
 
         // 应用解析结果
-        return slotDisplayResolved.applyTo(itemStack)
+        return slotDisplayResolved.applyInPlace(itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(

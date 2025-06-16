@@ -1,9 +1,13 @@
 package cc.mewcraft.wakame.display2.implementation.crafting_station
 
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.display2.*
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
+import cc.mewcraft.wakame.display2.IndexedText
+import cc.mewcraft.wakame.display2.RendererFormat
+import cc.mewcraft.wakame.display2.SimpleIndexedText
+import cc.mewcraft.wakame.display2.TextMetaFactory
+import cc.mewcraft.wakame.display2.TextMetaFactoryPredicate
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
@@ -38,20 +42,20 @@ internal data class FuzzyEnchantmentRendererFormat(
 @ConfigSerializable
 internal data class FuzzyPortableCoreRendererFormat(
     override val namespace: String,
-) : RendererFormat.Dynamic<PortableCore> {
+) : RendererFormat.Dynamic<Core> {
     override val textMetaFactory = TextMetaFactory()
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, "portable_core")
 
     private val unknownIndex = Key.key(namespace, "unknown")
 
-    fun render(data: PortableCore): IndexedText {
-        val core = data.wrapped as? AttributeCore
+    fun render(data: Core): IndexedText {
+        val core = data as? AttributeCore
             ?: return SimpleIndexedText(unknownIndex, listOf())
-        val index = Key.key(namespace, core.data.id)
+        val index = Key.key(namespace, core.wrapped.id)
         return SimpleIndexedText(index, core.description)
     }
 
-    override fun computeIndex(data: PortableCore): Key {
+    override fun computeIndex(data: Core): Key {
         throw UnsupportedOperationException() // 直接在 render(...) 函数中处理
     }
 }

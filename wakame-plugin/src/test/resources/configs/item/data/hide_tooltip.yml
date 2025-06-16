@@ -1,4 +1,0 @@
-base: bedrock
-
-# 隐藏提示框. 对应原版组件: https://minecraft.wiki/w/Data_component_format#hide_tooltip
-hide_tooltip: { }

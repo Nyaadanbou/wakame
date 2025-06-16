@@ -5,6 +5,7 @@ import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.rerolling_table.RerollingTableContext
 import cc.mewcraft.wakame.gui.common.PlayerInventorySuppressor
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.reforge.reroll.RerollingSession
@@ -242,13 +243,13 @@ internal class RerollingMenu(
             ItemRenderers.REROLLING_TABLE.render(previewItem, RerollingTableContext(session, RerollingTableContext.Slot.OUTPUT))
 
             val slotDisplayId = if (confirmed) "output_ok_confirmed" else "output_ok_unconfirmed"
-            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolveEverything {
+            val slotDisplayResolved = table.primaryMenuSettings.getSlotDisplay(slotDisplayId).resolve {
                 standard { component("item_name", previewItem.itemNameOrType) }
                 folded("item_lore", previewItem.fastLoreOrEmpty)
                 folded("cost_description", reforgeResult.reforgeCost.description)
             }
 
-            slotDisplayResolved.applyTo(previewItem)
+            slotDisplayResolved.applyInPlace(previewItem)
         } else {
             // 如果不可重造:
 
