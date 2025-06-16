@@ -41,6 +41,7 @@ import kotlin.reflect.KProperty
  * probably will not directly work with this interface. Instead, you
  * will likely use the subclasses. Use your IDE to navigate them.
  */
+@Deprecated("请使用新物品系统")
 interface NekoStack : Examinable {
 
     /**

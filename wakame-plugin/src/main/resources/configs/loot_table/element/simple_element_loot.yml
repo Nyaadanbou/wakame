@@ -1,0 +1,7 @@
+type: element # 元素类型的战利品表
+pools:
+  - rolls: 1 # 抽取次数
+    entries:
+      - type: simple # entry 的类型, simple 为直接数据
+        data: fire
+        weight: 1 # 该 entry 的权重

@@ -1,12 +1,16 @@
-package cc.mewcraft.wakame.random4
+package cc.mewcraft.wakame.loot
 
-import cc.mewcraft.wakame.random4.context.LootContext
-import cc.mewcraft.wakame.random4.entry.ComposableEntryContainer
-import cc.mewcraft.wakame.random4.entry.LootPoolEntry
-import cc.mewcraft.wakame.random4.predicate.LootPredicate
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
+import cc.mewcraft.wakame.loot.entry.LootPoolEntry
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.require
-import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import io.leangen.geantyref.TypeFactory
+import io.leangen.geantyref.TypeToken
+import org.spongepowered.configurate.ConfigurationNode
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 fun <S> LootPool(
     rolls: Int,
@@ -19,12 +23,12 @@ fun <S> LootPool(
 )
 
 /**
- * [LootPool] 是一个包含了若干 [cc.mewcraft.wakame.random4.entry.ComposableEntryContainer] 的集合.
+ * [LootPool] 是一个包含了若干 [cc.mewcraft.wakame.loot.entry.ComposableEntryContainer] 的集合.
  */
 interface LootPool<S> {
 
     companion object {
-        val SERIALIZER: TypeSerializer2<LootPool<*>> = TypeSerializer2 { type, node -> node.require<SimpleLootPool<*>>() }
+        val SERIALIZER: TypeSerializer2<LootPool<*>> = Serializer
     }
 
     /**
@@ -38,7 +42,7 @@ interface LootPool<S> {
     val conditions: List<LootPredicate>
 
     /**
-     * 这个 [LootPool] 中的所有 [cc.mewcraft.wakame.random4.entry.ComposableEntryContainer].
+     * 这个 [LootPool] 中的所有 [cc.mewcraft.wakame.loot.entry.ComposableEntryContainer].
      */
     val entries: List<ComposableEntryContainer<S>>
 
@@ -46,15 +50,39 @@ interface LootPool<S> {
      * 选择 [LootPool] 中的样本.
      */
     fun select(context: LootContext): List<S>
+
+    private object Serializer : TypeSerializer2<LootPool<*>> {
+        override fun deserialize(type: Type, node: ConfigurationNode): LootPool<*> {
+            val type = type as ParameterizedType
+            val rolls = node.node("rolls").require<Int>()
+            val conditions = node.node("conditions").require<List<LootPredicate>>()
+            val entries = getEntries(node.node("entries"), type)
+            return SimpleLootPool(
+                rolls = rolls,
+                conditions = conditions,
+                entries = entries
+            )
+        }
+
+        private fun getEntries(
+            node: ConfigurationNode,
+            entryType: ParameterizedType
+        ): List<ComposableEntryContainer<Any>> {
+            val sType = entryType.actualTypeArguments[0]
+            val entryContainerType: Type = TypeFactory.parameterizedClass(ComposableEntryContainer::class.java, sType) // ComposableEntryContainer<S>
+            val entriesType = TypeFactory.parameterizedClass(List::class.java, entryContainerType) // List<ComposableEntryContainer<S>>
+            val typeToken = TypeToken.get(entriesType) as TypeToken<List<ComposableEntryContainer<Any>>>
+            return node.require(typeToken) // 获取 entries 的类型为 List<ComposableEntryContainer<S>>
+        }
+    }
 }
 
 /* Implementations */
 
-@ConfigSerializable
 private data class SimpleLootPool<S>(
     override val rolls: Int,
-    override val conditions: List<LootPredicate>,
-    override val entries: List<ComposableEntryContainer<S>>,
+    override val conditions: List<LootPredicate> = emptyList(),
+    override val entries: List<ComposableEntryContainer<S>> = emptyList(),
 ) : LootPool<S> {
     override fun select(context: LootContext): List<S> {
         val results = mutableListOf<S>()

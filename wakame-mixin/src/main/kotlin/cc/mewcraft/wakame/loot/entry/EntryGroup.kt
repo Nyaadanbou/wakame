@@ -1,14 +1,16 @@
-package cc.mewcraft.wakame.random4.entry
+package cc.mewcraft.wakame.loot.entry
 
-import cc.mewcraft.wakame.random4.predicate.LootPredicate
-import cc.mewcraft.wakame.random4.context.LootContext
-import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 
-@ConfigSerializable
 class EntryGroup<S>(
     children: List<LootPoolEntryContainer<S>>,
     conditions: List<LootPredicate>,
 ) : CompositeEntryBase<S>(children, conditions) {
+    companion object {
+        val SERIALIZER: TypeSerializer2<EntryGroup<*>> = makeSerializer(::EntryGroup)
+    }
 
     override fun compose(children: List<ComposableEntryContainer<S>>): ComposableEntryContainer<S> {
         return when (children.size) {

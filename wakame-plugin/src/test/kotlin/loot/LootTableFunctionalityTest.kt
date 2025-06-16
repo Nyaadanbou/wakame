@@ -1,12 +1,12 @@
-package random4
+package loot
 
-import cc.mewcraft.wakame.random4.LootPool
-import cc.mewcraft.wakame.random4.LootTable
-import cc.mewcraft.wakame.random4.context.LootContext
-import cc.mewcraft.wakame.random4.entry.AlternativesEntry
-import cc.mewcraft.wakame.random4.entry.LootPoolSingletonContainer
-import cc.mewcraft.wakame.random4.entry.SequentialEntry
-import cc.mewcraft.wakame.random4.predicate.LootPredicate
+import cc.mewcraft.wakame.loot.LootPool
+import cc.mewcraft.wakame.loot.LootTable
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.loot.entry.AlternativesEntry
+import cc.mewcraft.wakame.loot.entry.LootPoolSingletonContainer
+import cc.mewcraft.wakame.loot.entry.SequentialEntry
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

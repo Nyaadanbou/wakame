@@ -1,17 +1,19 @@
-package cc.mewcraft.wakame.random4.entry
+package cc.mewcraft.wakame.loot.entry
 
-import cc.mewcraft.wakame.random4.context.LootContext
-import cc.mewcraft.wakame.random4.predicate.LootPredicate
-import org.spongepowered.configurate.objectmapping.ConfigSerializable
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
+import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 
 /**
  * 若满足指定条件, 从 [children] 开头开始, 逐一选择子项直到有一个子项不满足条件为止.
  */
-@ConfigSerializable
 class SequentialEntry<S>(
-    children: List<LootPoolEntryContainer<S>>,
-    conditions: List<LootPredicate>,
+    children: List<LootPoolEntryContainer<S>> = emptyList(),
+    conditions: List<LootPredicate> = emptyList(),
 ) : CompositeEntryBase<S>(children, conditions) {
+    companion object {
+        val SERIALIZER: TypeSerializer2<SequentialEntry<*>> = makeSerializer(::SequentialEntry)
+    }
 
     override fun compose(children: List<ComposableEntryContainer<S>>): ComposableEntryContainer<S> {
         return when (children.size) {

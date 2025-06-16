@@ -1,6 +1,6 @@
-package cc.mewcraft.wakame.random4.entry
+package cc.mewcraft.wakame.loot.entry
 
-import cc.mewcraft.wakame.random4.context.LootContext
+import cc.mewcraft.wakame.loot.context.LootContext
 
 interface LootPoolEntry<S> {
     fun getWeight(luck: Float): Int

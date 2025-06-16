@@ -23,6 +23,7 @@ import org.bukkit.entity.Player
  *
  * @see NekoStack
  */
+@Deprecated("请使用新物品系统")
 interface NekoItem : Examinable {
 
     /**

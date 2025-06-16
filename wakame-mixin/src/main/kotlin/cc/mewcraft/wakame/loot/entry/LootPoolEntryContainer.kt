@@ -1,7 +1,7 @@
-package cc.mewcraft.wakame.random4.entry
+package cc.mewcraft.wakame.loot.entry
 
-import cc.mewcraft.wakame.random4.context.LootContext
-import cc.mewcraft.wakame.random4.predicate.LootPredicate
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.loot.predicate.LootPredicate
 
 abstract class LootPoolEntryContainer<S>(
     val conditions: List<LootPredicate>,

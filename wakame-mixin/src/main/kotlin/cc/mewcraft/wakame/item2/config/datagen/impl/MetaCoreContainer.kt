@@ -6,7 +6,7 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.CoreContainer
-import cc.mewcraft.wakame.random4.LootTable
+import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
 import cc.mewcraft.wakame.util.MojangStack

@@ -28,6 +28,9 @@ paperweight {
 dependencies {
     paperweight.paperDevBundle(local.versions.paper)
 
+    // 将 Paper dev bundle 添加为 API 依赖, 以便测试模块使用
+    api(paperweight.paperDevBundleDependency(local.versions.paper.get()))
+
     remapper("net.fabricmc", "tiny-remapper", "0.10.4", classifier = "fat")
 
     compileOnly(local.ignite)

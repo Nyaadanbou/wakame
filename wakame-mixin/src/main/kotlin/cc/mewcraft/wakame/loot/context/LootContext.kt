@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.random4.context
+package cc.mewcraft.wakame.loot.context
 
 import kotlin.random.Random
 

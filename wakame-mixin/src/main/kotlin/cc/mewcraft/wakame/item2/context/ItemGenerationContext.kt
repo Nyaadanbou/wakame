@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.context
 
 import cc.mewcraft.wakame.item2.KoishItem
-import cc.mewcraft.wakame.random4.context.LootContext
+import cc.mewcraft.wakame.loot.context.LootContext
 import kotlin.random.Random
 
 /**

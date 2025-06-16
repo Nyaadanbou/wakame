@@ -27,8 +27,9 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.item2.data.impl.CoreTypes
 import cc.mewcraft.wakame.kizami2.Kizami
-import cc.mewcraft.wakame.random4.entry.LootPoolEntries
-import cc.mewcraft.wakame.random4.entry.LootPoolEntryType
+import cc.mewcraft.wakame.loot.LootTable
+import cc.mewcraft.wakame.loot.entry.LootPoolEntries
+import cc.mewcraft.wakame.loot.entry.LootPoolEntryType
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
@@ -187,6 +188,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val ATTACK_SPEED: WritableDefaultedRegistry<AttackSpeed> = registerDefaulted(BuiltInRegistryKeys.ATTACK_SPEED, "intrinsic")
+
+    /**
+     * 战利品表.
+     */
+    @JvmField
+    val LOOT_TABLE: WritableRegistry<LootTable<*>> = registerSimple(BuiltInRegistryKeys.LOOT_TABLE)
 
     /**
      * LootPoolEntry 的类型.
