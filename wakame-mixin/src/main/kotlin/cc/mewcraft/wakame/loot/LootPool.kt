@@ -75,6 +75,16 @@ interface LootPool<S> {
             return node.require(typeToken) // 获取 entries 的类型为 List<ComposableEntryContainer<S>>
         }
     }
+
+    /**
+     * 从这个 [LootPool] 中随机添加一个条目到 [dataConsumer] 中.
+     */
+    fun addRandomItem(context: LootContext, dataConsumer: (S) -> Unit)
+
+    /**
+     * 从这个 [LootPool] 中随机添加 [rolls] 次条目到 [dataConsumer] 中.
+     */
+    fun addRandomItems(context: LootContext, dataConsumer: (S) -> Unit)
 }
 
 /* Implementations */
@@ -90,7 +100,7 @@ private data class SimpleLootPool<S>(
         return results
     }
 
-    private fun addRandomItem(context: LootContext, dataConsumer: (S) -> Unit) {
+    override fun addRandomItem(context: LootContext, dataConsumer: (S) -> Unit) {
         val random = context.random
         val entries = mutableListOf<LootPoolEntry<S>>()
         var totalWeight = 0
@@ -130,7 +140,7 @@ private data class SimpleLootPool<S>(
         }
     }
 
-    fun addRandomItems(context: LootContext, dataConsumer: (S) -> Unit) {
+    override fun addRandomItems(context: LootContext, dataConsumer: (S) -> Unit) {
         if (this.conditions.all { it.test(context) }) {
             repeat(rolls) { this.addRandomItem(context, dataConsumer) }
         }
