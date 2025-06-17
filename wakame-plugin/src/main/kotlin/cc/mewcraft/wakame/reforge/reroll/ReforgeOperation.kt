@@ -109,7 +109,6 @@ private constructor(
                 // 如果玩家选择了该核孔:
                 if (sel.selected) {
                     // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-
                     val selected = sel.lootTable.select(context).firstOrNull() ?: EmptyCore
                     put(id, selected)
                 }

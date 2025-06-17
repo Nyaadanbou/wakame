@@ -80,8 +80,6 @@ internal object MinecraftRecipeRegistryLoader {
                 Util.pauseInIde(IllegalStateException("Can't load vanilla recipe: '${file.relativeTo(recipeDir)}'", e))
             }
         }
-
-        ItemRef.checkAll() // 检查所有物品引用
     }
 
     private fun registerForBukkitRecipes() {

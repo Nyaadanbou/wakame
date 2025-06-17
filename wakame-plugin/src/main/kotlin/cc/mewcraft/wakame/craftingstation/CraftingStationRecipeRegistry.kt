@@ -83,7 +83,6 @@ internal object CraftingStationRecipeRegistry {
                 LOGGER.warn(message, e)
             }
         }
-        ItemRef.checkAll()
     }
 
     private fun registerStationRecipes() {

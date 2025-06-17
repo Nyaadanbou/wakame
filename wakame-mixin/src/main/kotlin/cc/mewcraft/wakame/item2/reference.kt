@@ -2,8 +2,6 @@
 
 package cc.mewcraft.wakame.item2
 
-import cc.mewcraft.wakame.item2.ItemRef.Companion.checkAll
-import cc.mewcraft.wakame.item2.ItemRef.Companion.uncheckedItemRef
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
@@ -55,43 +53,6 @@ interface ItemRef {
                 type,
                 "$id does not correspond to a valid ItemRef."
             )
-        }
-
-        /**
-         * 验证到目前为止创建出来的所有 [ItemRef].
-         * 任何无效的 [ItemRef] 将出现在返回值中.
-         *
-         * 本函数可以*反复*调用. 例如(从上往下的顺序调用):
-         * - 合成系统使用 [uncheckedItemRef] 创建 5 个引用
-         * - 合成系统调用 [checkAll] 后, 未发现无效引用, 程序继续
-         * - 图鉴系统使用 [uncheckedItemRef] 创建 10 个引用
-         * - 图鉴系统调用 [checkAll] 后, 未发现无效引用, 程序继续
-         * - 技能系统调用 [uncheckedItemRef] 创建 2 个引用
-         * - 技能系统调用 [checkAll] 后, 发现了无效引用, 记录并终止程序
-         */
-        fun checkAll(): String {
-            return ItemRefManager.checkAll()
-        }
-
-        /**
-         * 从 [id] 创建一个 [ItemRef] (可能会复用现有实例).
-         *
-         * 该函数对于任何 [id] 始终会返回一个 [ItemRef] 实例, 但如果未经检查
-         * (即调用 [checkAll]) 而直接调用返回实例上面的属性/函数将会抛出异常.
-         *
-         * 也就是说, 使用该函数意味着调用方可以分别执行“创建和检查” [ItemRef] 的逻辑, 而非“创建即检查”.
-         *
-         * 具体的说:
-         *
-         * 使用该函数创建的 [ItemRef] 必须在 *之后的某个时机* 调用函数 [checkAll] 来验证其有效性.
-         * 如果发现了无效的 [ItemRef], 即引用没有指向一个有效的物品类型, 调用方应该*记录并终止程序*.
-         * 只使用该函数而不调用 [checkAll] 将导致此函数返回的 [ItemRef] 永远无效, 导致使用时抛异常.
-         *
-         * 该函数可能的使用场景:
-         * 正在加载配置文件的内容, 并且不希望单独处理 `ItemRef?`.
-         */
-        fun uncheckedItemRef(id: Identifier): ItemRef {
-            return ItemRefManager.createUnchecked(id)
         }
 
         /**
@@ -315,19 +276,12 @@ private data class ItemRefImpl(
  */
 private object ItemRefManager {
 
-    // 已验证的 ItemRef
-    private val checkedItemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
-
-    // 未验证的 ItemRef
-    private val uncheckedItemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
-
-    fun createUnchecked(id: Identifier): ItemRef {
-        return uncheckedItemRefs.computeIfAbsent(id, ::ItemRefImpl)
-    }
+    // 缓存的 [ItemRef] 实例
+    private val itemRefs: HashMap<Identifier, ItemRefImpl> = HashMap()
 
     fun createChecked(id: Identifier): ItemRef? {
         val handler = getHandler(id) ?: return null
-        return checkedItemRefs.computeIfAbsent(id, ::ItemRefImpl).also { it.handler = handler }
+        return itemRefs.computeIfAbsent(id, ::ItemRefImpl).also { it.handler = handler }
     }
 
     fun getHandler(id: Identifier): ItemRefHandler<*>? {
@@ -355,28 +309,4 @@ private object ItemRefManager {
         // 没有符合条件的 handler
         return null
     }
-
-    fun checkAll(): String {
-        val invalidRefs = mutableListOf<String>()
-
-        val iter = uncheckedItemRefs.iterator()
-        while (iter.hasNext()) {
-            val (id, ref) = iter.next()
-            val handler = getHandler(id)
-            if (handler != null) {
-                // 找到了支持的 handler, 分配给这个 ref
-                ref.handler = handler
-                // 将 ref 放入已检查集合中, 并从未检查集合移除
-                checkedItemRefs[id] = ref
-                iter.remove()
-            } else {
-                // 未找到任何支持的 handler, 验证失败
-                invalidRefs += id.toString()
-            }
-        }
-
-        // TODO #350: 返回值应该是一个专门的对象而不是字符串, 以方便调用者去记录/处理这些无效的 ItemRef.
-        return invalidRefs.joinToString(", ")
-    }
-
 }

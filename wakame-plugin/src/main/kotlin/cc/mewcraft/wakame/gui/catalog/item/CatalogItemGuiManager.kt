@@ -374,11 +374,6 @@ private class SingleDisplayItem(
     val item: ItemRef,
     val amount: Int,
 ) : AbstractItem() {
-
-    init {
-        ItemRef.checkAll()
-    }
-
     override fun getItemProvider(): ItemProvider {
         // TODO 渲染
         return ItemWrapper(item.createItemStack(amount))
@@ -398,10 +393,6 @@ private class MultiDisplayItem(
 ) : AbstractItem() {
     private var task: BukkitTask? = null
     private var state = 0
-
-    init {
-        ItemRef.checkAll()
-    }
 
     fun start() {
         task?.cancel()
