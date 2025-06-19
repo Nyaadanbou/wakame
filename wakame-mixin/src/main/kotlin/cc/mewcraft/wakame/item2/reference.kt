@@ -48,7 +48,7 @@ interface ItemRef {
         @JvmField
         val SERIALIZER: TypeSerializer2<ItemRef> = TypeSerializer2 { type, node ->
             val id = node.require<Identifier>()
-            checkedItemRef(id) ?: throw SerializationException(
+            create(id) ?: throw SerializationException(
                 node,
                 type,
                 "$id does not correspond to a valid ItemRef."
@@ -63,7 +63,7 @@ interface ItemRef {
          * 该函数可能的使用场景:
          * 游戏处于运行状态时, 需要接收来自玩家的输入 (在此场景下, 服务器管理员也算玩家).
          */
-        fun checkedItemRef(id: Identifier): ItemRef? {
+        fun create(id: Identifier): ItemRef? {
             return ItemRefManager.createChecked(id)
         }
 
@@ -73,17 +73,17 @@ interface ItemRef {
          * 该函数对于任何 [ItemStack] 都会返回一个有效的 [ItemRef], 而不是返回 `null` 或抛异常.
          * 如果没有物品系统可以理解 [stack], 一个 Minecraft 系统下的 [ItemRef] 将被作为兜底返回.
          */
-        fun checkedItemRef(stack: ItemStack): ItemRef {
+        fun create(stack: ItemStack): ItemRef {
             val handler = ItemRefManager.getHandler(stack) ?: error("Cannot get handler from ItemStack: ${stack.toJsonString()}. This is a bug!")
             val id = handler.getId(stack) ?: error("Cannot get type id from ItemStack: ${stack.toJsonString()}. This is a bug!")
-            return checkedItemRef(id) ?: error("Cannot get reference from ItemStack: ${stack.toJsonString()}. This is a bug!")
+            return create(id) ?: error("Cannot get reference from ItemStack: ${stack.toJsonString()}. This is a bug!")
         }
 
         /**
          * 从 [material] 创建一个 [ItemRef].
          */
-        fun checkedItemRef(material: Material): ItemRef {
-            return checkedItemRef(material.key) ?: error("Cannot get reference from Material: $material. This is a bug!")
+        fun create(material: Material): ItemRef {
+            return create(material.key) ?: error("Cannot get reference from Material: $material. This is a bug!")
         }
 
     }

@@ -83,7 +83,7 @@ internal class ItemChoiceCheckerContext(
             if (itemStack == null) {
                 continue
             }
-            val itemRef = ItemRef.checkedItemRef(itemStack)
+            val itemRef = ItemRef.create(itemStack)
             val amount = itemStack.amount
             ret.mergeInt(itemRef, amount) { old, given -> old + given }
         }

@@ -121,7 +121,7 @@ internal object DebugCommand : KoishCommandFactory<Source> {
             return
         }
 
-        val itemRef = ItemRef.checkedItemRef(itemInMainHand)
+        val itemRef = ItemRef.create(itemInMainHand)
         sender.sendPlainMessage("ItemRef: $itemRef")
     }
 

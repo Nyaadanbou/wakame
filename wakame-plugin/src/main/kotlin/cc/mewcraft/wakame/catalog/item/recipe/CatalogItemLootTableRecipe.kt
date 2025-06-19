@@ -81,7 +81,7 @@ data class CatalogItemLootTableRecipe(
             is MojangLootItem -> {
                 val holder = lootPoolEntryContainer.shadow<ShadowLootItem>().item
                 val material = CraftItemType.minecraftToBukkit(holder.value())
-                return listOf(ItemRef.checkedItemRef(material))
+                return listOf(ItemRef.create(material))
             }
 
             // TODO 战利品表本身可能会存在循环引用导致堆栈溢出
@@ -97,12 +97,12 @@ data class CatalogItemLootTableRecipe(
                 val tagKey = lootPoolEntryContainer.shadow<ShadowTagEntry>().tag
                 return MojangBuiltInRegistries.ITEM.getTagOrEmpty(tagKey).mapNotNull { holder ->
                     val material = CraftItemType.minecraftToBukkit(holder.value())
-                    ItemRef.checkedItemRef(material)
+                    ItemRef.create(material)
                 }
             }
 
             is KoishLootItem -> {
-                val itemRef = ItemRef.checkedItemRef(lootPoolEntryContainer.id.namespacedKey) ?: error("Invalid KoishLootItem: ${lootPoolEntryContainer.id}. This is a bug!")
+                val itemRef = ItemRef.create(lootPoolEntryContainer.id.namespacedKey) ?: error("Invalid KoishLootItem: ${lootPoolEntryContainer.id}. This is a bug!")
                 return listOf(itemRef)
             }
 

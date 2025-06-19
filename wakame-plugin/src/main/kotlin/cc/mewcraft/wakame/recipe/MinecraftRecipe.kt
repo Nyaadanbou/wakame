@@ -1,8 +1,9 @@
 package cc.mewcraft.wakame.recipe
 
-import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.adventure.key.Identified
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toNamespacedKey
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
@@ -32,13 +33,13 @@ import org.bukkit.inventory.StonecuttingRecipe as BukkitStonecuttingRecipe
 /**
  * 合成配方 (对 Bukkit 的合成配方的包装).
  */
-sealed interface MinecraftRecipe : Keyed, Examinable {
+sealed interface MinecraftRecipe : Identified, Examinable {
     val result: RecipeResult
 
     fun registerBukkitRecipe(): Boolean
 
     fun unregisterBukkitRecipe() {
-        Bukkit.removeRecipe(key.toNamespacedKey, false)
+        Bukkit.removeRecipe(identifier.toNamespacedKey, false)
     }
 
     /**
@@ -64,7 +65,7 @@ sealed interface MinecraftRecipe : Keyed, Examinable {
  * 高炉配方.
  */
 class BlastingRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
@@ -72,7 +73,7 @@ class BlastingRecipe(
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val blastingRecipe = BukkitBlastingRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             input.toBukkitRecipeChoice(),
             exp,
@@ -82,7 +83,7 @@ class BlastingRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -96,7 +97,7 @@ class BlastingRecipe(
  * 营火配方.
  */
 class CampfireRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
@@ -104,7 +105,7 @@ class CampfireRecipe(
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val campfireRecipe = BukkitCampfireRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             input.toBukkitRecipeChoice(),
             exp,
@@ -114,7 +115,7 @@ class CampfireRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -128,7 +129,7 @@ class CampfireRecipe(
  * 熔炉配方.
  */
 class FurnaceRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
@@ -136,7 +137,7 @@ class FurnaceRecipe(
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val furnaceRecipe = BukkitFurnaceRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             input.toBukkitRecipeChoice(),
             exp,
@@ -146,7 +147,7 @@ class FurnaceRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -161,7 +162,7 @@ class FurnaceRecipe(
  * 工作台有序合成配方.
  */
 class ShapedRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val pattern: Array<String>,
     val ingredients: Map<Char, RecipeChoice>,
@@ -171,7 +172,7 @@ class ShapedRecipe(
     }
 
     override fun registerBukkitRecipe(): Boolean {
-        val shapedRecipe = BukkitShapredRecipe(key.toNamespacedKey, result.toBukkitItemStack())
+        val shapedRecipe = BukkitShapredRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
         pattern.forEachIndexed { i, s -> pattern[i] = s.replace(EMPTY_INGREDIENT_CHAR, ' ') }
         shapedRecipe.shape(*pattern)
         ingredients.forEach {
@@ -181,7 +182,7 @@ class ShapedRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("pattern", pattern),
         ExaminableProperty.of("ingredients", ingredients),
@@ -194,12 +195,12 @@ class ShapedRecipe(
  * 工作台无序合成.
  */
 class ShapelessRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val ingredients: List<RecipeChoice>,
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
-        val shapelessRecipe = BukkitShapelessRecipe(key.toNamespacedKey, result.toBukkitItemStack())
+        val shapelessRecipe = BukkitShapelessRecipe(identifier.toNamespacedKey, result.toBukkitItemStack())
         ingredients.forEach {
             shapelessRecipe.addIngredient(it.toBukkitRecipeChoice())
         }
@@ -207,7 +208,7 @@ class ShapelessRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("ingredients", ingredients),
     )
@@ -219,7 +220,7 @@ class ShapelessRecipe(
  * 锻造台转化配方.
  */
 class SmithingTransformRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val base: RecipeChoice,
     val addition: RecipeChoice,
@@ -227,7 +228,7 @@ class SmithingTransformRecipe(
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smithingTransformRecipe = BukkitSmithingTransformRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             template.toBukkitRecipeChoice(),
             base.toBukkitRecipeChoice(),
@@ -238,7 +239,7 @@ class SmithingTransformRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
@@ -252,7 +253,7 @@ class SmithingTransformRecipe(
  * 锻造台纹饰配方.
  */
 class SmithingTrimRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
@@ -261,7 +262,7 @@ class SmithingTrimRecipe(
     override val result: RecipeResult = EmptyRecipeResult
     override fun registerBukkitRecipe(): Boolean {
         val smithingTrimRecipe = BukkitSmithingTrimRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             template.toBukkitRecipeChoice(),
             base.toBukkitRecipeChoice(),
             addition.toBukkitRecipeChoice(),
@@ -271,7 +272,7 @@ class SmithingTrimRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
         ExaminableProperty.of("template", template)
@@ -284,7 +285,7 @@ class SmithingTrimRecipe(
  * 烟熏炉配方.
  */
 class SmokingRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val input: RecipeChoice,
     val cookingTime: Int,
@@ -292,7 +293,7 @@ class SmokingRecipe(
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smokingRecipe = BukkitSmokingRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             input.toBukkitRecipeChoice(),
             exp,
@@ -302,7 +303,7 @@ class SmokingRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input),
         ExaminableProperty.of("cooking_time", cookingTime),
@@ -316,13 +317,13 @@ class SmokingRecipe(
  * 切石机配方.
  */
 class StonecuttingRecipe(
-    override val key: Key,
+    override val identifier: Identifier,
     override val result: RecipeResult,
     val input: RecipeChoice,
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val stonecuttingRecipe = BukkitStonecuttingRecipe(
-            key.toNamespacedKey,
+            identifier.toNamespacedKey,
             result.toBukkitItemStack(),
             input.toBukkitRecipeChoice(),
         )
@@ -330,7 +331,7 @@ class StonecuttingRecipe(
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-        ExaminableProperty.of("key", key),
+        ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("input", input)
     )
@@ -350,7 +351,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         BlastingRecipe(
-            key = key,
+            identifier = key,
             result = result,
             input = input,
             cookingTime = cookingTime,
@@ -366,7 +367,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         CampfireRecipe(
-            key = key,
+            identifier = key,
             result = result,
             input = input,
             cookingTime = cookingTime,
@@ -382,7 +383,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         FurnaceRecipe(
-            key = key,
+            identifier = key,
             result = result,
             input = input,
             cookingTime = cookingTime,
@@ -426,7 +427,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         ShapedRecipe(
-            key = key,
+            identifier = key,
             result = result,
             pattern = pattern.toTypedArray(),
             ingredients = ingredients,
@@ -450,7 +451,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         ShapelessRecipe(
-            key = key,
+            identifier = key,
             result = result,
             ingredients = ingredients
         )
@@ -469,7 +470,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmithingTransformRecipe(
-            key = key,
+            identifier = key,
             result = result,
             base = base,
             addition = addition,
@@ -489,7 +490,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmithingTrimRecipe(
-            key = key,
+            identifier = key,
             base = base,
             addition = addition,
             template = template
@@ -504,7 +505,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         SmokingRecipe(
-            key = key,
+            identifier = key,
             result = result,
             input = input,
             cookingTime = cookingTime,
@@ -518,7 +519,7 @@ enum class RecipeType(
         val key = node.getRecipeKey()
 
         StonecuttingRecipe(
-            key = key,
+            identifier = key,
             result = result,
             input = input,
         )

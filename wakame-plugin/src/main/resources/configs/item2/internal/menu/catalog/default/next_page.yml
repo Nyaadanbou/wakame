@@ -1,0 +1,4 @@
+base: arrow
+slot_display_name: "下一页 (<current_page>/<total_page>)"
+slot_display_lore:
+  - "<!i><dark_gray>点击查看下一页"

@@ -69,23 +69,23 @@ object KoishStackGenerator {
         dataContainer[ItemDataTypes.BYPASS_NETWORK_REWRITE] = Unit
 
         // 直接操作 MojangStack 以提高生成物品的速度
-        val itembase = type.properties.getOrDefault(ItemPropertyTypes.BASE, ItemBase.EMPTY)
-        val itemstack = itembase.createMojang()
+        val itemBase = type.properties.getOrDefault(ItemPropertyTypes.BASE, ItemBase.EMPTY)
+        val itemStack = itemBase.createMojang()
 
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
         // 因为 ItemStack.setData 只有在 ItemDataContainer 存在时才能写入数据
-        itemstack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
+        itemStack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
 
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig
 
         // 从 ItemMetaContainer 生成数据, 然后写入到物品堆叠上
         for (metaType in BuiltInRegistries.ITEM_META_TYPE) {
-            makePersistentDataThenWrite(metaType, dataConfig, itemstack, context)
+            makePersistentDataThenWrite(metaType, dataConfig, itemStack, context)
         }
 
-        return itemstack.toBukkit()
+        return itemStack.toBukkit()
     }
 
     private fun <U : ItemMetaEntry<V>, V> makePersistentDataThenWrite(

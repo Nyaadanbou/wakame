@@ -68,7 +68,7 @@ class HasItemCondition(
             if (itemStack == null || itemStack.isEmpty) {
                 continue
             }
-            val itemRef = ItemRef.checkedItemRef(itemStack)
+            val itemRef = ItemRef.create(itemStack)
             if (itemRef.id == itemKey) {
                 count += itemStack.amount
             }

@@ -46,7 +46,7 @@ internal object CategorySerializer : TypeSerializer2<CatalogItemCategory>, KoinC
         val itemIds = node.node("items").getList<String>(emptyList())
         val itemList = mutableListOf<ItemRef>()
         for (uid in itemIds) {
-            val item = ItemRef.checkedItemRef(Identifiers.of(uid))
+            val item = ItemRef.create(Identifiers.of(uid))
             if (item == null) {
                 LOGGER.warn("Cannot deserialize string '$uid' into ItemX, skipped adding it to category: '$id'")
                 continue
