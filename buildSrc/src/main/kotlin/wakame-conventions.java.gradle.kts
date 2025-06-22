@@ -40,9 +40,7 @@ indra {
 spotless {
     java {
         googleJavaFormat()
-        leadingTabsToSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
+        applyCommon()
         importOrderFile(".spotless/wakame.importorder")
     }
 }

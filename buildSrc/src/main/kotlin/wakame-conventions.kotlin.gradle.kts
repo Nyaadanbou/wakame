@@ -80,9 +80,7 @@ spotless {
     }
     kotlinGradle {
         target("*.gradle.kts", "src/*/kotlin/**.gradle.kts")
-        leadingTabsToSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
+        applyCommon()
         ktlint(local.versions.ktlint.get())
     }
 }
