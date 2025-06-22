@@ -83,10 +83,11 @@ spotless {
         applyCommon()
         ktlint(local.versions.ktlint.get())
     }
-}
-
-dependencies {
-    checkstyle(local.stylecheck)
+    format("configs") {
+        target("**/*.yml", "**/*.yaml", "**/*.json")
+        targetExclude("run/**")
+        applyCommon(2)
+    }
 }
 
 java {

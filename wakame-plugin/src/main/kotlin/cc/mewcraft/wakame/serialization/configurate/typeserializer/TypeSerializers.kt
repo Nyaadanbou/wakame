@@ -2,6 +2,9 @@
 
 package cc.mewcraft.wakame.serialization.configurate.typeserializer
 
+import cc.mewcraft.wakame.loot.LootPool
+import cc.mewcraft.wakame.loot.LootTable
+import cc.mewcraft.wakame.loot.entry.ComposableEntryContainer
 import cc.mewcraft.wakame.molang.ExpressionSerializer
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.DynamicRegistries
@@ -52,6 +55,10 @@ val KOISH_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.build
     .register(MaterialSerializer)
     .register(BlockTypeListSerializer)
     .register(ItemTypeListSerializer)
+    // Loot Table
+    .register(LootTable.SERIALIZER)
+    .register(LootPool.SERIALIZER)
+    .register(ComposableEntryContainer.SERIALIZER)
     // Paper Registry
     .register(RegistryKey.DAMAGE_TYPE.valueByNameTypeSerializer())
     .register(RegistryKey.ENCHANTMENT.valueByNameTypeSerializer())

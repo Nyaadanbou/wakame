@@ -1,4 +1,4 @@
-type: element # 元素类型的战利品表
+type: element # loot table 的类型
 pools:
   - rolls: 1 # 抽取次数
     entries:

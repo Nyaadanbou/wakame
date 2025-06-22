@@ -15,7 +15,7 @@
 # id: <物品 id>
 #   格式: "namespace:id"
 #   其中 namespace 支持:
-#     wakame: Koish 物品
+#     koish: Koish 物品 (默认命名空间)
 #     minecraft: Minecraft 物品
 #   其中 id 取决于具体实现
 # amount: <物品堆叠数量>
@@ -25,12 +25,12 @@
 # amount: <经验值数量>
 input:
   - { type: item, id: minecraft:raw_copper, amount: 3 }
-  - { type: item, id: wakame:example/raw_tin, amount: 1 }
+  - { type: item, id: example/raw_tin, amount: 1 }
   - { type: exp, amount: 1 }
 
 # 配方的输出
 output:
   # 该物品格式为 "namespace:id", 同配方输入的写法
-  item: wakame:example/bronze_ingot
+  item: example/bronze_ingot
   # 物品堆叠的数量, 可以超过单个堆叠的最大数量
   amount: 4

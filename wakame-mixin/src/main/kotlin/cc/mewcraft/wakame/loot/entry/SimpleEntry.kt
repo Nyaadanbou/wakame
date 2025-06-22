@@ -11,9 +11,9 @@ import java.util.stream.Stream
 
 class SimpleEntry<S>(
     val data: S,
-    weight: Int = 0,
-    quality: Int = 0,
-    conditions: List<LootPredicate> = emptyList(),
+    weight: Int,
+    quality: Int,
+    conditions: List<LootPredicate>,
 ) : LootPoolSingletonContainer<S>(weight, quality, conditions), Examinable {
     companion object {
         val SERIALIZER: TypeSerializer2<SimpleEntry<*>> = TypeSerializer2 { type, node ->

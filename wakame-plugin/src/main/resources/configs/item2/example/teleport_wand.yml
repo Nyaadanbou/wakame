@@ -2,7 +2,7 @@ base: stick
 
 item_name: "传送法杖"
 
-slot: vanilla:mainhand
+slot: minecraft:mainhand
 
 castable: {}
 

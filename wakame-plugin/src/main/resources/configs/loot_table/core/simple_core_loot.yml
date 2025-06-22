@@ -1,0 +1,9 @@
+type: core
+pools:
+  - rolls: 1
+    entries:
+      - type: simple
+        data:
+          type: attribute
+          value: { type: "max_mana", value: 100.0, weight: 1 }
+        weight: 1

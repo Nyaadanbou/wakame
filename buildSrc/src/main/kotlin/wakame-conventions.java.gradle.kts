@@ -43,8 +43,9 @@ spotless {
         applyCommon()
         importOrderFile(".spotless/wakame.importorder")
     }
-}
-
-dependencies {
-    checkstyle(local.stylecheck)
+    format("configs") {
+        target("**/*.yml", "**/*.yaml", "**/*.json")
+        targetExclude("run/**")
+        applyCommon(2)
+    }
 }

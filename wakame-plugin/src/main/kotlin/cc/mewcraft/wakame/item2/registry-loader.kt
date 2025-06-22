@@ -15,6 +15,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.loot.LootTableRegistryLoader
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
@@ -46,7 +47,8 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
     stage = InitStage.PRE_WORLD,
     runAfter = [
         AttributeFacadeRegistryLoader::class, // deps: 需要直接的数据
-        AbilityTriggerRegistryLoader::class
+        AbilityTriggerRegistryLoader::class,
+        LootTableRegistryLoader::class
     ]
 )
 @Reload

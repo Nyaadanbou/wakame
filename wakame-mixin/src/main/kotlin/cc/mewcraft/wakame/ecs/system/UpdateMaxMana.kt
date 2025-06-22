@@ -22,5 +22,6 @@ object UpdateMaxMana : IteratingSystem(
         if (mana.maximum != maxMana) {
             mana.maximum = maxMana
         }
+        mana.ensureMana()
     }
 }
