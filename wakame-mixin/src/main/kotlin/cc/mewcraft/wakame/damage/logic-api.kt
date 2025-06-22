@@ -5,7 +5,6 @@ package cc.mewcraft.wakame.damage
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -61,8 +60,7 @@ fun DamageContext(event: EntityDamageEvent): DamageContext {
     val damage = event.damage
     val damagee = event.entity as? LivingEntity ?: error("The damagee must be a living entity")
     val damageSource = event.damageSource
-    val damageModifiers = DamageModifier.entries.associateWith { event.getDamage(it) }
-    return DamageContext(damage, damagee, damageSource, damageModifiers)
+    return DamageContext(damage, damagee, damageSource)
 }
 
 /**
@@ -74,8 +72,7 @@ fun DamageContext(event: EntityDamageEvent): DamageContext {
 class DamageContext(
     val damage: Double,
     val damagee: LivingEntity,
-    val damageSource: DamageSource,
-    val damageModifiers: Map<DamageModifier, Double>
+    val damageSource: DamageSource
 ) {
     override fun toString(): String {
         return "DamageContext(damage=$damage, damagee=$damagee, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"

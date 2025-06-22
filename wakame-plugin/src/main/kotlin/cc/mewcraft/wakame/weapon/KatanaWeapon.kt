@@ -2,7 +2,10 @@ package cc.mewcraft.wakame.weapon
 
 import cc.mewcraft.wakame.config.MAIN_CONFIG
 import cc.mewcraft.wakame.config.optionalEntry
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.PlayerDamageMetadata
+import cc.mewcraft.wakame.damage.damageBundle
+import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
@@ -235,7 +238,6 @@ data class KatanaWeapon(
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
             attributes = attributeContainer,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
             damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
@@ -307,7 +309,6 @@ data class KatanaWeapon(
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
             attributes = attributeContainer,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
             damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
@@ -331,7 +332,6 @@ data class KatanaWeapon(
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
             attributes = attributeContainer,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
             damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()
@@ -411,7 +411,6 @@ data class KatanaWeapon(
         val attributeContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(
             attributes = attributeContainer,
-            damageTags = DamageTags(DamageTag.MELEE, DamageTag.KATANA),
             damageBundle = damageBundle(attributeContainer) {
                 every {
                     standard()

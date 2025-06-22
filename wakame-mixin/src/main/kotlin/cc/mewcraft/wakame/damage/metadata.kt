@@ -19,11 +19,6 @@ import kotlin.random.Random
  * 一旦实例化后, 各种信息就已经确定并不允许修改.
  */
 data class DamageMetadata(
-    /**
-     * 伤害标签.
-     */
-    @Deprecated("待移除")
-    val damageTags: DamageTags,
 
     /**
      * 攻击者伤害捆绑包.
@@ -149,7 +144,6 @@ fun CriticalStrikeMetadata(attributeMap: AttributeMap): CriticalStrikeMetadata {
 object VanillaDamageMetadata {
     operator fun invoke(damageBundle: DamageBundle): DamageMetadata {
         return DamageMetadata(
-            damageTags = DamageTags(),
             damageBundle = damageBundle,
             criticalStrikeMetadata = CriticalStrikeMetadata.NONE
         )
@@ -184,7 +178,6 @@ object PlayerDamageMetadata {
      */
     @JvmField
     val INTRINSIC_ATTACK: DamageMetadata = DamageMetadata(
-        damageTags = DamageTags(DamageTag.HAND),
         damageBundle = damageBundle {
             default {
                 min(1.0)
@@ -197,9 +190,8 @@ object PlayerDamageMetadata {
         criticalStrikeMetadata = CriticalStrikeMetadata.NONE
     )
 
-    operator fun invoke(attributes: AttributeMapLike, damageBundle: DamageBundle, damageTags: DamageTags = DamageTags()): DamageMetadata {
+    operator fun invoke(attributes: AttributeMapLike, damageBundle: DamageBundle): DamageMetadata {
         return DamageMetadata(
-            damageTags = damageTags,
             damageBundle = damageBundle,
             criticalStrikeMetadata = CriticalStrikeMetadata(
                 chance = attributes.getValue(Attributes.CRITICAL_STRIKE_CHANCE),
@@ -213,23 +205,17 @@ object PlayerDamageMetadata {
     operator fun invoke(attributes: AttributeMapLike, builder: DamageBundleDsl.() -> Unit): DamageMetadata {
         return invoke(
             attributes = attributes,
-            damageBundle = damageBundle(attributes, builder),
-            damageTags = DamageTags()
+            damageBundle = damageBundle(attributes, builder)
         )
     }
 }
 
 object EntityDamageMetadata {
-    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata, damageTags: DamageTags): DamageMetadata {
+    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata): DamageMetadata {
         return DamageMetadata(
-            damageTags = damageTags,
             damageBundle = damageBundle,
             criticalStrikeMetadata = criticalStrikeMetadata
         )
-    }
-
-    operator fun invoke(damageBundle: DamageBundle, criticalStrikeMetadata: CriticalStrikeMetadata): DamageMetadata {
-        return invoke(damageBundle, criticalStrikeMetadata, DamageTags())
     }
 }
 //</editor-fold>

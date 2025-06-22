@@ -28,8 +28,6 @@ internal sealed interface DamageMetadataBuilder<T> {
         val SERIALIZER: TypeSerializer2<DamageMetadataBuilder<*>> = Serializer
     }
 
-    val damageTags: DamageTagsBuilder
-
     fun build(context: DamageContext): DamageMetadata
 
     //
@@ -52,15 +50,6 @@ internal sealed interface DamageMetadataBuilder<T> {
 
     }
 
-}
-
-/**
- * 从配置文件反序列化得到的能够构建 [DamageTags] 的构造器.
- */
-internal interface DamageTagsBuilder {
-    val damageTags: List<DamageTag>
-
-    fun build(): DamageTags
 }
 
 /**
@@ -96,8 +85,6 @@ internal interface CriticalStrikeMetadataBuilder<T> {
 internal data class DirectDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsBuilder,
-    @Required
     val damageBundle: Map<String, DirectDamagePacketBuilder>,
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
@@ -108,14 +95,13 @@ internal data class DirectDamageMetadataBuilder(
     }
 
     private fun build(): DamageMetadata {
-        val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
             val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(DamageBundle::damageBundleOf)
         val criticalStrikeMetadata = criticalStrikeMetadata.build()
-        return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
+        return DamageMetadata(damageBundle, criticalStrikeMetadata)
     }
 }
 
@@ -128,8 +114,6 @@ internal data class DirectDamageMetadataBuilder(
 internal data class VanillaDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsBuilder,
-    @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
     val element: RegistryEntry<Element>,
@@ -140,7 +124,6 @@ internal data class VanillaDamageMetadataBuilder(
 
     override fun build(context: DamageContext): DamageMetadata {
         val damage = context.damage
-        val damageTags = damageTags.build()
         val damageBundle = damageBundle {
             single(element) {
                 min(damage)
@@ -151,7 +134,7 @@ internal data class VanillaDamageMetadataBuilder(
             }
         }
         val criticalStrikeMetadata = criticalStrikeMetadata.build()
-        return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
+        return DamageMetadata(damageBundle, criticalStrikeMetadata)
     }
 }
 
@@ -159,11 +142,7 @@ internal data class VanillaDamageMetadataBuilder(
  * 依赖攻击实体的 [cc.mewcraft.wakame.entity.attribute.AttributeMap] 的 [DamageMetadata] 序列化器.
  */
 @ConfigSerializable
-internal data class AttributeDamageMetadataBuilder(
-    @Setting(nodeFromParent = true)
-    @Required
-    override val damageTags: DirectDamageTagsBuilder,
-) : DamageMetadataBuilder<Double> {
+internal object AttributeDamageMetadataBuilder: DamageMetadataBuilder<Double> {
 
     override fun build(context: DamageContext): DamageMetadata {
         val damager = context.damageSource.causingEntity ?: throw IllegalStateException(
@@ -172,25 +151,13 @@ internal data class AttributeDamageMetadataBuilder(
         val attributeMap = AttributeMapAccess.INSTANCE.get(damager).getOrElse {
             error("Failed to build damage metadata by attribute map because the entity '${damager.type}' does not have an attribute map.")
         }
-        val damageTags = damageTags.build()
         val damageBundle = damageBundle(attributeMap) {
             every {
                 standard()
             }
         }
         val criticalStrikeMetadata = CriticalStrikeMetadata(attributeMap)
-        return DamageMetadata(damageTags, damageBundle, criticalStrikeMetadata)
-    }
-}
-
-@ConfigSerializable
-internal data class DirectDamageTagsBuilder(
-    @Required
-    override val damageTags: List<DamageTag>,
-) : DamageTagsBuilder {
-
-    override fun build(): DamageTags {
-        return DamageTags(damageTags)
+        return DamageMetadata(damageBundle, criticalStrikeMetadata)
     }
 }
 
@@ -230,8 +197,6 @@ internal data class DirectCriticalStrikeMetadataBuilder(
 internal data class MolangDamageMetadataBuilder(
     @Setting(nodeFromParent = true)
     @Required
-    override val damageTags: DirectDamageTagsBuilder,
-    @Required
     val damageBundle: Map<String, MolangDamagePacketBuilder>,
     @Required
     val criticalStrikeMetadata: MolangCriticalStrikeMetadataBuilder,
@@ -242,14 +207,13 @@ internal data class MolangDamageMetadataBuilder(
     }
 
     fun build(): DamageMetadata {
-        val damageTags = damageTags.build()
         val damageBundle = damageBundle.map { (xelement, xpacket) ->
             val element: RegistryEntry<Element> = BuiltInRegistries.ELEMENT.getEntry(xelement) ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
             val packet: DamagePacket = xpacket.build()
             element to packet
         }.toMap().let(DamageBundle::damageBundleOf)
         val criticalStrikeState = criticalStrikeMetadata.build()
-        return DamageMetadata(damageTags, damageBundle, criticalStrikeState)
+        return DamageMetadata(damageBundle, criticalStrikeState)
     }
 }
 
