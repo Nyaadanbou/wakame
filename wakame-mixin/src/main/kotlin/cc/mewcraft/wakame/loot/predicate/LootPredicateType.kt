@@ -1,19 +1,19 @@
-package cc.mewcraft.wakame.loot.entry
+package cc.mewcraft.wakame.loot.predicate
 
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import io.leangen.geantyref.TypeToken
 
 /**
- * 用于标识 [ComposableEntryContainer] 的类型, 以及提供序列化器.
+ * 用于标识 [LootPredicate] 的类型, 以及提供序列化器.
  *
- * @param T [ComposableEntryContainer] 的类型
+ * @param T [LootPredicate] 的类型
  */
-sealed interface LootPoolEntryType<out T : ComposableEntryContainer<*>> {
+sealed interface LootPredicateType<out T : LootPredicate> {
     companion object {
-        fun <T : ComposableEntryContainer<*>> create(
+        fun <T : LootPredicate> create(
             token: TypeToken<T>,
             serializer: TypeSerializer2<T>,
-        ): LootPoolEntryType<T> = Simple(token, serializer)
+        ): LootPredicateType<T> = Simple(token, serializer)
     }
 
     /**
@@ -26,10 +26,10 @@ sealed interface LootPoolEntryType<out T : ComposableEntryContainer<*>> {
      */
     val serializer: TypeSerializer2<out T>
 
-    private class Simple<T : ComposableEntryContainer<*>>(
+    private class Simple<T : LootPredicate>(
         override val typeToken: TypeToken<out T>,
         override val serializer: TypeSerializer2<out T>,
-    ) : LootPoolEntryType<T> {
-        override fun toString(): String = "SimpleLootPoolEntryType(typeToken=$typeToken, serializer=$serializer)"
+    ) : LootPredicateType<T> {
+        override fun toString(): String = "SimpleLootPredicateType(typeToken=$typeToken, serializer=$serializer)"
     }
 }

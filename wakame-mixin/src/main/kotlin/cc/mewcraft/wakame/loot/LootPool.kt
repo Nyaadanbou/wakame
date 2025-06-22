@@ -141,7 +141,7 @@ private data class SimpleLootPool<S>(
     }
 
     override fun addRandomItems(context: LootContext, dataConsumer: (S) -> Unit) {
-        if (this.conditions.all { it.test(context) }) {
+        if (this.conditions.all { it.invoke(context) }) {
             repeat(rolls) { this.addRandomItem(context, dataConsumer) }
         }
     }

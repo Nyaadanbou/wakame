@@ -23,6 +23,7 @@ import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.LootPoolEntryType
+import cc.mewcraft.wakame.loot.predicate.LootPredicateType
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.util.Identifiers
@@ -104,6 +105,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val LOOT_POOL_ENTRY_TYPE = createRegistryKey<LootPoolEntryType<*>>("loot_pool_entry_type")
+
+    @JvmField
+    val LOOT_PREDICATE_TYPE = createRegistryKey<LootPredicateType<*>>("loot_predicate_type")
 
     ///
 

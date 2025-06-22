@@ -1,38 +1,32 @@
 package cc.mewcraft.wakame.loot.predicate
 
 import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
-import cc.mewcraft.wakame.util.require
 import org.spongepowered.configurate.ConfigurationNode
+import org.spongepowered.configurate.kotlin.extensions.get
+import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
-fun interface LootPredicate {
+typealias LootContextPredicate = (LootContext) -> Boolean
+
+fun interface LootPredicate : LootContextPredicate {
     companion object {
         val SERIALIZER: TypeSerializer2<LootPredicate> = Serializer
-
-        object AlwaysTruePredicate : LootPredicate {
-            override fun test(context: LootContext): Boolean = true
-
-            override fun toString(): String = "AlwaysTruePredicate"
-        }
-
-        object AlwaysFalsePredicate : LootPredicate {
-            override fun test(context: LootContext): Boolean = false
-
-            override fun toString(): String = "AlwaysFalsePredicate"
-        }
     }
 
-    fun test(context: LootContext): Boolean
+    override fun invoke(context: LootContext): Boolean
 
-    private object  Serializer : TypeSerializer2<LootPredicate> {
-        override fun deserialize(type: Type, node: ConfigurationNode): LootPredicate? {
-            val typeName = node.node("type").require<String>()
-            return when (typeName) {
-                "always_true" -> AlwaysTruePredicate
-                "always_false" -> AlwaysFalsePredicate
-                else -> throw IllegalArgumentException("Unknown LootPredicate type: $typeName")
+    private object Serializer : TypeSerializer2<LootPredicate> {
+        override fun deserialize(type: Type, node: ConfigurationNode): LootPredicate {
+            val typeName = node.node("type").get<String>()
+            val lootPredicateType = if (typeName == null) {
+                LootPredicates.ALL_OF // 默认是 AllOfPredicate
+            } else {
+                BuiltInRegistries.LOOT_PREDICATE_TYPE[typeName] ?: throw SerializationException(node, type, "Unknown loot predicate type: $typeName")
             }
+            return lootPredicateType.serializer.deserialize(type, node)
+                ?: throw SerializationException(node, type, "Failed to deserialize loot predicate of type: $typeName")
         }
     }
 }

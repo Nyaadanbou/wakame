@@ -63,7 +63,7 @@ internal open class SimpleLootTable<S>(
         val result = mutableListOf<S>()
         val correctPools = pools.filter { pool ->
             // 过滤掉不满足条件的 pool
-            pool.conditions.all { it.test(context) }
+            pool.conditions.all { it.invoke(context) }
         }
 
         for (pool in correctPools) {

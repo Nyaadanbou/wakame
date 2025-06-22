@@ -31,6 +31,9 @@ ignite = "1.1.0"
 shadow-nbt = "1.21.3-SNAPSHOT"
 shadow-bukkit = "1.21.3-SNAPSHOT"
 
+# Test deps
+datafixerupper = "8.0.16"
+
 # Plugin deps
 helper = "6.0.0"
 adventurelevel = "2.0.0"
@@ -97,6 +100,11 @@ mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", ver
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
+
+# Test deps
+# 这些依赖只由测试使用. 在实际运行环境中存在服务端中.
+
+datafixerupper = { group = "com.mojang", name = "datafixerupper", version.ref = "datafixerupper" }
 
 # Plugin deps
 # 这些依赖属于插件, 无论是自研的还是第三方的
