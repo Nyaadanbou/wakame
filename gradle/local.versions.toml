@@ -8,6 +8,10 @@ copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.16"
 blossom = "2.1.0"
+checkstyle = "10.12.5"
+stylecheck = "0.2.1"
+ktlint = "0.50.0"
+spotless = "7.0.4"
 
 # Gradle plugin deps
 docker-java = "3.4.1"
@@ -55,6 +59,10 @@ plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
+plugin-spotless = { group = "com.diffplug.spotless", name = "com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
+
+# Build logics
+stylecheck = { group = "ca.stellardrift", name = "stylecheck", version.ref = "stylecheck" }
 
 # Gradle plugin deps
 docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }

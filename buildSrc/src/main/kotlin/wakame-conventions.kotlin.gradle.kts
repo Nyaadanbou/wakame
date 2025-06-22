@@ -1,6 +1,10 @@
+import gradle.kotlin.dsl.accessors._d5be38b3b73e8f212209bbd96c1b8841.checkstyle
+
 plugins {
     kotlin("jvm")
     id("net.kyori.indra")
+    id("net.kyori.indra.checkstyle")
+    id("com.diffplug.spotless")
     id("com.gradleup.shadow")
 }
 
@@ -66,7 +70,25 @@ sourceSets {
 }
 
 indra {
+    checkstyle().set(local.versions.checkstyle)
     javaVersions().target(21)
+}
+
+spotless {
+    kotlin {
+        ktlint(local.versions.ktlint.get())
+    }
+    kotlinGradle {
+        target("*.gradle.kts", "src/*/kotlin/**.gradle.kts")
+        leadingTabsToSpaces(4)
+        trimTrailingWhitespace()
+        endWithNewline()
+        ktlint(local.versions.ktlint.get())
+    }
+}
+
+dependencies {
+    checkstyle(local.stylecheck)
 }
 
 java {
