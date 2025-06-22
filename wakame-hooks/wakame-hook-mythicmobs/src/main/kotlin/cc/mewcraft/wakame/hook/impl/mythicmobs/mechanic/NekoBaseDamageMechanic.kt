@@ -27,7 +27,6 @@ class NekoBaseDamageMechanic(
         threadSafetyLevel = ThreadSafetyLevel.SYNC_ONLY
     }
 
-    private val damageTags: DamageTags = parseDamageTags(mlc.getStringList(arrayOf("tags", "t"), ""))
     private val damageBundle: (SkillMetadata) -> DamageBundle = parseDamageBundle(mlc.getStringList(arrayOf("bundle", "b"), ""))
     private val criticalStrikePower: PlaceholderDouble = mlc.getPlaceholderDouble(arrayOf("critical_strike_power", "csp"), 1.0)
     private val criticalStrikeState: CriticalStrikeState = parseCriticalState(mlc.getString(arrayOf("critical_strike_state", "css"), "NONE"))
@@ -67,13 +66,6 @@ class NekoBaseDamageMechanic(
         return PlaceholderDouble.of(this)
     }
 
-    private fun parseDamageTags(origin: List<String>): DamageTags {
-        if (origin.isEmpty()) {
-            return DamageTags()
-        }
-        return DamageTags(origin.map { DamageTag.valueOf(it) })
-    }
-
     private fun parseCriticalState(origin: String): CriticalStrikeState {
         return CriticalStrikeState.valueOf(origin)
     }
@@ -87,7 +79,7 @@ class NekoBaseDamageMechanic(
             ?: return SkillResult.INVALID_TARGET
 
         val damageMetadata = DamageMetadata(
-            damageTags, damageBundle.invoke(data), CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
+            damageBundle.invoke(data), CriticalStrikeMetadata(criticalStrikePower[target], criticalStrikeState)
         )
 
         val casterEntity = data.caster?.entity?.bukkitEntity as? LivingEntity

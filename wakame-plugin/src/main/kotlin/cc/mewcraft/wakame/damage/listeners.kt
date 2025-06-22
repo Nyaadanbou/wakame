@@ -59,7 +59,7 @@ internal object DamageListener : Listener {
         // 计算攻击阶段的伤害信息
         // 考虑伤害发起者对伤害值的各种影响
         // 伤害信息为空时取消伤害事件
-        val damageMetadata = DamageManager.calculateAttackPhaseMetadata(damageContext) ?: run {
+        val damageMetadata = DamageManager.createAttackPhaseMetadata(damageContext) ?: run {
             event.isCancelled = true
             return
         }
@@ -67,7 +67,7 @@ internal object DamageListener : Listener {
         // 计算防御阶段的伤害信息
         // 考虑伤害承受者对伤害值的各种影响
         // 伤害信息为空时取消伤害事件
-        val defenseMetadata = DamageManager.calculateDefensePhaseMetadata(damageContext) ?: run {
+        val defenseMetadata = DamageManager.createDefensePhaseMetadata(damageContext) ?: run {
             event.isCancelled = true
             return
         }

@@ -4,7 +4,10 @@
 package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageContext
+import cc.mewcraft.wakame.damage.DamageMetadataBuilder
+import cc.mewcraft.wakame.damage.DirectCriticalStrikeMetadataBuilder
+import cc.mewcraft.wakame.damage.VanillaDamageMetadataBuilder
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -37,7 +40,6 @@ internal object DamageTypeDamageMappings {
     private val default: DamageTypeMapper =
         DamageTypeMapper(
             VanillaDamageMetadataBuilder(
-                damageTags = DirectDamageTagsBuilder(emptyList()),
                 criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
                 element = BuiltInRegistries.ELEMENT.getDefaultEntry()
             )

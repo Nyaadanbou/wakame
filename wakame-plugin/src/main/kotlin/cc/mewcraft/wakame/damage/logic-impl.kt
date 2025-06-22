@@ -157,7 +157,7 @@ internal object DamageManager : DamageManagerApi {
      *
      * @return 攻击阶段的伤害信息, null意为取消伤害事件
      */
-    fun calculateAttackPhaseMetadata(context: DamageContext): DamageMetadata? {
+    fun createAttackPhaseMetadata(context: DamageContext): DamageMetadata? {
         val damagee = context.damagee
         val customDamageMetadata = damagee.getCustomDamageMetadata()
         if (customDamageMetadata != null) {
@@ -182,7 +182,7 @@ internal object DamageManager : DamageManagerApi {
                 if (directEntity.type in ATTRIBUTED_ARROW_TYPES) {
                     // 特殊处理属于 attributed_arrow_types 的 direct_entity, 考虑箭矢本身给予的额外伤害.
                     // 例如: 无源箭矢(发射器)
-                    return calculateNoCausingAttributedArrowDamage(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
+                    return createNoCausingAttributedArrowDamageMetadata(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 } else if (directEntity.type in DIRECT_ATTACKABLE_TYPES) {
                     // 使用映射来计算 direct_entity 造成的伤害.
                     // attributed_arrow_types 中的直接实体类型不会进入此分支
@@ -190,7 +190,7 @@ internal object DamageManager : DamageManagerApi {
                     return context.toDamageMetadata(Mapping.NULL_CAUSING_ENTITY)
                 } else {
                     // 不太可能发生
-                    return calculateDefaultDamageMetadata(context)
+                    return createDefaultDamageMetadata(context)
                 }
             }
 
@@ -202,7 +202,7 @@ internal object DamageManager : DamageManagerApi {
                     // 若没有注册则考虑弹射物物品上的属性.
                     // 再没有则使用 player_adhoc_mappings.
                     // 例如: 玩家箭矢, 玩家光灵箭, 玩家三叉戟
-                    return calculateRegisteredAbstractArrowDamage(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
+                    return createRegisteredAbstractArrowDamageMetadata(directEntity as AbstractArrow) ?: context.toDamageMetadata(Mapping.PLAYER_ADHOC)
                 } else if (directEntity.type in DIRECT_ATTACKABLE_TYPES) {
                     // 这里的情况: direct_entity 属于游戏里比较特殊的能够造成伤害的实体.
                     // 直接使用 player_adhoc_mappings.
@@ -224,8 +224,12 @@ internal object DamageManager : DamageManagerApi {
                 return context.toDamageMetadata(Mapping.ATTACK_CHARACTERISTIC)
             }
 
+            is FallingBlock -> { // causing_entity 是非 living_entity 的下落的方块
+                return createFallingBlockDamageMetadata(context)
+            }
+
             else -> { // 不太可能发生, 除非有插件在编造一些不太合法的 DamageSource
-                return calculateDefaultDamageMetadata(context)
+                return createDefaultDamageMetadata(context)
             }
 
         }
@@ -237,7 +241,7 @@ internal object DamageManager : DamageManagerApi {
      *
      * @return 防御阶段的伤害信息, null意为取消伤害事件
      */
-    fun calculateDefensePhaseMetadata(context: DamageContext): DefenseMetadata? {
+    fun createDefensePhaseMetadata(context: DamageContext): DefenseMetadata? {
         val damagee = context.damagee
         val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
             LOGGER.warn("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
@@ -480,7 +484,13 @@ internal object DamageManager : DamageManagerApi {
         return weapon.generateDamageMetadata(player, itemstack)
     }
 
-    private fun calculateDefaultDamageMetadata(context: DamageContext): DamageMetadata {
+    private fun createFallingBlockDamageMetadata(context: DamageContext): DamageMetadata {
+        // TODO
+        val fallingBlock = context.damageSource.causingEntity as? FallingBlock ?: error("The causing entity must be a falling block.")
+        return VanillaDamageMetadata(context.damage)
+    }
+
+    private fun createDefaultDamageMetadata(context: DamageContext): DamageMetadata {
         val damagee = context.damagee
         val directEntity = context.damageSource.directEntity
         val causingEntity = context.damageSource.causingEntity
@@ -546,7 +556,7 @@ internal object DamageManager : DamageManagerApi {
      * 考虑弹射物物品上的属性.
      * 返回 `null` 表示不由该函数负责.
      */
-    private fun calculateNoCausingAttributedArrowDamage(arrow: AbstractArrow): DamageMetadata? {
+    private fun createNoCausingAttributedArrowDamageMetadata(arrow: AbstractArrow): DamageMetadata? {
         val itemstack = arrow.itemStack
         if (!itemstack.hasBehaviorExact(ItemBehaviorTypes.ARROW)) return null
         val itemcores = itemstack.getData(ItemDataTypes.CORE_CONTAINER) ?: return null
@@ -569,7 +579,7 @@ internal object DamageManager : DamageManagerApi {
      * 若没有注册则考虑弹射物物品上的属性.
      * 返回 `null` 表示不由该函数负责.
      */
-    private fun calculateRegisteredAbstractArrowDamage(abstractArrow: AbstractArrow): DamageMetadata? {
+    private fun createRegisteredAbstractArrowDamageMetadata(abstractArrow: AbstractArrow): DamageMetadata? {
         val registeredProjectileDamage = abstractArrow.getRegisteredDamage()
         val attributes = registeredProjectileDamage?.attributes ?: getImaginaryArrowAttributes() ?: return null
         val force = registeredProjectileDamage?.force ?: 1.0
