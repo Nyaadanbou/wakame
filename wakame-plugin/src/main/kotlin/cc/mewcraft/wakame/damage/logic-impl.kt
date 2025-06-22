@@ -225,7 +225,8 @@ internal object DamageManager : DamageManagerApi {
             }
 
             is FallingBlock -> { // causing_entity 是非 living_entity 的下落的方块
-                return createFallingBlockDamageMetadata(context)
+                // 根据伤害类型计算伤害.
+                return context.toDamageMetadata(Mapping.DAMAGE_TYPE)
             }
 
             else -> { // 不太可能发生, 除非有插件在编造一些不太合法的 DamageSource
@@ -482,12 +483,6 @@ internal object DamageManager : DamageManagerApi {
         val itemstack = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         val weapon = itemstack.getBehavior<Weapon>() ?: return PlayerDamageMetadata.INTRINSIC_ATTACK
         return weapon.generateDamageMetadata(player, itemstack)
-    }
-
-    private fun createFallingBlockDamageMetadata(context: DamageContext): DamageMetadata {
-        // TODO
-        val fallingBlock = context.damageSource.causingEntity as? FallingBlock ?: error("The causing entity must be a falling block.")
-        return VanillaDamageMetadata(context.damage)
     }
 
     private fun createDefaultDamageMetadata(context: DamageContext): DamageMetadata {
