@@ -25,7 +25,7 @@ attack_speed:
       4: "4"
 
 # id: <有效的属性 id>
-cells/attributes:
+core/attributes:
   namespace: attribute
   ordinal:
     element:
@@ -40,8 +40,8 @@ cells/attributes:
       - multiply_base
       - multiply_total
 
-# id: `cells/empty`
-cells/empty:
+# id: `core/empty`
+core/empty:
   namespace: stash
   tooltip:
     - "[ Empty Slot ]"
@@ -86,8 +86,8 @@ item_name:
   namespace: vanilla
   tooltip: "Item Name: <value>"
 
-# id: `kizamiz`
-kizamiz:
+# id: `kizami`
+kizami:
   namespace: general
   tooltip:
     merged: "Kizami: <merged>"
@@ -107,8 +107,8 @@ lore:
     header: [ ]
     bottom: [ ]
 
-# id: `portable_core`
-portable_core:
+# id: `core`
+core:
   namespace: special
 
 # id: `rarity`

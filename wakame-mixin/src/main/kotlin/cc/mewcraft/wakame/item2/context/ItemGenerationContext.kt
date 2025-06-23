@@ -27,5 +27,5 @@ data class ItemGenerationContext(
     var rarity: RegistryEntry<Rarity> = BuiltInRegistries.RARITY.getDefaultEntry()
     val attributes: MutableList<AttributeContextData> = mutableListOf()
     val elements: MutableSet<RegistryEntry<Element>> = mutableSetOf()
-    val kizamiz: MutableSet<RegistryEntry<Kizami>> = mutableSetOf()
+    val kizami: MutableSet<RegistryEntry<Kizami>> = mutableSetOf()
 }

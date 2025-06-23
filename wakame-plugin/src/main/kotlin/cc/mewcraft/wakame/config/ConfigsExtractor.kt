@@ -48,7 +48,6 @@ internal object ConfigsExtractor {
         "item_proxied/",
         "loot_table/",
         "kizami/",
-        "random/",
         "rarity/",
         "recipe/",
         "reforging_station/",

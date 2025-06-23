@@ -142,25 +142,25 @@ interface ModdingSession : Examinable {
      * 获取 [usableInput] 的总核孔数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemTotalCellCount(): Int
+    fun getSourceItemTotalCoreContainerCount(): Int
 
     /**
      * 获取当前可以参与定制的核孔的数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangeableCellCount(): Int
+    fun getSourceItemChangeableCoreContainerCount(): Int
 
     /**
      * 获取当前参与了定制的核孔的数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangedCellCount(): Int
+    fun getSourceItemChangedCoreContainerCount(): Int
 
     /**
      * 获取当前参与了定制的核孔的定制花费的总和.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangedCellCost(): Double
+    fun getSourceItemChangedCoreContainerCost(): Double
 
     /**
      * 代表一个物品定制的结果.
@@ -235,10 +235,10 @@ interface ModdingSession : Examinable {
         /**
          * 被定制的核孔所对应的规则.
          */
-        val cellRule: ModdingTable.CellRule
+        val coreContainerRule: ModdingTable.CoreContainerRule
 
         // 开发日记 2024/8/17
-        // 当一个 Replace 实例被创建时, 其对应的 cell & rule & session 也都确定了.
+        // 当一个 Replace 实例被创建时, 其对应的 core container & rule & session 也都确定了.
         // 因此, 我们可以在这个时候就编译这个核孔的定制花费, 并且将其缓存起来.
         // 这样只要 sourceItem 没有变化, 这个函数就不需要重新编译以节约性能.
         /**

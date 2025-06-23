@@ -21,7 +21,7 @@ data class MetaCooldownGroup(
         return ItemMetaResult.of(id)
     }
 
-    override fun write(value: Identifier, itemstack: MojangStack) {
-        itemstack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, UseCooldown.useCooldown(.1f).cooldownGroup(id))
+    override fun write(value: Identifier, itemStack: MojangStack) {
+        itemStack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, UseCooldown.useCooldown(.1f).cooldownGroup(id))
     }
 }

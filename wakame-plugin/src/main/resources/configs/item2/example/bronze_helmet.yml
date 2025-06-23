@@ -2,7 +2,7 @@
 
 base: leather_helmet
 
-slot: minecraft:feet
+slot: minecraft:head
 
 item_name: "<rarity:style>青铜头盔"
 
@@ -12,7 +12,9 @@ level:
   float_amount: "[-2,3]"
   max: 30
 
-rarity: "mapping:station"
+rarity:
+  type: dynamic
+  value: "station"
 
 elements:
   type: static

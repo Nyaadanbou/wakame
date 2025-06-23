@@ -10,10 +10,10 @@ attack_speed:
       3: "3"
       4: "4"
 
-# id: `cells`
-cells:
+# id: `core_container`
+core_container:
   namespace: general
-  tooltip: "Cells: <min> - <max>"
+  tooltip: "Core Container: <min> - <max>"
 
 # id: `crate`
 crate:
@@ -56,11 +56,11 @@ item_name:
   namespace: vanilla
   tooltip: "<value>"
 
-# id: `kizamiz`
-kizamiz:
+# id: `kizami`
+kizami:
   namespace: general
   tooltip:
-    merged: "Kizamiz(<count>): <merged>"
+    merged: "Kizami(<count>): <merged>"
     single: "<single>"
     separator: ", "
 
@@ -72,6 +72,6 @@ lore:
     header: [ ]
     bottom: [ ]
 
-# id: `portable_core`
-portable_core:
+# id: `core`
+core:
   namespace: special

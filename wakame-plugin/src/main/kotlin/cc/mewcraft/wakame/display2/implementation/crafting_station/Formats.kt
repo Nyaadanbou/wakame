@@ -40,11 +40,11 @@ internal data class FuzzyEnchantmentRendererFormat(
 }
 
 @ConfigSerializable
-internal data class FuzzyPortableCoreRendererFormat(
+internal data class FuzzyCoreRendererFormat(
     override val namespace: String,
 ) : RendererFormat.Dynamic<Core> {
     override val textMetaFactory = TextMetaFactory()
-    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, "portable_core")
+    override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, "core")
 
     private val unknownIndex = Key.key(namespace, "unknown")
 

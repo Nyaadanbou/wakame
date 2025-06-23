@@ -10,10 +10,10 @@ import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
 import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
+import cc.mewcraft.wakame.display2.implementation.common.CoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
-import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.element.Element
@@ -99,9 +99,9 @@ internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
         item.process(ItemDataTypes.CORE_CONTAINER) { data -> for ((_, core) in data) renderCore(collector, core) }
         item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
         item.process(ItemDataTypes.ELEMENT) { data -> StandardRenderingHandlerRegistry.ELEMENT.process(collector, data) }
-        item.process(ItemDataTypes.KIZAMI) { data -> StandardRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
+        item.process(ItemDataTypes.KIZAMI) { data -> StandardRenderingHandlerRegistry.KIZAMI.process(collector, data) }
         item.process(ItemDataTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        item.process(ItemDataTypes.CORE) { data -> StandardRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
+        item.process(ItemDataTypes.CORE) { data -> StandardRenderingHandlerRegistry.CORE.process(collector, data) }
         item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
             val data1 = data1 ?: return@process
             val data2 = data2 ?: ReforgeHistory.ZERO
@@ -206,7 +206,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val KIZAMIZ: RenderingHandler<Set<RegistryEntry<Kizami>>, AggregateValueRendererFormat> = configure("kizami") { data, format ->
+    val KIZAMI: RenderingHandler<Set<RegistryEntry<Kizami>>, AggregateValueRendererFormat> = configure("kizami") { data, format ->
         format.render(data) { it.unwrap().displayName }
     }
 
@@ -217,7 +217,7 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     val LORE: RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingHandlers.LORE(this)
 
     @JvmField
-    val PORTABLE_CORE: RenderingHandler<Core, PortableCoreRendererFormat> = configure("core") { data, format ->
+    val CORE: RenderingHandler<Core, CoreRendererFormat> = configure("core") { data, format ->
         format.render(data)
     }
 

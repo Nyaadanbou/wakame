@@ -20,7 +20,7 @@ data class MetaCustomName(
         return ItemMetaResult.of(customName)
     }
 
-    override fun write(value: Component, itemstack: MojangStack) {
-        itemstack.set(DataComponents.CUSTOM_NAME, value.toNMSComponent())
+    override fun write(value: Component, itemStack: MojangStack) {
+        itemStack.set(DataComponents.CUSTOM_NAME, value.toNMSComponent())
     }
 }

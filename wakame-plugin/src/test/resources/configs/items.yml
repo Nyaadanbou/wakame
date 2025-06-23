@@ -24,9 +24,9 @@ components:
     enabled: true
     display_name: "Castable"
 
-  cells:
+  core_container:
     enabled: true
-    display_name: "Cells"
+    display_name: "Core Container"
     virtual_core:
       display_name: "Virtual Core"
       description: [ ]
@@ -86,9 +86,9 @@ components:
     enabled: true
     display_name: "Item Name"
 
-  kizamiz:
+  kizami:
     enabled: true
-    display_name: "Kizamiz"
+    display_name: "Kizami"
 
   level:
     enabled: true
@@ -107,9 +107,9 @@ components:
     enabled: true
     display_name: "Player Ability"
 
-  portable_core:
+  core:
     enabled: true
-    display_name: "Portable Core"
+    display_name: "Core"
 
   rarity:
     enabled: true

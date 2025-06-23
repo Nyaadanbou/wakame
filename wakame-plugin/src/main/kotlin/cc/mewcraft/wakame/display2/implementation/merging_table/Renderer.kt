@@ -10,7 +10,7 @@ import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
 import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
 import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
-import cc.mewcraft.wakame.display2.implementation.common.PortableCoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
 import cc.mewcraft.wakame.element.Element
@@ -124,7 +124,7 @@ internal object MergingTableRenderingHandlerRegistry : RenderingHandlerRegistry(
 
     // 渲染放在输入容器的便携核心
     @JvmField
-    val MERGE_IN: RenderingHandler2<Core, MergingTableContext.MergeInputSlot, PortableCoreRendererFormat> = configure2("merge_input") { data, context, format ->
+    val MERGE_IN: RenderingHandler2<Core, MergingTableContext.MergeInputSlot, CoreRendererFormat> = configure2("merge_input") { data, context, format ->
         format.render(data)
     }
 

@@ -79,8 +79,8 @@ private constructor(
 
         // 如果源物品不合法, 则返回失败
         val builder = usableInput.getData(ItemDataTypes.CORE_CONTAINER)?.toBuilder() ?: run {
-            logger.info("No cells found in source item")
-            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NO_CELLS_FOUND_IN_SOURCE_ITEM)
+            logger.info("No core container found in source item")
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NO_CORE_CONTAINER_FOUND_IN_SOURCE_ITEM)
         }
 
         for ((id, replace) in changedReplaceParams) {

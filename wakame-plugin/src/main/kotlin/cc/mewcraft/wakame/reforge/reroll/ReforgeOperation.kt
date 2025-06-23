@@ -73,7 +73,7 @@ private constructor(
         // 获取必要的物品组件
         val itemId = usableInput.koishTypeId!!
         val itemLevel = usableInput.getData(ItemDataTypes.LEVEL)?.level!!
-        val itemCoreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
+        val itemCoreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CORE_CONTAINER)
 
         // 检查重铸次数是否超过了重铸次数上限
         val modCount = usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).modCount
@@ -85,7 +85,7 @@ private constructor(
         // 获取可有可无的物品组件
         val itemRarity = usableInput.getData(ItemDataTypes.RARITY)!!
         val itemElements = usableInput.getData(ItemDataTypes.ELEMENT)!!
-        val itemKizamiz = usableInput.getData(ItemDataTypes.KIZAMI)!!
+        val itemKizami = usableInput.getData(ItemDataTypes.KIZAMI)!!
 
         // 准备生成核心用的上下文
         val context = try {
@@ -94,7 +94,7 @@ private constructor(
                 itemLevel,
                 itemRarity,
                 itemElements,
-                itemKizamiz,
+                itemKizami,
                 itemCoreContainer
             )
         } catch (e: Exception) { // 有必要 try-catch?
@@ -138,7 +138,7 @@ private constructor(
         itemLevel: Int,
         itemRarity: RegistryEntry<Rarity>,
         itemElements: Set<RegistryEntry<Element>>,
-        itemKizamiz: Set<RegistryEntry<Kizami>>,
+        itemKizami: Set<RegistryEntry<Kizami>>,
         itemCoreContainer: CoreContainer,
     ): ItemGenerationContext {
         // 创建一个空的 context
@@ -148,7 +148,7 @@ private constructor(
         context.level = itemLevel
         context.rarity = itemRarity
         context.elements += itemElements
-        context.kizamiz += itemKizamiz
+        context.kizami += itemKizami
 
         val selectionMap = session.selectionMap
 

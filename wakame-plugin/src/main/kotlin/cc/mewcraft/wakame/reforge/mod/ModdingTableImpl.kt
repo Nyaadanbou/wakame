@@ -74,16 +74,16 @@ internal object WtfModdingTable : ModdingTable {
         override val coreRuleMap: ModdingTable.CoreRuleMap = AnyCoreRuleMap
     }
 
-    private object AnyCellRule : ModdingTable.CellRule {
+    private object AnyCoreContainerRule : ModdingTable.CoreContainerRule {
         override val requireElementMatch: Boolean = false
-        override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = ZeroCellCurrencyCost
+        override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> = ZeroCoreContainerCurrencyCost
         override val permission: String? = null
         override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.any()
     }
 
     private object AnyCoreRuleMap : ModdingTable.CoreRuleMap {
         override val comparator: Comparator<String?> = nullsLast(naturalOrder())
-        override fun get(key: String): ModdingTable.CellRule = AnyCellRule
+        override fun get(key: String): ModdingTable.CoreContainerRule = AnyCoreContainerRule
     }
 
     private object AnyItemRuleMap : ModdingTable.ItemRuleMap {
@@ -95,8 +95,8 @@ internal object WtfModdingTable : ModdingTable {
         override val total = ModdingTable.TableTotalFunction { ZERO_MOCHA_FUNCTION }
     }
 
-    private object ZeroCellCurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
-        override val total = ModdingTable.CellTotalFunction { _, _ -> ZERO_MOCHA_FUNCTION }
+    private object ZeroCoreContainerCurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> {
+        override val total = ModdingTable.CoreContainerTotalFunction { _, _ -> ZERO_MOCHA_FUNCTION }
     }
 }
 
@@ -157,12 +157,12 @@ internal class SimpleModdingTable(
         override fun toString(): String = toSimpleString()
     }
 
-    class CellRule(
+    class CoreContainerRule(
         override val requireElementMatch: Boolean,
-        override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>,
+        override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction>,
         override val permission: String?,
         override val acceptableCores: CoreMatchRuleContainer,
-    ) : ModdingTable.CellRule {
+    ) : ModdingTable.CoreContainerRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("requireElementMatch", requireElementMatch),
             ExaminableProperty.of("currencyCost", currencyCost),
@@ -174,14 +174,14 @@ internal class SimpleModdingTable(
     }
 
     class CoreRuleMap(
-        private val data: LinkedHashMap<String, ModdingTable.CellRule>,
+        private val data: LinkedHashMap<String, ModdingTable.CoreContainerRule>,
     ) : ModdingTable.CoreRuleMap {
 
         // 让 string 的顺序采用 key 在 data 里的顺序
         private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
         override val comparator: Comparator<String?> = nullsLast(compareBy(keyOrder::get))
 
-        override fun get(key: String): ModdingTable.CellRule? {
+        override fun get(key: String): ModdingTable.CoreContainerRule? {
             return data[key]
         }
 
@@ -202,9 +202,9 @@ internal class SimpleModdingTable(
         override fun toString(): String = toSimpleString()
     }
 
-    class CellCurrencyCost(
-        override val total: ModdingTable.CellTotalFunction,
-    ) : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
+    class CoreContainerCurrencyCost(
+        override val total: ModdingTable.CoreContainerTotalFunction,
+    ) : ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> {
         override fun examinableProperties(): Stream<out ExaminableProperty?> = Stream.of(
             ExaminableProperty.of("total", total)
         )
@@ -231,12 +231,12 @@ internal class SimpleModdingTable(
         }
     }
 
-    class CellTotalFunction(
+    class CoreContainerTotalFunction(
         val code: String,
-    ) : ModdingTable.CellTotalFunction {
+    ) : ModdingTable.CoreContainerTotalFunction {
         override fun compile(session: ModdingSession, replace: ModdingSession.Replace): MochaFunction {
             val mocha = MochaEngine.createStandard()
-            val binding = CellTotalBinding(session, replace)
+            val binding = CoreContainerTotalBinding(session, replace)
             mocha.bindInstance(binding, "query")
             return mocha.prepareEval(code)
         }
@@ -265,29 +265,29 @@ internal class TableTotalBinding(
         return session.getSourceItemLevel()
     }
 
-    @Binding("source_item_total_cell_count")
-    fun getSourceItemTotalCellCount(): Int {
-        return session.getSourceItemTotalCellCount()
+    @Binding("source_item_total_core_container_count")
+    fun getSourceItemTotalCoreContainerCount(): Int {
+        return session.getSourceItemTotalCoreContainerCount()
     }
 
-    @Binding("source_item_changeable_cell_count")
-    fun getSourceItemChangeableCellCount(): Int {
-        return session.getSourceItemChangeableCellCount()
+    @Binding("source_item_changeable_core_container_count")
+    fun getSourceItemChangeableCoreContainerCount(): Int {
+        return session.getSourceItemChangeableCoreContainerCount()
     }
 
-    @Binding("source_item_changed_cell_count")
-    fun getSourceItemChangedCellCount(): Int {
-        return session.getSourceItemChangedCellCount()
+    @Binding("source_item_changed_core_container_count")
+    fun getSourceItemChangedCoreContainerCount(): Int {
+        return session.getSourceItemChangedCoreContainerCount()
     }
 
-    @Binding("source_item_changed_cell_cost")
-    fun getSourceItemChangedCellCost(): Double {
-        return session.getSourceItemChangedCellCost()
+    @Binding("source_item_changed_core_container_cost")
+    fun getSourceItemChangedCoreContainerCost(): Double {
+        return session.getSourceItemChangedCoreContainerCost()
     }
 }
 
 @Binding("query")
-internal class CellTotalBinding(
+internal class CoreContainerTotalBinding(
     val session: ModdingSession,
     val replace: ModdingSession.Replace,
 ) {

@@ -93,4 +93,4 @@ rarity_number_mapping:
 currency_cost: >-
   10.0 * query.source_level()
   + query.source_rarity() * query.sum_of_cost('unselected')
-  + 100.0 * ( query.count_cell('all') - query.count_cell('selected') )
+  + 100.0 * ( query.count_core_container('all') - query.count_core_container('selected') )

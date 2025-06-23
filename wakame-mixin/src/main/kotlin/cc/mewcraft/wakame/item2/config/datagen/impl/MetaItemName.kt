@@ -22,8 +22,8 @@ data class MetaItemName(
         return ItemMetaResult.of(itemName)
     }
 
-    override fun write(value: Component, itemstack: MojangStack) {
-        itemstack.set(DataComponents.ITEM_NAME, value.toNMSComponent())
+    override fun write(value: Component, itemStack: MojangStack) {
+        itemStack.set(DataComponents.ITEM_NAME, value.toNMSComponent())
     }
 
 }

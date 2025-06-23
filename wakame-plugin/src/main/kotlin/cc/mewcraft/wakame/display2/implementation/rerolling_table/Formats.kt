@@ -98,7 +98,7 @@ internal data class CoreEmptyRendererFormat(
     private val tooltip: List<Component>,
     private val diffFormats: RerollingDifferenceFormats,
 ) : RendererFormat.Simple {
-    override val id: String = "cells/empty"
+    override val id: String = "core/empty"
     override val index: DerivedIndex = createIndex()
     override val textMetaFactory: TextMetaFactory = CyclicTextMetaFactory(namespace, id, CyclicIndexRule.SLASH)
     override val textMetaPredicate: TextMetaFactoryPredicate = TextMetaFactoryPredicate(namespace, id)

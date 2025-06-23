@@ -1,9 +1,11 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
+import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaBrewRecipe
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCooldownGroup
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaElement
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
@@ -75,6 +77,13 @@ data object ItemMetaTypes {
         serializers {
             registerExact(MetaKizami.SERIALIZER)
             register(BuiltInRegistries.KIZAMI.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
+    val ELEMENT: ItemMetaType<MetaElement, Set<RegistryEntry<Element>>> = typeOf("element") {
+        serializers {
+            register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
         }
     }
 

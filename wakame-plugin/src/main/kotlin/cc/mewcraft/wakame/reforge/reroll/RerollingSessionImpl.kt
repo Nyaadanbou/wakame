@@ -297,7 +297,7 @@ internal object Selection {
     /**
      * 创建一个可被修改的 [Selection].
      */
-    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CellRule, lootTable: LootTable<Core>): RerollingSession.Selection {
+    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CoreContainerRule, lootTable: LootTable<Core>): RerollingSession.Selection {
         return Simple(session, id, rule, lootTable)
     }
 
@@ -306,8 +306,8 @@ internal object Selection {
         override val session: RerollingSession,
         override val id: String,
     ) : RerollingSession.Selection {
-        override val rule: RerollingTable.CellRule
-            get() = RerollingTable.CellRule.empty()
+        override val rule: RerollingTable.CoreContainerRule
+            get() = RerollingTable.CoreContainerRule.empty()
         override val changeable: Boolean
             get() = false
         override val lootTable: LootTable<Core>
@@ -325,14 +325,14 @@ internal object Selection {
     private class Simple(
         override val session: RerollingSession,
         override val id: String,
-        override val rule: RerollingTable.CellRule,
+        override val rule: RerollingTable.CoreContainerRule,
         override val lootTable: LootTable<Core>,
     ) : RerollingSession.Selection {
         // private val logger: Logger = LOGGER.decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
         override val changeable: Boolean = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            // logger.info("Selection status updated (cell: '$id'): $old -> $new")
+            // logger.info("Selection status updated (core container: '$id'): $old -> $new")
         }
 
         override fun invert(): Boolean {
@@ -371,7 +371,7 @@ internal object SelectionMap {
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
         val metaCoreContainer = usableInput.getMeta(ItemMetaTypes.CORE_CONTAINER) ?: run {
-            // logger.info("Usable input has no `cells` template.")
+            // logger.info("Usable input has no `core container` template.")
             return empty(session)
         }
 
@@ -388,12 +388,12 @@ internal object SelectionMap {
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
         val itemRule = session.table.itemRuleMap[usableInput.koishTypeId!!] ?: return empty(session)
 
-        val cellRuleMap = itemRule.cellRuleMap
-        val selectionData = sortedMapOf<String, RerollingSession.Selection>(cellRuleMap.comparator)
+        val coreContainerRuleMap = itemRule.coreContainerRuleMap
+        val selectionData = sortedMapOf<String, RerollingSession.Selection>(coreContainerRuleMap.comparator)
         for ((id, _) in coreContainer) {
 
             // 获取核孔的重造规则
-            val cellRule = cellRuleMap[id]
+            val coreContainerRule = coreContainerRuleMap[id]
 
             // 获取核孔的重造模板
             val lootTable = metaCoreContainer.entry[id]
@@ -404,10 +404,10 @@ internal object SelectionMap {
             // 则判定该核孔不支持重造.
             // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
             // 这样可以让其他系统比较优雅的处理一些特殊情况 (例如无定义情况).
-            if (cellRule != null && lootTable != null) {
-                selectionData[id] = Selection.changeable(session, id, cellRule, lootTable)
+            if (coreContainerRule != null && lootTable != null) {
+                selectionData[id] = Selection.changeable(session, id, coreContainerRule, lootTable)
             } else {
-                // logger.info("Item cell '$id' does not support rerolling.")
+                // logger.info("Item core container '$id' does not support rerolling.")
                 selectionData[id] = Selection.unchangeable(session, id)
             }
         }

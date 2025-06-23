@@ -12,24 +12,33 @@ import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
 import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
 import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.standard.AttackSpeedRendererFormat
+import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaElement
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
 import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.ItemCrate
 import cc.mewcraft.wakame.item2.isNetworkRewrite
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.loot.context.LootContext
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.item.fastLore
 import cc.mewcraft.wakame.util.item.hideAttributeModifiers
 import cc.mewcraft.wakame.util.item.hideEnchantments
 import cc.mewcraft.wakame.util.item.hideStoredEnchantments
 import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.DamageResistant
 import io.papermc.paper.datacomponent.item.FoodProperties
 import io.papermc.paper.datacomponent.item.ItemEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
@@ -90,10 +99,16 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
         item.process(ItemMetaTypes.CORE_CONTAINER) { data -> CraftingStationRenderingHandlerRegistry.CORE_CONTAINER.process(collector, data) }
         item.process(ItemMetaTypes.CUSTOM_NAME) { data -> CraftingStationRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
         item.process(ItemMetaTypes.ITEM_NAME) { data -> CraftingStationRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        item.process(ItemMetaTypes.KIZAMI) { data -> CraftingStationRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
+        item.process(ItemMetaTypes.KIZAMI) { data -> CraftingStationRenderingHandlerRegistry.KIZAMI.process(collector, data) }
+        item.process(ItemMetaTypes.ELEMENT) { data -> CraftingStationRenderingHandlerRegistry.ELEMENT.process(collector, data) }
 
+        item.process(ItemPropertyTypes.ATTACK_SPEED) { data -> CraftingStationRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
         item.process(ItemPropertyTypes.EXTRA_LORE) { data -> CraftingStationRenderingHandlerRegistry.LORE.process(collector, data) }
 
+        item.process(ItemDataTypes.CRATE) { data -> CraftingStationRenderingHandlerRegistry.CRATE.process(collector, data) }
+        item.process(ItemDataTypes.CORE) { data -> CraftingStationRenderingHandlerRegistry.CORE.process(collector, data) }
+
+        item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> CraftingStationRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, data) }
         item.process(DataComponentTypes.ENCHANTMENTS) { data -> CraftingStationRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
         item.process(DataComponentTypes.FOOD) { data -> CraftingStationRenderingHandlerRegistry.FOOD.process(collector, data) }
 
@@ -108,6 +123,11 @@ internal object CraftingStationItemRenderer : AbstractItemRenderer<CraftingStati
 
 internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegistry(CraftingStationItemRenderer) {
     @JvmField
+    val ATTACK_SPEED: RenderingHandler<RegistryEntry<AttackSpeed>, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
+        format.render(data)
+    }
+
+    @JvmField
     val CORE_CONTAINER: RenderingHandler<MetaCoreContainer, SingleValueRendererFormat> = configure("core_container") { data, format ->
         when (data) {
             is MetaCoreContainer.Static -> {
@@ -121,11 +141,38 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     }
 
     @JvmField
+    val CRATE: RenderingHandler<ItemCrate, SingleValueRendererFormat> = configure("crate") { data, format ->
+        format.render(
+            // Placeholder.component("id", Component.text(data.identity)),
+            Placeholder.component("level", Component.text(data.level)), // TODO display2 盲盒完成时再写这里
+        )
+    }
+
+    @JvmField
+    val ELEMENT: RenderingHandler<MetaElement, AggregateValueRendererFormat> = configure("element") { data, format ->
+        when (data) {
+            is MetaElement.Static -> {
+                format.render(data.entries) { it.unwrap().displayName }
+            }
+            is MetaElement.Dynamic -> {
+                val selector = data.entries
+                val allPossibleElements = selector.select(LootContext.EMPTY) // 进行一次随机的选择, 来向玩家展示可能出现的元素
+                format.render(allPossibleElements, { it.unwrap().displayName })
+            }
+        }
+    }
+
+    @JvmField
     val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
     val ENCHANTMENTS: RenderingHandler<ItemEnchantments, FuzzyEnchantmentRendererFormat> = configure("enchantments") { data, format ->
         format.render(data.enchantments())
+    }
+
+    @JvmField
+    val DAMAGE_RESISTANT: RenderingHandler<DamageResistant, SingleValueRendererFormat> = configure("damage_resistant") { data, format ->
+        format.render(Placeholder.component("value", Component.text(data.types().key().asString())))
     }
 
     @JvmField
@@ -139,19 +186,25 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     @JvmField
     val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
-    val KIZAMIZ: RenderingHandler<MetaKizami, AggregateValueRendererFormat> = configure("kizami") { data, format ->
+    val KIZAMI: RenderingHandler<MetaKizami, AggregateValueRendererFormat> = configure("kizami") { data, format ->
         when (data) {
             is MetaKizami.Static -> {
                 format.render(data.entries, { it.unwrap().displayName })
             }
 
             is MetaKizami.Dynamic -> {
-                // TODO #373: 实现动态生成
-                IndexedText.NOP
+                val selector = data.selector
+                val allPossibleKizami = selector.select(LootContext.EMPTY) // 进行一次随机的选择, 来向玩家展示可能出现的 Kizami
+                format.render(allPossibleKizami, { it.unwrap().displayName })
             }
         }
     }
 
     @JvmField
     val LORE: RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingHandlers.LORE(this)
+
+    @JvmField
+    val CORE: RenderingHandler<Core, FuzzyCoreRendererFormat> = configure("core") { data, format ->
+        format.render(data)
+    }
 }

@@ -172,7 +172,7 @@ interface RerollingSession : Examinable {
         /**
          * 核孔的重造规则.
          */
-        val rule: RerollingTable.CellRule
+        val rule: RerollingTable.CoreContainerRule
 
         /**
          * 核孔是否可以被重造.

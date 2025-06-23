@@ -35,8 +35,8 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             .build()
     }
 
-    override fun write(value: String, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
+    override fun write(value: String, itemStack: MojangStack) {
+        itemStack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
     }
 
     /**

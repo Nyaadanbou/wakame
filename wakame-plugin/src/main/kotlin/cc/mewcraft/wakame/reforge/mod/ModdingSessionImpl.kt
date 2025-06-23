@@ -16,7 +16,7 @@ import cc.mewcraft.wakame.item2.isKoish
 import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.lang.translate
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
-import cc.mewcraft.wakame.reforge.mod.ModdingTable.CellRule
+import cc.mewcraft.wakame.reforge.mod.ModdingTable.CoreContainerRule
 import cc.mewcraft.wakame.reforge.mod.ModdingTable.ItemRule
 import cc.mewcraft.wakame.util.ItemStackDelegates
 import cc.mewcraft.wakame.util.adventure.plain
@@ -154,19 +154,19 @@ internal class SimpleModdingSession(
         return usableInput?.getData(ItemDataTypes.RARITY)?.getKeyOrThrow()?.value?.let(table.rarityNumberMapping::get) ?: .0
     }
 
-    override fun getSourceItemTotalCellCount(): Int {
+    override fun getSourceItemTotalCoreContainerCount(): Int {
         return usableInput?.getData(ItemDataTypes.CORE_CONTAINER)?.size ?: 0
     }
 
-    override fun getSourceItemChangeableCellCount(): Int {
+    override fun getSourceItemChangeableCoreContainerCount(): Int {
         return replaceParams.size
     }
 
-    override fun getSourceItemChangedCellCount(): Int {
+    override fun getSourceItemChangedCoreContainerCount(): Int {
         return replaceParams.count { (_, repl) -> repl.latestResult.applicable }
     }
 
-    override fun getSourceItemChangedCellCost(): Double {
+    override fun getSourceItemChangedCoreContainerCost(): Double {
         val total = replaceParams
             .values
             .filter { it.latestResult.applicable }
@@ -209,11 +209,11 @@ internal class SimpleModdingSession(
                 executeReforge()
                 return
             }
-            val inputItemCells = usableInput0.getData(ItemDataTypes.CORE_CONTAINER)
+            val inputItemCoreContainer = usableInput0.getData(ItemDataTypes.CORE_CONTAINER)
             val inputItemRule = usableInput0.let { table.itemRuleMap[it.koishTypeId!!] }
 
             if (
-                inputItemCells == null || // 源物品没有核孔组件
+                inputItemCoreContainer == null || // 源物品没有核孔组件
                 inputItemRule == null // 源物品没有定制规则
             ) {
                 usableInput = null
@@ -224,7 +224,7 @@ internal class SimpleModdingSession(
 
             usableInput = usableInput0
             itemRule = inputItemRule
-            replaceParams = createReplaceParameters(thisRef, inputItemCells, inputItemRule)
+            replaceParams = createReplaceParameters(thisRef, inputItemCoreContainer, inputItemRule)
             executeReforge()
         }
 
@@ -398,7 +398,7 @@ private object ReforgeReplace {
     /**
      * 封装一个可以修改的核孔.
      */
-    fun changeable(session: SimpleModdingSession, id: String, core: Core, rule: CellRule): ModdingSession.Replace {
+    fun changeable(session: SimpleModdingSession, id: String, core: Core, rule: CoreContainerRule): ModdingSession.Replace {
         return Changeable(session, core, id, rule)
     }
 
@@ -416,8 +416,8 @@ private object ReforgeReplace {
         override val changeable: Boolean
             get() = false
 
-        override val cellRule
-            get() = CellRule.empty()
+        override val coreContainerRule
+            get() = CoreContainerRule.empty()
 
         // unchangeable 不需要任何花费 (?)
         override val total
@@ -465,9 +465,9 @@ private object ReforgeReplace {
         override val session: SimpleModdingSession,
         override val core: Core,
         override val coreId: String,
-        override val cellRule: CellRule,
+        override val coreContainerRule: CoreContainerRule,
     ) : ModdingSession.Replace {
-        override val total: MochaFunction = cellRule.currencyCost.total.compile(session, this)
+        override val total: MochaFunction = coreContainerRule.currencyCost.total.compile(session, this)
 
         override var originalInput: ItemStack? by OriginalInputDelegate(null)
 
@@ -538,14 +538,14 @@ private object ReforgeReplace {
             }
 
             // 获取源物品上的核孔
-            val inputCells = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: run {
-                session.logger.error("Usable input has no cells, but an item is being replaced. This is a bug!")
+            val inputCoreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: run {
+                session.logger.error("Usable input has no core container, but an item is being replaced. This is a bug!")
                 return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_ERR_INTERNAL_ERROR)
             }
 
             // 源物品的核孔上 必须没有与便携核心相似的核心
-            val inputCellsExcludingThis = inputCells.filter { it.value.similarTo(core) }
-            if (inputCellsExcludingThis.size > 1) {
+            val inputCoreContainerExcludingThis = inputCoreContainer.filter { it.value.similarTo(core) }
+            if (inputCoreContainerExcludingThis.size > 1) {
                 return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_SIMILAR_CORE_PRESENT_ON_TARGET)
             }
 
@@ -558,12 +558,12 @@ private object ReforgeReplace {
             }
 
             // 便携式核心的类型 必须符合定制规则
-            if (!cellRule.acceptableCores.test(portableCore)) {
-                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CELL)
+            if (!coreContainerRule.acceptableCores.test(portableCore)) {
+                return ReforgeReplaceResult.failure(viewer, TranslatableMessages.MSG_MODDING_REPLACE_RESULT_CORE_INCOMPATIBLE_WITH_CORE_CONTAINER)
             }
 
             // 便携式核心上面的所有元素 必须全部出现在被定制物品上
-            if (cellRule.requireElementMatch) {
+            if (coreContainerRule.requireElementMatch) {
                 val elementsOnInput = usableInput.getDataOrDefault(ItemDataTypes.ELEMENT, emptySet())
                 // 这里要求耗材上只有一种元素, 并且元素是存在核心里面的
                 val elementOnIngredient = (portableCore as? AttributeCore)?.wrapped?.element
@@ -697,7 +697,7 @@ private object ReforgeReplaceMap {
             get() = data.values
 
         override fun get(id: String): ModdingSession.Replace {
-            // the dummy cell should never be accessed
+            // the dummy core container should never be accessed
             return data.getOrPut(id) { ReforgeReplace.unchangeable(session, id, VirtualCore) }
         }
 

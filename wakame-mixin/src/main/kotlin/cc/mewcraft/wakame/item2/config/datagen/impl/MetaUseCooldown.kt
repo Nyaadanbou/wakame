@@ -21,7 +21,7 @@ data class MetaUseCooldown(
         return ItemMetaResult.of(useCooldown)
     }
 
-    override fun write(value: UseCooldown, itemstack: MojangStack) {
-        itemstack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, value)
+    override fun write(value: UseCooldown, itemStack: MojangStack) {
+        itemStack.toBukkit().setData(DataComponentTypes.USE_COOLDOWN, value)
     }
 }

@@ -124,7 +124,7 @@ internal data class RarityRendererFormat(
 }
 
 @ConfigSerializable
-internal data class PortableCoreRendererFormat(
+internal data class CoreRendererFormat(
     override val namespace: String,
     @NodeKey
     override val id: String,

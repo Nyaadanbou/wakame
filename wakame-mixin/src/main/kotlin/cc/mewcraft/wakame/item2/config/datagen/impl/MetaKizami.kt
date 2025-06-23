@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
-import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.loot.LootTable
@@ -31,8 +31,8 @@ sealed interface MetaKizami : ItemMetaEntry<Set<RegistryEntry<Kizami>>> {
     // 尽管 MetaKizami 有多个实现, 但其 write 函数体都是一样的.
     // 因此可以直接在接口定义 write 函数的实现,
     // 其余的实现类只需要重写 make 函数即可.
-    override fun write(value: Set<RegistryEntry<Kizami>>, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.KIZAMI, value)
+    override fun write(value: Set<RegistryEntry<Kizami>>, itemStack: MojangStack) {
+        itemStack.ensureSetData(ItemDataTypes.KIZAMI, value)
     }
 
     @ConfigSerializable

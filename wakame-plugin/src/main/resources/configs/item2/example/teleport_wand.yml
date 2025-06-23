@@ -6,7 +6,7 @@ slot: minecraft:mainhand
 
 castable: {}
 
-player_ability:
+ability:
   - id: active/blink
     variant: 0
     trigger: "combo/111"

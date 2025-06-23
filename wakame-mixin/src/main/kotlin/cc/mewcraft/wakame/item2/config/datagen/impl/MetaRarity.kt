@@ -28,8 +28,8 @@ interface MetaRarity : ItemMetaEntry<RegistryEntry<Rarity>> {
 
     }
 
-    override fun write(value: RegistryEntry<Rarity>, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.RARITY, value)
+    override fun write(value: RegistryEntry<Rarity>, itemStack: MojangStack) {
+        itemStack.ensureSetData(ItemDataTypes.RARITY, value)
     }
 
     @ConfigSerializable
