@@ -84,16 +84,19 @@ interface LootTable<S> {
 
 /* Implementations */
 
-// 最基本的 LootTable 实现, 用于测试使用
+// 最基本的 LootTable 实现
 @PublishedApi
-internal open class SimpleLootTable<S>(
-    final override val pools: List<LootPool<S>>,
+internal class SimpleLootTable<S>(
+    override val pools: List<LootPool<S>>,
 ) : LootTable<S>, Examinable {
-    final override fun select(context: LootContext): List<S> {
+    override fun select(context: LootContext): List<S> {
         val result = mutableListOf<S>()
-        val correctPools = pools.filter { pool ->
+        val correctPools = if (context.isIterating) {
+            // 如果忽略条件, 则直接使用所有的 pool
+            pools
+        } else {
             // 过滤掉不满足条件的 pool
-            pool.conditions.all { it.invoke(context) }
+            pools.filter { pool -> pool.conditions.all { it.invoke(context) } }
         }
 
         for (pool in correctPools) {

@@ -110,7 +110,7 @@ private data class SimpleLootPool<S>(
             lootPoolEntryContainer.expand(context) { entry: LootPoolEntry<S> ->
                 // 计算 entry 的权重, 若其权重大于 0, 则记录 entry 和并累计权重.
                 val weight = entry.getWeight(context.luck)
-                if (weight > 0) {
+                if (context.isIterating || weight > 0) {
                     entries.add(entry)
                     totalWeight += weight
                 }
@@ -130,6 +130,12 @@ private data class SimpleLootPool<S>(
                 var randomInt = random.nextInt(totalWeight)
 
                 for (lootPoolEntry in entries) {
+                    if (context.isIterating) {
+                        // 如果正在迭代, 则直接创建数据, 并继续抽取.
+                        lootPoolEntry.createData(context, dataConsumer)
+                        continue
+                    }
+
                     randomInt -= lootPoolEntry.getWeight(context.luck)
                     if (randomInt < 0) {
                         lootPoolEntry.createData(context, dataConsumer)
@@ -141,7 +147,7 @@ private data class SimpleLootPool<S>(
     }
 
     override fun addRandomItems(context: LootContext, dataConsumer: (S) -> Unit) {
-        if (this.conditions.all { it.invoke(context) }) {
+        if (context.isIterating || this.conditions.all { it.invoke(context) }) {
             repeat(rolls) { this.addRandomItem(context, dataConsumer) }
         }
     }

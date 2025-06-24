@@ -22,6 +22,11 @@ class SequentialEntry<S>(
             2 -> children[0].and(children[1])
             else -> ComposableEntryContainer { context: LootContext, dataConsumer: (LootPoolEntry<S>) -> Unit ->
                 for (composableEntryContainer in children) {
+                    if (context.isIterating) {
+                        // If we are iterating, we expand all composable entries
+                        composableEntryContainer.expand(context, dataConsumer)
+                        continue
+                    }
                     if (!composableEntryContainer.expand(context, dataConsumer)) {
                         return@ComposableEntryContainer false
                     }

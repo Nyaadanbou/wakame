@@ -24,7 +24,7 @@ class NestedLootTable<S>(
     override fun createData(context: LootContext, dataConsumer: (S) -> Unit) {
         val lootTable = contents.unwrap()
         for (pool in lootTable.pools) {
-            pool.addRandomItems(context, dataConsumer)
+            pool.addRandomItems(context, dataConsumer = dataConsumer)
         }
     }
 }

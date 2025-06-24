@@ -131,8 +131,9 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
     val CORE_CONTAINER: RenderingHandler<MetaCoreContainer, SingleValueRendererFormat> = configure("core_container") { data, format ->
         when (data) {
             is MetaCoreContainer.Static -> {
-                format.render(Placeholder.parsed("count", data.entry.size.toString()))
+                format.render(Placeholder.component("count", Component.text(data.entry.size)))
             }
+
             is MetaCoreContainer.Dynamic -> {
                 // TODO #373: 实现动态生成
                 IndexedText.NOP
@@ -154,9 +155,11 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
             is MetaElement.Static -> {
                 format.render(data.entries) { it.unwrap().displayName }
             }
+
             is MetaElement.Dynamic -> {
                 val selector = data.entries
-                val allPossibleElements = selector.select(LootContext.EMPTY) // 进行一次随机的选择, 来向玩家展示可能出现的元素
+                val context = LootContext.EMPTY.apply { isIterating = true }
+                val allPossibleElements = selector.select(context)
                 format.render(allPossibleElements, { it.unwrap().displayName })
             }
         }

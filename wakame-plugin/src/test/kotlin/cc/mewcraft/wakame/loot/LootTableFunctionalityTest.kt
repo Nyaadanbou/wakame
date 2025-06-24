@@ -108,8 +108,8 @@ class LootTableFunctionalityTest {
         // 可能会出现三种情况: [100, 150], [150, 100], [100, 100]
         assertTrue("Expected the loot entries to be in sequence, either [100, 150], [150, 100], or [100, 100]") {
             (selected[0] == 100 && selected[1] == 150) ||
-            (selected[0] == 150 && selected[1] == 100) ||
-            (selected[0] == 100 && selected[1] == 100)
+                    (selected[0] == 150 && selected[1] == 100) ||
+                    (selected[0] == 100 && selected[1] == 100)
         }
     }
 
@@ -122,5 +122,56 @@ class LootTableFunctionalityTest {
         override fun createData(context: LootContext, dataConsumer: (Int) -> Unit) {
             dataConsumer(data)
         }
+    }
+
+    @Test
+    fun `test iterating single loot table`() {
+        val lootPools = listOf(
+            LootPool(
+                rolls = 1,
+                conditions = emptyList(),
+                entries = listOf(
+                    Loot(100, conditions = listOf(LootPredicate { false })), // This will be selected
+                    Loot(200) // This will be selected too
+                )
+            )
+        )
+
+        val lootTable = LootTable(lootPools)
+        val context = LootContext.EMPTY.apply { isIterating = true }
+        val selected = lootTable.select(context)
+        assertEquals(2, selected.size, "Expected 2 loot entries to be selected ignoring conditions")
+        println("Ignore conditions loot entry test: $selected")
+        assertEquals(100, selected[0], "Expected the first loot entry to be 100")
+        assertEquals(200, selected[1], "Expected the second loot entry to be 200")
+    }
+
+    @Test
+    fun `test iterating compose loot table`() {
+        val lootPools = listOf(
+            LootPool(
+                rolls = 1,
+                conditions = emptyList(),
+                entries = listOf(
+                    AlternativesEntry(
+                        children = listOf(
+                            Loot(50, conditions = listOf(LootPredicate { false })), // This will be selected
+                            Loot(100), // This will be selected
+                            Loot(150), // This will be selected
+                        ),
+                        conditions = emptyList()
+                    )
+                )
+            )
+        )
+
+        val lootTable = LootTable(lootPools)
+        val context = LootContext.EMPTY.apply { isIterating = true }
+        val selected = lootTable.select(context)
+        assertEquals(3, selected.size, "Expected 3 loot entries to be selected ignoring conditions")
+        println("Iterating compose loot entry test: $selected")
+        assertEquals(50, selected[0], "Expected the loot entry to be 50")
+        assertEquals(100, selected[1], "Expected the loot entry to be 100")
+        assertEquals(150, selected[2], "Expected the loot entry to be 150")
     }
 }
