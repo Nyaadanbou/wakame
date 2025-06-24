@@ -51,7 +51,11 @@ private val SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bui
         LootTableRegistryLoader::class
     ]
 )
-@Reload
+@Reload(
+    runAfter = [
+        LootTableRegistryLoader::class // 需要在掉落表加载后加载物品
+    ]
+)
 internal object CustomItemRegistryLoader : RegistryLoader {
 
     /**
