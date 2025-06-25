@@ -1,6 +1,0 @@
-base: bedrock
-
-# 将物品作为盲盒
-crate:
-  # 物品绑定的盲盒 id
-  id: "foo"

@@ -8,8 +8,8 @@ custom_name:
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<!i><value>"
 
-# id: `elements`
-elements:
+# id: `element`
+element:
   namespace: general
   # 可用标签
   # <merged> 多个元素合并后的文本

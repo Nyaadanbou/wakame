@@ -48,6 +48,11 @@ sealed interface CoreContainer : Iterable<Map.Entry<String, Core>> {
     }
 
     /**
+     * 返回核心的数量.
+     */
+    val size: Int
+
+    /**
      * 检查 [id] 核孔对应的核心是否存在.
      *
      * 注意: 空核心也是核心, 此函数将返回 `true`.
@@ -62,7 +67,7 @@ sealed interface CoreContainer : Iterable<Map.Entry<String, Core>> {
     /**
      * 基于当前容器创建一个新的 [CoreContainer], 其中只包含满足 [predicate] 的核心.
      */
-    fun filter(predicate: (Core) -> Boolean): CoreContainer
+    fun filter(predicate: (String, Core) -> Boolean): CoreContainer
 
     /**
      * 基于当前容器创建一个新的 [CoreContainer], 其中 [id] 对应的核心是修改后的版本.
@@ -116,9 +121,10 @@ sealed interface CoreContainer : Iterable<Map.Entry<String, Core>> {
 // ------------
 
 private object EmptyCoreContainer : CoreContainer {
+    override val size: Int = 0
     override fun contains(id: String): Boolean = false
     override fun get(id: String): Core? = null
-    override fun filter(predicate: (Core) -> Boolean): CoreContainer = this
+    override fun filter(predicate: (String, Core) -> Boolean): CoreContainer = this
     override fun modify(id: String, block: (Core) -> Core): CoreContainer = this
     override fun forEach(action: (String, Core) -> Unit) = Unit
     override fun iterator(): Iterator<Map.Entry<String, Core>> = emptyMap<String, Core>().iterator()
@@ -155,6 +161,9 @@ private class SimpleCoreContainer(
         }
     }
 
+    override val size: Int
+        get() = dataMap.size
+
     override fun contains(id: String): Boolean {
         return dataMap.containsKey(id)
     }
@@ -164,9 +173,9 @@ private class SimpleCoreContainer(
     }
 
     // 即使全部符合 predicate, 也永远返回一个新的 CoreContainer
-    override fun filter(predicate: (Core) -> Boolean): CoreContainer {
+    override fun filter(predicate: (String, Core) -> Boolean): CoreContainer {
         val filteredMap = Object2ObjectArrayMap(dataMap)
-        filteredMap.removeIf { !predicate(it.value) }
+        filteredMap.removeIf { !predicate(it.key, it.value) }
         return SimpleCoreContainer(dataMap = filteredMap, copyOnWrite = false)
     }
 

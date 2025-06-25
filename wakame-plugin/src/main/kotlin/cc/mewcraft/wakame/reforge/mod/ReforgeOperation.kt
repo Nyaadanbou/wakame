@@ -1,8 +1,11 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
-import cc.mewcraft.wakame.item.extension.cells
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getDataOrDefault
+import cc.mewcraft.wakame.item2.setData
 import org.bukkit.entity.Player
 
 /**
@@ -69,15 +72,15 @@ private constructor(
         }
 
         // 检查经过修改的核孔中是否存在惩罚值过高
-        if (changedReplaceParams.any { (_, repl) -> (repl.usableInput?.reforgeHistory?.modCount ?: 0) >= itemRule.modLimit }) {
+        if (changedReplaceParams.any { (_, repl) -> (repl.usableInput?.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: 0) >= itemRule.modLimit }) {
             logger.info("Skipped reforge as mod count exceeds mod limit")
             return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_REACHING_MOD_COUNT_LIMIT)
         }
 
         // 如果源物品不合法, 则返回失败
-        val builder = usableInput.cells?.builder() ?: run {
-            logger.info("No cells found in source item")
-            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NO_CELLS_FOUND_IN_SOURCE_ITEM)
+        val builder = usableInput.getData(ItemDataTypes.CORE_CONTAINER)?.toBuilder() ?: run {
+            logger.info("No core container found in source item")
+            return ReforgeResult.failure(viewer, TranslatableMessages.MSG_MODDING_RESULT_FAILURE_FOR_NO_CORE_CONTAINER_FOUND_IN_SOURCE_ITEM)
         }
 
         for ((id, replace) in changedReplaceParams) {
@@ -92,27 +95,24 @@ private constructor(
             }
 
             val portableCore = replace.augment!!
-            val wrappedCore = portableCore.wrapped
 
-            builder.modify(id) { cell ->
-                cell.copy(core = wrappedCore)
-            }
+            builder.put(id, portableCore)
         }
 
         // 把修改后的核孔应用到输出物品上
-        usableInput.cells = builder.build()
+        usableInput.setData(ItemDataTypes.CORE_CONTAINER, builder.build())
 
         // 增加物品的重铸次数
         when (session.table.reforgeCountAddMethod) {
             ModdingTable.ReforgeCountAddMethod.PLUS_ONE -> {
-                val changed = usableInput.reforgeHistory.incCount(1)
-                usableInput.reforgeHistory = changed
+                val changed = usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).incCount(1)
+                usableInput.setData(ItemDataTypes.REFORGE_HISTORY, changed)
             }
 
             ModdingTable.ReforgeCountAddMethod.ALL_CORE -> {
-                val sum = changedReplaceParams.sumOf { it.value.usableInput?.reforgeHistory?.modCount ?: 0 }
-                val changed = usableInput.reforgeHistory.incCount(sum + 1)
-                usableInput.reforgeHistory = changed
+                val sum = changedReplaceParams.sumOf { it.value.usableInput?.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO)?.modCount ?: 0 }
+                val changed = usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).incCount(sum + 1)
+                usableInput.setData(ItemDataTypes.REFORGE_HISTORY, changed)
             }
         }
 

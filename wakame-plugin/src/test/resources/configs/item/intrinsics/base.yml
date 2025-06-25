@@ -1,6 +1,0 @@
-# 定义该自定义物品的“基底”
-# 格式参考: https://minecraft.wiki/w/Data_component_format#Command_format
-base: bedrock[!attribute_modifiers,!food,!tool]
-
-# 开发日记 2024/6/25
-# 在物品生成的过程中, 移除原版物品组件将发生在最后阶段

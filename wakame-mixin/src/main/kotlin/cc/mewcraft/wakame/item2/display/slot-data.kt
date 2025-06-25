@@ -2,10 +2,14 @@ package cc.mewcraft.wakame.item2.display
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.MM
-import cc.mewcraft.wakame.item2.*
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.KoishItem
+import cc.mewcraft.wakame.item2.KoishStackGenerator
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData.Companion.SERIALIZER
+import cc.mewcraft.wakame.item2.getProperty
+import cc.mewcraft.wakame.item2.getPropertyOrDefault
+import cc.mewcraft.wakame.item2.isNetworkRewrite
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
@@ -32,7 +36,7 @@ class SlotDisplay private constructor(
     private val koishItem: RegistryEntry<KoishItem>,
 ) {
 
-    private val itemStack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, Context(koishItem)) }
+    private val itemStack: ItemStack by koishItem.reactive().map { KoishStackGenerator.generate(it, ItemGenerationContext(koishItem.unwrap(), 0f)) }
 
     companion object {
 

@@ -2,6 +2,10 @@
 
 package cc.mewcraft.wakame.item2
 
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
@@ -30,6 +34,8 @@ val ItemStack.isKoish: Boolean get() = toNMS().isKoish
 val ItemStack.isExactKoish: Boolean get() = toNMS().isExactKoish
 val ItemStack.koishItem: KoishItem? get() = toNMS().koishItem
 fun ItemStack.dataContainer(includeProxy: Boolean): ItemDataContainer? = toNMS().dataContainer(includeProxy)
+fun ItemStack.dataConfig(): ItemMetaContainer? = toNMS().dataConfig()
+fun ItemStack.propertyContainer(): ItemPropertyContainer? = toNMS().propertyContainer()
 val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[key()]
 
 /* Property */
@@ -45,6 +51,12 @@ fun <T> ItemStack.getData(type: ItemDataType<out T>): T? = toNMS().getData(type)
 fun <T> ItemStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T = toNMS().getDataOrDefault(type, fallback)
 fun <T> ItemStack.setData(type: ItemDataType<in T>, value: T): T? = toNMS().setData(type, value)
 fun <T> ItemStack.removeData(type: ItemDataType<out T>): T? = toNMS().removeData(type)
+
+/* ItemMeta */
+
+fun <U : ItemMetaEntry<V>, V> ItemStack.getMeta(type: ItemMetaType<U, V>): U? = toNMS().getMeta(type)
+fun <U : ItemMetaEntry<V>, V> ItemStack.hasMeta(type: ItemMetaType<U, V>): Boolean = toNMS().hasMeta(type)
+fun <U : ItemMetaEntry<V>, V> ItemStack.getMetaOrDefault(type: ItemMetaType<U, V>, fallback: U): U = toNMS().getMetaOrDefault(type, fallback)
 
 var ItemStack.isNetworkRewrite: Boolean
     get() = toNMS().isNetworkRewrite
@@ -137,6 +149,28 @@ fun MojangStack.dataContainer(includeProxy: Boolean): ItemDataContainer? =
     get(ExtraDataComponents.DATA_CONTAINER) ?: if (includeProxy) item.koishProxy?.data else null
 
 /**
+ * 获取该物品堆叠的持久化数据容器 [ItemMetaContainer].
+ *
+ * * *绝大多数情况下无需使用该函数.*
+ */
+fun MojangStack.dataConfig(): ItemMetaContainer? =
+    koishItem?.dataConfig
+
+/**
+ * 获取该物品堆叠的属性数据容器 [ItemPropertyContainer].
+ *
+ * *绝大多数情况下无需使用该函数.*
+ *
+ * @return 如果该物品堆叠是 Koish 物品, 则返回其属性数据容器
+ *
+ * @see hasProperty
+ * @see getProperty
+ * @see getPropertyOrDefault
+ */
+fun MojangStack.propertyContainer(): ItemPropertyContainer? =
+    koishItem?.properties
+
+/**
  * 获取该物品类型的套皮物品的实例.
  *
  * *绝大多数情况下无需使用该函数.*
@@ -147,13 +181,13 @@ val Item.koishProxy: KoishItemProxy?
 /* Property */
 
 fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
-    koishItem?.properties?.get(type)
+    propertyContainer()?.get(type)
 
 fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
-    koishItem?.properties?.has(type) == true
+    propertyContainer()?.has(type) == true
 
 fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
-    koishItem?.properties?.getOrDefault(type, fallback)
+    propertyContainer()?.getOrDefault(type, fallback)
 
 /* ItemData */
 
@@ -165,6 +199,17 @@ fun <T> MojangStack.getData(type: ItemDataType<out T>): T? =
 
 fun <T> MojangStack.getDataOrDefault(type: ItemDataType<out T>, fallback: T): T =
     dataContainer(true)?.getOrDefault(type, fallback) ?: fallback
+
+/* ItemMeta */
+
+fun <U : ItemMetaEntry<V>, V> MojangStack.getMeta(type: ItemMetaType<U, V>): U? =
+    dataConfig()?.get(type)
+
+fun <U : ItemMetaEntry<V>, V> MojangStack.hasMeta(type: ItemMetaType<U, V>): Boolean =
+    dataConfig()?.has(type) == true
+
+fun <U : ItemMetaEntry<V>, V> MojangStack.getMetaOrDefault(type: ItemMetaType<U, V>, fallback: U): U =
+    dataConfig()?.getOrDefault(type, fallback) ?: fallback
 
 /**
  * 向物品堆叠写入 Koish 数据 [T].

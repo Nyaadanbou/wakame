@@ -8,6 +8,10 @@ copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
 paperweight = "2.0.0-beta.16"
 blossom = "2.1.0"
+checkstyle = "10.12.5"
+stylecheck = "0.2.1"
+ktlint = "0.50.0"
+spotless = "7.0.4"
 
 # Gradle plugin deps
 docker-java = "3.4.1"
@@ -26,6 +30,9 @@ mixin-extras = "0.4.1"
 ignite = "1.1.0"
 shadow-nbt = "1.21.3-SNAPSHOT"
 shadow-bukkit = "1.21.3-SNAPSHOT"
+
+# Test deps
+datafixerupper = "8.0.16"
 
 # Plugin deps
 helper = "6.0.0"
@@ -55,6 +62,10 @@ plugin-libraries-repository = { group = "cc.mewcraft.gradle", name = "libraries-
 plugin-copy-jar-build = { group = "cc.mewcraft.gradle", name = "copy-jar-build-plugin", version.ref = "copy-jar-build" }
 plugin-copy-jar-docker = { group = "cc.mewcraft.gradle", name = "copy-jar-docker-plugin", version.ref = "copy-jar-docker" }
 plugin-paperweight-userdev = { group = "io.papermc.paperweight", name = "paperweight-userdev", version.ref = "paperweight" }
+plugin-spotless = { group = "com.diffplug.spotless", name = "com.diffplug.spotless.gradle.plugin", version.ref = "spotless" }
+
+# Build logics
+stylecheck = { group = "ca.stellardrift", name = "stylecheck", version.ref = "stylecheck" }
 
 # Gradle plugin deps
 docker-java = { group = "com.github.docker-java", name = "docker-java", version.ref = "docker-java" }
@@ -89,6 +100,11 @@ mixin-extras = { group = "io.github.llamalad7", name = "mixinextras-common", ver
 ignite = { group = "space.vectrix.ignite", name = "ignite-api", version.ref = "ignite" }
 shadow-nbt = { group = "cc.mewcraft", name = "shadow-nbt", version.ref = "shadow-nbt" }
 shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "shadow-bukkit" }
+
+# Test deps
+# 这些依赖只由测试使用. 在实际运行环境中存在服务端中.
+
+datafixerupper = { group = "com.mojang", name = "datafixerupper", version.ref = "datafixerupper" }
 
 # Plugin deps
 # 这些依赖属于插件, 无论是自研的还是第三方的

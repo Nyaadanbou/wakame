@@ -1,5 +1,5 @@
 # id: <有效的属性 id>
-cells/attributes/in:
+core/attributes/in:
   namespace: attribute
   diff_formats:
     changeable: { }
@@ -20,7 +20,7 @@ cells/attributes/in:
       - multiply_total
 
 # id: <有效的属性 id>
-cells/attributes/out:
+core/attributes/out:
   namespace: attribute
   diff_formats:
     changeable: { }
@@ -40,8 +40,8 @@ cells/attributes/out:
       - multiply_base
       - multiply_total
 
-# id: `cells/empty`
-cells/empty/in:
+# id: `core/empty`
+core/empty/in:
   namespace: stash
   tooltip: "[ Empty Slot ]"
   diff_formats:
@@ -50,7 +50,7 @@ cells/empty/in:
     selected: { }
     unselected: { }
 
-cells/empty/out:
+core/empty/out:
   namespace: stash
   tooltip: "[ Empty Slot ]"
   diff_formats:

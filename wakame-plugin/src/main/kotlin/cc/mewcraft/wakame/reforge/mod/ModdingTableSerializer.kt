@@ -3,7 +3,13 @@ package cc.mewcraft.wakame.reforge.mod
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.reforge.common.*
+import cc.mewcraft.wakame.reforge.common.CoreMatchRule
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleContainerSerializer
+import cc.mewcraft.wakame.reforge.common.CoreMatchRuleSerializer
+import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.reforge.common.RarityNumberMappingSerializer
+import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
 import cc.mewcraft.wakame.util.register
@@ -99,8 +105,8 @@ internal object ModdingTableSerializer {
                     val itemNode = yamlLoader {
                         withDefaults()
                         serializers {
-                            register<ModdingTable.CellRule>(CellRule)
-                            register<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>(CellCurrencyCost)
+                            register<ModdingTable.CoreContainerRule>(CoreContainerRule)
+                            register<ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction>>(CoreContainerCurrencyCost)
                             register<CoreMatchRule>(CoreMatchRuleSerializer)
                             register<CoreMatchRuleContainer>(CoreMatchRuleContainerSerializer)
                         }
@@ -108,9 +114,9 @@ internal object ModdingTableSerializer {
 
                     val modLimit = itemNode.node("mod_limit").getInt(0)
                     // configurate 返回的是 LinkedHashMap, 保留了顺序
-                    val cellRuleMapData = itemNode.node("cells").require<Map<String, ModdingTable.CellRule>>()
-                    val cellRuleMap = SimpleModdingTable.CellRuleMap(LinkedHashMap(cellRuleMapData))
-                    val itemRule = SimpleModdingTable.ItemRule(itemId, modLimit, cellRuleMap)
+                    val coreContainerRuleMapData = itemNode.node("core_container").require<Map<String, ModdingTable.CoreContainerRule>>()
+                    val coreContainerRuleMap = SimpleModdingTable.CoreRuleMap(LinkedHashMap(coreContainerRuleMapData))
+                    val itemRule = SimpleModdingTable.ItemRule(itemId, modLimit, coreContainerRuleMap)
 
                     itemId to itemRule
                 } catch (e: Exception) {
@@ -140,21 +146,21 @@ internal object ModdingTableSerializer {
         }
     }
 
-    private object CellCurrencyCost : TypeSerializer2<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>> {
-        override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
+    private object CoreContainerCurrencyCost : TypeSerializer2<ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction>> {
+        override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> {
             val code = node.require<String>()
-            val function = SimpleModdingTable.CellTotalFunction(code)
-            return SimpleModdingTable.CellCurrencyCost(function)
+            val function = SimpleModdingTable.CoreContainerTotalFunction(code)
+            return SimpleModdingTable.CoreContainerCurrencyCost(function)
         }
     }
 
-    private object CellRule : TypeSerializer2<ModdingTable.CellRule> {
-        override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CellRule {
-            val currencyCost = node.node("currency_cost").require<ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction>>()
+    private object CoreContainerRule : TypeSerializer2<ModdingTable.CoreContainerRule> {
+        override fun deserialize(type: Type, node: ConfigurationNode): ModdingTable.CoreContainerRule {
+            val currencyCost = node.node("currency_cost").require<ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction>>()
             val requireElementMatch = node.node("require_element_match").getBoolean(false)
             val permission = node.node("permission").string
             val acceptedCores = node.node("accepted_cores").require<CoreMatchRuleContainer>()
-            return SimpleModdingTable.CellRule(
+            return SimpleModdingTable.CoreContainerRule(
                 currencyCost = currencyCost,
                 requireElementMatch = requireElementMatch,
                 permission = permission,

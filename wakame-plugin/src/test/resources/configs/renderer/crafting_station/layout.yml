@@ -5,14 +5,14 @@
 primary:
   - (fixed:special)
   - special:crate
-  - special:portable_core
+  - special:core
 
   - (default:blank)topmost:attack_speed
 
   - (fixed:general)
-  - general:cells
+  - general:core_container
   - general:elements
-  - general:kizamiz
+  - general:kizami
 
   - (fixed:vanilla)
   - vanilla:item_name

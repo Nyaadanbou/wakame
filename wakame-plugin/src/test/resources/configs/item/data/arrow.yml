@@ -1,6 +1,0 @@
-base: arrow
-
-# 将物品变成弓的弹药
-arrow:
-  # 设置该弹药可以穿透3个实体
-  pierce_level: 3

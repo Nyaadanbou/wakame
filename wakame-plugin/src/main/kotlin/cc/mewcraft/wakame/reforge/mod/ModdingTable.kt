@@ -77,7 +77,7 @@ interface ModdingTable : Examinable {
         /**
          * 该物品每个核孔的定制规则.
          */
-        val cellRuleMap: CellRuleMap
+        val coreRuleMap: CoreRuleMap
     }
 
     /**
@@ -105,10 +105,10 @@ interface ModdingTable : Examinable {
     /**
      * 代表一个核孔的定制规则.
      */
-    interface CellRule : Examinable {
+    interface CoreContainerRule : Examinable {
 
         companion object {
-            fun empty(): CellRule = EmptyCellRule
+            fun empty(): CoreContainerRule = EmptyCoreContainerRule
         }
 
         /**
@@ -119,7 +119,7 @@ interface ModdingTable : Examinable {
         /**
          * 定制本核孔所需要的货币.
          */
-        val currencyCost: CurrencyCost<CellTotalFunction>
+        val currencyCost: CurrencyCost<CoreContainerTotalFunction>
 
         /**
          * 定制本核孔所需要的前置权限.
@@ -135,10 +135,10 @@ interface ModdingTable : Examinable {
     /**
      * 储存了每个核孔的定制规则.
      */
-    interface CellRuleMap : Examinable {
+    interface CoreRuleMap : Examinable {
 
         companion object {
-            fun empty(): CellRuleMap = EmptyCellRuleMap
+            fun empty(): CoreRuleMap = EmptyCoreRuleMap
         }
 
         /**
@@ -152,7 +152,7 @@ interface ModdingTable : Examinable {
          * 如果返回的不是 `null`, 则我们说这个核孔在定制系统中存在定义.
          * 否则, 我们说这个核孔在定制系统中不存在定义 (无法进行定制).
          */
-        operator fun get(key: String): CellRule?
+        operator fun get(key: String): CoreContainerRule?
     }
 
     /**
@@ -178,7 +178,7 @@ interface ModdingTable : Examinable {
     /**
      * 自定义函数.
      */
-    fun interface CellTotalFunction : Examinable {
+    fun interface CoreContainerTotalFunction : Examinable {
         /**
          * 依据给定的 [session] 和 [replace] 编译自定义函数.
          */
@@ -198,22 +198,22 @@ private object EmptyItemRule : ModdingTable.ItemRule {
         get() = GenericKeys.EMPTY
     override val modLimit: Int
         get() = 0
-    override val cellRuleMap: ModdingTable.CellRuleMap
-        get() = EmptyCellRuleMap
+    override val coreRuleMap: ModdingTable.CoreRuleMap
+        get() = EmptyCoreRuleMap
 }
 
-private object EmptyCellRule : ModdingTable.CellRule {
+private object EmptyCoreContainerRule : ModdingTable.CoreContainerRule {
     override val requireElementMatch: Boolean = false
-    override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> = CurrencyCost
+    override val currencyCost: ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> = CurrencyCost
     override val permission: String? = null
     override val acceptableCores: CoreMatchRuleContainer = CoreMatchRuleContainer.empty()
 
-    private object CurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CellTotalFunction> {
-        override val total = ModdingTable.CellTotalFunction { _, _ -> MochaFunction { .0 } }
+    private object CurrencyCost : ModdingTable.CurrencyCost<ModdingTable.CoreContainerTotalFunction> {
+        override val total = ModdingTable.CoreContainerTotalFunction { _, _ -> MochaFunction { .0 } }
     }
 }
 
-private object EmptyCellRuleMap : ModdingTable.CellRuleMap {
+private object EmptyCoreRuleMap : ModdingTable.CoreRuleMap {
     override val comparator: Comparator<String?> = nullsLast(naturalOrder())
-    override fun get(key: String): ModdingTable.CellRule? = null
+    override fun get(key: String): ModdingTable.CoreContainerRule? = null
 }

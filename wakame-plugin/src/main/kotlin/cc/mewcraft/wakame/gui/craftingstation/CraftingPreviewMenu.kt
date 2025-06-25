@@ -2,6 +2,7 @@ package cc.mewcraft.wakame.gui.craftingstation
 
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent

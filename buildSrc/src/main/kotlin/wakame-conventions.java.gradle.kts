@@ -1,7 +1,11 @@
 plugins {
     id("net.kyori.indra")
+    id("net.kyori.indra.checkstyle")
+    id("com.diffplug.spotless")
     id("com.gradleup.shadow")
 }
+
+val local = the<org.gradle.accessors.dm.LibrariesForLocal>()
 
 tasks {
     compileJava {
@@ -29,5 +33,19 @@ java {
 }
 
 indra {
+    checkstyle().set(local.versions.checkstyle)
     javaVersions().target(21)
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        applyCommon()
+        importOrderFile(".spotless/wakame.importorder")
+    }
+    format("configs") {
+        target("**/*.yml", "**/*.yaml", "**/*.json")
+        targetExclude("run/**")
+        applyCommon(2)
+    }
 }

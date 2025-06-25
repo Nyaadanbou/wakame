@@ -1,7 +1,0 @@
-base: bedrock
-
-# 为物品添加核孔
-# TBD 添加更多文档
-cells:
-  buckets: { }
-  selectors: { }

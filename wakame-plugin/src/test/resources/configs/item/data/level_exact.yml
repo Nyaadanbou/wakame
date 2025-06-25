@@ -1,6 +1,0 @@
-base: bedrock
-level:
-  base: 12
-  float_chance: 0.0
-  float_amount: "(1,3)"
-  max: 15

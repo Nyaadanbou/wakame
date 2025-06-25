@@ -3,18 +3,17 @@ package cc.mewcraft.wakame.craftingstation
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.Util
-import cc.mewcraft.wakame.core.ItemXSerializer
 import cc.mewcraft.wakame.craftingstation.recipe.Recipe
-import cc.mewcraft.wakame.craftingstation.recipe.StationChoiceSerializer
-import cc.mewcraft.wakame.craftingstation.recipe.StationRecipeSerializer
-import cc.mewcraft.wakame.craftingstation.recipe.StationResultSerializer
-import cc.mewcraft.wakame.item.ItemTypeRegistryLoader
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeChoice
+import cc.mewcraft.wakame.craftingstation.recipe.RecipeResult
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
 import cc.mewcraft.wakame.util.NamespacedFileTreeWalker
+import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.registerExact
 import cc.mewcraft.wakame.util.require
 import cc.mewcraft.wakame.util.yamlLoader
@@ -24,9 +23,7 @@ import org.jetbrains.annotations.VisibleForTesting
 @Init(
     stage = InitStage.POST_WORLD,
 )
-@Reload(
-    runAfter = [ItemTypeRegistryLoader::class],
-)
+@Reload
 internal object CraftingStationRecipeRegistry {
 
     @VisibleForTesting
@@ -66,15 +63,15 @@ internal object CraftingStationRecipeRegistry {
                 val recipeNode = yamlLoader {
                     withDefaults()
                     serializers {
-                        registerExact(StationRecipeSerializer)
-                        registerExact(StationChoiceSerializer)
-                        registerExact(StationResultSerializer)
-                        register(ItemXSerializer)
+                        registerExact(Recipe.Serializer)
+                        registerExact(RecipeChoice.Serializer)
+                        registerExact(RecipeResult.Serializer)
+                        register(ItemRef.SERIALIZER)
                     }
                 }.buildAndLoadString(fileText)
 
                 // 注入 key 节点
-                recipeNode.hint(StationRecipeSerializer.HINT_NODE, key)
+                recipeNode.hint(Recipe.Serializer.HINT_NODE, key)
                 // 反序列化 Recipe
                 val recipe = recipeNode.require<Recipe>()
                 // 添加进临时注册表
@@ -90,11 +87,7 @@ internal object CraftingStationRecipeRegistry {
 
     private fun registerStationRecipes() {
         raw.forEach { (key, recipe) ->
-            if (recipe.valid()) {
-                recipes[key] = recipe
-            } else {
-                LOGGER.warn("Can't register station recipe: '$key'")
-            }
+            recipes[key] = recipe
         }
 
         LOGGER.info("Registered station recipes: {}", recipes.keys.joinToString())

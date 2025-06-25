@@ -1,6 +1,16 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
-import cc.mewcraft.wakame.item2.config.datagen.impl.*
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaBrewRecipe
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCooldownGroup
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaElement
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemLevel
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaKizami
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaRarity
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaUseCooldown
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyContainer
 import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.item2.data.impl.CoreContainer
@@ -71,6 +81,13 @@ data object ItemMetaTypes {
     }
 
     @JvmField
+    val ELEMENT: ItemMetaType<MetaElement, Set<RegistryEntry<Element>>> = typeOf("element") {
+        serializers {
+            register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
+        }
+    }
+
+    @JvmField
     val CORE_CONTAINER: ItemMetaType<MetaCoreContainer, CoreContainer> = typeOf("cores") {
         serializers {
             registerExact(MetaCoreContainer.SERIALIZER)
@@ -100,7 +117,7 @@ data object ItemMetaTypes {
      * @param id 将作为注册表中的 ID
      * @param block 用于配置 [ItemMetaType]
      */
-    private inline fun <reified U, V> typeOf(id: String, block: ItemMetaType.Builder<U, V>.() -> Unit = {}): ItemMetaType<U, V> {
+    private inline fun <reified U : ItemMetaEntry<V>, V> typeOf(id: String, block: ItemMetaType.Builder<U, V>.() -> Unit = {}): ItemMetaType<U, V> {
         val type = ItemMetaType.builder<U, V>().apply(block).build()
         return type.also { BuiltInRegistries.ITEM_META_TYPE.add(id, it) }
     }

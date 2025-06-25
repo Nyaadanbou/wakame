@@ -11,6 +11,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.DynamicRegistries
 import cc.mewcraft.wakame.registry2.RegistryLoader
 import cc.mewcraft.wakame.util.Identifier
@@ -21,7 +22,11 @@ import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
-import kotlin.io.path.*
+import kotlin.io.path.extension
+import kotlin.io.path.name
+import kotlin.io.path.readText
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.streams.asSequence
 
 @Init(
@@ -104,7 +109,7 @@ internal object CatalogItemLootTableRecipeRegistryLoader : RegistryLoader {
 
         // 根据对应的菜单布局和图标, 注册战利品表配方
         lootTableIds.forEach { lootTableId ->
-            val icon = lootTableIdToIconId[lootTableId] ?: DynamicRegistries.ITEM.defaultId
+            val icon = lootTableIdToIconId[lootTableId] ?: BuiltInRegistries.ITEM.defaultId
             val menuSettings = lootTableIdToMenuId[lootTableId]?.let(CatalogItemMenuSettings::getMenuSettings)
                 ?: BasicMenuSettings(Component.text("Untitled"), emptyArray(), hashMapOf())
 

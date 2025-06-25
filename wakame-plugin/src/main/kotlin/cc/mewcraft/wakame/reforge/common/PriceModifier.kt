@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.reforge.common
 
-import cc.mewcraft.wakame.item.extension.level
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.extension.reforgeHistory
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.util.bindInstance
 import cc.mewcraft.wakame.util.item.damage
 import org.bukkit.inventory.ItemStack
@@ -80,8 +78,7 @@ data class LevelPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.wrap() ?: return .0
-        val level = nekoStack.level
+        val level = item.getData(ItemDataTypes.LEVEL)?.level ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(LevelBinding(level), "query")
         return mocha.eval(expression)
@@ -110,8 +107,7 @@ data class RarityPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.wrap() ?: return .0
-        val rarity = nekoStack.rarity
+        val rarity = item.getData(ItemDataTypes.RARITY) ?: return .0
         val mapped = mapping[rarity.getIdAsString()] ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RarityBinding(mapped), "query")
@@ -139,8 +135,7 @@ data class MergingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.wrap() ?: return .0
-        val value = nekoStack.reforgeHistory.modCount
+        val value = item.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(MergingBinding(value), "query")
         return mocha.eval(expression)
@@ -167,8 +162,7 @@ data class ModdingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.wrap() ?: return .0
-        val value = nekoStack.reforgeHistory.modCount
+        val value = item.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(ModdingBinding(value), "query")
         return mocha.eval(expression)
@@ -195,8 +189,7 @@ data class RerollingPenaltyPriceModifier(
     }
 
     override fun evaluate(item: ItemStack): Double {
-        val nekoStack = item.wrap() ?: return .0
-        val value = nekoStack.reforgeHistory.modCount
+        val value = item.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: return .0
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(RerollingBinding(value), "query")
         return mocha.eval(expression)

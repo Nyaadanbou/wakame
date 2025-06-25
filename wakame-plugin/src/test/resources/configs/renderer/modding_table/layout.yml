@@ -9,7 +9,7 @@ primary:
   - attribute:defense
   - attribute:max_health
   - attribute:movement_speed
-  - stash:cells/empty
+  - stash:core/empty
 
   - (fixed:vanilla)
   - vanilla:item_name

@@ -62,7 +62,7 @@ internal class RecipeMatcherResult(
         val itemStack = recipe.output.displayItemStack(settings)
 
         // 解析展示用的所有占位符
-        val slotDisplayResolved = settings.getSlotDisplay("listing").resolveEverything {
+        val slotDisplayResolved = settings.getSlotDisplay("listing").resolve {
 
             // 适用于整个物品堆叠的占位符
             standard {
@@ -87,7 +87,7 @@ internal class RecipeMatcherResult(
                             // 类似上面的 "choice_exp", 只不过这里是 "choice_item"
                             resolve("choice_item") {
                                 preprocess { replace("requirement_mark", if (flag) "ok" else "bad") }
-                                parsed("item", choice.item.displayName())
+                                component("item", choice.item.name)
                                 component("amount", Component.text(choice.amount))
                             }
                         }
@@ -97,7 +97,7 @@ internal class RecipeMatcherResult(
         }
 
         // 应用解析结果到物品堆叠上, 并返回
-        return slotDisplayResolved.applyTo(itemStack)
+        return slotDisplayResolved.applyInPlace(itemStack)
     }
 
     /**

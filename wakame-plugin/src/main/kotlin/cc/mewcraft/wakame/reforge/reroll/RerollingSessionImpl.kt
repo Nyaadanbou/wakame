@@ -3,16 +3,17 @@ package cc.mewcraft.wakame.reforge.reroll
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.NekoStackDelegates
-import cc.mewcraft.wakame.item.extension.cells
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCoreContainer
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getMeta
+import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.lang.translate
-import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
+import cc.mewcraft.wakame.util.ItemStackDelegates
 import cc.mewcraft.wakame.util.adventure.plain
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.decorate
@@ -24,10 +25,10 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.slf4j.Logger
 import team.unnamed.mocha.runtime.MochaFunction
-import java.util.*
-import java.util.Collections.*
+import java.util.Collections.emptyList
+import java.util.Collections.emptyMap
+import java.util.Collections.emptySet
 import java.util.stream.Stream
-import kotlin.collections.set
 import kotlin.properties.Delegates
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -42,7 +43,7 @@ internal class SimpleRerollingSession(
 
     override var originalInput: ItemStack? by OriginalInputDelegate(null)
 
-    override var usableInput: NekoStack? by UsableInputDelegate(null)
+    override var usableInput: ItemStack? by UsableInputDelegate(null)
 
     override var itemRule: RerollingTable.ItemRule? = null
 
@@ -92,7 +93,7 @@ internal class SimpleRerollingSession(
     override fun getFinalOutputs(): Array<ItemStack> {
         val reforgeResult = latestResult
         if (reforgeResult.isSuccess) {
-            return arrayOf(reforgeResult.output.bukkitStack.clone())
+            return arrayOf(reforgeResult.output.clone())
         } else {
             return emptyArray()
         }
@@ -112,19 +113,19 @@ internal class SimpleRerollingSession(
 
         override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
-            usableInput = value?.wrap()
-            itemRule = usableInput?.id?.let(table.itemRuleMap::get)
+            usableInput = value
+            itemRule = usableInput?.koishTypeId?.let(table.itemRuleMap::get)
             selectionMap = SelectionMap.simple(thisRef)
             latestResult = executeReforge0()
         }
     }
 
-    private inner class UsableInputDelegate(private var backing: NekoStack?) : ReadWriteProperty<RerollingSession, NekoStack?> {
-        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): NekoStack? {
+    private inner class UsableInputDelegate(private var backing: ItemStack?) : ReadWriteProperty<RerollingSession, ItemStack?> {
+        override fun getValue(thisRef: RerollingSession, property: KProperty<*>): ItemStack? {
             return backing?.clone()
         }
 
-        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: NekoStack?) {
+        override fun setValue(thisRef: RerollingSession, property: KProperty<*>, value: ItemStack?) {
             backing = value?.clone()
         }
     }
@@ -149,7 +150,7 @@ internal object ReforgeResult {
      * 失败结果; 用于表示因已知的某些条件不满足而无法进行重造.
      */
     fun failure(viewer: Player, description: List<ComponentLike>): RerollingSession.ReforgeResult {
-        return Simple(false, description.translate(viewer), NekoStack.empty(), ReforgeCost.empty(viewer))
+        return Simple(false, description.translate(viewer), ItemStack.empty(), ReforgeCost.empty(viewer))
     }
 
     /**
@@ -162,7 +163,7 @@ internal object ReforgeResult {
     /**
      * 成功结果; 用于表示重造已准备就绪.
      */
-    fun success(viewer: Player, item: NekoStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
+    fun success(viewer: Player, item: ItemStack, cost: RerollingSession.ReforgeCost): RerollingSession.ReforgeResult {
         return Simple(true, TranslatableMessages.MSG_REROLLING_RESULT_SUCCESS.translate(viewer), item, cost)
     }
 
@@ -182,34 +183,34 @@ internal object ReforgeResult {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(TranslatableMessages.MSG_ERR_INTERNAL_ERROR.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.error(viewer)
-        override val output: NekoStack = NekoStack.empty()
+        override val output: ItemStack = ItemStack.empty()
     }
 
     private class Empty(viewer: Player) : Base() {
         override val isSuccess: Boolean = false
         override val description: List<Component> = listOf(TranslatableMessages.MSG_REROLLING_RESULT_EMPTY.translate(viewer))
         override val reforgeCost: RerollingSession.ReforgeCost = ReforgeCost.empty(viewer)
-        override val output: NekoStack = NekoStack.empty()
+        override val output: ItemStack = ItemStack.empty()
     }
 
     private class Simple(
         successful: Boolean,
         description: List<Component>,
-        item: NekoStack,
+        item: ItemStack,
         cost: RerollingSession.ReforgeCost,
     ) : Base() {
 
         constructor(
             successful: Boolean,
             description: Component,
-            item: NekoStack,
+            item: ItemStack,
             cost: RerollingSession.ReforgeCost,
         ) : this(successful, listOf(description), item, cost)
 
         override val isSuccess: Boolean = successful
         override val description: List<Component> = description
         override val reforgeCost: RerollingSession.ReforgeCost = cost
-        override val output: NekoStack by NekoStackDelegates.copyOnRead(item)
+        override val output: ItemStack by ItemStackDelegates.copyOnRead(item)
 
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("isSuccess", isSuccess),
@@ -296,8 +297,8 @@ internal object Selection {
     /**
      * 创建一个可被修改的 [Selection].
      */
-    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CellRule, template: Group<CoreArchetype, ItemGenerationContext>): RerollingSession.Selection {
-        return Simple(session, id, rule, template)
+    fun changeable(session: RerollingSession, id: String, rule: RerollingTable.CoreContainerRule, lootTable: LootTable<Core>): RerollingSession.Selection {
+        return Simple(session, id, rule, lootTable)
     }
 
     // FIXME data class
@@ -305,12 +306,12 @@ internal object Selection {
         override val session: RerollingSession,
         override val id: String,
     ) : RerollingSession.Selection {
-        override val rule: RerollingTable.CellRule
-            get() = RerollingTable.CellRule.empty()
+        override val rule: RerollingTable.CoreContainerRule
+            get() = RerollingTable.CoreContainerRule.empty()
         override val changeable: Boolean
             get() = false
-        override val template: Group<CoreArchetype, ItemGenerationContext>
-            get() = Group.empty()
+        override val lootTable: LootTable<Core>
+            get() = LootTable.empty()
         override val total: MochaFunction
             get() = MochaFunction { .0 }
         override var selected: Boolean
@@ -324,14 +325,14 @@ internal object Selection {
     private class Simple(
         override val session: RerollingSession,
         override val id: String,
-        override val rule: RerollingTable.CellRule,
-        override val template: Group<CoreArchetype, ItemGenerationContext>,
+        override val rule: RerollingTable.CoreContainerRule,
+        override val lootTable: LootTable<Core>,
     ) : RerollingSession.Selection {
         // private val logger: Logger = LOGGER.decorate(prefix = ReforgeLoggerPrefix.REROLL)
         override val total: MochaFunction = rule.currencyCost.compile(session, this)
         override val changeable: Boolean = true
         override var selected: Boolean by Delegates.observable(false) { _, old, new ->
-            // logger.info("Selection status updated (cell: '$id'): $old -> $new")
+            // logger.info("Selection status updated (core container: '$id'): $old -> $new")
         }
 
         override fun invert(): Boolean {
@@ -369,28 +370,33 @@ internal object SelectionMap {
 
         // 获取源物品的核孔模板
         // 如果源物品没有核孔*模板*, 则判定整个物品不支持重造
-        val templates = usableInput.templates.get(ItemTemplateTypes.CELLS)?.cells ?: run {
-            // logger.info("Usable input has no `cells` template.")
+        val metaCoreContainer = usableInput.getMeta(ItemMetaTypes.CORE_CONTAINER) ?: run {
+            // logger.info("Usable input has no `core container` template.")
+            return empty(session)
+        }
+
+        // 如果源物品的核孔模板不是动态的, 则判定整个物品不支持重造
+        if (metaCoreContainer !is MetaCoreContainer.Dynamic) {
             return empty(session)
         }
 
         // 获取源物品的核孔
         // 如果这个物品没有核孔组件, 则判定整个物品不支持重造
-        val cells = usableInput.cells ?: return empty(session)
+        val coreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: return empty(session)
 
         // 获取源物品的重造规则
         // 如果这个物品没有对应的重造规则, 则判定整个物品不支持重造
-        val itemRule = session.table.itemRuleMap[usableInput.id] ?: return empty(session)
+        val itemRule = session.table.itemRuleMap[usableInput.koishTypeId!!] ?: return empty(session)
 
-        val cellRuleMap = itemRule.cellRuleMap
-        val selectionData = sortedMapOf<String, RerollingSession.Selection>(cellRuleMap.comparator)
-        for ((id, _) in cells) {
+        val coreContainerRuleMap = itemRule.coreContainerRuleMap
+        val selectionData = sortedMapOf<String, RerollingSession.Selection>(coreContainerRuleMap.comparator)
+        for ((id, _) in coreContainer) {
 
             // 获取核孔的重造规则
-            val cellRule = cellRuleMap[id]
+            val coreContainerRule = coreContainerRuleMap[id]
 
             // 获取核孔的重造模板
-            val template = templates[id]?.core
+            val lootTable = metaCoreContainer.entry[id]
 
             // 如果:
             //   这个核孔没有对应的重造规则, 或者
@@ -398,10 +404,10 @@ internal object SelectionMap {
             // 则判定该核孔不支持重造.
             // 不支持重造的核孔依然被封装为一个 Selection.unchangeable,
             // 这样可以让其他系统比较优雅的处理一些特殊情况 (例如无定义情况).
-            if (cellRule != null && template != null) {
-                selectionData[id] = Selection.changeable(session, id, cellRule, template)
+            if (coreContainerRule != null && lootTable != null) {
+                selectionData[id] = Selection.changeable(session, id, coreContainerRule, lootTable)
             } else {
-                // logger.info("Item cell '$id' does not support rerolling.")
+                // logger.info("Item core container '$id' does not support rerolling.")
                 selectionData[id] = Selection.unchangeable(session, id)
             }
         }

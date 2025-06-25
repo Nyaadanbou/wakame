@@ -2,7 +2,7 @@
 type: smithing_trim
 
 # 表示要被添加纹饰的基础物品, 一般为盔甲
-base: wakame:example/bronze_helmet
+base: example/bronze_helmet
 
 # 表示为基础物品添加纹饰时所需的锻造原材料, 以确定添加到基础物品上的纹饰材料
 addition:

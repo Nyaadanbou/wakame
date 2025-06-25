@@ -47,17 +47,17 @@ interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBund
     val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>
 
     /**
-     * A creator for [cc.mewcraft.wakame.item.templates.components.cells.cores.AttributeCoreArchetype].
+     * A creator for [cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundle].
      */
     val convertNodeToVariable: (ConfigurationNode) -> S
 
     /**
-     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
+     * A creator for [cc.mewcraft.wakame.item2.data.impl.AttributeCore].
      */
     val convertNodeToConstant: (ConfigurationNode) -> T
 
     /**
-     * A creator for [cc.mewcraft.wakame.item.components.cells.AttributeCore].
+     * A creator for [cc.mewcraft.wakame.item2.data.impl.AttributeCore].
      */
     val convertNbtToConstant: (CompoundTag) -> T
 

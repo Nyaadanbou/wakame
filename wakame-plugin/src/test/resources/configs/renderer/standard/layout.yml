@@ -8,7 +8,7 @@ primary:
   - general:level
   - general:rarity
   - general:elements
-  - general:kizamiz
+  - general:kizami
 
   - attribute:attack_damage
   - attribute:block_interaction_range
@@ -18,7 +18,7 @@ primary:
   - attribute:max_health
   - attribute:movement_speed
 
-  - stash:cells/empty
+  - stash:core/empty
 
   - (fixed:vanilla)222
   - vanilla:enchantments
@@ -27,7 +27,7 @@ primary:
 
   - (fixed:special)333
   - special:crate
-  - special:portable_core
+  - special:core
 
   - (fixed:general)
   - (default:'无描述')general:lore

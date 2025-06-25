@@ -2,30 +2,57 @@ package cc.mewcraft.wakame.display2.implementation.standard
 
 import cc.mewcraft.wakame.display2.IndexedText
 import cc.mewcraft.wakame.display2.TextAssembler
-import cc.mewcraft.wakame.display2.implementation.*
-import cc.mewcraft.wakame.display2.implementation.common.*
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.components.*
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.extension.*
-import cc.mewcraft.wakame.item.template.ItemTemplateTypes
-import cc.mewcraft.wakame.item.templates.components.CustomName
-import cc.mewcraft.wakame.item.templates.components.ExtraLore
-import cc.mewcraft.wakame.item.templates.components.ItemArrow
-import cc.mewcraft.wakame.item.templates.components.ItemName
+import cc.mewcraft.wakame.display2.implementation.AbstractItemRenderer
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererFormatRegistry
+import cc.mewcraft.wakame.display2.implementation.AbstractRendererLayout
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler
+import cc.mewcraft.wakame.display2.implementation.RenderingHandler2
+import cc.mewcraft.wakame.display2.implementation.RenderingHandlerRegistry
+import cc.mewcraft.wakame.display2.implementation.common.AggregateValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.CommonRenderingHandlers
+import cc.mewcraft.wakame.display2.implementation.common.CoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.EnchantmentRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.ExtraLoreRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.ListValueRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.RarityRendererFormat
+import cc.mewcraft.wakame.display2.implementation.common.SingleValueRendererFormat
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.entity.player.AttackSpeed
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaTypes
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaCustomName
+import cc.mewcraft.wakame.item2.config.datagen.impl.MetaItemName
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.ItemCrate
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.data.impl.VirtualCore
+import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.lifecycle.reloader.Reload
 import cc.mewcraft.wakame.lifecycle.reloader.ReloadFun
+import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.item.fastLore
+import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
+import cc.mewcraft.wakame.util.item.hideAttributeModifiers
+import cc.mewcraft.wakame.util.item.hideEnchantments
+import cc.mewcraft.wakame.util.item.hideStoredEnchantments
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.FoodProperties
+import io.papermc.paper.datacomponent.item.ItemEnchantments
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import org.bukkit.inventory.ItemStack
 import java.nio.file.Path
-
 
 internal class StandardRendererFormatRegistry(renderer: StandardItemRenderer) : AbstractRendererFormatRegistry(renderer)
 
@@ -33,7 +60,7 @@ internal class StandardRendererLayout(renderer: StandardItemRenderer) : Abstract
 
 @Init(stage = InitStage.POST_WORLD)
 @Reload
-internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>() {
+internal object StandardItemRenderer : AbstractItemRenderer<Nothing>() {
     override val name = "standard"
     override val formats = StandardRendererFormatRegistry(this)
     override val layout = StandardRendererLayout(this)
@@ -58,34 +85,32 @@ internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>(
         layout.initialize(layoutPath)
     }
 
-    override fun render(item: NekoStack, context: Nothing?) {
+    override fun render(item: ItemStack, context: Nothing?) {
         val collector = ReferenceOpenHashSet<IndexedText>()
 
-        val templates = item.templates
-        templates.process(ItemTemplateTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
+        item.process(ItemPropertyTypes.ARROW) { data -> StandardRenderingHandlerRegistry.ARROW.process(collector, data) }
+        item.process(ItemPropertyTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
+        item.process(ItemPropertyTypes.EXTRA_LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
 
-        // 对于最可能被频繁修改的 `custom_name`, `item_name`, `lore` 直接读取配置模板里的内容
-        templates.process(ItemTemplateTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
-        templates.process(ItemTemplateTypes.LORE) { data -> StandardRenderingHandlerRegistry.LORE.process(collector, data) }
+        // 对于最可能被频繁修改的 `item_name`, `custom_name` 直接读取配置模板里的内容
+        item.process(ItemMetaTypes.ITEM_NAME) { data -> StandardRenderingHandlerRegistry.ITEM_NAME.process(collector, data) }
+        item.process(ItemMetaTypes.CUSTOM_NAME) { data -> StandardRenderingHandlerRegistry.CUSTOM_NAME.process(collector, data) }
 
-        val components = item.components
-        components.process(ItemComponentTypes.ATTACK_SPEED) { data -> StandardRenderingHandlerRegistry.ATTACK_SPEED.process(collector, data) }
-        components.process(ItemComponentTypes.CELLS) { data -> for ((_, cell) in data) renderCore(collector, cell.core) }
-        components.process(ItemComponentTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
-        components.process(ItemComponentTypes.ELEMENTS) { data -> StandardRenderingHandlerRegistry.ELEMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
-        components.process(ItemComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
-        components.process(ItemComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
-        components.process(ItemComponentTypes.KIZAMIZ) { data -> StandardRenderingHandlerRegistry.KIZAMIZ.process(collector, data) }
-        components.process(ItemComponentTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
-        components.process(ItemComponentTypes.PORTABLE_CORE) { data -> StandardRenderingHandlerRegistry.PORTABLE_CORE.process(collector, data) }
-        components.process(ItemComponentTypes.RARITY, ItemComponentTypes.REFORGE_HISTORY) { data1, data2 ->
-            val data1: ItemRarity = data1 ?: return@process
-            val data2: ReforgeHistory = data2 ?: ReforgeHistory.ZERO
+        item.process(ItemDataTypes.CORE_CONTAINER) { data -> for ((_, core) in data) renderCore(collector, core) }
+        item.process(ItemDataTypes.CRATE) { data -> StandardRenderingHandlerRegistry.CRATE.process(collector, data) }
+        item.process(ItemDataTypes.ELEMENT) { data -> StandardRenderingHandlerRegistry.ELEMENT.process(collector, data) }
+        item.process(ItemDataTypes.KIZAMI) { data -> StandardRenderingHandlerRegistry.KIZAMI.process(collector, data) }
+        item.process(ItemDataTypes.LEVEL) { data -> StandardRenderingHandlerRegistry.LEVEL.process(collector, data) }
+        item.process(ItemDataTypes.CORE) { data -> StandardRenderingHandlerRegistry.CORE.process(collector, data) }
+        item.process(ItemDataTypes.RARITY, ItemDataTypes.REFORGE_HISTORY) { data1, data2 ->
+            val data1 = data1 ?: return@process
+            val data2 = data2 ?: ReforgeHistory.ZERO
             StandardRenderingHandlerRegistry.RARITY.process(collector, data1, data2)
         }
-        components.process(ItemComponentTypes.STORED_ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
+
+        item.process(DataComponentTypes.ENCHANTMENTS) { data -> StandardRenderingHandlerRegistry.ENCHANTMENTS.process(collector, data) }
+        item.process(DataComponentTypes.DAMAGE_RESISTANT) { data -> StandardRenderingHandlerRegistry.DAMAGE_RESISTANT.process(collector, Unit) }
+        item.process(DataComponentTypes.FOOD) { data -> StandardRenderingHandlerRegistry.FOOD.process(collector, data) }
 
         val lore = textAssembler.assemble(collector)
         item.fastLore(run {
@@ -108,21 +133,20 @@ internal object StandardItemRenderer : AbstractItemRenderer<NekoStack, Nothing>(
         item.hideAttributeModifiers()
         item.hideEnchantments()
         item.hideStoredEnchantments()
-
-        item.erase()
     }
 
     private fun renderCore(collector: ReferenceOpenHashSet<IndexedText>, core: Core) {
         when (core) {
-            is AttributeCore -> StandardRenderingHandlerRegistry.CELLULAR_ATTRIBUTE.process(collector, core)
-            is EmptyCore -> StandardRenderingHandlerRegistry.CELLULAR_EMPTY.process(collector, core)
+            is AttributeCore -> StandardRenderingHandlerRegistry.CORE_ATTRIBUTE.process(collector, core)
+            is EmptyCore -> StandardRenderingHandlerRegistry.CORE_EMPTY.process(collector, core)
+            is VirtualCore -> IndexedText.NOP
         }
     }
 }
 
 internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(StandardItemRenderer) {
     @JvmField
-    val ARROW: RenderingHandler<ItemArrow, ListValueRendererFormat> = configure("arrow") { data, format ->
+    val ARROW: RenderingHandler<Arrow, ListValueRendererFormat> = configure("arrow") { data, format ->
         format.render(
             Placeholder.component("pierce_level", Component.text(data.pierceLevel)),
             Placeholder.component("fire_ticks", Component.text(data.fireTicks)),
@@ -133,37 +157,36 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     }
 
     @JvmField
-    val ATTACK_SPEED: RenderingHandler<ItemAttackSpeed, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
-        format.render(data.level)
-    }
-
-    @JvmField
-    val CELLULAR_ATTRIBUTE: RenderingHandler<AttributeCore, CellularAttributeRendererFormat> = configure("cells/attributes") { data, format ->
+    val ATTACK_SPEED: RenderingHandler<RegistryEntry<AttackSpeed>, AttackSpeedRendererFormat> = configure("attack_speed") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val CELLULAR_EMPTY: RenderingHandler<EmptyCore, CellularEmptyRendererFormat> = configure("cells/empty") { data, format ->
+    val CORE_ATTRIBUTE: RenderingHandler<AttributeCore, CoreAttributeRendererFormat> = configure("core/attributes") { data, format ->
+        format.render(data)
+    }
+
+    @JvmField
+    val CORE_EMPTY: RenderingHandler<EmptyCore, CoreEmptyRendererFormat> = configure("core/empty") { data, format ->
         format.render(data)
     }
 
     @JvmField
     val CRATE: RenderingHandler<ItemCrate, SingleValueRendererFormat> = configure("crate") { data, format ->
         format.render(
-            Placeholder.component("id", Component.text(data.identity)),
-            Placeholder.component("name", Component.text(data.identity)), // TODO display2 盲盒完成时再写这里)
+            Placeholder.component("level", Component.text(data.level)) // TODO display2 盲盒完成时再写这里)
         )
     }
 
     @JvmField
-    val CUSTOM_NAME: RenderingHandler<CustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
+    val CUSTOM_NAME: RenderingHandler<MetaCustomName, SingleValueRendererFormat> = CommonRenderingHandlers.CUSTOM_NAME(this)
 
     @JvmField
-    val ELEMENTS: RenderingHandler<ItemElements, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENTS(this)
+    val ELEMENT: RenderingHandler<Set<RegistryEntry<Element>>, AggregateValueRendererFormat> = CommonRenderingHandlers.ELEMENT(this)
 
     @JvmField
     val ENCHANTMENTS: RenderingHandler<ItemEnchantments, EnchantmentRendererFormat> = configure("enchantments") { data, format ->
-        format.render(data.enchantments)
+        format.render(data.enchantments())
     }
 
     @JvmField
@@ -174,17 +197,17 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     @JvmField
     val FOOD: RenderingHandler<FoodProperties, ListValueRendererFormat> = configure("food") { data, format ->
         format.render(
-            Placeholder.component("nutrition", Component.text(data.nutrition)),
-            Placeholder.component("saturation", Component.text(data.saturation)),
+            Placeholder.component("nutrition", Component.text(data.nutrition())),
+            Placeholder.component("saturation", Component.text(data.saturation()))
         )
     }
 
     @JvmField
-    val ITEM_NAME: RenderingHandler<ItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
+    val ITEM_NAME: RenderingHandler<MetaItemName, SingleValueRendererFormat> = CommonRenderingHandlers.ITEM_NAME(this)
 
     @JvmField
-    val KIZAMIZ: RenderingHandler<ItemKizamiz, AggregateValueRendererFormat> = configure("kizamiz") { data, format ->
-        format.render(data.kizamiz) { it.unwrap().displayName }
+    val KIZAMI: RenderingHandler<Set<RegistryEntry<Kizami>>, AggregateValueRendererFormat> = configure("kizami") { data, format ->
+        format.render(data) { it.unwrap().displayName }
     }
 
     @JvmField
@@ -194,10 +217,10 @@ internal object StandardRenderingHandlerRegistry : RenderingHandlerRegistry(Stan
     val LORE: RenderingHandler<ExtraLore, ExtraLoreRendererFormat> = CommonRenderingHandlers.LORE(this)
 
     @JvmField
-    val PORTABLE_CORE: RenderingHandler<PortableCore, PortableCoreRendererFormat> = configure("portable_core") { data, format ->
+    val CORE: RenderingHandler<Core, CoreRendererFormat> = configure("core") { data, format ->
         format.render(data)
     }
 
     @JvmField
-    val RARITY: RenderingHandler2<ItemRarity, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
+    val RARITY: RenderingHandler2<RegistryEntry<Rarity>, ReforgeHistory, RarityRendererFormat> = CommonRenderingHandlers.RARITY(this)
 }

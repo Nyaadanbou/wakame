@@ -94,21 +94,21 @@ internal object RerollingTableSerializer {
                     val itemRuleNode = yamlLoader {
                         withDefaults()
                         serializers {
-                            register<RerollingTable.CellRule>(CellRuleSerializer)
-                            register<RerollingTable.CellCurrencyCost>(CellCurrencyCostSerializer)
+                            register<RerollingTable.CoreContainerRule>(CoreContainerRuleSerializer)
+                            register<RerollingTable.CoreContainerCurrencyCost>(CoreContainerCurrencyCostSerializer)
                         }
                     }.buildAndLoadString(text)
 
                     val modLimit = itemRuleNode.node("mod_limit").int
-                    val cellRuleMapData = itemRuleNode.node("cells").require<Map<String, RerollingTable.CellRule>>()
-                    val cellRuleMap = LinkedHashMap(cellRuleMapData)
+                    val coreContainerRuleMapData = itemRuleNode.node("core_container").require<Map<String, RerollingTable.CoreContainerRule>>()
+                    val coreContainerRuleMap = LinkedHashMap(coreContainerRuleMapData)
 
                     // 未来可能会包含更多规则
                     // ...
 
                     SimpleRerollingTable.ItemRule(
                         modLimit = modLimit,
-                        cellRuleMap = SimpleRerollingTable.CellRuleMap(cellRuleMap)
+                        coreContainerRuleMap = SimpleRerollingTable.CoreContainerRuleMap(coreContainerRuleMap)
                     )
                 }
 
@@ -134,17 +134,17 @@ internal object RerollingTableSerializer {
         }
     }
 
-    private object CellCurrencyCostSerializer : TypeSerializer2<RerollingTable.CellCurrencyCost> {
-        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellCurrencyCost {
+    private object CoreContainerCurrencyCostSerializer : TypeSerializer2<RerollingTable.CoreContainerCurrencyCost> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CoreContainerCurrencyCost {
             val code = node.require<String>()
-            return SimpleRerollingTable.CellCurrencyCost(code)
+            return SimpleRerollingTable.CoreContainerCurrencyCost(code)
         }
     }
 
-    private object CellRuleSerializer : TypeSerializer2<RerollingTable.CellRule> {
-        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CellRule {
-            val currencyCost = node.node("currency_cost").require<RerollingTable.CellCurrencyCost>()
-            return SimpleRerollingTable.CellRule(currencyCost)
+    private object CoreContainerRuleSerializer : TypeSerializer2<RerollingTable.CoreContainerRule> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RerollingTable.CoreContainerRule {
+            val currencyCost = node.node("currency_cost").require<RerollingTable.CoreContainerCurrencyCost>()
+            return SimpleRerollingTable.CoreContainerRule(currencyCost)
         }
     }
 }

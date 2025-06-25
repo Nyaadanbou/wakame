@@ -20,7 +20,7 @@ import kotlin.reflect.typeOf
 /* 这里定义了可以在不同渲染器之间通用的 RendererFormats 实现 */
 
 internal abstract class AbstractRendererFormatRegistry(
-    protected val renderer: AbstractItemRenderer<*, *>,
+    protected val renderer: AbstractItemRenderer<*>,
 ) : RendererFormatRegistry {
 
     /**
@@ -51,7 +51,8 @@ internal abstract class AbstractRendererFormatRegistry(
         for ((id, type) in typeIdToRendererFormatType) {
             val node = rootNode.node(id)
             if (node.virtual()) {
-                LOGGER.warn("Renderer format '$id' is not found in '$relativeTo'")
+                LOGGER.error("Renderer format '$id' is not found in '$relativeTo'")
+                continue
             }
             val format = node.require<RendererFormat>(type)
 

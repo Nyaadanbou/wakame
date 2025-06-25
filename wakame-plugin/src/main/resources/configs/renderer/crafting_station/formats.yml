@@ -9,8 +9,8 @@ attack_speed:
     # <value> 攻击速度值
     line: "<!i><white>攻击速度: <value>"
 
-# id: `cells`
-cells:
+# id: `core_container`
+core_container:
   namespace: general
   # 可用标签
   # <min> 最小核孔数量
@@ -32,8 +32,8 @@ custom_name:
   # <value> 物品的 `minecraft:custom_name`
   tooltip: "<!i><gray>定制名: <reset><value>"
 
-# id: `elements`
-elements:
+# id: `element`
+element:
   namespace: general
   # 元素种类是随机的, 因此需要将所有可能的结果都显示出来.
   #
@@ -57,7 +57,7 @@ enchantments:
 # id: `damage_resistant`
 damage_resistant:
   namespace: vanilla
-  tooltip: "<!i><blue>伤害免疫"
+  tooltip: "<!i><blue><value> 伤害免疫"
 
 # id: `food`
 food:
@@ -69,7 +69,6 @@ food:
   tooltip:
     - "<!i><blue>饥饿值 +<nutrition>"
     - "<!i><blue>饱和度 +<saturation>"
-    - "<!i><blue>食用时间: <eat_seconds>"
 
 # id: `item_name`
 item_name:
@@ -78,8 +77,8 @@ item_name:
   # <value> 物品的 `minecraft:item_name`
   tooltip: "<!i><gray>物品名: <white><value>"
 
-# id: `kizamiz`
-kizamiz:
+# id: `kizami`
+kizami:
   namespace: general
   # 铭刻种类是随机的, 因此需要将所有可能的结果都显示出来.
   #
@@ -102,6 +101,6 @@ lore:
     header: [ ]
     bottom: [ ]
 
-# id: `portable_core`
-portable_core:
+# id: `core`
+core:
   namespace: special

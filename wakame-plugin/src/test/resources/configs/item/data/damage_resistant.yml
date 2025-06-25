@@ -1,4 +1,0 @@
-base: oak_log
-
-# 使物品免疫特定类型伤害. 对应原版组件: https://minecraft.wiki/w/Data_component_format#damage_resistant
-damage_resistant: "is_fire"

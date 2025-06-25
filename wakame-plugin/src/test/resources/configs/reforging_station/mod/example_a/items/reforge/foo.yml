@@ -1,6 +1,6 @@
 mod_limit: 8
 
-cells:
+core_container:
 
   a:
     currency_cost: "100 + query.joined_item_level() * 10 + query.source_item_mod_count() * 10"

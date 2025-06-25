@@ -22,7 +22,7 @@ object DisplayMana : IteratingSystem(
         val current = entity[Mana].current
         val maximum = entity[Mana].maximum
 
-        val progress = current.toFloat() / maximum.toFloat()
+        val progress = (current.toFloat() / maximum.toFloat()).coerceIn(0f, 1f)
         val text = Component.text("魔法值 $current / $maximum")
 
         val bossBar = entity[ManaBossBar].bossBar

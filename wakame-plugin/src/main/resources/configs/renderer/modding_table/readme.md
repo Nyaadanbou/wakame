@@ -13,7 +13,7 @@
 定制台只是负责定制 *核孔*.
 
 因此整个定制过程中需要用到的物品信息大概是这些:
-- cells
+- core_container
 - elements
 - level
 - rarity

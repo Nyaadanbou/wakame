@@ -46,7 +46,7 @@ primary:
   - attribute:health_regeneration
   - attribute:mana_regeneration
   - (fixed:stash)<st><dark_gray>             </dark_gray></st>
-  - stash:cells/empty
+  - stash:core/empty
 
   - (fixed:vanilla)<st><dark_gray>             </dark_gray></st>
   - vanilla:enchantments
@@ -55,10 +55,10 @@ primary:
 
   - (fixed:special)<st><dark_gray>             </dark_gray></st>
   - special:crate
-  - special:portable_core
+  - special:core
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:kizamiz
-  - general:elements
+  - general:kizami
+  - general:element
   - general:rarity
   - general:lore

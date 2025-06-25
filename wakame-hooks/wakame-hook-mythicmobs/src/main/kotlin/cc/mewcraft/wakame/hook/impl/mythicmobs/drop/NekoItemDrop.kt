@@ -22,7 +22,7 @@ class NekoItemDrop(
         val key = Key.key(itemKey)
         val player = data.cause.getOrNull()?.bukkitEntity as? Player
 
-        val itemRef = ItemRef.checkedItemRef(key) ?: error("Invalid ItemRef: $key") // may throw exceptions, can MM handle it?
+        val itemRef = ItemRef.create(key) ?: error("Invalid ItemRef: $key") // may throw exceptions, can MM handle it?
         val itemStack = itemRef.createItemStack(1, player)
 
         return ItemComponentBukkitItemStack(itemStack).amount(amount.toInt())

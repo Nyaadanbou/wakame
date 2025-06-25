@@ -1,12 +1,12 @@
 package cc.mewcraft.wakame.catalog.item
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXFactoryRegistry
 import cc.mewcraft.wakame.gui.BasicMenuSettings
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.RepresentationHints
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
 import org.koin.core.component.KoinComponent
@@ -24,7 +24,7 @@ data class CatalogItemCategory(
     val icon: Key,
     val menuSettings: BasicMenuSettings,
     val permission: String?,
-    val items: List<ItemX>,
+    val items: List<ItemRef>,
 )
 
 /**
@@ -44,9 +44,9 @@ internal object CategorySerializer : TypeSerializer2<CatalogItemCategory>, KoinC
         // val itemUids = node.node("items").getList<ItemX>(emptyList())
         // 不像上面这样写的原因: 若列表中的某个 id 有问题, 将跳过这个 id 而不是抛异常
         val itemIds = node.node("items").getList<String>(emptyList())
-        val itemList = mutableListOf<ItemX>()
+        val itemList = mutableListOf<ItemRef>()
         for (uid in itemIds) {
-            val item = ItemXFactoryRegistry[uid]
+            val item = ItemRef.create(Identifiers.of(uid))
             if (item == null) {
                 LOGGER.warn("Cannot deserialize string '$uid' into ItemX, skipped adding it to category: '$id'")
                 continue

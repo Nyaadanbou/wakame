@@ -84,6 +84,8 @@ dependencies {
     testImplementation(local.commons.provider)
     testImplementation(local.commons.reflection)
     testImplementation(local.commons.tuple)
+    testImplementation(local.paper)
+    testImplementation(local.datafixerupper)
     testImplementation(platform(libs.bom.configurate.yaml))
     testImplementation(platform(libs.bom.configurate.gson))
     testImplementation(platform(libs.bom.configurate.extra.kotlin))

@@ -4,17 +4,22 @@ import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.bundle.AttributeContextData
 import cc.mewcraft.wakame.entity.attribute.bundle.element
-import cc.mewcraft.wakame.item.components.ItemCells
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.extension.*
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.template.ItemGenerationContexts
-import cc.mewcraft.wakame.item.template.ItemGenerationTriggers
-import cc.mewcraft.wakame.item.templates.components.cells.cores.EmptyCoreArchetype
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.data.impl.VirtualCore
+import cc.mewcraft.wakame.item2.getData
+import cc.mewcraft.wakame.item2.getDataOrDefault
+import cc.mewcraft.wakame.item2.koishTypeId
+import cc.mewcraft.wakame.item2.setData
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import net.kyori.adventure.key.Key
+import cc.mewcraft.wakame.util.Identifier
 import org.bukkit.entity.Player
 import org.slf4j.Logger
 
@@ -66,21 +71,21 @@ private constructor(
         }
 
         // 获取必要的物品组件
-        val itemId = usableInput.id
-        val itemLevel = usableInput.level
-        val itemCells = usableInput.cells ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CELLS)
+        val itemId = usableInput.koishTypeId!!
+        val itemLevel = usableInput.getData(ItemDataTypes.LEVEL)?.level!!
+        val itemCoreContainer = usableInput.getData(ItemDataTypes.CORE_CONTAINER) ?: return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_WITHOUT_CORE_CONTAINER)
 
         // 检查重铸次数是否超过了重铸次数上限
-        val modCount = usableInput.reforgeHistory.modCount
+        val modCount = usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).modCount
         val modLimit = itemRule.modLimit
         if (modCount >= modLimit) {
             return ReforgeResult.failure(viewer, TranslatableMessages.MSG_REROLLING_RESULT_FAILURE_INPUT_REACH_MOD_COUNT_LIMIT)
         }
 
         // 获取可有可无的物品组件
-        val itemRarity = usableInput.rarity
-        val itemElements = usableInput.elements
-        val itemKizamiz = usableInput.kizamiz
+        val itemRarity = usableInput.getData(ItemDataTypes.RARITY)!!
+        val itemElements = usableInput.getData(ItemDataTypes.ELEMENT)!!
+        val itemKizami = usableInput.getData(ItemDataTypes.KIZAMI)!!
 
         // 准备生成核心用的上下文
         val context = try {
@@ -89,39 +94,35 @@ private constructor(
                 itemLevel,
                 itemRarity,
                 itemElements,
-                itemKizamiz,
-                itemCells
+                itemKizami,
+                itemCoreContainer
             )
         } catch (e: Exception) { // 有必要 try-catch?
             logger.error("Unexpected error while preparing generation context", e)
             return ReforgeResult.error(viewer)
         }
 
-        val updatedItemCells = itemCells.builder().apply {
+        val updatedCoreContainer = itemCoreContainer.toBuilder().apply {
             // 遍历每一个选择:
             for ((id, sel) in selectionMap) {
 
                 // 如果玩家选择了该核孔:
                 if (sel.selected) {
-
                     // 重新生成选择的核心 (这里跟从模板生成物品时的逻辑一样)
-                    modify(id) { cell ->
-                        val selected = sel.template.select(context).firstOrNull() ?: EmptyCoreArchetype
-                        val generated = selected.generate(context)
-                        cell.copy(core = generated)
-                    }
+                    val selected = sel.lootTable.select(context).firstOrNull() ?: EmptyCore
+                    put(id, selected)
                 }
             }
         }.build()
 
         // 为物品的重铸历史次数 +1
-        usableInput.reforgeHistory = usableInput.reforgeHistory.incCount(1)
+        usableInput.setData(ItemDataTypes.REFORGE_HISTORY, usableInput.getDataOrDefault(ItemDataTypes.REFORGE_HISTORY, ReforgeHistory.ZERO).incCount(1))
 
         // 准备作为输出的物品
         val output = usableInput.clone()
 
         // 将新的核孔组件写入物品
-        output.cells = updatedItemCells
+        output.setData(ItemDataTypes.CORE_CONTAINER, updatedCoreContainer)
 
         // 计算重造物品的总花费
         val total = ReforgeCost.simple(viewer, session.total.evaluate())
@@ -133,42 +134,47 @@ private constructor(
      * 初始化物品生成的上下文.
      */
     private fun initializeContext(
-        itemId: Key,
+        itemId: Identifier,
         itemLevel: Int,
         itemRarity: RegistryEntry<Rarity>,
         itemElements: Set<RegistryEntry<Element>>,
-        itemKizamiz: Set<RegistryEntry<Kizami>>,
-        itemCells: ItemCells,
+        itemKizami: Set<RegistryEntry<Kizami>>,
+        itemCoreContainer: CoreContainer,
     ): ItemGenerationContext {
         // 创建一个空的 context
-        val trigger = ItemGenerationTriggers.direct(itemLevel)
-        val context = ItemGenerationContexts.create(trigger, itemId)
+        val context = ItemGenerationContext(BuiltInRegistries.ITEM.getOrThrow(itemId), 0f)
 
         // 先把*不可由玩家改变的信息*全部写入上下文
         context.level = itemLevel
         context.rarity = itemRarity
         context.elements += itemElements
-        context.kizamiz += itemKizamiz
+        context.kizami += itemKizami
 
         val selectionMap = session.selectionMap
 
         // 然后再把*可由玩家改变的信息*全部写入上下文
-        itemCells
+        itemCoreContainer
             // 注意, 我们必须跳过玩家选择要重造的核孔.
             // 如果不跳过, 那么新的核孔将无法被正确生成.
             // 这是因为截止至 2024/8/20, 我们的设计不允许
             // 相似的核心出现在同一个物品上.
-            .filter2 { cell -> !selectionMap[cell.id].selected }
-            .forEach { (_, cell) ->
-                when (
-                    val core = cell.core
-                ) {
+            .filter { id, core -> !selectionMap[id].selected }
+            .forEach { (id, core) ->
+                when (core) {
                     is AttributeCore -> {
                         context.attributes += AttributeContextData(
-                            id = core.id.value(),
-                            operation = core.data.operation,
-                            element = core.data.element
+                            id = id,
+                            operation = core.wrapped.operation,
+                            element = core.wrapped.element
                         )
+                    }
+
+                    EmptyCore -> {
+                        // NOP
+                    }
+
+                    VirtualCore -> {
+                        // NOP
                     }
                 }
             }

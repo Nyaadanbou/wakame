@@ -42,8 +42,8 @@ primary:
   - attribute:step_height
   - attribute:health_regeneration
   - attribute:mana_regeneration
-  - stash:cells/empty
+  - stash:core/empty
 
   - (fixed:general)<st><dark_gray>             </dark_gray></st>
-  - general:elements
+  - general:element
   - general:rarity

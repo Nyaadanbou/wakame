@@ -1,10 +1,17 @@
 package cc.mewcraft.wakame.catalog.item.recipe
 
-import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXFactoryRegistry
-import cc.mewcraft.wakame.core.ItemXNoOp
-import cc.mewcraft.wakame.core.ItemXVanilla
-import org.bukkit.inventory.*
+import cc.mewcraft.wakame.item2.ItemRef
+import org.bukkit.inventory.BlastingRecipe
+import org.bukkit.inventory.CampfireRecipe
+import org.bukkit.inventory.CookingRecipe
+import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.RecipeChoice
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.SmithingTransformRecipe
+import org.bukkit.inventory.SmithingTrimRecipe
+import org.bukkit.inventory.SmokingRecipe
+import org.bukkit.inventory.StonecuttingRecipe
 import org.bukkit.inventory.Recipe as BukkitRecipe
 
 /**
@@ -14,8 +21,8 @@ abstract class CatalogStandardRecipe(
     private val recipe: BukkitRecipe,
 ) : CatalogRecipe {
 
-    private val outputs: Set<ItemX> = setOfNotNull(ItemXFactoryRegistry[recipe.result])
-    override fun getLookupOutputs(): Set<ItemX> = outputs
+    private val outputs: Set<ItemRef> = setOfNotNull(ItemRef.create(recipe.result))
+    override fun getLookupOutputs(): Set<ItemRef> = outputs
     fun <T : BukkitRecipe> recipe(): T = recipe as T
 
 }
@@ -31,15 +38,14 @@ abstract class CatalogCookingRecipe(
     val experience = recipe.experience
 
     // 对应原版该类型配方对 RecipeChoice 存储格式
-    // 意在缓存各个 RecipeChoice 转化为 List<ItemX> 的结果
-    val inputItems: List<ItemX> = recipe.inputChoice.toItems()
+    // 意在缓存各个 RecipeChoice 转化为 List<ItemRef> 的结果
+    val inputItems: List<ItemRef> = recipe.inputChoice.toItems()
 
-    // 缓存配方的输出转化为 ItemX 的结果
-    // TODO 通过改进 ItemX 使得这里不用强转非空
-    val outputItems: ItemX = ItemXFactoryRegistry[recipe.result]!!
+    // 缓存配方的输出转化为 ItemRef 的结果
+    val outputItems: ItemRef = ItemRef.create(recipe.result)
 
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = inputItems.toSet()
+    override fun getLookupInputs(): Set<ItemRef> = inputItems.toSet()
 }
 
 
@@ -65,51 +71,51 @@ class CatalogShapedRecipe(
     recipe: ShapedRecipe,
 ) : CatalogStandardRecipe(recipe) {
     val shape: Array<out String> = recipe.shape
-    val inputItems: Map<Char, List<ItemX>> = recipe.choiceMap.mapValues { it.value.toItems() }
-    val outputItem: ItemX = ItemXFactoryRegistry[recipe.result]!!
+    val inputItems: Map<Char, List<ItemRef>> = recipe.choiceMap.mapValues { it.value.toItems() }
+    val outputItem: ItemRef = ItemRef.create(recipe.result)
 
     override val type = CatalogRecipeType.SHAPED_RECIPE
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = inputItems.values.flatten().toSet()
+    override fun getLookupInputs(): Set<ItemRef> = inputItems.values.flatten().toSet()
 }
 
 class CatalogShapelessRecipe(
     recipe: ShapelessRecipe,
 ) : CatalogStandardRecipe(recipe) {
-    val inputItems: List<List<ItemX>> = recipe.choiceList.map { it.toItems() }
-    val outputItems: ItemX = ItemXFactoryRegistry[recipe.result]!!
+    val inputItems: List<List<ItemRef>> = recipe.choiceList.map { it.toItems() }
+    val outputItems: ItemRef = ItemRef.create(recipe.result)
 
     override val type = CatalogRecipeType.SHAPELESS_RECIPE
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = inputItems.flatten().toSet()
+    override fun getLookupInputs(): Set<ItemRef> = inputItems.flatten().toSet()
 }
 
 class CatalogSmithingTransformRecipe(
     recipe: SmithingTransformRecipe,
 ) : CatalogStandardRecipe(recipe) {
-    val baseItems: List<ItemX> = recipe.base.toItems()
-    val templateItems: List<ItemX> = recipe.template.toItems()
-    val additionItems: List<ItemX> = recipe.addition.toItems()
-    val outputItemX: ItemX = ItemXFactoryRegistry[recipe.result]!!
+    val baseItems: List<ItemRef> = recipe.base.toItems()
+    val templateItems: List<ItemRef> = recipe.template.toItems()
+    val additionItems: List<ItemRef> = recipe.addition.toItems()
+    val outputItemRef: ItemRef = ItemRef.create(recipe.result)
 
     override val type = CatalogRecipeType.SMITHING_TRANSFORM_RECIPE
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
+    override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 }
 
 class CatalogSmithingTrimRecipe(
     recipe: SmithingTrimRecipe,
 ) : CatalogStandardRecipe(recipe) {
-    val baseItems: List<ItemX> = recipe.base.toItems()
-    val templateItems: List<ItemX> = recipe.template.toItems()
-    val additionItems: List<ItemX> = recipe.addition.toItems()
+    val baseItems: List<ItemRef> = recipe.base.toItems()
+    val templateItems: List<ItemRef> = recipe.template.toItems()
+    val additionItems: List<ItemRef> = recipe.addition.toItems()
 
     override val type = CatalogRecipeType.SMITHING_TRIM_RECIPE
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = (baseItems + templateItems + additionItems).toSet()
+    override fun getLookupInputs(): Set<ItemRef> = (baseItems + templateItems + additionItems).toSet()
 
     // 锻造台纹饰配方没有输出, 返回一个占位物品作为节点
-    override fun getLookupOutputs(): Set<ItemX> = setOf(ItemXNoOp)
+    override fun getLookupOutputs(): Set<ItemRef> = emptySet()
 }
 
 class CatalogSmokingRecipe(
@@ -122,21 +128,21 @@ class CatalogSmokingRecipe(
 class CatalogStonecuttingRecipe(
     recipe: StonecuttingRecipe,
 ) : CatalogStandardRecipe(recipe) {
-    val inputItems: List<ItemX> = recipe.inputChoice.toItems()
-    val outputItem: ItemX = ItemXFactoryRegistry[recipe.result]!!
+    val inputItems: List<ItemRef> = recipe.inputChoice.toItems()
+    val outputItem: ItemRef = ItemRef.create(recipe.result)
 
     override val type = CatalogRecipeType.STONECUTTING_RECIPE
     override val sortId: String = recipe.key.value()
-    override fun getLookupInputs(): Set<ItemX> = inputItems.toSet()
+    override fun getLookupInputs(): Set<ItemRef> = inputItems.toSet()
 }
 
 /**
  * 方便函数.
  */
-private fun RecipeChoice?.toItems(): List<ItemX> {
+private fun RecipeChoice?.toItems(): List<ItemRef> {
     return when (this) {
-        is RecipeChoice.ExactChoice -> choices.mapNotNull { ItemXFactoryRegistry[it] }
-        is RecipeChoice.MaterialChoice -> choices.map { ItemXVanilla(it.name.lowercase()) }
+        is RecipeChoice.ExactChoice -> choices.mapNotNull { ItemRef.create(it) }
+        is RecipeChoice.MaterialChoice -> choices.map { ItemRef.create(it) }
         else -> emptyList()
     }
 }

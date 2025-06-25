@@ -3,11 +3,12 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.item2.config.datagen.Context
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
+import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.ItemId
@@ -44,19 +45,19 @@ import kotlin.time.measureTimedValue
 object KoishStackGenerator {
 
     /**
-     * 基于上下文 [Context] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.
+     * 基于上下文 [ItemGenerationContext] 从物品类型 [KoishItem] 生成一个新的 [ItemStack] 实例.
      *
      * @param type 物品类型
      * @param context 生成物品的上下文
      * @return 新生成的 [ItemStack]
      */
-    fun generate(type: KoishItem, context: Context): ItemStack {
+    fun generate(type: KoishItem, context: ItemGenerationContext): ItemStack {
         val result = measureTimedValue { generate0(type, context) }
         LOGGER.info(Component.text("Generated item ${context.koishItem.id.asMinimalStringKoish()} in ${result.duration.inWholeMilliseconds}ms").color(NamedTextColor.DARK_GRAY))
         return result.value
     }
 
-    private fun generate0(type: KoishItem, context: Context): ItemStack {
+    private fun generate0(type: KoishItem, context: ItemGenerationContext): ItemStack {
         val dataContainer = ItemDataContainer.builder()
 
         // 写入基础信息, 每个自定义物品都有
@@ -68,30 +69,30 @@ object KoishStackGenerator {
         dataContainer[ItemDataTypes.BYPASS_NETWORK_REWRITE] = Unit
 
         // 直接操作 MojangStack 以提高生成物品的速度
-        val itembase = type.properties.getOrDefault(ItemPropertyTypes.BASE, ItemBase.EMPTY)
-        val itemstack = itembase.createMojang()
+        val itemBase = type.properties.getOrDefault(ItemPropertyTypes.BASE, ItemBase.EMPTY)
+        val itemStack = itemBase.createMojang()
 
         // 在把 ItemStack 传递到 ItemMetaEntry 之前, 需要先将 ItemDataContainer 写入到 ItemStack.
         // 否则按照目前的实现, 简单的使用 ItemStack.setData 是无法将数据写入到 ItemStack 的,
         // 因为 ItemStack.setData 只有在 ItemDataContainer 存在时才能写入数据
-        itemstack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
+        itemStack.set(ExtraDataComponents.DATA_CONTAINER, dataContainer.build())
 
         // 获取 ItemData 的“配置文件” (ItemMetaContainer)
         val dataConfig = type.dataConfig
 
         // 从 ItemMetaContainer 生成数据, 然后写入到物品堆叠上
         for (metaType in BuiltInRegistries.ITEM_META_TYPE) {
-            makePersistentDataThenWrite(metaType, dataConfig, itemstack, context)
+            makePersistentDataThenWrite(metaType, dataConfig, itemStack, context)
         }
 
-        return itemstack.toBukkit()
+        return itemStack.toBukkit()
     }
 
-    private fun <U, V> makePersistentDataThenWrite(
+    private fun <U : ItemMetaEntry<V>, V> makePersistentDataThenWrite(
         metaType: ItemMetaType<U, V>,
         metaContainer: ItemMetaContainer,
         itemstack: MojangStack,
-        context: Context,
+        context: ItemGenerationContext,
     ) {
         val entry = metaContainer[metaType]
         if (entry != null) {

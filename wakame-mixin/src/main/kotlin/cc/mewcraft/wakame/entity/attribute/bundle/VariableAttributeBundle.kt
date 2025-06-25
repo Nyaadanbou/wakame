@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.entity.attribute.bundle
 
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier
-import cc.mewcraft.wakame.item2.config.datagen.LevelContext
+import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.util.RandomizedValue
@@ -34,7 +34,7 @@ interface VariableAttributeBundle : AttributeBundle {
 /**
  * 代表一个生成 [AttributeBundle] 的上下文.
  */
-interface AttributeContext : LevelContext {
+interface AttributeContext : LootContext {
     val attributes: MutableCollection<AttributeContextData>
 }
 

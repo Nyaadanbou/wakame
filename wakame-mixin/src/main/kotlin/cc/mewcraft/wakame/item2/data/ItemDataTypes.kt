@@ -1,7 +1,13 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.data.impl.*
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.CoreContainer
+import cc.mewcraft.wakame.item2.data.impl.ItemBrewRecipe
+import cc.mewcraft.wakame.item2.data.impl.ItemCrate
+import cc.mewcraft.wakame.item2.data.impl.ItemId
+import cc.mewcraft.wakame.item2.data.impl.ItemLevel
+import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -63,7 +69,7 @@ data object ItemDataTypes {
     }
 
     @JvmField
-    val ELEMENT: ItemDataType<RegistryEntry<Element>> = typeOf("element") {
+    val ELEMENT: ItemDataType<Set<RegistryEntry<Element>>> = typeOf("element") {
         serializers {
             register(BuiltInRegistries.ELEMENT.holderByNameTypeSerializer())
         }
@@ -82,6 +88,12 @@ data object ItemDataTypes {
 
     @JvmField
     val BREW_RECIPE: ItemDataType<ItemBrewRecipe> = typeOf("brew_recipe")
+
+    @JvmField
+    val CRATE: ItemDataType<ItemCrate> = typeOf("crate")
+
+    @JvmField
+    val REFORGE_HISTORY: ItemDataType<ReforgeHistory> = typeOf("reforge_history")
 
     // ------------
     // 方便函数

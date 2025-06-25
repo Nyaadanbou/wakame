@@ -3,12 +3,13 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.Namespaces
-import cc.mewcraft.wakame.adventure.key.Keyed
+import cc.mewcraft.wakame.adventure.key.Identified
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
@@ -28,7 +29,7 @@ val GLOBAL_ATTRIBUTE_CONFIG = ConfigAccess.INSTANCE["attributes"]
  *
  * 使用 [AttributeProvider] 来获取实例.
  */
-interface Attribute : Keyed {
+interface Attribute : Identified {
 
     /**
      * 本属性的唯一标识.
@@ -140,7 +141,7 @@ protected constructor(
         return value
     }
 
-    override val key: Key = Key.key(Namespaces.ATTRIBUTE, id)
+    override val identifier: Identifier = Key.key(Namespaces.ATTRIBUTE, id)
 
     override fun examinableProperties(): Stream<out ExaminableProperty> {
         return Stream.of(

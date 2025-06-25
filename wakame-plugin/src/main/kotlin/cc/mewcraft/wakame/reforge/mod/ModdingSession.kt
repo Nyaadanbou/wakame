@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.reforge.mod
 
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.PortableCore
-import cc.mewcraft.wakame.item.components.cells.Cell
+import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -67,7 +65,7 @@ interface ModdingSession : Examinable {
      * - 访问该物品始终会返回一个克隆.
      */
     @VariableByPlayer
-    val usableInput: NekoStack?
+    val usableInput: ItemStack?
 
     /**
      * 当前 [usableInput] 的重铸规则.
@@ -144,25 +142,25 @@ interface ModdingSession : Examinable {
      * 获取 [usableInput] 的总核孔数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemTotalCellCount(): Int
+    fun getSourceItemTotalCoreContainerCount(): Int
 
     /**
      * 获取当前可以参与定制的核孔的数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangeableCellCount(): Int
+    fun getSourceItemChangeableCoreContainerCount(): Int
 
     /**
      * 获取当前参与了定制的核孔的数量.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangedCellCount(): Int
+    fun getSourceItemChangedCoreContainerCount(): Int
 
     /**
      * 获取当前参与了定制的核孔的定制花费的总和.
      * 若不存在则返回 `0`.
      */
-    fun getSourceItemChangedCellCost(): Double
+    fun getSourceItemChangedCoreContainerCost(): Double
 
     /**
      * 代表一个物品定制的结果.
@@ -194,7 +192,7 @@ interface ModdingSession : Examinable {
          * - 源物品不存在, i.e., [ModdingSession.usableInput] = `null`
          */
         @get:Contract(" -> new")
-        val output: NekoStack?
+        val output: ItemStack?
     }
 
     /**
@@ -227,15 +225,20 @@ interface ModdingSession : Examinable {
         /**
          * 被定制的核孔.
          */
-        val cell: Cell
+        val core: Core
+
+        /**
+         * 被定制的核孔 ID
+         */
+        val coreId: String
 
         /**
          * 被定制的核孔所对应的规则.
          */
-        val cellRule: ModdingTable.CellRule
+        val coreContainerRule: ModdingTable.CoreContainerRule
 
         // 开发日记 2024/8/17
-        // 当一个 Replace 实例被创建时, 其对应的 cell & rule & session 也都确定了.
+        // 当一个 Replace 实例被创建时, 其对应的 core container & rule & session 也都确定了.
         // 因此, 我们可以在这个时候就编译这个核孔的定制花费, 并且将其缓存起来.
         // 这样只要 sourceItem 没有变化, 这个函数就不需要重新编译以节约性能.
         /**
@@ -276,14 +279,14 @@ interface ModdingSession : Examinable {
          * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
          */
         @VariableByPlayer
-        val usableInput: NekoStack?
+        val usableInput: ItemStack?
 
         /**
          * 方便函数.
-         * 获取 [usableInput] 中包含的 [PortableCore].
+         * 获取 [usableInput] 中包含的 [Core].
          */
         @VariableByPlayer
-        val augment: PortableCore?
+        val augment: Core?
 
         /**
          * 储存了当前的重铸结果.

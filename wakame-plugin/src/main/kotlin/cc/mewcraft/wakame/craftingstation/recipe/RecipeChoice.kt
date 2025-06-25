@@ -1,11 +1,10 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.item.fastLoreOrEmpty
@@ -47,12 +46,6 @@ internal sealed interface RecipeChoice : Examinable {
     fun consume(contextMap: ChoiceConsumerContextMap)
 
     /**
-     * 该 [RecipeChoice] 是否有效.
-     * 用于延迟验证配方是否能够注册.
-     */
-    fun valid(): Boolean
-
-    /**
      * 获取此 [RecipeChoice] 展示用的物品堆叠.
      *
      * 由于合成输入不一定是固定的, 其展示用的物品堆叠与最终给予玩家的物品堆叠必须要有区别.
@@ -60,6 +53,33 @@ internal sealed interface RecipeChoice : Examinable {
      * 而不是直接展示众多随机结果中的一种. 这样可以使玩家对合成的随机结果有更清晰的认识.
      */
     fun displayItemStack(settings: BasicMenuSettings): ItemStack
+
+    /**
+     * [RecipeChoice] 的序列化器.
+     */
+    object Serializer : TypeSerializer2<RecipeChoice> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
+            val choiceType = node.node("type").require<String>()
+            when (choiceType) {
+                ItemChoice.TYPE -> {
+                    val item = node.node("id").require<ItemRef>()
+                    val amount = node.node("amount").getInt(1)
+                    require(amount > 0) { "Item amount must more than 0" }
+                    return ItemChoice(item, amount)
+                }
+
+                ExpChoice.TYPE -> {
+                    val amount = node.node("amount").require<Int>()
+                    require(amount > 0) { "Exp amount must more than 0" }
+                    return ExpChoice(amount)
+                }
+
+                else -> {
+                    throw SerializationException("Unknown station choice type")
+                }
+            }
+        }
+    }
 }
 
 
@@ -70,7 +90,7 @@ internal sealed interface RecipeChoice : Examinable {
  * 物品类型的合成站输入.
  */
 internal data class ItemChoice(
-    val item: ItemX,
+    val item: ItemRef,
     val amount: Int,
 ) : RecipeChoice {
     companion object {
@@ -101,25 +121,21 @@ internal data class ItemChoice(
         context.add(item, amount)
     }
 
-    override fun valid(): Boolean {
-        return item.valid()
-    }
-
     override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
         // 生成原始的物品堆叠 (最终给予玩家的物品堆叠)
-        val itemStack = item.createItemStack(amount) ?: ItemStack(Material.BARRIER)
+        val itemStack = item.createItemStack(amount)
 
         // 基于合成站渲染物品, 这将填充 name & lore
         itemStack.render()
 
         // 解析展示用的物品堆叠信息
-        val slotDisplayResolved = settings.getSlotDisplay("choice").resolveEverything {
+        val slotDisplayResolved = settings.getSlotDisplay("choice").resolve {
             standard { component("item_name", itemStack.itemNameOrType) }
             folded("item_lore", itemStack.fastLoreOrEmpty)
         }
 
         // 应用解析结果
-        return slotDisplayResolved.applyTo(itemStack)
+        return slotDisplayResolved.applyInPlace(itemStack)
     }
 
     override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
@@ -156,10 +172,6 @@ internal data class ExpChoice(
         context.add(amount)
     }
 
-    override fun valid(): Boolean {
-        return true
-    }
-
     override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
         // 经验瓶无需解析, 可以直接返回一个原始的物品堆叠
         return ItemStack(Material.EXPERIENCE_BOTTLE)
@@ -175,38 +187,10 @@ internal data class ExpChoice(
 }
 
 /**
- * [RecipeChoice] 的序列化器.
- */
-internal object StationChoiceSerializer : TypeSerializer2<RecipeChoice> {
-    override fun deserialize(type: Type, node: ConfigurationNode): RecipeChoice {
-        val choiceType = node.node("type").require<String>()
-        when (choiceType) {
-            ItemChoice.TYPE -> {
-                val item = node.node("id").require<ItemX>()
-                val amount = node.node("amount").getInt(1)
-                require(amount > 0) { "Item amount must more than 0" }
-                return ItemChoice(item, amount)
-            }
-
-            ExpChoice.TYPE -> {
-                val amount = node.node("amount").require<Int>()
-                require(amount > 0) { "Exp amount must more than 0" }
-                return ExpChoice(amount)
-            }
-
-            else -> {
-                throw SerializationException("Unknown station choice type")
-            }
-        }
-    }
-}
-
-/**
  * 方便函数.
  */
 private fun ItemStack.render(): ItemStack {
-    val nekoStack = wrap() ?: return this
-    val context = CraftingStationContext(Pos.CHOICE, erase = true)
-    ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
+    val context = CraftingStationContext(Pos.CHOICE)
+    ItemRenderers.CRAFTING_STATION.render(this, context)
     return this
 }

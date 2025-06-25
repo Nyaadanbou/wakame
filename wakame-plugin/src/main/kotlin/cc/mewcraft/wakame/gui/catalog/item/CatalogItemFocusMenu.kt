@@ -1,7 +1,8 @@
 package cc.mewcraft.wakame.gui.catalog.item
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemMenuSettings
-import cc.mewcraft.wakame.core.ItemX
+import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item2.display.resolveToItemWrapper
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -23,7 +24,7 @@ internal class CatalogItemFocusMenu(
     /**
      * 该菜单聚焦的物品.
      */
-    val item: ItemX,
+    val item: ItemRef,
     /**
      * 该菜单的检索状态.
      */

@@ -1,7 +1,6 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.core.ItemX
-import cc.mewcraft.wakame.core.ItemXFactoryRegistry
+import cc.mewcraft.wakame.item2.ItemRef
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
 import org.bukkit.entity.Player
@@ -76,17 +75,17 @@ internal object ExpChoiceChecker : ChoiceChecker<ExpChoiceCheckerContext> {
 internal class ItemChoiceCheckerContext(
     override val player: Player,
 ) : ChoiceCheckerContext {
-    val inventorySnapshot: Object2IntOpenHashMap<ItemX> = run {
+    val inventorySnapshot: Object2IntOpenHashMap<ItemRef> = run {
         // 只搜索主背包(36格)的物品, 不搜索副手和盔甲
         val inventory = player.inventory
-        val ret = Object2IntOpenHashMap<ItemX>(36)
+        val ret = Object2IntOpenHashMap<ItemRef>(36)
         for (itemStack in inventory.storageContents) {
             if (itemStack == null) {
                 continue
             }
-            val itemX = ItemXFactoryRegistry[itemStack]
+            val itemRef = ItemRef.create(itemStack)
             val amount = itemStack.amount
-            ret.mergeInt(itemX, amount) { old, given -> old + given }
+            ret.mergeInt(itemRef, amount) { old, given -> old + given }
         }
         ret
     }

@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellCurrencyCost
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRule
-import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CellRuleMap
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CoreContainerCurrencyCost
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CoreContainerRule
+import cc.mewcraft.wakame.reforge.reroll.RerollingTable.CoreContainerRuleMap
 import net.kyori.adventure.key.Key
 import net.kyori.examination.Examinable
 import team.unnamed.mocha.runtime.MochaFunction
@@ -55,7 +55,7 @@ interface RerollingTable : Examinable {
         /**
          * 该物品的每个核孔的重造规则.
          */
-        val cellRuleMap: CellRuleMap
+        val coreContainerRuleMap: CoreContainerRuleMap
     }
 
     /**
@@ -77,21 +77,21 @@ interface RerollingTable : Examinable {
     /**
      * 代表一个核孔的重造规则.
      */
-    interface CellRule : Examinable {
+    interface CoreContainerRule : Examinable {
         /**
          * 该核孔的货币花费.
          */
-        val currencyCost: CellCurrencyCost
+        val currencyCost: CoreContainerCurrencyCost
 
         companion object Shared {
-            fun empty(): CellRule = EmptyCellRule
+            fun empty(): CoreContainerRule = EmptyCoreContainerRule
         }
     }
 
     /**
      * 该对象本质是一个映射, 包含了所有核孔的重造规则.
      */
-    interface CellRuleMap : Examinable {
+    interface CoreContainerRuleMap : Examinable {
 
         /**
          * 关于核孔 id 的 [Comparator], 基于核孔在配置文件中的顺序.
@@ -106,7 +106,7 @@ interface RerollingTable : Examinable {
          * @param key 核孔的唯一标识
          * @return 核孔的重造规则
          */
-        operator fun get(key: String): CellRule?
+        operator fun get(key: String): CoreContainerRule?
 
         /**
          * 检查是否包含指定核孔的重造规则.
@@ -120,7 +120,7 @@ interface RerollingTable : Examinable {
         operator fun contains(key: String): Boolean
 
         companion object Shared {
-            fun empty(): CellRuleMap = EmptyCellRuleMap
+            fun empty(): CoreContainerRuleMap = EmptyCoreContainerRuleMap
         }
     }
 
@@ -133,9 +133,9 @@ interface RerollingTable : Examinable {
      *   no args
      * query.source_item_level()
      *   no args
-     * query.cell_count(`type`)
+     * query.core_container_count(`type`)
      *   type = 'all' | 'selected' | 'unselected'
-     * query.cell_cost(`type`)
+     * query.core_container_cost(`type`)
      *   type = 'all' | 'selected' | 'unselected'
      * ```
      */
@@ -152,7 +152,7 @@ interface RerollingTable : Examinable {
      *   no args
      * ```
      */
-    fun interface CellCurrencyCost {
+    fun interface CoreContainerCurrencyCost {
         fun compile(session: RerollingSession, selection: RerollingSession.Selection): MochaFunction
     }
 }
@@ -161,12 +161,12 @@ interface RerollingTable : Examinable {
 /* Internals */
 
 
-private object EmptyCellRule : CellRule {
-    override val currencyCost: CellCurrencyCost = CellCurrencyCost { _, _ -> MochaFunction { Double.NaN } }
+private object EmptyCoreContainerRule : CoreContainerRule {
+    override val currencyCost: CoreContainerCurrencyCost = CoreContainerCurrencyCost { _, _ -> MochaFunction { Double.NaN } }
 }
 
-private object EmptyCellRuleMap : CellRuleMap {
+private object EmptyCoreContainerRuleMap : CoreContainerRuleMap {
     override val comparator: Comparator<String?> = nullsLast(naturalOrder())
-    override fun get(key: String): CellRule? = null
+    override fun get(key: String): CoreContainerRule? = null
     override fun contains(key: String): Boolean = false
 }

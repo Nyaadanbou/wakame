@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.integration.economy.EconomyManager
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.koishTypeId
 import cc.mewcraft.wakame.reforge.common.PriceInstance
 import cc.mewcraft.wakame.reforge.common.ReforgingStationConstants
 import cc.mewcraft.wakame.util.adventure.plain
@@ -16,7 +16,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import org.slf4j.Logger
-import java.util.*
 
 internal class SimpleRepairingSession(
     override val table: RepairingTable,
@@ -31,7 +30,7 @@ internal class SimpleRepairingSession(
     private fun getItemKey(item: ItemStack): Key {
         // 先尝试获取萌芽系统里的物品 id,
         // 如果没有的话就返回原版物品 id
-        return item.wrap()?.id ?: item.type.key
+        return item.koishTypeId ?: item.type.key
     }
 
     private fun getItemPrice(item: ItemStack?): PriceInstance? {

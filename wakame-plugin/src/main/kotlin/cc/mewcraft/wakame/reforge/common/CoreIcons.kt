@@ -2,13 +2,13 @@ package cc.mewcraft.wakame.reforge.common
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.display2.ItemRenderers
-import cc.mewcraft.wakame.item.NekoItem
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.components.cells.AttributeCore
-import cc.mewcraft.wakame.item.components.cells.Core
-import cc.mewcraft.wakame.item.components.cells.EmptyCore
-import cc.mewcraft.wakame.item.realize
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.item2.KoishItem
+import cc.mewcraft.wakame.item2.KoishStackGenerator
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
+import cc.mewcraft.wakame.item2.data.impl.AttributeCore
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.item2.data.impl.EmptyCore
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -18,25 +18,20 @@ internal object CoreIcons {
     private const val ICON_ID_PREFIX = "internal:menu/core_icon"
     private const val DEFAULT_ICON_ID = "$ICON_ID_PREFIX/default"
 
-    fun getNekoStack(core: Core): NekoStack {
-        val coreId = core.id.value() // 核心 id, 但去掉 namespace
+    fun getItemStack(coreId: String, core: Core): ItemStack {
         val item = when (core) {
-            is AttributeCore -> DynamicRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
-            is EmptyCore -> DynamicRegistries.ITEM["$ICON_ID_PREFIX/empty"]
-            else -> DynamicRegistries.ITEM[DEFAULT_ICON_ID]
+            is AttributeCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/attribute/$coreId"]
+            is EmptyCore -> BuiltInRegistries.ITEM["$ICON_ID_PREFIX/empty"]
+            else -> BuiltInRegistries.ITEM[DEFAULT_ICON_ID]
         } ?: getDefaultIcon()
-        val stack = item.realize()
+        val stack = KoishStackGenerator.generate(item, ItemGenerationContext(item, 0f, 0))
         return stack.apply(ItemRenderers.SIMPLE::render)
     }
 
-    fun getItemStack(core: Core): ItemStack {
-        return getNekoStack(core).bukkitStack
-    }
-
-    private fun getDefaultIcon(): NekoItem {
-        return DynamicRegistries.ITEM[DEFAULT_ICON_ID] ?: run {
+    private fun getDefaultIcon(): KoishItem {
+        return BuiltInRegistries.ITEM[DEFAULT_ICON_ID] ?: run {
             LOGGER.error("Default core icon not found! Please fix your config by add a item with id '$DEFAULT_ICON_ID'")
-            DynamicRegistries.ITEM.getDefaultEntry().unwrap()
+            BuiltInRegistries.ITEM.getDefaultEntry().unwrap()
         }
     }
 }

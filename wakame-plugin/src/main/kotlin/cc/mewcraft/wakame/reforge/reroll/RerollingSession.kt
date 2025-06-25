@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.reforge.reroll
 
-import cc.mewcraft.wakame.item.NekoStack
-import cc.mewcraft.wakame.item.template.ItemGenerationContext
-import cc.mewcraft.wakame.item.templates.components.cells.CoreArchetype
-import cc.mewcraft.wakame.random3.Group
+import cc.mewcraft.wakame.item2.data.impl.Core
+import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.reforge.common.VariableByPlayer
 import net.kyori.adventure.text.Component
 import net.kyori.examination.Examinable
@@ -58,7 +56,7 @@ interface RerollingSession : Examinable {
      * 否则, 该属性会返回一个不为 `null` 的 [NekoStack] 实例.
      */
     @VariableByPlayer
-    val usableInput: NekoStack?
+    val usableInput: ItemStack?
 
     /**
      * 当前 [usableInput] 的重铸规则.
@@ -134,7 +132,7 @@ interface RerollingSession : Examinable {
          * 重造后的物品.
          */
         @get:Contract(" -> new")
-        val output: NekoStack
+        val output: ItemStack
     }
 
     /**
@@ -174,7 +172,7 @@ interface RerollingSession : Examinable {
         /**
          * 核孔的重造规则.
          */
-        val rule: RerollingTable.CellRule
+        val rule: RerollingTable.CoreContainerRule
 
         /**
          * 核孔是否可以被重造.
@@ -184,7 +182,7 @@ interface RerollingSession : Examinable {
         /**
          * 用于重新随机核孔核心的掉落表.
          */
-        val template: Group<CoreArchetype, ItemGenerationContext>
+        val lootTable: LootTable<Core>
 
         /**
          * 核孔花费的计算函数.

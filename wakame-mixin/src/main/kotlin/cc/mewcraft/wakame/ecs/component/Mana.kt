@@ -29,4 +29,10 @@ data class Mana(
         current = x
         return true
     }
+
+    fun ensureMana() {
+        if (current > maximum) {
+            current = maximum
+        }
+    }
 }

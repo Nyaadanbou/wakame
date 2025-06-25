@@ -1,9 +1,8 @@
 package cc.mewcraft.wakame.reforge.reroll
 
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.component.ItemComponentTypes
-import cc.mewcraft.wakame.item.extension.rarity
-import cc.mewcraft.wakame.item.extension.reforgeHistory
+import cc.mewcraft.wakame.item2.data.ItemDataTypes
+import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
@@ -13,7 +12,6 @@ import net.kyori.examination.ExaminableProperty
 import team.unnamed.mocha.MochaEngine
 import team.unnamed.mocha.runtime.MochaFunction
 import team.unnamed.mocha.runtime.binding.Binding
-import java.util.*
 import java.util.stream.Stream
 
 /**
@@ -69,19 +67,19 @@ internal object WtfRerollingTable : RerollingTable {
 
     override fun toString(): String = toSimpleString() // 最简输出
 
-    private data object AnyCellRule : RerollingTable.CellRule {
-        override val currencyCost: RerollingTable.CellCurrencyCost = RerollingTable.CellCurrencyCost { _, _ -> ZERO_MOCHA_FUNCTION }
+    private data object AnyCoreContainerRule : RerollingTable.CoreContainerRule {
+        override val currencyCost: RerollingTable.CoreContainerCurrencyCost = RerollingTable.CoreContainerCurrencyCost { _, _ -> ZERO_MOCHA_FUNCTION }
     }
 
-    private data object AnyCellRuleMap : RerollingTable.CellRuleMap {
+    private data object AnyCoreContainerRuleMap : RerollingTable.CoreContainerRuleMap {
         override val comparator: Comparator<String?> = nullsLast(naturalOrder())
-        override fun get(key: String): RerollingTable.CellRule = AnyCellRule
+        override fun get(key: String): RerollingTable.CoreContainerRule = AnyCoreContainerRule
         override fun contains(key: String): Boolean = true
     }
 
     private data object AnyItemRule : RerollingTable.ItemRule {
         override val modLimit: Int = Int.MAX_VALUE
-        override val cellRuleMap: RerollingTable.CellRuleMap = AnyCellRuleMap
+        override val coreContainerRuleMap: RerollingTable.CoreContainerRuleMap = AnyCoreContainerRuleMap
     }
 }
 
@@ -108,9 +106,9 @@ internal class SimpleRerollingTable(
 
     override fun toString(): String = toSimpleString()
 
-    data class CellRule(
-        override val currencyCost: RerollingTable.CellCurrencyCost,
-    ) : RerollingTable.CellRule {
+    data class CoreContainerRule(
+        override val currencyCost: RerollingTable.CoreContainerCurrencyCost,
+    ) : RerollingTable.CoreContainerRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
             ExaminableProperty.of("currencyCost", currencyCost),
         )
@@ -118,14 +116,14 @@ internal class SimpleRerollingTable(
         override fun toString(): String = toSimpleString()
     }
 
-    data class CellRuleMap(
-        private val data: LinkedHashMap<String, RerollingTable.CellRule>,
-    ) : RerollingTable.CellRuleMap {
+    data class CoreContainerRuleMap(
+        private val data: LinkedHashMap<String, RerollingTable.CoreContainerRule>,
+    ) : RerollingTable.CoreContainerRuleMap {
 
         private val keyOrder: Map<String, Int> = data.keys.withIndex().associate { it.value to it.index }
         override val comparator: Comparator<String?> = nullsLast(compareBy(keyOrder::get))
 
-        override fun get(key: String): RerollingTable.CellRule? {
+        override fun get(key: String): RerollingTable.CoreContainerRule? {
             return data[key]
         }
 
@@ -142,10 +140,10 @@ internal class SimpleRerollingTable(
 
     data class ItemRule(
         override val modLimit: Int,
-        override val cellRuleMap: RerollingTable.CellRuleMap,
+        override val coreContainerRuleMap: RerollingTable.CoreContainerRuleMap,
     ) : RerollingTable.ItemRule {
         override fun examinableProperties(): Stream<out ExaminableProperty> = Stream.of(
-            ExaminableProperty.of("cellRuleMap", cellRuleMap),
+            ExaminableProperty.of("coreRuleMap", coreContainerRuleMap),
         )
 
         override fun toString(): String = toSimpleString()
@@ -180,12 +178,12 @@ internal class SimpleRerollingTable(
         }
     }
 
-    data class CellCurrencyCost(
+    data class CoreContainerCurrencyCost(
         val code: String,
-    ) : RerollingTable.CellCurrencyCost {
+    ) : RerollingTable.CoreContainerCurrencyCost {
         override fun compile(session: RerollingSession, selection: RerollingSession.Selection): MochaFunction {
             val mocha = MochaEngine.createStandard()
-            val binding = CellCostBinding(session, selection)
+            val binding = CoreContainerCostBinding(session, selection)
             mocha.bindInstance(binding, "query")
             return mocha.prepareEval(code)
         }
@@ -199,17 +197,17 @@ internal class TableCostBinding(
     @Binding("source_rarity")
     fun getSourceRarity(): Double {
         val mapping = session.table.rarityNumberMapping
-        val rarity = session.usableInput?.rarity?.getKeyOrThrow()?.value ?: return .0
+        val rarity = session.usableInput?.getData(ItemDataTypes.RARITY)?.getKeyOrThrow()?.value ?: return .0
         return mapping.get(rarity)
     }
 
     @Binding("source_level")
     fun getSourceLevel(): Int {
-        return session.usableInput?.components?.get(ItemComponentTypes.LEVEL)?.level?.toInt() ?: 0
+        return session.usableInput?.getData(ItemDataTypes.LEVEL)?.level ?: 0
     }
 
-    @Binding("cell_count")
-    fun getCellCount(type: String): Int {
+    @Binding("core_container_count")
+    fun getCoreContainerCount(type: String): Int {
         val selectionMap = session.selectionMap
         return when (type) {
             "all" -> selectionMap.size
@@ -232,7 +230,7 @@ internal class TableCostBinding(
 }
 
 @Binding("query")
-internal class CellCostBinding(
+internal class CoreContainerCostBinding(
     val session: RerollingSession,
     val selection: RerollingSession.Selection,
 ) {
@@ -243,6 +241,6 @@ internal class CellCostBinding(
 
     @Binding("mod_count")
     fun getModCount(): Int {
-        return session.usableInput?.reforgeHistory?.modCount ?: 0
+        return session.usableInput?.getData(ItemDataTypes.REFORGE_HISTORY)?.modCount ?: 0
     }
 }

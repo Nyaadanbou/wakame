@@ -51,7 +51,24 @@ sealed interface ItemMetaContainer {
      * @param U 配置类型, 即 [ItemMetaEntry] 的实现类
      * @param V 数据类型, 即 [配置类型][U] 对应的 *数据类型*
      */
-    operator fun <U, V> get(type: ItemMetaType<U, V>): ItemMetaEntry<V>?
+    operator fun <U : ItemMetaEntry<V>, V> get(type: ItemMetaType<U, V>): U?
+
+    /**
+     * 获取指定类型的数据, 如果不存在则返回默认值.
+     */
+    fun <U : ItemMetaEntry<V>, V> getOrDefault(type: ItemMetaType<U, V>, fallback: U): U = get(type) ?: fallback
+
+    /**
+     * 判断是否包含指定类型的配置.
+     *
+     * @param type 要检查的配置类型
+     */
+    infix fun has(type: ItemMetaType<*, *>): Boolean = get(type) != null
+
+    /**
+     * 判断是否包含指定类型的配置.
+     */
+    operator fun contains(type: ItemMetaType<*, *>): Boolean = has(type)
 
     /**
      * [ItemMetaContainer] 的生成器.
@@ -61,7 +78,7 @@ sealed interface ItemMetaContainer {
         /**
          * 设置 [ItemMetaType] 对应的 [ItemMetaEntry].
          */
-        operator fun <U, V> set(type: ItemMetaType<U, V>, value: ItemMetaEntry<V>)
+        operator fun <U : ItemMetaEntry<V>, V> set(type: ItemMetaType<U, V>, value: U)
 
         /**
          * 设置 [ItemMetaType] 对应的 [ItemMetaEntry].
@@ -85,18 +102,18 @@ sealed interface ItemMetaContainer {
 // ------------
 
 private data object EmptyItemMetaContainer : ItemMetaContainer {
-    override fun <U, V> get(type: ItemMetaType<U, V>): ItemMetaEntry<V>? = null
+    override fun <U : ItemMetaEntry<V>, V> get(type: ItemMetaType<U, V>): U? = null
 }
 
 private class SimpleItemMetaContainer(
     private val metaMap: Reference2ObjectLinkedOpenHashMap<ItemMetaType<*, *>, ItemMetaEntry<*>> = Reference2ObjectLinkedOpenHashMap(),
 ) : ItemMetaContainer, ItemMetaContainer.Builder {
 
-    override fun <U, V> get(type: ItemMetaType<U, V>): ItemMetaEntry<V>? {
-        return metaMap[type] as ItemMetaEntry<V>?
+    override fun <U : ItemMetaEntry<V>, V> get(type: ItemMetaType<U, V>): U? {
+        return metaMap[type] as U?
     }
 
-    override fun <U, V> set(type: ItemMetaType<U, V>, value: ItemMetaEntry<V>) {
+    override fun <U : ItemMetaEntry<V>, V> set(type: ItemMetaType<U, V>, value: U) {
         metaMap.put(type, value)
     }
 

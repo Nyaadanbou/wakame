@@ -2,7 +2,6 @@ package cc.mewcraft.wakame.registry2
 
 import cc.mewcraft.wakame.catalog.item.CatalogItemCategory
 import cc.mewcraft.wakame.catalog.item.recipe.CatalogItemLootTableRecipe
-import cc.mewcraft.wakame.item.NekoItem
 import cc.mewcraft.wakame.util.Identifiers
 
 object DynamicRegistryKeys {
@@ -10,9 +9,6 @@ object DynamicRegistryKeys {
     val ROOT_REGISTRY_NAME = Identifiers.of("dynamic")
 
     ///
-
-    @JvmField
-    val ITEM = createRegistryKey<NekoItem>("item")
 
     @JvmField
     val ITEM_CATEGORY = createRegistryKey<CatalogItemCategory>("item_category")

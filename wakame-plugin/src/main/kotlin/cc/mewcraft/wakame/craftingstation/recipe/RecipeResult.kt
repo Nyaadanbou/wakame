@@ -1,12 +1,10 @@
 package cc.mewcraft.wakame.craftingstation.recipe
 
-import cc.mewcraft.wakame.core.ItemX
 import cc.mewcraft.wakame.display2.ItemRenderers
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext
 import cc.mewcraft.wakame.display2.implementation.crafting_station.CraftingStationContext.Pos
 import cc.mewcraft.wakame.gui.BasicMenuSettings
-import cc.mewcraft.wakame.item.ItemStacks
-import cc.mewcraft.wakame.item.wrap
+import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.giveItemStack
@@ -30,12 +28,6 @@ internal sealed interface RecipeResult : Examinable {
     fun apply(player: Player)
 
     /**
-     * 检查此 [RecipeResult] 是否有效.
-     * 用于延迟验证配方是否能够注册.
-     */
-    fun valid(): Boolean
-
-    /**
      * 获取此 [RecipeResult] 展示用的物品堆叠.
      *
      * 由于合成结果不一定是固定的, 其展示用的物品堆叠与最终给予玩家的物品堆叠必须要有区别.
@@ -43,21 +35,29 @@ internal sealed interface RecipeResult : Examinable {
      * 而不是直接展示众多随机结果中的一种. 这样可以使玩家对合成的随机结果有更清晰的认识.
      */
     fun displayItemStack(settings: BasicMenuSettings): ItemStack
+
+    /**
+     * [RecipeResult] 的序列化器.
+     */
+    object Serializer : TypeSerializer2<RecipeResult> {
+        override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
+            val item = node.node("item").require<ItemRef>()
+            val amount = node.node("amount").getInt(1)
+            require(amount >= 1) { "item amount should not less than 1" }
+            return ItemResult(item, amount)
+        }
+    }
 }
 
 /**
  * 物品类型的合成站输出.
  */
 internal data class ItemResult(
-    val item: ItemX,
+    val item: ItemRef,
     val amount: Int,
 ) : RecipeResult {
     override fun apply(player: Player) {
         player.giveItemStack(item.createItemStack(amount, player))
-    }
-
-    override fun valid(): Boolean {
-        return item.valid()
     }
 
     override fun displayItemStack(settings: BasicMenuSettings): ItemStack {
@@ -67,7 +67,7 @@ internal data class ItemResult(
         // 但如果实在有这个需求的话, 也可以写.
 
         // 生成原始的物品堆叠
-        val itemStack = item.createItemStack(amount) ?: ItemStacks.createUnknown(item.identifier)
+        val itemStack = item.createItemStack(amount)
 
         // 然后基于合成站来渲染物品, 主要填充 name & lore
         itemStack.render()
@@ -87,23 +87,10 @@ internal data class ItemResult(
 }
 
 /**
- * [RecipeResult] 的序列化器.
- */
-internal object StationResultSerializer : TypeSerializer2<RecipeResult> {
-    override fun deserialize(type: Type, node: ConfigurationNode): RecipeResult {
-        val item = node.node("item").require<ItemX>()
-        val amount = node.node("amount").getInt(1)
-        require(amount >= 1) { "item amount should not less than 1" }
-        return ItemResult(item, amount)
-    }
-}
-
-/**
  * 方便函数.
  */
 private fun ItemStack.render(): ItemStack {
-    val nekoStack = wrap() ?: return this
-    val context = CraftingStationContext(Pos.RESULT, erase = true)
-    ItemRenderers.CRAFTING_STATION.render(nekoStack, context)
+    val context = CraftingStationContext(Pos.RESULT)
+    ItemRenderers.CRAFTING_STATION.render(this, context)
     return this
 }

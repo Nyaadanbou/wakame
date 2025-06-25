@@ -27,6 +27,11 @@ import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.data.impl.CoreType
 import cc.mewcraft.wakame.item2.data.impl.CoreTypes
 import cc.mewcraft.wakame.kizami2.Kizami
+import cc.mewcraft.wakame.loot.LootTable
+import cc.mewcraft.wakame.loot.entry.LootPoolEntries
+import cc.mewcraft.wakame.loot.entry.LootPoolEntryType
+import cc.mewcraft.wakame.loot.predicate.LootPredicateType
+import cc.mewcraft.wakame.loot.predicate.LootPredicates
 import cc.mewcraft.wakame.rarity2.LevelToRarityMapping
 import cc.mewcraft.wakame.rarity2.Rarity
 import org.jetbrains.annotations.ApiStatus
@@ -186,6 +191,23 @@ object BuiltInRegistries {
     @JvmField
     val ATTACK_SPEED: WritableDefaultedRegistry<AttackSpeed> = registerDefaulted(BuiltInRegistryKeys.ATTACK_SPEED, "intrinsic")
 
+    /**
+     * 战利品表.
+     */
+    @JvmField
+    val LOOT_TABLE: WritableRegistry<LootTable<*>> = registerSimple(BuiltInRegistryKeys.LOOT_TABLE)
+
+    /**
+     * LootPoolEntry 的类型.
+     */
+    @JvmField
+    val LOOT_POOL_ENTRY_TYPE: WritableRegistry<LootPoolEntryType<*>> = registerSimple(BuiltInRegistryKeys.LOOT_POOL_ENTRY_TYPE) { LootPoolEntries }
+
+    /**
+     * LootPredicate 的类型.
+     */
+    @JvmField
+    val LOOT_PREDICATE_TYPE: WritableRegistry<LootPredicateType<*>> = registerSimple(BuiltInRegistryKeys.LOOT_PREDICATE_TYPE) { LootPredicates }
 
     // 在本类型 <clinit> 最后执行所有的 INITIALIZER
     init {

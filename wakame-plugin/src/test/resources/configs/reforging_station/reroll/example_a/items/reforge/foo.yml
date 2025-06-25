@@ -1,6 +1,6 @@
 mod_limit: 8
 
-cells:
+core_container:
 
   a:
     currency_cost: "100.0 * query.mod_count()"

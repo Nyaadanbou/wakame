@@ -35,7 +35,7 @@ components:
     enabled: true
     display_name: "<!i><white>可以施放技能"
 
-  cells:
+  core_container:
     enabled: true
     display_name: "<!i><white>核孔"
     # 虚核心的全局设置
@@ -77,7 +77,7 @@ components:
 
   damage_resistant:
     enabled: true
-    display_name: "<!i><white>伤害免疫"
+    display_name: "<!i><white><value> 伤害免疫"
 
   food:
     enabled: true
@@ -99,7 +99,7 @@ components:
     enabled: true
     display_name: "<!i><white>物品名字"
 
-  kizamiz:
+  kizami:
     enabled: true
     display_name: "<!i><white>铭刻"
 
@@ -121,7 +121,7 @@ components:
     enabled: true
     display_name: "<!i><white>物品技能"
 
-  portable_core:
+  core:
     enabled: true
     display_name: "<!i><white>便携式核心"
 

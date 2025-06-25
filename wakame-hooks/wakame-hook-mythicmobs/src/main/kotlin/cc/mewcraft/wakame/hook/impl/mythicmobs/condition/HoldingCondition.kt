@@ -44,7 +44,7 @@ class HoldingCondition(
             if (entityEquipment != null) {
                 val holding = entityEquipment.itemInMainHand
                 for (itemKey in this.comparisons) {
-                    val itemRef = ItemRef.checkedItemRef(holding)
+                    val itemRef = ItemRef.create(holding)
                     if (itemKey == itemRef.id) {
                         return true
                     }

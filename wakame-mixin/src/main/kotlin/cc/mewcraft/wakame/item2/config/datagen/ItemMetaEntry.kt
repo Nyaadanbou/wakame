@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.item2.config.datagen
 
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.data.ItemDataContainer
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents
@@ -15,7 +16,7 @@ interface ItemMetaEntry<V> {
     /**
      * 根据上下文生成数据 [V].
      */
-    fun make(context: Context): ItemMetaResult<V>
+    fun make(context: ItemGenerationContext): ItemMetaResult<V>
 
     /**
      * 向物品堆叠写入数据 [V].
@@ -24,7 +25,7 @@ interface ItemMetaEntry<V> {
      * 如果要写入的数据是自定义数据类型, 而不是 Minecraft 自带的数据类型,
      * 应该使用函数 [cc.mewcraft.wakame.util.MojangStack.ensureSetData] 来确保数据可以写入成功.
      */
-    fun write(value: V, itemstack: MojangStack)
+    fun write(value: V, itemStack: MojangStack)
 
     /**
      * 向该物品堆叠写入数据 [T], *无论该物品堆叠是否为合法的自定义物品*.

@@ -6,7 +6,7 @@
 只要是 NS(NekoStack)，那么其就一定有完整的 `wakame` NBT 数据，也就是拥有完整的：
 
 - 根数据（id, seed, variant, ...)
-- 核孔 (cell)
+- 核孔 (core_container)
 - 元数据 (meta)
 
 NS 又分为 PNS(PlayNekoStack) 和 SNS(ShowNekoStack)。

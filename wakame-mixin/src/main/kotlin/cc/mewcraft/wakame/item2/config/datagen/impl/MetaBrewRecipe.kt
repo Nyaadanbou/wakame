@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.item2.config.datagen.impl
 
 import cc.mewcraft.wakame.brewery.BrewRecipeManager
-import cc.mewcraft.wakame.item2.config.datagen.Context
+import cc.mewcraft.wakame.item2.context.ItemGenerationContext
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaResult
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
@@ -35,8 +35,8 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             .build()
     }
 
-    override fun write(value: String, itemstack: MojangStack) {
-        itemstack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
+    override fun write(value: String, itemStack: MojangStack) {
+        itemStack.ensureSetData(ItemDataTypes.BREW_RECIPE, ItemBrewRecipe(value, false))
     }
 
     /**
@@ -48,7 +48,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
         val entry: String,
     ) : MetaBrewRecipe {
 
-        override fun make(context: Context): ItemMetaResult<String> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<String> {
             return ItemMetaResult.of(entry)
         }
     }
@@ -62,7 +62,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
         val entries: Set<String>,
     ) : MetaBrewRecipe {
 
-        override fun make(context: Context): ItemMetaResult<String> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<String> {
             return if (entries.isEmpty()) {
                 ItemMetaResult.empty()
             } else {
@@ -81,7 +81,7 @@ interface MetaBrewRecipe : ItemMetaEntry<String> {
             if (node.virtual()) null else RandomFromAll
         }
 
-        override fun make(context: Context): ItemMetaResult<String> {
+        override fun make(context: ItemGenerationContext): ItemMetaResult<String> {
             val result = BrewRecipeManager.INSTANCE.random()?.id
 
             return if (result == null) {

@@ -1,8 +1,8 @@
 package cc.mewcraft.wakame.gui
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.item.SlotDisplay
-import cc.mewcraft.wakame.registry2.DynamicRegistries
+import cc.mewcraft.wakame.item2.display.SlotDisplay
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.adventure.plain
 import net.kyori.adventure.text.Component
@@ -46,7 +46,7 @@ data class BasicMenuSettings(
     fun getSlotDisplay(id: String): SlotDisplay {
         val itemId = icons[id] ?: run {
             LOGGER.warn("Menu icon '$id' not found in the settings of '${title.plain}', using default icon")
-            DynamicRegistries.ITEM.defaultId
+            BuiltInRegistries.ITEM.defaultId
         }
         return SlotDisplay.get(itemId)
     }
