@@ -8,10 +8,16 @@ import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
+import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.test.TestOnly
 import cc.mewcraft.wakame.util.test.TestPath
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -27,6 +33,14 @@ class StationSerializationTest {
         @BeforeAll
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
+            mockkObject(ItemRef)
+            every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
+        }
+
+        @JvmStatic
+        @AfterAll
+        fun teardown() {
+            unmockkObject(ItemRef)
         }
     }
 
@@ -44,14 +58,13 @@ class StationSerializationTest {
         assertContentEquals(
             listOf(
                 ItemChoice(ItemRefMock("minecraft:raw_copper"), 3),
-                ItemChoice(ItemRefMock("wakame:material/raw_tin"), 1),
+                ItemChoice(ItemRefMock("koish:material/raw_tin"), 1),
                 ExpChoice(495)
             ), input1
         )
 
         val output1 = recipe1.output
-        assertEquals(ItemResult(ItemRefMock("wakame:material/raw_bronze"), 4), output1)
-
+        assertEquals(ItemResult(ItemRefMock("koish:material/raw_bronze"), 4), output1)
 
         val key2 = Key.key("test:amethyst_dust")
 
@@ -66,8 +79,7 @@ class StationSerializationTest {
         )
 
         val output2 = recipe2.output
-        assertEquals(ItemResult(ItemRefMock("wakame:material/amethyst_dust"), 2), output2)
-
+        assertEquals(ItemResult(ItemRefMock("koish:material/amethyst_dust"), 2), output2)
 
         val id = "simple_station"
 

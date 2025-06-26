@@ -1,7 +1,0 @@
-nodes:
-  - type: berserker
-    weight: 3
-  - type: guarding
-    weight: 2
-  - type: magic_affinity
-    weight: 1

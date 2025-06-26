@@ -18,7 +18,7 @@ import kotlin.test.fail
 @OptIn(TestOnly::class)
 class CheckMissingComponentConfigTest {
     companion object {
-        const val CONFIG_ID = "cc/mewcraft/wakame/mewcraft/wakame/item2"
+        const val CONFIG_ID = "items"
         const val NODE_COMPONENTS = "components"
     }
 
@@ -62,7 +62,7 @@ class CheckMissingComponentConfigTest {
         }
 
         if (missingConfigs.isNotEmpty()) {
-            fail("Missing item component configs for: ${missingConfigs.joinToString(", ")}")
+            fail("Missing item component configs for: ${missingConfigs.sorted().joinToString(", ")}")
         }
     }
 }

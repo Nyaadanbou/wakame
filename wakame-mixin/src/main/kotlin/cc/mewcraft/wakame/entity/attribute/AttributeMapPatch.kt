@@ -1,7 +1,13 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.util.data.*
+import cc.mewcraft.wakame.util.data.CompoundTag
+import cc.mewcraft.wakame.util.data.ListTag
+import cc.mewcraft.wakame.util.data.NbtUtils
+import cc.mewcraft.wakame.util.data.getByteOrNull
+import cc.mewcraft.wakame.util.data.getDoubleOrNull
+import cc.mewcraft.wakame.util.data.getListOrNull
+import cc.mewcraft.wakame.util.data.getStringOrNull
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -22,7 +28,7 @@ import java.io.IOException
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
 
     companion object {
-        private val PDC_KEY = NamespacedKey.fromString("wakame:attributes") ?: error("Spoogot")
+        private val PDC_KEY = NamespacedKey.fromString("koish:attributes") ?: error("Spoogot")
 
         fun decode(owner: Attributable): AttributeMapPatch {
             if (owner !is PersistentDataHolder) {

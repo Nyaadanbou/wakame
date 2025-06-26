@@ -1,140 +1,58 @@
+version: 1
+
 components:
-
-  arrow:
+  brew_recipe:
     enabled: true
-    display_name: "Arrow"
+    display_name: Brew Recipe
 
-  attack_speed:
-    enabled: true
-    display_name: "Attack Speed"
-
-  attribute_modifiers:
-    enabled: true
-    display_name: "Attribute Modifiers"
-
-  can_break:
-    enabled: true
-    display_name: "Can Break"
-
-  can_place_on:
-    enabled: true
-    display_name: "Can Place On"
-
-  castable:
-    enabled: true
-    display_name: "Castable"
-
-  core_container:
-    enabled: true
-    display_name: "Core Container"
-    virtual_core:
-      display_name: "Virtual Core"
-      description: [ ]
-    empty_core:
-      display_name: "Empty Core"
-      description: [ ]
-
-  crate:
-    enabled: true
-    display_name: "Crate"
-
-  custom_model_data:
-    enabled: true
-    display_name: "Custom Model Data"
-
-  custom_name:
-    enabled: true
-    display_name: "Custom Name"
-
-  damage:
-    enabled: true
-    display_name: "Damage"
-
-  dyed_color:
-    enabled: true
-    display_name: "Dyed Color"
-
-  elements:
-    enabled: true
-    display_name: "Elements"
-
-  enchantments:
-    enabled: true
-    display_name: "Enchantments"
-
-  damage_resistant:
-    enabled: true
-    display_name: "Damage Resistant"
-
-  food:
-    enabled: true
-    display_name: "Food"
-
-  glowable:
-    enabled: true
-    display_name: "Glowable"
-
-  hide_tooltip:
-    enabled: true
-    display_name: "Hide Tooltip"
-
-  hide_additional_tooltip:
-    enabled: true
-    display_name: "Hide Additional Tooltip"
-
-  item_name:
-    enabled: true
-    display_name: "Item Name"
-
-  kizami:
-    enabled: true
-    display_name: "Kizami"
-
-  level:
-    enabled: true
-    display_name: "Level"
-    minimum_level: 1
-
-  lore:
-    enabled: true
-    display_name: "Lore"
-
-  max_damage:
-    enabled: true
-    display_name: "Max Damage"
-
-  player_ability:
-    enabled: true
-    display_name: "Player Ability"
+  bypass_network_rewrite:
+    enabled: false
+    display_name: Bypass Network Rewrite
 
   core:
     enabled: true
-    display_name: "Core"
+    display_name: Core
+
+  cores:
+    enabled: true
+    display_name: Cores
+
+  crate:
+    enabled: true
+    display_name: Crate
+
+  element:
+    enabled: true
+    display_name: Element
+
+  id:
+    enabled: true
+    display_name: ID
+
+  kizami:
+    enabled: true
+    display_name: Kizami
+
+  level:
+    enabled: true
+    display_name: Level
+
+  processed:
+    enabled: true
+    display_name: Processed
 
   rarity:
     enabled: true
-    display_name: "Rarity"
+    display_name: Rarity
 
   reforge_history:
     enabled: true
-    display_name: "Reforge History"
+    display_name: Reforge History
 
-  stored_enchantments:
+  variant:
     enabled: true
-    display_name: "Stored Enchantments"
+    display_name: Variant
 
-  tool:
+  version:
     enabled: true
-    display_name: "Tool"
-
-  tracks:
-    enabled: true
-    display_name: "Tracks"
-
-  trim:
-    enabled: true
-    display_name: "Trim"
-
-  unbreakable:
-    enabled: true
-    display_name: "Unbreakable"
+    display_name: Version

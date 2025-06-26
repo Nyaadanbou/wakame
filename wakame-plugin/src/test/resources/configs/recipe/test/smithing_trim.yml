@@ -1,5 +1,5 @@
 type: smithing_trim
-base: wakame:armor/bronze_helmet
+base: armor/bronze_helmet
 addition:
   - minecraft:amethyst_shard
   - minecraft:copper_ingot
