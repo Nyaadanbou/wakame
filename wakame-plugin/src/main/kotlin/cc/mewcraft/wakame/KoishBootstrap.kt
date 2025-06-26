@@ -4,12 +4,9 @@ import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
-import cc.mewcraft.wakame.entity.entityModule
-import cc.mewcraft.wakame.gui.guiModule
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.AssetExtractor
-import cc.mewcraft.wakame.pack.packModule
 import cc.mewcraft.wakame.util.data.Version
 import cc.mewcraft.wakame.util.data.VersionRange
 import io.papermc.paper.plugin.bootstrap.BootstrapContext
@@ -19,7 +16,6 @@ import kotlinx.coroutines.debug.DebugProbes
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.context.GlobalContext.startKoin
 
 private val REQUIRED_SERVER_VERSION: VersionRange = Version("1.21.4")..Version("1.21.4")
 internal val PREVIOUS_KOISH_VERSION: Version? = PermanentStorage.retrieveOrNull<Version>("last_version")
@@ -37,15 +33,6 @@ internal class KoishBootstrap : PluginBootstrap {
     override fun bootstrap(context: BootstrapContext) {
         LoggerProvider.set(context.logger)
         ConfigAccess.register(Configs) // 配置文件 API 实例趁早注册
-
-        startKoin {
-            modules(
-                // (按字母顺序)
-                entityModule(),
-                guiModule(),
-                packModule(),
-            )
-        }
 
         BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
         BootstrapContexts.registerAuthors(context.pluginMeta.authors)

@@ -25,53 +25,6 @@ val ConstantAttributeBundle.element: RegistryEntry<Element>?
     get() = (this as? AttributeBundleTrait.Element)?.element
 
 /**
- * 从 NBT 构建一个 [ConstantAttributeBundle].
- *
- * 给定的 [CompoundTag] 必须是以下结构之一:
- *
- * ## 对于 ConstantAttributeBundleS
- *
- * ```NBT
- * byte('op'): <operation>
- * byte('value'): <double>
- * byte('quality'): <quality>
- * ```
- *
- * ## 对于 ConstantAttributeBundleSE
- *
- * ```NBT
- * byte('op'): <operation>
- * byte('value'): <double>
- * byte('element'): <element>
- * byte('quality'): <quality>
- * ```
- *
- * ## 对于 ConstantAttributeBundleR
- *
- * ```NBT
- * byte('op'): <operation>
- * byte('lower'): <double>
- * byte('upper'): <double>
- * byte('quality'): <quality>
- * ```
- *
- * ## 对于 ConstantAttributeBundleRE
- *
- * ```NBT
- * byte('op'): <operation>
- * byte('lower'): <double>
- * byte('upper'): <double>
- * byte('element'): <element>
- * byte('quality'): <quality>
- * ```
- */
-fun ConstantAttributeBundle(
-    id: String, tag: CompoundTag,
-): ConstantAttributeBundle {
-    return BuiltInRegistries.ATTRIBUTE_FACADE.getOrThrow(id).convertNbtToConstant(tag)
-}
-
-/**
  * 从配置文件构建一个 [ConstantAttributeBundle].
  *
  * 给定的 [ConfigurationNode] 必须是以下结构之一:

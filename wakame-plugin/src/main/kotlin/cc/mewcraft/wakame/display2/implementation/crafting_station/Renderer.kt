@@ -158,7 +158,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
 
             is MetaElement.Dynamic -> {
                 val selector = data.entries
-                val context = LootContext.EMPTY.apply { isIterating = true }
+                val context = LootContext.default().apply { selectEverything = true }
                 val allPossibleElements = selector.select(context)
                 format.render(allPossibleElements, { it.unwrap().displayName })
             }
@@ -197,7 +197,7 @@ internal object CraftingStationRenderingHandlerRegistry : RenderingHandlerRegist
 
             is MetaKizami.Dynamic -> {
                 val selector = data.selector
-                val allPossibleKizami = selector.select(LootContext.EMPTY) // 进行一次随机的选择, 来向玩家展示可能出现的 Kizami
+                val allPossibleKizami = selector.select(LootContext.default()) // 进行一次随机的选择, 来向玩家展示可能出现的 Kizami
                 format.render(allPossibleKizami, { it.unwrap().displayName })
             }
         }

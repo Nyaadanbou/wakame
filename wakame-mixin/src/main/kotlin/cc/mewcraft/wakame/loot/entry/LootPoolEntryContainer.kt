@@ -7,6 +7,6 @@ abstract class LootPoolEntryContainer<S>(
     val conditions: List<LootPredicate>,
 ) : ComposableEntryContainer<S> {
     protected fun canRun(context: LootContext): Boolean {
-        return context.isIterating || this.conditions.all { it.invoke(context) }
+        return context.selectEverything || this.conditions.all { it.invoke(context) }
     }
 }

@@ -4,6 +4,8 @@ import cc.mewcraft.wakame.KoishDataPaths.ASSETS
 import cc.mewcraft.wakame.KoishDataPaths.CONFIGS
 import cc.mewcraft.wakame.KoishDataPaths.LANG
 import cc.mewcraft.wakame.KoishDataPaths.ROOT
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import java.nio.file.Path
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -47,16 +49,21 @@ object KoishDataPaths {
     /**
      * 重新初始化 [ROOT], [CONFIGS], [ASSETS], [LANG] 的值.
      *
-     * 何时调用该函数:
-     * - 对于 IDE 环境, 该函数应该在单元测试开始之前调用.
-     * - 对于服务端环境, 该函数应该在服务端启动时调用.
+     * 对于服务端环境, 该函数会在服务端启动时调用.
      */
     fun initialize() {
-        if (SharedConstants.isRunningInIde) {
-            paths.root.value = Injector.get<Path>(InjectionQualifier.DATA_FOLDER)
-        } else {
-            paths.root.value = Path.of("plugins/Wakame")
-        }
+        paths.root.value = Path.of("plugins/Wakame")
+        paths.configs.value = ROOT.resolve(CONFIGS_PATH)
+        paths.assets.value = ROOT.resolve(ASSETS_PATH)
+        paths.lang.value = ROOT.resolve(LANG_PATH)
+    }
+
+    /**
+     * 仅用于测试环境的配置初始化函数.
+     */
+    @TestOnly
+    fun initializeForTest(path: TestPath) {
+        paths.root.value = path.testRootPath
         paths.configs.value = ROOT.resolve(CONFIGS_PATH)
         paths.assets.value = ROOT.resolve(ASSETS_PATH)
         paths.lang.value = ROOT.resolve(LANG_PATH)

@@ -56,8 +56,6 @@ dependencies {
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.extra.kotlin))
     implementation(platform(libs.bom.configurate.extra.dfu8))
-    implementation(platform(local.koin.bom))
-    implementation(local.koin.core)
 }
 
 sourceSets {

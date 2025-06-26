@@ -1,60 +1,36 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.element.ElementRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeMap
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.inject
-import org.slf4j.Logger
 import kotlin.test.Test
 
 /**
  * 测试 [DamageBundle] 的 DSL 的正确性.
  */
-class DamageBundleDSLTest : KoinTest {
+class DamageBundleDSLTest {
     companion object {
+        @OptIn(TestOnly::class)
         @BeforeAll
         @JvmStatic
         fun beforeAll() {
-            // 配置依赖注入
-            startKoin {
-                // environment
-                modules(
-                    testEnv()
-                )
-
-                // this module
-                modules(
-                    // damageModule()
-                )
-            }
-
-            KoishDataPaths.initialize()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
 
             // 按依赖顺序, 初始化注册表
             ElementRegistryLoader.init()
         }
-
-        @AfterAll
-        @JvmStatic
-        fun afterAll() {
-            stopKoin()
-        }
     }
-
-    private val logger: Logger by inject()
 
     // 用于测试的 Element 实例
     private lateinit var fireElem: RegistryEntry<Element>
@@ -82,7 +58,7 @@ class DamageBundleDSLTest : KoinTest {
     }
 
     private fun printBundle(id: String, bundle: DamageBundle) {
-        bundle.packets().forEach { logger.info("($id) $it") }
+        bundle.packets().forEach { LOGGER.info("($id) $it") }
     }
 
     // 标准的伤害包构建方式

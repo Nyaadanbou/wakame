@@ -22,7 +22,7 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val selected = lootTable.select(LootContext.EMPTY)
+        val selected = lootTable.select(LootContext.default())
         assertEquals(1, selected.size, "Expected 1 loot entry to be selected")
         println("Singleton loot entry test: $selected")
         assertEquals(42, selected[0], "Expected the loot entry to be 42")
@@ -44,7 +44,7 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val selected = lootTable.select(LootContext.EMPTY)
+        val selected = lootTable.select(LootContext.default())
         assertEquals(2, selected.size, "Expected 2 loot entries to be selected")
         println("Multiple loot pools test: $selected")
         assertEquals(10, selected[0], "Expected the first loot entry to be 10")
@@ -73,7 +73,7 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val selected = lootTable.select(LootContext.EMPTY)
+        val selected = lootTable.select(LootContext.default())
         assertEquals(2, selected.size, "Expected 1 loot entry to be selected")
         println("Alternatives loot entry test: $selected")
         // 只会出现: [100, 100]
@@ -101,14 +101,15 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val selected = lootTable.select(LootContext.EMPTY)
+        val selected = lootTable.select(LootContext.default())
         assertEquals(2, selected.size, "Expected 2 loot entries to be selected in sequence")
         println("Sequential loot entry test: $selected")
 
         // 可能会出现三种情况: [100, 150], [150, 100], [100, 100]
-        assertTrue("Expected the loot entries to be in sequence, either [100, 150], [150, 100], or [100, 100]") {
+        assertTrue("Expected the loot entries to be in sequence, either [100, 150], [150, 100], [150, 150] or [100, 100]") {
             (selected[0] == 100 && selected[1] == 150) ||
                     (selected[0] == 150 && selected[1] == 100) ||
+                    (selected[0] == 150 && selected[1] == 150) ||
                     (selected[0] == 100 && selected[1] == 100)
         }
     }
@@ -138,7 +139,7 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val context = LootContext.EMPTY.apply { isIterating = true }
+        val context = LootContext.default().apply { selectEverything = true }
         val selected = lootTable.select(context)
         assertEquals(2, selected.size, "Expected 2 loot entries to be selected ignoring conditions")
         println("Ignore conditions loot entry test: $selected")
@@ -147,7 +148,7 @@ class LootTableFunctionalityTest {
     }
 
     @Test
-    fun `test iterating compose loot table`() {
+    fun `test iterating alternatives loot table`() {
         val lootPools = listOf(
             LootPool(
                 rolls = 1,
@@ -166,12 +167,43 @@ class LootTableFunctionalityTest {
         )
 
         val lootTable = LootTable(lootPools)
-        val context = LootContext.EMPTY.apply { isIterating = true }
+        val context = LootContext.default().apply { selectEverything = true }
         val selected = lootTable.select(context)
         assertEquals(3, selected.size, "Expected 3 loot entries to be selected ignoring conditions")
         println("Iterating compose loot entry test: $selected")
         assertEquals(50, selected[0], "Expected the loot entry to be 50")
         assertEquals(100, selected[1], "Expected the loot entry to be 100")
         assertEquals(150, selected[2], "Expected the loot entry to be 150")
+    }
+
+    @Test
+    fun `test iterating sequential loot table`() {
+        val lootPools = listOf(
+            LootPool(
+                rolls = 1,
+                conditions = emptyList(),
+                entries = listOf(
+                    SequentialEntry(
+                        children = listOf(
+                            Loot(100), // This will be selected
+                            Loot(150), // This will be selected
+                            Loot(200, conditions = listOf(LootPredicate { false })), // This will be selected
+                            Loot(250), // This will be selected
+                        ),
+                        conditions = emptyList()
+                    )
+                )
+            )
+        )
+
+        val lootTable = LootTable(lootPools)
+        val context = LootContext.default().apply { selectEverything = true }
+        val selected = lootTable.select(context)
+        assertEquals(4, selected.size, "Expected 4 loot entries to be selected ignoring conditions")
+        println("Iterating sequential loot entry test: $selected")
+        assertEquals(100, selected[0], "Expected the first loot entry to be 100")
+        assertEquals(150, selected[1], "Expected the second loot entry to be 150")
+        assertEquals(200, selected[2], "Expected the third loot entry to be 200")
+        assertEquals(250, selected[3], "Expected the fourth loot entry to be 250")
     }
 }

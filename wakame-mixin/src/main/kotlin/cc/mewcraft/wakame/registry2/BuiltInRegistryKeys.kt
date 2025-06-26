@@ -12,6 +12,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -72,6 +73,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val KIZAMI = createRegistryKey<Kizami>("kizami")
+
+    @JvmField
+    val ENTITY_REF_LOOKUP_DIR = createRegistryKey<EntityRefLookup.Dictionary>("entity_ref_lookup_dir")
 
     @JvmField
     val ENTITY_REF = createRegistryKey<EntityRef>("entity_ref")

@@ -8,39 +8,25 @@ import cc.mewcraft.wakame.craftingstation.SimpleCraftingStation
 import cc.mewcraft.wakame.craftingstation.recipe.ExpChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemChoice
 import cc.mewcraft.wakame.craftingstation.recipe.ItemResult
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import kotlinx.coroutines.runBlocking
 import net.kyori.adventure.key.Key
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
-class StationSerializationTest : KoinTest {
+class StationSerializationTest {
 
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
-
-            KoishDataPaths.initialize()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
         }
     }
 

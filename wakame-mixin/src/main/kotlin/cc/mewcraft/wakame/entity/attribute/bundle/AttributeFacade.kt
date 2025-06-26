@@ -5,7 +5,6 @@ import cc.mewcraft.wakame.entity.attribute.AttributeModifier
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Keyed
 import net.kyori.adventure.text.Component
-import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import kotlin.reflect.KClass
@@ -55,11 +54,6 @@ interface AttributeFacade<T : ConstantAttributeBundle, S : VariableAttributeBund
      * A creator for [cc.mewcraft.wakame.item2.data.impl.AttributeCore].
      */
     val convertNodeToConstant: (ConfigurationNode) -> T
-
-    /**
-     * A creator for [cc.mewcraft.wakame.item2.data.impl.AttributeCore].
-     */
-    val convertNbtToConstant: (CompoundTag) -> T
 
     /**
      * A creator for tooltip name.

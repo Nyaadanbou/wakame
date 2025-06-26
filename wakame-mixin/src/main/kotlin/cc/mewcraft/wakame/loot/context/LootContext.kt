@@ -4,27 +4,41 @@ import kotlin.random.Random
 
 interface LootContext {
     companion object {
-        val EMPTY: LootContext = EmptyLootContext
+        fun default(): LootContext {
+            return DefaultLootContext()
+        }
     }
 
+    /**
+     * 随机数生成器, 用于在战利品表中进行随机抽取.
+     */
     val random: Random
 
+    /**
+     * 战利品表的幸运值, 用于影响战利品的掉落概率.
+     *
+     * @see cc.mewcraft.wakame.loot.entry.LootPoolEntry.getWeight
+     */
     val luck: Float
 
     /**
-     * 是否正在迭代整个战利品表的内容.
+     * 是否选择整个战利品表的内容.
      *
-     * 迭代时会忽略战利品表的条件, 不再具有随机性.
-     * 此时的 [cc.mewcraft.wakame.loot.LootPool.rolls] 意为遍历 [cc.mewcraft.wakame.loot.LootPool.rolls] 次战利品表的内容.
+     * 选择时会忽略战利品表的条件, 不再具有随机性.
+     * 此时会忽略 [cc.mewcraft.wakame.loot.LootPool.rolls] 属性,
+     * 直接让内部逻辑选择所有条目并产出数据.
      */
-    var isIterating: Boolean
+    var selectEverything: Boolean
 
+    /**
+     * 战利品表的抽取等级, 用于影响战利品的掉落概率.
+     */
     var level: Int
 }
 
-private object EmptyLootContext : LootContext {
+private class DefaultLootContext : LootContext {
     override val luck: Float = 0f
     override val random: Random = Random.Default
-    override var isIterating: Boolean = false
+    override var selectEverything: Boolean = false
     override var level: Int = 0
 }

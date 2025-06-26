@@ -1,16 +1,12 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemRefMock
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import net.kyori.adventure.key.Key
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.inject
-import org.slf4j.Logger
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,30 +16,17 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
-class VanillaRecipeSerializationTest : KoinTest {
+class VanillaRecipeSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
-
-            KoishDataPaths.initialize()
-
+            KoishDataPaths.initializeForTest(TestPath.TEST)
             MinecraftRecipeRegistryLoader.load()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
         }
     }
 
-    private val logger: Logger by inject()
     private lateinit var key: Key
 
     @BeforeTest
@@ -53,7 +36,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
     @AfterTest
     fun afterTest() {
-        logger.info(key.asString())
+        LOGGER.info(key.asString())
     }
 
     @Test

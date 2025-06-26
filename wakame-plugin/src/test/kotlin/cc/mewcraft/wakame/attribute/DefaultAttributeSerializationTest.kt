@@ -6,47 +6,28 @@ import cc.mewcraft.wakame.entity.attribute.AttributeFacadeRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplierRegistryLoader
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.mockk
 import org.bukkit.attribute.Attributable
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class DefaultAttributeSerializationTest : KoinTest {
+class DefaultAttributeSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv()
-                )
-
-                // this module
-                modules(
-
-                )
-            }
-
-            KoishDataPaths.initialize()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
 
             ElementRegistryLoader.init()
             Attributes.init()
             AttributeFacadeRegistryLoader.init()
             AttributeSupplierRegistryLoader.init()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
         }
     }
 

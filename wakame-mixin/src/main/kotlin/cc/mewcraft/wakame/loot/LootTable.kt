@@ -91,7 +91,7 @@ internal class SimpleLootTable<S>(
 ) : LootTable<S>, Examinable {
     override fun select(context: LootContext): List<S> {
         val result = mutableListOf<S>()
-        val correctPools = if (context.isIterating) {
+        val correctPools = if (context.selectEverything) {
             // 如果忽略条件, 则直接使用所有的 pool
             pools
         } else {

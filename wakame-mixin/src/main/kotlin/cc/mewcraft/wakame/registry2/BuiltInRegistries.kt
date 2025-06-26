@@ -13,6 +13,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -128,6 +129,12 @@ object BuiltInRegistries {
      */
     @JvmField
     val KIZAMI: WritableRegistry<Kizami> = registerSimple(BuiltInRegistryKeys.KIZAMI)
+
+    /**
+     * 实体类型的引用查找.
+     */
+    @JvmField
+    val ENTITY_REF_LOOKUP_DIR: WritableRegistry<EntityRefLookup.Dictionary> = registerSimple(BuiltInRegistryKeys.ENTITY_REF_LOOKUP_DIR)
 
     /**
      * 实体类型的引用.

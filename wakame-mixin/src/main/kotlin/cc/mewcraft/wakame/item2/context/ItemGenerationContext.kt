@@ -23,7 +23,7 @@ data class ItemGenerationContext(
     override var level: Int = 0
 ): LootContext {
     override val random: Random = Random.Default
-    override var isIterating: Boolean = false
+    override var selectEverything: Boolean = false
 
     var rarity: RegistryEntry<Rarity> = BuiltInRegistries.RARITY.getDefaultEntry()
     val attributes: MutableList<AttributeContextData> = mutableListOf()

@@ -3,32 +3,18 @@ package cc.mewcraft.wakame.reforge.blacksmith
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.reforge.recycle.RecyclingStationRegistry
 import cc.mewcraft.wakame.reforge.repair.RepairingTableRegistry
-import cc.mewcraft.wakame.testEnv
-import org.junit.jupiter.api.AfterAll
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import kotlin.test.Test
 
-class BlacksmithStationSerializationTest : KoinTest {
+class BlacksmithStationSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
-
-            KoishDataPaths.initialize()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
         }
     }
 

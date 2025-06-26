@@ -1,28 +1,20 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.util.ObservableDelegates
-import org.junit.jupiter.api.AfterAll
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import kotlin.test.assertTrue
 
 class ObservableValueTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(testEnv())
-            }
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
         }
     }
 
