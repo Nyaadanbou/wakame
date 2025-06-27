@@ -25,10 +25,10 @@ import com.github.quillraven.fleks.EntityComponentContext
  */
 interface EnchantmentListenerBasedEffect {
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     fun apply(entity: Entity, level: Int, slot: ItemSlot)
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     fun remove(entity: Entity, level: Int, slot: ItemSlot)
 
 }

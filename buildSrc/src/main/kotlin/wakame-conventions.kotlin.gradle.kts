@@ -43,7 +43,7 @@ tasks {
             suppressWarnings.set(true)
             freeCompilerArgs.add("-Xjvm-default=all")
             freeCompilerArgs.add("-Xnon-local-break-continue")
-            freeCompilerArgs.add("-Xcontext-receivers")
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
     }
     assemble {

@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.ecs.component.ParticleEffect
 import cc.mewcraft.wakame.ecs.component.TickCount
 import cc.mewcraft.wakame.ecs.data.LinePath
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
+import cc.mewcraft.wakame.ecs.plusAssign
 import cc.mewcraft.wakame.util.text.mini
 import com.destroystokyo.paper.MaterialSetTag
 import com.destroystokyo.paper.ParticleBuilder
@@ -32,7 +33,7 @@ object TickAbilityBlink : IteratingSystem(
         }
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity
 
@@ -44,7 +45,7 @@ object TickAbilityBlink : IteratingSystem(
         return StatePhase.Casting(true)
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.Reset()
         val blink = entity[Blink]
@@ -103,7 +104,7 @@ object TickAbilityBlink : IteratingSystem(
         return StatePhase.Backswing()
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
         val blink = entity[Blink]
         if (!blink.isTeleported) {

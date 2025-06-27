@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.enchantment2.effect
 
+import cc.mewcraft.wakame.ecs.configure
 import cc.mewcraft.wakame.enchantment2.component.Fragile
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import com.github.quillraven.fleks.Entity
@@ -24,7 +25,7 @@ data class EnchantmentFragileEffect(
 
     }
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
             it += Fragile(
@@ -33,7 +34,7 @@ data class EnchantmentFragileEffect(
         }
     }
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     override fun remove(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
             it -= Fragile
