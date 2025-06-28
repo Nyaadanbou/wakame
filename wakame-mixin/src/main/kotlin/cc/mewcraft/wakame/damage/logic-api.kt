@@ -2,9 +2,13 @@
 
 package cc.mewcraft.wakame.damage
 
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -56,11 +60,11 @@ interface DamageManagerApi {
 // ------------
 
 @ApiStatus.Internal
-fun DamageContext(event: EntityDamageEvent): DamageContext {
+fun RawDamageContext(event: EntityDamageEvent): RawDamageContext {
     val damage = event.damage
     val damagee = event.entity as? LivingEntity ?: error("The damagee must be a living entity")
     val damageSource = event.damageSource
-    return DamageContext(damage, damagee, damageSource)
+    return RawDamageContext(damage, damagee, damageSource)
 }
 
 /**
@@ -69,7 +73,7 @@ fun DamageContext(event: EntityDamageEvent): DamageContext {
  * 其中不含 Koish 自定义伤害的信息.
  */
 @ApiStatus.Internal
-class DamageContext(
+class RawDamageContext(
     val damage: Double,
     val damagee: LivingEntity,
     val damageSource: DamageSource
@@ -78,3 +82,48 @@ class DamageContext(
         return "DamageContext(damage=$damage, damagee=$damagee, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
     }
 }
+
+/**
+ * 对最终伤害的信息封装.
+ */
+@ApiStatus.Internal
+class FinalDamageContext(
+    /**
+     * 攻击阶段的伤害信息.
+     */
+    val damageMetadata: DamageMetadata,
+
+    /**
+     * 防御阶段的伤害信息.
+     */
+    val defenseMetadata: DefenseMetadata,
+
+    /**
+     * 原版 [BASE] 修饰器将要被修改为的值.
+     */
+    val baseModifierValue: Double,
+
+    /**
+     * 原版 [BLOCKING] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val blockingModifierValue: Double?,
+
+    /**
+     * 原版 [RESISTANCE] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val resistanceModifierValue: Double?,
+
+    /**
+     * 原版 [ABSORPTION] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val absorptionModifierValue: Double?,
+
+    /**
+     * 各元素的最终伤害值.
+     * 真正意义上的"最终", 可直接显示给玩家.
+     */
+    val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>
+)

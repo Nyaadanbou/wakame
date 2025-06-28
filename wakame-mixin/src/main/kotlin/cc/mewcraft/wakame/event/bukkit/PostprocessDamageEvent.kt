@@ -2,9 +2,9 @@ package cc.mewcraft.wakame.event.bukkit
 
 import cc.mewcraft.wakame.damage.DamageMetadata
 import cc.mewcraft.wakame.damage.DefenseMetadata
+import cc.mewcraft.wakame.damage.FinalDamageContext
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
@@ -20,13 +20,9 @@ import org.bukkit.event.entity.EntityDamageEvent
  * - 无法使用该事件修改伤害.
  * - 伤害的所有计算逻辑均应由伤害系统负责, 不提供外部修改的接口.
  *
- * @property damageMetadata 伤害信息 (攻击阶段)
- * @property defenseMetadata 伤害信息 (防御阶段)
  */
 class PostprocessDamageEvent(
-    val damageMetadata: DamageMetadata,
-    val defenseMetadata: DefenseMetadata,
-    val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
+    val finalDamageContext: FinalDamageContext,
     private val bukkitEvent: EntityDamageEvent,
 ) : Event(), Cancellable {
 
@@ -44,26 +40,29 @@ class PostprocessDamageEvent(
         get() = bukkitEvent.damageSource
 
     /**
-     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 `null`.
+     * 攻击阶段的伤害信息.
      */
-    fun getFinalDamage(element: RegistryEntry<Element>): Double? {
-        if (!finalDamageMap.containsKey(element)) return null
-        return finalDamageMap.getDouble(element)
-    }
+    val damageMetadata: DamageMetadata
+        get() = finalDamageContext.damageMetadata
+
+    /**
+     * 防御阶段的伤害信息.
+     */
+    val defenseMetadata: DefenseMetadata
+        get() = finalDamageContext.defenseMetadata
+
 
     /**
      * 获取本次伤害事件的最终伤害的值 (即各元素的最终伤害的简单相加).
      */
-    fun getFinalDamage(): Double {
-        return finalDamageMap.values.sum()
-    }
+    val finalDamage: Double
+        get() = finalDamageContext.finalDamageMap.values.sum()
 
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      */
-    fun getFinalDamageMap(): Map<RegistryEntry<Element>, Double> {
-        return finalDamageMap
-    }
+    val finalDamageMap: Map<RegistryEntry<Element>, Double>
+        get() = finalDamageContext.finalDamageMap
 
     override fun isCancelled(): Boolean {
         return bukkitEvent.isCancelled

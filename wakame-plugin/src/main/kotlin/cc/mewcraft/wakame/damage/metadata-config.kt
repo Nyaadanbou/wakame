@@ -28,7 +28,7 @@ internal sealed interface DamageMetadataBuilder<T> {
         val SERIALIZER: TypeSerializer2<DamageMetadataBuilder<*>> = Serializer
     }
 
-    fun build(context: DamageContext): DamageMetadata
+    fun build(context: RawDamageContext): DamageMetadata
 
     //
 
@@ -90,7 +90,7 @@ internal data class DirectDamageMetadataBuilder(
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
 ) : DamageMetadataBuilder<Double> {
 
-    override fun build(context: DamageContext): DamageMetadata {
+    override fun build(context: RawDamageContext): DamageMetadata {
         return build()
     }
 
@@ -122,7 +122,7 @@ internal data class VanillaDamageMetadataBuilder(
     val defensePenetrationRate: Double = 0.0,
 ) : DamageMetadataBuilder<Double> {
 
-    override fun build(context: DamageContext): DamageMetadata {
+    override fun build(context: RawDamageContext): DamageMetadata {
         val damage = context.damage
         val damageBundle = damageBundle {
             single(element) {
@@ -144,7 +144,7 @@ internal data class VanillaDamageMetadataBuilder(
 @ConfigSerializable
 internal object AttributeDamageMetadataBuilder: DamageMetadataBuilder<Double> {
 
-    override fun build(context: DamageContext): DamageMetadata {
+    override fun build(context: RawDamageContext): DamageMetadata {
         val damager = context.damageSource.causingEntity ?: throw IllegalStateException(
             "Failed to build damage metadata by attribute map because the damager is null."
         )
@@ -202,7 +202,7 @@ internal data class MolangDamageMetadataBuilder(
     val criticalStrikeMetadata: MolangCriticalStrikeMetadataBuilder,
 ) : DamageMetadataBuilder<Expression> {
 
-    override fun build(context: DamageContext): DamageMetadata {
+    override fun build(context: RawDamageContext): DamageMetadata {
         return build()
     }
 

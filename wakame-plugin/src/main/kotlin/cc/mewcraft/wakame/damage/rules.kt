@@ -21,7 +21,6 @@ internal object DamageRules {
 
     private val VALID_DEFENSE_FORMULA: String by RULES_CONFIG.entry("valid_defense_formula")
     private val DAMAGE_AFTER_DEFENSE_FORMULA: String by RULES_CONFIG.entry("damage_after_defense_formula")
-    private val DAMAGE_AFTER_RESISTANCE_FORMULA: String by RULES_CONFIG.entry("damage_after_resistance_formula")
     private val BOW_FORCE_FORMULA: String by RULES_CONFIG.entry("bow_force_formula")
 
     @Binding("q")
@@ -40,14 +39,6 @@ internal object DamageRules {
         val originalDamage: Double,
         @JvmField @Binding("valid_defense")
         val validDefense: Double,
-    )
-
-    @Binding("q")
-    internal class BindingDamageAfterResistance(
-        @JvmField @Binding("original_damage")
-        val originalDamage: Double,
-        @JvmField @Binding("resistance_level")
-        val resistanceLevel: Int,
     )
 
     @Binding("q")
@@ -85,21 +76,6 @@ internal object DamageRules {
         val mocha = MochaEngine.createStandard()
         mocha.bindInstance(BindingDamageAfterDefense(originalDamage, validDefense), "q")
         return mocha.eval(DAMAGE_AFTER_DEFENSE_FORMULA)
-    }
-
-    /**
-     * 计算抗性提升药水效果等级对伤害的减免.
-     *
-     * 影响因素:
-     * - 原始伤害值
-     * - 抗性提升药水效果等级
-     */
-    fun calculateDamageAfterResistance(
-        originalDamage: Double, resistanceLevel: Int
-    ): Double {
-        val mocha = MochaEngine.createStandard()
-        mocha.bindInstance(BindingDamageAfterResistance(originalDamage, resistanceLevel), "q")
-        return mocha.eval(DAMAGE_AFTER_RESISTANCE_FORMULA)
     }
 
     /**

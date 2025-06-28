@@ -89,6 +89,7 @@ internal object AttributeFacadeRegistryLoader : RegistryLoader {
         +build("attack_effect_chance").single().bind(Attributes.ATTACK_EFFECT_CHANCE)
         +build("attack_knockback").single().bind(Attributes.ATTACK_KNOCKBACK)
         +build("block_interaction_range").single().bind(Attributes.BLOCK_INTERACTION_RANGE)
+        +build("blocking_damage_reduction").single().element().bind(Attributes.BLOCKING_DAMAGE_REDUCTION)
         +build("critical_strike_chance").single().bind(Attributes.CRITICAL_STRIKE_CHANCE)
         +build("critical_strike_power").single().bind(Attributes.CRITICAL_STRIKE_POWER)
         +build("defense").single().element().bind(Attributes.DEFENSE)
