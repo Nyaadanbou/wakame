@@ -27,7 +27,7 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
     }
 
     override fun onEnable() {
-        BootstrapContexts.registerLifecycleManager(lifecycleManager) // LifecycleManager 此时已发生变化, 重新注册
+        BootstrapContexts.registerLifecycleManagerOwnedByPlugin(lifecycleManager) // LifecycleManager 此时已发生变化, 重新注册
 
         // 在 onEnable() 调用 Initializer.performPostWorld() 可以让我们利用 paper-plugin.yml
         // 中的插件依赖的配置项来控制 KoishPlugin#onEnable 的调用时机是先于其他插件还是晚于其他插件.

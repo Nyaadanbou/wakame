@@ -47,7 +47,7 @@ internal class KoishBootstrap : PluginBootstrap {
             )
         }
 
-        BootstrapContexts.registerLifecycleManager(context.lifecycleManager)
+        BootstrapContexts.registerLifecycleManagerOwnedByBootstrap(context.lifecycleManager)
         BootstrapContexts.registerAuthors(context.pluginMeta.authors)
         BootstrapContexts.registerName(context.pluginMeta.name)
         BootstrapContexts.registerVersion(Version(context.pluginMeta.version))

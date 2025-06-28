@@ -63,12 +63,12 @@ object BootstrapContexts {
     }
 
     @ApiStatus.Internal
-    fun registerLifecycleManager(lifecycleEventManager: LifecycleEventManager<BootstrapContext>) {
+    fun registerLifecycleManagerOwnedByBootstrap(lifecycleEventManager: LifecycleEventManager<BootstrapContext>) {
         this.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP = lifecycleEventManager
     }
 
     @ApiStatus.Internal
-    fun registerLifecycleManager(lifecycleEventManager: LifecycleEventManager<Plugin>) {
+    fun registerLifecycleManagerOwnedByPlugin(lifecycleEventManager: LifecycleEventManager<Plugin>) {
         this.LIFECYCLE_MANAGER_OWNED_BY_PLUGIN = lifecycleEventManager
     }
 
