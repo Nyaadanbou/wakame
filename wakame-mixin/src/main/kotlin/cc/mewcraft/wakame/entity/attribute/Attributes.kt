@@ -111,6 +111,8 @@ object Attributes : AttributeProvider {
     @JvmField
     val ATTACK_DAMAGE_RATE = registerLazy { element -> ElementAttribute("attack_damage_rate", 1.0, .0, 16384.0, element) }
     @JvmField
+    val BLOCKING_DAMAGE_REDUCTION = registerLazy { element -> ElementAttribute("blocking_damage_reduction", .0, .0, 16384.0, element) }
+    @JvmField
     val INCOMING_DAMAGE_RATE = registerLazy { element -> ElementAttribute("incoming_damage_rate", 1.0, .0, 16384.0, element) }
     //</editor-fold>
 

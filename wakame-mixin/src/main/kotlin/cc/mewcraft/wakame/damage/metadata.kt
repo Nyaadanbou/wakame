@@ -31,11 +31,6 @@ data class DamageMetadata(
     val criticalStrikeMetadata: CriticalStrikeMetadata,
 
     /**
-     * 此攻击是否忽略无懈可击期间的伤害减免.
-     */
-    val ignoreInvulnerability: Boolean = false,
-
-    /**
      * 此攻击是否忽略格挡的伤害减免.
      */
     val ignoreBlocking: Boolean = false,
@@ -237,9 +232,9 @@ data class DefenseMetadata(
     val incomingDamageRateMap: Reference2DoubleMap<RegistryEntry<Element>>,
 
     /**
-     * 受伤者格挡减伤.
+     * 受伤者因各元素格挡伤害减免值.
      */
-    val isBlocking: Boolean,
+    val blockingDamageReductionMap: Reference2DoubleMap<RegistryEntry<Element>>,
 
     /**
      * 受伤者抗性提升状态效果等级.
@@ -248,13 +243,12 @@ data class DefenseMetadata(
 ) {
     constructor(
         damageeAttributes: AttributeMap,
-        isBlocking: Boolean,
         resistanceLevel: Int
     ) : this(
-        defenseMap = damageeAttributes.getDefenseMap(),
-        incomingDamageRateMap = damageeAttributes.getIncomingDamageRateMap(),
-        isBlocking = isBlocking,
-        resistanceLevel = resistanceLevel
+       damageeAttributes.getDefenseMap(),
+       damageeAttributes.getIncomingDamageRateMap(),
+       damageeAttributes.getBlockingDamageReductionMap(),
+       resistanceLevel
     )
 
     fun getElementDefense(elementType:RegistryEntry<Element>): Double{
@@ -286,6 +280,15 @@ private fun AttributeMap.getIncomingDamageRateMap(): Reference2DoubleMap<Registr
     for (elementType in BuiltInRegistries.ELEMENT.entrySequence) {
         val incomingDamageRate = getValue(Attributes.INCOMING_DAMAGE_RATE.of(elementType))
         map[elementType] = incomingDamageRate
+    }
+    return map
+}
+
+private fun AttributeMap.getBlockingDamageReductionMap(): Reference2DoubleMap<RegistryEntry<Element>> {
+    val map = Reference2DoubleOpenHashMap<RegistryEntry<Element>>()
+    for (elementType in BuiltInRegistries.ELEMENT.entrySequence) {
+        val blockingDamageReduction = getValue(Attributes.BLOCKING_DAMAGE_REDUCTION.of(elementType))
+        map[elementType] = blockingDamageReduction
     }
     return map
 }

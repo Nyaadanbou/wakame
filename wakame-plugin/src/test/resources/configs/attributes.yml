@@ -105,6 +105,38 @@ block_interaction_range:
     min: 1.0
     max: 64.0
 
+blocking_damage_reduction:
+  display_name: "Blocking Damage Reduction"
+  tooltips:
+    add: "Blocking Damage Reduction <value:+#.#;-.><quality>"
+    multiply_base: "Blocking Damage Reduction <value:+#%;-.%><quality>"
+    multiply_total: "Blocking Damage Reduction ×<value:+#%;-.%><quality>"
+  values:
+    neutral:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    fire:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    water:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    wind:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    earth:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    thunder:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+
 critical_strike_chance:
   display_name: "Critical Strike Chance"
   tooltips:

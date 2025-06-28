@@ -2,7 +2,7 @@
 
 package cc.mewcraft.wakame.damage.mapping
 
-import cc.mewcraft.wakame.damage.DamageContext
+import cc.mewcraft.wakame.damage.RawDamageContext
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.extension.transformKeys
 import cc.mewcraft.wakame.util.require
@@ -14,7 +14,7 @@ import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.Type
 
 /**
- * 用于检查 [DamageContext] 是否属于一个特定场景的谓词.
+ * 用于检查 [RawDamageContext] 是否属于一个特定场景的谓词.
  */
 internal sealed interface DamagePredicate {
 
@@ -23,7 +23,7 @@ internal sealed interface DamagePredicate {
         val SERIALIZER: TypeSerializer2<DamagePredicate> = Serializer
     }
 
-    fun test(context: DamageContext): Boolean
+    fun test(context: RawDamageContext): Boolean
 
     //
 
@@ -102,7 +102,7 @@ private data class EntityDataPredicate(
         }
     }
 
-    override fun test(context: DamageContext): Boolean {
+    override fun test(context: RawDamageContext): Boolean {
         val damager = context.damageSource.causingEntity as? LivingEntity ?: return false
         return requiredData.all { (str, num) -> map[str]?.invoke(num, damager) == true }
     }
@@ -118,7 +118,7 @@ private data class DamageTypePredicate(
         const val TYPE_ID = "damage_type"
     }
 
-    override fun test(context: DamageContext): Boolean {
+    override fun test(context: RawDamageContext): Boolean {
         return context.damageSource.damageType in types
     }
 }
@@ -133,7 +133,7 @@ private data class CausingEntityTypePredicate(
         const val TYPE_ID = "causing_entity_type"
     }
 
-    override fun test(context: DamageContext): Boolean {
+    override fun test(context: RawDamageContext): Boolean {
         val causingEntity = context.damageSource.causingEntity ?: return false
         return causingEntity.type in types
     }
@@ -149,7 +149,7 @@ private data class DirectEntityTypePredicate(
         const val TYPE_ID = "direct_entity_type"
     }
 
-    override fun test(context: DamageContext): Boolean {
+    override fun test(context: RawDamageContext): Boolean {
         val directEntity = context.damageSource.directEntity ?: return false
         return directEntity.type in types
     }
@@ -165,7 +165,7 @@ private data class VictimEntityTypePredicate(
         const val TYPE_ID = "victim_entity_type"
     }
 
-    override fun test(context: DamageContext): Boolean {
+    override fun test(context: RawDamageContext): Boolean {
         return context.damagee.type in types
     }
 }
