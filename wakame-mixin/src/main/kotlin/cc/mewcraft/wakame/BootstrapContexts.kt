@@ -1,11 +1,13 @@
 package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.util.data.Version
+import io.papermc.paper.plugin.bootstrap.BootstrapContext
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import org.bukkit.plugin.Plugin
 import org.jetbrains.annotations.ApiStatus
 import java.nio.file.Path
 
@@ -29,8 +31,11 @@ object BootstrapContexts {
     @get:JvmName("getBootstrap")
     lateinit var BOOTSTRAP: PluginBootstrap private set
 
-    @get:JvmName("getLifecycleManager")
-    lateinit var LIFECYCLE_MANAGER: LifecycleEventManager<*> private set
+    @get:JvmName("getLifecycleManagerOwnedByBootstrap")
+    lateinit var LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP: LifecycleEventManager<BootstrapContext> private set
+
+    @get:JvmName("getLifecycleManagerOwnedByPlugin")
+    lateinit var LIFECYCLE_MANAGER_OWNED_BY_PLUGIN: LifecycleEventManager<Plugin> private set
 
     @get:JvmName("getPluginAuthors")
     lateinit var PLUGIN_AUTHORS: List<String> private set
@@ -58,8 +63,13 @@ object BootstrapContexts {
     }
 
     @ApiStatus.Internal
-    fun registerLifecycleManager(lifecycleEventManager: LifecycleEventManager<*>) {
-        this.LIFECYCLE_MANAGER = lifecycleEventManager
+    fun registerLifecycleManager(lifecycleEventManager: LifecycleEventManager<BootstrapContext>) {
+        this.LIFECYCLE_MANAGER_OWNED_BY_BOOTSTRAP = lifecycleEventManager
+    }
+
+    @ApiStatus.Internal
+    fun registerLifecycleManager(lifecycleEventManager: LifecycleEventManager<Plugin>) {
+        this.LIFECYCLE_MANAGER_OWNED_BY_PLUGIN = lifecycleEventManager
     }
 
     @ApiStatus.Internal
