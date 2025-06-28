@@ -1,10 +1,7 @@
 package cc.mewcraft.wakame.loot
 
-import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.data.impl.Core
 import cc.mewcraft.wakame.loot.context.LootContext
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import io.leangen.geantyref.TypeFactory
@@ -12,7 +9,6 @@ import io.leangen.geantyref.TypeToken
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.spongepowered.configurate.ConfigurationNode
-import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.SerializationException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -55,24 +51,9 @@ interface LootTable<S> {
             }
             // 如果 rawScalar 不是字符串, 则是配置文件中直接指定了一整个 LootTable 对象, 或是 LootTable 系统本身在序列化, 进行对应逻辑.
             val type = type as ParameterizedType
-            var sType = type.actualTypeArguments[0]
+            val sType = type.actualTypeArguments[0]
             if (sType is WildcardType) {
-                // 如果 sType 是通配符类型, 则是配置文件中指定了类型, 需要从配置文件中读取
-                val configType = node.node("type").get<String>()
-                    ?: throw SerializationException(node, type, "无法从配置文件中读取类型, 请在配置文件中指定 type 字段, 或请在代码中明确类型")
-                sType = when (configType) {
-                    "core" -> {
-                        // LootPool<Core>
-                        Core::class.java
-                    }
-
-                    "element" -> {
-                        // LootPool<RegistryEntry<Element>>
-                        TypeFactory.parameterizedClass(RegistryEntry::class.java, Element::class.java)
-                    }
-
-                    else -> throw SerializationException(node, type, "Unknown type $sType")
-                }
+                throw SerializationException(node, type, "LootTable 的样本类型不能是通配符类型, 这是一个代码 bug!")
             }
             val poolType = TypeFactory.parameterizedClass(LootPool::class.java, sType) // LootPool<S>
             val poolTypeToken = TypeToken.get(poolType) as TypeToken<LootPool<Any>>
