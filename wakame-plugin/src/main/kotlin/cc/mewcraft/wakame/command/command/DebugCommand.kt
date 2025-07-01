@@ -7,8 +7,6 @@ import cc.mewcraft.wakame.damage.PlayerDamageMetadata
 import cc.mewcraft.wakame.damage.damageBundle
 import cc.mewcraft.wakame.damage.hurt
 import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.item.KoishStackImplementations
-import cc.mewcraft.wakame.item.wrap
 import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
