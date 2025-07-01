@@ -31,15 +31,6 @@ rules:
   #   受伤者该元素的有效防御
   damage_after_defense_formula: "math.max(q.original_damage * (1.0 - (q.valid_defense / (q.original_damage + q.valid_defense))), 0.0)"
 
-  # 计算抗性提升药水效果对伤害的影响的公式.
-  #
-  # 可用参数:
-  # q.original_damage
-  #   原始伤害
-  # q.resistance_level
-  #   受伤者抗性提升药水效果等级
-  damage_after_resistance_formula: "q.original_damage * (1.0 - q.resistance_level * 0.05)"
-
   # 计算拉弓力度的公式.
   #
   # 可用参数:
