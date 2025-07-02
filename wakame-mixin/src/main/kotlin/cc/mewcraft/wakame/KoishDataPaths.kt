@@ -2,6 +2,7 @@ package cc.mewcraft.wakame
 
 import cc.mewcraft.wakame.KoishDataPaths.ASSETS
 import cc.mewcraft.wakame.KoishDataPaths.CONFIGS
+import cc.mewcraft.wakame.KoishDataPaths.DATA
 import cc.mewcraft.wakame.KoishDataPaths.LANG
 import cc.mewcraft.wakame.KoishDataPaths.ROOT
 import cc.mewcraft.wakame.util.test.TestOnly
@@ -13,6 +14,7 @@ import kotlin.reflect.KProperty
 private const val CONFIGS_PATH = "configs"
 private const val ASSETS_PATH = "assets"
 private const val LANG_PATH = "lang"
+private const val DATA_PATH = "data"
 
 object KoishDataPaths {
 
@@ -47,7 +49,13 @@ object KoishDataPaths {
     val LANG: Path by paths.lang
 
     /**
-     * 重新初始化 [ROOT], [CONFIGS], [ASSETS], [LANG] 的值.
+     * 数据文件夹, 位于 [ROOT] 之下的 `data`.
+     */
+    @get:JvmName("getData")
+    val DATA: Path by paths.data
+
+    /**
+     * 重新初始化 [ROOT], [CONFIGS], [ASSETS], [LANG], [DATA] 的值.
      *
      * 对于服务端环境, 该函数会在服务端启动时调用.
      */
@@ -56,6 +64,7 @@ object KoishDataPaths {
         paths.configs.value = ROOT.resolve(CONFIGS_PATH)
         paths.assets.value = ROOT.resolve(ASSETS_PATH)
         paths.lang.value = ROOT.resolve(LANG_PATH)
+        paths.data.value = ROOT.resolve(DATA_PATH)
     }
 
     /**
@@ -67,6 +76,7 @@ object KoishDataPaths {
         paths.configs.value = ROOT.resolve(CONFIGS_PATH)
         paths.assets.value = ROOT.resolve(ASSETS_PATH)
         paths.lang.value = ROOT.resolve(LANG_PATH)
+        paths.data.value = ROOT.resolve(DATA_PATH)
     }
 
     private class PathSet {
@@ -75,6 +85,7 @@ object KoishDataPaths {
         val configs = NotNullVar<Path>()
         val assets = NotNullVar<Path>()
         val lang = NotNullVar<Path>()
+        val data = NotNullVar<Path>()
     }
 
     private class NotNullVar<T : Any>() : ReadWriteProperty<Any?, T> {

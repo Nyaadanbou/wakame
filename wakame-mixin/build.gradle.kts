@@ -43,7 +43,9 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    implementation(libs.hikari)
+    implementation(libs.hikari) {
+        exclude("org.slf4j", "slf4j-api")
+    }
     implementation(libs.mocha)
     implementation(local.shadow.bukkit)
     implementation(local.commons.collections)

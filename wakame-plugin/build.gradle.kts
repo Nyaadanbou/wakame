@@ -62,6 +62,7 @@ dependencies {
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
+    implementation(local.jdbc.mariadb)
 
     // other plugins (hard dependencies)
     compileOnly(local.adventurelevel)
@@ -84,6 +85,9 @@ dependencies {
     testImplementation(local.paper)
     testImplementation(local.datafixerupper)
     testImplementation(local.kotlinx.serialization.core)
+    testImplementation(local.jdbc.mariadb)
+    testImplementation(local.jdbc.sqlite)
+    testImplementation(platform(libs.bom.exposed))
     testImplementation(platform(libs.bom.configurate.yaml))
     testImplementation(platform(libs.bom.configurate.gson))
     testImplementation(platform(libs.bom.configurate.extra.kotlin))

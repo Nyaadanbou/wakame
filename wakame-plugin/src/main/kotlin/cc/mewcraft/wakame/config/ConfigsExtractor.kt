@@ -31,6 +31,7 @@ internal object ConfigsExtractor {
         "damage/damage_type_mappings.yml",
         "damage/null_causing_mappings.yml",
         "damage/player_adhoc_mappings.yml",
+        "database.yml",
         "entities.yml",
         "items.yml",
         "levels.yml",
