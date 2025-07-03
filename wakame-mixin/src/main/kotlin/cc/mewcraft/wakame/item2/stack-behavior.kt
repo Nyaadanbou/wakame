@@ -7,9 +7,9 @@ import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
-import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.MojangStack
 import cc.mewcraft.wakame.util.item.toNMS
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
@@ -78,8 +78,8 @@ fun ItemStack.handleDamage(player: Player, itemstack: ItemStack, event: PlayerIt
 fun ItemStack.handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) =
     handleBehavior { it.handleBreak(player, itemstack, event) }
 
-fun ItemStack.handleEquip(player: Player, itemstack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) =
-    handleBehavior { it.handleEquip(player, itemstack, equipped, event) }
+fun ItemStack.handleEquip(player: Player, itemstack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) =
+    handleBehavior { it.handleEquip(player, itemstack, slot, equipped, event) }
 
 fun ItemStack.handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) =
     handleBehavior { it.handleInventoryClick(player, itemstack, event) }

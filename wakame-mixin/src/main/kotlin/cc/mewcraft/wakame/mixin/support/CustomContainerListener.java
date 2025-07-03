@@ -32,8 +32,8 @@ public class CustomContainerListener implements ContainerListener {
 
     // Paper start - Add PlayerInventorySlotChangeEvent
     @Override
-    public void slotChanged(AbstractContainerMenu handler, int slotId, ItemStack oldStack, ItemStack stack) {
-        Slot slot = handler.getSlot(slotId);
+    public void slotChanged(AbstractContainerMenu containerToSend, int dataSlotIndex, ItemStack oldStack, ItemStack stack) {
+        Slot slot = containerToSend.getSlot(dataSlotIndex);
         if (!(slot instanceof ResultSlot)) {
             if (slot.container == this.serverPlayer.getInventory()) {
                 if (PlayerInventorySlotChangeEvent.getHandlerList().getRegisteredListeners().length == 0) {
@@ -41,7 +41,12 @@ public class CustomContainerListener implements ContainerListener {
                     return;
                 }
                 // Wakame start - pass ItemStack as mirror
-                PlayerInventorySlotChangeEvent event = new PlayerInventorySlotChangeEvent(serverPlayer.getBukkitEntity(), slotId, CraftItemStack.asCraftMirror(oldStack), CraftItemStack.asCraftMirror(stack));
+                PlayerInventorySlotChangeEvent event = new PlayerInventorySlotChangeEvent(
+                        serverPlayer.getBukkitEntity(),
+                        dataSlotIndex,
+                        CraftItemStack.asCraftMirror(oldStack),
+                        CraftItemStack.asCraftMirror(stack)
+                );
                 event.callEvent();
                 // Wakame end - pass ItemStack as mirror
                 if (event.shouldTriggerAdvancements()) {

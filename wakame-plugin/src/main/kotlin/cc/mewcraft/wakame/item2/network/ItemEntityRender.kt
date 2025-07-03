@@ -17,8 +17,8 @@ import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
-import cc.mewcraft.wakame.util.connection
 import cc.mewcraft.wakame.util.item.itemName
+import cc.mewcraft.wakame.util.send
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
@@ -70,7 +70,7 @@ internal object ItemEntityRender : PacketListener {
         for (entityId in event.entityIds.intIterator()) {
             entityId2EntityUniqueId.remove(entityId)
                 ?.let { entityUniqueId -> buildRemoveTeamPacket(entityUniqueId) }
-                ?.let { serverTeamPacket -> event.player.connection.send(serverTeamPacket) }
+                ?.let { serverTeamPacket -> event.player.send(serverTeamPacket) }
         }
     }
 
@@ -96,7 +96,7 @@ internal object ItemEntityRender : PacketListener {
         val rarityColor = item.itemStack.getData(ItemDataTypes.RARITY)?.unwrap()?.color ?: return
         val teamPacket = buildCreateTeamPacket(item, rarityColor)
         entityId2EntityUniqueId[item.entityId] = item.uniqueId
-        player.connection.send(teamPacket)
+        player.send(teamPacket)
     }
 
     private fun buildCreateTeamPacket(itemEntity: Item, color: NamedTextColor): ClientboundSetPlayerTeamPacket {

@@ -6,7 +6,7 @@ kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.3-snapshot"
 copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
-paperweight = "2.0.0-beta.16"
+paperweight = "2.0.0-beta.17"
 blossom = "2.1.0"
 checkstyle = "10.12.5"
 stylecheck = "0.2.1"
@@ -25,7 +25,7 @@ mariadb-jdbc = "3.5.4"
 snakeyaml-engine = "2.8"
 
 # Server deps
-paper = "1.21.4-R0.1-SNAPSHOT"
+paper = "1.21.7-R0.1-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
@@ -52,8 +52,8 @@ quickshop = "6.2.0.9-RELEASE-1"
 towny = "0.100.4.0"
 worldguard = "7.0.7"
 townyflight = "1.13.0"
-nightcore = "2.7.4" # TODO 更新 1.21.4/5 时记得提高该版本号
-economybridge = "1.2.0" # 同上
+nightcore = "2.7.8"
+economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
 
 [libraries]
@@ -130,7 +130,7 @@ papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 quickshop-api = { group = "com.ghostchu", name = "quickshop-api", version.ref = "quickshop" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
-nightcore = { group = "su.nightexpress.nightcore", name = "nightcore", version.ref = "nightcore" }
+nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
 economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
 breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
 

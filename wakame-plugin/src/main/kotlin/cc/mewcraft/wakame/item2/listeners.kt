@@ -11,9 +11,9 @@ import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotRegistry
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
-import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Player
@@ -44,18 +44,20 @@ internal object ItemBehaviorListener : Listener {
     // ------------
     // Item Behavior
     // ------------
-
-    // FIXME #373: ArmorChangeEvent 很早就会被触发
-    //  https://pastes.dev/riyJVh6WMH
+    
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun on(event: ArmorChangeEvent) {
-        val player = event.player
+    fun on(event: EntityEquipmentChangedEvent) {
+        val player = event.entity as? Player ?: return
         if (!player.isInventoryListenable) return
-        val previous = event.previous?.takeUnlessEmpty()
-        val current = event.current?.takeUnlessEmpty()
+        for ((slot, change) in event.equipmentChanges) {
+            val previous  = change.oldItem().takeUnlessEmpty()
+            val current = change.newItem().takeUnlessEmpty()
+            if (previous == current)
+                continue
 
-        previous?.handleEquip(player, previous, false, event)
-        current?.handleEquip(player, current, true, event)
+            change.oldItem().takeUnlessEmpty()?.handleEquip(player, change.oldItem(), slot, false, event)
+            change.newItem().takeUnlessEmpty()?.handleEquip(player, change.newItem(), slot, true, event)
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -36,7 +36,7 @@ import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TranslatableComponent
 import net.kyori.adventure.text.event.HoverEvent
-import net.minecraft.core.component.DataComponentPredicate
+import net.minecraft.core.component.DataComponentExactPredicate
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.protocol.game.ClientboundRecipeBookAddPacket
 import net.minecraft.network.syncher.EntityDataSerializers
@@ -62,7 +62,7 @@ import java.util.*
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "renderer").orElse(false)
 
 /**
- * 修改 [ItemStack].
+ * 修改 [net.minecraft.world.item.ItemStack].
  */
 @Init(stage = InitStage.POST_WORLD)
 internal object ItemStackRender : PacketListener, Listener {
@@ -135,10 +135,10 @@ internal object ItemStackRender : PacketListener, Listener {
 
         event.offers.forEach { offer ->
             val stackA = offer.baseCostA.itemStack.modify()
-            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentPredicate.EMPTY, stackA)
+            val costA = ItemCost(stackA.itemHolder, stackA.count, DataComponentExactPredicate.EMPTY, stackA)
             val costB = offer.costB.map {
                 val stackB = it.itemStack.modify()
-                ItemCost(stackB.itemHolder, stackB.count, DataComponentPredicate.EMPTY, stackB)
+                ItemCost(stackB.itemHolder, stackB.count, DataComponentExactPredicate.EMPTY, stackB)
             }
             newOffers += MerchantOffer(
                 costA, costB, offer.result.modify(),
@@ -253,7 +253,7 @@ internal object ItemStackRender : PacketListener, Listener {
         is SlotDisplay.SmithingTrimDemoSlotDisplay -> SlotDisplay.SmithingTrimDemoSlotDisplay(
             modifySlotDisplay(display.base),
             modifySlotDisplay(display.material),
-            modifySlotDisplay(display.pattern)
+            display.pattern
         )
 
         is SlotDisplay.WithRemainder -> SlotDisplay.WithRemainder(
@@ -264,8 +264,7 @@ internal object ItemStackRender : PacketListener, Listener {
         is SlotDisplay.AnyFuel,
         is SlotDisplay.Empty,
         is SlotDisplay.ItemSlotDisplay,
-        is SlotDisplay.TagSlotDisplay,
-            -> display
+        is SlotDisplay.TagSlotDisplay -> display
 
         else -> {
             LOGGER.warn("Unknown slot display type: ${display.javaClass}")

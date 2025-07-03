@@ -23,7 +23,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.dedicated.DedicatedServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.server.network.ServerGamePacketListenerImpl
 import net.minecraft.world.level.chunk.LevelChunk
 import org.bukkit.Bukkit
 import org.bukkit.Chunk
@@ -58,9 +57,6 @@ val Chunk.levelChunk: LevelChunk
 
 val Player.serverPlayer: ServerPlayer
     get() = (this as CraftPlayer).handle
-
-val Player.connection: ServerGamePacketListenerImpl
-    get() = serverPlayer.connection
 
 val serverTick: Int
     get() = MINECRAFT_SERVER.tickCount
@@ -272,12 +268,12 @@ internal val ResourceLocation.name: String
     get() = path
 
 fun Player.send(vararg packets: Packet<*>) {
-    val connection = connection
+    val connection = serverPlayer.connection
     packets.forEach { connection.send(it) }
 }
 
 fun Player.send(packets: Iterable<Packet<*>>) {
-    val connection = connection
+    val connection = serverPlayer.connection
     packets.forEach { connection.send(it) }
 }
 

@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(targets = "net.minecraft.world.item.ItemStack$1") // ItemStack#OPTIONAL_STREAM_CODEC
+@Mixin(targets = "net.minecraft.world.item.ItemStack$2") // ItemStack#createOptionalStreamCodec
 public abstract class MixinItemStackOptionalStreamCodec {
 
     @Redirect(

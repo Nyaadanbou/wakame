@@ -2,12 +2,12 @@ package cc.mewcraft.wakame.item2.config.property.impl
 
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.MojangStack
+import cc.mewcraft.wakame.util.REGISTRY_ACCESS
 import cc.mewcraft.wakame.util.item.toBukkit
 import cc.mewcraft.wakame.util.item.toNMS
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.exceptions.CommandSyntaxException
 import net.minecraft.commands.arguments.item.ItemParser
-import net.minecraft.server.MinecraftServer
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.spongepowered.configurate.ConfigurationNode
@@ -89,7 +89,7 @@ private data class SimpleItemBase(
         // Source: org.bukkit.craftbukkit.inventory.CraftItemFactory.createItemStack
         try {
             val arguments = type.name.lowercase() + format
-            val arg = ItemParser(MinecraftServer.getDefaultRegistryAccess()).parse(StringReader(arguments))
+            val arg = ItemParser(REGISTRY_ACCESS).parse(StringReader(arguments))
 
             val item = arg.item().value()
             val mojangStack = MojangStack(item)

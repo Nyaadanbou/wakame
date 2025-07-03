@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
 import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
-import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
+import io.papermc.paper.event.entity.EntityEquipmentChangedEvent
 import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
@@ -72,7 +72,7 @@ interface ItemBehavior {
 
     fun handleBreak(player: Player, itemstack: ItemStack, event: PlayerItemBreakEvent) = Unit
 
-    fun handleEquip(player: Player, itemstack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) = Unit
+    fun handleEquip(player: Player, itemstack: ItemStack, slot: EquipmentSlot, equipped: Boolean, event: EntityEquipmentChangedEvent) = Unit
 
     fun handleInventoryClick(player: Player, itemstack: ItemStack, event: InventoryClickEvent) = Unit
 

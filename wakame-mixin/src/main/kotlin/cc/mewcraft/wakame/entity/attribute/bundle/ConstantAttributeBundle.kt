@@ -8,11 +8,9 @@ import cc.mewcraft.wakame.entity.attribute.AttributeModifierSource
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
 import cc.mewcraft.wakame.serialization.configurate.serializer.DispatchingSerializer
-import cc.mewcraft.wakame.util.data.getByteOrNull
 import cc.mewcraft.wakame.util.registerExact
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -121,11 +119,6 @@ sealed class ConstantAttributeBundle : AttributeBundle, AttributeModifierSource 
     abstract fun similarTo(other: ConstantAttributeBundle): Boolean
 
     /**
-     * 序列化为 NBT 标签. 请注意这并不包含 [id] 的信息.
-     */
-    abstract fun saveNbt(): CompoundTag
-
-    /**
      * 生成该 值属性块 的属性修饰符.
      */
     override fun createAttributeModifiers(modifierId: Key): Map<Attribute, AttributeModifier> {
@@ -173,23 +166,9 @@ data class ConstantAttributeBundleS(
     override val value: Double,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleS<Double> {
-    constructor(
-        id: String, compound: CompoundTag,
-    ) : this(
-        id,
-        compound.readOperation(),
-        compound.readNumber(SINGLE_VALUE_FIELD),
-        compound.readQuality(),
-    )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleS && other.id == id && other.operation == operation
-    }
-
-    override fun saveNbt(): CompoundTag = CompoundTag().apply {
-        writeOperation(operation)
-        writeNumber(SINGLE_VALUE_FIELD, value)
-        writeQuality(quality)
     }
 }
 
@@ -202,25 +181,9 @@ data class ConstantAttributeBundleR(
     override val upper: Double,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleR<Double> {
-    constructor(
-        id: String, compound: CompoundTag,
-    ) : this(
-        id,
-        compound.readOperation(),
-        compound.readNumber(RANGED_MIN_VALUE_FIELD),
-        compound.readNumber(RANGED_MAX_VALUE_FIELD),
-        compound.readQuality(),
-    )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleR && other.id == id && other.operation == operation
-    }
-
-    override fun saveNbt(): CompoundTag = CompoundTag().apply {
-        writeOperation(operation)
-        writeNumber(RANGED_MIN_VALUE_FIELD, lower)
-        writeNumber(RANGED_MAX_VALUE_FIELD, upper)
-        writeQuality(quality)
     }
 }
 
@@ -233,25 +196,9 @@ data class ConstantAttributeBundleSE(
     override val element: RegistryEntry<Element>,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleSE<Double> {
-    constructor(
-        id: String, compound: CompoundTag,
-    ) : this(
-        id,
-        compound.readOperation(),
-        compound.readNumber(SINGLE_VALUE_FIELD),
-        compound.readElement(),
-        compound.readQuality(),
-    )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleSE && other.id == id && other.operation == operation && other.element == element
-    }
-
-    override fun saveNbt(): CompoundTag = CompoundTag().apply {
-        writeOperation(operation)
-        writeNumber(SINGLE_VALUE_FIELD, value)
-        writeElement(element)
-        writeQuality(quality)
     }
 }
 
@@ -265,65 +212,8 @@ data class ConstantAttributeBundleRE(
     override val element: RegistryEntry<Element>,
     override val quality: Quality? = null,
 ) : ConstantAttributeBundle(), AttributeBundleRE<Double> {
-    constructor(
-        id: String, compound: CompoundTag,
-    ) : this(
-        id,
-        compound.readOperation(),
-        compound.readNumber(RANGED_MIN_VALUE_FIELD),
-        compound.readNumber(RANGED_MAX_VALUE_FIELD),
-        compound.readElement(),
-        compound.readQuality(),
-    )
 
     override fun similarTo(other: ConstantAttributeBundle): Boolean {
         return other is ConstantAttributeBundleRE && other.id == id && other.operation == operation && other.element == element
     }
-
-    override fun saveNbt(): CompoundTag = CompoundTag().apply {
-        writeOperation(operation)
-        writeNumber(RANGED_MIN_VALUE_FIELD, lower)
-        writeNumber(RANGED_MAX_VALUE_FIELD, upper)
-        writeElement(element)
-        writeQuality(quality)
-    }
-}
-
-private fun CompoundTag.readElement(): RegistryEntry<Element> {
-    val id = getString(ELEMENT_TYPE_FIELD)
-    return BuiltInRegistries.ELEMENT.getEntry(id)
-        ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
-}
-
-private fun CompoundTag.readOperation(): Operation {
-    val id = getByte(OPERATION_TYPE_FIELD).toInt()
-    return Operation.byId(id) ?: error("No such operation with id: $id")
-}
-
-private fun CompoundTag.readNumber(key: String): Double {
-    return getDouble(key)
-}
-
-private fun CompoundTag.readQuality(): ConstantAttributeBundle.Quality? {
-    val id = getByteOrNull(QUALITY_FIELD)?.toInt() ?: return null
-    return ConstantAttributeBundle.Quality.entries[id]
-}
-
-private fun CompoundTag.writeNumber(key: String, value: Double) {
-    putDouble(key, value)
-}
-
-private fun CompoundTag.writeElement(element: RegistryEntry<Element>) {
-    val id = element.getIdAsString()
-    putString(ELEMENT_TYPE_FIELD, id)
-}
-
-private fun CompoundTag.writeOperation(operation: Operation) {
-    val id = operation.id.toByte()
-    putByte(OPERATION_TYPE_FIELD, id)
-}
-
-private fun CompoundTag.writeQuality(quality: ConstantAttributeBundle.Quality?) {
-    val id = quality?.ordinal?.toByte() ?: return
-    putByte(QUALITY_FIELD, id)
 }

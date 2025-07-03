@@ -32,6 +32,7 @@ internal object KoishCommandManager {
     private lateinit var manager: PaperCommandManager.Bootstrapped<Source>
 
     fun bootstrap(context: BootstrapContext) {
+        return // TODO: #392 在 Cloud 更新后移除它
         manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
             .executionCoordinator(ExecutionCoordinator.asyncCoordinator())
             .buildBootstrapped(context)
@@ -66,6 +67,7 @@ internal object KoishCommandManager {
 
     @InitFun
     fun init() {
+        return // TODO: #392 在 Cloud 更新后移除它
         manager.onEnable()
     }
 
