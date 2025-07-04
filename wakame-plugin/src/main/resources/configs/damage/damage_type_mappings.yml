@@ -20,8 +20,6 @@ arrow:
   # 伤害的元数据
   damage_metadata:
     type: vanilla  # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
-    # 伤害的标签
-    damage_tags: [ ]
     # 伤害的元素类型
     element: neutral
     # 可省略, 默认 1.0
@@ -44,14 +42,12 @@ arrow:
 bad_respawn_point:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 cactus:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -59,7 +55,6 @@ cactus:
 campfire:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -67,7 +62,6 @@ campfire:
 cramming:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -75,14 +69,12 @@ cramming:
 dragon_breath:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 drown:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: water
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -90,7 +82,6 @@ drown:
 dry_out:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -106,14 +97,12 @@ dry_out:
 explosion:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 fall:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -121,7 +110,6 @@ fall:
 falling_anvil:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -129,7 +117,6 @@ falling_anvil:
 falling_block:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -137,7 +124,6 @@ falling_block:
 falling_stalactite:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -145,28 +131,24 @@ falling_stalactite:
 fireball:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     critical_strike_metadata:
       chance: 0.0
 fireworks:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 fly_into_wall:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 freeze:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: water
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -174,7 +156,6 @@ freeze:
 generic:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -182,7 +163,6 @@ generic:
 generic_kill:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -190,7 +170,6 @@ generic_kill:
 hot_floor:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -198,7 +177,6 @@ hot_floor:
 in_fire:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -206,7 +184,6 @@ in_fire:
 in_wall:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -214,7 +191,6 @@ in_wall:
 indirect_magic:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -222,7 +198,6 @@ indirect_magic:
 lava:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -230,7 +205,6 @@ lava:
 lightning_bolt:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -238,7 +212,6 @@ lightning_bolt:
 magic:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -253,28 +226,24 @@ magic:
 mob_attack:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 mob_attack_no_aggro:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 mob_projectile:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 on_fire:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -282,7 +251,6 @@ on_fire:
 out_of_world:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -290,7 +258,6 @@ out_of_world:
 outside_border:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -298,35 +265,30 @@ outside_border:
 player_attack:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 player_explosion:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 sonic_boom:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 spit:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 stalagmite:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -334,7 +296,6 @@ stalagmite:
 starve:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     defense_penetration_rate: 1.0
     critical_strike_metadata:
@@ -342,63 +303,54 @@ starve:
 sting:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 sweet_berry_bush:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 thorns:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 thrown:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 trident:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 unattributed_fireball:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: fire
     critical_strike_metadata:
       chance: 0.0
 wind_charge:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: wind
     critical_strike_metadata:
       chance: 0.0
 wither:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
 wither_skull:
   damage_metadata:
     type: vanilla
-    damage_tags: [ ]
     element: neutral
     critical_strike_metadata:
       chance: 0.0
