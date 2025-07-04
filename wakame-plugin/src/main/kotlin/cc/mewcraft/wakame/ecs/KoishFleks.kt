@@ -59,10 +59,10 @@ internal object KoishFleks : Listener, Fleks, FleksAdder {
 
             BuiltInRegistries.SYSTEM_BOOTSTRAPPER.freeze()
 
-            BuiltInRegistries.SYSTEM_BOOTSTRAPPER
-                .keys
-                .filter { it.value !in systemOrder }
-                .also { LOGGER.info("未启用的 ECS 系统: $it") }
+            val unloadSystems = BuiltInRegistries.SYSTEM_BOOTSTRAPPER.keys.filter { it.value !in systemOrder }.map { it.value.value() }
+            if (unloadSystems.isNotEmpty()) {
+                LOGGER.info("未启用的 ECS 系统: ${unloadSystems.joinToString(", ")}")
+            }
             for (order in systemOrder) {
                 val system = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order]
                     ?: error("无法找到系统 $order, 请检查配置文件")
