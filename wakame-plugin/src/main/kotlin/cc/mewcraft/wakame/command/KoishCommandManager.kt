@@ -33,7 +33,7 @@ internal object KoishCommandManager {
     private lateinit var manager: PaperCommandManager.Bootstrapped<Source>
 
     fun bootstrap(context: BootstrapContext) {
-        return
+        return // TODO: #392 在 Cloud 更新后移除
         try {
             manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
                 .executionCoordinator(ExecutionCoordinator.asyncCoordinator())

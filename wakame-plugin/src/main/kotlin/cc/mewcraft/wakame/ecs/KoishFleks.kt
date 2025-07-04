@@ -97,11 +97,11 @@ internal object KoishFleks : Listener, Fleks, FleksAdder {
 
             val unloadSystems = BuiltInRegistries.SYSTEM_BOOTSTRAPPER.keys.filter { it.value !in systemOrder }.map { it.value.value() }
             if (unloadSystems.isNotEmpty()) {
-                LOGGER.info("未启用的 ECS 系统: ${unloadSystems.joinToString(", ")}")
+                LOGGER.info("未启用的 ECS system: ${unloadSystems.joinToString(", ")}")
             }
             for (order in systemOrder) {
                 val system = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order]
-                    ?: error("无法找到系统 $order, 请检查配置文件")
+                    ?: error("无法找到 ECS system $order, 请检查配置文件")
                 add(system.bootstrap())
             }
         }
