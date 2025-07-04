@@ -33,6 +33,7 @@ internal object KoishCommandManager {
     private lateinit var manager: PaperCommandManager.Bootstrapped<Source>
 
     fun bootstrap(context: BootstrapContext) {
+        return
         try {
             manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
                 .executionCoordinator(ExecutionCoordinator.asyncCoordinator())

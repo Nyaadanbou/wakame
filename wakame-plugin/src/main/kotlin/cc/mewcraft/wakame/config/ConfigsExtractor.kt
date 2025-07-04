@@ -33,7 +33,6 @@ internal object ConfigsExtractor {
         "damage/player_adhoc_mappings.yml",
         "database.yml",
         "entities.yml",
-        "fleks.yml",
         "items.yml",
         "levels.yml",
         "resourcepack.yml",

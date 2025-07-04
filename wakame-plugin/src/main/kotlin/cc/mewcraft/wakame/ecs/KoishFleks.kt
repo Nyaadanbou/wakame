@@ -1,8 +1,6 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.system.CountTick
 import cc.mewcraft.wakame.ecs.system.DisplayMana
@@ -20,6 +18,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import com.github.quillraven.fleks.Entity
@@ -30,11 +29,48 @@ import com.github.quillraven.fleks.configureWorld
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-private val GLOBAL_FLEKS_CONFIG = Configs["fleks"]
-
 @InternalInit(stage = InternalInitStage.POST_WORLD)
 internal object KoishFleks : Listener, Fleks, FleksAdder {
-    private val systemOrder: List<Identifier> by GLOBAL_FLEKS_CONFIG.entry("system_order")
+    private val systemOrder: List<Identifier> = listOf(
+        "remove_bukkit_entities",
+        "remove_bukkit_blocks",
+        "init_ability_container",
+        "init_item_cooldown_container",
+        "init_attribute_container",
+        "init_element_stack_container",
+        "init_kizami_container",
+        "init_mana",
+        "init_player_combo",
+        "scan_item_slot_changes",
+        "play_attack_speed_animation",
+        "apply_attribute_effects",
+        "apply_kizami_effects",
+        "switch_katana",
+        "tick_katana",
+        "ability_activator",
+        "ability_remover",
+        "tick_element_stack",
+        "update_entity_info_boss_bar",
+        "manage_boss_bar",
+        "count_tick",
+        "consume_mana_for_abilities",
+        "tick_ability_blackhole",
+        "tick_ability_blink",
+        "tick_ability_dash",
+        "tick_ability_multi_jump",
+        "render_once_off_item_name",
+        "apply_enchantment_effect",
+        "tick_antigrav_shot_enchantment",
+        "tick_attribute_enchantment",
+        "tick_blast_mining_enchantment",
+        "tick_fragile_enchantment",
+        "tick_smelter_enchantment",
+        "tick_veinminer_enchantment",
+        "update_max_mana",
+        "restore_mana",
+        "display_mana",
+        "render_particle"
+    ).map(Identifiers::of)
 
     override val world: World = configureWorld {
 
