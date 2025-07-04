@@ -11,7 +11,6 @@ import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.NodeKey
 import org.spongepowered.configurate.objectmapping.meta.Required
-import org.spongepowered.configurate.objectmapping.meta.Setting
 import org.spongepowered.configurate.serialize.SerializationException
 import team.unnamed.mocha.MochaEngine
 import java.lang.reflect.Type
@@ -83,7 +82,6 @@ internal interface CriticalStrikeMetadataBuilder<T> {
  */
 @ConfigSerializable
 internal data class DirectDamageMetadataBuilder(
-    @Setting(nodeFromParent = true)
     @Required
     val damageBundle: Map<String, DirectDamagePacketBuilder>,
     @Required
@@ -112,7 +110,6 @@ internal data class DirectDamageMetadataBuilder(
  */
 @ConfigSerializable
 internal data class VanillaDamageMetadataBuilder(
-    @Setting(nodeFromParent = true)
     @Required
     val criticalStrikeMetadata: DirectCriticalStrikeMetadataBuilder,
     @Required
@@ -195,7 +192,6 @@ internal data class DirectCriticalStrikeMetadataBuilder(
 
 @ConfigSerializable
 internal data class MolangDamageMetadataBuilder(
-    @Setting(nodeFromParent = true)
     @Required
     val damageBundle: Map<String, MolangDamagePacketBuilder>,
     @Required
