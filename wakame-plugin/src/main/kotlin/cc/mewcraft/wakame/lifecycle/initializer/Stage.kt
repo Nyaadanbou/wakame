@@ -1,7 +1,7 @@
 package cc.mewcraft.wakame.lifecycle.initializer
 
 import cc.mewcraft.wakame.config.Configs
-import cc.mewcraft.wakame.ecs.Fleks
+import cc.mewcraft.wakame.ecs.KoishFleks
 import cc.mewcraft.wakame.util.internalName
 import xyz.xenondevs.commons.collections.mapToArray
 import kotlin.reflect.KClass
@@ -55,7 +55,7 @@ enum class InitStage(
     /**
      * Before Fleks is initialized.
      */
-    PRE_FLEKS(InternalInitStage.POST_WORLD, runAfter = setOf(Fleks::class));
+    PRE_FLEKS(InternalInitStage.POST_WORLD, runAfter = setOf(KoishFleks::class));
 
     internal val runAfter: Array<String> = runAfter.mapToArray { it.internalName }
     internal val runBefore: Array<String> = runBefore.mapToArray { it.internalName }
