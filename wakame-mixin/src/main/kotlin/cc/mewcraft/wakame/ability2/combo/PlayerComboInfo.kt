@@ -12,7 +12,7 @@ import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilitySequenceTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilitySingleTrigger
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
-import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.CommonFamilies
 import cc.mewcraft.wakame.util.RingBuffer
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.runTaskLater
@@ -96,7 +96,7 @@ class PlayerComboInfo(
     }
 
     private fun Player.updateAbilityState(abilityMetaType: AbilityMetaType<*>, penalty: ManaCostPenalty) {
-        Families.ABILITY.forEach { entity ->
+        CommonFamilies.ABILITY.forEach { entity ->
             if (entity[CastBy].entityOrPlayer() != this@updateAbilityState)
                 return@forEach
             if (entity[Ability].meta.type != abilityMetaType)

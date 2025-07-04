@@ -1,12 +1,12 @@
 [versions]
 
 # Gradle plugins
-kotlin = "2.1.10"
-kotlinx-coroutines = "1.10.1"
+kotlin = "2.2.0"
+kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.3-snapshot"
 copy-jar-build = "0.0.1-snapshot"
 copy-jar-docker = "0.0.1-snapshot"
-paperweight = "2.0.0-beta.16"
+paperweight = "2.0.0-beta.17"
 blossom = "2.1.0"
 checkstyle = "10.12.5"
 stylecheck = "0.2.1"
@@ -21,10 +21,11 @@ apache-commons-compress = "1.27.1"
 koin = "4.0.0"
 commons = "1.24"
 fleks = "2.11"
+mariadb-jdbc = "3.5.4"
 snakeyaml-engine = "2.8"
 
 # Server deps
-paper = "1.21.4-R0.1-SNAPSHOT"
+paper = "1.21.7-R0.1-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
@@ -33,13 +34,15 @@ shadow-bukkit = "1.21.3-SNAPSHOT"
 
 # Test deps
 datafixerupper = "8.0.16"
+kotlinx-coroutines-core = "1.8.1"
+jdbc-sqlite = "3.50.2.0"
 
 # Plugin deps
 helper = "6.0.0"
 adventurelevel = "2.0.0"
 betterhud = "1.12"
 bettercommand = "1.4.3"
-mythicmobs = "5.8.0-SNAPSHOT"
+mythicmobs = "5.9.1"
 economy = "2.2.0"
 chestsort = "13.0.0-SNAPSHOT"
 vault = "1.7"
@@ -49,8 +52,8 @@ quickshop = "6.2.0.9-RELEASE-1"
 towny = "0.100.4.0"
 worldguard = "7.0.7"
 townyflight = "1.13.0"
-nightcore = "2.7.4" # TODO 更新 1.21.4/5 时记得提高该版本号
-economybridge = "1.2.0" # 同上
+nightcore = "2.7.8"
+economybridge = "1.2.1" # 同上
 breweryx = "3.4.10"
 
 [libraries]
@@ -86,6 +89,7 @@ commons-provider = { group = "xyz.xenondevs.commons", name = "commons-provider",
 commons-reflection = { group = "xyz.xenondevs.commons", name = "commons-reflection", version.ref = "commons" }
 commons-tuple = { group = "xyz.xenondevs.commons", name = "commons-tuple", version.ref = "commons" }
 fleks = { group = "io.github.quillraven.fleks", name = "Fleks", version.ref = "fleks" }
+jdbc-mariadb = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadb-jdbc" }
 snakeyaml-engine = { group = "org.snakeyaml", name = "snakeyaml-engine", version.ref = "snakeyaml-engine" }
 
 # Server deps
@@ -105,6 +109,8 @@ shadow-bukkit = { group = "cc.mewcraft", name = "shadow-bukkit", version.ref = "
 # 这些依赖只由测试使用. 在实际运行环境中存在服务端中.
 
 datafixerupper = { group = "com.mojang", name = "datafixerupper", version.ref = "datafixerupper" }
+kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-coroutines-core" }
+jdbc-sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "jdbc-sqlite" }
 
 # Plugin deps
 # 这些依赖属于插件, 无论是自研的还是第三方的
@@ -124,7 +130,7 @@ papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 quickshop-api = { group = "com.ghostchu", name = "quickshop-api", version.ref = "quickshop" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
-nightcore = { group = "su.nightexpress.nightcore", name = "nightcore", version.ref = "nightcore" }
+nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
 economybridge = { group = "su.nightexpress.economybridge", name = "economy-bridge", version.ref = "economybridge" }
 breweryx = { group = "com.dre.brewery", name = "BreweryX", version.ref = "breweryx" }
 

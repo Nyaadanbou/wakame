@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.ability2.system
 import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ecs.bridge.EEntity
+import cc.mewcraft.wakame.ecs.get
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import com.github.quillraven.fleks.EntityUpdateContext
 
@@ -13,7 +14,7 @@ interface AbilitySkeleton {
      *
      * @return 下一 tick 的状态.
      */
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tickIdle(tickCount: Int, entity: EEntity): StatePhase {
         // 默认将技能标记为准备移除.
         entity[Ability].isReadyToRemove = true
@@ -25,7 +26,7 @@ interface AbilitySkeleton {
      *
      * @return 下一 tick 的状态.
      */
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase =
         StatePhase.Casting()
 
@@ -34,25 +35,25 @@ interface AbilitySkeleton {
      *
      * @return 下一 tick 的状态.
      */
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tickCast(tickCount: Int, entity: EEntity): StatePhase =
         StatePhase.Backswing()
 
     /**
      * 执行此技能施法后摇逻辑
      */
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tickBackswing(tickCount: Int, entity: EEntity): StatePhase =
         StatePhase.Reset()
 
     /**
      * 执行此技能的重置逻辑.
      */
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tickReset(tickCount: Int, entity: EEntity): StatePhase =
         StatePhase.Idle()
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     fun tick(tickCount: Int, phase: StatePhase, entity: EEntity): StatePhase {
         try {
             return when (phase) {

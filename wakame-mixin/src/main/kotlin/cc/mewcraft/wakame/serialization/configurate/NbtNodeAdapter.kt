@@ -1,6 +1,19 @@
 package cc.mewcraft.wakame.serialization.configurate
 
-import net.minecraft.nbt.*
+import net.minecraft.nbt.ByteArrayTag
+import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.EndTag
+import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.IntArrayTag
+import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.LongArrayTag
+import net.minecraft.nbt.LongTag
+import net.minecraft.nbt.ShortTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.ConfigurationNodeFactory
@@ -8,7 +21,7 @@ import org.spongepowered.configurate.ConfigurationOptions
 import java.io.IOException
 
 /**
- * A configuration adapter that converts Minecraft NBT data into a [ConfigurationNode].
+ * A conNbtfiguration adapter that converts Minecraft NBT data into a [ConfigurationNode].
  */
 object NbtNodeAdapter {
 
@@ -38,15 +51,15 @@ object NbtNodeAdapter {
      */
     fun nbtToNode(tag: Tag?, node: ConfigurationNode) {
         when (tag) {
-            is CompoundTag -> tag.allKeys.forEach { key -> nbtToNode(tag.get(key), node.node(key)) }
+            is CompoundTag -> tag.keySet().forEach { key -> nbtToNode(tag.get(key), node.node(key)) }
             is ListTag -> tag.forEach { value -> nbtToNode(value, node.appendListNode()) }
-            is StringTag -> node.raw(tag.asString)
-            is ByteTag -> node.raw(tag.asByte)
-            is ShortTag -> node.raw(tag.asShort)
-            is IntTag -> node.raw(tag.asInt)
-            is LongTag -> node.raw(tag.asLong)
-            is FloatTag -> node.raw(tag.asFloat)
-            is DoubleTag -> node.raw(tag.asDouble)
+            is StringTag -> node.raw(tag.asString())
+            is ByteTag -> node.raw(tag.asByte())
+            is ShortTag -> node.raw(tag.asShort())
+            is IntTag -> node.raw(tag.asInt())
+            is LongTag -> node.raw(tag.asLong())
+            is FloatTag -> node.raw(tag.asFloat())
+            is DoubleTag -> node.raw(tag.asDouble())
             is ByteArrayTag -> setArrayOrList(node, tag.asByteArray)
             is IntArrayTag -> setArrayOrList(node, tag.asIntArray)
             is LongArrayTag -> setArrayOrList(node, tag.asLongArray)

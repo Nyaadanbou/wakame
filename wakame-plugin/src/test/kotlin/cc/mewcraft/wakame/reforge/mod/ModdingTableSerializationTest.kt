@@ -1,45 +1,27 @@
 package cc.mewcraft.wakame.reforge.mod
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.testEnv
-import org.junit.jupiter.api.AfterAll
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.inject
-import org.slf4j.Logger
-import kotlin.collections.iterator
 import kotlin.test.Test
 
-class ModdingTableSerializationTest : KoinTest {
+class ModdingTableSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
-
-            KoishDataPaths.initialize()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
         }
     }
-
-    private val logger by inject<Logger>()
 
     @Test
     fun `test serialization`() {
         val tables = ModdingTableSerializer.loadAll()
         for (table in tables) {
-            logger.info(table.toString())
+            LOGGER.info(table.toString())
         }
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.TooltipDisplay
 import org.bukkit.Bukkit
 import org.bukkit.craftbukkit.inventory.CraftItemStack
 import org.bukkit.inventory.ItemStack
@@ -98,11 +99,16 @@ var ItemStack.isNetworkRewrite: Boolean
 // 1.20.5/1.21.5 这两版本对于该机制的实现有非常大的变化
 // 设置这些扩展函数, 是为了降低 Koish 需要变动的代码, 以及提高代码的性能
 
-private fun <T : Any> ItemStack.hideData(type: DataComponentType<T>, change: (T) -> T) = whenNotEmpty {
+private fun <T : Any> ItemStack.hideData(type: DataComponentType<T>) = whenNotEmpty {
     val item = toNMS()
-    val oldData = item.get(type) ?: return@whenNotEmpty // 如果没有数据就不需要隐藏, 可以直接返回
-    val newData = change(oldData)
-    item.set(type, newData)
+    item.get(type) ?: return@whenNotEmpty // 如果没有数据就不需要隐藏, 可以直接返回
+    item.set(
+        DataComponents.TOOLTIP_DISPLAY,
+        TooltipDisplay(
+            item.get(DataComponents.TOOLTIP_DISPLAY)?.hideTooltip == true,
+            item.get(DataComponents.TOOLTIP_DISPLAY)?.hiddenComponents?.also { it.toMutableSet().add(type) } ?: linkedSetOf(type)
+        )
+    )
 }
 
 fun ItemStack.hideAll() = whenNotEmpty {
@@ -117,15 +123,15 @@ fun ItemStack.hideAll() = whenNotEmpty {
     hideUnbreakable()
 }
 
-fun ItemStack.hideDyedColor() = hideData(DataComponents.DYED_COLOR) { it.withTooltip(false) }
-fun ItemStack.hideCanBreak() = hideData(DataComponents.CAN_BREAK) { it.withTooltip(false) }
-fun ItemStack.hideCanPlaceOn() = hideData(DataComponents.CAN_PLACE_ON) { it.withTooltip(false) }
-fun ItemStack.hideTrim() = hideData(DataComponents.TRIM) { it.withTooltip(false) }
-fun ItemStack.hideAttributeModifiers() = hideData(DataComponents.ATTRIBUTE_MODIFIERS) { it.withTooltip(false) }
-fun ItemStack.hideEnchantments() = hideData(DataComponents.ENCHANTMENTS) { it.withTooltip(false) }
-fun ItemStack.hideStoredEnchantments() = hideData(DataComponents.STORED_ENCHANTMENTS) { it.withTooltip(false) }
-fun ItemStack.hideJukeboxPlayable() = hideData(DataComponents.JUKEBOX_PLAYABLE) { it.withTooltip(false) }
-fun ItemStack.hideUnbreakable() = hideData(DataComponents.UNBREAKABLE) { it.withTooltip(false) }
+fun ItemStack.hideDyedColor() = hideData(DataComponents.DYED_COLOR)
+fun ItemStack.hideCanBreak() = hideData(DataComponents.CAN_BREAK)
+fun ItemStack.hideCanPlaceOn() = hideData(DataComponents.CAN_PLACE_ON)
+fun ItemStack.hideTrim() = hideData(DataComponents.TRIM)
+fun ItemStack.hideAttributeModifiers() = hideData(DataComponents.ATTRIBUTE_MODIFIERS)
+fun ItemStack.hideEnchantments() = hideData(DataComponents.ENCHANTMENTS)
+fun ItemStack.hideStoredEnchantments() = hideData(DataComponents.STORED_ENCHANTMENTS)
+fun ItemStack.hideJukeboxPlayable() = hideData(DataComponents.JUKEBOX_PLAYABLE)
+fun ItemStack.hideUnbreakable() = hideData(DataComponents.UNBREAKABLE)
 
 
 // Bukkit & Mojang 互相转换

@@ -3,21 +3,15 @@ package cc.mewcraft.wakame.display2
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.display2.implementation.BlankStaticTextMeta
 import cc.mewcraft.wakame.display2.implementation.CustomStaticTextMeta
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import io.mockk.every
-import io.mockk.mockkClass
+import io.mockk.mockk
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.key.Key.key
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.get
-import org.koin.test.mock.MockProvider
-import org.koin.test.mock.declareMock
-import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,30 +21,16 @@ import kotlin.test.assertEquals
  *
  * 本测试使用了 [TextAssemblerTestLifecycle] 来快速构建测试用例.
  */
-class TextAssemblerTest : KoinTest {
+class TextAssemblerTest {
 
     // 每个 test 用到了不同的 RendererConfig 和
     // LoreMetaLookup, 因此需要在每个 test 前后
     // 重新注册和注销 mock
 
+    @OptIn(TestOnly::class)
     @BeforeTest
     fun before() {
-        MockProvider.register { clazz ->
-            mockkClass(clazz)
-        }
-
-        startKoin {
-            modules(
-                testEnv(),
-            )
-        }
-
-        KoishDataPaths.initialize()
-    }
-
-    @AfterTest
-    fun after() {
-        stopKoin()
+        KoishDataPaths.initializeForTest(TestPath.TEST)
     }
 
     // 每个测试都是手动定义好:
@@ -465,7 +445,7 @@ private fun textAssemblerTestLifecycle(init: TextAssemblerTestLifecycle.() -> Un
  * 用于构建测试用例的辅助类. 使用 [textAssemblerTestLifecycle] 来构建测试用例.
  */
 @TextAssemblerTestLifecycleDsl
-private class TextAssemblerTestLifecycle : KoinTest {
+private class TextAssemblerTestLifecycle {
     // built configurations
     private lateinit var defaultTexts: List<IndexedText>
     private lateinit var staticTexts: List<IndexedText>
@@ -496,7 +476,7 @@ private class TextAssemblerTestLifecycle : KoinTest {
         println()
 
         // configure injections
-        declareMock<RendererLayout> {
+        val rendererLayoutMock = mockk<RendererLayout> {
             every { defaultIndexedTextList } returns defaultTexts
             every { staticIndexedTextList } returns staticTexts
             every { getOrdinal(any()) } answers { ordinalMap.getValue(firstArg()) }
@@ -505,7 +485,7 @@ private class TextAssemblerTestLifecycle : KoinTest {
 
         // create assembler
         val assembler = TextAssembler(
-            rendererLayout = get(),
+            rendererLayout = rendererLayoutMock,
         )
 
         // run runners

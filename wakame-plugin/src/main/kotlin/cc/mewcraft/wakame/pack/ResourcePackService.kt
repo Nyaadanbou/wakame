@@ -261,7 +261,7 @@ private class SelfHostService(
     }
 
     private fun buildResourcePack(): BuiltResourcePack? {
-        val file = KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE).toFile()
+        val file = KoishDataPaths.ROOT.resolve(ResourcePackManager.GENERATED_FILE).toFile()
         if (!file.exists() || !file.isFile) {
             LOGGER.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
             return null
@@ -277,7 +277,7 @@ private class SelfHostService(
 
         try {
             watchServiceListener.listenToFile(
-                KoishDataPaths.ROOT.resolve(GENERATED_RESOURCE_PACK_ZIP_FILE)
+                KoishDataPaths.ROOT.resolve(ResourcePackManager.GENERATED_FILE)
             ) { event ->
                 if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                     LOGGER.info("Resource pack file changed. Reloading resource pack...")

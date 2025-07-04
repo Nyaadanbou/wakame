@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.enchantment2.effect
 
 import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.ecs.configure
 import cc.mewcraft.wakame.enchantment2.component.Smelter
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
 import cc.mewcraft.wakame.serialization.codec.BukkitCodecs
@@ -58,7 +59,7 @@ data class EnchantmentSmelterEffect(
             }
     }
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     override fun apply(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
             it += Smelter(
@@ -69,7 +70,7 @@ data class EnchantmentSmelterEffect(
         }
     }
 
-    context(EntityComponentContext)
+    context(_: EntityComponentContext)
     override fun remove(entity: Entity, level: Int, slot: ItemSlot) {
         entity.configure {
             it -= Smelter

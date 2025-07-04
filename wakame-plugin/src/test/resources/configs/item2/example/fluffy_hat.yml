@@ -1,0 +1,9 @@
+# Use case: 一个标准的, 仅作为合成材料使用的物品模板
+
+base: shulker_shell
+
+item_name: "<aqua>毛毛帽"
+
+lore:
+  - "<!i><dark_gray>缤纷纨绔绒"
+  - "<!i><dark_gray>纯绚绵绝缎"

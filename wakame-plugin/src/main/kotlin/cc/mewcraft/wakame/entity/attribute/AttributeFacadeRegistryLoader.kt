@@ -7,8 +7,20 @@ import cc.mewcraft.wakame.config.node
 import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeModifier.Operation
-import cc.mewcraft.wakame.entity.attribute.bundle.*
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTrait
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeBundleTraitSet
+import cc.mewcraft.wakame.entity.attribute.bundle.AttributeFacade
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle.Quality
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleR
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleRE
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundleSE
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleR
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleRE
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleS
+import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundleSE
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -29,7 +41,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
-import net.minecraft.nbt.CompoundTag
 import org.spongepowered.configurate.ConfigurationNode
 import xyz.xenondevs.commons.provider.Provider
 import xyz.xenondevs.commons.provider.orElse
@@ -205,7 +216,6 @@ private class AttributeFacadeImpl<T : ConstantAttributeBundle, S : VariableAttri
     override val createAttributeModifiers: (Key, T) -> Map<Attribute, AttributeModifier>,
     override val convertNodeToVariable: (ConfigurationNode) -> S,
     override val convertNodeToConstant: (ConfigurationNode) -> T,
-    override val convertNbtToConstant: (CompoundTag) -> T,
     override val createTooltipName: (T) -> Component,
     override val createTooltipLore: (T) -> List<Component>,
 ) : AttributeFacade<T, S> {
@@ -372,19 +382,15 @@ private class SingleSelectionImpl(
                 val value = node.scalar
                 ConstantAttributeBundleS(id, operation, value)
             },
-            convertNbtToConstant = { tag ->
-                ConstantAttributeBundleS(id, tag)
-            },
             createTooltipName = {
                 MM.deserialize(displayName)
             },
-            createTooltipLore = { data ->
-                val input = tooltips.line(data.operation)
-                val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
-                val resolver2 = tooltips.component("quality", quality.translate(data.quality))
-                listOf(MM.deserialize(input, resolver1, resolver2))
-            },
-        )
+        ) { data ->
+            val input = tooltips.line(data.operation)
+            val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
+            val resolver2 = tooltips.component("quality", quality.translate(data.quality))
+            listOf(MM.deserialize(input, resolver1, resolver2))
+        }
     }
 }
 
@@ -434,20 +440,16 @@ private class RangedSelectionImpl(
                 val upper = node.max
                 ConstantAttributeBundleR(id, operation, lower, upper)
             },
-            convertNbtToConstant = { tag ->
-                ConstantAttributeBundleR(id, tag)
-            },
             createTooltipName = {
                 MM.deserialize(displayName)
             },
-            createTooltipLore = { data ->
-                val lines = tooltips.line(data.operation)
-                val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
-                val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
-                val resolver3 = tooltips.component("quality", quality.translate(data.quality))
-                listOf(MM.deserialize(lines, resolver1, resolver2, resolver3))
-            },
-        )
+        ) { data ->
+            val lines = tooltips.line(data.operation)
+            val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
+            val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
+            val resolver3 = tooltips.component("quality", quality.translate(data.quality))
+            listOf(MM.deserialize(lines, resolver1, resolver2, resolver3))
+        }
     }
 }
 
@@ -489,21 +491,17 @@ private class AttributeBinderSEImpl(
                 val element = node.element
                 ConstantAttributeBundleSE(id, operation, value, element)
             },
-            convertNbtToConstant = { tag ->
-                ConstantAttributeBundleSE(id, tag)
-            },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.unwrap().displayName)
                 MM.deserialize(displayName, resolver)
             },
-            createTooltipLore = { data ->
-                val input = tooltips.line(data.operation)
-                val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
-                val resolver2 = tooltips.component("element", data.element.unwrap().displayName)
-                val resolver3 = tooltips.component("quality", quality.translate(data.quality))
-                listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
-            },
-        )
+        ) { data ->
+            val input = tooltips.line(data.operation)
+            val resolver1 = tooltips.number("value", scaling.scale(data.operation, data.value))
+            val resolver2 = tooltips.component("element", data.element.unwrap().displayName)
+            val resolver3 = tooltips.component("quality", quality.translate(data.quality))
+            listOf(MM.deserialize(input, resolver1, resolver2, resolver3))
+        }
     }
 }
 
@@ -551,22 +549,18 @@ private class AttributeBinderREImpl(
                 val element = node.element
                 ConstantAttributeBundleRE(id, operation, lower, upper, element)
             },
-            convertNbtToConstant = { tag ->
-                ConstantAttributeBundleRE(id, tag)
-            },
             createTooltipName = {
                 val resolver = Placeholder.component("element", it.element.unwrap().displayName)
                 MM.deserialize(displayName, resolver)
             },
-            createTooltipLore = { data ->
-                val input = tooltips.line(data.operation)
-                val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
-                val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
-                val resolver3 = tooltips.component("element", data.element.unwrap().displayName)
-                val resolver4 = tooltips.component("quality", quality.translate(data.quality))
-                listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
-            },
-        )
+        ) { data ->
+            val input = tooltips.line(data.operation)
+            val resolver1 = tooltips.number("min", scaling.scale(data.operation, data.lower))
+            val resolver2 = tooltips.number("max", scaling.scale(data.operation, data.upper))
+            val resolver3 = tooltips.component("element", data.element.unwrap().displayName)
+            val resolver4 = tooltips.component("quality", quality.translate(data.quality))
+            listOf(MM.deserialize(input, resolver1, resolver2, resolver3, resolver4))
+        }
     }
 }
 

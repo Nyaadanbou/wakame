@@ -1,0 +1,8 @@
+base: gray_stained_glass_pane
+
+slot_display_name: "适用的核心"
+
+# 额外占位符
+# {core}
+slot_display_lore:
+  - "<!i><gray>- {core}"

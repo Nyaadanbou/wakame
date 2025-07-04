@@ -5,7 +5,6 @@ package cc.mewcraft.wakame.item2.behavior.impl
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehavior
-import cc.mewcraft.wakame.player.equipment.ArmorChangeEvent
 import cc.mewcraft.wakame.util.item.damage
 import cc.mewcraft.wakame.util.item.isDamageable
 import cc.mewcraft.wakame.util.item.maxDamage
@@ -47,12 +46,6 @@ object HoldLastDamage : ItemBehavior {
         if (damage + event.damage >= maxDamage) {
             event.isCancelled = true
             itemstack.damage = maxDamage
-        }
-    }
-
-    override fun handleEquip(player: Player, itemstack: ItemStack, equipped: Boolean, event: ArmorChangeEvent) {
-        if (equipped) {
-            tryCancelEvent(itemstack, player, event)
         }
     }
 

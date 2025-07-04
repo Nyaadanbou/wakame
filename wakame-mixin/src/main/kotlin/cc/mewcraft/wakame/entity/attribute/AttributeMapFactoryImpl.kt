@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import org.bukkit.entity.Entity
@@ -9,8 +8,6 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 object AttributeMapFactoryImpl : AttributeMapFactory {
-
-    private val entityRefLookup: EntityRefLookup by Injector.inject()
 
     override fun create(player: Player): AttributeMap {
         val key = EntityType.PLAYER.key // a bit faster than `player.type.key`
@@ -26,7 +23,7 @@ object AttributeMapFactoryImpl : AttributeMapFactory {
         if (entity !is LivingEntity)
             return null // atm only living entity has attribute map
 
-        val key = entityRefLookup.get(entity)
+        val key = EntityRefLookup.get(entity)
         val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(key)
         return EntityAttributeMap(default, entity).apply {
             syncToMinecraft() // 同步到世界

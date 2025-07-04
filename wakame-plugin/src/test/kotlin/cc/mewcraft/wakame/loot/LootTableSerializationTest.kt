@@ -42,7 +42,7 @@ class LootTableSerializationTest {
         val deserialized = rootNode.require<LootTable<Int>>()
         println("Deserialized: $deserialized")
         assertEquals(deserialized.pools.size, 1, "Expected one pool, got ${deserialized.pools.size}")
-        val selected = deserialized.select(LootContext.EMPTY)
+        val selected = deserialized.select(LootContext.default())
         println("Selected: $selected")
         assertEquals(selected.size, 1, "Expected one entry to be selected, got ${selected.size}")
         assertEquals(selected[0], 12, "Expected selected entry data to be 12, got ${selected[0]}")
@@ -69,7 +69,7 @@ class LootTableSerializationTest {
 
         val deserialized = rootNode.require<LootTable<Int>>()
         println("Deserialized with alternatives: $deserialized")
-        val selected = deserialized.select(LootContext.EMPTY)
+        val selected = deserialized.select(LootContext.default())
         println("Selected from alternatives: $selected")
         assertEquals(selected.size, 1, "Expected one entry to be selected from alternatives, got ${selected.size}")
     }
@@ -106,7 +106,7 @@ class LootTableSerializationTest {
 
         val deserialized = rootNode.require<LootTable<TestData>>()
         println("Deserialized complex data: $deserialized")
-        val selected = deserialized.select(LootContext.EMPTY)
+        val selected = deserialized.select(LootContext.default())
         println("Selected complex data: $selected")
         assertEquals(selected.size, 1, "Expected one entry to be selected, got ${selected.size}")
         assertEquals(selected[0].intValue, 42, "Expected intValue to be 42, got ${selected[0].intValue}")

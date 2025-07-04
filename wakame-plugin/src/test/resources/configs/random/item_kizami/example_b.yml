@@ -1,7 +1,0 @@
-nodes:
-  - type: antigravity
-    weight: 3
-  - type: berserker
-    weight: 2
-  - type: guarding
-    weight: 1

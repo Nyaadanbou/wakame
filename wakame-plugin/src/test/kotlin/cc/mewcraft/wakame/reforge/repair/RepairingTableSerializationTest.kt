@@ -1,32 +1,18 @@
 package cc.mewcraft.wakame.reforge.repair
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.testEnv
-import org.junit.jupiter.api.AfterAll
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import kotlin.test.Test
 
-class RepairingTableSerializationTest : KoinTest {
+class RepairingTableSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
-
-            KoishDataPaths.initialize()
-        }
-
-        @JvmStatic
-        @AfterAll
-        fun shutdown() {
-            stopKoin()
+            KoishDataPaths.initializeForTest(TestPath.TEST)
         }
     }
 

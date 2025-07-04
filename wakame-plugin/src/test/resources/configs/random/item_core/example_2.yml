@@ -1,3 +1,0 @@
-nodes:
-  - { type: attribute:defense, value: 10.0, element: neutral, weight: 1 }
-  - { type: attribute:defense, value: 20.0, element: neutral, weight: 1 }

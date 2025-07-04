@@ -1,12 +1,14 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item2.data.ItemDataContainer.Companion.build
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 import cc.mewcraft.wakame.serialization.configurate.STANDARD_SERIALIZERS
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.serialization.configurate.serializer.CompressedEnumValueSerializer
 import cc.mewcraft.wakame.serialization.configurate.serializer.IdentifierSerializer
+import cc.mewcraft.wakame.transformation.Transformations
 import cc.mewcraft.wakame.util.register
 import cc.mewcraft.wakame.util.typeTokenOf
 import com.mojang.serialization.Codec
@@ -14,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import org.jetbrains.annotations.ApiStatus
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.extra.dfu.v8.DfuSerializers
+import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
 import java.lang.reflect.Type
 
@@ -305,6 +308,12 @@ private open class SimpleItemDataContainer(
 
     object Serializer : TypeSerializer2<ItemDataContainer> {
         override fun deserialize(type: Type, node: ConfigurationNode): ItemDataContainer {
+            Transformations.createItemTransformation().apply(node)
+            if (!SharedConstants.isRunningInIde && Transformations.versionNode(node).get<Int>() != SharedConstants.DATA_VERSION) {
+                throw IllegalStateException(
+                    "The item $node data version does not match the expected version ${SharedConstants.DATA_VERSION}. "
+                )
+            }
             val builder = ItemDataContainer.builder()
             for ((rawNodeKey, itemDataNode) in node.childrenMap()) {
                 val nodeKey = rawNodeKey.toString()

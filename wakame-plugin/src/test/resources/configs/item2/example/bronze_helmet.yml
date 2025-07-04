@@ -1,0 +1,26 @@
+# Use case: 新的头盔
+
+base: leather_helmet
+
+slot: minecraft:head
+
+item_name: "<rarity:style>青铜头盔"
+
+level:
+  base: CONTEXT
+  float_chance: 0.15
+  float_amount: "[-2,3]"
+  max: 30
+
+rarity:
+  type: dynamic
+  value: "station"
+
+elements:
+  type: static
+  value: fire
+
+cores:
+  type: dynamic
+  value:
+    test_1: core/simple_core_loot
