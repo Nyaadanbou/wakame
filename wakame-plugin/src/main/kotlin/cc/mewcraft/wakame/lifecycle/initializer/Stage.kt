@@ -55,7 +55,7 @@ enum class InitStage(
     /**
      * Before Fleks is initialized.
      */
-    PRE_FLEKS(InternalInitStage.POST_WORLD, runAfter = setOf(KoishFleks::class));
+    PRE_FLEKS(InternalInitStage.POST_WORLD, runBefore = setOf(KoishFleks::class));
 
     internal val runAfter: Array<String> = runAfter.mapToArray { it.internalName }
     internal val runBefore: Array<String> = runBefore.mapToArray { it.internalName }
