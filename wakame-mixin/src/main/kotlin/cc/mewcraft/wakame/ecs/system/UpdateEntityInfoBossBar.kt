@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.ecs.system
 
-import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.CommonFamilies
 import cc.mewcraft.wakame.ecs.bridge.EEntity
 import cc.mewcraft.wakame.ecs.bridge.canKoishify
 import cc.mewcraft.wakame.ecs.bridge.koishify
@@ -24,7 +24,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 
 object UpdateEntityInfoBossBar : IteratingSystem(
-    family = Families.BUKKIT_ENTITY
+    family = CommonFamilies.BUKKIT_ENTITY
 ), FamilyOnAdd, FamilyOnRemove {
 
     override fun onTickEntity(eentity: EEntity) {

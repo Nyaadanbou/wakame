@@ -27,7 +27,7 @@ import org.bukkit.Bukkit
 import org.objectweb.asm.Type
 import kotlin.reflect.KClass
 
-@Init(stage = InitStage.POST_WORLD)
+@Init(stage = InitStage.PRE_FLEKS)
 internal object HooksLoader {
 
     /** 用户指定的玩家等级系统. */
