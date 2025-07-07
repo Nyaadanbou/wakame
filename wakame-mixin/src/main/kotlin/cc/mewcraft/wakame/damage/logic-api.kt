@@ -8,7 +8,10 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -36,6 +39,12 @@ interface DamageManagerApi {
         damager: LivingEntity? = null,
         knockback: Boolean = false,
     )
+
+    /**
+     * 将插入到原版伤害系统触发 [EntityDamageEvent] 之后、造成实际伤害效果(扣血, 装备损失耐久等)之前的位置.
+     * @return 最终要被记录到 LivingEntity#lastHurt 变量中的值
+     */
+    fun injectDamageLogic(event: EntityDamageEvent, isDuringInvulnerable: Boolean): Float
 
     /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
