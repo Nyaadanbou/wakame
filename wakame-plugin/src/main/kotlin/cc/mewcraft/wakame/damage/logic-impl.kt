@@ -4,9 +4,12 @@
 package cc.mewcraft.wakame.damage
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SERVER
+import cc.mewcraft.wakame.config.MAIN_CONFIG
+import cc.mewcraft.wakame.config.optionalEntry
 import cc.mewcraft.wakame.damage.DamageManager.registerExactArrow
 import cc.mewcraft.wakame.damage.DamageManager.registerTrident
-import cc.mewcraft.wakame.damage.DamageManager.registeredCustomDamageMetadata
+import cc.mewcraft.wakame.damage.DamageManager.registeredDamages
 import cc.mewcraft.wakame.damage.DamageManager.registeredProjectileDamages
 import cc.mewcraft.wakame.damage.mapping.AttackCharacteristicDamageMappings
 import cc.mewcraft.wakame.damage.mapping.DamageTypeDamageMappings
@@ -16,6 +19,7 @@ import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.AttributeMapAccess
 import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
 import cc.mewcraft.wakame.entity.player.attributeContainer
+import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
 import cc.mewcraft.wakame.item2.behavior.ItemBehaviorTypes
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.Weapon
 import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
@@ -31,7 +35,27 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
+import net.kyori.adventure.extra.kotlin.join
+import net.kyori.adventure.text.Component.empty
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
+import net.kyori.adventure.text.JoinConfiguration
+import net.kyori.adventure.text.LinearComponents
+import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
 import org.bukkit.entity.AbstractArrow
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Entity
@@ -44,11 +68,18 @@ import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.FREEZING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.HARD_HAT
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.INVULNERABILITY_REDUCTION
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.MAGIC
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.potion.PotionEffectType
 import xyz.xenondevs.commons.collections.enumSetOf
+import xyz.xenondevs.commons.provider.orElse
 import java.time.Duration
 import java.util.*
 import kotlin.math.min
@@ -57,6 +88,8 @@ import kotlin.math.round
 // ------------
 // 内部实现
 // ------------
+
+private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
 /**
  * 包含伤害系统的计算逻辑和状态.
@@ -141,7 +174,7 @@ internal object DamageManager : DamageManagerApi {
     ) = RecursionGuard.with(
         functionName = "hurt", silenceLogs = true
     ) {
-        victim.registerCustomDamageMetadata(metadata)
+        victim.registerDamageMetadata(metadata)
 
         // 如果自定义伤害有源且需要取消击退.
         // 这里修复了: 无源伤害 (即没有造成伤害的 LivingEntity) 不会触发击退事件.
@@ -154,18 +187,92 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
+     * 包含所有与 Bukkit 伤害事件交互的逻辑.
+     */
+    override fun injectDamageLogic(event: EntityDamageEvent, isDuringInvulnerable: Boolean): Float {
+        val finalDamageContext = handleKoishDamageCalculationLogic(event)
+        if (finalDamageContext == null) {
+            // Bukkit 伤害事件被取消, 后续服务端中的 actuallyHurt 方法会返回false
+            // LivingEntity#lastHurt 变量其实不会被设置
+            // 无需深究返回 0f 可能造成的问题
+            event.isCancelled = true
+            return 0f
+        } else {
+            val finalDamage = finalDamageContext.finalDamageMap.values.sum().toFloat()
+            val damagee = event.entity
+            // 无懈可击期间只会受到大于 lastHurt 的伤害
+            if (isDuringInvulnerable && damagee is LivingEntity) {
+                if (finalDamage <= damagee.lastDamage){
+                    event.isCancelled = true
+                    // 同上无需深究返回 0f 可能造成的问题
+                    return 0f
+                }
+            }
+
+            // 触发 PostprocessDamageEvent 事件
+            val postprocessEvent = PostprocessDamageEvent(finalDamageContext, event)
+            if (!postprocessEvent.callEvent()) {
+                // Koish 伤害事件被取消, 则直接返回
+                // Koish 伤害事件被取消时, 其内部的 Bukkit 伤害事件必然是取消的状态
+                // 同上无需深究返回 0f 可能造成的问题
+                return 0f
+            }
+
+            // 修改 BASE 伤害
+            // 由于原版中某些伤害附带效果只能通过相应修饰器实现, 如增加相应统计信息/扣除黄心等
+            // 故不能将伤害计算全赶到 BASE 中, 必须考虑某些原版伤害修饰器
+            event.modifyDamageModifier(BASE, finalDamageContext.baseModifierValue)
+            // 置零 Koish 伤害系统不考虑的原版伤害修饰器
+            event.removeUnusedDamageModifiers()
+            // 修改 Koish 伤害系统考虑的原版伤害修饰器
+            event.modifyUsedDamageModifiers(finalDamageContext)
+
+            // 记录日志
+            if (LOGGING) postprocessEvent.logging()
+            return finalDamage
+        }
+    }
+
+    /**
+     * Koish 伤害系统对伤害进行修改的逻辑.
+     * 返回空意味着取消伤害事件.
+     */
+    private fun handleKoishDamageCalculationLogic(event: EntityDamageEvent): FinalDamageContext? {
+        // 只处理伤害承受者是生物的情况
+        // TODO 考虑非生物
+        val damagee = event.entity as? LivingEntity ?: return null
+
+        // 提取 Bukkit 伤害事件中的有用信息生成上下文
+        val rawDamageContext = RawDamageContext(event)
+
+        // 计算攻击阶段的伤害信息
+        // 考虑伤害发起者对伤害值的各种影响
+        // 为空时取消伤害事件
+        val damageMetadata = createAttackPhaseMetadata(rawDamageContext) ?: return null
+
+        // 计算防御阶段的伤害信息
+        // 考虑伤害承受者对伤害值的各种影响
+        // 为空时取消伤害事件
+        val defenseMetadata = createDefensePhaseMetadata(rawDamageContext) ?: return null
+
+        // 计算最终伤害的信息
+        val finalDamageContext = createFinalDamageContext(damageMetadata, defenseMetadata)
+        return finalDamageContext
+    }
+
+    /**
      * 计算“攻击阶段”的伤害信息.
      * 即考虑所有因为伤害发起者导致的影响.
      *
      * @return 攻击阶段的伤害信息, null意为取消伤害事件
      */
-    fun createAttackPhaseMetadata(context: RawDamageContext): DamageMetadata? {
+    private fun createAttackPhaseMetadata(context: RawDamageContext): DamageMetadata? {
         val damagee = context.damagee
-        val customDamageMetadata = damagee.getCustomDamageMetadata()
+        val customDamageMetadata = damagee.getRegisteredDamageMetadata()
         if (customDamageMetadata != null) {
             // 该伤害是一个自定义伤害(由代码执行 hurt 造成的),
             // 直接返回已经注册的自定义伤害信息
-            damagee.unregisterCustomDamageMetadata() // 注销, 因为已经“用掉”了
+            damagee.unregisterDamageMetadata() // 注销, 因为已经“用掉”了
             return customDamageMetadata
         }
 
@@ -244,7 +351,7 @@ internal object DamageManager : DamageManagerApi {
      *
      * @return 防御阶段的伤害信息, null意为取消伤害事件
      */
-    fun createDefensePhaseMetadata(context: RawDamageContext): DefenseMetadata? {
+    private fun createDefensePhaseMetadata(context: RawDamageContext): DefenseMetadata? {
         val damagee = context.damagee
         val damageeAttributes = AttributeMapAccess.INSTANCE.get(damagee).getOrElse {
             LOGGER.warn("Failed to generate defense metadata because the entity $damagee does not have an attribute map.")
@@ -260,7 +367,7 @@ internal object DamageManager : DamageManagerApi {
     /**
      * 计算并创建 [FinalDamageContext].
      */
-    fun createFinalDamageContext(damageMetadata: DamageMetadata, defenseMetadata: DefenseMetadata): FinalDamageContext {
+    private fun createFinalDamageContext(damageMetadata: DamageMetadata, defenseMetadata: DefenseMetadata): FinalDamageContext {
         val baseModifierValueMap = calculateBaseModifierValueMap(damageMetadata, defenseMetadata)
         val blockingModifierValueMap = calculateBlockingModifierValueMap(damageMetadata, defenseMetadata, baseModifierValueMap)
         val resistanceModifierValue = calculateResistanceModifierValue(damageMetadata)
@@ -416,6 +523,128 @@ internal object DamageManager : DamageManagerApi {
         }
 
         return finalDamageMap
+    }
+
+    /**
+     * 方便函数.
+     * 固定置零伤害事件中的以下伤害修饰器:
+     * [INVULNERABILITY_REDUCTION] - 无懈可击期间的伤害减免 - 为了元素可合适的作为伤害组分而移除. 由于小于等于 lastHurt 的伤害不会触发伤害事件, 故移除此修饰器不会导致高频伤害失去保护.
+     * [FREEZING] - 烈焰人等受细雪伤害*5 - 该特性通过给相关生物配置对应元素承伤倍率实现
+     * [HARD_HAT] - 头盔减少25%下落的方块伤害 - 该特性无关紧要
+     * [ARMOR] - 原版盔甲值/盔甲韧性/魔咒效果组件armor_effectiveness的伤害减免 - Koish 专门的防御力机制已在 [BASE] 中考虑
+     * [MAGIC] - 魔咒保护系数伤害减免/女巫85%魔法伤害减免 - Koish 专门的防御力机制已在 [BASE] 中考虑
+     */
+    private fun EntityDamageEvent.removeUnusedDamageModifiers() {
+        modifyDamageModifier(INVULNERABILITY_REDUCTION, .0)
+        modifyDamageModifier(FREEZING, .0)
+        modifyDamageModifier(HARD_HAT, .0)
+        modifyDamageModifier(ARMOR, .0)
+        modifyDamageModifier(MAGIC, .0)
+    }
+
+    /**
+     * 方便函数.
+     * 修改伤害事件中的以下伤害修饰器:
+     * [BLOCKING] - 格挡
+     * [RESISTANCE] - 抗性提升药水效果伤害减免
+     * [ABSORPTION] - 伤害吸收
+     */
+    private fun EntityDamageEvent.modifyUsedDamageModifiers(
+        finalDamageContext: FinalDamageContext
+    ) {
+        finalDamageContext.blockingModifierValue?.let { modifyDamageModifier(BLOCKING, it) }
+        finalDamageContext.resistanceModifierValue?.let { modifyDamageModifier(RESISTANCE, it) }
+        finalDamageContext.absorptionModifierValue?.let { modifyDamageModifier(ABSORPTION, it) }
+    }
+
+    /**
+     * 方便函数.
+     * 修改特定原版伤害修饰器.
+     */
+    private fun EntityDamageEvent.modifyDamageModifier(modifierType: EntityDamageEvent.DamageModifier, value: Double): Boolean {
+        if (this.isApplicable(modifierType)) {
+            this.setDamage(modifierType, value)
+            return true
+        }
+        return false
+    }
+
+    /**
+     * 方便函数.
+     * 伤害日志.
+     */
+    private fun PostprocessDamageEvent.logging() {
+        LOGGER.info("${damagee.type}(${damagee.uniqueId}) 受到了 $finalDamage 点伤害")
+
+        val power = damageMetadata.criticalStrikeMetadata.power
+        val attackPhaseComponent = text("原始伤害:")
+            .appendNewline()
+            .append(
+                damageMetadata.damageBundle.packets()
+                    .map { packet -> LinearComponents.linear(text(" - "), packet.element.unwrap().displayName, text(": "), text(packet.packetDamage)) }
+                    .join(JoinConfiguration.newlines()))
+            .appendNewline()
+            .append(
+                when (damageMetadata.criticalStrikeMetadata.state) {
+                    CriticalStrikeState.POSITIVE -> text("暴击: 正(x$power)")
+                    CriticalStrikeState.NEGATIVE -> text("暴击: 负(x$power)")
+                    CriticalStrikeState.NONE -> text("暴击: 无(x$power)")
+                }
+            )
+            .appendNewline()
+            .append(text("忽略格挡: ${if (damageMetadata.ignoreBlocking) "是" else "否"}"))
+            .appendNewline()
+            .append(text("忽略抗性提升: ${if (damageMetadata.ignoreResistance) "是" else "否"}"))
+            .appendNewline()
+            .append(text("忽略伤害吸收: ${if (damageMetadata.ignoreAbsorption) "是" else "否"}"))
+
+
+        val defensePhaseComponent = text("受伤者防御:")
+            .appendNewline()
+            .append(
+                defenseMetadata.defenseMap
+                    .map { (element, value) -> LinearComponents.linear(text(" - "), element.unwrap().displayName, text(": "), text(value)) }
+                    .join(JoinConfiguration.newlines())
+            )
+            .appendNewline()
+            .appendNewline()
+            .append(text("受伤者承伤倍率:"))
+            .appendNewline()
+            .append(
+                defenseMetadata.incomingDamageRateMap
+                    .map { (element, value) -> LinearComponents.linear(text(" - "), element.unwrap().displayName, text(": "), text(value)) }
+                    .join(JoinConfiguration.newlines())
+            )
+
+        val finalDamageComponent = text("最终伤害:")
+            .appendNewline()
+            .append(
+                finalDamageContext.finalDamageMap
+                    .map { (element, value) -> LinearComponents.linear(text(" - "), element.unwrap().displayName, text(": "), text(value)) }
+                    .join(JoinConfiguration.newlines())
+            )
+            .appendNewline()
+            .append(text("基础伤害: ${finalDamageContext.baseModifierValue}"))
+            .appendNewline()
+            .append(text("格挡伤害: ${finalDamageContext.blockingModifierValue}"))
+            .appendNewline()
+            .append(text("抗性伤害: ${finalDamageContext.resistanceModifierValue}"))
+            .appendNewline()
+            .append(text("吸收伤害: ${finalDamageContext.absorptionModifierValue}"))
+
+        val message = LinearComponents.linear(
+            translatable(damagee.type)
+                .append(if (damagee is Player) text("(${damagee.name})") else empty())
+                .clickEvent(ClickEvent.copyToClipboard(damagee.uniqueId.toString())),
+            text("受到了 $finalDamage 点伤害").hoverEvent(finalDamageComponent),
+            text(" ("),
+            text("攻击阶段").decorate(TextDecoration.UNDERLINED).hoverEvent(attackPhaseComponent),
+            text("|"),
+            text("防御阶段").decorate(TextDecoration.UNDERLINED).hoverEvent(defensePhaseComponent),
+            text(")")
+        )
+
+        SERVER.filterAudience { it is Player }.sendMessage(message)
     }
 
     private enum class Mapping {
@@ -603,30 +832,30 @@ internal object DamageManager : DamageManagerApi {
     }
 
     /**
-     * 包含已注册的 [DamageMetadata], 用于让代码对实体造成任意的自定义伤害(减免前).
+     * 包含已注册的 [DamageMetadata], 用于让代码对实体发起任意组成的伤害.
      *
      * 不要跟 [registeredProjectileDamages] 搞混了, 这里的伤害基本来源于由代码额外造成的伤害(比如: 武器攻击特效, MythicMobs Mechanic).
      */
-    private val registeredCustomDamageMetadata = Caffeine.newBuilder()
+    private val registeredDamages = Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofSeconds(30))
         .build<UUID, DamageMetadata>()
 
-    private fun Entity.getCustomDamageMetadata(): DamageMetadata? {
-        return registeredCustomDamageMetadata.getIfPresent(uniqueId)
+    private fun Entity.getRegisteredDamageMetadata(): DamageMetadata? {
+        return registeredDamages.getIfPresent(uniqueId)
     }
 
-    private fun Entity.registerCustomDamageMetadata(attributes: DamageMetadata) {
-        registeredCustomDamageMetadata.put(uniqueId, attributes)
+    private fun Entity.registerDamageMetadata(damageMetadata: DamageMetadata) {
+        registeredDamages.put(uniqueId, damageMetadata)
     }
 
-    private fun Entity.unregisterCustomDamageMetadata() {
-        registeredCustomDamageMetadata.invalidate(uniqueId)
+    private fun Entity.unregisterDamageMetadata() {
+        registeredDamages.invalidate(uniqueId)
     }
 
     /**
      * 包含已注册的 [Projectile] 的 [AttributeMapSnapshot], 用于在弹射物刚被创建时就固定其伤害(减免前).
      *
-     * 不要跟 [registeredCustomDamageMetadata] 搞混了, 这里的属性快照仅仅用于实现弹射物的伤害计算.
+     * 不要跟 [registeredDamages] 搞混了, 这里的属性快照仅仅用于实现弹射物的伤害计算.
      * 这样设计可以让弹射物的属性在*打中*实体时被拦截和修改, 允许代码根据受伤实体的状态来修改属性;
      * 而不是*创建*弹射物时拦截属性和修改 - 代码无法从这个时机得知受伤实体的状态.
      */
