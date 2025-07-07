@@ -4,15 +4,11 @@ import cc.mewcraft.wakame.damage.DamageManagerApi;
 import net.minecraft.world.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity {
-
-    @Shadow
-    public float lastHurt;
 
     /**
      * 让此处if表达式的条件恒为false.
@@ -30,6 +26,9 @@ public abstract class MixinLivingEntity {
         return -Float.MAX_VALUE;
     }
 
+    /**
+     * 插入无懈可击期间自定义的伤害逻辑.
+     */
     @Redirect(
             method = "hurtServer",
             at = @At(
@@ -42,6 +41,9 @@ public abstract class MixinLivingEntity {
         return DamageManagerApi.Companion.getInstance().injectDamageLogic(event, true);
     }
 
+    /**
+     * 插入非无懈可击期间自定义的伤害逻辑.
+     */
     @Redirect(
             method = "hurtServer",
             at = @At(
