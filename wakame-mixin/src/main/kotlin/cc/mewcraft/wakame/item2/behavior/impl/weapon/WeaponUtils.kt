@@ -10,6 +10,7 @@ import cc.mewcraft.wakame.util.collision.OBB
 import cc.mewcraft.wakame.util.collision.calculateOrthonormalBasis
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
+import org.joml.Vector3f
 import xyz.xenondevs.commons.provider.orElse
 
 object WeaponUtils {
@@ -43,11 +44,14 @@ object WeaponUtils {
             attackOBB.drawWireframe(player)
         }
 
-        return location.getNearbyLivingEntities(aabbRadius) { entity ->
+        return location.getNearbyLivingEntities(aabbRadius * scale) { entity ->
             entity != player
         }.filter { entity ->
             attackOBB.isCollide(entity)
         }
     }
 
+    fun getHitEntities(player: Player, aabbRadius: Double, halfExtentsBase: Vector3f, angle: Float = 0f): List<LivingEntity> {
+        return getHitEntities(player, aabbRadius, halfExtentsBase.x, halfExtentsBase.y, halfExtentsBase.z, angle)
+    }
 }

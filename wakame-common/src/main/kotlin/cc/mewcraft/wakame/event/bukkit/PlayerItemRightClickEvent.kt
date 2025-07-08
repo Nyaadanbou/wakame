@@ -29,15 +29,15 @@ class PlayerItemRightClickEvent(
     init {
         require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        //player.sendMessage(
-        //    "$currentTick ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
-        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-        //            stream.asSequence().dropWhile { frame ->
-        //                frame.className == PlayerItemRightClickEvent::class.qualifiedName
-        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-        //        }
-        //    }"
-        //)
+//        player.sendMessage(
+//            "${Bukkit.getCurrentTick()} ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
+//                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+//                    stream.asSequence().dropWhile { frame ->
+//                        frame.className == PlayerItemRightClickEvent::class.qualifiedName
+//                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+//                }
+//            }"
+//        )
     }
 
     override fun getHandlers(): HandlerList {

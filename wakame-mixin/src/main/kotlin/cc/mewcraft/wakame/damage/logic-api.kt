@@ -2,16 +2,16 @@
 
 package cc.mewcraft.wakame.damage
 
-import cc.mewcraft.wakame.entity.attribute.AttributeMapSnapshot
-import cc.mewcraft.wakame.entity.player.attributeContainer
-import cc.mewcraft.wakame.event.bukkit.PreprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.PreprocessDamageEvent.Phase
+import cc.mewcraft.wakame.element.Element
+import cc.mewcraft.wakame.registry2.entry.RegistryEntry
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
-import org.bukkit.damage.DamageType
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
+import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.RESISTANCE
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -41,6 +41,12 @@ interface DamageManagerApi {
     )
 
     /**
+     * 将插入到原版伤害系统触发 [EntityDamageEvent] 之后、造成实际伤害效果(扣血, 装备损失耐久等)之前的位置.
+     * @return 最终要被记录到 LivingEntity#lastHurt 变量中的值
+     */
+    fun injectDamageLogic(event: EntityDamageEvent, isDuringInvulnerable: Boolean): Float
+
+    /**
      * 伴生对象, 提供 [DamageManagerApi] 的实例.
      */
     companion object {
@@ -63,86 +69,70 @@ interface DamageManagerApi {
 // ------------
 
 @ApiStatus.Internal
-fun DamageContext(event: EntityDamageEvent): DamageContext {
+fun RawDamageContext(event: EntityDamageEvent): RawDamageContext {
     val damage = event.damage
     val damagee = event.entity as? LivingEntity ?: error("The damagee must be a living entity")
     val damageSource = event.damageSource
-    val damageCause = event.cause
-    return DamageContext(damage, damagee, damageSource, damageCause)
+    return RawDamageContext(damage, damagee, damageSource)
 }
 
 /**
- * 伤害信息的封装.
+ * 对 Bukkit 伤害事件所含伤害信息的封装.
+ * 用于兼容原版的各种伤害场景.
+ * 其中不含 Koish 自定义伤害的信息.
  */
 @ApiStatus.Internal
-class DamageContext(
+class RawDamageContext(
     val damage: Double,
     val damagee: LivingEntity,
-    val damageSource: DamageSource,
-    val damageCause: DamageCause,
+    val damageSource: DamageSource
 ) {
     override fun toString(): String {
-        return "DamageContext(damage=$damage, damagee=$damagee, damageCause=$damageCause, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
+        return "DamageContext(damage=$damage, damagee=$damagee, damageType=${damageSource.damageType}, causingEntity=${damageSource.causingEntity}, directEntity=${damageSource.directEntity}, damageLocation=${damageSource.damageLocation})"
     }
 }
 
 /**
- * 用于方便构建 [PreprocessDamageEvent].
+ * 对最终伤害的信息封装.
  */
 @ApiStatus.Internal
-object PreprocessDamageEventFactory {
+class FinalDamageContext(
+    /**
+     * 攻击阶段的伤害信息.
+     */
+    val damageMetadata: DamageMetadata,
 
-    fun launchProjectile(causingEntity: Player): PreprocessDamageEvent {
-        return PreprocessDamageEvent(
-            phase = Phase.SEARCHING_TARGET,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = null,
-            _damageSource = null
-        )
-    }
+    /**
+     * 防御阶段的伤害信息.
+     */
+    val defenseMetadata: DefenseMetadata,
 
-    fun searchingTarget(causingEntity: Player): PreprocessDamageEvent {
-        return PreprocessDamageEvent(
-            phase = Phase.SEARCHING_TARGET,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = null,
-            _damageSource = null
-        )
-    }
+    /**
+     * 原版 [BASE] 修饰器将要被修改为的值.
+     */
+    val baseModifierValue: Double,
 
-    fun actuallyDamage(causingEntity: Player, damageeEntity: LivingEntity): PreprocessDamageEvent {
-        return PreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = damageeEntity,
-            _damageSource = DamageSource.builder(DamageType.GENERIC)
-                .withCausingEntity(causingEntity)
-                .withDirectEntity(causingEntity)
-                .withDamageLocation(damageeEntity.location)
-                .build(),
-        )
-    }
+    /**
+     * 原版 [BLOCKING] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val blockingModifierValue: Double?,
 
-    fun actuallyDamage(causingEntity: Player, damageContext: DamageContext): PreprocessDamageEvent {
-        return PreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingEntity.attributeContainer.getSnapshot(),
-            _damageeEntity = damageContext.damagee,
-            _damageSource = damageContext.damageSource,
-        )
-    }
+    /**
+     * 原版 [RESISTANCE] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val resistanceModifierValue: Double?,
 
-    fun actuallyDamage(causingEntity: Player, causingAttributes: AttributeMapSnapshot, damageContext: DamageContext): PreprocessDamageEvent {
-        return PreprocessDamageEvent(
-            phase = Phase.ACTUALLY_DAMAGE,
-            causingEntity = causingEntity,
-            causingAttributes = causingAttributes,
-            _damageeEntity = damageContext.damagee,
-            _damageSource = damageContext.damageSource,
-        )
-    }
-}
+    /**
+     * 原版 [ABSORPTION] 修饰器将要被修改为的值.
+     * 空值意味着不修改.
+     */
+    val absorptionModifierValue: Double?,
+
+    /**
+     * 各元素的最终伤害值.
+     * 真正意义上的"最终", 可直接显示给玩家.
+     */
+    val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>
+)

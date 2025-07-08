@@ -19,6 +19,7 @@
     "MixinIngredient",
     "MixinItemStackInfo",
     "MixinItemStackOptionalStreamCodec",
+    "MixinLivingEntity",
     "MixinLootPoolEntries",
     "MixinPlayerInventory",
     "MixinRegistryDataLoader",
