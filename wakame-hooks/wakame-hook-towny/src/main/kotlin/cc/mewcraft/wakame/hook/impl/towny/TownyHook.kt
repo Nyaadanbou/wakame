@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.ecs.FleksAdder
 import cc.mewcraft.wakame.integration.Hook
-import cc.mewcraft.wakame.util.registerEvents
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil
@@ -18,8 +17,8 @@ import org.bukkit.inventory.ItemStack
 object TownyHook : ProtectionIntegration, FleksAdder {
 
     init {
-        addToRegistryFamily("towny_families") { TownyFamilies }
-        TownyHookListener.registerEvents()
+        // addToRegistryFamily("towny_families") { TownyFamilies }
+        // TownyHookListener.registerEvents()
     }
 
     internal val TOWNY = TownyAPI.getInstance()
