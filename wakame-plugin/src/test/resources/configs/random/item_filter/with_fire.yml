@@ -1,4 +1,0 @@
-# 引用它的方式为: `type: global:with_fire`
-nodes:
-  - type: item:element
-    element: fire

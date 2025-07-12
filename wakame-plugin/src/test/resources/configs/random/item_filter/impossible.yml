@@ -1,7 +1,0 @@
-nodes:
-  # 该引用包含的第一个 filter
-  - type: item:toss
-    chance: 0.001
-  # 该引用包含的第二个 filter
-  - type: item:mark
-    mark: impossible

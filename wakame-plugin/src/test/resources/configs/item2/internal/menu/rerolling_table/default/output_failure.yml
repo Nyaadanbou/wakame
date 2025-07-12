@@ -1,0 +1,8 @@
+base: barrier
+
+slot_display_name: "<white>结果: <red>失败"
+
+# 额外占位符
+# {failure_reason}
+slot_display_lore:
+  - "{failure_reason}"

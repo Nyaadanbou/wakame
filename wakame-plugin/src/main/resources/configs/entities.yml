@@ -224,6 +224,10 @@ entity_attributes:
     parent: minecraft:damageable
     values: { }
 
+  minecraft:happy_ghast:
+    parent: minecraft:damageable
+    values: { }
+
   minecraft:hoglin:
     parent: minecraft:damageable
     values: { }

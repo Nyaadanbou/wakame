@@ -1,10 +1,13 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.util.RecursionGuard
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 
@@ -89,7 +92,7 @@ class RecursionGuardTest {
     fun `should work independently in different threads`() {
         val threadPool = Executors.newFixedThreadPool(2)
         val latch = CountDownLatch(2)
-        var results = mutableListOf<Int>()
+        val results = CopyOnWriteArrayList<Int>()
         fun multiThread(i: Int): Int? = RecursionGuard.withValue("test4", silence = false) {
             Thread.sleep(10)
             100 + i
@@ -105,7 +108,10 @@ class RecursionGuardTest {
 
         latch.await()
 
-        assertTrue(results.containsAll(listOf(100, 101)))
+        // 用 Set 来进行比较有两个好处:
+        // 1. 可以忽略结果的顺序, 符合多线程顺序不确定的特性.
+        // 2. 可以自动去重, 确保结果的唯一性. (出现两个线程返回相同结果的情况也能正确报告)
+        assertEquals(results.toSet(), setOf(100, 101))
     }
 
     // 场景 5: 多次正常调用后状态应正确

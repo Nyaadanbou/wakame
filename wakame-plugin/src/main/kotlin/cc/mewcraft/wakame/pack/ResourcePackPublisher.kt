@@ -106,7 +106,7 @@ private data class GithubPublisher(
         val dataFolder = KoishDataPaths.ROOT.toFile()
         val manager = GithubRepoManager(
             localRepoPath = dataFolder.resolve(".cache/repo"),
-            resourcePackDirPath = dataFolder.resolve(GENERATED_RESOURCE_PACK_DIR),
+            resourcePackDirPath = dataFolder.resolve(ResourcePackManager.GENERATED_DIR),
             username = username,
             token = token,
             repo = repo,

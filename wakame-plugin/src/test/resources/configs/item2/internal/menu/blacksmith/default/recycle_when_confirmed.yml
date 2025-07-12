@@ -1,0 +1,21 @@
+base: writable_book
+slot_display_name: "即将出售下列物品"
+
+# 额外占位符
+# {item_list}
+# {total_worth}
+slot_display_lore:
+  - "<!i><gray>- {item_list}"
+  - ""
+  - "<!i><gray>总价值: <yellow><total_worth>"
+  - ""
+  - "<!i><aqua>再次点击确认."
+
+slot_display_dict:
+  # 额外占位符
+  # <item_name>
+  # <item_level>
+  with_level: "<item_name> <gray>[<yellow>lv. <item_level></yellow>]"
+  # 额外占位符
+  # <item_name>
+  without_level: "<item_name>"

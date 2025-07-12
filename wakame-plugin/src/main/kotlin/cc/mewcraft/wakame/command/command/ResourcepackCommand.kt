@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.command.command
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.command.CommandPermissions
 import cc.mewcraft.wakame.command.KoishCommandFactory
@@ -49,10 +48,9 @@ internal object ResourcepackCommand : KoishCommandFactory<Source> {
 
     private suspend fun handleGenerateResourcepack(context: CommandContext<Source>) {
         val sender = context.sender().source()
-        val manager = Injector.get<ResourcePackManager>()
 
         try {
-            manager.generate()
+            ResourcePackManager.generate()
         } catch (e: Throwable) {
             sender.sendPlainMessage("Failed to generate resourcepack, see console for details.")
             LOGGER.error("Failed to generate resourcepack", e)

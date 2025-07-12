@@ -1,4 +1,3 @@
-type: core
 pools:
   - rolls: 1
     entries:

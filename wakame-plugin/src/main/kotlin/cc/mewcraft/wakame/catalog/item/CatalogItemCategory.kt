@@ -9,7 +9,6 @@ import cc.mewcraft.wakame.util.Identifier
 import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.require
 import net.kyori.adventure.key.Key
-import org.koin.core.component.KoinComponent
 import org.spongepowered.configurate.ConfigurationNode
 import org.spongepowered.configurate.kotlin.extensions.get
 import org.spongepowered.configurate.kotlin.extensions.getList
@@ -30,7 +29,7 @@ data class CatalogItemCategory(
 /**
  * [CatalogItemCategory] 的序列化器.
  */
-internal object CategorySerializer : TypeSerializer2<CatalogItemCategory>, KoinComponent {
+internal object CategorySerializer : TypeSerializer2<CatalogItemCategory> {
 
     override fun deserialize(type: Type, node: ConfigurationNode): CatalogItemCategory {
         val id = node.hint(RepresentationHints.CATAGORY_ID) ?: throw SerializationException(

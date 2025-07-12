@@ -36,8 +36,6 @@ dependencies {
     runtimeOnly(project(":wakame-hooks:wakame-hook-worldguard"))
 
     // libraries
-    compileOnly(platform(local.koin.bom)) // 运行时由 koish-mod 提供
-    compileOnly(local.koin.core)
     compileOnly(local.shadow.bukkit) // 运行时由 koish-mod 提供
     compileOnly(local.commons.collections)
     compileOnly(local.commons.gson)
@@ -48,9 +46,11 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+    compileOnly(libs.hikari)
     compileOnly(libs.mocha)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
+    compileOnly(platform(libs.bom.exposed))
     compileOnly(platform(libs.bom.configurate.yaml)) // 运行时由 koish-mod 提供
     compileOnly(platform(libs.bom.configurate.gson))
     compileOnly(platform(libs.bom.configurate.extra.kotlin))
@@ -62,6 +62,7 @@ dependencies {
         exclude("org.jetbrains")
     }
     implementation(platform(libs.bom.jgit))
+    implementation(local.jdbc.mariadb)
 
     // other plugins (hard dependencies)
     compileOnly(local.adventurelevel)
@@ -75,9 +76,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
     testImplementation(libs.logback.classic)
-    testImplementation(platform(local.koin.bom)) // koin 的 junit5 模块要求这个必须出现在 testRuntime
-    testImplementation(local.koin.core)
-    testImplementation(local.koin.test.junit5)
     testImplementation(local.shadow.bukkit)
     testImplementation(local.commons.collections)
     testImplementation(local.commons.gson)
@@ -86,6 +84,10 @@ dependencies {
     testImplementation(local.commons.tuple)
     testImplementation(local.paper)
     testImplementation(local.datafixerupper)
+    testImplementation(local.kotlinx.serialization.core)
+    testImplementation(local.jdbc.mariadb)
+    testImplementation(local.jdbc.sqlite)
+    testImplementation(platform(libs.bom.exposed))
     testImplementation(platform(libs.bom.configurate.yaml))
     testImplementation(platform(libs.bom.configurate.gson))
     testImplementation(platform(libs.bom.configurate.extra.kotlin))

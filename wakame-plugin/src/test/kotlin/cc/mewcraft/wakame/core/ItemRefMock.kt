@@ -36,4 +36,22 @@ class ItemRefMock(
     override fun createItemStack(amount: Int, player: Player?): ItemStack {
         throw UnsupportedOperationException()
     }
+
+    override fun toString(): String {
+        return "ItemRefMock(id=$id)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ItemRefMock) return false
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 }

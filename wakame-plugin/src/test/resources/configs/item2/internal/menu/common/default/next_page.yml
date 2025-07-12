@@ -1,0 +1,4 @@
+base: arrow
+slot_display_name: 下一页
+slot_display_lore:
+  - "<dark_gray>点击查看下一页"

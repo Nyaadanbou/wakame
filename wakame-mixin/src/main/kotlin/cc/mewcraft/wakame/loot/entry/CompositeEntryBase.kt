@@ -8,6 +8,16 @@ import io.leangen.geantyref.TypeToken
 import org.spongepowered.configurate.kotlin.extensions.get
 import java.lang.reflect.ParameterizedType
 
+/**
+ * 战利品池复合条目的基础抽象类，用于组合多个子条目.
+ *
+ * 该类表示一个“复合型”战利品条目容器(如 Alternatives、Sequence 等)，它将多个子容器组合为一个统一的逻辑整体.
+ * 子类需要实现具体的组合策略 (如并列, 顺序, 任选其一等).
+ *
+ * @param S 战利品数据的类型.
+ * @param children 子条目列表，每个子条目本身也是一个 [LootPoolEntryContainer].
+ * @param conditions 当前条目所需满足的条件列表.
+ */
 abstract class CompositeEntryBase<S>(
     protected val children: List<LootPoolEntryContainer<S>>,
     conditions: List<LootPredicate>,
@@ -28,6 +38,17 @@ abstract class CompositeEntryBase<S>(
 
     private val composedChildren: ComposableEntryContainer<S> = compose(children)
 
+    /**
+     * 子类需要实现的组合策略，将多个 [ComposableEntryContainer] 组合为一个逻辑容器。
+     *
+     * 例如：
+     * - 随机选取一个(Alternatives)
+     * - 顺序执行(Sequence)
+     * - 所有满足条件的都尝试执行(Group)
+     *
+     * @param children 子条目容器列表
+     * @return 组合后的逻辑容器
+     */
     protected abstract fun compose(children: List<ComposableEntryContainer<S>>): ComposableEntryContainer<S>
 
     final override fun expand(context: LootContext, dataConsumer: (LootPoolEntry<S>) -> Unit): Boolean {

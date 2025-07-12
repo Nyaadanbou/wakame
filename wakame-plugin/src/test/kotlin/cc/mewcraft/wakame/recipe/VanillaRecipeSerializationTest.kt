@@ -1,18 +1,20 @@
 package cc.mewcraft.wakame.recipe
 
 import cc.mewcraft.wakame.KoishDataPaths
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.core.ItemRefMock
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.item2.ItemRef
+import cc.mewcraft.wakame.item2.ItemRefBootstrap
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
+import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import net.kyori.adventure.key.Key
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
-import org.koin.test.inject
-import org.slf4j.Logger
 import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertContentEquals
@@ -20,40 +22,33 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
-class VanillaRecipeSerializationTest : KoinTest {
+class VanillaRecipeSerializationTest {
     companion object {
+        @OptIn(TestOnly::class)
         @JvmStatic
         @BeforeAll
         fun setup() {
-            startKoin {
-                modules(
-                    testEnv(),
-                )
-            }
+            KoishDataPaths.initializeForTest(TestPath.TEST)
 
-            KoishDataPaths.initialize()
+            mockkObject(ItemRef)
+            every { ItemRef.create(any<Identifier>()) } answers { ItemRefMock(firstArg<Identifier>()) }
 
+            ItemRefBootstrap.init()
             MinecraftRecipeRegistryLoader.load()
         }
 
         @JvmStatic
         @AfterAll
-        fun shutdown() {
-            stopKoin()
+        fun teardown() {
+            unmockkObject(ItemRef)
         }
     }
 
-    private val logger: Logger by inject()
     private lateinit var key: Key
-
-    @BeforeTest
-    fun beforeEach() {
-
-    }
 
     @AfterTest
     fun afterTest() {
-        logger.info(key.asString())
+        LOGGER.info(key.asString())
     }
 
     @Test
@@ -204,18 +199,20 @@ class VanillaRecipeSerializationTest : KoinTest {
                 )
             )
         )
-        assertEquals(4, ingredients
-            .filterIsInstance<SingleRecipeChoice>()
-            .count { it.item == ItemRefMock("minecraft:poppy") }
+        assertEquals(
+            4, ingredients
+                .filterIsInstance<SingleRecipeChoice>()
+                .count { it.item == ItemRefMock("minecraft:poppy") }
         )
-        assertEquals(1, ingredients
-            .filterIsInstance<MultiRecipeChoice>()
-            .count {
-                it.items == listOf(
-                    ItemRefMock("minecraft:red_dye"),
-                    ItemRefMock("minecraft:pink_dye")
-                )
-            }
+        assertEquals(
+            1, ingredients
+                .filterIsInstance<MultiRecipeChoice>()
+                .count {
+                    it.items == listOf(
+                        ItemRefMock("minecraft:red_dye"),
+                        ItemRefMock("minecraft:pink_dye")
+                    )
+                }
         )
         val result = recipe.result
         assertIs<SingleRecipeResult>(result)
@@ -265,7 +262,7 @@ class VanillaRecipeSerializationTest : KoinTest {
 
         val base = recipe.base
         assertIs<SingleRecipeChoice>(base)
-        assertEquals(ItemRefMock("wakame:armor/bronze_helmet"), base.item)
+        assertEquals(ItemRefMock("armor/bronze_helmet"), base.item)
 
         val addition = recipe.addition
         assertIs<MultiRecipeChoice>(addition)

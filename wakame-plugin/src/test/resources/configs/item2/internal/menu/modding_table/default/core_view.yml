@@ -1,0 +1,8 @@
+# 额外占位符
+# <core_name>
+slot_display_name: "<core_name>"
+
+# 额外占位符
+# {core_description}
+slot_display_lore:
+  - "{core_description}"

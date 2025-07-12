@@ -39,7 +39,15 @@ import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleMaps
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import org.bukkit.Material
-import org.bukkit.entity.*
+import org.bukkit.entity.AbstractArrow
+import org.bukkit.entity.Arrow
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.entity.Projectile
+import org.bukkit.entity.SpectralArrow
+import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
@@ -71,7 +79,8 @@ internal object DamageManager : DamageManagerApi {
         EntityType.FIREBALL,
         EntityType.FIREWORK_ROCKET,
         EntityType.LLAMA_SPIT,
-        EntityType.POTION,
+        EntityType.SPLASH_POTION,
+        EntityType.LINGERING_POTION,
         EntityType.SHULKER_BULLET,
         EntityType.SMALL_FIREBALL,
         EntityType.SNOWBALL,

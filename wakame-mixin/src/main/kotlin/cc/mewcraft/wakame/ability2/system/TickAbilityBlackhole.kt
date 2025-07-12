@@ -9,6 +9,8 @@ import cc.mewcraft.wakame.ecs.component.TickCount
 import cc.mewcraft.wakame.ecs.data.CirclePath
 import cc.mewcraft.wakame.ecs.data.FixedPath
 import cc.mewcraft.wakame.ecs.data.ParticleConfiguration
+import cc.mewcraft.wakame.ecs.minusAssign
+import cc.mewcraft.wakame.ecs.plusAssign
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.EntityUpdateContext
@@ -29,7 +31,7 @@ object TickAbilityBlackhole : IteratingSystem(
         }
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCastPoint(tickCount: Int, entity: EEntity): StatePhase {
         val bukkitEntity = entity[CastBy].entityOrPlayer() as? LivingEntity ?: return StatePhase.Reset()
         val blackhole = entity[Blackhole]
@@ -43,7 +45,7 @@ object TickAbilityBlackhole : IteratingSystem(
         return StatePhase.Casting()
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val caster = entity[CastBy].entityOrPlayer()
         val blackhole = entity[Blackhole]
@@ -112,7 +114,7 @@ object TickAbilityBlackhole : IteratingSystem(
         return StatePhase.Casting(true)
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
         val blackhole = entity[Blackhole]
         blackhole.holeDirection = BlockFace.UP

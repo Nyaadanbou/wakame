@@ -4,7 +4,7 @@ import cc.mewcraft.wakame.ability2.StatePhase
 import cc.mewcraft.wakame.ability2.component.Ability
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.ManaCost
-import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.CommonFamilies
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.ecs.component.Mana
@@ -20,7 +20,7 @@ object ConsumeManaForAbilities : IteratingSystem(
 ) {
     override fun onTickEntity(entity: Entity) {
         val caster = entity[CastBy].caster
-        if (caster !in Families.BUKKIT_PLAYER)
+        if (caster !in CommonFamilies.BUKKIT_PLAYER)
             return
         if (!entity[Ability].phase.isCostMana)
             return

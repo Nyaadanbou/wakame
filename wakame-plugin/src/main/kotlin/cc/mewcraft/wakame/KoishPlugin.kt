@@ -15,7 +15,6 @@ import cc.mewcraft.wakame.util.registerEvents
 import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
-import org.koin.core.context.stopKoin
 import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
@@ -44,7 +43,6 @@ internal object KoishPlugin : JavaPlugin(), IKoish {
         KoishProvider.unregister()
         Initializer.performDisable()
         PLUGIN_SCOPE.cancel("Koish Plugin has been disabled")
-        stopKoin()
 
         if (ServerUtils.isReload()) {
             LOGGER.error("====================================================")

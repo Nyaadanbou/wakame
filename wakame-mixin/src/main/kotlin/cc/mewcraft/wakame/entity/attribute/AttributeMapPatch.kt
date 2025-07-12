@@ -1,7 +1,11 @@
 package cc.mewcraft.wakame.entity.attribute
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.util.data.*
+import cc.mewcraft.wakame.util.data.NBTUtils
+import cc.mewcraft.wakame.util.data.getByteOrNull
+import cc.mewcraft.wakame.util.data.getDoubleOrNull
+import cc.mewcraft.wakame.util.data.getListOrNull
+import cc.mewcraft.wakame.util.data.getStringOrNull
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
@@ -22,7 +26,7 @@ import java.io.IOException
 class AttributeMapPatch : Iterable<Map.Entry<Attribute, AttributeInstance>> {
 
     companion object {
-        private val PDC_KEY = NamespacedKey.fromString("wakame:attributes") ?: error("Spoogot")
+        private val PDC_KEY = NamespacedKey.fromString("koish:attributes") ?: error("Spoogot")
 
         fun decode(owner: Attributable): AttributeMapPatch {
             if (owner !is PersistentDataHolder) {
@@ -148,7 +152,7 @@ private object AttributeMapPatchType {
                     )
                 }
 
-                val serializableInstanceListTag = ListTag {
+                val serializableInstanceListTag = ListTag().apply {
                     serializableInstanceList.forEach { serializable ->
                         add(SerializableAttributeInstance.NBT_CODEC.encode(serializable))
                     }
@@ -165,7 +169,7 @@ private object AttributeMapPatchType {
                 val inputStream = DataInputStream(FastByteArrayInputStream(primitive))
                 val listTag = ListTag.TYPE.load(inputStream, NbtAccounter.unlimitedHeap())
                 require(!listTag.isEmpty()) { "list is empty" }
-                require(listTag.elementType == NbtUtils.TAG_COMPOUND.toByte()) { "element type is not compound" }
+                require(listTag.elementAt(0).id == NBTUtils.TAG_COMPOUND.toByte()) { "element type is not compound" }
                 val patch = AttributeMapPatch()
                 for (tag in listTag) {
                     val compound = tag as CompoundTag
@@ -190,16 +194,16 @@ private class SerializableAttributeInstance(
             /* decoder = */ { nbt ->
                 val attribute = nbt.getStringOrNull("id") ?: throw IllegalStateException("id is null")
                 val baseValue = nbt.getDoubleOrNull("base") ?: throw IllegalStateException("base is null")
-                val modifiers = nbt.getListOrNull("modifiers", NbtUtils.TAG_COMPOUND)
+                val modifiers = nbt.getListOrNull("modifiers")
                     ?.map { elem -> SerializableAttributeModifier.NBT_CODEC.decode(elem as CompoundTag) }
                     ?: emptyList()
                 SerializableAttributeInstance(attribute, baseValue, modifiers)
             },
             /* encoder = */ { data ->
-                CompoundTag {
+                CompoundTag().apply {
                     putString("id", data.id)
                     putDouble("base", data.base)
-                    put("modifiers", ListTag {
+                    put("modifiers", ListTag().apply {
                         data.modifiers.forEach { modifier ->
                             add(SerializableAttributeModifier.NBT_CODEC.encode(modifier))
                         }
@@ -236,7 +240,7 @@ private class SerializableAttributeModifier(
                 SerializableAttributeModifier(id, amount, operation)
             },
             /* encoder = */ { data ->
-                CompoundTag {
+                CompoundTag().apply {
                     putString("id", data.id)
                     putDouble("amount", data.amount)
                     putByte("operation", data.operation)

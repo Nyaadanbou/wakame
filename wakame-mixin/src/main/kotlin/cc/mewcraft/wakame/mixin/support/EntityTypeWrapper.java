@@ -90,16 +90,6 @@ public class EntityTypeWrapper<T extends Entity> extends EntityType<T> {
     }
 
     @Override
-    public @Nullable T spawn(ServerLevel world, @Nullable ItemStack stack, @Nullable Player player, BlockPos pos, EntitySpawnReason spawnReason, boolean alignPosition, boolean invertY) {
-        return getDelegate().spawn(world, stack, player, pos, spawnReason, alignPosition, invertY);
-    }
-
-    @Override
-    public @Nullable T spawn(ServerLevel worldserver, @Nullable ItemStack itemstack, @Nullable Player entityhuman, BlockPos blockposition, EntitySpawnReason entityspawnreason, boolean flag, boolean flag1, CreatureSpawnEvent.SpawnReason spawnReason) {
-        return getDelegate().spawn(worldserver, itemstack, entityhuman, blockposition, entityspawnreason, flag, flag1, spawnReason);
-    }
-
-    @Override
     public @Nullable T spawn(ServerLevel world, BlockPos pos, EntitySpawnReason reason) {
         return getDelegate().spawn(world, pos, reason);
     }

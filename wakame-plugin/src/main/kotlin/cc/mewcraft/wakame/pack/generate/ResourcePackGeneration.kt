@@ -5,9 +5,8 @@ package cc.mewcraft.wakame.pack.generate
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
-import cc.mewcraft.wakame.util.readFromDirectory
-import cc.mewcraft.wakame.util.readFromZipFile
 import cc.mewcraft.wakame.util.text.mini
+import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
@@ -16,6 +15,10 @@ import team.unnamed.creative.serialize.ResourcePackReader
 import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
 import xyz.xenondevs.commons.collections.associateWithNotNull
 import xyz.xenondevs.commons.collections.mapValuesNotNull
+import java.io.File
+import java.io.IOException
+import java.io.UncheckedIOException
+import java.util.zip.ZipFile
 
 /**
  * 封装了一个独立的资源包生成逻辑.
@@ -93,4 +96,24 @@ internal class ResourcePackMergePackGeneration(
             resourcePack.merge(mergePack, MergeStrategy.mergeAndKeepFirstOnError())
         }
     }
+}
+
+/**
+ * Reads a [ResourcePack] from a given ZIP [file][File].
+ *
+ * @param file The ZIP file
+ * @return The read resource pack
+ */
+private fun ResourcePackReader<FileTreeReader>.readFromZipFile(file: File): ResourcePack {
+    try {
+        FileTreeReader.zip(ZipFile(file)).use { reader ->
+            return read(reader)
+        }
+    } catch (e: IOException) {
+        throw UncheckedIOException(e)
+    }
+}
+
+private fun ResourcePackReader<FileTreeReader>.readFromDirectory(directory: File): ResourcePack {
+    return read(FileTreeReader.directory(directory))
 }
