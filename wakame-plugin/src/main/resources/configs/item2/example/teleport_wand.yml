@@ -7,7 +7,7 @@ slot: minecraft:mainhand
 castable: {}
 
 ability:
-  - id: active/blink
-    variant: 0
-    trigger: "combo/111"
-    mana_cost: 10
+  id: active/blink
+  variant: 0
+  trigger: "combo/111"
+  mana_cost: 10

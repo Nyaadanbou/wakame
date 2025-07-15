@@ -7,5 +7,5 @@ slot: minecraft:feet
 castable: {}
 
 ability:
-  - id: passive/double_jump
-    variant: 0
+  id: passive/double_jump
+  variant: 0
