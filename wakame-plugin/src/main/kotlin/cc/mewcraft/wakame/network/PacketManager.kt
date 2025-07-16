@@ -5,21 +5,19 @@ import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
 import cc.mewcraft.wakame.util.MINECRAFT_SERVER
 import cc.mewcraft.wakame.util.registerEvents
+import cc.mewcraft.wakame.util.serverPlayer
 import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
-import net.kyori.adventure.text.Component
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.server.network.ServerConnectionListener
-import net.minecraft.server.network.ServerLoginPacketListenerImpl
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerLoginEvent
-import org.bukkit.event.player.PlayerLoginEvent.Result
 import org.bukkit.event.player.PlayerQuitEvent
 import java.lang.invoke.MethodHandles
 import java.util.*
@@ -52,7 +50,7 @@ private const val PACKET_HANDLER_NAME = "koish_packet_handler"
 internal object PacketManager : Listener {
 
     val handlers = WeakHashMap<Player, PacketHandler>()
-    
+
     @Suppress("UNCHECKED_CAST")
     @InitFun
     fun init() {
@@ -61,38 +59,18 @@ internal object PacketManager : Listener {
         val channels = SERVER_CONNECTION_LISTENER_CHANNELS_GETTER.invoke(MINECRAFT_SERVER.connection) as List<ChannelFuture>
         val serverChannel = channels.first().channel()
         val pipeline = serverChannel.pipeline()
-
         pipeline.addFirst("koish_pipeline_adapter", KoishServerChannelBootstrap)
     }
-    
-    @EventHandler
-    private fun handleLogin(event: PlayerLoginEvent) {
-        var deny = true
 
-        // find corresponding packet handler and set player instance
-        val player = event.player
-        for (connection in MINECRAFT_SERVER.connection.connections) {
-            val listener = connection.packetListener
-            if (listener is ServerLoginPacketListenerImpl && listener.authenticatedProfile?.name == player.name) {
-                val handler = connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
-                handler.player = player
-                handlers[player] = handler
-
-                deny = false
-            }
-        }
-
-        if (deny) {
-            event.disallow(Result.KICK_OTHER, Component.text("[Koish] Something went wrong"))
-        }
-    }
-    
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     private fun handleJoin(event: PlayerJoinEvent) {
-        val handler = handlers[event.player]!!
+        val player = event.player
+        val handler = player.serverPlayer.connection.connection.channel.pipeline().get(PACKET_HANDLER_NAME) as PacketHandler
+        handler.player = player
         handler.loggedIn = true
+        handlers[player] = handler
     }
-    
+
     @EventHandler
     private fun handleQuit(event: PlayerQuitEvent) {
         handlers -= event.player
@@ -121,4 +99,5 @@ internal object PacketManager : Listener {
         }
 
     }
+
 }

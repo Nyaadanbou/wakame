@@ -1,0 +1,15 @@
+adapter: sqlite
+database:
+  credentials:
+    host: localhost
+    port: 33060
+    database: bridge
+    username: minecraft
+    password: 0
+    parameters: '?autoReconnect=true&useSSL=false'
+  connection_pool:
+    maximum_pool_size: 10
+    minimum_idle: 10
+    maximum_lifetime: 1800000
+    keep_alive_time: 0
+    connection_timeout: 5000

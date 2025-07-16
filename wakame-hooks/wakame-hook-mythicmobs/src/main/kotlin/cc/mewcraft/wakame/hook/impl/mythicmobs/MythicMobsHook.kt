@@ -26,6 +26,9 @@ object MythicMobsHook {
         // 这应该覆盖掉默认的实例
         DamageApplier.register(MythicMobsDamageApplier)
         MythicApiProvider.register(MythicApiImpl)
+
+        // 目前的所有实现暂时不需要获取 MythicMobs 的怪物的 id, 等之后需要的时候再把这个注释给去掉.
+        // BuiltInRegistries.ENTITY_REF_LOOKUP_DIR.add("mythicmobs", MythicMobsEntityRefLookupDictionary())
     }
 }
 

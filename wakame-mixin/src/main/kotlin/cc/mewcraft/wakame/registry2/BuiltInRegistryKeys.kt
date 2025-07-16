@@ -3,6 +3,8 @@ package cc.mewcraft.wakame.registry2
 import cc.mewcraft.wakame.ability2.meta.AbilityMeta
 import cc.mewcraft.wakame.ability2.meta.AbilityMetaType
 import cc.mewcraft.wakame.ability2.trigger.AbilityTrigger
+import cc.mewcraft.wakame.ecs.FamiliesBootstrapper
+import cc.mewcraft.wakame.ecs.SystemBootstrapper
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.entity.attribute.Attribute
 import cc.mewcraft.wakame.entity.attribute.AttributeSupplier
@@ -12,6 +14,7 @@ import cc.mewcraft.wakame.entity.attribute.bundle.ConstantAttributeBundle
 import cc.mewcraft.wakame.entity.attribute.bundle.VariableAttributeBundle
 import cc.mewcraft.wakame.entity.player.AttackSpeed
 import cc.mewcraft.wakame.entity.typeref.EntityRef
+import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
 import cc.mewcraft.wakame.item2.ItemRefHandler
 import cc.mewcraft.wakame.item2.KoishItem
 import cc.mewcraft.wakame.item2.KoishItemProxy
@@ -74,6 +77,9 @@ object BuiltInRegistryKeys {
     val KIZAMI = createRegistryKey<Kizami>("kizami")
 
     @JvmField
+    val ENTITY_REF_LOOKUP_DIR = createRegistryKey<EntityRefLookup.Dictionary>("entity_ref_lookup_dir")
+
+    @JvmField
     val ENTITY_REF = createRegistryKey<EntityRef>("entity_ref")
 
     @JvmField
@@ -108,6 +114,12 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val LOOT_PREDICATE_TYPE = createRegistryKey<LootPredicateType<*>>("loot_predicate_type")
+
+    @JvmField
+    val SYSTEM_BOOTSTRAPPER = createRegistryKey<SystemBootstrapper>("system_bootstrapper")
+
+    @JvmField
+    val FAMILIES_BOOTSTRAPPER = createRegistryKey<FamiliesBootstrapper>("families")
 
     ///
 

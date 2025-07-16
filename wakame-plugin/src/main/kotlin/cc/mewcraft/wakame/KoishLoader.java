@@ -20,8 +20,7 @@ public class KoishLoader implements PluginLoader {
         // 目前 Koish 的依赖都是直接打包放在 JAR 里的
 
         MavenLibraryResolver resolver = new MavenLibraryResolver();
-
-        resolver.addRepository(new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2/").build());
+        resolver.addRepository(new RemoteRepository.Builder("central", "default", MavenLibraryResolver.MAVEN_CENTRAL_DEFAULT_MIRROR).build());
         resolver.addRepository(new RemoteRepository.Builder("xenondevs", "default", "https://repo.xenondevs.xyz/releases/").build());
 
         // InvUI
@@ -32,8 +31,8 @@ public class KoishLoader implements PluginLoader {
                 new Exclusion("org.jetbrains.kotlin", "*", "*", "*"),
                 new Exclusion("org.jetbrains.kotlinx", "*", "*", "*")
         );
-        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.43"), null));
-        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui-kotlin:1.43"), null, false, exclusions));
+        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui:pom:1.46"), null));
+        resolver.addDependency(new Dependency(new DefaultArtifact("xyz.xenondevs.invui:invui-kotlin:1.46"), null, false, exclusions));
 
         classpathBuilder.addLibrary(resolver);
     }

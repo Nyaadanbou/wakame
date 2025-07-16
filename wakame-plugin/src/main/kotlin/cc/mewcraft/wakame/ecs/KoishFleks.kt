@@ -1,49 +1,16 @@
 package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.ability2.system.AbilityActivator
-import cc.mewcraft.wakame.ability2.system.AbilityRemover
-import cc.mewcraft.wakame.ability2.system.ConsumeManaForAbilities
-import cc.mewcraft.wakame.ability2.system.InitAbilityContainer
-import cc.mewcraft.wakame.ability2.system.InitPlayerCombo
-import cc.mewcraft.wakame.ability2.system.RenderOnceOffItemName
-import cc.mewcraft.wakame.ability2.system.TickAbilityBlackhole
-import cc.mewcraft.wakame.ability2.system.TickAbilityBlink
-import cc.mewcraft.wakame.ability2.system.TickAbilityDash
-import cc.mewcraft.wakame.ability2.system.TickAbilityMultiJump
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.system.CountTick
-import cc.mewcraft.wakame.ecs.system.DisplayMana
-import cc.mewcraft.wakame.ecs.system.InitMana
-import cc.mewcraft.wakame.ecs.system.ManageBossBar
 import cc.mewcraft.wakame.ecs.system.RemoveBukkitBlocks
 import cc.mewcraft.wakame.ecs.system.RemoveBukkitEntities
-import cc.mewcraft.wakame.ecs.system.RenderParticle
-import cc.mewcraft.wakame.ecs.system.RestoreMana
-import cc.mewcraft.wakame.ecs.system.UpdateEntityInfoBossBar
-import cc.mewcraft.wakame.ecs.system.UpdateMaxMana
-import cc.mewcraft.wakame.element.system.InitElementStackContainer
-import cc.mewcraft.wakame.element.system.TickElementStack
-import cc.mewcraft.wakame.enchantment2.system.ApplyEnchantmentEffect
-import cc.mewcraft.wakame.enchantment2.system.TickAntigravShotEnchantment
-import cc.mewcraft.wakame.enchantment2.system.TickAttributeEnchantment
-import cc.mewcraft.wakame.enchantment2.system.TickBlastMiningEnchantment
-import cc.mewcraft.wakame.enchantment2.system.TickFragileEnchantment
-import cc.mewcraft.wakame.enchantment2.system.TickSmelterEnchantment
-import cc.mewcraft.wakame.enchantment2.system.TickVeinminerEnchantment
-import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
-import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
-import cc.mewcraft.wakame.entity.player.system.InitItemCooldownContainer
-import cc.mewcraft.wakame.entity.player.system.PlayAttackSpeedAnimation
-import cc.mewcraft.wakame.item2.ScanItemSlotChanges
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.SwitchKatana
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.TickKatana
-import cc.mewcraft.wakame.kizami2.system.ApplyKizamiEffects
-import cc.mewcraft.wakame.kizami2.system.InitKizamiContainer
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
-import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
-import cc.mewcraft.wakame.lifecycle.initializer.InitStage
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
+import cc.mewcraft.wakame.lifecycle.initializer.InternalInitStage
+import cc.mewcraft.wakame.registry2.BuiltInRegistries
+import cc.mewcraft.wakame.util.Identifier
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
 import com.github.quillraven.fleks.Entity
@@ -54,57 +21,72 @@ import com.github.quillraven.fleks.configureWorld
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-@Init(stage = InitStage.POST_WORLD)
-internal object KoishFleks : Listener, Fleks {
+@InternalInit(stage = InternalInitStage.POST_WORLD)
+internal object KoishFleks : Listener, Fleks , FleksPatcher {
+
+    private val SYSTEM_ORDER: List<Identifier> = listOf(
+        "init_ability_container",
+        "init_item_cooldown_container",
+        "init_attribute_container",
+        "init_element_stack_container",
+        "init_kizami_container",
+        "init_mana",
+        "init_player_combo",
+        "scan_item_slot_changes",
+        "play_attack_speed_animation",
+        "apply_attribute_effects",
+        "apply_kizami_effects",
+        "switch_katana",
+        "tick_katana",
+        "ability_activator",
+        "ability_remover",
+        "tick_element_stack",
+        "update_entity_info_boss_bar",
+        "manage_boss_bar",
+        "count_tick",
+        "consume_mana_for_abilities",
+        "tick_ability_blackhole",
+        "tick_ability_blink",
+        "tick_ability_dash",
+        "tick_ability_multi_jump",
+        "render_once_off_item_name",
+        "apply_enchantment_effect",
+        "tick_antigrav_shot_enchantment",
+        "tick_attribute_enchantment",
+        "tick_blast_mining_enchantment",
+        "tick_fragile_enchantment",
+        "tick_smelter_enchantment",
+        "tick_veinminer_enchantment",
+        "update_max_mana",
+        "restore_mana",
+        "display_mana",
+        "render_particle"
+    ).map(Identifiers::of)
 
     override val world: World = configureWorld {
 
         families {
-            Families.bootstrap()
+            BuiltInRegistries.FAMILIES_BOOTSTRAPPER.add("common_families") { CommonFamilies }
+
+            BuiltInRegistries.FAMILIES_BOOTSTRAPPER.freeze()
+            BuiltInRegistries.FAMILIES_BOOTSTRAPPER.forEach { it.bootstrap() }
         }
 
         systems {
-            add(RemoveBukkitEntities) // 移除无效 bukkit entity 所映射的 ecs entity
-            add(RemoveBukkitBlocks) // 移除无效 bukkit block 所映射的 ecs entity
+            BuiltInRegistries.SYSTEM_BOOTSTRAPPER.freeze()
 
-            add(InitAbilityContainer)
-            add(InitItemCooldownContainer) // 初始化玩家的物品冷却容器
-            add(InitAttributeContainer) // 初始化玩家的属性容器
-            add(InitElementStackContainer)
-            add(InitKizamiContainer) // 初始化玩家的铭刻容器
-            add(InitMana)
-            add(InitPlayerCombo) // 初始化玩家的连招状态
-            add(ScanItemSlotChanges)// 监听玩家背包里的物品变化
-            add(PlayAttackSpeedAnimation) // 渲染武器攻击速度的动画效果
-            add(ApplyAttributeEffects) // 将物品上的属性效果应用到玩家
-            add(ApplyKizamiEffects) // 将物品上的铭刻效果应用到玩家
-            add(SwitchKatana) // 当玩家切换太刀时更新太刀状态
-            add(TickKatana) // 更新每 tick 的太刀状态
+            add(RemoveBukkitEntities)
+            add(RemoveBukkitBlocks)
 
-            add(AbilityActivator) // “激活”玩家装备的技能
-            add(AbilityRemover) // “移除”玩家装备的技能
-            add(TickElementStack) // 元素特效层数
-            add(UpdateEntityInfoBossBar) // 各种关于 boss bar 的逻辑
-            add(ManageBossBar) // 显示/移除 boss bar
-            add(CountTick) // 记录 entity 存在的 tick 数
-            add(ConsumeManaForAbilities) // 消耗使用技能的魔法值
-            add(TickAbilityBlackhole)
-            add(TickAbilityBlink)
-            add(TickAbilityDash)
-            add(TickAbilityMultiJump)
-            add(RenderOnceOffItemName)
-
-            add(ApplyEnchantmentEffect) //
-            add(TickAntigravShotEnchantment)
-            add(TickAttributeEnchantment)
-            add(TickBlastMiningEnchantment)
-            add(TickFragileEnchantment)
-            add(TickSmelterEnchantment)
-            add(TickVeinminerEnchantment)
-            add(UpdateMaxMana)
-            add(RestoreMana)
-            add(DisplayMana)
-            add(RenderParticle)
+            val unloadSystems = BuiltInRegistries.SYSTEM_BOOTSTRAPPER.keys.filter { it.value !in SYSTEM_ORDER }.map { it.value.value() }
+            if (unloadSystems.isNotEmpty()) {
+                LOGGER.info("未启用的 ECS system: ${unloadSystems.joinToString(", ")}")
+            }
+            for (order in SYSTEM_ORDER) {
+                val systemBootstrapper = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order] ?: continue
+                val system = systemBootstrapper.bootstrap() ?: continue
+                add(system)
+            }
         }
     }
 

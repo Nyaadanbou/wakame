@@ -22,9 +22,9 @@ primary_menu_settings:
   # select_repairing: 选择修复台
   # select_recycling: 选择回收站
   icons:
-    background: "internal:menu/common/default/background"
-    select_repairing: "internal:menu/blacksmith/default/select_repairing"
-    select_recycling: "internal:menu/blacksmith/default/select_recycling"
+    background: "internal/menu/common/default/background"
+    select_repairing: "internal/menu/blacksmith/default/select_repairing"
+    select_recycling: "internal/menu/blacksmith/default/select_recycling"
 
 # 修复台的菜单的设置
 repairing_menu_settings:
@@ -43,8 +43,8 @@ repairing_menu_settings:
   # background: 背景
   # background2: 背景2
   icons:
-    background: "internal:menu/common/default/background"
-    background2: "internal:menu/blacksmith/default/background2"
+    background: "menu/common/default/background"
+    background2: "menu/blacksmith/default/background2"
 
 # 回收站的菜单的设置
 recycling_menu_settings:
@@ -66,8 +66,8 @@ recycling_menu_settings:
   # recycle_when_confirmed: 回收 (已确认)
   # recycle_when_unconfirmed: 回收 (未确认)
   icons:
-    background: "internal:menu/common/default/background"
-    recycle_when_empty: "internal:menu/blacksmith/default/recycle_when_empty"
-    recycle_when_error: "internal:menu/blacksmith/default/recycle_when_error"
-    recycle_when_confirmed: "internal:menu/blacksmith/default/recycle_when_confirmed"
-    recycle_when_unconfirmed: "internal:menu/blacksmith/default/recycle_when_unconfirmed"
+    background: "menu/common/default/background"
+    recycle_when_empty: "menu/blacksmith/default/recycle_when_empty"
+    recycle_when_error: "menu/blacksmith/default/recycle_when_error"
+    recycle_when_confirmed: "menu/blacksmith/default/recycle_when_confirmed"
+    recycle_when_unconfirmed: "menu/blacksmith/default/recycle_when_unconfirmed"

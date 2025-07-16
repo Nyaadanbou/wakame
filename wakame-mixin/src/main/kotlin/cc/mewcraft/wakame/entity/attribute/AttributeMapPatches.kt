@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.Injector
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.entity.typeref.EntityRefLookup
@@ -22,7 +21,6 @@ import java.util.*
 
 object AttributeMapPatches : Listener {
 
-    private val entityRefLookup: EntityRefLookup by Injector.inject()
     private val uuidToPatch = Object2ObjectOpenHashMap<UUID, AttributeMapPatch>()
 
     fun get(attributable: UUID): AttributeMapPatch? {
@@ -93,7 +91,7 @@ object AttributeMapPatches : Listener {
             if (entity !is LivingEntity) continue
 
             val patch = get(entity.uniqueId) ?: continue
-            val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
+            val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(EntityRefLookup.get(entity))
 
             // 把跟默认属性一样的属性移除
             patch.trimBy(default)
@@ -119,7 +117,7 @@ object AttributeMapPatches : Listener {
         if (entity !is LivingEntity) return
 
         val patch = get(entity.uniqueId) ?: return
-        val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(entityRefLookup.get(entity))
+        val default = BuiltInRegistries.ATTRIBUTE_SUPPLIER.getOrThrow(EntityRefLookup.get(entity))
 
         // 把跟默认属性一样的属性移除
         patch.trimBy(default)

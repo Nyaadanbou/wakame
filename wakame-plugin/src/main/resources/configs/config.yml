@@ -15,6 +15,12 @@ economy_provider: vanilla
 #   zero: 无等级 (永远为 0)
 player_level_provider: vanilla
 
+# Koish 如何显示玩家的魔法值
+# 可用选项:
+#   none: Koish 不负责魔法值显示
+#   koish: Koish 内置的魔法值显示 (BossBar)
+display_mana_provider: koish
+
 # 只有物品的所有者可以拾起死亡掉落的物品
 only_owner_can_pickup_death_drops: false
 

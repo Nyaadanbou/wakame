@@ -34,7 +34,7 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
         }
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickIdle(tickCount: Int, entity: EEntity): StatePhase {
         entity[Ability].isReadyToRemove = true
         val multiJump = entity[MultiJump]
@@ -47,7 +47,7 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
         return StatePhase.Idle()
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val multijump = entity[MultiJump]
         val player = entity[CastBy].player()
@@ -68,7 +68,7 @@ object TickAbilityMultiJump : ListenableIteratingSystem(
         return StatePhase.Idle()
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickReset(tickCount: Int, entity: EEntity): StatePhase {
         val multiJump = entity[MultiJump]
         multiJump.jumpCount = multiJump.count

@@ -200,6 +200,12 @@ interface WritableRegistry<T> : Registry<T> {
     fun update(id: Identifier, value: T): RegistryEntry.Reference<T> = update(RegistryKey.of(this.key, id), value)
     fun update(id: String, value: T): RegistryEntry.Reference<T> = update(Identifiers.of(id), value)
 
+    fun upsert(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T> {
+        return if (containsKey(key)) update(key, value) else add(key, value)
+    }
+    fun upsert(id: Identifier, value: T): RegistryEntry.Reference<T> = upsert(RegistryKey.of(this.key, id), value)
+    fun upsert(id: String, value: T): RegistryEntry.Reference<T> = upsert(Identifiers.of(id), value)
+
     fun add(key: RegistryKey<T>, value: T): RegistryEntry.Reference<T>
     fun add(id: Identifier, value: T): RegistryEntry.Reference<T> = add(RegistryKey.of(this.key, id), value)
     fun add(id: String, value: T): RegistryEntry.Reference<T> = add(Identifiers.of(id), value)

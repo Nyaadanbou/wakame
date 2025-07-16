@@ -4,7 +4,7 @@ base: leather_helmet
 
 slot: minecraft:head
 
-item_name: "<rarity:style>青铜头盔"
+item_name: "青铜头盔"
 
 level:
   base: CONTEXT
@@ -17,8 +17,12 @@ rarity:
   value: "station"
 
 elements:
-  type: static
-  value: fire
+  type: dynamic
+  value: element/simple_element_loot
+
+kizami:
+  type: dynamic
+  value: kizami/simple_kizami_loot
 
 cores:
   type: dynamic

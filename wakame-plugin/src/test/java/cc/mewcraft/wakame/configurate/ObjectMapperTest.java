@@ -51,9 +51,9 @@ class ObjectMapperTest {
 
         // Setting up database configuration
         final ConfigurationNode app = root.node("app");
-        app.node("database", "url").set("jdbc:mysql://localhost:3306/mydb");
-        app.node("database", "username").set("admin");
-        app.node("database", "password").set("secret");
+        app.node("cc/mewcraft/wakame/database", "url").set("jdbc:mysql://localhost:3306/mydb");
+        app.node("cc/mewcraft/wakame/database", "username").set("admin");
+        app.node("cc/mewcraft/wakame/database", "password").set("secret");
 
         // Setting up API configuration
         app.node("api", "endpoint").set("https://api.example.com");
@@ -79,11 +79,11 @@ class ObjectMapperTest {
         final ConfigurationNode root = BasicConfigurationNode.root(ConfigurationOptions.defaults());
 
         // Setting up global configuration
-        root.node("database", "url").set("jdbc:mysql://global:3306/default");
+        root.node("cc/mewcraft/wakame/database", "url").set("jdbc:mysql://global:3306/default");
         root.node("api", "endpoint").set("https://global.api.com");
 
         // Setting up local configuration
-        root.node("local", "database", "url").set("jdbc:mysql://local:3306/mydb");
+        root.node("local", "cc/mewcraft/wakame/database", "url").set("jdbc:mysql://local:3306/mydb");
         root.node("local", "api", "endpoint").set("https://local.api.com");
 
         // Loading the local configuration into AppConfig

@@ -5,13 +5,13 @@ import cc.mewcraft.wakame.ability2.component.AbilityContainer
 import cc.mewcraft.wakame.ability2.component.AtSlot
 import cc.mewcraft.wakame.ability2.component.CastBy
 import cc.mewcraft.wakame.ability2.component.TargetTo
-import cc.mewcraft.wakame.ecs.Families
+import cc.mewcraft.wakame.ecs.CommonFamilies
 import cc.mewcraft.wakame.item2.ItemSlotChanges
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
 
 object AbilityRemover : IteratingSystem(
-    family = Families.ABILITY
+    family = CommonFamilies.ABILITY
 ) {
     override fun onTickEntity(entity: Entity) {
         val ability = entity[Ability]
@@ -30,7 +30,7 @@ object AbilityRemover : IteratingSystem(
             return // 还是有效的技能才继续执行
 
         val slot = entity.getOrNull(AtSlot)?.slot
-        if (slot != null && caster in Families.BUKKIT_PLAYER) {
+        if (slot != null && caster in CommonFamilies.BUKKIT_PLAYER) {
             // 如果技能被栏位持有, 则进行物品技能的移除逻辑.
             val slotChanges = caster[ItemSlotChanges]
             val entry = slotChanges[slot]

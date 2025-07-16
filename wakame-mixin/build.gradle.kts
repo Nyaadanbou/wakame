@@ -43,6 +43,9 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+    implementation(libs.hikari) {
+        exclude("org.slf4j", "slf4j-api")
+    }
     implementation(libs.mocha)
     implementation(local.shadow.bukkit)
     implementation(local.commons.collections)
@@ -52,12 +55,11 @@ dependencies {
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(local.commons.tuple)
+    implementation(platform(libs.bom.exposed))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))
     implementation(platform(libs.bom.configurate.extra.kotlin))
     implementation(platform(libs.bom.configurate.extra.dfu8))
-    implementation(platform(local.koin.bom))
-    implementation(local.koin.core)
 }
 
 sourceSets {

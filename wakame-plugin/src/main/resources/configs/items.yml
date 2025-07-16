@@ -11,144 +11,58 @@ components:
     # 物品组件的展示名字
     display_name: "<color:#aa2213>Example"
 
-  arrow:
+  brew_recipe:
     enabled: true
-    display_name: "<!i><white>弹药"
+    display_name: "<!i><color:white>酒酿配方"
 
-  attack_speed:
-    enabled: true
-    display_name: "<!i><white>攻击速度"
-
-  attribute_modifiers:
-    enabled: true
-    display_name: "<!i><white>属性修饰符"
-
-  can_break:
-    enabled: true
-    display_name: "<!i><white>可以破坏"
-
-  can_place_on:
-    enabled: true
-    display_name: "<!i><white>可以放置在"
-
-  castable:
-    enabled: true
-    display_name: "<!i><white>可以施放技能"
-
-  core_container:
-    enabled: true
-    display_name: "<!i><white>核孔"
-    # 虚核心的全局设置
-    virtual_core:
-      display_name: "<!i><white>虚核心"
-      description: [ ]
-    # 空核心的全局设置
-    empty_core:
-      display_name: "<!i><white>空核心"
-      description: [ ]
-
-  crate:
-    enabled: true
-    display_name: "<!i><white>盲盒"
-
-  custom_model_data:
-    enabled: true
-    display_name: "<!i><white>自定义模型数据"
-
-  custom_name:
-    enabled: true
-    display_name: "<!i><white>自定义名字"
-
-  damage:
-    enabled: true
-    display_name: "<!i><white>耐久损耗"
-
-  dyed_color:
-    enabled: true
-    display_name: "<!i><white>染色"
-
-  elements:
-    enabled: true
-    display_name: "<!i><white>元素"
-
-  enchantments:
-    enabled: true
-    display_name: "<!i><white>附魔"
-
-  damage_resistant:
-    enabled: true
-    display_name: "<!i><white><value> 伤害免疫"
-
-  food:
-    enabled: true
-    display_name: "<!i><white>食物"
-
-  glowable:
-    enabled: true
-    display_name: "<!i><white>可发光"
-
-  hide_tooltip:
-    enabled: true
-    display_name: "<!i><white>隐藏提示框"
-
-  hide_additional_tooltip:
-    enabled: true
-    display_name: "<!i><white>隐藏额外提示框"
-
-  item_name:
-    enabled: true
-    display_name: "<!i><white>物品名字"
-
-  kizami:
-    enabled: true
-    display_name: "<!i><white>铭刻"
-
-  level:
-    enabled: true
-    display_name: "<!i><white>等级"
-    # 读取或生成的最小物品等级
-    minimum_level: 1
-
-  lore:
-    enabled: true
-    display_name: "<!i><white>描述"
-
-  max_damage:
-    enabled: true
-    display_name: "<!i><white>最大耐久损耗"
-
-  player_ability:
-    enabled: true
-    display_name: "<!i><white>物品技能"
+  bypass_network_rewrite:
+    enabled: false
+    display_name: "<!i><color:white>绕过网络重写"
 
   core:
     enabled: true
-    display_name: "<!i><white>便携式核心"
+    display_name: "<!i><color:white>核心"
+
+  cores:
+    enabled: true
+    display_name: "<!i><color:white>词条栏"
+
+  crate:
+    enabled: true
+    display_name: "<!i><color:white>战利品箱"
+
+  element:
+    enabled: true
+    display_name: "<!i><color:white>元素"
+
+  id:
+    enabled: true
+    display_name: "<!i><color:white>标识符"
+
+  kizami:
+    enabled: true
+    display_name: "<!i><color:white>刻印"
+
+  level:
+    enabled: true
+    display_name: "<!i><color:white>等级"
+
+  processed:
+    enabled: false
+    display_name: "<!i><color:white>已处理"
 
   rarity:
     enabled: true
-    display_name: "<!i><white>稀有度"
+    display_name: "<!i><color:white>稀有度"
 
   reforge_history:
     enabled: true
-    display_name: "<!i><white>重铸历史"
+    display_name: "<!i><color:white>重铸记录"
 
-  stored_enchantments:
+  variant:
     enabled: true
-    display_name: "<!i><white>存储的附魔"
+    display_name: "<!i><color:white>变种"
 
-  tool:
-    enabled: true
-    display_name: "<!i><white>工具"
-
-  tracks:
-    enabled: true
-    display_name: "<!i><white>跟踪"
-
-  trim:
-    enabled: true
-    display_name: "<!i><white>纹饰"
-
-  unbreakable:
-    enabled: true
-    display_name: "<!i><white>无法破坏"
+  version:
+    enabled: false
+    display_name: "<!i><color:white>版本"

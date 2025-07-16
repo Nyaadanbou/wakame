@@ -29,7 +29,7 @@ object TickAbilityDash : IteratingSystem(
         }
     }
 
-    context(EntityUpdateContext)
+    context(_: EntityUpdateContext)
     override fun tickCast(tickCount: Int, entity: EEntity): StatePhase {
         val dash = entity[Dash]
         if (tickCount >= dash.duration + STARTING_TICK) {

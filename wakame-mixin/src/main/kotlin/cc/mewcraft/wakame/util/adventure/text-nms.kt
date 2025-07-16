@@ -1,11 +1,12 @@
 package cc.mewcraft.wakame.util.adventure
 
-import cc.mewcraft.wakame.util.REGISTRY_ACCESS
 import cc.mewcraft.wakame.util.toResourceLocation
+import com.mojang.serialization.JsonOps
 import io.papermc.paper.adventure.PaperAdventure
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.format.TextDecoration
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import java.util.*
@@ -16,7 +17,7 @@ fun MojangComponent.toAdventureComponent(): Component {
 }
 
 fun MojangComponent.toJson(): String {
-    return MojangComponent.Serializer.toJson(this, REGISTRY_ACCESS)
+    return ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, this).orThrow.asString
 }
 
 fun Component.toNMSComponent(): MojangComponent {

@@ -9,9 +9,9 @@ primary_menu_settings:
     - "s . * * * * * * *"
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    select_repairing: "internal:menu/blacksmith/select_repairing"
-    select_recycling: "internal:menu/blacksmith/select_recycling"
+    background: "internal/menu/common/background"
+    select_repairing: "internal/menu/blacksmith/select_repairing"
+    select_recycling: "internal/menu/blacksmith/select_recycling"
 
 repairing_menu_settings:
   title: "修复台: example_a"
@@ -19,8 +19,8 @@ repairing_menu_settings:
     - "i i i i i . ."
     - "* * * * * . ."
   icons:
-    background: "internal:menu/common/background"
-    background2: "internal:menu/blacksmith/background2"
+    background: "internal/menu/common/background"
+    background2: "internal/menu/blacksmith/background2"
 
 recycling_menu_settings:
   title: "回收站: example_a"
@@ -28,8 +28,8 @@ recycling_menu_settings:
     - "i i i i i . ."
     - "i i i i i . x"
   icons:
-    background: "internal:menu/common/background"
-    recycle_when_empty: "internal:menu/blacksmith/recycle_when_empty"
-    recycle_when_error: "internal:menu/blacksmith/recycle_when_error"
-    recycle_when_confirmed: "internal:menu/blacksmith/recycle_when_confirmed"
-    recycle_when_unconfirmed: "internal:menu/blacksmith/recycle_when_unconfirmed"
+    background: "internal/menu/common/background"
+    recycle_when_empty: "internal/menu/blacksmith/recycle_when_empty"
+    recycle_when_error: "internal/menu/blacksmith/recycle_when_error"
+    recycle_when_confirmed: "internal/menu/blacksmith/recycle_when_confirmed"
+    recycle_when_unconfirmed: "internal/menu/blacksmith/recycle_when_unconfirmed"

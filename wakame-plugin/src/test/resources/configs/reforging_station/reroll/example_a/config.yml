@@ -9,25 +9,25 @@ primary_menu_settings:
     - ". . i . . . o . ."
     - ". . . . . . . . ."
   icons:
-    error: "internal:menu/common/error"
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
-    compatibility_view: "internal:menu/rerolling/compatibility_view"
-    output_ok_confirmed: "internal:menu/rerolling/output_ok_confirmed"
-    output_ok_unconfirmed: "internal:menu/rerolling/output_ok_unconfirmed"
-    output_empty: "internal:menu/rerolling/output_empty"
-    output_failure: "internal:menu/rerolling/output_failure"
-    output_insufficient_resource: "internal:menu/rerolling/output_insufficient_resource"
+    error: "internal/menu/common/error"
+    background: "internal/menu/common/background"
+    prev_page: "internal/menu/common/prev_page"
+    next_page: "internal/menu/common/next_page"
+    compatibility_view: "internal/menu/rerolling/compatibility_view"
+    output_ok_confirmed: "internal/menu/rerolling/output_ok_confirmed"
+    output_ok_unconfirmed: "internal/menu/rerolling/output_ok_unconfirmed"
+    output_empty: "internal/menu/rerolling/output_empty"
+    output_failure: "internal/menu/rerolling/output_failure"
+    output_insufficient_resource: "internal/menu/rerolling/output_insufficient_resource"
 
 selection_menu_settings:
   title: "DO_NOT_USE"
   structure: ["a", "b"]
   icons:
-    error: "internal:menu/common/error"
-    core_view: "internal:menu/rerolling/core_view"
-    core_selected: "internal:menu/rerolling/core_selected"
-    core_unselected: "internal:menu/rerolling/core_unselected"
+    error: "internal/menu/common/error"
+    core_view: "internal/menu/rerolling/core_view"
+    core_selected: "internal/menu/rerolling/core_selected"
+    core_unselected: "internal/menu/rerolling/core_unselected"
 
 rarity_number_mapping:
   common: 1.0

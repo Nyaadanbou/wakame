@@ -1,13 +1,7 @@
 package cc.mewcraft.wakame.util
 
-import cc.mewcraft.wakame.commonEnv
 import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
 import net.kyori.adventure.text.Component.text
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import org.spongepowered.configurate.BasicConfigurationNode
 import org.spongepowered.configurate.ConfigurationOptions
 import kotlin.test.Test
@@ -21,21 +15,7 @@ import kotlin.test.assertEquals
  *
  * 模拟一个完整的的使用场景.
  */
-class SlotDisplayDataMixTest : KoinTest {
-
-    @BeforeEach
-    fun beforeEach() {
-        startKoin {
-            modules(
-                commonEnv(),
-            )
-        }
-    }
-
-    @AfterEach
-    fun afterEach() {
-        stopKoin()
-    }
+class SlotDisplayDataMixTest {
 
     @Test
     fun `mix case 1`() {

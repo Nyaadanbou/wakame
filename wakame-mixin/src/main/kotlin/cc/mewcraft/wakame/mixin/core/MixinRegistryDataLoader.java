@@ -5,11 +5,20 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.gametest.framework.GameTestInstance;
+import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.server.dialog.Dialog;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.entity.animal.WolfVariant;
+import net.minecraft.world.entity.animal.CatVariant;
+import net.minecraft.world.entity.animal.ChickenVariant;
+import net.minecraft.world.entity.animal.CowVariant;
+import net.minecraft.world.entity.animal.PigVariant;
+import net.minecraft.world.entity.animal.frog.FrogVariant;
+import net.minecraft.world.entity.animal.wolf.WolfSoundVariant;
+import net.minecraft.world.entity.animal.wolf.WolfVariant;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.JukeboxSong;
@@ -44,7 +53,13 @@ public class MixinRegistryDataLoader {
             InvokerRegistryData.create(Registries.CHAT_TYPE, ChatType.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.TRIM_PATTERN, TrimPattern.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.TRIM_MATERIAL, TrimMaterial.DIRECT_CODEC),
-            InvokerRegistryData.create(Registries.WOLF_VARIANT, WolfVariant.DIRECT_CODEC, true),
+            InvokerRegistryData.create(Registries.WOLF_VARIANT, WolfVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.WOLF_SOUND_VARIANT, WolfSoundVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.PIG_VARIANT, PigVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.FROG_VARIANT, FrogVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.CAT_VARIANT, CatVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.COW_VARIANT, CowVariant.NETWORK_CODEC, true),
+            InvokerRegistryData.create(Registries.CHICKEN_VARIANT, ChickenVariant.NETWORK_CODEC, true),
             InvokerRegistryData.create(Registries.PAINTING_VARIANT, PaintingVariant.DIRECT_CODEC, true),
             InvokerRegistryData.create(Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC),
             InvokerRegistryData.create(Registries.DAMAGE_TYPE, DamageType.DIRECT_CODEC),
@@ -65,7 +80,9 @@ public class MixinRegistryDataLoader {
             )),
             // Koish end - 替换 Codec
             InvokerRegistryData.create(Registries.JUKEBOX_SONG, JukeboxSong.DIRECT_CODEC),
-            InvokerRegistryData.create(Registries.INSTRUMENT, Instrument.DIRECT_CODEC)
+            InvokerRegistryData.create(Registries.INSTRUMENT, Instrument.DIRECT_CODEC),
+            InvokerRegistryData.create(Registries.TEST_ENVIRONMENT, TestEnvironmentDefinition.DIRECT_CODEC),
+            InvokerRegistryData.create(Registries.TEST_INSTANCE, GameTestInstance.DIRECT_CODEC),
+            InvokerRegistryData.create(Registries.DIALOG, Dialog.DIRECT_CODEC)
     );
-
 }

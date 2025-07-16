@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.mixin.core;
 
 import cc.mewcraft.wakame.mixin.support.CustomContainerListener;
-import cc.mewcraft.wakame.mixin.support.WatchedArmorList;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerListener;
@@ -21,8 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player {
 
-    protected MixinServerPlayer(final Level world, final BlockPos pos, final float yaw, final GameProfile gameProfile) {
-        super(world, pos, yaw, gameProfile);
+    protected MixinServerPlayer(final Level world, final GameProfile gameProfile) {
+        super(world, gameProfile);
     }
 
     @Shadow
@@ -37,18 +35,5 @@ public abstract class MixinServerPlayer extends Player {
     public void onConstruction(CallbackInfo callback) {
         // 替换成我们自己的 ContainerListener
         this.containerListener = new CustomContainerListener((ServerPlayer) (Object) this);
-    }
-
-    @Inject(method = "restoreFrom", at = @At("TAIL"))
-    private void onRestoreFrom(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci) {
-        // Changing worlds in vanilla creates a new ServerPlayer instance which should also create a new Inventory and
-        // WatchedArmorList with the initialized field set to false.
-        // However, Spigot reuses ServerPlayer instances, so in some cases ServerPlayer#restoreFrom is called with itself,
-        // which causes the armor inventory entries to be set again, firing ArmorChangeEvent on a player that is not alive.
-        // See: https://github.com/orgs/PaperMC/projects/6?pane=issue&itemId=16746355 (this should solve this problem)
-        // To circumvent this issue, we mark WatchedArmorList as uninitialized again in ServerPlayer#restoreFrom.
-        if (this.getInventory().armor instanceof WatchedArmorList list) {
-            list.initialized = false;
-        }
     }
 }

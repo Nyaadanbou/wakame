@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.gui.BasicMenuSettings
 import cc.mewcraft.wakame.item2.data.ItemDataTypes
 import cc.mewcraft.wakame.item2.getData
 import cc.mewcraft.wakame.reforge.common.RarityNumberMapping
+import cc.mewcraft.wakame.util.Identifiers
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.bindInstance
 import net.kyori.adventure.key.Key
@@ -33,15 +34,15 @@ internal object WtfRerollingTable : RerollingTable {
             ". . . . . . . . .",
         ),
         icons = hashMapOf(
-            "error" to Key.key("internal:menu/common/default/error"),
-            "background" to Key.key("internal:menu/common/default/background"),
-            "prev_page" to Key.key("internal:menu/common/default/prev_page"),
-            "next_page" to Key.key("internal:menu/common/default/next_page"),
-            "compatibility_view" to Key.key("internal:menu/rerolling_table/default/compatibility_view"),
-            "output_ok_confirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_confirmed"),
-            "output_ok_unconfirmed" to Key.key("internal:menu/rerolling_table/default/output_ok_unconfirmed"),
-            "output_empty" to Key.key("internal:menu/rerolling_table/default/output_empty"),
-            "output_failure" to Key.key("internal:menu/rerolling_table/default/output_failure"),
+            "error" to Identifiers.of("internal/menu/common/default/error"),
+            "background" to Identifiers.of("internal/menu/common/default/background"),
+            "prev_page" to Identifiers.of("internal/menu/common/default/prev_page"),
+            "next_page" to Identifiers.of("internal/menu/common/default/next_page"),
+            "compatibility_view" to Identifiers.of("internal/menu/rerolling_table/default/compatibility_view"),
+            "output_ok_confirmed" to Identifiers.of("internal/menu/rerolling_table/default/output_ok_confirmed"),
+            "output_ok_unconfirmed" to Identifiers.of("internal/menu/rerolling_table/default/output_ok_unconfirmed"),
+            "output_empty" to Identifiers.of("internal/menu/rerolling_table/default/output_empty"),
+            "output_failure" to Identifiers.of("internal/menu/rerolling_table/default/output_failure"),
         )
     )
 
@@ -49,10 +50,10 @@ internal object WtfRerollingTable : RerollingTable {
         title = Component.text("DO_NOT_USE"),
         structure = arrayOf("a", "b"),
         icons = hashMapOf(
-            "error" to Key.key("internal:menu/common/default/error"),
-            "core_view" to Key.key("internal:menu/rerolling_table/default/core_view"),
-            "core_selected" to Key.key("internal:menu/rerolling_table/default/core_selected"),
-            "core_unselected" to Key.key("internal:menu/rerolling_table/default/core_unselected"),
+            "error" to Identifiers.of("internal/menu/common/default/error"),
+            "core_view" to Identifiers.of("internal/menu/rerolling_table/default/core_view"),
+            "core_selected" to Identifiers.of("internal/menu/rerolling_table/default/core_selected"),
+            "core_unselected" to Identifiers.of("internal/menu/rerolling_table/default/core_unselected"),
         )
     )
 

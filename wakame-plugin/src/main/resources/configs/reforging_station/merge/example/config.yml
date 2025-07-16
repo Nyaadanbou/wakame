@@ -18,11 +18,11 @@ primary_menu_settings:
   # output_ok: 输出
   # output_empty: 输出
   icons:
-    background: "internal:menu/common/default/background"
-    output_ok: "internal:menu/merging/default/output_ok"
-    output_empty: "internal:menu/merging/default/output_empty"
-    output_failure: "internal:menu/merging/default/output_failure"
-    output_insufficient_resource: "internal:menu/merging/default/output_insufficient_resource"
+    background: "internal/menu/common/default/background"
+    output_ok: "internal/menu/merging/default/output_ok"
+    output_empty: "internal/menu/merging/default/output_empty"
+    output_failure: "internal/menu/merging/default/output_failure"
+    output_insufficient_resource: "internal/menu/merging/default/output_insufficient_resource"
 
 # 合并工作台可以接受的最大物品等级.
 # 如果玩家放入的物品等级超过了这个值, 合并将算作失败.

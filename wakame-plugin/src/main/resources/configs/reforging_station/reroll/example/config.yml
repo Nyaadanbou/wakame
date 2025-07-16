@@ -28,16 +28,16 @@ primary_menu_settings:
   # output_empty: 输出
   # output_failed: 输出
   icons:
-    error: "internal:menu/common/default/error"
-    background: "internal:menu/common/default/background"
-    prev_page: "internal:menu/common/default/prev_page"
-    next_page: "internal:menu/common/default/next_page"
-    compatibility_view: "internal:menu/rerolling/default/compatibility_view"
-    output_ok_confirmed: "internal:menu/rerolling/default/output_ok_confirmed"
-    output_ok_unconfirmed: "internal:menu/rerolling/default/output_ok_unconfirmed"
-    output_empty: "internal:menu/rerolling/default/output_empty"
-    output_failure: "internal:menu/rerolling/default/output_failure"
-    output_insufficient_resource: "internal:menu/rerolling/default/output_insufficient_resource"
+    error: "internal/menu/common/default/error"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/common/default/prev_page"
+    next_page: "internal/menu/common/default/next_page"
+    compatibility_view: "internal/menu/rerolling/default/compatibility_view"
+    output_ok_confirmed: "internal/menu/rerolling/default/output_ok_confirmed"
+    output_ok_unconfirmed: "internal/menu/rerolling/default/output_ok_unconfirmed"
+    output_empty: "internal/menu/rerolling/default/output_empty"
+    output_failure: "internal/menu/rerolling/default/output_failure"
+    output_insufficient_resource: "internal/menu/rerolling/default/output_insufficient_resource"
 
 # 用于选择核心的菜单的设置
 selection_menu_settings:
@@ -54,10 +54,10 @@ selection_menu_settings:
   # core_selected: 已选择的核心
   # core_unselected: 未选择的核心
   icons:
-    error: "internal:menu/common/default/error"
-    core_view: "internal:menu/rerolling/default/core_view"
-    core_selected: "internal:menu/rerolling/default/core_selected"
-    core_unselected: "internal:menu/rerolling/default/core_unselected"
+    error: "internal/menu/common/default/error"
+    core_view: "internal/menu/rerolling/default/core_view"
+    core_selected: "internal/menu/rerolling/default/core_selected"
+    core_unselected: "internal/menu/rerolling/default/core_unselected"
 
 # 稀有度->数值的映射表.
 # 可用于所有的自定义函数.

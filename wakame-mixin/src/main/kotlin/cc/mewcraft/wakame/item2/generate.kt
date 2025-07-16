@@ -3,6 +3,7 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.SharedConstants
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaContainer
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaEntry
 import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
@@ -62,7 +63,7 @@ object KoishStackGenerator {
 
         // 写入基础信息, 每个自定义物品都有
         dataContainer[ItemDataTypes.ID] = ItemId.of(type.id)
-        dataContainer[ItemDataTypes.VERSION] = 0 // FIXME #350: 实现数据迁移系统
+        dataContainer[ItemDataTypes.VERSION] = SharedConstants.DATA_VERSION
         dataContainer[ItemDataTypes.VARIANT] = 0
 
         // 测试写入类型为 Unit 的数据
@@ -91,7 +92,7 @@ object KoishStackGenerator {
     private fun <U : ItemMetaEntry<V>, V> makePersistentDataThenWrite(
         metaType: ItemMetaType<U, V>,
         metaContainer: ItemMetaContainer,
-        itemstack: MojangStack,
+        itemStack: MojangStack,
         context: ItemGenerationContext,
     ) {
         val entry = metaContainer[metaType]
@@ -99,7 +100,7 @@ object KoishStackGenerator {
             val result = entry.make(context)
             if (result.isPresent()) {
                 val value = result.unwrap()
-                entry.write(value, itemstack)
+                entry.write(value, itemStack)
             }
         }
     }

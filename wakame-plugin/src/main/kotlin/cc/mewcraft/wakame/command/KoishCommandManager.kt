@@ -2,6 +2,7 @@
 
 package cc.mewcraft.wakame.command
 
+import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.command.command.AbilityCommand
 import cc.mewcraft.wakame.command.command.AttributeCommand
 import cc.mewcraft.wakame.command.command.CatalogCommand
@@ -32,40 +33,46 @@ internal object KoishCommandManager {
     private lateinit var manager: PaperCommandManager.Bootstrapped<Source>
 
     fun bootstrap(context: BootstrapContext) {
-        manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
-            .executionCoordinator(ExecutionCoordinator.asyncCoordinator())
-            .buildBootstrapped(context)
-        val brigadierManager = manager.brigadierManager()
+        try {
+            manager = PaperCommandManager.builder(PaperSimpleSenderMapper.simpleSenderMapper())
+                .executionCoordinator(ExecutionCoordinator.asyncCoordinator())
+                .buildBootstrapped(context)
+            val brigadierManager = manager.brigadierManager()
 
-        with(brigadierManager) {
-            setNativeNumberSuggestions(true)
+            with(brigadierManager) {
+                setNativeNumberSuggestions(true)
 
-            // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
-            registerMapping(typeTokenOf<AbilityMetaParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
-            registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
-            registerMapping(typeTokenOf<Item2Parser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
-        }
+                // 在这里注册形如命名空间的指令参数, 否则 Brigadier 无法正常工作
+                registerMapping(typeTokenOf<AbilityMetaParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+                registerMapping(typeTokenOf<AttributeParser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+                registerMapping(typeTokenOf<Item2Parser<Source>>()) { builder -> builder.cloudSuggestions().toConstant(ResourceLocationArgument.id()) }
+            }
 
-        manager.apply {
-            // Change default settings
-            settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true)
-            settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true)
+            manager.apply {
+                // Change default settings
+                settings().set(ManagerSetting.OVERRIDE_EXISTING_COMMANDS, true)
+                settings().set(ManagerSetting.ALLOW_UNSAFE_REGISTRATION, true)
 
-            // Register commands
-            command(AbilityCommand)
-            command(AttributeCommand)
-            command(CatalogCommand)
-            command(CraftCommand)
-            command(DebugCommand)
-            command(Item2Command)
-            command(PluginCommand)
-            command(ReforgeCommand)
-            command(ResourcepackCommand)
+                // Register commands
+                command(AbilityCommand)
+                command(AttributeCommand)
+                command(CatalogCommand)
+                command(CraftCommand)
+                command(DebugCommand)
+                command(Item2Command)
+                command(PluginCommand)
+                command(ReforgeCommand)
+                command(ResourcepackCommand)
+            }
+        } catch (e: Exception) {
+            LOGGER.error("Failed to bootstrap Koish command manager", e)
         }
     }
 
     @InitFun
     fun init() {
+        if (!::manager.isInitialized)
+            return
         manager.onEnable()
     }
 

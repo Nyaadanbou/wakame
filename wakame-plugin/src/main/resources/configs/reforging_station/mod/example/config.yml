@@ -29,16 +29,16 @@ primary_menu_settings:
   # output_ok_unconfirmed: 输出
   # output_insufficient_resource: 输出
   icons:
-    background: "internal:menu/common/default/background"
-    prev_page: "internal:menu/common/default/prev_page"
-    next_page: "internal:menu/common/default/next_page"
-    input_ok: "internal:menu/modding/default/input_ok"
-    input_empty: "internal:menu/modding/default/input_empty"
-    output_empty: "internal:menu/modding/default/output_empty"
-    output_failure: "internal:menu/modding/default/output_failure"
-    output_ok_confirmed: "internal:menu/modding/default/output_ok_confirmed"
-    output_ok_unconfirmed: "internal:menu/modding/default/output_ok_unconfirmed"
-    output_insufficient_resource: "internal:menu/modding/default/output_insufficient_resource"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/common/default/prev_page"
+    next_page: "internal/menu/common/default/next_page"
+    input_ok: "internal/menu/modding/default/input_ok"
+    input_empty: "internal/menu/modding/default/input_empty"
+    output_empty: "internal/menu/modding/default/output_empty"
+    output_failure: "internal/menu/modding/default/output_failure"
+    output_ok_confirmed: "internal/menu/modding/default/output_ok_confirmed"
+    output_ok_unconfirmed: "internal/menu/modding/default/output_ok_unconfirmed"
+    output_insufficient_resource: "internal/menu/modding/default/output_insufficient_resource"
 
 # 用于更换核心的菜单的设置
 replace_menu_settings:
@@ -56,10 +56,10 @@ replace_menu_settings:
   # core_unusable: 不可用核心
   # core_usable: 可用核心
   icons:
-    compatibility_view: "internal:menu/modding/default/compatibility_view"
-    core_view: "internal:menu/modding/default/core_view"
-    core_unusable: "internal:menu/modding/default/core_unusable"
-    core_usable: "internal:menu/modding/default/core_usable"
+    compatibility_view: "internal/menu/modding/default/compatibility_view"
+    core_view: "internal/menu/modding/default/core_view"
+    core_unusable: "internal/menu/modding/default/core_unusable"
+    core_usable: "internal/menu/modding/default/core_usable"
 
 # 物品的重铸次数的计算方式
 # 可用的计算方式:

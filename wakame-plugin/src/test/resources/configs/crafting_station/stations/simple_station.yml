@@ -1,14 +1,17 @@
+# 合成站的类型
+# 暂无实际作用
 type: simple
 
 # 出现在该合成站里的配方列表
-# 确保这些配方都已在 stations/crafting/recipes/{命名空间} 目录下注册
+# 确保这些配方都已在 recipes/ 目录下注册
 recipes:
-  - test:raw_bronze
-  - test:amethyst_dust
+  - example:bronze_ingot
 
-
+# 合成站 listing 菜单的布局
+# 该菜单显示所有可以合成的物品, 也是玩家刚打开合成站看到的样子
 listing_menu_settings:
-  title: "<b>示例合成站"
+
+  title: "示例合成站"
 
   # .: background
   # x: recipe
@@ -25,13 +28,16 @@ listing_menu_settings:
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
-    listing: "internal:menu/crafting/listing"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/common/default/prev_page"
+    next_page: "internal/menu/common/default/next_page"
+    listing: "internal/menu/crafting_station/default/listing"
 
+# 合成站 preview 菜单的布局
+# 该菜单显示单个合成配方的详细信息
 preview_menu_settings:
-  title: "<b>合成预览"
+
+  title: "合成预览"
 
   # .: background
   # i: input/choice
@@ -51,14 +57,16 @@ preview_menu_settings:
   # 直接写物品的命名空间路径
   # 按照传统应该把这些物品放在 internal 命名空间下
   icons:
-    back: "internal:menu/common/back"
-    background: "internal:menu/common/background"
-    next_page: "internal:menu/common/next_page"
-    prev_page: "internal:menu/common/prev_page"
-    craft: "internal:menu/crafting/craft"
+    back: "internal/menu/common/default/back"
+    background: "internal/menu/common/default/background"
+    next_page: "internal/menu/common/default/next_page"
+    prev_page: "internal/menu/common/default/prev_page"
+    craft: "internal/menu/crafting_station/default/craft"
 
 catalog_menu_settings:
-  title: "示例合成站"
+
+  title: "面包机"
+
   # .: background
   # i: input
   # o: output
@@ -68,5 +76,6 @@ catalog_menu_settings:
     - ". i i i . . o . ."
     - ". i i i . . . . ."
     - ". . . . . . . . ."
+
   icons:
-    background: "internal:menu/common/background"
+    background: "internal/menu/common/default/background"

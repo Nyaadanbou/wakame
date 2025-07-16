@@ -1,4 +1,3 @@
-type: element # loot table 的类型
 pools:
   - rolls: 1 # 抽取次数
     entries:

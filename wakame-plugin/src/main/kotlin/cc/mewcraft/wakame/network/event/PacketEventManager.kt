@@ -17,7 +17,6 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundOpenScreenPacketE
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlaceGhostRecipePacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundPlayerCombatKillPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundRecipeBookAddPacketEvent
-import cc.mewcraft.wakame.network.event.clientbound.ClientboundRegistryDataPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetCursorItemPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEntityDataPacketEvent
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundSetEquipmentPacketEvent
@@ -29,16 +28,18 @@ import cc.mewcraft.wakame.network.event.clientbound.ClientboundUpdateAttributesP
 import cc.mewcraft.wakame.network.event.clientbound.ClientboundUpdateRecipesPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundContainerClickPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundInteractPacketEvent
+import cc.mewcraft.wakame.network.event.serverbound.ServerboundPickItemFromBlockPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundPlaceRecipePacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundPlayerActionPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundSelectBundleItemPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundSetCreativeModeSlotPacketEvent
+import cc.mewcraft.wakame.network.event.serverbound.ServerboundSwingPacketEvent
 import cc.mewcraft.wakame.network.event.serverbound.ServerboundUseItemPacketEvent
-import cc.mewcraft.wakame.util.toMethodHandle
 import net.minecraft.network.protocol.Packet
 import org.bukkit.entity.Player
 import org.bukkit.event.EventPriority
 import xyz.xenondevs.commons.collections.removeIf
+import xyz.xenondevs.commons.reflection.toMethodHandle
 import java.lang.invoke.MethodHandle
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
@@ -48,16 +49,16 @@ import net.minecraft.network.PacketListener as MojangPacketListener
 private data class Listener(val handle: MethodHandle, val priority: EventPriority, val ignoreIfCancelled: Boolean)
 
 object PacketEventManager {
-    
+
     private val LOCK = ReentrantLock()
-    
+
     private val eventTypes = HashMap<KClass<out Packet<*>>, KClass<out PacketEvent<*>>>()
     private val eventConstructors = HashMap<KClass<out Packet<*>>, (Packet<*>) -> PacketEvent<Packet<*>>>()
     private val playerEventConstructors = HashMap<KClass<out Packet<*>>, (Player, Packet<*>) -> PlayerPacketEvent<Packet<*>>>()
-    
+
     private val listeners = HashMap<KClass<out PacketEvent<*>>, MutableList<Listener>>()
     private val listenerInstances = HashMap<Any, List<Listener>>()
-    
+
     init {
         // clientbound - player
         registerPlayerEventType(::ClientboundSystemChatPacketEvent)
@@ -84,7 +85,6 @@ object PacketEventManager {
         registerPlayerEventType(::ClientboundRecipeBookAddPacketEvent)
         registerPlayerEventType(::ClientboundPlaceGhostRecipePacketEvent)
         registerPlayerEventType(::ClientboundPlayerCombatKillPacketEvent)
-        registerEventType(::ClientboundRegistryDataPacketEvent)
         
         // serverbound - player
         registerPlayerEventType(::ServerboundPlaceRecipePacketEvent)
@@ -94,9 +94,11 @@ object PacketEventManager {
         registerPlayerEventType(::ServerboundInteractPacketEvent)
         registerPlayerEventType(::ServerboundContainerClickPacketEvent)
         registerPlayerEventType(::ServerboundSelectBundleItemPacketEvent)
+        registerPlayerEventType(::ServerboundPickItemFromBlockPacketEvent)
+        registerPlayerEventType(::ServerboundSwingPacketEvent)
     }
 
-    private inline fun <reified P : Packet<*>, reified E : PacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
+    private inline fun <reified P : Packet<*>, reified E : PlayerPacketEvent<P>> registerEventType(noinline constructor: (P) -> E) {
         eventTypes[P::class] = E::class
         eventConstructors[P::class] = constructor as (Packet<*>) -> PacketEvent<Packet<*>>
     }
@@ -174,6 +176,5 @@ object PacketEventManager {
 
         listenerInstances -= listener
     }
-
 
 }

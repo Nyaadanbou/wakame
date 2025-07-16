@@ -1,18 +1,13 @@
 package cc.mewcraft.wakame.item2
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.commonEnv
+import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.node
-import cc.mewcraft.wakame.mainEnv
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
-import cc.mewcraft.wakame.testEnv
+import cc.mewcraft.wakame.util.test.TestOnly
+import cc.mewcraft.wakame.util.test.TestPath
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.test.KoinTest
 import org.spongepowered.configurate.kotlin.extensions.contains
 import kotlin.test.Test
 import kotlin.test.fail
@@ -20,40 +15,31 @@ import kotlin.test.fail
 /**
  * 用于检查所有物品组件的配置是否已经出现在 main/items.yml 或 test/items.yml.
  */
-class CheckMissingComponentConfigTest : KoinTest {
+@OptIn(TestOnly::class)
+class CheckMissingComponentConfigTest {
     companion object {
-        const val CONFIG_ID = "cc/mewcraft/wakame/mewcraft/wakame/item2"
+        const val CONFIG_ID = "items"
         const val NODE_COMPONENTS = "components"
-    }
-
-    @BeforeEach
-    fun beforeEach() {
-        startKoin {
-            modules(
-                commonEnv(),
-            )
-        }
     }
 
     @AfterEach
     fun afterEach() {
         Configs.cleanup() // 清理所有已缓存的实例
-        stopKoin()
     }
 
     // 检查所有物品组件类型的配置文件已经出现在 main/items.yml
     @Test
     fun `check all item component config's at main`() {
-        loadKoinModules(mainEnv())
-        KoishDataPaths.initialize()
+        KoishDataPaths.initializeForTest(TestPath.MAIN)
+        ConfigAccess.register(Configs)
         checkMissingConfigs()
     }
 
     // 检查所有物品组件类型的配置文件已经出现在 test/items.yml
     @Test
     fun `check all item component config's at test`() {
-        loadKoinModules(testEnv())
-        KoishDataPaths.initialize()
+        KoishDataPaths.initializeForTest(TestPath.TEST)
+        ConfigAccess.register(Configs)
         checkMissingConfigs()
     }
 
@@ -76,7 +62,7 @@ class CheckMissingComponentConfigTest : KoinTest {
         }
 
         if (missingConfigs.isNotEmpty()) {
-            fail("Missing item component configs for: ${missingConfigs.joinToString(", ")}")
+            fail("Missing item component configs for: ${missingConfigs.sorted().joinToString(", ")}")
         }
     }
 }

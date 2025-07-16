@@ -1,9 +1,7 @@
 package cc.mewcraft.wakame.hook.impl.betterhud
 
-import cc.mewcraft.wakame.ecs.Fleks
 import cc.mewcraft.wakame.ecs.bridge.koishify
 import cc.mewcraft.wakame.ecs.component.Mana
-import cc.mewcraft.wakame.ecs.system.DisplayMana
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.integration.Hook
@@ -21,7 +19,6 @@ object BetterHudHook {
 
     init {
         registerPlaceholders()
-        Fleks.INSTANCE.world.remove(DisplayMana) // 移除原有的 DisplayMana, “替换”为 BetterHud 的
     }
 
     private fun registerPlaceholders() {
