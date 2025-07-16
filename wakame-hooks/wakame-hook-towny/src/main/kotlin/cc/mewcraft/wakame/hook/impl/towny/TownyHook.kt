@@ -2,7 +2,7 @@ package cc.mewcraft.wakame.hook.impl.towny
 
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
-import cc.mewcraft.wakame.ecs.FleksAdder
+import cc.mewcraft.wakame.ecs.FleksPatcher
 import cc.mewcraft.wakame.integration.Hook
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
@@ -14,7 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["Towny"])
-object TownyHook : ProtectionIntegration, FleksAdder {
+object TownyHook : ProtectionIntegration, FleksPatcher {
 
     init {
         // addToRegistryFamily("towny_families") { TownyFamilies }

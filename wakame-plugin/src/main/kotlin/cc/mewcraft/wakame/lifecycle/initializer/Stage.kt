@@ -53,9 +53,14 @@ enum class InitStage(
     POST_WORLD(InternalInitStage.POST_WORLD),
 
     /**
-     * Before Fleks is initialized.
+     * 在 Fleks 加载之前, 用于使用 [cc.mewcraft.wakame.ecs.SystemBootstrapper] 添加系统.
      */
-    PRE_FLEKS(InternalInitStage.POST_WORLD, runBefore = setOf(KoishFleks::class));
+    PRE_FLEKS(InternalInitStage.POST_WORLD, runBefore = setOf(KoishFleks::class)),
+
+    /**
+     * 在 Fleks 加载之后, 用于删除现有的系统.
+     */
+    POST_FLEKS(InternalInitStage.POST_WORLD, runAfter = setOf(KoishFleks::class));
 
     internal val runAfter: Array<String> = runAfter.mapToArray { it.internalName }
     internal val runBefore: Array<String> = runBefore.mapToArray { it.internalName }

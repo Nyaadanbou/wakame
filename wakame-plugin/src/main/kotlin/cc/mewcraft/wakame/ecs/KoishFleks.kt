@@ -2,16 +2,8 @@ package cc.mewcraft.wakame.ecs
 
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.ecs.bridge.EEntity
-import cc.mewcraft.wakame.ecs.system.CountTick
-import cc.mewcraft.wakame.ecs.system.DisplayMana
-import cc.mewcraft.wakame.ecs.system.InitMana
-import cc.mewcraft.wakame.ecs.system.ManageBossBar
 import cc.mewcraft.wakame.ecs.system.RemoveBukkitBlocks
 import cc.mewcraft.wakame.ecs.system.RemoveBukkitEntities
-import cc.mewcraft.wakame.ecs.system.RenderParticle
-import cc.mewcraft.wakame.ecs.system.RestoreMana
-import cc.mewcraft.wakame.ecs.system.UpdateEntityInfoBossBar
-import cc.mewcraft.wakame.ecs.system.UpdateMaxMana
 import cc.mewcraft.wakame.lifecycle.initializer.DisableFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
@@ -30,10 +22,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object KoishFleks : Listener, Fleks, FleksAdder {
-    private val systemOrder: List<Identifier> = listOf(
-        "remove_bukkit_entities",
-        "remove_bukkit_blocks",
+internal object KoishFleks : Listener, Fleks , FleksPatcher {
+
+    private val SYSTEM_ORDER: List<Identifier> = listOf(
         "init_ability_container",
         "init_item_cooldown_container",
         "init_attribute_container",
@@ -82,27 +73,23 @@ internal object KoishFleks : Listener, Fleks, FleksAdder {
         }
 
         systems {
-            addToRegistrySystem("count_tick") { CountTick } // 记录 entity 存在的 tick 数
-            addToRegistrySystem("display_mana") { DisplayMana } // 显示玩家的魔法值
-            addToRegistrySystem("init_mana") { InitMana } // 初始化玩家的魔法值
-            addToRegistrySystem("manage_boss_bar") { ManageBossBar } // 显示/移除 boss bar
-            addToRegistrySystem("remove_bukkit_entities") { RemoveBukkitEntities } // 移除无效 bukkit entity 所映射的 ecs entity
-            addToRegistrySystem("remove_bukkit_blocks") { RemoveBukkitBlocks } // 移除无效 bukkit block 所映射的 ecs entity
-            addToRegistrySystem("render_particle") { RenderParticle } // 渲染粒子效果
-            addToRegistrySystem("restore_mana") { RestoreMana } // 恢复玩家的魔法值
-            addToRegistrySystem("update_entity_info_boss_bar") { UpdateEntityInfoBossBar } // 更新各种关于 boss bar 的逻辑
-            addToRegistrySystem("update_max_mana") { UpdateMaxMana } // 更新玩家的最大魔法值
-
             BuiltInRegistries.SYSTEM_BOOTSTRAPPER.freeze()
 
-            val unloadSystems = BuiltInRegistries.SYSTEM_BOOTSTRAPPER.keys.filter { it.value !in systemOrder }.map { it.value.value() }
+            add(RemoveBukkitEntities)
+            add(RemoveBukkitBlocks)
+
+            val unloadSystems = BuiltInRegistries.SYSTEM_BOOTSTRAPPER.keys.filter { it.value !in SYSTEM_ORDER }.map { it.value.value() }
             if (unloadSystems.isNotEmpty()) {
                 LOGGER.info("未启用的 ECS system: ${unloadSystems.joinToString(", ")}")
             }
-            for (order in systemOrder) {
-                val system = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order]
-                    ?: error("无法找到 ECS system $order, 请检查配置文件")
-                add(system.bootstrap())
+            for (order in SYSTEM_ORDER) {
+                val systemBootstrapper = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order]
+                if (systemBootstrapper == null) {
+                    LOGGER.warn("无法找到 ECS system $order, 请检查 SYSTEM_ORDER！")
+                    continue
+                }
+                val system = systemBootstrapper.bootstrap() ?: continue
+                add(system)
             }
         }
     }

@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.entity.attribute
 
-import cc.mewcraft.wakame.ecs.FleksAdder
+import cc.mewcraft.wakame.ecs.FleksPatcher
 import cc.mewcraft.wakame.entity.attribute.system.ApplyAttributeEffects
 import cc.mewcraft.wakame.entity.attribute.system.InitAttributeContainer
 import cc.mewcraft.wakame.lifecycle.initializer.Init
@@ -8,7 +8,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 @Init(stage = InitStage.PRE_FLEKS)
-object AttributeFleksAdder : FleksAdder {
+object AttributeFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
         addToRegistrySystem("apply_attribute_effects") { ApplyAttributeEffects } // 将物品上的属性效果应用到玩家

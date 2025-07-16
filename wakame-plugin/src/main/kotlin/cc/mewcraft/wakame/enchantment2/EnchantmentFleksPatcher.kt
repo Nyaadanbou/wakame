@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.enchantment2
 
-import cc.mewcraft.wakame.ecs.FleksAdder
+import cc.mewcraft.wakame.ecs.FleksPatcher
 import cc.mewcraft.wakame.enchantment2.system.ApplyEnchantmentEffect
 import cc.mewcraft.wakame.enchantment2.system.TickAntigravShotEnchantment
 import cc.mewcraft.wakame.enchantment2.system.TickAttributeEnchantment
@@ -13,7 +13,7 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 
 @Init(stage = InitStage.PRE_FLEKS)
-object EnchantmentFleksAdder : FleksAdder {
+object EnchantmentFleksPatcher : FleksPatcher {
     @InitFun
     fun init() {
         addToRegistrySystem("apply_enchantment_effect") { ApplyEnchantmentEffect } // 将物品上的附魔效果应用到玩家

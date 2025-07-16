@@ -1,4 +1,4 @@
-package cc.mewcraft.wakame.ecs.system
+package cc.mewcraft.wakame.ability2.system
 
 import cc.mewcraft.wakame.ecs.bridge.EWorld
 import cc.mewcraft.wakame.ecs.component.TickCount
