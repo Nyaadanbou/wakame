@@ -7,11 +7,11 @@ primary_menu_settings:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal:menu/common/background"
-    output_ok: "internal:menu/merging/output_ok"
-    output_empty: "internal:menu/merging/output_empty"
-    output_failure: "internal:menu/merging/output_failure"
-    output_insufficient_resource: "internal:menu/merging/output_insufficient_resource"
+    background: "internal/menu/common/background"
+    output_ok: "internal/menu/merging/output_ok"
+    output_empty: "internal/menu/merging/output_empty"
+    output_failure: "internal/menu/merging/output_failure"
+    output_insufficient_resource: "internal/menu/merging/output_insufficient_resource"
 
 input_level_limit: 30
 

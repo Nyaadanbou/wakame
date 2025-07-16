@@ -83,11 +83,7 @@ internal object KoishFleks : Listener, Fleks , FleksPatcher {
                 LOGGER.info("未启用的 ECS system: ${unloadSystems.joinToString(", ")}")
             }
             for (order in SYSTEM_ORDER) {
-                val systemBootstrapper = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order]
-                if (systemBootstrapper == null) {
-                    LOGGER.warn("无法找到 ECS system $order, 请检查 SYSTEM_ORDER！")
-                    continue
-                }
+                val systemBootstrapper = BuiltInRegistries.SYSTEM_BOOTSTRAPPER[order] ?: continue
                 val system = systemBootstrapper.bootstrap() ?: continue
                 add(system)
             }

@@ -8,25 +8,25 @@ primary_menu_settings:
     - ". . . x x x . . ."
     - ". . . < # > . . ."
   icons:
-    background: "internal:menu/common/background"
-    prev_page: "internal:menu/common/prev_page"
-    next_page: "internal:menu/common/next_page"
-    input_ok: "internal:menu/modding/input_ok"
-    input_empty: "internal:menu/modding/input_empty"
-    output_empty: "internal:menu/modding/output_empty"
-    output_failure: "internal:menu/modding/output_failure"
-    output_ok_confirmed: "internal:menu/modding/output_ok_confirmed"
-    output_ok_unconfirmed: "internal:menu/modding/output_ok_unconfirmed"
-    output_insufficient_resource: "internal:menu/modding/output_insufficient_resource"
+    background: "internal/menu/common/background"
+    prev_page: "internal/menu/common/prev_page"
+    next_page: "internal/menu/common/next_page"
+    input_ok: "internal/menu/modding/input_ok"
+    input_empty: "internal/menu/modding/input_empty"
+    output_empty: "internal/menu/modding/output_empty"
+    output_failure: "internal/menu/modding/output_failure"
+    output_ok_confirmed: "internal/menu/modding/output_ok_confirmed"
+    output_ok_unconfirmed: "internal/menu/modding/output_ok_unconfirmed"
+    output_insufficient_resource: "internal/menu/modding/output_insufficient_resource"
 
 replace_menu_settings:
   title: "DO_NOT_USE"
   structure: [ "a * b" ]
   icons:
-    compatibility_view: "internal:menu/modding/compatibility_view"
-    core_view: "internal:menu/modding/core_view"
-    core_unusable: "internal:menu/modding/core_unusable"
-    core_usable: "internal:menu/modding/core_usable"
+    compatibility_view: "internal/menu/modding/compatibility_view"
+    core_view: "internal/menu/modding/core_view"
+    core_unusable: "internal/menu/modding/core_unusable"
+    core_usable: "internal/menu/modding/core_usable"
 
 reforge_count_add_method: PLUS_ONE
 

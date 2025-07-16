@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack
  * 临时实现, 用来获取一些“随机”的物品类型作为菜单图标.
  */
 internal object CoreIcons {
-    private const val ICON_ID_PREFIX = "internal:menu/core_icon"
+    private const val ICON_ID_PREFIX = "internal/menu/core_icon"
     private const val DEFAULT_ICON_ID = "$ICON_ID_PREFIX/default"
 
     fun getItemStack(coreId: String, core: Core): ItemStack {
