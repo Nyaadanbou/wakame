@@ -24,10 +24,10 @@ menu_settings:
     - "< . . . b . . . >"
 
   icons:
-    background: "internal/menu/common/background"
-    prev_page: "menu/catalog/default/prev_page"
-    next_page: "menu/catalog/default/next_page"
-    back: "menu/common/default/back"
+    background: "internal/menu/common/default/background"
+    prev_page: "internal/menu/catalog/default/prev_page"
+    next_page: "internal/menu/catalog/default/next_page"
+    back: "internal/menu/common/default/back"
 
 items:
   - minecraft:cake

@@ -9,7 +9,7 @@ primary_menu_settings:
     - "s . * * * * * * *"
     - ". . . . . . . . ."
   icons:
-    background: "internal/menu/common/background"
+    background: "internal/menu/common/default/background"
     select_repairing: "internal/menu/blacksmith/select_repairing"
     select_recycling: "internal/menu/blacksmith/select_recycling"
 
@@ -19,7 +19,7 @@ repairing_menu_settings:
     - "i i i i i . ."
     - "* * * * * . ."
   icons:
-    background: "internal/menu/common/background"
+    background: "internal/menu/common/default/background"
     background2: "internal/menu/blacksmith/background2"
 
 recycling_menu_settings:
@@ -28,7 +28,7 @@ recycling_menu_settings:
     - "i i i i i . ."
     - "i i i i i . x"
   icons:
-    background: "internal/menu/common/background"
+    background: "internal/menu/common/default/background"
     recycle_when_empty: "internal/menu/blacksmith/recycle_when_empty"
     recycle_when_error: "internal/menu/blacksmith/recycle_when_error"
     recycle_when_confirmed: "internal/menu/blacksmith/recycle_when_confirmed"

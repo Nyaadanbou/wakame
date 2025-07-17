@@ -8,9 +8,9 @@ primary_menu_settings:
     - ". . . x x x . . ."
     - ". . . < # > . . ."
   icons:
-    background: "internal/menu/common/background"
-    prev_page: "internal/menu/common/prev_page"
-    next_page: "internal/menu/common/next_page"
+    background: "internal/menu/common/defaultdefault/background"
+    prev_page: "internal/menu/common/defaultprev_page"
+    next_page: "internal/menu/common/defaultnext_page"
     input_ok: "internal/menu/modding/input_ok"
     input_empty: "internal/menu/modding/input_empty"
     output_empty: "internal/menu/modding/output_empty"

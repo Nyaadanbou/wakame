@@ -7,7 +7,7 @@ primary_menu_settings:
     - ". . . . . . . . ."
     - ". . . . . . . . ."
   icons:
-    background: "internal/menu/common/background"
+    background: "internal/menu/common/default/background"
     output_ok: "internal/menu/merging/output_ok"
     output_empty: "internal/menu/merging/output_empty"
     output_failure: "internal/menu/merging/output_failure"
