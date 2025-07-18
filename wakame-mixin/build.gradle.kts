@@ -55,6 +55,14 @@ dependencies {
     implementation(local.commons.provider)
     implementation(local.commons.reflection)
     implementation(local.commons.tuple)
+    implementation(local.mongodb.driver) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
+    implementation(local.mongodb.bson) {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
     implementation(platform(libs.bom.exposed))
     implementation(platform(libs.bom.configurate.yaml))
     implementation(platform(libs.bom.configurate.gson))

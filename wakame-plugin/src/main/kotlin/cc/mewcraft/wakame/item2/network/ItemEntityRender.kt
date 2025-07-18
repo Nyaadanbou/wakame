@@ -17,11 +17,13 @@ import cc.mewcraft.wakame.network.event.unregisterPacketListener
 import cc.mewcraft.wakame.shadow.world.entity.ShadowEntity
 import cc.mewcraft.wakame.util.NMSUtils
 import cc.mewcraft.wakame.util.adventure.toNMSComponent
+import cc.mewcraft.wakame.util.item.customName
 import cc.mewcraft.wakame.util.item.itemName
 import cc.mewcraft.wakame.util.send
 import io.papermc.paper.adventure.PaperAdventure
 import me.lucko.shadow.bukkit.BukkitShadowFactory
 import me.lucko.shadow.staticShadow
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.ChatFormatting
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
@@ -85,8 +87,13 @@ internal object ItemEntityRender : PacketListener {
     private fun tryAddCustomNameEntityData(item: Item, entityData: MutableList<SynchedEntityData.DataValue<*>>) {
         val itemStack = item.itemStack
 
+        var customName = itemStack.customName ?: itemStack.itemName
+        if (itemStack.amount > 1) {
+            customName = customName?.append(Component.text(" x${itemStack.amount}", NamedTextColor.AQUA))
+        }
+
         // CustomName
-        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME, Optional.ofNullable(itemStack.itemName?.toNMSComponent())))
+        entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME, Optional.ofNullable(customName?.toNMSComponent())))
 
         // CustomNameVisible
         entityData.add(SynchedEntityData.DataValue.create(shadowEntity.DATA_CUSTOM_NAME_VISIBLE, true))

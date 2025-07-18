@@ -23,7 +23,7 @@ class DataStorageTest {
         fun setup() {
             KoishDataPaths.initializeForTest(TestPath.TEST)
             ConfigAccess.register(Configs)
-            DataStorageInitializer.init()
+            SqlDataStorageInitializer.init()
 
             transaction {
                 SchemaUtils.drop(Users)
@@ -37,7 +37,7 @@ class DataStorageTest {
             transaction {
                 SchemaUtils.drop(Users)
             }
-            DataStorageInitializer.disable()
+            SqlDataStorageInitializer.disable()
         }
     }
 

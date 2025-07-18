@@ -1,6 +1,6 @@
 package cc.mewcraft.wakame.database
 
-enum class DataAdapter {
+enum class SqlDataAdapter {
     SQLITE,
     MARIADB,
 }

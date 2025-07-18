@@ -8,9 +8,9 @@ import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.ExposedConnectionImpl
 
 class MariaDataStorage(
-    override val config: DataStorageConfig
-) : DataStorage {
-    override val adapter: DataAdapter = DataAdapter.MARIADB
+    override val config: SqlDataStorageConfig
+) : SqlDataStorage {
+    override val adapter: SqlDataAdapter = SqlDataAdapter.MARIADB
     private lateinit var dataSource: HikariDataSource
 
     override fun connectToDatabase() {

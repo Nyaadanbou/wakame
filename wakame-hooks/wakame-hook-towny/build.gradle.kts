@@ -14,10 +14,14 @@ dependencies {
     compileOnly(project(":wakame-api"))
     compileOnly(project(":wakame-mixin"))
     compileOnly(project(":wakame-plugin"))
-    compileOnly(platform(libs.bom.exposed))
+    compileOnly(local.mongodb.driver)
+    compileOnly(local.mongodb.bson)
     compileOnly(local.fleks) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
+    }
+    compileOnly(platform(libs.bom.invui)) /* 由自定义的 classloader 加载 */ {
+        exclude("org.jetbrains")
     }
 
     // libraries

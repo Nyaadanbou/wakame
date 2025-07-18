@@ -3,13 +3,13 @@ package cc.mewcraft.wakame.database
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 
 @ConfigSerializable
-data class DataStorageConfig(
-    val credentials: DataStorageCredentials,
-    val connectionPool: DataStorageConnectionPool = DataStorageConnectionPool(),
+data class SqlDataStorageConfig(
+    val credentials: SqlDataStorageCredentials,
+    val connectionPool: SqlDataStorageConnectionPool = SqlDataStorageConnectionPool(),
 )
 
 @ConfigSerializable
-data class DataStorageCredentials(
+data class SqlDataStorageCredentials(
     val host: String,
     val port: Int,
     val database: String,
@@ -19,7 +19,7 @@ data class DataStorageCredentials(
 )
 
 @ConfigSerializable
-data class DataStorageConnectionPool(
+data class SqlDataStorageConnectionPool(
     val maximumPoolSize: Int = 10,
     val minimumIdle: Int = 10,
     val maximumLifetime: Long = 1800000L,

@@ -9,10 +9,10 @@ import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.ExposedConnectionImpl
 import kotlin.io.path.createDirectories
 
-class SQLiteDataStorage(
-    override val config: DataStorageConfig
-) : DataStorage {
-    override val adapter: DataAdapter = DataAdapter.SQLITE
+class SqliteDataStorage(
+    override val config: SqlDataStorageConfig
+) : SqlDataStorage {
+    override val adapter: SqlDataAdapter = SqlDataAdapter.SQLITE
     private lateinit var dataSource: HikariDataSource
 
     override fun connectToDatabase() {

@@ -22,9 +22,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 @InternalInit(stage = InternalInitStage.POST_WORLD)
-internal object KoishFleks : Listener, Fleks , FleksPatcher {
+internal object KoishFleks : Listener, Fleks {
 
     private val SYSTEM_ORDER: List<Identifier> = listOf(
+        "remove_town_hall",
         "init_ability_container",
         "init_item_cooldown_container",
         "init_attribute_container",
@@ -45,6 +46,7 @@ internal object KoishFleks : Listener, Fleks , FleksPatcher {
         "manage_boss_bar",
         "count_tick",
         "consume_mana_for_abilities",
+        "buff_furnace",
         "tick_ability_blackhole",
         "tick_ability_blink",
         "tick_ability_dash",

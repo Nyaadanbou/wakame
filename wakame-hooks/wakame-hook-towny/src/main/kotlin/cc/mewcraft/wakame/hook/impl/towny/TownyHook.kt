@@ -3,25 +3,58 @@ package cc.mewcraft.wakame.hook.impl.towny
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration
 import cc.mewcraft.wakame.api.protection.ProtectionIntegration.ExecutionMode
 import cc.mewcraft.wakame.ecs.FleksPatcher
+import cc.mewcraft.wakame.ecs.bridge.KoishEntity
+import cc.mewcraft.wakame.hook.impl.towny.bridge.koishify
+import cc.mewcraft.wakame.hook.impl.towny.gui.enhancement.TownEnhancementsMenu
+import cc.mewcraft.wakame.hook.impl.towny.system.BuffFurnace
+import cc.mewcraft.wakame.hook.impl.towny.system.RemoveTownHall
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.util.registerEvents
 import com.palmergames.bukkit.towny.TownyAPI
 import com.palmergames.bukkit.towny.`object`.TownyPermission
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil
 import org.bukkit.Location
 import org.bukkit.OfflinePlayer
+import org.bukkit.block.Block
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.inventory.ItemStack
 
 @Hook(plugins = ["Towny"])
-object TownyHook : ProtectionIntegration, FleksPatcher {
+object TownyHook : ProtectionIntegration, FleksPatcher, Listener {
 
     init {
-        // addToRegistryFamily("towny_families") { TownyFamilies }
-        // TownyHookListener.registerEvents()
+        addToRegistryFamily("towny_families") { TownyFamilies }
+
+        addToRegistrySystem("buff_furnace") { BuffFurnace }
+        addToRegistrySystem("remove_town_hall") { RemoveTownHall }
+        // MongoTownDataStorage.init()
+
+        registerEvents()
+    }
+
+    @EventHandler
+    fun on(event: PlayerSwapHandItemsEvent) {
+        val player = event.player
+        if (!player.isSneaking) {
+            return
+        }
+        event.isCancelled = true
+        TownEnhancementsMenu(
+            town = TOWNY.getTown(event.player) ?: return,
+            viewer = event.player
+        ).open()
     }
 
     internal val TOWNY = TownyAPI.getInstance()
+
+    internal fun getTownHallEntity(furnace: Block): KoishEntity? {
+        val town = TOWNY.getTownBlock(furnace.location)?.townOrNull ?: return null
+        return town.koishify()
+    }
 
     override fun getExecutionMode(): ExecutionMode {
         return ExecutionMode.SERVER

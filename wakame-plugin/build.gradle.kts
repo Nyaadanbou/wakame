@@ -48,6 +48,8 @@ dependencies {
     }
     compileOnly(libs.hikari)
     compileOnly(libs.mocha)
+    compileOnly(local.mongodb.driver)
+    compileOnly(local.mongodb.bson)
     implementation(platform(libs.bom.adventure))
     implementation(platform(libs.bom.caffeine))
     compileOnly(platform(libs.bom.exposed))
