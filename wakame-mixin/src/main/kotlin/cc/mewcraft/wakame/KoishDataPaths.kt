@@ -15,6 +15,7 @@ private const val CONFIGS_PATH = "configs"
 private const val ASSETS_PATH = "assets"
 private const val LANG_PATH = "lang"
 private const val DATA_PATH = "data"
+private const val FEATURES_PATH = "features"
 
 object KoishDataPaths {
 
@@ -55,6 +56,12 @@ object KoishDataPaths {
     val DATA: Path by paths.data
 
     /**
+     * 特性数据文件夹, 位于 [ROOT] 之下的 `features`.
+     */
+    @get:JvmName("getFeatures")
+    val FEATURES: Path by paths.features
+
+    /**
      * 重新初始化 [ROOT], [CONFIGS], [ASSETS], [LANG], [DATA] 的值.
      *
      * 对于服务端环境, 该函数会在服务端启动时调用.
@@ -65,6 +72,7 @@ object KoishDataPaths {
         paths.assets.value = ROOT.resolve(ASSETS_PATH)
         paths.lang.value = ROOT.resolve(LANG_PATH)
         paths.data.value = ROOT.resolve(DATA_PATH)
+        paths.features.value = ROOT.resolve(FEATURES_PATH)
     }
 
     /**
@@ -77,6 +85,7 @@ object KoishDataPaths {
         paths.assets.value = ROOT.resolve(ASSETS_PATH)
         paths.lang.value = ROOT.resolve(LANG_PATH)
         paths.data.value = ROOT.resolve(DATA_PATH)
+        paths.features.value = ROOT.resolve(FEATURES_PATH)
     }
 
     private class PathSet {
@@ -86,6 +95,7 @@ object KoishDataPaths {
         val assets = NotNullVar<Path>()
         val lang = NotNullVar<Path>()
         val data = NotNullVar<Path>()
+        val features = NotNullVar<Path>()
     }
 
     private class NotNullVar<T : Any>() : ReadWriteProperty<Any?, T> {

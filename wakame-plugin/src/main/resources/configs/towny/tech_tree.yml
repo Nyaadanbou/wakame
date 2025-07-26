@@ -1,0 +1,26 @@
+tech_tree:
+  - id: t1
+    display_name: 农业
+    cost: 10
+    research_time: 5
+
+  - id: t2
+    display_name: 青铜
+    cost: 20
+    research_time: 10
+    dependencies:
+      - t1
+
+  - id: t3
+    display_name: 铁器
+    cost: 30
+    research_time: 15
+    dependencies:
+      - t2
+
+  - id: t4
+    display_name: 书写
+    cost: 25
+    research_time: 12
+    dependencies:
+      - t1

@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.command.KoishCommandManager
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.Configs
 import cc.mewcraft.wakame.config.PermanentStorage
+import cc.mewcraft.wakame.feature.FeatureExtractor
 import cc.mewcraft.wakame.lang.LanguageExtractor
 import cc.mewcraft.wakame.lifecycle.initializer.Initializer
 import cc.mewcraft.wakame.pack.AssetExtractor
@@ -80,6 +81,7 @@ internal class KoishBootstrap : PluginBootstrap {
             Configs.initialize()
             LanguageExtractor.extractDefaults()
             AssetExtractor.extractDefaults()
+            FeatureExtractor.extractDefaults()
 
             // 初始化所有 InitFun (PRE_WORLD)
             Initializer.initialize()

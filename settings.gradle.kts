@@ -25,6 +25,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "wakame"
 
+// Features
+include(":koish-features:koish-mypet")
+include(":koish-features:koish-townhall")
+
+// Internals
 include(":wakame-api")
 include(":wakame-common")
 include(":wakame-hooks:wakame-hook-adventurelevel")

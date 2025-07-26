@@ -15,15 +15,15 @@ import java.io.BufferedWriter
 // Builder extensions
 
 
-internal fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
+fun yamlLoader(block: YamlLoaderDsl.() -> Unit): YamlConfigurationLoader.Builder {
     return YamlLoaderDsl().apply(block).builder
 }
 
-internal fun gsonLoader(block: GsonLoaderDsl.() -> Unit): GsonConfigurationLoader.Builder {
+fun gsonLoader(block: GsonLoaderDsl.() -> Unit): GsonConfigurationLoader.Builder {
     return GsonLoaderDsl().apply(block).builder
 }
 
-internal class YamlLoaderDsl {
+class YamlLoaderDsl {
     /* private */ val builder: YamlConfigurationLoader.Builder = YamlConfigurationLoader.builder()
 
     // 应用默认设置的逻辑
@@ -55,7 +55,7 @@ internal class YamlLoaderDsl {
     }
 }
 
-internal class GsonLoaderDsl {
+class GsonLoaderDsl {
     /* private */ val builder: GsonConfigurationLoader.Builder = GsonConfigurationLoader.builder()
 
     fun withDefaults(): GsonLoaderDsl {

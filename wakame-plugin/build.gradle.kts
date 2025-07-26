@@ -20,6 +20,10 @@ dependencies {
     compileOnly(project(":wakame-api")) // 运行时由 koish-mod 提供
     compileOnly(project(":wakame-common")) // 运行时由 koish-mod 提供
     compileOnly(project(":wakame-mixin")) // 运行时由 koish-mod 提供
+
+    runtimeOnly(project(":koish-features:koish-mypet"))
+    runtimeOnly(project(":koish-features:koish-townhall"))
+
     runtimeOnly(project(":wakame-hooks:wakame-hook-adventurelevel"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-betterhud"))
     runtimeOnly(project(":wakame-hooks:wakame-hook-breweryx"))

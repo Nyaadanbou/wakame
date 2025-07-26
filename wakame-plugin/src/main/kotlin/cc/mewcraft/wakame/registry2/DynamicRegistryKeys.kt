@@ -18,7 +18,7 @@ object DynamicRegistryKeys {
 
     ///
 
-    private fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
+    fun <T> createRegistryKey(name: String): RegistryKey<out Registry<T>> {
         return RegistryKey.of(ROOT_REGISTRY_NAME, Identifiers.of(name))
     }
 }

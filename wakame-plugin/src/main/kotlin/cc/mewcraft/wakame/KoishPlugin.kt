@@ -19,7 +19,7 @@ import java.io.File
 import java.util.Objects.requireNonNull
 import cc.mewcraft.wakame.api.Koish as IKoish
 
-internal object KoishPlugin : JavaPlugin(), IKoish {
+object KoishPlugin : JavaPlugin(), IKoish {
 
     override fun onLoad() {
         PluginHolder.register(this)

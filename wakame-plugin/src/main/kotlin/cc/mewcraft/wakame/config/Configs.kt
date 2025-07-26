@@ -1,5 +1,6 @@
 package cc.mewcraft.wakame.config
 
+import cc.mewcraft.wakame.FeatureDataPaths
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.feature.Feature
 import cc.mewcraft.wakame.lifecycle.initializer.InternalInit
@@ -21,6 +22,7 @@ import org.spongepowered.configurate.yaml.NodeStyle
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import xyz.xenondevs.commons.provider.Provider
 import java.nio.file.Path
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 
@@ -52,11 +54,13 @@ internal object Configs : ConfigAccess {
     }
 
     private fun resolveConfigPath(configId: Identifier): Path {
-        val dataFolder = when (configId.namespace()) {
-            KOISH_NAMESPACE -> KoishDataPaths.ROOT // -> plugins/<data_folder>
-            else -> throw IllegalArgumentException("Only 'koish' namespace is currently supported.")
+        return if (configId.namespace() == KOISH_NAMESPACE) {
+            // 如果是 Koish 的配置文件, 则直接使用 KoishDataPaths.CONFIGS
+            KoishDataPaths.CONFIGS.resolve(configId.value() + ".yml")
+        } else {
+            // 否则使用 FeatureDataPaths.getPath 方法获取对应 Feature 的配置路径
+            FeatureDataPaths.getPath(configId.namespace(), Path(configId.value() + ".yml"))
         }
-        return dataFolder.resolve("configs").resolve(configId.value() + ".yml")
     }
 
     @VisibleForTesting

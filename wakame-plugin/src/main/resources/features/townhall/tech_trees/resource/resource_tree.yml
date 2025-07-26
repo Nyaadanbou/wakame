@@ -1,0 +1,4 @@
+nodes:
+  - buff_furnace_v1:
+      cost: 20
+      research_time: 10
