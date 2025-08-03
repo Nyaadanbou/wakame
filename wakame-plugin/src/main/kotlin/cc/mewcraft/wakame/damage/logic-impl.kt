@@ -56,17 +56,6 @@ import org.bukkit.entity.SpectralArrow
 import org.bukkit.entity.Trident
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ABSORPTION
-import org.bukkit.entity.AbstractArrow
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
-import org.bukkit.entity.Projectile
-import org.bukkit.entity.SpectralArrow
-import org.bukkit.entity.Trident
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause
-import org.bukkit.entity.*
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.ARMOR
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BASE
 import org.bukkit.event.entity.EntityDamageEvent.DamageModifier.BLOCKING
@@ -202,7 +191,7 @@ internal object DamageManager : DamageManagerApi {
             val damagee = event.entity
             // 无懈可击期间只会受到大于 lastHurt 的伤害
             if (isDuringInvulnerable && damagee is LivingEntity) {
-                if (finalDamage <= damagee.lastDamage){
+                if (finalDamage <= damagee.lastDamage) {
                     event.isCancelled = true
                     // 同上无需深究返回 0f 可能造成的问题
                     return 0f
