@@ -12,9 +12,10 @@ import cc.mewcraft.wakame.ecs.component.BukkitPlayer
 import cc.mewcraft.wakame.entity.attribute.Attributes
 import cc.mewcraft.wakame.entity.player.attributeContainer
 import cc.mewcraft.wakame.event.bukkit.PlayerItemLeftClickEvent
+import cc.mewcraft.wakame.event.bukkit.PlayerItemRightClickEvent
 import cc.mewcraft.wakame.event.bukkit.PostprocessDamageEvent
-import cc.mewcraft.wakame.event.bukkit.WrappedPlayerInteractEvent
 import cc.mewcraft.wakame.item2.ItemSlotChanges
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.WeaponUtils.getInputDirection
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.extension.addCooldown
@@ -23,21 +24,21 @@ import cc.mewcraft.wakame.item2.extension.isOnCooldown
 import cc.mewcraft.wakame.item2.getProperty
 import cc.mewcraft.wakame.util.adventure.SoundSource
 import cc.mewcraft.wakame.util.adventure.playSound
+import cc.mewcraft.wakame.util.runTaskLater
 import com.github.quillraven.fleks.ComponentType
 import com.github.quillraven.fleks.Entity
 import com.github.quillraven.fleks.IteratingSystem
-import io.papermc.paper.event.player.PlayerStopUsingItemEvent
 import io.papermc.paper.registry.keys.SoundEventKeys
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
-import org.bukkit.event.block.Action
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.util.Vector
 import xyz.xenondevs.commons.provider.orElse
+import kotlin.random.Random
 
 private val LOGGING by MAIN_CONFIG.optionalEntry<Boolean>("debug", "logging", "damage").orElse(false)
 
@@ -54,12 +55,91 @@ object Katana : Weapon {
         if (katanaState.isArmed.not()) return
         if (itemstack.isOnCooldown(player)) return
 
-        if (!player.isSneaking) {
-            // 玩家单纯左键点击, 发动横斩
-            horizontalSlash(player, itemstack, katanaState)
-        } else {
-            // 玩家潜行左键点击, 进行复杂的连招判定
-            slashCombo(player, itemstack, katanaState)
+        val currentAction = katanaState.currentAction
+        val config = katanaState.config
+        when (currentAction) {
+            KatanaState.ActionType.IDLE,
+            KatanaState.ActionType.HORIZONTAL_SLASH,
+            KatanaState.ActionType.FORESIGHT_SLASH -> {
+                if (player.isSneaking) {
+                    // 气刃值足够发动气刃斩1
+                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume1) {
+                        return spiritBladeSlash1(player, itemstack, katanaState)
+                    }
+                }
+            }
+
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_1 -> {
+                if (player.isSneaking) {
+                    // 气刃值足够发动气刃斩2
+                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume2) {
+                        return spiritBladeSlash2(player, itemstack, katanaState)
+                    }
+                }
+            }
+
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_2 -> {
+                if (player.isSneaking) {
+                    // 气刃值足够发动气刃斩3
+                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume3) {
+                        return spiritBladeSlash3(player, itemstack, katanaState)
+                    }
+                }
+            }
+
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_3 -> {
+                if (player.isSneaking) {
+                    // 气刃值足够发动气刃大回旋斩
+                    if (katanaState.currentBladeSpirit >= config.roundSlashSpiritConsume) {
+                        return roundSlash(player, itemstack, katanaState)
+                    }
+                }
+            }
+
+            KatanaState.ActionType.ROUND_SLASH -> {
+                // 气刃大回旋斩之后只能横斩
+            }
+
+            // KatanaState.ActionType.DRAGON_ASCEND_SLASH -> {}
+        }
+        // 如果前面的状态都没有 return
+        // 则发动发动横斩
+        return horizontalSlash(player, itemstack, katanaState)
+    }
+
+    override fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) {
+        if (hand != EquipmentSlot.HAND) return
+
+        val katanaState = player.koishify().getOrNull(KatanaState) ?: return
+        if (katanaState.isArmed.not()) return
+        if (itemstack.isOnCooldown(player)) return
+
+        val currentAction = katanaState.currentAction
+        val config = katanaState.config
+        when (currentAction) {
+            KatanaState.ActionType.IDLE,
+            KatanaState.ActionType.ROUND_SLASH,
+            KatanaState.ActionType.FORESIGHT_SLASH -> {
+                // 待机不能直接看破斩(需要垫刀)
+                // 气刃大回旋斩之后不能看破斩
+                // 看破斩之后不能看破斩(不能复读)
+                return
+            }
+
+            KatanaState.ActionType.HORIZONTAL_SLASH,
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_1,
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_2,
+            KatanaState.ActionType.SPIRIT_BLADE_SLASH_3 -> {
+                return if (katanaState.currentBladeSpirit >= config.foresightSlashSpiritRequire) {
+                    // 气刃值足够发动正常看破斩
+                    foresightSlash(player, itemstack, katanaState)
+                } else {
+                    // 气刃值不足以发动正常看破斩
+                    weakForesightSlash(player, itemstack, katanaState)
+                }
+            }
+
+            // KatanaState.ActionType.DRAGON_ASCEND_SLASH -> {}
         }
     }
 
@@ -67,75 +147,276 @@ object Katana : Weapon {
         val katanaState = player.koishify().getOrNull(KatanaState) ?: return
         if (katanaState.isArmed.not()) return
 
-        laiSlashCheck(player, katanaState, event)
-    }
-
-    override fun handleRelease(player: Player, itemstack: ItemStack, event: PlayerStopUsingItemEvent) {
-        val katanaState = player.koishify().getOrNull(KatanaState) ?: return
-        if (katanaState.isArmed.not()) return
-        if (itemstack.isOnCooldown(player)) return
-
-        laiSlash(player, itemstack, katanaState)
-    }
-
-    override fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) {
-        val event = wrappedEvent.event
-        if (event.useItemInHand() == Event.Result.DENY) return
-        if (event.action == Action.PHYSICAL) return
-        if (event.hand != EquipmentSlot.HAND) {
-            // 太刀只允许主手交互
-            event.setUseItemInHand(Event.Result.DENY)
-        }
-        wrappedEvent.actionPerformed = true
+        foresightSlashCheck(player, katanaState, event)
     }
 
     /**
-     * 太刀横斩.
+     * 执行太刀横斩的攻击效果.
      */
     private fun horizontalSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-        val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+        val config = katanaState.config
+        val damageMetadata = PlayerDamageMetadata(player.attributeContainer) {
             every {
                 standard()
                 rate { // override
-                    katanaState.getBladeLevelDamageRate() * standard()
+                    katanaState.getBladeLevelDamageRate() * config.horizontalSlashDamageMultiplier * standard()
                 }
             }
         }
-        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, katanaConfig.horizontalSlashHalfExtentsBase)
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.horizontalSlashHalfExtentsBase)
         if (hitEntities.isNotEmpty()) {
             // 造成伤害
             hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
             // 增加气刃值
-            katanaState.addBladeSpirit(katanaConfig.horizontalSlashSpiritReward)
+            katanaState.addBladeSpirit(config.horizontalSlashSpiritReward)
             // 设置耐久
-            player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
+            player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
         }
         // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.horizontalSlashCooldown)
+        val cooldown = config.horizontalSlashCooldown
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.HORIZONTAL_SLASH, cooldown + config.allowComboTicks)
     }
 
     /**
-     * 太刀居合斩.
+     * 方便函数.
+     * 执行太刀气刃斩的通用攻击效果.
+     */
+    private fun spiritBladeSlashBase(
+        player: Player, katanaState: KatanaState, damageMultiplier: Double, angel: Float
+    ) {
+        val config = katanaState.config
+        val damageMetadata = PlayerDamageMetadata(player.attributeContainer) {
+            every {
+                standard()
+                rate { // override
+                    katanaState.getBladeLevelDamageRate() * damageMultiplier * standard()
+                }
+            }
+        }
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.spiritBladeSlashHalfExtentsBase, angel)
+        if (hitEntities.isNotEmpty()) {
+            // 造成伤害
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+            // 设置耐久
+            player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
+        }
+    }
+
+    /**
+     * 执行太刀气刃斩1(左气刃斩)的攻击效果.
+     */
+    private fun spiritBladeSlash1(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        // 消耗气
+        katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume1)
+        spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier1, Random.nextDouble(32.0, 38.0).toFloat())
+        // 设置冷却
+        val cooldown = config.spiritBladeSlashCooldown1
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_1, cooldown + config.allowComboTicks)
+    }
+
+    /**
+     * 执行太刀气刃斩2(右气刃斩)的攻击效果.
+     */
+    private fun spiritBladeSlash2(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        // 消耗气
+        katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume2)
+        spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier2, Random.nextDouble(-32.0, -38.0).toFloat())
+        // 设置冷却
+        val cooldown = config.spiritBladeSlashCooldown2
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_2, cooldown + config.allowComboTicks)
+    }
+
+    /**
+     * 执行太刀气刃斩3(气刃三连斩)的攻击效果.
+     */
+    private fun spiritBladeSlash3(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        // 消耗气
+        katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume3)
+        spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(32.0, 38.0).toFloat())
+        runTaskLater(8) {
+            spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(-32.0, -38.0).toFloat())
+        }
+        runTaskLater(16) {
+            spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(85.0, 95.0).toFloat())
+        }
+        // 设置冷却
+        val cooldown = config.spiritBladeSlashCooldown3
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_3, cooldown + config.allowComboTicks)
+    }
+
+    /**
+     * 执行太刀气刃大回旋斩的攻击效果.
+     */
+    private fun roundSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        // 消耗气
+        katanaState.addBladeSpirit(-config.roundSlashSpiritConsume)
+        // 造成伤害
+        val centerLocation = player.location.add(.0, player.boundingBox.height / 2, .0)
+        val attributeContainer = player.attributeContainer
+        val scale = attributeContainer.getValue(Attributes.SCALE).toFloat()
+        val hitEntities = centerLocation.getNearbyLivingEntities(config.roundSlashRadius * scale, 1.1 * scale) { it != player }
+        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
+            every {
+                standard()
+                rate {
+                    katanaState.getBladeLevelDamageRate() * config.roundSlashDamageMultiplier * standard()
+                }
+            }
+        }
+        if (hitEntities.isNotEmpty()) {
+            // 造成伤害
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+            // 提升气刃等级
+            katanaState.upgradeBladeLevel()
+            // 设置耐久
+            player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
+            if (LOGGING) player.sendMessage("回旋斩命中! 气刃等级提升!")
+        } else {
+            if (LOGGING) player.sendMessage("回旋斩未命中!")
+        }
+        // 设置冷却
+        val cooldown = config.roundSlashCooldown
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.ROUND_SLASH, cooldown + config.allowComboTicks)
+    }
+
+    /**
+     * 方便函数.
+     * 执行太刀看破斩的通用攻击效果.
+     */
+    private fun foresightSlashBase(
+        player: Player, itemstack: ItemStack, katanaState: KatanaState,
+        damageMultiplier: Double, durationTicks: Int, cooldown: Int
+    ) {
+        val config = katanaState.config
+        // 重置标记
+        katanaState.isForesightSlashAlreadyReward = false
+        katanaState.isForesightSlashHitTarget = false
+        // 消耗所有气刃值
+        katanaState.addBladeSpirit(-KatanaState.MAX_BLADE_SPIRIT)
+        val damageMetadata = PlayerDamageMetadata(player.attributeContainer) {
+            every {
+                standard()
+                rate { // override
+                    katanaState.getBladeLevelDamageRate() * damageMultiplier * standard()
+                }
+            }
+        }
+        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, config.foresightSlashHalfExtentsBase)
+        if (hitEntities.isNotEmpty()) {
+            // 造成伤害
+            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
+            // 设置耐久
+            player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
+            // 标记命中生物
+            katanaState.isForesightSlashHitTarget = true
+        }
+        // 设置看破斩判定时间
+        katanaState.remainingForesightSlashTicks = durationTicks
+        // 位移
+        val inputDirection = player.getInputDirection()
+        val velocity = if (inputDirection == null) {
+            // 无输入时默认向后位移
+            player.location.direction.setY(0).normalize().multiply(-config.foresightSlashVelocityMultiplier)
+        } else {
+            // 向玩家输入的反方向位移
+            Vector(inputDirection.x, inputDirection.y, inputDirection.z).multiply(-config.foresightSlashVelocityMultiplier)
+        }
+        player.velocity = velocity
+        // 设置冷却
+        itemstack.addCooldown(player, cooldown)
+        // 连招状态
+        katanaState.changeAction(KatanaState.ActionType.FORESIGHT_SLASH, cooldown + config.allowComboTicks)
+    }
+
+    /**
+     * 执行太刀看破斩(气刃值足够时)的攻击效果.
+     */
+    private fun foresightSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        foresightSlashBase(
+            player, itemstack, katanaState,
+            config.foresightSlashDamageMultiplier, config.foresightSlashDurationTicks, config.foresightSlashCooldown
+        )
+    }
+
+    /**
+     * 执行太刀看破斩(气刃值不足时)的攻击效果.
+     */
+    private fun weakForesightSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
+        val config = katanaState.config
+        foresightSlashBase(
+            player, itemstack, katanaState,
+            config.weakForesightSlashDamageMultiplier, config.weakForesightSlashDurationTicks, config.weakForesightSlashCooldown
+        )
+    }
+
+    /**
+     * 检查玩家受伤时是否满足看破斩成功条件.
+     * 若满足成功条件则给予奖励.
+     */
+    private fun foresightSlashCheck(player: Player, katanaState: KatanaState, event: PostprocessDamageEvent) {
+        val config = katanaState.config
+        // 免除伤害:
+        // 不存在伤害来源实体 - 不处理
+        event.damageSource.causingEntity as? LivingEntity ?: return
+        // 玩家不处于看破斩判定时间内 - 不处理
+        if (katanaState.remainingForesightSlashTicks <= 0) return
+        // 处于无敌时间都取消伤害
+        // 即使看破斩未命中生物
+        event.isCancelled = true
+
+        // 给予气刃值奖励:
+        // 看破斩命中生物 且 看破斩期间内玩家受伤, 才给予气刃值奖励
+        // 看破斩未命中生物 - 不处理
+        if (!katanaState.isForesightSlashHitTarget) return
+        // 已经给予过看破斩奖励 - 不处理
+        if (!katanaState.isForesightSlashAlreadyReward) return
+        // 修改标记
+        katanaState.isForesightSlashAlreadyReward = true
+        // 加气刃值
+        katanaState.addBladeSpirit(config.foresightSlashSpiritReward)
+        // 播放音效 // TODO 音效和特效: 叮~
+        player.playSound(player) {
+            type(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP)
+            source(SoundSource.PLAYER)
+        }
+    }
+
+    /*
+    /**
+     * 执行太刀居合斩的攻击效果.
      */
     private fun laiSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         katanaState.isAlreadyLai = false
-        val katanaConfig = katanaState.config
-        val laiTicks = if (katanaState.bladeSpirit < katanaConfig.laiSlashSpiritConsume) {
+        val config = katanaState.config
+        val laiTicks = if (katanaState.currentBladeSpirit < config.laiSlashSpiritConsume) {
             // 气刃值不足发动正常居合斩 - 扣除全部气刃值
-            katanaState.bladeSpirit = 0
-            katanaConfig.weakLaiSlashTicks
+            katanaState.currentBladeSpirit = 0
+            config.weakLaiSlashTicks
         } else {
             // 扣除所需气刃值
-            katanaState.addBladeSpirit(-katanaConfig.laiSlashSpiritConsume)
-            katanaConfig.laiSlashTicks
+            katanaState.addBladeSpirit(-config.laiSlashSpiritConsume)
+            config.laiSlashTicks
         }
         katanaState.laiTicks = laiTicks
         // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.laiSlashCooldown)
+        itemstack.addCooldown(player, config.laiSlashCooldown)
         // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
+        player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
     }
 
     /**
@@ -155,7 +436,7 @@ object Katana : Weapon {
         // 加气刃值
         katanaState.addBladeSpirit(katanaConfig.laiSlashSpiritReward)
         // 向前位移
-        val force = player.location.direction.setY(0).normalize().multiply(katanaConfig.laiSlashVelocityMultiply)
+        val force = player.location.direction.setY(0).normalize().multiply(katanaConfig.laiSlashVelocityMultiplier)
         player.velocity = force
         // 对伤害来源造成伤害
         val attributeContainer = player.attributeContainer
@@ -174,194 +455,11 @@ object Katana : Weapon {
             source(SoundSource.PLAYER)
         }
     }
-
-    /**
-     * 方便函数.
-     * 用于太刀气刃斩连段123.
      */
-    private fun spiritBladeSlashBase(player: Player, katanaState: KatanaState, angel: Float) {
-        val katanaConfig = katanaState.config
-        val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
-            every {
-                standard()
-                rate { // override
-                    katanaState.getBladeLevelDamageRate() * standard()
-                }
-            }
-        }
-
-        val hitEntities = WeaponUtils.getHitEntities(player, 5.0, katanaConfig.spiritBladeSlashHalfExtentsBase, angel)
-        // 造成伤害
-        hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
-    }
-
-    /**
-     * 太刀气刃斩连段1.
-     * 左气刃斩.
-     */
-    private fun spiritBladeSlash1(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-
-        // 消耗气
-        katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume1)
-        spiritBladeSlashBase(player, katanaState, 35f)
-        // 连招状态
-        katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_1
-        katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown1)
-        // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
-    }
-
-    /**
-     * 太刀气刃斩连段2.
-     * 右气刃斩.
-     */
-    private fun spiritBladeSlash2(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-
-        // 消耗气
-        katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume2)
-        spiritBladeSlashBase(player, katanaState, -35f)
-        // 连招状态
-        katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_2
-        katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown2)
-        // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
-    }
-
-    /**
-     * 太刀气刃斩连段3.
-     * 左右气刃二连斩.
-     */
-    private fun spiritBladeSlash3(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-
-        // 消耗气
-        katanaState.addBladeSpirit(-katanaConfig.spiritBladeSlashSpiritConsume3)
-        spiritBladeSlashBase(player, katanaState, 35f)
-        spiritBladeSlashBase(player, katanaState, -35f)
-        // 连招状态
-        katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_3
-        katanaState.spiritBladeSlashComboTicks = katanaConfig.spiritBladeSlashAllowComboTicks
-        // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.spiritBladeSlashCooldown3)
-        // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
-    }
-
-    /**
-     * 太刀气刃大回旋斩.
-     */
-    private fun roundSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-
-        // 消耗气
-        katanaState.addBladeSpirit(-katanaConfig.roundSlashSpiritConsume)
-
-        // 造成伤害
-        val centerLocation = player.location.add(.0, player.boundingBox.height / 2, .0)
-        val scale = player.attributeContainer.getValue(Attributes.SCALE).toFloat()
-        val hitEntities = centerLocation.getNearbyLivingEntities(katanaConfig.roundSlashRadius * scale, 1.1 * scale) { it != player }
-        val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
-            every {
-                standard()
-                rate {
-                    katanaState.getBladeLevelDamageRate() * standard()
-                }
-            }
-        }
-        if (hitEntities.isNotEmpty()) {
-            // 造成伤害
-            hitEntities.forEach { entity -> entity.hurt(damageMetadata, player, true) }
-            // 提升气刃等级
-            katanaState.upgradeBladeLevel()
-            if (LOGGING) player.sendMessage("回旋斩命中! 气刃等级提升!")
-        } else {
-            if (LOGGING) player.sendMessage("回旋斩未命中!")
-        }
-
-        // 更新连招状态
-        katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.NONE
-        katanaState.spiritBladeSlashComboTicks = 0
-        // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.roundSlashCooldown)
-        // 设置耐久
-    }
-
-    /**
-     * 太刀连招.
-     */
-    private fun slashCombo(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        val katanaConfig = katanaState.config
-        val comboTicks = katanaState.spiritBladeSlashComboTicks
-        val state = katanaState.spiritBladeSlashState
-        when (state) {
-            KatanaState.SpiritBladeSlashState.NONE -> {
-                // 气刃值足够发动气刃斩1
-                if (katanaState.bladeSpirit >= katanaConfig.spiritBladeSlashSpiritConsume1) {
-                    spiritBladeSlash1(player, itemstack, katanaState)
-                } else {
-                    horizontalSlash(player, itemstack, katanaState)
-                }
-            }
-
-            KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_1 -> {
-                // 气刃值足够发动气刃斩2, 且处于连招允许时间内
-                if (katanaState.bladeSpirit >= katanaConfig.spiritBladeSlashSpiritConsume2 && comboTicks > 0) {
-                    spiritBladeSlash2(player, itemstack, katanaState)
-                } else {
-                    horizontalSlash(player, itemstack, katanaState)
-                }
-            }
-
-            KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_2 -> {
-                // 气刃值足够发动气刃斩3, 且处于连招允许时间内
-                if (katanaState.bladeSpirit >= katanaConfig.spiritBladeSlashSpiritConsume3 && comboTicks > 0) {
-                    spiritBladeSlash3(player, itemstack, katanaState)
-                } else {
-                    horizontalSlash(player, itemstack, katanaState)
-                }
-            }
-
-            KatanaState.SpiritBladeSlashState.SPIRIT_BLADE_SLASH_3 -> {
-                val bladeLevel = katanaState.bladeLevel
-                when (bladeLevel) {
-
-                    // 非红刃, 尝试发动回旋斩
-                    KatanaState.BladeLevel.NONE,
-                    KatanaState.BladeLevel.WHITE,
-                    KatanaState.BladeLevel.YELLOW,
-                        -> {
-                        // 气刃值足够发动回旋斩, 且处于连招允许时间内
-                        if (katanaState.bladeSpirit >= katanaConfig.roundSlashSpiritConsume && comboTicks > 0) {
-                            roundSlash(player, itemstack, katanaState)
-                        } else {
-                            horizontalSlash(player, itemstack, katanaState)
-                        }
-                    }
-
-                    // 红刃, 尝试发动登龙斩
-                    KatanaState.BladeLevel.RED -> {
-                        // 气刃值足够发动登龙斩, 且处于连招允许时间内
-                        if (katanaState.bladeSpirit >= katanaConfig.dragonAscendSlashSpiritConsume && comboTicks > 0) {
-                            dragonAscendSlash(player, itemstack, katanaState)
-                        } else {
-                            horizontalSlash(player, itemstack, katanaState)
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     /**
      * 太刀气刃登龙斩.
+     * TODO
      */
     private fun dragonAscendSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
         val katanaConfig = katanaState.config
@@ -369,13 +467,13 @@ object Katana : Weapon {
         if (LOGGING) player.sendMessage("登龙斩!")
 
         // 消耗气和一层气刃等级
-        katanaState.addBladeSpirit(-katanaConfig.dragonAscendSlashSpiritConsume)
+        // katanaState.addBladeSpirit(-katanaConfig.dragonAscendSlashSpiritConsume)
         katanaState.downgradeBladeLevel()
 
-        // TODO 登龙效果
+        // 登龙效果
 
         // 设置冷却
-        itemstack.addCooldown(player, katanaConfig.dragonAscendSlashCooldown)
+        // itemstack.addCooldown(player, katanaConfig.dragonAscendSlashCooldown)
         // 设置耐久
         player.damageItem(EquipmentSlot.HAND, katanaConfig.itemDamagePerAttack)
     }
@@ -448,7 +546,7 @@ object TickKatana : IteratingSystem(
                 katanaState.unarmedTicks = 0
                 katanaState.addBladeSpirit(-katanaState.config.unarmedSpiritConsume)
                 // 如果玩家的气刃值为0, 且气刃等级为无刃, 则不再记录数据, 也不再 tick
-                if (katanaState.bladeSpirit <= 0 && katanaState.bladeLevel == KatanaState.BladeLevel.NONE) {
+                if (katanaState.currentBladeSpirit <= 0 && katanaState.currentBladeLevel == KatanaState.BladeLevel.NONE) {
                     katanaState.bossBar.removeViewer(player)
                     entity.configure { it -= KatanaState }
                     return
@@ -457,31 +555,31 @@ object TickKatana : IteratingSystem(
         }
 
         // 气刃等级持续时间自减和降级
-        if (katanaState.bladeLevelTicks > 0) {
-            katanaState.bladeLevelTicks -= 1
-            if (katanaState.bladeLevelTicks == 0) {
+        if (katanaState.remainingBladeLevelTicks > 0) {
+            katanaState.remainingBladeLevelTicks -= 1
+            if (katanaState.remainingBladeLevelTicks == 0) {
                 katanaState.downgradeBladeLevel()
             }
         }
 
-        // 气刃斩连段时间自减
-        if (katanaState.spiritBladeSlashComboTicks > 0) {
-            katanaState.spiritBladeSlashComboTicks -= 1
-            if (katanaState.spiritBladeSlashComboTicks <= 0) {
-                katanaState.spiritBladeSlashState = KatanaState.SpiritBladeSlashState.NONE
+        // 连招时间自减和回到待机状态
+        if (katanaState.currentAction != KatanaState.ActionType.IDLE && katanaState.remainingComboTicks > 0) {
+            katanaState.remainingComboTicks -= 1
+            if (katanaState.remainingComboTicks <= 0) {
+                katanaState.changeAction(KatanaState.ActionType.IDLE, 0)
             }
         }
 
-        // 居合无敌时间自减
-        if (katanaState.laiTicks > 0) {
-            katanaState.laiTicks -= 1
+        // 无敌时间自减
+        if (katanaState.remainingForesightSlashTicks > 0) {
+            katanaState.remainingForesightSlashTicks -= 1
         }
 
         // 更新 BossBar
         val bossBar = katanaState.bossBar
-        val progress = katanaState.bladeSpirit.toFloat() / KatanaState.MAX_BLADE_SPIRIT
-        val text = Component.text("气刃值 ${katanaState.bladeSpirit} / ${KatanaState.MAX_BLADE_SPIRIT}")
-        val color = when (katanaState.bladeLevel) {
+        val progress = katanaState.currentBladeSpirit.toFloat() / KatanaState.MAX_BLADE_SPIRIT
+        val text = Component.text("气刃值 ${katanaState.currentBladeSpirit} / ${KatanaState.MAX_BLADE_SPIRIT}")
+        val color = when (katanaState.currentBladeLevel) {
             KatanaState.BladeLevel.NONE -> BossBar.Color.BLUE
             KatanaState.BladeLevel.WHITE -> BossBar.Color.WHITE
             KatanaState.BladeLevel.YELLOW -> BossBar.Color.YELLOW
@@ -500,33 +598,46 @@ object TickKatana : IteratingSystem(
  * 该类型会在玩家使用太刀时实例化/更新.
  *
  * @property isArmed 玩家当前是否手持太刀.
- * @property unarmedTicks 玩家非手持太刀累计 tick 数.
- * @property bladeSpirit 气刃值.
- * @property bladeLevel 气刃等级, 分为无刃、白刃、黄刃、红刃.
- * @property bossBar 展示气刃信息的 BossBar
- * @property bladeLevelTicks 当前气刃等级的持续时间.
- * @property spiritBladeSlashComboTicks 玩家可以继续气刃斩连段的剩余时间.
- * @property spiritBladeSlashState 玩家气刃斩连段的状态.
- * @property laiTicks 居合斩无敌时间. 大于 0 意味着玩家正处于居合斩无敌判定中.
- * @property isAlreadyLai 居合斩是否已经判定成功. 发动居合斩时会被设置为 `false`.
+ * @property unarmedTicks 玩家非手持太刀累计时间.
+ * @property isForesightSlashHitTarget 标记看破斩是否命中生物.
+ * @property isForesightSlashAlreadyReward 标记看破斩奖励是否已经给予.
+ * @property remainingForesightSlashTicks 看破斩的剩余判定时间.
+ * @property remainingBladeLevelTicks 当前气刃等级的剩余持续时间.
+ * @property remainingComboTicks 当前招式可以进行连招的剩余时间.
+ * @property currentBladeSpirit 当前气刃值.
+ * @property currentBladeLevel 当前气刃等级, 分为无刃、白刃、黄刃、红刃.
+ * @property currentAction 当前招式.
  */
 data class KatanaState(
     var config: Katana,
-    var isArmed: Boolean = true,
-    var unarmedTicks: Int = 0,
-    var bladeSpirit: Int = 0,
-    var bladeLevel: BladeLevel = BladeLevel.NONE,
-    val bossBar: BossBar = BossBar.bossBar(Component.empty(), 0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS),
-    var bladeLevelTicks: Int = -1,
-    var spiritBladeSlashComboTicks: Int = 0,
-    var spiritBladeSlashState: SpiritBladeSlashState = SpiritBladeSlashState.NONE,
-    var laiTicks: Int = 0,
-    var isAlreadyLai: Boolean = true,
+    // var laiTicks: Int = 0,
+    // var isAlreadyLai: Boolean = true,
 ) : EComponent<KatanaState> {
+    var isArmed: Boolean = true
+    var unarmedTicks: Int = 0
+    var isForesightSlashHitTarget: Boolean = false
+    var isForesightSlashAlreadyReward: Boolean = false
+    var remainingForesightSlashTicks: Int = 0
+    var remainingBladeLevelTicks: Int = -1
+    var remainingComboTicks: Int = 0
+
+    var currentBladeSpirit: Int = 0
+        private set
+    var currentBladeLevel: BladeLevel = BladeLevel.NONE
+        private set
+    var currentAction: ActionType = ActionType.IDLE
+        private set
+
+    /**
+     * 展示气刃信息的 BossBar.
+     * TODO 改为 HUD
+     */
+    val bossBar: BossBar = BossBar.bossBar(Component.empty(), 0f, BossBar.Color.BLUE, BossBar.Overlay.PROGRESS)
 
     companion object : EComponentType<KatanaState>() {
         /** 气刃值上限. */
         const val MAX_BLADE_SPIRIT = 100
+
         /** 气刃值下限. */
         const val MIN_BLADE_SPIRIT = 0
     }
@@ -538,40 +649,45 @@ data class KatanaState(
      * [value] 可以为负数, 即减少气刃值.
      */
     fun addBladeSpirit(value: Int) {
-        bladeSpirit = (bladeSpirit + value).coerceIn(MIN_BLADE_SPIRIT, MAX_BLADE_SPIRIT)
+        currentBladeSpirit = (currentBladeSpirit + value).coerceIn(MIN_BLADE_SPIRIT, MAX_BLADE_SPIRIT)
     }
 
     /**
      * 获取太刀气刃等级伤害加成.
      */
     fun getBladeLevelDamageRate(): Double {
-        return bladeLevel.damageRate
+        return currentBladeLevel.damageRate
     }
 
     /**
      * 提高气刃等级.
      */
     fun upgradeBladeLevel() {
-        bladeLevel = when (bladeLevel) {
+        currentBladeLevel = when (currentBladeLevel) {
             BladeLevel.NONE -> BladeLevel.WHITE
             BladeLevel.WHITE -> BladeLevel.YELLOW
             BladeLevel.YELLOW -> BladeLevel.RED
             BladeLevel.RED -> return
         }
-        bladeLevelTicks = bladeLevel.duration
+        remainingBladeLevelTicks = currentBladeLevel.duration
     }
 
     /**
      * 降低气刃等级.
      */
     fun downgradeBladeLevel() {
-        bladeLevel = when (bladeLevel) {
+        currentBladeLevel = when (currentBladeLevel) {
             BladeLevel.NONE -> return
             BladeLevel.WHITE -> BladeLevel.NONE
             BladeLevel.YELLOW -> BladeLevel.WHITE
             BladeLevel.RED -> BladeLevel.YELLOW
         }
-        bladeLevelTicks = bladeLevel.duration
+        remainingBladeLevelTicks = currentBladeLevel.duration
+    }
+
+    fun changeAction(newAction: ActionType, duration: Int) {
+        currentAction = newAction
+        remainingComboTicks = duration
     }
 
     enum class BladeLevel(
@@ -586,18 +702,19 @@ data class KatanaState(
         val duration: Int,
     ) {
         NONE(1.0, -1),
-        WHITE(1.1, 60 * 20),
-        YELLOW(1.2, 45 * 20),
-        RED(1.4, 30 * 20)
+        WHITE(1.05, 60 * 20),
+        YELLOW(1.1, 45 * 20),
+        RED(1.2, 30 * 20)
     }
 
-    /**
-     * 太刀的气刃斩状态.
-     */
-    enum class SpiritBladeSlashState {
-        NONE,
+    enum class ActionType {
+        IDLE,
+        HORIZONTAL_SLASH,
         SPIRIT_BLADE_SLASH_1,
         SPIRIT_BLADE_SLASH_2,
         SPIRIT_BLADE_SLASH_3,
+        ROUND_SLASH,
+        FORESIGHT_SLASH,
+        // DRAGON_ASCEND_SLASH,
     }
 }
