@@ -100,8 +100,8 @@ internal object AttackCharacteristicDamageMappings {
     }
 
     fun get(context: RawDamageContext): DamageMapper? {
-        val entityType = context.damageSource.directEntity?.type
-            ?: error("Context has no direct entity.")
+        val entityType = context.damageSource.causingEntity?.type
+            ?: error("Context has no causing entity.")
         return mappings[entityType]?.first { mapper -> mapper.match(context) }
     }
 

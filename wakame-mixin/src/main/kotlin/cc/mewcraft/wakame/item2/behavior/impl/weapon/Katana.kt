@@ -56,14 +56,13 @@ object Katana : Weapon {
         if (itemstack.isOnCooldown(player)) return
 
         val currentAction = katanaState.currentAction
-        val config = katanaState.config
         when (currentAction) {
             KatanaState.ActionType.IDLE,
             KatanaState.ActionType.HORIZONTAL_SLASH,
             KatanaState.ActionType.FORESIGHT_SLASH -> {
                 if (player.isSneaking) {
-                    // 气刃值足够发动气刃斩1
-                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume1) {
+                    // 能够发动气刃斩1
+                    if (katanaState.canUseSpiritBladeSlash1()) {
                         return spiritBladeSlash1(player, itemstack, katanaState)
                     }
                 }
@@ -71,8 +70,8 @@ object Katana : Weapon {
 
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_1 -> {
                 if (player.isSneaking) {
-                    // 气刃值足够发动气刃斩2
-                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume2) {
+                    // 能够发动气刃斩2
+                    if (katanaState.canUseSpiritBladeSlash2()) {
                         return spiritBladeSlash2(player, itemstack, katanaState)
                     }
                 }
@@ -80,8 +79,8 @@ object Katana : Weapon {
 
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_2 -> {
                 if (player.isSneaking) {
-                    // 气刃值足够发动气刃斩3
-                    if (katanaState.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume3) {
+                    // 能够发动气刃斩3
+                    if (katanaState.canUseSpiritBladeSlash3()) {
                         return spiritBladeSlash3(player, itemstack, katanaState)
                     }
                 }
@@ -89,8 +88,8 @@ object Katana : Weapon {
 
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_3 -> {
                 if (player.isSneaking) {
-                    // 气刃值足够发动气刃大回旋斩
-                    if (katanaState.currentBladeSpirit >= config.roundSlashSpiritConsume) {
+                    // 能够发动气刃大回旋斩
+                    if (katanaState.canUseRoundSlash()) {
                         return roundSlash(player, itemstack, katanaState)
                     }
                 }
@@ -117,15 +116,14 @@ object Katana : Weapon {
         val currentAction = katanaState.currentAction
         val config = katanaState.config
         when (currentAction) {
-            KatanaState.ActionType.IDLE,
             KatanaState.ActionType.ROUND_SLASH,
             KatanaState.ActionType.FORESIGHT_SLASH -> {
-                // 待机不能直接看破斩(需要垫刀)
                 // 气刃大回旋斩之后不能看破斩
                 // 看破斩之后不能看破斩(不能复读)
                 return
             }
 
+            KatanaState.ActionType.IDLE,
             KatanaState.ActionType.HORIZONTAL_SLASH,
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_1,
             KatanaState.ActionType.SPIRIT_BLADE_SLASH_2,
@@ -177,6 +175,12 @@ object Katana : Weapon {
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.HORIZONTAL_SLASH, cooldown + config.allowComboTicks)
+        if (katanaState.canUseSpiritBladeSlash1()) {
+            // TODO 显然这个文本不应该写死, 先临时这样, 下同
+            player.sendActionBar(Component.text("左键: 横斩   潜行+左键: 左气刃斩   右键: 看破斩"))
+        } else {
+            player.sendActionBar(Component.text("左键: 横斩   右键: 看破斩"))
+        }
     }
 
     /**
@@ -217,6 +221,11 @@ object Katana : Weapon {
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_1, cooldown + config.allowComboTicks)
+        if (katanaState.canUseSpiritBladeSlash2()) {
+            player.sendActionBar(Component.text("左键: 横斩   潜行+左键: 右气刃斩   右键: 看破斩"))
+        } else {
+            player.sendActionBar(Component.text("左键: 横斩   右键: 看破斩"))
+        }
     }
 
     /**
@@ -226,12 +235,17 @@ object Katana : Weapon {
         val config = katanaState.config
         // 消耗气
         katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume2)
-        spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier2, Random.nextDouble(-32.0, -38.0).toFloat())
+        spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier2, Random.nextDouble(-38.0, -32.0).toFloat())
         // 设置冷却
         val cooldown = config.spiritBladeSlashCooldown2
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_2, cooldown + config.allowComboTicks)
+        if (katanaState.canUseSpiritBladeSlash3()) {
+            player.sendActionBar(Component.text("左键: 横斩   潜行+左键: 气刃三连斩   右键: 看破斩"))
+        } else {
+            player.sendActionBar(Component.text("左键: 横斩   右键: 看破斩"))
+        }
     }
 
     /**
@@ -242,10 +256,10 @@ object Katana : Weapon {
         // 消耗气
         katanaState.addBladeSpirit(-config.spiritBladeSlashSpiritConsume3)
         spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(32.0, 38.0).toFloat())
-        runTaskLater(8) {
-            spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(-32.0, -38.0).toFloat())
+        runTaskLater(3) {
+            spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(-38.0, -32.0).toFloat())
         }
-        runTaskLater(16) {
+        runTaskLater(6) {
             spiritBladeSlashBase(player, katanaState, config.spiritBladeSlashDamageMultiplier3, Random.nextDouble(85.0, 95.0).toFloat())
         }
         // 设置冷却
@@ -253,6 +267,11 @@ object Katana : Weapon {
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.SPIRIT_BLADE_SLASH_3, cooldown + config.allowComboTicks)
+        if (katanaState.canUseRoundSlash()) {
+            player.sendActionBar(Component.text("左键: 横斩   潜行+左键: 气刃大回旋斩   右键: 看破斩"))
+        } else {
+            player.sendActionBar(Component.text("左键: 横斩   右键: 看破斩"))
+        }
     }
 
     /**
@@ -291,6 +310,7 @@ object Katana : Weapon {
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.ROUND_SLASH, cooldown + config.allowComboTicks)
+        player.sendActionBar(Component.text("左键: 横斩"))
     }
 
     /**
@@ -332,14 +352,19 @@ object Katana : Weapon {
             // 无输入时默认向后位移
             player.location.direction.setY(0).normalize().multiply(-config.foresightSlashVelocityMultiplier)
         } else {
-            // 向玩家输入的反方向位移
-            Vector(inputDirection.x, inputDirection.y, inputDirection.z).multiply(-config.foresightSlashVelocityMultiplier)
+            // 向玩家输入的方向位移
+            Vector(inputDirection.x, inputDirection.y, inputDirection.z).multiply(config.foresightSlashVelocityMultiplier)
         }
         player.velocity = velocity
         // 设置冷却
         itemstack.addCooldown(player, cooldown)
         // 连招状态
         katanaState.changeAction(KatanaState.ActionType.FORESIGHT_SLASH, cooldown + config.allowComboTicks)
+        if (katanaState.canUseSpiritBladeSlash1()) {
+            player.sendActionBar(Component.text("左键: 横斩   潜行+左键: 左气刃斩"))
+        } else {
+            player.sendActionBar(Component.text("左键: 横斩"))
+        }
     }
 
     /**
@@ -384,7 +409,7 @@ object Katana : Weapon {
         // 看破斩未命中生物 - 不处理
         if (!katanaState.isForesightSlashHitTarget) return
         // 已经给予过看破斩奖励 - 不处理
-        if (!katanaState.isForesightSlashAlreadyReward) return
+        if (katanaState.isForesightSlashAlreadyReward) return
         // 修改标记
         katanaState.isForesightSlashAlreadyReward = true
         // 加气刃值
@@ -396,66 +421,6 @@ object Katana : Weapon {
         }
     }
 
-    /*
-    /**
-     * 执行太刀居合斩的攻击效果.
-     */
-    private fun laiSlash(player: Player, itemstack: ItemStack, katanaState: KatanaState) {
-        katanaState.isAlreadyLai = false
-        val config = katanaState.config
-        val laiTicks = if (katanaState.currentBladeSpirit < config.laiSlashSpiritConsume) {
-            // 气刃值不足发动正常居合斩 - 扣除全部气刃值
-            katanaState.currentBladeSpirit = 0
-            config.weakLaiSlashTicks
-        } else {
-            // 扣除所需气刃值
-            katanaState.addBladeSpirit(-config.laiSlashSpiritConsume)
-            config.laiSlashTicks
-        }
-        katanaState.laiTicks = laiTicks
-        // 设置冷却
-        itemstack.addCooldown(player, config.laiSlashCooldown)
-        // 设置耐久
-        player.damageItem(EquipmentSlot.HAND, config.itemDamagePerAttack)
-    }
-
-    /**
-     * 太刀居合斩判定.
-     */
-    private fun laiSlashCheck(player: Player, katanaState: KatanaState, event: PostprocessDamageEvent) {
-        val katanaConfig = katanaState.config
-        // 不存在伤害来源实体 - 不处理
-        val damager = event.damageSource.causingEntity as? LivingEntity ?: return
-        // 玩家不处于居合斩无敌时间 - 不处理
-        if (katanaState.laiTicks <= 0) return
-        // 处于无敌时间都取消伤害, 即使居合斩已经判定成功过了.
-        event.isCancelled = true
-        // 居合斩奖励只判定一次
-        if (katanaState.isAlreadyLai) return
-        katanaState.isAlreadyLai = true
-        // 加气刃值
-        katanaState.addBladeSpirit(katanaConfig.laiSlashSpiritReward)
-        // 向前位移
-        val force = player.location.direction.setY(0).normalize().multiply(katanaConfig.laiSlashVelocityMultiplier)
-        player.velocity = force
-        // 对伤害来源造成伤害
-        val attributeContainer = player.attributeContainer
-        val damageMetadata = PlayerDamageMetadata(attributeContainer) {
-            every {
-                standard()
-                rate {
-                    katanaState.getBladeLevelDamageRate() * standard()
-                }
-            }
-        }
-        damager.hurt(damageMetadata, player, true)
-        // 播放音效 // TODO 音效和特效: 叮~
-        player.playSound(player) {
-            type(SoundEventKeys.ENTITY_EXPERIENCE_ORB_PICKUP)
-            source(SoundSource.PLAYER)
-        }
-    }
-     */
 
     /**
      * 太刀气刃登龙斩.
@@ -567,6 +532,7 @@ object TickKatana : IteratingSystem(
             katanaState.remainingComboTicks -= 1
             if (katanaState.remainingComboTicks <= 0) {
                 katanaState.changeAction(KatanaState.ActionType.IDLE, 0)
+                player.sendActionBar(Component.text("左键: 横斩   右键: 看破斩"))
             }
         }
 
@@ -610,8 +576,6 @@ object TickKatana : IteratingSystem(
  */
 data class KatanaState(
     var config: Katana,
-    // var laiTicks: Int = 0,
-    // var isAlreadyLai: Boolean = true,
 ) : EComponent<KatanaState> {
     var isArmed: Boolean = true
     var unarmedTicks: Int = 0
@@ -685,9 +649,40 @@ data class KatanaState(
         remainingBladeLevelTicks = currentBladeLevel.duration
     }
 
+    /**
+     * 切换当前招式状态.
+     */
     fun changeAction(newAction: ActionType, duration: Int) {
         currentAction = newAction
         remainingComboTicks = duration
+    }
+
+    /**
+     * 当前是否可以发动气刃斩1.
+     */
+    fun canUseSpiritBladeSlash1(): Boolean {
+        return this.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume1
+    }
+
+    /**
+     * 当前是否可以发动气刃斩2.
+     */
+    fun canUseSpiritBladeSlash2(): Boolean {
+        return this.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume2
+    }
+
+    /**
+     * 当前是否可以发动气刃斩3.
+     */
+    fun canUseSpiritBladeSlash3(): Boolean {
+        return this.currentBladeSpirit >= config.spiritBladeSlashSpiritConsume3
+    }
+
+    /**
+     * 当前是否可以发动气刃大回旋斩.
+     */
+    fun canUseRoundSlash(): Boolean {
+        return this.currentBladeSpirit >= config.roundSlashSpiritConsume
     }
 
     enum class BladeLevel(

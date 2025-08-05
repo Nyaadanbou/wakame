@@ -62,7 +62,7 @@ object WeaponUtils {
         val currentInput = this.currentInput
         val yawRad = this.yaw.toRadians()
         val forward = Vector3f(-sin(yawRad), 0f, cos(yawRad))
-        val right = Vector3f(cos(yawRad), 0f, sin(yawRad))
+        val right = Vector3f(-cos(yawRad), 0f, -sin(yawRad))
 
         // 累加方向
         var result = Vector3f(0f, 0f, 0f)

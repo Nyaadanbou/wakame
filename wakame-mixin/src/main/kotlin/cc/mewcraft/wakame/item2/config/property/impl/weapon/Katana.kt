@@ -43,11 +43,11 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
 data class Katana(
     val itemDamagePerAttack: Int = 1,
     val unarmedSpiritConsume: Int = 5,
-    val allowComboTicks: Int = 10,
+    val allowComboTicks: Int = 12,
 
     val horizontalSlashHalfExtentsBase: Vector3f = Vector3f(1.2f, 0.05f, 1.1f),
     val horizontalSlashDamageMultiplier: Double = 1.0,
-    val horizontalSlashCooldown: Int = 14,
+    val horizontalSlashCooldown: Int = 12,
     val horizontalSlashSpiritReward: Int = 4,
 
     val spiritBladeSlashHalfExtentsBase: Vector3f = Vector3f(1.7f, 0.05f, 1.4f),
@@ -67,14 +67,14 @@ data class Katana(
     val roundSlashCooldown: Int = 20,
 
     val foresightSlashSpiritRequire: Int = 10,
-    val foresightSlashVelocityMultiplier: Double = 3.0,
+    val foresightSlashVelocityMultiplier: Double = 0.8,
     val foresightSlashHalfExtentsBase: Vector3f = Vector3f(1.2f, 0.05f, 1.4f),
     val foresightSlashDamageMultiplier: Double = 1.15,
     val weakForesightSlashDamageMultiplier: Double = 0.5,
-    val foresightSlashCooldown: Int = 20,
-    val weakForesightSlashCooldown: Int = 20,
-    val foresightSlashDurationTicks: Int = 15,
-    val weakForesightSlashDurationTicks: Int = 5,
+    val foresightSlashCooldown: Int = 14,
+    val weakForesightSlashCooldown: Int = 14,
+    val foresightSlashDurationTicks: Int = 12,
+    val weakForesightSlashDurationTicks: Int = 4,
     val foresightSlashSpiritReward: Int = 100,
     val weakForesightSlashSpiritReward: Int = 100,
 )
