@@ -217,7 +217,7 @@ entity_attributes:
     values: { }
 
   minecraft:happy_ghast:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:hoglin:
