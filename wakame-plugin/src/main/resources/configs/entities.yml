@@ -51,13 +51,13 @@ entity_attributes:
   minecraft:living:
     parent: ~
     values:
-      defense: 0
+      defense: 0.0
       incoming_damage_rate: 1.0
-      blocking_damage_reduction: 0
-      universal_defense: 0
+      blocking_damage_reduction: 0.0
+      universal_defense: 0.0
 
   minecraft:player:
-    parent: ~
+    parent: minecraft:living
     values:
       attack_damage: default
       attack_damage_rate: default
@@ -431,15 +431,15 @@ entity_attributes:
   minecraft:all_zeros:
     parent: ~
     values:
-      attack_damage: 0
-      attack_damage_rate: 0
-      critical_strike_chance: 0
-      critical_strike_power: 0
-      defense_penetration: 0
-      defense_penetration_rate: 0
-      universal_attack_damage: 0
-      universal_defense_penetration: 0
-      universal_defense_penetration_rate: 0
+      attack_damage: 0.0
+      attack_damage_rate: 0.0
+      critical_strike_chance: 0.0
+      critical_strike_power: 0.0
+      defense_penetration: 0.0
+      defense_penetration_rate: 0.0
+      universal_attack_damage: 0.0
+      universal_defense_penetration: 0.0
+      universal_defense_penetration_rate: 0.0
 
   minecraft:arrow:
     parent: minecraft:all_zeros
