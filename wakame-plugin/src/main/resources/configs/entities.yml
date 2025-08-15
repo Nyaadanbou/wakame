@@ -152,6 +152,10 @@ entity_attributes:
     parent: minecraft:living
     values: { }
 
+  minecraft:creaking:
+    parent: minecraft:living
+    values: { }
+
   minecraft:creeper:
     parent: minecraft:living
     values: { }
