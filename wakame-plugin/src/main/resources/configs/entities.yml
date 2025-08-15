@@ -328,7 +328,7 @@ entity_attributes:
     parent: minecraft:living
     values: { }
 
-  minecraft:sliverfish:
+  minecraft:silverfish:
     parent: minecraft:living
     values: { }
 
