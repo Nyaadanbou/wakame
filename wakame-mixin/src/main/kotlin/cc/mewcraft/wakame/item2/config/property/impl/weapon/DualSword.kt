@@ -11,7 +11,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable
  * @property attackCooldown 攻击后物品冷却.
  */
 @ConfigSerializable
-data class Sword(
+data class DualSword(
     val itemDamagePerAttack: Int = 1,
     val attackHalfExtentsBase: Vector3f = Vector3f(1.3f, 0.05f, 1.4f),
     val attackCooldown: Int = 12,

@@ -22,11 +22,11 @@ import org.bukkit.inventory.ItemStack
 /**
  * 剑的物品行为.
  */
-object Sword : Weapon {
+object DualSword : Weapon {
 
     override fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) {
         if (itemstack.isOnCooldown(player)) return
-        val sword = itemstack.getProperty(ItemPropertyTypes.SWORD) ?: return
+        val sword = itemstack.getProperty(ItemPropertyTypes.DUAL_SWORD) ?: return
         // 造成伤害
         val attrContainer = player.attributeContainer
         val damageMetadata = PlayerDamageMetadata(attrContainer) {
@@ -57,7 +57,7 @@ object Sword : Weapon {
         // 副手物品处于冷却 - 不处理
         if (itemInOffHand.isOnCooldown(player)) return
         // 副手物品不是剑 - 不处理
-        val offSword = itemInOffHand.getProperty(ItemPropertyTypes.SWORD) ?: return
+        val offSword = itemInOffHand.getProperty(ItemPropertyTypes.DUAL_SWORD) ?: return
 
         val attributeContainerSnapshot = player.attributeContainer.getSnapshot()
         // 如果主手剑位于主手时提供属性修饰符, 才需要移除

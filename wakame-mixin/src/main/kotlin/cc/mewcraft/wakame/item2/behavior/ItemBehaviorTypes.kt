@@ -3,7 +3,13 @@ package cc.mewcraft.wakame.item2.behavior
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -70,7 +76,7 @@ object ItemBehaviorTypes {
      * 作为剑的逻辑.
      */
     @JvmField
-    val SWORD = typeOf("sword", Sword)
+    val DUAL_SWORD = typeOf("dual_sword", DualSword)
 
     /**
      * 作为三叉戟的逻辑.
