@@ -1,4 +1,4 @@
 package cc.mewcraft.wakame.item2.behavior.impl.weapon
 
-object Hammer : Weapon {
+object Mace : Weapon {
 }

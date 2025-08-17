@@ -2,10 +2,15 @@ package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.config.property.impl.*
+import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
+import cc.mewcraft.wakame.item2.config.property.impl.Arrow
+import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
+import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
+import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
-import cc.mewcraft.wakame.item2.config.property.impl.weapon.Spear
-import cc.mewcraft.wakame.item2.config.property.impl.weapon.Weapon
+import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
 import cc.mewcraft.wakame.item2.display.SlotDisplayDictData
 import cc.mewcraft.wakame.item2.display.SlotDisplayLoreData
 import cc.mewcraft.wakame.item2.display.SlotDisplayNameData
@@ -103,22 +108,13 @@ data object ItemPropertyTypes {
     val KATANA: ItemPropertyType<Katana> = typeOf("katana")
 
     @JvmField
-    val AXE: ItemPropertyType<Weapon> = typeOf("axe")
+    val MELEE: ItemPropertyType<Melee> = typeOf("melee")
 
     @JvmField
-    val CUDGEL: ItemPropertyType<Weapon> = typeOf("cudgel")
+    val DUAL_SWORD: ItemPropertyType<DualSword> = typeOf("dual_sword")
 
     @JvmField
-    val HAMMER: ItemPropertyType<Weapon> = typeOf("hammer")
-
-    @JvmField
-    val SPEAR: ItemPropertyType<Spear> = typeOf("spear")
-
-    @JvmField
-    val SWORD: ItemPropertyType<Weapon> = typeOf("sword")
-
-    @JvmField
-    val TRIDENT: ItemPropertyType<Weapon> = typeOf("trident")
+    val TRIDENT: ItemPropertyType<Unit> = typeOf("trident")
 
     // ------------
     // 方便函数

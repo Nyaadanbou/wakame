@@ -51,8 +51,10 @@ entity_attributes:
   minecraft:living:
     parent: ~
     values:
-      defense: default
-      max_mana: 100.0
+      defense: 0.0
+      incoming_damage_rate: 1.0
+      blocking_damage_reduction: 0.0
+      universal_defense: 0.0
 
   minecraft:player:
     parent: minecraft:living
@@ -62,6 +64,7 @@ entity_attributes:
       attack_effect_chance: default
       attack_knockback: default
       block_interaction_range: default
+      blocking_damage_reduction: default
       critical_strike_chance: default
       critical_strike_power: default
       defense_penetration: default
@@ -89,365 +92,358 @@ entity_attributes:
       universal_defense_penetration_rate: default
       water_movement_efficiency: default
 
-  minecraft:mob:
+  minecraft:allay:
     parent: minecraft:living
     values: { }
 
-  minecraft:damageable:
-    parent: ~
-    values:
-      defense: 0
-      incoming_damage_rate: 1.0
-      universal_defense: 0
-
-  minecraft:allay:
-    parent: minecraft:damageable
-    values: { }
-
   minecraft:armadillo:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:armor_stand:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:axolotl:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:bat:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:bee:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:blaze:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:bogged:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:breeze:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:camel:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:cat:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:cave_spider:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:chicken:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:cod:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:cow:
-    parent: minecraft:damageable
+    parent: minecraft:living
+    values: { }
+
+  minecraft:creaking:
+    parent: minecraft:living
     values: { }
 
   minecraft:creeper:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:dolphin:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:donkey:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:drowned:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:elder_guardian:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:ender_dragon:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:enderman:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:endermite:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:evoker:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:fox:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:frog:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:ghast:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:giant:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:glow_squid:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:goat:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:guardian:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:happy_ghast:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:hoglin:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:horse:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:husk:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:illusioner:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:iron_golem:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:llama:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:magma_cube:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:mooshroom:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:mule:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:ocelot:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:panda:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:parrot:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:phantom:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:pig:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:piglin:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:piglin_brute:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:pillager:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:polar_bear:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:pufferfish:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:rabbit:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:ravager:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:salmon:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:sheep:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:shulker:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:skeleton:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:skeleton_horse:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:slime:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
-  minecraft:sliverfish:
-    parent: minecraft:damageable
+  minecraft:silverfish:
+    parent: minecraft:living
     values: { }
 
   minecraft:sniffer:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:snow_golem:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:spider:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:squid:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:stray:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:strider:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:tadpole:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:trader_llama:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:tropical_fish:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:turtle:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:vex:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:villager:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:vindicator:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:wandering_trader:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:warden:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:witch:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:wither:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:wither_skeleton:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:wolf:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:zoglin:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:zombie:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:zombie_horse:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:zombie_villager:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:zombified_piglin:
-    parent: minecraft:damageable
+    parent: minecraft:living
     values: { }
 
   minecraft:all_zeros:
     parent: ~
     values:
-      attack_damage: 0
-      attack_damage_rate: 0
-      critical_strike_chance: 0
-      critical_strike_power: 0
-      defense_penetration: 0
-      defense_penetration_rate: 0
-      universal_attack_damage: 0
-      universal_defense_penetration: 0
-      universal_defense_penetration_rate: 0
+      attack_damage: 0.0
+      attack_damage_rate: 0.0
+      critical_strike_chance: 0.0
+      critical_strike_power: 0.0
+      defense_penetration: 0.0
+      defense_penetration_rate: 0.0
+      universal_attack_damage: 0.0
+      universal_defense_penetration: 0.0
+      universal_defense_penetration_rate: 0.0
 
   minecraft:arrow:
     parent: minecraft:all_zeros

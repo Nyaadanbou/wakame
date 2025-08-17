@@ -4,7 +4,10 @@
 package cc.mewcraft.wakame.damage.mapping
 
 import cc.mewcraft.wakame.KoishDataPaths
-import cc.mewcraft.wakame.damage.*
+import cc.mewcraft.wakame.damage.DamageMetadataBuilder
+import cc.mewcraft.wakame.damage.DirectCriticalStrikeMetadataBuilder
+import cc.mewcraft.wakame.damage.RawDamageContext
+import cc.mewcraft.wakame.damage.VanillaDamageMetadataBuilder
 import cc.mewcraft.wakame.lifecycle.initializer.Init
 import cc.mewcraft.wakame.lifecycle.initializer.InitFun
 import cc.mewcraft.wakame.lifecycle.initializer.InitStage
@@ -37,7 +40,6 @@ internal object DamageTypeDamageMappings {
     private val default: DamageTypeMapper =
         DamageTypeMapper(
             VanillaDamageMetadataBuilder(
-                damageTags = DirectDamageTagsBuilder(emptyList()),
                 criticalStrikeMetadata = DirectCriticalStrikeMetadataBuilder(),
                 element = BuiltInRegistries.ELEMENT.getDefaultEntry()
             )
@@ -97,9 +99,9 @@ internal object AttackCharacteristicDamageMappings {
         loadDataIntoRegistry()
     }
 
-    fun get(context: DamageContext): DamageMapper? {
-        val entityType = context.damageSource.directEntity?.type
-            ?: error("Context has no direct entity.")
+    fun get(context: RawDamageContext): DamageMapper? {
+        val entityType = context.damageSource.causingEntity?.type
+            ?: error("Context has no causing entity.")
         return mappings[entityType]?.first { mapper -> mapper.match(context) }
     }
 
@@ -143,7 +145,7 @@ internal object NullCausingDamageMappings {
         loadDataIntoRegistry()
     }
 
-    fun get(context: DamageContext): DamageMapper? {
+    fun get(context: RawDamageContext): DamageMapper? {
         val damageSource = context.damageSource
         val entityType = damageSource.directEntity?.type
             ?: error("Context has no direct entity. This is a misuse of the mappings.")
@@ -193,7 +195,7 @@ internal object PlayerAdhocDamageMappings {
         loadDataIntoRegistry()
     }
 
-    fun get(context: DamageContext): DamageMapper? {
+    fun get(context: RawDamageContext): DamageMapper? {
         val damageSource = context.damageSource
         val entityType = damageSource.directEntity?.type
             ?: error("Context has no direct entity. This is a misuse of the mappings.")

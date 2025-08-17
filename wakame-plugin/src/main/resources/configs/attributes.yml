@@ -163,6 +163,38 @@ block_interaction_range:
     min: 1.0
     max: 64.0
 
+blocking_damage_reduction:
+  display_name: "格挡伤害减免"
+  tooltips:
+    add: "格挡伤害减免 <value:+#.#;-.><quality>"
+    multiply_base: "格挡伤害减免 <value:+#%;-.%><quality>"
+    multiply_total: "格挡伤害减免 ×<value:+#%;-.%><quality>"
+  values:
+    neutral:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    fire:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    water:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    wind:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    earth:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+    thunder:
+      default: 0.0
+      min: 0.0
+      max: 16384.0
+
 critical_strike_chance:
   display_name: "暴击概率"
   tooltips:

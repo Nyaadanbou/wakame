@@ -4,16 +4,6 @@ version: 1
 # 伤害规则相关.
 rules:
 
-  # 元素伤害倍率(或称攻击威力)乘算时机.
-  # true - 防御前计算
-  # false - 防御后计算
-  attack_damage_rate_multiply_before_defense: false
-
-  # 暴击倍率属性乘算时机.
-  # true - 防御前计算
-  # false - 防御后计算
-  critical_strike_power_multiply_before_defense: false
-
   # 对于某一元素类型, 其伤害计算时, 最终是否四舍五入到整数位.
   rounding_damage: true
 
@@ -39,7 +29,7 @@ rules:
   #   原始伤害
   # q.valid_defense
   #   受伤者该元素的有效防御
-  damage_after_defense_formula: "math.max(q.original_damage - q.valid_defense, 0.0)"
+  damage_after_defense_formula: "math.max(q.original_damage * (1.0 - (q.valid_defense / (q.original_damage + q.valid_defense))), 0.0)"
 
   # 计算拉弓力度的公式.
   #
@@ -53,7 +43,7 @@ display:
 
   # 伤害数值以何种模式显示.
   # 可用选项: merged, separated
-  mode: separated
+  mode: merged
 
   # 模式: separated
   # 每种元素的伤害单独显示.
@@ -84,7 +74,7 @@ display:
 
       - delay: 2
         normal:
-          interpolation_duration: 8
+          interpolation_duration: 5
           translation: [ .0, -0.5, .0 ]
           scale: [ 2.5, 2.5, 2.5 ]
         positive_critical_strike:
@@ -94,13 +84,13 @@ display:
 
       - delay: 8
         normal:
-          interpolation_duration: 8
+          interpolation_duration: 20
           translation: [ .0, 0.5, .0 ]
-          scale: [ .0, .0, .0 ]
+          scale: [ 1.0, 1.0, 1.0 ]
 
     # 动画持续的总 tick 数
     # 即该时长后伤害显示文本不再显示
-    animation_duration: 16
+    animation_duration: 32
 
     # 伤害显示总文本.
     final_text: <critical_strike_style><critical_strike_text><damage_value_text>
@@ -122,7 +112,7 @@ display:
     # - <element_name> 元素名
     # - <element_style> 元素风格
     # - <damage_value> 该元素类型具体伤害值
-    damage_value_text: "<element_style><damage_value:#>"
+    damage_value_text: "<element_style><damage_value:0>"
 
     # 各元素类型的伤害文本之间的分隔字符串.
     separator: " "
@@ -135,27 +125,27 @@ display:
 
       - delay: 0
         normal:
-          translation: [ .0, -1.0, .0 ]
+          translation: [ .0, -0.4, .0 ]
           scale: [ 1.5, 1.5, 1.5 ]
 
       - delay: 2
         normal:
-          interpolation_duration: 5
-          translation: [ .0, -0.5, .0 ]
-          scale: [ 2.5, 2.5, 2.5 ]
-        positive_critical_strike:
-          scale: [ 4.5, 4.5, 4.5 ]
-        negative_critical_strike:
-          scale: [ 4.5, 4.5, 4.5 ]
+          interpolation_duration: 4
+          translation: [ .0, -0.1, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
 
-      - delay: 8
+      - delay: 6
         normal:
-          interpolation_duration: 20
-          translation: [ .0, 0.5, .0 ]
-          scale: [ 1.0, 1.0, 1.0 ]
+          interpolation_duration: 3
+          translation: [ .0, .0, .0 ]
+          scale: [ 1.5, 1.5, 1.5 ]
 
-    animation_duration: 32
-
+      - delay: 9
+        normal:
+          interpolation_duration: 4
+          translation: [ .0, .2, .0 ]
+          scale: [ .8, .8, .8 ]
+    animation_duration: 14
     final_text: <critical_strike_style><critical_strike_text><damage_value_text>
 
     critical_strike_style:
@@ -173,4 +163,4 @@ display:
     # - <element_name> 伤害占比最高的元素类型的元素名.
     # - <element_style> 伤害占比最高的元素类型的风格.
     # - <damage_value> 总伤害值.
-    damage_value_text: "<element_style><damage_value:#>"
+    damage_value_text: "<element_style><damage_value:0>"

@@ -65,9 +65,6 @@ interaction:
       # direct: 伤害的所有内容均有配置文件指定, 支持多元素
       type: direct
 
-      # 伤害的标签
-      damage_tags: [ ]
-
       # 伤害的数值
       damage_bundle:
         # 这一级 node 的 key 为元素, value 为该元素对应的伤害数值
@@ -101,7 +98,6 @@ interaction:
       # 基于原版伤害值获取, 即简单的给原版伤害加上元素等信息, 仅支持单元素
       type: vanilla
       # 伤害的标签
-      damage_tags: [ ]
       # 元素的类型
       element: fire
       # 可省略, 默认 1.0
@@ -127,7 +123,6 @@ interaction:
       # 基于攻击实体的 AttributeMap 获取
       type: attribute
       # 伤害的标签
-      damage_tags: [ ]
 
   映射/4:
     predicates: { }
@@ -135,7 +130,6 @@ interaction:
       # 基于 Molang 表达式
       type: molang
       # 伤害的标签
-      damage_tags: [ ]
       # 伤害的数值
       damage_bundle:
         neutral:
@@ -158,7 +152,6 @@ axolotl:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -170,7 +163,6 @@ bee:
         - sting
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -182,7 +174,6 @@ blaze:
         - small_fireball
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 5.0, max: 5.0 }
       critical_strike_metadata:
@@ -193,7 +184,6 @@ blaze:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -205,7 +195,6 @@ bogged:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
@@ -216,7 +205,6 @@ bogged:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -228,7 +216,6 @@ breeze:
         - breeze_wind_charge
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
@@ -240,7 +227,6 @@ cat:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -252,7 +238,6 @@ cave_spider:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -265,7 +250,6 @@ creeper:
         - player_explosion
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
@@ -278,7 +262,6 @@ dolphin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -290,7 +273,6 @@ drowned:
         - trident
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral:
           min: 12
@@ -303,7 +285,6 @@ drowned:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -315,7 +296,6 @@ elder_guardian:
         - indirect_magic
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 7.5, max: 7.5 }
       critical_strike_metadata:
@@ -326,7 +306,6 @@ elder_guardian:
         - thorns
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -337,7 +316,6 @@ elder_guardian:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
@@ -350,7 +328,6 @@ ender_dragon:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 7.0, max: 15.0 }
       critical_strike_metadata:
@@ -361,7 +338,6 @@ ender_dragon:
         - indirect_magic
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 6.0 }
       critical_strike_metadata:
@@ -373,7 +349,6 @@ enderman:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 10.5, max: 10.5 }
       critical_strike_metadata:
@@ -385,7 +360,6 @@ endermite:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -397,7 +371,6 @@ evoker:
         - indirect_magic
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral:
           min: 9
@@ -411,7 +384,6 @@ fox:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -423,7 +395,6 @@ frog:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 10.0, max: 10.0 }
       critical_strike_metadata:
@@ -438,7 +409,6 @@ ghast:
         - fireball
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
@@ -450,7 +420,6 @@ ghast:
         - fireball
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -462,7 +431,6 @@ giant:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 75.0, max: 75.0 }
       critical_strike_metadata:
@@ -476,7 +444,6 @@ goat:
         - mob_attack_no_aggro
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -489,7 +456,6 @@ goat:
         - mob_attack_no_aggro
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
@@ -501,7 +467,6 @@ guardian:
         - indirect_magic
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -512,7 +477,6 @@ guardian:
         - thorns
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -523,7 +487,6 @@ guardian:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -537,7 +500,6 @@ hoglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 12.0 }
       critical_strike_metadata:
@@ -550,7 +512,6 @@ hoglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.75, max: 0.75 }
       critical_strike_metadata:
@@ -562,7 +523,6 @@ husk:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -574,7 +534,6 @@ illusioner:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
@@ -586,7 +545,6 @@ iron_golem:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 11.25, max: 32.25 }
       critical_strike_metadata:
@@ -598,7 +556,6 @@ llama:
         - llama_spit
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
@@ -610,7 +567,6 @@ magma_cube:
         size: 1
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 3.0 }
       critical_strike_metadata:
@@ -621,7 +577,6 @@ magma_cube:
         size: 2
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -632,7 +587,6 @@ magma_cube:
         size: 4
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -644,7 +598,6 @@ ocelot:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -656,7 +609,6 @@ panda:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -668,7 +620,6 @@ phantom:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -680,7 +631,6 @@ piglin:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
@@ -691,7 +641,6 @@ piglin:
         - firework_rocket
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -701,7 +650,6 @@ piglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 7.5, max: 7.5 }
       critical_strike_metadata:
@@ -713,7 +661,6 @@ piglin_brute:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 19.5, max: 19.5 }
       critical_strike_metadata:
@@ -725,7 +672,6 @@ pillager:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 5.0, max: 5.0 }
       critical_strike_metadata:
@@ -736,7 +682,6 @@ pillager:
         - firework_rocket
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -747,7 +692,6 @@ polar_bear:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 9.0, max: 9.0 }
       critical_strike_metadata:
@@ -759,7 +703,6 @@ pufferfish:
         puff_state: 2
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -770,7 +713,6 @@ pufferfish:
         puff_state: 1
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -782,7 +724,6 @@ rabbit:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
@@ -795,7 +736,6 @@ ravager:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 18.0, max: 18.0 }
       critical_strike_metadata:
@@ -807,7 +747,6 @@ shulker:
         - shulker_bullet
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -819,7 +758,6 @@ silverfish:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
@@ -831,7 +769,6 @@ skeleton:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.0, max: 5.0 }
       critical_strike_metadata:
@@ -842,7 +779,6 @@ skeleton:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -854,7 +790,6 @@ slime:
         size: 2
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -865,7 +800,6 @@ slime:
         size: 4
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -879,7 +813,6 @@ snow_golem:
         - blaze
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -890,7 +823,6 @@ snow_golem:
         - snowball
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.0, max: 0.0 }
       critical_strike_metadata:
@@ -902,7 +834,6 @@ spider:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -914,7 +845,6 @@ stray:
         - arrow
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 5.0 }
       critical_strike_metadata:
@@ -925,7 +855,6 @@ stray:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -937,7 +866,6 @@ trader_llama:
         - llama_spit
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.5, max: 1.5 }
       critical_strike_metadata:
@@ -949,7 +877,6 @@ vex:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 13.5, max: 13.5 }
       critical_strike_metadata:
@@ -961,7 +888,6 @@ villager:
         - firework_rocket
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -972,7 +898,6 @@ vindicator:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 19.5, max: 19.5 }
       critical_strike_metadata:
@@ -984,7 +909,6 @@ warden:
         - sonic_boom
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 15.0, max: 15.0 }
       critical_strike_metadata:
@@ -995,7 +919,6 @@ warden:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 45.0, max: 45.0 }
       critical_strike_metadata:
@@ -1007,7 +930,6 @@ witch:
         - indirect_magic
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -1022,7 +944,6 @@ wither:
         - wither_skull
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
@@ -1034,7 +955,6 @@ wither:
         - wither_skull
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
@@ -1046,7 +966,6 @@ wither:
         - player_explosion
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       defense_penetration: 0.0
       defense_penetration_rate: 0.0
@@ -1059,7 +978,6 @@ wither_skeleton:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
@@ -1071,7 +989,6 @@ wolf:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -1085,7 +1002,6 @@ zoglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 12.0 }
       critical_strike_metadata:
@@ -1098,7 +1014,6 @@ zoglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.75, max: 0.75 }
       critical_strike_metadata:
@@ -1110,7 +1025,6 @@ zombie:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:
@@ -1122,7 +1036,6 @@ zombified_piglin:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 12.0, max: 12.0 }
       critical_strike_metadata:
@@ -1134,7 +1047,6 @@ zombie_villager:
         - mob_attack
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.5, max: 4.5 }
       critical_strike_metadata:

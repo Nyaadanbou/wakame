@@ -10,7 +10,10 @@ import cc.mewcraft.wakame.lifecycle.initializer.InitStage
 import cc.mewcraft.wakame.util.item.takeUnlessEmpty
 import cc.mewcraft.wakame.util.registerEvents
 import com.destroystokyo.paper.event.server.ServerTickStartEvent
+import io.papermc.paper.event.player.PlayerArmSwingEvent
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet
+import org.bukkit.GameMode
 import org.bukkit.block.Block
 import org.bukkit.block.BlockType
 import org.bukkit.entity.Player
@@ -19,9 +22,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.vehicle.VehicleDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import xyz.xenondevs.commons.provider.map
 
@@ -37,6 +38,10 @@ internal object ItemClickEventSupport : Listener {
     fun init() {
         registerEvents()
     }
+
+    // 记录了当前 tick 将要左键点击的玩家
+    @JvmStatic
+    private val willLeftClick: ReferenceOpenHashSet<Player> = ReferenceOpenHashSet()
 
     // 记录了当前 tick 左键点击过的玩家
     @JvmStatic
@@ -56,6 +61,7 @@ internal object ItemClickEventSupport : Listener {
 
     @EventHandler
     fun on(event: ServerTickStartEvent) {
+        willLeftClick.clear()
         haveLeftClicked.clear()
         haveRightClicked.clear()
     }
@@ -68,9 +74,26 @@ internal object ItemClickEventSupport : Listener {
         val hand = event.hand!!
         val player = event.player
         when (action) {
-            Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK -> {
-                if (haveLeftClicked.add(player)) {
-                    PlayerItemLeftClickEvent(player, item, hand).callEvent()
+            Action.LEFT_CLICK_AIR -> {
+                // 该tick此玩家未触发过左键点击
+                if (!haveLeftClicked.contains(player)) {
+                    // 将此玩家标记为"将要左键"
+                    // 目的是后续判定swing包是主手还是副手
+                    willLeftClick.add(player)
+                }
+            }
+
+            Action.LEFT_CLICK_BLOCK -> {
+                // 该tick此玩家未触发过左键点击
+                if (!haveLeftClicked.contains(player)) {
+                    // 冒险模式下玩家左键方块是基于挥手包(swing)判定, 需要特殊处理
+                    if (player.gameMode == GameMode.ADVENTURE) {
+                        // 将此玩家标记为"将要左键"
+                        // 目的是后续判定swing包是主手还是副手
+                        willLeftClick.add(player)
+                    } else {
+                        PlayerItemLeftClickEvent(player, item, hand).callEvent()
+                    }
                 }
             }
 
@@ -93,7 +116,18 @@ internal object ItemClickEventSupport : Listener {
                 }
             }
 
-            else -> {} // Action = PHYSICAL
+            else -> {}
+        }
+    }
+
+    @EventHandler
+    fun on(event: PlayerArmSwingEvent) {
+        val player = event.player
+        // 只允许主手挥手包(swing)触发左键事件
+        // 目的是修复服务端发送挥手动画时, 基于挥手包(swing)的左键事件会触发的问题
+        if (willLeftClick.contains(player) && event.hand == EquipmentSlot.HAND) {
+            haveLeftClicked.add(player)
+            PlayerItemLeftClickEvent(player, player.inventory.itemInMainHand, EquipmentSlot.HAND).callEvent()
         }
     }
 
@@ -108,19 +142,8 @@ internal object ItemClickEventSupport : Listener {
     }
 
     @EventHandler
-    fun on(event: EntityDamageEvent) {
-        val player = event.damageSource.directEntity as? Player ?: return
-        val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
-        if (haveLeftClicked.add(player)) {
-            PlayerItemLeftClickEvent(player, itemInMainHand, EquipmentSlot.HAND).callEvent()
-        }
-    }
-
-    // 手持物品左键 Boat/Minecart 不会触发 EntityDamageEvent.
-    // 需使用 VehicleDamageEvent 实现.
-    @EventHandler
-    fun on(event: VehicleDamageEvent) {
-        val player = event.attacker as? Player ?: return
+    fun on(event: PrePlayerAttackEntityEvent) {
+        val player = event.player
         val itemInMainHand = player.inventory.itemInMainHand.takeUnlessEmpty() ?: return
         if (haveLeftClicked.add(player)) {
             PlayerItemLeftClickEvent(player, itemInMainHand, EquipmentSlot.HAND).callEvent()

@@ -3,6 +3,7 @@ package cc.mewcraft.wakame.item2
 import org.bukkit.entity.LivingEntity
 import java.util.*
 
+@Deprecated("过时")
 object ItemDamageEventMarker {
     private val markers: MutableSet<UUID> = mutableSetOf()
 

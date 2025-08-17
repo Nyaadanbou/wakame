@@ -3,7 +3,13 @@ package cc.mewcraft.wakame.item2.behavior
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -36,12 +42,6 @@ object ItemBehaviorTypes {
     val BREW_RECIPE = typeOf("brew_recipe", BrewRecipe) // ID 故意和 ItemBrewRecipe(ItemData) 保持一致
 
     /**
-     * 作为斧的逻辑.
-     */
-    @JvmField
-    val AXE = typeOf("axe", Axe)
-
-    /**
      * 作为弓的逻辑.
      */
     @JvmField
@@ -54,34 +54,29 @@ object ItemBehaviorTypes {
     val CROSSBOW = typeOf("crossbow", Crossbow)
 
     /**
-     * 作为棍的逻辑.
-     */
-    @JvmField
-    val CUDGEL = typeOf("stick", Cudgel)
-
-    /**
-     * 作为锤的逻辑.
-     */
-    @JvmField
-    val HAMMER = typeOf("hammer", Hammer)
-
-    /**
      * 作为太刀的逻辑.
      */
     @JvmField
     val KATANA = typeOf("katana", Katana)
 
     /**
-     * 作为矛的逻辑.
+     * 作为锤的逻辑.
      */
     @JvmField
-    val SPEAR = typeOf("spear", Spear)
+    val MACE = typeOf("mace", Mace)
+
+    /**
+     * 作为一般近战武器的逻辑.
+     * 如斧等.
+     */
+    @JvmField
+    val MELEE = typeOf("melee", Melee)
 
     /**
      * 作为剑的逻辑.
      */
     @JvmField
-    val SWORD = typeOf("sword", Sword)
+    val DUAL_SWORD = typeOf("dual_sword", DualSword)
 
     /**
      * 作为三叉戟的逻辑.

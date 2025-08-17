@@ -15,6 +15,8 @@ import org.bukkit.inventory.ItemStack
  * - 主/副手会各自触发一次此事件.
  * - 右键可交互的方块不会触发此事件.
  * - 右键矿车/船/盔甲架不会触发此事件.
+ * - 玩家长按原版可使用的物品/带 Consumable 组件的物品会持续多次触发该事件.
+ * - 欲处理玩家长按右键松开的情景, 使用 [io.papermc.paper.event.player.PlayerStopUsingItemEvent].
  *
  * @param player 触发事件的玩家
  * @param item 使用的物品, 永远不为空气
@@ -29,15 +31,15 @@ class PlayerItemRightClickEvent(
     init {
         require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        //player.sendMessage(
-        //    "$currentTick ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
-        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-        //            stream.asSequence().dropWhile { frame ->
-        //                frame.className == PlayerItemRightClickEvent::class.qualifiedName
-        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-        //        }
-        //    }"
-        //)
+//        player.sendMessage(
+//            "${Bukkit.getCurrentTick()} ${PlayerItemRightClickEvent::class.simpleName} called, hand = $hand, on = ${
+//                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+//                    stream.asSequence().dropWhile { frame ->
+//                        frame.className == PlayerItemRightClickEvent::class.qualifiedName
+//                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+//                }
+//            }"
+//        )
     }
 
     override fun getHandlers(): HandlerList {

@@ -18,6 +18,7 @@
     "MixinEntityType",
     "MixinIngredient",
     "MixinItemStackOptionalStreamCodec",
+    "MixinLivingEntity",
     "MixinLootPoolEntries",
     "MixinRegistryDataLoader",
     "MixinRepairItemRecipe",

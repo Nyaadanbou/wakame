@@ -18,7 +18,6 @@ tnt:
   一般:
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -26,7 +25,6 @@ end_crystal:
   一般:
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -34,7 +32,6 @@ arrow:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.0, max: 1.0 }
       critical_strike_metadata:
@@ -43,7 +40,6 @@ egg:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.0, max: 0.0 }
       critical_strike_metadata:
@@ -52,7 +48,6 @@ ender_pearl:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.0, max: 0.0 }
       critical_strike_metadata:
@@ -65,14 +60,12 @@ fireball:
         - player_explosion
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: fire
       critical_strike_metadata:
         chance: 0.0
   接触:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         fire: { min: 6.0, max: 6.0 }
       critical_strike_metadata:
@@ -81,7 +74,6 @@ firework_rocket:
   一般:
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -89,7 +81,6 @@ area_effect_cloud:
   一般:
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -97,7 +88,6 @@ llama_spit:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 1.0, max: 1.0 }
       critical_strike_metadata:
@@ -106,7 +96,6 @@ shulker_bullet:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 4.0, max: 4.0 }
       critical_strike_metadata:
@@ -115,7 +104,6 @@ small_fireball:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         fire: { min: 5.0, max: 5.0 }
       critical_strike_metadata:
@@ -127,7 +115,6 @@ snowball:
         - blaze
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 3.0, max: 3.0 }
       critical_strike_metadata:
@@ -135,7 +122,6 @@ snowball:
   攻击其他实体:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 0.0, max: 0.0 }
       critical_strike_metadata:
@@ -144,7 +130,6 @@ potion:
   一般:
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
@@ -152,7 +137,6 @@ trident:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 8.0, max: 8.0 }
       critical_strike_metadata:
@@ -161,7 +145,6 @@ wind_charge:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         wind: { min: 1.0, max: 1.0 }
       critical_strike_metadata:
@@ -170,7 +153,6 @@ breeze_wind_charge:
   一般:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         wind: { min: 1.0, max: 1.0 }
       critical_strike_metadata:
@@ -183,14 +165,12 @@ wither_skull:
         - player_explosion
     damage_metadata:
       type: vanilla
-      damage_tags: [ ]
       element: neutral
       critical_strike_metadata:
         chance: 0.0
   接触:
     damage_metadata:
       type: direct
-      damage_tags: [ ]
       damage_bundle:
         neutral: { min: 8.0, max: 8.0 }
       critical_strike_metadata:

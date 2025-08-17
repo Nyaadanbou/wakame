@@ -27,15 +27,15 @@ class PlayerItemLeftClickEvent(
     init {
         require(!item.isEmpty) { "item cannot be empty" } // throw early
 
-        //player.sendMessage(
-        //    "$currentTick ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
-        //        StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
-        //            stream.asSequence().dropWhile { frame ->
-        //                frame.className == PlayerItemLeftClickEvent::class.qualifiedName
-        //            }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
-        //        }
-        //    }"
-        //)
+//        player.sendMessage(
+//            "${Bukkit.getCurrentTick()} ${PlayerItemLeftClickEvent::class.simpleName} called, on = ${
+//                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).walk { stream ->
+//                    stream.asSequence().dropWhile { frame ->
+//                        frame.className == PlayerItemLeftClickEvent::class.qualifiedName
+//                    }.firstOrNull()?.methodType?.lastParameterType()?.simpleName
+//                }
+//            }"
+//        )
     }
 
     override fun getHandlers(): HandlerList {

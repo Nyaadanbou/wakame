@@ -79,7 +79,7 @@ internal object DamageDisplay : Listener {
     fun on(event: PostprocessDamageEvent) {
         val damagee = event.damagee as? LivingEntity ?: return
         val damageeLoc = damagee.location
-        val css = event.getCriticalState()
+        val css = event.damageMetadata.criticalStrikeMetadata.state
         val hologramLoc = calculateHologramLocation1(damagee = damagee)
         val hologramText = settings.finalText(event)
 
@@ -340,7 +340,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
     val damageValueText: String by MERGED_DISPLAY_CONFIG.entry("damage_value_text")
 
     override fun damageValueText(context: PostprocessDamageEvent): Component {
-        val damageMap = context.getFinalDamageMap()
+        val damageMap = context.finalDamageMap
         val elementType = damageMap.maxWithOrNull(
             compareBy { it.value }
         )?.key ?: BuiltInRegistries.ELEMENT.getDefaultEntry()
@@ -348,7 +348,7 @@ internal object MergedDamageDisplaySettings : DamageDisplaySettings, DamageDispl
             damageValueText,
             Placeholder.component("element_name", elementType.unwrap().displayName),
             Placeholder.styling("element_style", *elementType.unwrap().displayStyles),
-            Formatter.number("damage_value", context.getFinalDamage())
+            Formatter.number("damage_value", context.finalDamage)
         )
         return damageValueText
     }
@@ -361,7 +361,7 @@ internal object SeparatedDamageDisplaySettings : DamageDisplaySettings, DamageDi
     val separator: Component by SEPARATED_DISPLAY_CONFIG.entry("separator")
 
     override fun damageValueText(context: PostprocessDamageEvent): Component {
-        val damageMap = context.getFinalDamageMap()
+        val damageMap = context.finalDamageMap
         val damageValueText = damageMap.map { (elementType, damageValue) ->
             MM.deserialize(
                 damageValueText,

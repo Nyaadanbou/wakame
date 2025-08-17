@@ -15,8 +15,6 @@ private val RULES_CONFIG = DAMAGE_CONFIG.node("rules")
  */
 internal object DamageRules {
 
-    val ATTACK_DAMAGE_RATE_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("attack_damage_rate_multiply_before_defense")
-    val CRITICAL_STRIKE_POWER_MULTIPLY_BEFORE_DEFENSE: Boolean by RULES_CONFIG.entry("critical_strike_power_multiply_before_defense")
     val ROUNDING_DAMAGE: Boolean by RULES_CONFIG.entry("rounding_damage")
 
     val LEAST_DAMAGE: Double by RULES_CONFIG.entry("least_damage")

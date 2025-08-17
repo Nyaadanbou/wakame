@@ -1,35 +1,28 @@
 package cc.mewcraft.wakame.event.bukkit
 
-import cc.mewcraft.wakame.damage.CriticalStrikeState
 import cc.mewcraft.wakame.damage.DamageMetadata
+import cc.mewcraft.wakame.damage.DefenseMetadata
+import cc.mewcraft.wakame.damage.FinalDamageContext
 import cc.mewcraft.wakame.element.Element
 import cc.mewcraft.wakame.registry2.entry.RegistryEntry
-import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import org.bukkit.damage.DamageSource
 import org.bukkit.entity.Entity
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
-import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-
-@Deprecated("该事件的名字有点模糊", replaceWith = ReplaceWith("NekoPostprocessDamageEvent"))
-typealias NekoEntityDamageEvent = PostprocessDamageEvent
 
 /**
  * 该事件发生在最终伤害已经计算完毕, 但还未实际将最终伤害应用到实体上.
  *
- * - 监听该事件可以读取到完整的伤害信息 (计算防御前/后).
+ * - 监听该事件可以读取到完整的伤害信息 (攻击阶段/防御阶段).
  * - 取消该事件会使本次伤害失效.
  * - 无法使用该事件修改伤害.
+ * - 伤害的所有计算逻辑均应由伤害系统负责, 不提供外部修改的接口.
  *
- * @property damageMetadata 伤害信息 (计算防御前)
- * @property finalDamageMap 伤害信息 (计算防御后)
- * @see PreprocessDamageEvent 如果需要修改伤害, 使用这个事件
  */
 class PostprocessDamageEvent(
-    val damageMetadata: DamageMetadata,
-    private val finalDamageMap: Reference2DoubleMap<RegistryEntry<Element>>,
+    val finalDamageContext: FinalDamageContext,
     private val bukkitEvent: EntityDamageEvent,
 ) : Event(), Cancellable {
 
@@ -47,47 +40,29 @@ class PostprocessDamageEvent(
         get() = bukkitEvent.damageSource
 
     /**
-     * 获取本次伤害是否是玩家跳劈.
+     * 攻击阶段的伤害信息.
      */
-    fun isJumpCriticalHit(): Boolean {
-        return bukkitEvent is EntityDamageByEntityEvent && bukkitEvent.isCritical
-    }
+    val damageMetadata: DamageMetadata
+        get() = finalDamageContext.damageMetadata
 
     /**
-     * 获取本次伤害事件中指定元素的最终伤害值. 若元素不存在则返回 `null`.
+     * 防御阶段的伤害信息.
      */
-    fun getFinalDamage(element: RegistryEntry<Element>): Double? {
-        if (!finalDamageMap.containsKey(element)) return null
-        return finalDamageMap.getDouble(element)
-    }
+    val defenseMetadata: DefenseMetadata
+        get() = finalDamageContext.defenseMetadata
+
 
     /**
      * 获取本次伤害事件的最终伤害的值 (即各元素的最终伤害的简单相加).
      */
-    fun getFinalDamage(): Double {
-        return finalDamageMap.values.sum()
-    }
+    val finalDamage: Double
+        get() = finalDamageContext.finalDamageMap.values.sum()
 
     /**
      * 获取一个包含了每种元素的最终伤害值的映射.
      */
-    fun getFinalDamageMap(): Map<RegistryEntry<Element>, Double> {
-        return finalDamageMap
-    }
-
-    /**
-     * 获取本次伤害的暴击状态.
-     */
-    fun getCriticalState(): CriticalStrikeState {
-        return damageMetadata.criticalStrikeMetadata.state
-    }
-
-    /**
-     * 获取本次伤害的暴击倍率.
-     */
-    fun getCriticalPower(): Double {
-        return damageMetadata.criticalStrikeMetadata.power
-    }
+    val finalDamageMap: Map<RegistryEntry<Element>, Double>
+        get() = finalDamageContext.finalDamageMap
 
     override fun isCancelled(): Boolean {
         return bukkitEvent.isCancelled
