@@ -4,7 +4,6 @@ import cc.mewcraft.wakame.item2.ItemRef
 import cc.mewcraft.wakame.serialization.configurate.TypeSerializer2
 import cc.mewcraft.wakame.util.adventure.toSimpleString
 import cc.mewcraft.wakame.util.require
-import io.papermc.paper.datacomponent.DataComponentTypes
 import net.kyori.examination.Examinable
 import net.kyori.examination.ExaminableProperty
 import org.bukkit.Material
@@ -41,7 +40,7 @@ data class SingleRecipeResult(
 ) : RecipeResult {
     override fun toBukkitItemStack(): ItemStack {
         val itemStack = item.createItemStack()
-        itemStack.setData(DataComponentTypes.ITEM_MODEL, item.id)
+        // itemStack.setData(DataComponentTypes.ITEM_MODEL, item.id) // 不需要专门写入 item_model. item_model 完全由专门的组件控制, 和 item_name 组件的用法和定位一致.
         itemStack.amount = amount
         return itemStack
     }
