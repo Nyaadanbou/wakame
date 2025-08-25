@@ -225,6 +225,7 @@ class SmithingTransformRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
+    val copyDataComponents: Boolean,
 ) : MinecraftRecipe {
     override fun registerBukkitRecipe(): Boolean {
         val smithingTransformRecipe = BukkitSmithingTransformRecipe(
@@ -233,7 +234,7 @@ class SmithingTransformRecipe(
             template.toBukkitRecipeChoice(),
             base.toBukkitRecipeChoice(),
             addition.toBukkitRecipeChoice(),
-            false
+            copyDataComponents
         )
         return Bukkit.addRecipe(smithingTransformRecipe)
     }
@@ -243,7 +244,8 @@ class SmithingTransformRecipe(
         ExaminableProperty.of("recipe_result", result),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
-        ExaminableProperty.of("template", template)
+        ExaminableProperty.of("template", template),
+        ExaminableProperty.of("copy_data_components", copyDataComponents)
     )
 
     override fun toString(): String = toSimpleString()
@@ -257,6 +259,7 @@ class SmithingTrimRecipe(
     val base: RecipeChoice,
     val addition: RecipeChoice,
     val template: RecipeChoice,
+    val copyDataComponents: Boolean,
 ) : MinecraftRecipe {
     // 锻造台纹饰配方的结果是原版生成的
     override val result: RecipeResult = EmptyRecipeResult
@@ -266,7 +269,7 @@ class SmithingTrimRecipe(
             template.toBukkitRecipeChoice(),
             base.toBukkitRecipeChoice(),
             addition.toBukkitRecipeChoice(),
-            true
+            copyDataComponents
         )
         return Bukkit.addRecipe(smithingTrimRecipe)
     }
@@ -275,7 +278,8 @@ class SmithingTrimRecipe(
         ExaminableProperty.of("identifier", identifier),
         ExaminableProperty.of("base", base),
         ExaminableProperty.of("addition", addition),
-        ExaminableProperty.of("template", template)
+        ExaminableProperty.of("template", template),
+        ExaminableProperty.of("copy_data_components", copyDataComponents)
     )
 
     override fun toString(): String = toSimpleString()
@@ -460,6 +464,7 @@ enum class RecipeType(
         val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
+        val copyDataComponents = node.node("copy_data_components").getBoolean(true)
 
         // addition和template不能同时是EmptyRecipeChoice
         require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
@@ -474,13 +479,15 @@ enum class RecipeType(
             result = result,
             base = base,
             addition = addition,
-            template = template
+            template = template,
+            copyDataComponents = copyDataComponents
         )
     }),
     SMITHING_TRIM(RecipeTypeBridge(typeTokenOf()) { _, node ->
         val base = node.node("base").require<RecipeChoice>()
         val addition = node.node("addition").get<RecipeChoice>(EmptyRecipeChoice)
         val template = node.node("template").get<RecipeChoice>(EmptyRecipeChoice)
+        val copyDataComponents = node.node("copy_data_components").getBoolean(true)
 
         // addition和template不能同时是EmptyRecipeChoice
         require(addition != EmptyRecipeChoice || template != EmptyRecipeChoice) {
@@ -493,7 +500,8 @@ enum class RecipeType(
             identifier = key,
             base = base,
             addition = addition,
-            template = template
+            template = template,
+            copyDataComponents = copyDataComponents
         )
     }),
     SMOKING(RecipeTypeBridge(typeTokenOf()) { _, node ->
