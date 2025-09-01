@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.entry
 import cc.mewcraft.wakame.config.node
@@ -261,7 +260,7 @@ private class SelfHostService(
     }
 
     private fun buildResourcePack(): BuiltResourcePack? {
-        val file = KoishDataPaths.ROOT.resolve(ResourcePackManager.GENERATED_FILE).toFile()
+        val file = ResourcePackManager.outputFile
         if (!file.exists() || !file.isFile) {
             LOGGER.warn("Resource pack file not found at: '${file.path}'. No resource pack will be sent to players.")
             return null
@@ -277,7 +276,7 @@ private class SelfHostService(
 
         try {
             watchServiceListener.listenToFile(
-                KoishDataPaths.ROOT.resolve(ResourcePackManager.GENERATED_FILE)
+                ResourcePackManager.outputFile.toPath()
             ) { event ->
                 if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY || event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                     LOGGER.info("Resource pack file changed. Reloading resource pack...")

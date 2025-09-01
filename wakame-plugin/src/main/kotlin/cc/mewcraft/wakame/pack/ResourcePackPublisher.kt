@@ -106,7 +106,7 @@ private data class GithubPublisher(
         val dataFolder = KoishDataPaths.ROOT.toFile()
         val manager = GithubRepoManager(
             localRepoPath = dataFolder.resolve(".cache/repo"),
-            resourcePackDirPath = dataFolder.resolve(ResourcePackManager.GENERATED_DIR),
+            resourcePackDirPath = ResourcePackManager.outputDirectory,
             username = username,
             token = token,
             repo = repo,
@@ -115,11 +115,10 @@ private data class GithubPublisher(
             commitMessage = commitMessage,
         )
 
-        manager.publishPack()
-            .onFailure {
-                LOGGER.error("Failed to publish resource pack to Github", it)
-                return false
-            }
+        manager.publishPack().onFailure {
+            LOGGER.error("Failed to publish resource pack to Github", it)
+            return false
+        }
 
         return true
     }

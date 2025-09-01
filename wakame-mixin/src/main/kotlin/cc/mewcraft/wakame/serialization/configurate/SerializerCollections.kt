@@ -3,7 +3,13 @@
 package cc.mewcraft.wakame.serialization.configurate
 
 import cc.mewcraft.wakame.serialization.configurate.mapper.KoishObjectMapper
-import cc.mewcraft.wakame.serialization.configurate.serializer.*
+import cc.mewcraft.wakame.serialization.configurate.serializer.ArraySerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.ConfigurationNodeSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.ListSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.MapSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.PathSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.SetSerializer
+import cc.mewcraft.wakame.serialization.configurate.serializer.UnitSerializer
 import cc.mewcraft.wakame.util.register
 import org.spongepowered.configurate.serialize.Scalars
 import org.spongepowered.configurate.serialize.TypeSerializerCollection
@@ -42,4 +48,5 @@ val STANDARD_SERIALIZERS: TypeSerializerCollection = TypeSerializerCollection.bu
     .register(SetSerializer::accepts, SetSerializer())
     .register(ConfigurationNodeSerializer.TYPE, ConfigurationNodeSerializer())
     .register(Unit::class, UnitSerializer)
+    .register(PathSerializer.TYPE, PathSerializer.INSTANCE)
     .build()

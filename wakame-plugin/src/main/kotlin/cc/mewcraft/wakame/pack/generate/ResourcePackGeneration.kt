@@ -4,21 +4,14 @@ package cc.mewcraft.wakame.pack.generate
 
 import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
-import cc.mewcraft.wakame.SERVER
 import cc.mewcraft.wakame.util.text.mini
-import team.unnamed.creative.ResourcePack
 import team.unnamed.creative.base.Writable
 import team.unnamed.creative.metadata.pack.PackFormat
 import team.unnamed.creative.metadata.pack.PackMeta
 import team.unnamed.creative.resources.MergeStrategy
-import team.unnamed.creative.serialize.ResourcePackReader
-import team.unnamed.creative.serialize.minecraft.fs.FileTreeReader
-import xyz.xenondevs.commons.collections.associateWithNotNull
-import xyz.xenondevs.commons.collections.mapValuesNotNull
-import java.io.File
-import java.io.IOException
-import java.io.UncheckedIOException
-import java.util.zip.ZipFile
+import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
+import xyz.xenondevs.commons.collections.filterValuesNotNull
+import kotlin.io.path.absolutePathString
 
 /**
  * 封装了一个独立的资源包生成逻辑.
@@ -63,57 +56,35 @@ internal class ResourcePackIconGeneration(
 
 internal class ResourcePackMergePackGeneration(
     context: ResourcePackGenerationContext,
-    private val packReader: ResourcePackReader<FileTreeReader>,
 ) : ResourcePackGeneration(context) {
 
     override suspend fun process() {
-        // TODO 允许测试环境正常运行
-        val serverPluginDirectory = SERVER.pluginsFolder
         val resourcePack = context.resourcePack
-        val mergePacks = context.mergePacks
-            .associateWithNotNull {
-                val file = serverPluginDirectory.resolve(it)
-                if (!file.exists()) {
-                    LOGGER.error("Merge pack not found: $it")
-                    return@associateWithNotNull null
+        val mergePackByPath = context.mergePacks
+            .filter { path ->
+                val file = path.toFile()
+                file.exists().also { exists ->
+                    if (!exists) LOGGER.error("Merge pack not found: ${path.absolutePathString()}")
                 }
-                file
             }
-            .mapValuesNotNull { (_, file) ->
-                if (file.isDirectory) {
-                    packReader.readFromDirectory(file)
-                } else {
-                    if (file.extension != "zip") {
-                        LOGGER.error("Invalid file extension for merge pack: ${file.extension}")
-                        return@mapValuesNotNull null
+            .associate { path ->
+                try {
+                    val file = path.toFile()
+                    if (file.isDirectory) {
+                        path to MinecraftResourcePackReader.minecraft().readFromDirectory(file)
+                    } else {
+                        path to MinecraftResourcePackReader.minecraft().readFromZipFile(path)
                     }
-                    packReader.readFromZipFile(file)
+                } catch (e: Exception) {
+                    LOGGER.error("Failed to read merge pack: ${path.absolutePathString()}", e)
+                    path to null
                 }
             }
+            .filterValuesNotNull()
 
-        for ((path, mergePack) in mergePacks) {
-            LOGGER.info("Merging pack... path: $path")
+        for ((packPath, mergePack) in mergePackByPath) {
+            LOGGER.info("Merging pack: $packPath")
             resourcePack.merge(mergePack, MergeStrategy.mergeAndKeepFirstOnError())
         }
     }
-}
-
-/**
- * Reads a [ResourcePack] from a given ZIP [file][File].
- *
- * @param file The ZIP file
- * @return The read resource pack
- */
-private fun ResourcePackReader<FileTreeReader>.readFromZipFile(file: File): ResourcePack {
-    try {
-        FileTreeReader.zip(ZipFile(file)).use { reader ->
-            return read(reader)
-        }
-    } catch (e: IOException) {
-        throw UncheckedIOException(e)
-    }
-}
-
-private fun ResourcePackReader<FileTreeReader>.readFromDirectory(directory: File): ResourcePack {
-    return read(FileTreeReader.directory(directory))
 }

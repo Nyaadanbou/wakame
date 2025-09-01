@@ -1,7 +1,5 @@
 package cc.mewcraft.wakame.pack
 
-import cc.mewcraft.wakame.BootstrapContexts
-import cc.mewcraft.wakame.KoishDataPaths
 import cc.mewcraft.wakame.LOGGER
 import cc.mewcraft.wakame.config.ConfigAccess
 import cc.mewcraft.wakame.config.entry
@@ -14,31 +12,54 @@ import cc.mewcraft.wakame.pack.generate.ResourcePackMergePackGeneration
 import cc.mewcraft.wakame.pack.generate.ResourcePackMetaGeneration
 import cc.mewcraft.wakame.util.formatSize
 import team.unnamed.creative.ResourcePack
-import team.unnamed.creative.serialize.ResourcePackWriter
-import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackReader
 import team.unnamed.creative.serialize.minecraft.MinecraftResourcePackWriter
-import team.unnamed.creative.serialize.minecraft.fs.FileTreeWriter
+import xyz.xenondevs.commons.provider.map
+import xyz.xenondevs.commons.provider.mapEach
 import xyz.xenondevs.commons.provider.orElse
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.IOException
-import java.io.UncheckedIOException
 import java.nio.file.Path
-import java.util.zip.ZipOutputStream
-import kotlin.io.path.createDirectories
-import kotlin.io.path.createFile
-import kotlin.io.path.exists
-import kotlin.io.path.moveTo
-import kotlin.io.path.outputStream
 
 internal val RESOURCE_PACK_CONFIG = ConfigAccess.INSTANCE["resourcepack"]
 
-internal object ResourcePackManager {
-    internal val ZIP_FILE = "${BootstrapContexts.PLUGIN_NAME}.zip"
-    internal val GENERATED_DIR = "generated/${BootstrapContexts.PLUGIN_NAME}"
-    internal val GENERATED_FILE = "generated/$ZIP_FILE"
+private class ResourcePackGenerationSettings {
+    private val config = RESOURCE_PACK_CONFIG.node("generation")
 
-    private val generationSettings: ResourcePackGenerationSettings = ResourcePackGenerationSettings()
+    private fun finalizePath(rawPath: Path): Path =
+        if (rawPath.isAbsolute) {
+            rawPath
+        } else {
+            val serverRoot = File("").absoluteFile.toPath()
+            serverRoot.resolve(rawPath)
+        }
+
+    // output
+    val outputFile: Path by config.entry<Path>("output", "file").map(::finalizePath)
+    val outputDirectory: Path by config.entry<Path>("output", "directory").map(::finalizePath)
+
+    // mcmeta
+    val description: String by config.entry<String>("mcmeta", "description")
+    val format: Int by config.entry<Int>("mcmeta", "format")
+    val min: Int by config.entry<Int>("mcmeta", "min")
+    val max: Int by config.entry<Int>("mcmeta", "max")
+
+    // merge_packs
+    val mergePacks: List<Path> by config.optionalEntry<List<Path>>("merge_packs").orElse(emptyList()).mapEach(::finalizePath)
+}
+
+internal object ResourcePackManager {
+    private val settings: ResourcePackGenerationSettings = ResourcePackGenerationSettings()
+
+    /**
+     * 生成的资源包文件的路径 (ZIP 文件).
+     */
+    val outputFile: File
+        get() = settings.outputFile.toFile()
+
+    /**
+     * 生成的资源包文件的路径 (文件夹).
+     */
+    val outputDirectory: File
+        get() = settings.outputDirectory.toFile()
 
     /**
      * 基于当前所有的配置文件, 生成一个资源包, 并储存到设定好的地方.
@@ -46,98 +67,44 @@ internal object ResourcePackManager {
      * @return 包含生成是否成功的结果
      */
     suspend fun generate() {
-        val tempDir = KoishDataPaths.ROOT.resolve(".temp").toFile().apply { mkdirs() }
+        // 创建 ResourcePack 实例 (可变), 接下来将逐步修改其状态
+        val resourcePack = ResourcePack.resourcePack()
+
+        // 创建资源包生成的上下文
+        val generationCtx = ResourcePackGenerationContext(
+            description = settings.description,
+            format = settings.format,
+            min = settings.min,
+            max = settings.max,
+            mergePacks = settings.mergePacks,
+            resourcePack = resourcePack,
+        )
+
+        // 构建 ResourcePack
+        val generations: List<ResourcePackGeneration> = listOf(
+            ResourcePackMetaGeneration(generationCtx),
+            ResourcePackIconGeneration(generationCtx),
+            ResourcePackMergePackGeneration(generationCtx),
+        )
+
         try {
-            val resourcePackFile = KoishDataPaths.ROOT.resolve(GENERATED_FILE).toFile()
-            val resourcePackDirectory = KoishDataPaths.ROOT.resolve(GENERATED_DIR).toFile()
-
-            resourcePackFile.delete()
-            resourcePackDirectory.deleteRecursively()
-
-            val resourceTempFile = tempDir.resolve(GENERATED_FILE)
-            val resourceTempDir = tempDir.resolve(GENERATED_DIR)
-
-            val resourcePack = ResourcePack.resourcePack()
-            val context = ResourcePackGenerationContext(
-                description = generationSettings.description,
-                format = generationSettings.format,
-                min = generationSettings.min,
-                max = generationSettings.max,
-                mergePacks = generationSettings.mergePacks,
-                resourcePack = resourcePack,
-            )
-
-            // Generate the resource pack
-            val generations: List<ResourcePackGeneration> = listOf(
-                ResourcePackMetaGeneration(context),
-                ResourcePackIconGeneration(context),
-                ResourcePackMergePackGeneration(context, MinecraftResourcePackReader.minecraft()),
-            )
-
-            try {
-                generations.forEach { it.process() }
-            } catch (t: Throwable) {
-                LOGGER.warn("Failed to generate resourcepack", t)
-            }
-
-            // Write the resource pack to the file
-
-            val packWriter = MinecraftResourcePackWriter.minecraft()
-            packWriter.writeToZipFile(path = resourcePackFile.toPath(), tempPath = resourceTempFile.toPath(), resourcePack = resourcePack)
-            packWriter.writeToDirectory(directory = resourcePackDirectory, tempDir = resourceTempDir, resourcePack = resourcePack)
-
-            LOGGER.info("Resource pack has been generated.")
-            // Build the resource pack to ensure it's valid
-            MinecraftResourcePackWriter.minecraft().build(resourcePack)
-
-            LOGGER.info("Resource pack has been generated. Size: ${resourcePackFile.formatSize()}")
-        } finally {
-            tempDir.deleteRecursively()
+            generations.forEach { it.process() }
+        } catch (t: Throwable) {
+            LOGGER.warn("Failed to generate resource pack. Nothing will be written to disk.", t)
+            return
         }
+
+        // 先删除已有的文件/文件夹, 然后创建空的文件/文件夹
+        outputFile.delete()
+        outputFile.parentFile.mkdirs()
+        outputFile.createNewFile()
+        outputDirectory.deleteRecursively()
+        outputDirectory.mkdirs()
+
+        // 向磁盘写入数据
+        MinecraftResourcePackWriter.minecraft().writeToZipFile(outputFile, resourcePack)
+        MinecraftResourcePackWriter.minecraft().writeToDirectory(outputDirectory, resourcePack)
+
+        LOGGER.info("Resource pack has been generated. Size: ${outputFile.formatSize()}")
     }
-
-    private fun ResourcePackWriter<FileTreeWriter>.writeToZipFile(
-        path: Path,
-        tempPath: Path = path,
-        resourcePack: ResourcePack,
-    ) {
-        try {
-            if (!tempPath.exists()) {
-                tempPath.parent.createDirectories()
-                tempPath.createFile()
-            }
-            ZipOutputStream(tempPath.outputStream().buffered()).use { outputStream ->
-                write(FileTreeWriter.zip(outputStream), resourcePack)
-            }
-            // Move the temporary file to the target path
-            tempPath.moveTo(path, true)
-        } catch (e: FileNotFoundException) {
-            throw IllegalStateException("Failed to write resource pack to zip file: File not found: $path", e)
-        } catch (e: IOException) {
-            throw UncheckedIOException(e)
-        }
-    }
-
-    private fun ResourcePackWriter<FileTreeWriter>.writeToDirectory(
-        directory: File,
-        tempDir: File = directory,
-        resourcePack: ResourcePack,
-    ) {
-        if (!tempDir.exists()) {
-            tempDir.mkdirs()
-        }
-        write(FileTreeWriter.directory(tempDir), resourcePack)
-        // Move the temporary directory to the target directory
-        tempDir.toPath().moveTo(directory.toPath(), true)
-    }
-}
-
-private class ResourcePackGenerationSettings {
-    private val config = RESOURCE_PACK_CONFIG.node("generation")
-
-    val description: String by config.entry<String>("description")
-    val format: Int by config.entry<Int>("format")
-    val min: Int by config.entry<Int>("min")
-    val max: Int by config.entry<Int>("max")
-    val mergePacks: List<String> by config.optionalEntry<List<String>>("merge_packs").orElse(emptyList())
 }

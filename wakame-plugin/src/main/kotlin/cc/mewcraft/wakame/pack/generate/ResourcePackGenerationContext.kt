@@ -1,6 +1,7 @@
 package cc.mewcraft.wakame.pack.generate
 
 import team.unnamed.creative.ResourcePack
+import java.nio.file.Path
 
 data class ResourcePackGenerationContext(
     /**
@@ -25,7 +26,7 @@ data class ResourcePackGenerationContext(
     /**
      * 需要合并的资源包路径.
      */
-    val mergePacks: List<String>,
+    val mergePacks: List<Path>,
 
     //
 

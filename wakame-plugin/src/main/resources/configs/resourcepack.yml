@@ -3,18 +3,26 @@ version: 1
 
 # 在这里设置资源包的生成细节
 generation:
-  # 描述
-  description: Koish!
-  # 版本号
-  # 参考: https://minecraft.wiki/w/Pack_format#List_of_resource_pack_formats
-  format: 42
-  # 兼容的最低版本
-  min: 42
-  # 兼容的最高版本
-  max: 42
-  # 需要合并的资源包路径 (文件夹或 zip 文件), 相对于 plugins/ 目录
-  merge_packs:
-    - "ModelEngine/resource pack"
+  # 资源包输出路径
+  # 可以用绝对或相对路径, 如果是相对路径, 则相对于服务端根目录
+  output:
+    # 输出的文件路径
+    file: plugins/Koish/generated/pack.zip
+    # 输出的文件夹路径
+    directory: plugins/Koish/generated/pack
+  # pack.mcmeta. 参考: https://minecraft.wiki/w/Pack.mcmeta
+  mcmeta:
+    # 描述
+    description: Koish!
+    # 版本号, 参考: https://minecraft.wiki/w/Pack_format#List_of_resource_pack_formats
+    format: 46
+    # 兼容的最低版本
+    min: 46
+    # 兼容的最高版本
+    max: 99
+  # 需要合并的资源包 (文件夹或 zip 文件)
+  # 可以用绝对或相对路径, 如果是相对路径, 则相对于服务端根目录
+  merge_packs: [ ]
 
 # 在这里设置资源包的分发方式
 # 当玩家进入服务器时自动向玩家分发资源包
