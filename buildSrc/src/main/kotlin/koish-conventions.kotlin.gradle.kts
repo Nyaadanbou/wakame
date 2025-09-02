@@ -1,5 +1,3 @@
-import gradle.kotlin.dsl.accessors._d5be38b3b73e8f212209bbd96c1b8841.checkstyle
-
 plugins {
     kotlin("jvm")
     id("net.kyori.indra")

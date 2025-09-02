@@ -1,5 +1,5 @@
 plugins {
-    id("wakame-conventions.kotlin")
+    id("koish-conventions.kotlin")
     id("cc.mewcraft.libraries-repository")
     id("cc.mewcraft.copy-jar-build")
     id("cc.mewcraft.copy-jar-docker")
@@ -7,7 +7,7 @@ plugins {
     alias(local.plugins.blossom)
 }
 
-group = "cc.mewcraft.wakame"
+group = "cc.mewcraft.koish"
 version = "0.0.1-snapshot"
 description = "The core gameplay implementation of Xiaomi's server (ignite mod)"
 

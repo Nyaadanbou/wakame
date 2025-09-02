@@ -2,12 +2,12 @@
 // 该项目是所有其他项目 (mixin, plugin, ...) 的共同依赖.
 
 plugins {
-    id("wakame-conventions.kotlin")
+    id("koish-conventions.kotlin")
     id("cc.mewcraft.libraries-repository")
     `maven-publish`
 }
 
-group = "cc.mewcraft.wakame"
+group = "cc.mewcraft.koish"
 version = "0.0.1-SNAPSHOT"
 description = "The common code of the core gameplay implementation"
 
