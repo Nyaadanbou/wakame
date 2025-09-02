@@ -4,9 +4,8 @@ main: cc.mewcraft.wakame.KoishPlugin
 bootstrapper: cc.mewcraft.wakame.KoishBootstrap
 loader: cc.mewcraft.wakame.KoishLoader
 description: "{{ description }}"
-api-version: 1.21
+api-version: 1.21.8
 author: Nailm
-load: STARTUP
 dependencies:
   server:
     AdventureLevel:
@@ -47,6 +46,9 @@ dependencies:
     QuickShop:
       required: false
       load: OMIT
+    TheBrewingProject:
+      required: false
+      load: AFTER
     Towny:
       required: false
       load: OMIT
