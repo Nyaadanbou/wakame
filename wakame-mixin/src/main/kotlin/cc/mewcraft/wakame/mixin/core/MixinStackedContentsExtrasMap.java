@@ -17,5 +17,5 @@ public abstract class MixinStackedContentsExtrasMap {
      */
     @Final
     @Shadow
-    public ObjectSet<ItemStack> exactIngredients = new ObjectOpenCustomHashSet<>(CustomItemStack.EXACT_MATCH_STRATEGY);
+    public final ObjectSet<ItemStack> exactIngredients = new ObjectOpenCustomHashSet<>(CustomItemStack.EXACT_MATCH_STRATEGY);
 }
