@@ -18,7 +18,7 @@ public abstract class MixinIngredient implements StackedContents.IngredientInfo<
     /**
      * @return a set of item stacks that are used to check for equality
      * @author Nailm, Flandre
-     * @reason make custom items invariant to their data components
+     * @reason make Koish items invariant to their data components
      */
     @Redirect(
             method = "ofStacks(Ljava/util/List;)Lnet/minecraft/world/item/crafting/Ingredient;",

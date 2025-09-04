@@ -17,7 +17,7 @@ public abstract class MixinItemOrExactExact {
 
     /**
      * @author Nailm
-     * @reason make custom items invariant to their data components
+     * @reason make Koish items invariant to their data components
      */
     @Overwrite
     public boolean matches(final ItemStack stack) {
@@ -26,7 +26,7 @@ public abstract class MixinItemOrExactExact {
 
     /**
      * @author Nailm
-     * @reason make custom items invariant to their data components
+     * @reason make Koish items invariant to their data components
      */
     @Overwrite
     public boolean equals(final Object obj) {
@@ -36,7 +36,7 @@ public abstract class MixinItemOrExactExact {
 
     /**
      * @author Nailm
-     * @reason make custom items invariant to their data components
+     * @reason make Koish items invariant to their data components
      */
     @Overwrite
     public int hashCode() {
