@@ -24,7 +24,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Map serializer that does not throw errors on individual entry serialization failures.
  * <p>
- * Source: {@link io.papermc.paper.configuration.serializer.collections.MapSerializer}
+ * Source: {@link io.papermc.paper.configuration.serializer.collection.map.MapSerializer}
  */
 public class MapSerializer implements TypeSerializer.Annotated<Map<?, ?>> {
 
