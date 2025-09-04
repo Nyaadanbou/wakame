@@ -25,7 +25,7 @@ mariadb-jdbc = "3.5.4"
 snakeyaml-engine = "2.8"
 
 # Server deps
-paper = "1.21.7-R0.1-SNAPSHOT"
+paper = "1.21.8-R0.1-SNAPSHOT"
 mixin = "0.8.7"
 mixin-extras = "0.4.1"
 ignite = "1.1.0"
