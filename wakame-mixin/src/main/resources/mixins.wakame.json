@@ -17,6 +17,7 @@
     "MixinEnchantmentLocationBasedEffect",
     "MixinEntityType",
     "MixinIngredient",
+    "MixinItemOrExactExact",
     "MixinItemStackOptionalStreamCodec",
     "MixinLivingEntity",
     "MixinLootPoolEntries",
