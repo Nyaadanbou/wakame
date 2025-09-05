@@ -48,7 +48,7 @@ dependencies:
       load: BEFORE
     TheBrewingProject:
       required: false
-      load: AFTER
+      load: BEFORE
     Towny:
       required: false
       load: OMIT
