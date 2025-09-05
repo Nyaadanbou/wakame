@@ -12,8 +12,8 @@ import com.ghostchu.quickshop.api.registry.builtin.itemexpression.ItemExpression
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 
-@Hook(plugins = ["QuickShop"])
-object QuickShopHook : ItemExpressionHandler {
+@Hook(plugins = ["QuickShop-Hikari"])
+object QuickShopHook : Listener, ItemExpressionHandler {
     val quickShop: QuickShopAPI = QuickShopAPI.getInstance()
 
     init {
