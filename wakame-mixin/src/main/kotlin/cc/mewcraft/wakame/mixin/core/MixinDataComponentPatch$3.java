@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.DataComponentPatchExtras;
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
 import net.minecraft.core.component.DataComponentPatch;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +25,13 @@ public abstract class MixinDataComponentPatch$3 {
             ),
             ordinal = 1
     )
-    private DataComponentPatch modifyPatch(DataComponentPatch patch) {
-        return ((DataComponentPatchExtras) (Object) patch).koish$intrusiveRemove(ExtraDataComponents::isCustomType);
+    private DataComponentPatch modifyDataComponentPatch(DataComponentPatch patch) {
+        var optional = patch.get(ExtraDataComponents.DATA_CONTAINER);
+        //noinspection OptionalAssignedToNull
+        if (optional != null) { // 这里不为 null 的语义是该组件可能为 add 也可能为 remove - 只有这种情况需要 forget
+            return patch.forget(ExtraDataComponents::isCustomType);
+        } else {
+            return patch;
+        }
     }
 }
