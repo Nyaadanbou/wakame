@@ -21,7 +21,7 @@ import kotlin.jvm.optionals.getOrNull
  */
 object TheBrewingProjectItemRefHandler : ItemRefHandler<Recipe<ItemStack>> {
 
-    private const val NAMESPACE = "thebrewingproject"
+    const val NAMESPACE = "brew"
 
     override val systemName: String = "TheBrewingProject"
 
