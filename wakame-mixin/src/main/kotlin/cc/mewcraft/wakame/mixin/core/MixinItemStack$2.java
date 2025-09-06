@@ -1,6 +1,5 @@
 package cc.mewcraft.wakame.mixin.core;
 
-import cc.mewcraft.wakame.mixin.support.DataComponentPatchExtras;
 import cc.mewcraft.wakame.mixin.support.ExtraDataComponents;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,6 +22,12 @@ public abstract class MixinItemStack$2 {
     private void encode(StreamCodec<RegistryFriendlyByteBuf, DataComponentPatch> instance, Object buf, Object patch) {
         // 发包时不发送 Koish 添加的 DataComponent
         // 注: 其实可以改发包实现, 但 Mixin 性能更好
-        instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatchExtras) patch).koish$intrusiveRemove(ExtraDataComponents::isCustomType));
+        var optional = ((DataComponentPatch) patch).get(ExtraDataComponents.DATA_CONTAINER);
+        //noinspection OptionalAssignedToNull
+        if (optional != null) { // 这里不为 null 的语义是该组件可能为 add 也可能为 remove - 只有这种情况需要 forget
+            instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch).forget(ExtraDataComponents::isCustomType));
+        } else {
+            instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch));
+        }
     }
 }
