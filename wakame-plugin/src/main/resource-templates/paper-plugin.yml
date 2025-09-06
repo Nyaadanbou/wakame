@@ -23,6 +23,9 @@ dependencies:
     ChestSort:
       required: false
       load: OMIT
+    CraftEngine:
+      required: false
+      load: OMIT # 只在服务端完全启动后调其 API
     Economy:
       required: false
       load: OMIT
