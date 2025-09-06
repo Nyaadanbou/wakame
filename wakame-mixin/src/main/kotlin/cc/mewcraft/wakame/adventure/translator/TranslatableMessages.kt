@@ -74,6 +74,7 @@ object TranslatableMessages {
     val MSG_CATALOG_MENU_DEQUE_LIMIT = create("msg_catalog_menu_deque_limit")
     val MSG_REVEALED_BREW_RECIPE = create("msg_revealed_brew_recipe")
     val MSG_ALREADY_REVEALED_BREW_RECIPE = create("msg_already_revealed_brew_recipe")
+    val MSG_MSG_ITEM_NOT_PURCHASABLE = create("msg_item_not_purchasable")
 
     private fun create(key: String): TranslatableComponent.Builder {
         return Component.translatable().key(key)

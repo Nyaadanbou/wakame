@@ -45,7 +45,7 @@ dependencies:
       load: OMIT
     QuickShop-Hikari:
       required: false
-      load: BEFORE
+      load: OMIT # 只监听其事件, 所以顺序无关紧要
     TheBrewingProject:
       required: false
       load: BEFORE

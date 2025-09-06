@@ -1,40 +1,80 @@
 package cc.mewcraft.wakame.hook.impl.quickshop
 
-import cc.mewcraft.wakame.PluginHolder
+import cc.mewcraft.wakame.LOGGER
+import cc.mewcraft.wakame.adventure.translator.TranslatableMessages
 import cc.mewcraft.wakame.integration.Hook
+import cc.mewcraft.wakame.item2.config.property.ItemPropertyTypes
+import cc.mewcraft.wakame.item2.hasProperty
+import cc.mewcraft.wakame.item2.isExactKoish
 import cc.mewcraft.wakame.item2.isKoish
-import cc.mewcraft.wakame.item2.typeId
-import cc.mewcraft.wakame.util.KOISH_NAMESPACE
-import com.ghostchu.quickshop.api.QuickShopAPI
-import com.ghostchu.quickshop.api.registry.BuiltInRegistry
-import com.ghostchu.quickshop.api.registry.builtin.itemexpression.ItemExpressionHandler
-import com.ghostchu.quickshop.api.registry.builtin.itemexpression.ItemExpressionRegistry
-import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.Plugin
+import cc.mewcraft.wakame.item2.koishTypeId
+import cc.mewcraft.wakame.util.registerEvents
+import com.ghostchu.quickshop.api.event.QSCancellable
+import com.ghostchu.quickshop.api.event.display.ItemPreviewComponentPrePopulateEvent
+import com.ghostchu.quickshop.api.event.general.ShopItemMatchEvent
+import com.ghostchu.quickshop.api.event.management.ShopCreateEvent
+import com.ghostchu.quickshop.api.event.settings.type.ShopItemEvent
+import com.ghostchu.quickshop.api.event.settings.type.ShopTypeEvent
+import com.ghostchu.quickshop.api.shop.Shop
+import com.ghostchu.quickshop.api.shop.ShopType
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 
 @Hook(plugins = ["QuickShop-Hikari"])
-object QuickShopHook : Listener, ItemExpressionHandler {
-    val quickShop: QuickShopAPI = QuickShopAPI.getInstance()
-
+object QuickShopHook : Listener {
     init {
-        val registry = quickShop.registry.getRegistry(BuiltInRegistry.ITEM_EXPRESSION)
-        if (registry is ItemExpressionRegistry) {
-            registry.registerHandlerSafely(this)
+        registerEvents()
+    }
+
+    // 如果 original 属于 Koish 物品类型, 则尝试匹配 Koish 物品类型
+    @EventHandler
+    fun on(event: ShopItemMatchEvent) {
+        LOGGER.info("$event")
+        val original = event.original()
+        val comparison = event.comparison()
+        if (original.isExactKoish && original.koishTypeId == comparison.koishTypeId) {
+            event.matches(true)
         }
     }
 
-    override fun getPlugin(): Plugin {
-        return PluginHolder.INSTANCE
+    // 在玩家创建[收购类型]的商店时, 如果物品类型不允许收购, 则阻止商店创建
+    @EventHandler
+    fun on(event: ShopCreateEvent) {
+        LOGGER.info("$event")
+        if (event.phase().cancellable()) {
+            tryCancel(event.shop().get(), event)
+        }
     }
 
-    override fun getPrefix(): String? {
-        return KOISH_NAMESPACE
+    // 在玩家更新[收购类型]的商店时, 如果物品类型不允许收购, 则阻止商店更新
+    @EventHandler
+    fun on(event: ShopTypeEvent) {
+        LOGGER.info("$event")
+        if (event.phase().cancellable()) {
+            tryCancel(event.shop(), event)
+        }
     }
 
-    override fun match(itemStack: ItemStack, expression: String): Boolean {
-        if (!itemStack.isKoish)
-            return false
-        val itemId = itemStack.typeId
-        return expression == itemId.asString()
+    // 在玩家更新[收购类型]的商店时, 如果物品类型不允许收购, 则阻止商店更新
+    @EventHandler
+    fun on(event: ShopItemEvent) {
+        LOGGER.info("$event")
+        if (event.phase().cancellable()) {
+            tryCancel(event.shop(), event)
+        }
+    }
+
+    @EventHandler
+    fun on(event: ItemPreviewComponentPrePopulateEvent) {
+        LOGGER.info("$event")
+    }
+
+    private fun tryCancel(shop: Shop, event: QSCancellable) {
+        if (shop.shopType == ShopType.BUYING) {
+            val shopItem = shop.item
+            if (shopItem.isKoish && !shopItem.hasProperty(ItemPropertyTypes.PLAYER_PURCHASABLE)) {
+                event.setCancelled(true, TranslatableMessages.MSG_MSG_ITEM_NOT_PURCHASABLE.build())
+            }
+        }
     }
 }

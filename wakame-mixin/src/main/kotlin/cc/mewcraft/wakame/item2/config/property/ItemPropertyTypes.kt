@@ -2,12 +2,7 @@ package cc.mewcraft.wakame.item2.config.property
 
 import cc.mewcraft.wakame.ability2.trigger.AbilityTriggerVariant
 import cc.mewcraft.wakame.entity.player.AttackSpeed
-import cc.mewcraft.wakame.item2.config.property.impl.AbilityOnItem
-import cc.mewcraft.wakame.item2.config.property.impl.Arrow
-import cc.mewcraft.wakame.item2.config.property.impl.ExtraLore
-import cc.mewcraft.wakame.item2.config.property.impl.ItemBase
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlot
-import cc.mewcraft.wakame.item2.config.property.impl.ItemSlotGroup
+import cc.mewcraft.wakame.item2.config.property.impl.*
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.DualSword
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Katana
 import cc.mewcraft.wakame.item2.config.property.impl.weapon.Melee
@@ -115,6 +110,22 @@ data object ItemPropertyTypes {
 
     @JvmField
     val TRIDENT: ItemPropertyType<Unit> = typeOf("trident")
+
+    /**
+     * 存在该 property 则表示玩家可以对一个物品发起收购操作.
+     *
+     * 设计哲学:
+     *
+     * 玩家发起收购时, 如果要收购的物品涉及到动态数据 (如附魔), 他通常无法完整描述所有的动态数据.
+     * 比如, 也许玩家只想收购有锋利V的钻石剑, 但他并不关心再多几个其他的魔咒, 也不关心耐久度.
+     * 除非说我们做一个专门的收购系统, 可以精确的描述物品上可能存在的所有动态数据.
+     * 但这样的系统似乎有点复杂, 我们暂时不考虑.
+     *
+     * 因此, 最终的设计是, 对于不太适合收购的物品类型来说, 我们直接禁止玩家发起收购操作.
+     * 当然 “禁止发起收购”的逻辑需要在特定的代码路径中实现, 这个 property 只是标记而已.
+     */
+    @JvmField
+    val PLAYER_PURCHASABLE: ItemPropertyType<Unit> = typeOf("player_purchasable")
 
     // ------------
     // 方便函数
