@@ -17,6 +17,9 @@ dependencies:
     BreweryX:
       required: false
       load: BEFORE # Koish 需要访问其 PluginItem 并注册实例
+    ChestShop:
+      required: false
+      load: OMIT # 只监听其事件, 所以顺序无关紧要
     ChestSort:
       required: false
       load: OMIT

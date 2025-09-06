@@ -30,6 +30,7 @@ include(":wakame-common")
 include(":wakame-hooks:wakame-hook-adventurelevel")
 include(":wakame-hooks:wakame-hook-betterhud")
 include(":wakame-hooks:wakame-hook-breweryx")
+include(":wakame-hooks:wakame-hook-chestshop")
 // include(":wakame-hooks:wakame-hook-chestsort") // FIXME 仓库已经挂掉并且作者似乎没有修复的打算
 include(":wakame-hooks:wakame-hook-economy")
 include(":wakame-hooks:wakame-hook-economybridge")
