@@ -68,6 +68,7 @@ msg_rerolling_cost_simple: "<gray>花费: <white><arg:0:'zh-CN':'#'> 硬币"
 msg_blacksmith_total_worth: "<gray>总价值: <white><arg:0:'zh-CN':'#'> - <arg:1:'zh-CN':'#'> 硬币"
 msg_revealed_brew_recipe: "<green>你揭示了酒酿配方: <arg:0>"
 msg_already_revealed_brew_recipe: "<red>这个酒酿配方已经被揭示过了."
+msg_item_not_purchasable: "<red>无法对该物品发起收购."
 
 # 像这样制定一个数字的格式, '#' 是 Java 的 DecimalFormat 的语法
 msg_number_format: "This is a decimal number: <arg:0:'zh-CN':'#'>."

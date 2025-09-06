@@ -12,5 +12,6 @@ dependencies {
 
     // libraries
     compileOnly(local.paper)
-    compileOnly(local.quickshop.api) { isTransitive = false }
+    compileOnly(local.quickshop.api)
+    compileOnly(local.quickshop.bukkit)
 }

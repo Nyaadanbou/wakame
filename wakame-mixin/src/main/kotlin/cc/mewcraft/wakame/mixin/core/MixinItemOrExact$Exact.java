@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(value = ItemOrExact.Exact.class)
-public abstract class MixinItemOrExactExact {
+public abstract class MixinItemOrExact$Exact {
 
     @Final
     @Shadow

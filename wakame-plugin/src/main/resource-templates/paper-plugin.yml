@@ -43,12 +43,12 @@ dependencies:
     PlaceholderAPI:
       required: false
       load: OMIT
-    QuickShop:
+    QuickShop-Hikari:
       required: false
-      load: OMIT
+      load: OMIT # 只监听其事件, 所以顺序无关紧要
     TheBrewingProject:
       required: false
-      load: AFTER
+      load: BEFORE
     Towny:
       required: false
       load: OMIT

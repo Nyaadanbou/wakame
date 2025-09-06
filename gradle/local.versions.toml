@@ -1,7 +1,7 @@
 [versions]
 
 # Gradle plugins
-kotlin = "2.2.0"
+kotlin = "2.2.10"
 kotlinx-coroutines = "1.10.2"
 libraries-repository = "0.0.4-snapshot"
 copy-jar-build = "0.0.1-snapshot"
@@ -48,7 +48,7 @@ chestsort = "13.0.0-SNAPSHOT"
 vault = "1.7"
 luckperms = "5.4"
 papi = "2.11.6"
-quickshop = "6.2.0.9-RELEASE-1"
+quickshop = "6.2.0.10"
 towny = "0.100.4.0"
 worldguard = "7.0.7"
 townyflight = "1.13.0"
@@ -128,6 +128,8 @@ vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault
 luckperms = { group = "net.luckperms", name = "api", version.ref = "luckperms" }
 papi = { group = "me.clip", name = "placeholderapi", version.ref = "papi" }
 quickshop-api = { group = "com.ghostchu", name = "quickshop-api", version.ref = "quickshop" }
+quickshop-bukkit = { group = "com.ghostchu", name = "quickshop-bukkit", version.ref = "quickshop" }
+quickshop-common = { group = "com.ghostchu", name = "quickshop-common", version.ref = "quickshop" }
 towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 townyflight = { group = "com.github.TownyAdvanced", name = "TownyFlight", version.ref = "townyflight" }
 nightcore = { group = "su.nightexpress.nightcore", name = "main", version.ref = "nightcore" }
