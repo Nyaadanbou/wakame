@@ -50,14 +50,49 @@ interface ItemBehavior {
 
     // 除非特别说明，所有函数的 ItemStack 参数都保证已经是合法的 KoishItem
 
+    /**
+     * 玩家手持该物品对方块按下使用键(默认为鼠标右键)进行交互执行的行为.
+     */
+    fun handleUseOn(context: UseOnContext): InteractionResult = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对空气按下使用键(默认为鼠标右键)进行交互执行的行为.
+     */
+    fun handleUse(context: UseContext): InteractionResult = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对实体按下使用键(默认为鼠标右键)进行交互执行的行为.
+     */
+    fun handleUseEntity(context: UseEntityContext): InteractionResult = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对方块按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     */
+    fun handleAttackOn(context: AttackOnContext) = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对空气按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     */
+    fun handleAttack(context: AttackContext) = InteractionResult.PASS
+
+    /**
+     * 玩家手持该物品对实体按下攻击键(默认为鼠标左键)进行交互执行的行为.
+     */
+    fun handleAttackEntity(context: AttackEntityContext) = InteractionResult.PASS
+
+    @Deprecated("use handleAttack/handleAttackOn/handleAttackEntity instead")
     fun handleLeftClick(player: Player, itemstack: ItemStack, event: PlayerItemLeftClickEvent) = Unit
 
+    @Deprecated("use handleUseOn/handleUse instead")
     fun handleRightClick(player: Player, itemstack: ItemStack, hand: EquipmentSlot, event: PlayerItemRightClickEvent) = Unit
 
+    @Deprecated("use handleUseOn/handleUse instead")
     fun handleInteract(player: Player, itemstack: ItemStack, action: Action, wrappedEvent: WrappedPlayerInteractEvent) = Unit
 
+    @Deprecated("use handleUseEntity instead")
     fun handleInteractAtEntity(player: Player, itemstack: ItemStack, clicked: Entity, event: PlayerInteractAtEntityEvent) = Unit
 
+    // TODO 以下需要整理和重命名
     fun handlePlayerReceiveDamage(player: Player, itemstack: ItemStack, damageSource: DamageSource, event: PostprocessDamageEvent) = Unit
 
     fun handlePlayerAttackEntity(player: Player, itemstack: ItemStack, damagee: Entity, event: PostprocessDamageEvent) = Unit
