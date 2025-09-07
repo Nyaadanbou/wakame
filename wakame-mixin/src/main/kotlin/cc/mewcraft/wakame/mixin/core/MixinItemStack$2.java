@@ -25,7 +25,7 @@ public abstract class MixinItemStack$2 {
         var optional = ((DataComponentPatch) patch).get(ExtraDataComponents.DATA_CONTAINER);
         //noinspection OptionalAssignedToNull
         if (optional != null) { // 这里不为 null 的语义是该组件可能为 add 也可能为 remove - 只有这种情况需要 forget
-            instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch).forget(ExtraDataComponents::isCustomType));
+            instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch).forget(t -> t == ExtraDataComponents.DATA_CONTAINER));
         } else {
             instance.encode((RegistryFriendlyByteBuf) buf, ((DataComponentPatch) patch));
         }
