@@ -4,6 +4,7 @@ import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
 import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
+import cc.mewcraft.wakame.item2.behavior.impl.test.TestInteract
 import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
@@ -17,6 +18,12 @@ object ItemBehaviorTypes {
     // ------------
     // 注册表
     // ------------
+    /**
+     * 物品具有该行为时, 可以测试各种交互.
+     * 仅作为内部测试行为使用.
+     */
+    @JvmField
+    val TEST_INTERACT = typeOf("test_interact", TestInteract)
 
     /**
      * 将物品作为自定义箭矢的逻辑.
