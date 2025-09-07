@@ -8,8 +8,8 @@ import net.minecraft.network.HashedPatchMap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +39,7 @@ public class MixinHashedPatchMap {
     /**
      * 使服务端在比较物品哈希时, 忽略 `minecraft:lore` 和 `koish:data_container` 物品组件.
      *
-     * @param patch         服务端侧的 {@link DataComponentPatch}
-     * @param hashGenerator 哈希生成器
+     * @param patch 服务端侧的 {@link DataComponentPatch}
      */
     // 这里的 matches 原本逻辑:
     //   计算服务端侧数据(DataComponentPatch)的哈希, 与客户端发过来的哈希进行比较.
@@ -51,15 +50,14 @@ public class MixinHashedPatchMap {
     //   如果包含 (即为 Koish 物品), 则直接返回 true (即假装哈希一致), 让服务端始终不纠正该数据.
     // 潜在问题:
     //   未知
-    @Inject(
+    @ModifyVariable(
             method = "matches",
-            at = @At("HEAD")
+            at = @At("HEAD"),
+            argsOnly = true
     )
-    private void injected1(
-            DataComponentPatch patch,
-            HashedPatchMap.HashGenerator hashGenerator,
-            CallbackInfoReturnable<Boolean> cir
+    private DataComponentPatch injected1(
+            DataComponentPatch patch
     ) {
-        patch.forget(t -> t == DataComponents.LORE || t == ExtraDataComponents.DATA_CONTAINER);
+        return patch.forget(t -> t == DataComponents.LORE || t == ExtraDataComponents.DATA_CONTAINER);
     }
 }
