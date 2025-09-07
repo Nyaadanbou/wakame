@@ -23,12 +23,7 @@ public class ExtraDataComponents {
         // 用于初始化静态变量
     }
 
-    public static boolean isCustomType(DataComponentType<?> type) {
-        return type == DATA_CONTAINER;
-    }
-
     private static <T> DataComponentType<T> register(String id, UnaryOperator<DataComponentType.Builder<T>> builderOperator) {
         return InvokerDataComponents.register(id, builderOperator);
     }
-
 }

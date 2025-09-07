@@ -13,12 +13,12 @@ import java.util.SequencedSet;
 @Mixin(TooltipDisplay.class)
 public abstract class MixinTooltipDisplay {
     @Inject(
-        method = "<init>",
-        at = @At(
-            value = "TAIL"
-        )
+            method = "<init>",
+            at = @At(
+                    value = "TAIL"
+            )
     )
     private void onInit(boolean hideTooltip, SequencedSet<DataComponentType<?>> hiddenComponents, CallbackInfo ci) {
-        hiddenComponents.removeIf(ExtraDataComponents::isCustomType); // 移除 Koish 添加的自定义数据类型.
+        hiddenComponents.removeIf(t -> t == ExtraDataComponents.DATA_CONTAINER); // 移除 Koish 添加的自定义数据类型.
     }
 }
