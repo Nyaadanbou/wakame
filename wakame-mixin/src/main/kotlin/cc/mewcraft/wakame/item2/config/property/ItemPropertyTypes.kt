@@ -127,6 +127,9 @@ data object ItemPropertyTypes {
     @JvmField
     val PLAYER_PURCHASABLE: ItemPropertyType<Unit> = typeOf("player_purchasable")
 
+    @JvmField
+    val ENTITY_BUCKET: ItemPropertyType<EntityBucket> = typeOf("entity_bucket")
+
     // ------------
     // 方便函数
     // ------------

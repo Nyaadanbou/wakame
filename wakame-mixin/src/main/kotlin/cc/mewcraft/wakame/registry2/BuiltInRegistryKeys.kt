@@ -23,6 +23,7 @@ import cc.mewcraft.wakame.item2.config.datagen.ItemMetaType
 import cc.mewcraft.wakame.item2.config.property.ItemPropertyType
 import cc.mewcraft.wakame.item2.data.ItemDataType
 import cc.mewcraft.wakame.item2.data.impl.CoreType
+import cc.mewcraft.wakame.item2.data.impl.EntityBucketInfoType
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.loot.LootTable
 import cc.mewcraft.wakame.loot.entry.LootPoolEntryType
@@ -102,6 +103,9 @@ object BuiltInRegistryKeys {
 
     @JvmField
     val CORE_TYPE = createRegistryKey<CoreType>("core_type")
+
+    @JvmField
+    val ENTITY_BUCKET_INFO_TYPE = createRegistryKey<EntityBucketInfoType>("entity_bucket_info_type")
 
     @JvmField
     val ATTACK_SPEED = createRegistryKey<AttackSpeed>("attack_speed")

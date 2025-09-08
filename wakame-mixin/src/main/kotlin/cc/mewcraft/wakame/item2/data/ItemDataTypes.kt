@@ -1,13 +1,7 @@
 package cc.mewcraft.wakame.item2.data
 
 import cc.mewcraft.wakame.element.Element
-import cc.mewcraft.wakame.item2.data.impl.Core
-import cc.mewcraft.wakame.item2.data.impl.CoreContainer
-import cc.mewcraft.wakame.item2.data.impl.ItemBrewRecipe
-import cc.mewcraft.wakame.item2.data.impl.ItemCrate
-import cc.mewcraft.wakame.item2.data.impl.ItemId
-import cc.mewcraft.wakame.item2.data.impl.ItemLevel
-import cc.mewcraft.wakame.item2.data.impl.ReforgeHistory
+import cc.mewcraft.wakame.item2.data.impl.*
 import cc.mewcraft.wakame.kizami2.Kizami
 import cc.mewcraft.wakame.rarity2.Rarity
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
@@ -76,7 +70,11 @@ data object ItemDataTypes {
     }
 
     @JvmField
-    val CORE: ItemDataType<Core> = typeOf("core")
+    val CORE: ItemDataType<Core> = typeOf("core") {
+        serializers {
+            registerAll(Core.serializers())
+        }
+    }
 
     @JvmField
     val CORE_CONTAINER: ItemDataType<CoreContainer> = typeOf("cores") {
@@ -94,6 +92,13 @@ data object ItemDataTypes {
 
     @JvmField
     val REFORGE_HISTORY: ItemDataType<ReforgeHistory> = typeOf("reforge_history")
+
+    @JvmField
+    val ENTITY_BUCKET_INFO: ItemDataType<EntityBucketInfo> = typeOf("entity_bucket_info") {
+        serializers {
+            registerAll(EntityBucketInfo.serializers())
+        }
+    }
 
     // ------------
     // 方便函数
