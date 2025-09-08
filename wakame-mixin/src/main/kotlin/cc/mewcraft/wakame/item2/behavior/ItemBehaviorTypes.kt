@@ -2,14 +2,9 @@ package cc.mewcraft.wakame.item2.behavior
 
 import cc.mewcraft.wakame.item2.behavior.impl.Arrow
 import cc.mewcraft.wakame.item2.behavior.impl.BrewRecipe
+import cc.mewcraft.wakame.item2.behavior.impl.EntityBucket
 import cc.mewcraft.wakame.item2.behavior.impl.HoldLastDamage
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Bow
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Crossbow
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.DualSword
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Katana
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Mace
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Melee
-import cc.mewcraft.wakame.item2.behavior.impl.weapon.Trident
+import cc.mewcraft.wakame.item2.behavior.impl.weapon.*
 import cc.mewcraft.wakame.registry2.BuiltInRegistries
 
 /**
@@ -83,6 +78,12 @@ object ItemBehaviorTypes {
      */
     @JvmField
     val TRIDENT = typeOf("trident", Trident)
+
+    /**
+     * 用桶捕捉生物的逻辑.
+     */
+    @JvmField
+    val ENTITY_BUCKET = typeOf("entity_bucket", EntityBucket)
 
     // ------------
     // 方便函数

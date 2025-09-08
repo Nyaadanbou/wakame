@@ -40,8 +40,15 @@ val Material.koishProxy: KoishItemProxy? get() = BuiltInRegistries.ITEM_PROXY[ke
 
 /* Property */
 
+fun <T> ItemStack.getProp(type: ItemPropertyType<out T>): T? = toNMS().getProp(type)
+fun <T> ItemStack.hasProp(type: ItemPropertyType<T>): Boolean = toNMS().hasProp(type)
+fun <T> ItemStack.getPropOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropOrDefault(type, fallback)
+
+@Deprecated("Use getProp instead", ReplaceWith("hasProp(type)"))
 fun <T> ItemStack.hasProperty(type: ItemPropertyType<T>): Boolean = toNMS().hasProperty(type)
+@Deprecated("Use hasProp instead", ReplaceWith("getProp(type)"))
 fun <T> ItemStack.getProperty(type: ItemPropertyType<out T>): T? = toNMS().getProperty(type)
+@Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
 fun <T> ItemStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? = toNMS().getPropertyOrDefault(type, fallback)
 
 /* ItemData */
@@ -180,14 +187,26 @@ val Item.koishProxy: KoishItemProxy?
 
 /* Property */
 
-fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
+fun <T> MojangStack.getProp(type: ItemPropertyType<out T>): T? =
     propertyContainer()?.get(type)
 
-fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
+fun <T> MojangStack.hasProp(type: ItemPropertyType<T>): Boolean =
     propertyContainer()?.has(type) == true
 
-fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+fun <T> MojangStack.getPropOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
     propertyContainer()?.getOrDefault(type, fallback)
+
+@Deprecated("Use getProp instead", ReplaceWith("getProp(type)"))
+fun <T> MojangStack.getProperty(type: ItemPropertyType<out T>): T? =
+    getProp(type)
+
+@Deprecated("Use hasProp instead", ReplaceWith("hasProp(type)"))
+fun <T> MojangStack.hasProperty(type: ItemPropertyType<T>): Boolean =
+    hasProp(type)
+
+@Deprecated("Use getPropOrDefault instead", ReplaceWith("getPropOrDefault(type, fallback)"))
+fun <T> MojangStack.getPropertyOrDefault(type: ItemPropertyType<out T>, fallback: T): T? =
+    getPropOrDefault(type, fallback)
 
 /* ItemData */
 

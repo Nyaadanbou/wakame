@@ -93,12 +93,21 @@ data object ItemDataTypes {
     @JvmField
     val REFORGE_HISTORY: ItemDataType<ReforgeHistory> = typeOf("reforge_history")
 
+    /**
+     * 桶中生物的信息, 会经过渲染后展示给玩家看.
+     */
     @JvmField
     val ENTITY_BUCKET_INFO: ItemDataType<EntityBucketInfo> = typeOf("entity_bucket_info") {
         serializers {
             registerAll(EntityBucketInfo.serializers())
         }
     }
+
+    /**
+     * 桶中生物的 NBT 数据.
+     */
+    @JvmField
+    val ENTITY_BUCKET_DATA: ItemDataType<ByteArray> = typeOf("entity_bucket_data")
 
     // ------------
     // 方便函数
