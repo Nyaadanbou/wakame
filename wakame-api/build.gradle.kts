@@ -14,7 +14,7 @@ dependencies {
 
 publishing {
     repositories {
-        nyaadanbouPrivate()
+        nyaadanbouReleases().credentials(PasswordCredentials::class)
     }
     publications {
         create<MavenPublication>("maven") {
